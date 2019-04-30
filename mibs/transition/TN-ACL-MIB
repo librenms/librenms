@@ -1,0 +1,1593 @@
+-- *****************************************************************
+-- TN-ACL-MIB
+--
+-- Copyright (c) 2014, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+TN-ACL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32, Integer32, Counter32
+        FROM SNMPv2-SMI
+    InetAddress FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    entPhysicalIndex FROM ENTITY-MIB
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    RowStatus,
+    MacAddress,
+    StorageType
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    VlanIdOrAny,
+    VlanIdOrNone,
+    VlanIdOrAnyOrNone,
+    PortList
+        FROM Q-BRIDGE-MIB
+    ifIndex,
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    tnDevMgmt
+        FROM TN-MGMT-MIB;
+
+tnAclMgmt     MODULE-IDENTITY
+     LAST-UPDATED "201305160000Z"
+     ORGANIZATION "Transition Networks, Inc."
+     CONTACT-INFO
+                 "       Transition Networks
+                         Technical Support
+                         10900 Red Circle Drive
+                         Minnetonka, MN 55343 USA
+                         Tel: +1-800-526-9267
+
+                     E-mail: techsupport@transition.com"
+     DESCRIPTION
+--Jing
+         "The mib provides functionalities for ACL managing in TN modules."
+
+     REVISION      "201305160000Z"
+     DESCRIPTION
+         "Initial Revision of this module"
+     REVISION      "201405050000Z"
+     DESCRIPTION
+         "Added Serval MIB tnAceLookup to this module"
+    ::= { tnDevMgmt 5 }
+
+RateLimiterValue ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+      "Rate limiter valid value. Here '0' means 'disabled'."
+    SYNTAX Integer32 (0 | 1..16) 
+          
+
+TruthValueOrAny ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+      "Truth value 0/1 and any."
+    SYNTAX INTEGER
+          {
+                      any(1),
+                      val0(2),
+                      val1(3)
+          }
+
+HostOrNetworkOrAny ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+      "Truth value 0/1 and any."
+    SYNTAX INTEGER
+          {
+                      any(1),
+                      host(2),
+                      network(3)
+          }
+
+tnAclPortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnAclPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table displays and sets the ACL parameters (ACE) of each switch port."
+    ::= { tnAclMgmt 1 }
+
+tnAclPortEntry OBJECT-TYPE
+    SYNTAX          TnAclPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an ACL port configuration."
+    INDEX           { ifIndex }
+    ::= { tnAclPortTable 1 }
+
+TnAclPortEntry ::= SEQUENCE {
+        tnAclPortPolicyId                   INTEGER,
+        tnAclPortAction                     INTEGER,
+        tnAclPortRateLimiterId              RateLimiterValue,
+        tnAclPortEvcPolicerState            INTEGER,
+        tnAclPortEvcPolicerId               INTEGER,
+        tnAclPortRedirect                   PortList,
+        tnAclPortMirrorState                INTEGER,
+        tnAclPortLoggingState               INTEGER,
+        tnAclPortShutdownState              INTEGER,
+        tnAclPortAclState                   INTEGER,
+        tnAclPortCounter                    Counter32
+}
+
+tnAclPortPolicyId OBJECT-TYPE
+    SYNTAX          INTEGER (0..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Select the policy to apply to this port. The allowed values are 0 through 255.
+         The default value is 0."
+    ::= { tnAclPortEntry 1 }
+
+tnAclPortAction OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        deny(1),
+                        permit(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Select the policy to apply to this port. The allowed values are 0 through 255.
+         The default value is 0."
+    ::= { tnAclPortEntry 2 }
+
+tnAclPortRateLimiterId OBJECT-TYPE
+    SYNTAX          RateLimiterValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Select which rate limiter to apply on this port. The allowed values are Disabled
+         or the values 1 through 16. The default value is 'Disabled'."
+    ::= { tnAclPortEntry 3 }
+
+tnAclPortEvcPolicerState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Select whether EVC policer is enabled or disabled. The default value is 'Disabled'."
+    ::= { tnAclPortEntry 4 }
+
+tnAclPortEvcPolicerId OBJECT-TYPE
+    SYNTAX          INTEGER (1..128)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Select which EVC policer ID to apply on this port. when 'tnAclPortEvcPolicerState'
+         is enabled, the valid value is from 1 to 128."
+    ::= { tnAclPortEntry 5 }
+
+tnAclPortRedirect OBJECT-TYPE
+    SYNTAX          PortList
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Select which port frames are redirected on. The allowed values is a specific port number
+     and it can't be set when action is permitted. When no bit is selected, port redirect is
+     'disabled'."
+    ::= { tnAclPortEntry 6 }
+
+tnAclPortMirrorState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the mirror operation of this port. The allowed values are:
+         Enabled: Frames received on the port are mirrored.
+         Disabled: Frames received on the port are not mirrored.
+         The default value is 'Disabled'."
+    ::= { tnAclPortEntry 7 }
+
+tnAclPortLoggingState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the logging operation of this port. The allowed values are:
+         Enabled: Frames received on the port are stored in the System Log.
+         Disabled: Frames received on the port are not logged.
+         The default value is 'Disabled'."
+    ::= { tnAclPortEntry 8 }
+
+tnAclPortShutdownState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the port shut down operation of this port. The allowed values are:
+         Enabled: If a frame is received on the port, the port will be disabled.
+         Disabled: Port shut down is disabled.
+         The default value is 'Disabled'."
+    ::= { tnAclPortEntry 9 }
+
+tnAclPortAclState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the port state of this port. The allowed values are:
+         Enabled: To reopen ports by changing the volatile port configuration of the ACL user module.
+         Disabled: To close ports by changing the volatile port configuration of the ACL user module.
+         The default value is 'Enabled'."
+    ::= { tnAclPortEntry 10 }
+
+tnAclPortCounter OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Counts the number of frames that match this ACE."
+    ::= { tnAclPortEntry 11 }
+
+-- ACL rate limiter
+tnAclRateLimiterTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnAclRateLimiterEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table displays and sets the rate limiter for the ACL of the switch."
+    ::= { tnAclMgmt 2 }
+
+tnAclRateLimiterEntry OBJECT-TYPE
+    SYNTAX          TnAclRateLimiterEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an ACL rate limiter."
+    INDEX           { entPhysicalIndex, tnAclRateLimitId }
+    ::= { tnAclRateLimiterTable 1 }
+
+TnAclRateLimiterEntry ::= SEQUENCE {
+        tnAclRateLimitId                    INTEGER,
+        tnAclRateLimitRate                  INTEGER,
+        tnAclRateLimitUnit                  INTEGER
+}
+
+tnAclRateLimitId OBJECT-TYPE
+    SYNTAX          INTEGER (1..16)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The rate limiter ID for the settings contained in the same row."
+    ::= { tnAclRateLimiterEntry 1 }
+
+tnAclRateLimitRate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The allowed values are: 0-3276700 in pps 
+         or 0, 100, 200, 300, ..., 1000000 in kbps."
+    ::= { tnAclRateLimiterEntry 2 }
+
+tnAclRateLimitUnit OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pps(1),
+                        kbps(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the rate unit. The allowed values are:
+         pps: packets per second.
+         kbps: Kbits per second."
+    ::= { tnAclRateLimiterEntry 3 }
+
+tnAclOperTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnAclOperEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+      "This table sets the ACL operation."
+  ::= { tnAclMgmt 3 }
+
+tnAclOperEntry OBJECT-TYPE
+    SYNTAX          TnAclOperEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an ACL operation."
+    INDEX { entPhysicalIndex }
+    ::= { tnAclOperTable 1 }
+
+TnAclOperEntry ::= SEQUENCE {
+  tnAclClearCounter    INTEGER
+}
+
+tnAclClearCounter OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        nooper(1),
+                        clear(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify ACL clear operation. The allowed values are:
+         nooper: no operation.
+         clear: Clear all ACL counters, including counts the number of frames that match this ACE
+                and ACL port counters."
+    ::= { tnAclOperEntry 1 }
+
+--  tnAceTable
+tnAceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnAceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of ACE(ACL control entry) of the switch."
+    ::= { tnAclMgmt 4 }
+
+tnAceEntry OBJECT-TYPE
+    SYNTAX          TnAceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an ACE.
+
+        Each entry in this table represents an ACE and can be created or deleted
+        by the management system."
+    INDEX           { entPhysicalIndex, tnAceIndex }
+    ::= { tnAceTable 1 }
+
+TnAceEntry ::= SEQUENCE {
+        tnAceIndex                INTEGER,
+        tnAceNextIndex            INTEGER,
+        tnAceIngressPort          PortList,
+        tnAcePolicyFilterType     INTEGER,
+        tnAcePolicyValue          INTEGER,
+        tnAcePolicyBitMask        INTEGER,
+        tnAcePolicyFrameType      INTEGER,
+        tnAceAction               INTEGER,
+        tnAceRateLimiter          RateLimiterValue,
+        tnAceEvcPolicerState      INTEGER,
+        tnAceEvcPolicerId         INTEGER,
+        tnAcePortRedirect         PortList,
+        tnAceMirrorState          INTEGER,
+        tnAceLoggingState         INTEGER,
+        tnAceShutdownState        INTEGER,
+        tnAceCounter              Counter32,
+        tnAceVlan8021qTagged      INTEGER,
+        tnAceVlanIdFilter         INTEGER,
+        tnAceVlanId               INTEGER,
+        tnAceTagPriority          INTEGER,
+        tnAceRowStatus            INTEGER,
+        tnAceLookup               TruthValue
+}
+
+tnAceIndex OBJECT-TYPE
+    SYNTAX          INTEGER (1..256)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The index of ACE."
+    ::= { tnAceEntry 1 }
+
+tnAceNextIndex OBJECT-TYPE
+    SYNTAX          INTEGER (1..256)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Specify the created ACE is placed before which ACE."
+    ::= { tnAceEntry 2 }
+
+tnAceIngressPort OBJECT-TYPE
+    SYNTAX          PortList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Select the ingress port for which this ACE applies."
+    ::= { tnAceEntry 3 }
+
+tnAcePolicyFilterType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        any(1),
+                        specific(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Specify the policy number filter for this ACE.
+         Any: No policy filter is specified. (policy filter status is 'dont-care'.)
+         Specific: If you want to filter a specific policy with this ACE, choose this
+                   value. Two field for entering an policy value and bitmask appears."
+    ::= { tnAceEntry 4 }
+
+tnAcePolicyValue OBJECT-TYPE
+    SYNTAX          INTEGER (0..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the policy filter, you can enter a specific
+         policy value. The allowed range is 0 to 255."
+    ::= { tnAceEntry 5 }
+
+tnAcePolicyBitMask OBJECT-TYPE
+    SYNTAX          INTEGER (0..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the policy filter, you can enter a specific
+         policy bitmask. The allowed range is 0x0 to 0xff."
+    ::= { tnAceEntry 6 }
+
+tnAcePolicyFrameType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        any(1),
+                        etherType(2),
+                        arp(3), 
+                        ipv4(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Select the frame type for this ACE. These frame types are mutually exclusive.
+         any: Any frame can match this ACE.
+         etherType: Only Ethernet Type frames can match this ACE. The IEEE 802.3
+                    describes the value of Length/Type Field specifications to be
+                    greater than or equal to 1536 decimal (equal to 0600 hexadecimal).
+         arp: Only ARP frames can match this ACE. Notice the ARP frames won't match the
+              ACE with ethernet type.
+         ipv4: Only IPv4 frames can match this ACE. Notice the IPv4 frames won't match
+               the ACE with ethernet type."
+    ::= { tnAceEntry 7 }
+
+tnAceAction OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        permit(1),
+                        deny(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+         "Specify the action to take with a frame that hits this ACE.
+          permit: The frame that hits this ACE is granted permission for the ACE operation.
+          deny: The frame that hits this ACE is dropped."
+    ::= { tnAceEntry 8 }
+
+tnAceRateLimiter OBJECT-TYPE
+    SYNTAX          RateLimiterValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the rate limiter in number of base units. The allowed range is 1 to 16.
+         'disabled' indicates that the rate limiter operation is disabled."
+    ::= { tnAceEntry 9 }
+
+tnAceEvcPolicerState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+         "Select whether EVC policer is enabled or disabled. The default value is 'Disabled'."
+    ::= { tnAceEntry 10 }
+
+tnAceEvcPolicerId OBJECT-TYPE
+    SYNTAX          INTEGER (1..128)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Select which EVC policer ID to apply on this ACE. The allowed values are from 1
+         through 128."
+    ::= { tnAceEntry 11 }
+
+tnAcePortRedirect OBJECT-TYPE
+    SYNTAX          PortList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Frames that hit the ACE are redirected to the port number specified here. The allowed
+         range is the same as the switch port number range. 'disabled' indicates that the port redirect
+         operation is disabled and the specific port number of 'Port Redirect' can't be set when action
+         is permitted."
+    ::= { tnAceEntry 12 }
+
+tnAceMirrorState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+         "Specify the mirror operation of this port. Frames matching the ACE are mirrored to the destination
+          mirror port. The allowed values are:
+          Enabled: Frames received on the port are mirrored.
+          Disabled: Frames received on the port are not mirrored.
+          The default value is 'Disabled'."
+    ::= { tnAceEntry 13 }
+
+tnAceLoggingState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+         "Specify the logging operation of the ACE. The allowed values are:
+          Enabled: Frames matching the ACE are stored in the System Log.
+          Disabled: Frames matching the ACE are not logged."
+    ::= { tnAceEntry 14 }
+
+tnAceShutdownState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+         "Specify the port shut down operation of the ACE. The allowed values are:
+          Enabled: If a frame matches the ACE, the ingress port will be disabled.
+          Disabled: Port shut down is disabled for the ACE."
+    ::= { tnAceEntry 15 }
+
+tnAceCounter OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The counter indicates the number of times the ACE was hit by a frame."
+    ::= { tnAceEntry 16 }
+
+tnAceVlan8021qTagged OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        any(1),
+                        enabled(2),
+                        disabled(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+         "Specify whether frames can hit the action according to the 802.1Q tagged. The allowed values are:
+          any: Any value is allowed ('dont-care').
+          enabled: Tagged frame only.
+          disabled: Untagged frame only.
+          The default value is 'Any'."
+    ::= { tnAceEntry 17 }
+
+tnAceVlanIdFilter OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        any(1),
+                        specific(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Specify the VLAN ID filter for this ACE.
+         any: No VLAN ID filter is specified. (VLAN ID filter status is 'dont-care'.)
+         specific: If you want to filter a specific VLAN ID with this ACE, choose this value. A field for
+                   entering a VLAN ID number appears."
+    ::= { tnAceEntry 18 }
+
+tnAceVlanId OBJECT-TYPE
+    SYNTAX          INTEGER(1..4094)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the VLAN ID filter, you can enter a specific VLAN ID number.
+         The allowed range is 1 to 4095. A frame that hits this ACE matches this VLAN ID value."
+    ::= { tnAceEntry 19 }
+
+tnAceTagPriority  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      tp0(1),
+                      tp1(2),
+                      tp2(3),
+                      tp3(4),
+                      tp4(5),
+                      tp5(6),
+                      tp6(7),
+                      tp7(8),
+                      any(9)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Specify the tag priority for this ACE. A frame that hits this ACE matches this tag priority.
+         The allowed number range is 0 to 7. The value Any means that no tag priority is specified (tag
+         priority is 'dont-care')."
+    ::= { tnAceEntry 20 }
+
+tnAceRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+      "The status of this conceptual row entry of ACE table. This object isused to manage the
+       creation and deletion of conceptual rows.
+
+       The status column has six defined values:
+
+           - 'active', which indicates that the conceptual row is
+           available for use by the managed device;
+
+           - 'notInService', which indicates that the conceptual
+           row exists in the agent, but is unavailable for use by
+           the managed device (see NOTE below);
+
+           - 'notReady', which indicates that the conceptual row
+           exists in the agent, but is missing information
+           necessary in order to be available for use by the
+           managed device;
+
+           - 'createAndGo', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row and to have its status automatically set
+           to active, making it available for use by the managed
+           device;
+
+           - 'createAndWait', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row (but not make it available for use by
+           the managed device); and,
+
+           - 'destroy', which is supplied by a management station
+           wishing to delete all of the instances associated with
+           an existing conceptual row.
+
+           For a detailed description of this object, please refer to
+           SNMPv2-TC MIB."
+    ::= { tnAceEntry 21 }
+
+tnAceLookup OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Specify the second lookup operation of the ACE."
+    ::= { tnAceEntry 22 }
+
+-- tnAceEtherTable
+tnAceEtherTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnAceEtherEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the related configuration of ACE
+         when frame type is etherType."
+    ::= { tnAclMgmt 5 }
+
+tnAceEtherEntry OBJECT-TYPE
+    SYNTAX          TnAceEtherEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an etherType related ACE configuration."
+    INDEX           { entPhysicalIndex, tnAceIndex }
+    ::= { tnAceEtherTable 1 }
+
+TnAceEtherEntry ::= SEQUENCE {
+    tnAceEtherSmacFilter         INTEGER,
+    tnAceEtherSmacVal            MacAddress,
+    tnAceEtherDmacFilter         INTEGER,
+    tnAceEtherDmacVal            MacAddress,
+    tnAceEtherTypeFilter         INTEGER,
+    tnAceEtherTypeVal            INTEGER
+}
+
+tnAceEtherSmacFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the source MAC filter for this ACE.
+         any: No SMAC filter is specified. (SMAC filter status is 'dont-care'.)
+         specific: If you want to filter a specific source MAC address with this ACE, choose this value.
+                   A field for entering an SMAC value appears."
+    ::= { tnAceEtherEntry 1 }
+
+tnAceEtherSmacVal  OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the SMAC/DMAC filter, you can enter a specific value.
+         The legal format is 'xx-xx-xx-xx-xx-xx' or 'xx.xx.xx.xx.xx.xx' or 'xxxxxxxxxxxx' (x is
+         a hexadecimal digit).  A frame that hits this ACE matches this SMAC value."
+    ::= { tnAceEtherEntry 2 }
+
+tnAceEtherDmacFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      unicast(2),
+                      multicast(3),
+                      broadcast(4),
+                      specific(5)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the destination MAC filter for this ACE.
+         any: No DMAC filter is specified. (DMAC filter status is 'dont-care'.)
+         unicast: Frame must be unicast.
+         multicast: Frame must be multicast.
+         broadcast: Frame must be broadcast.
+         specific: If you want to filter a specific destination MAC address with this ACE,
+                   choose this value. A field for entering a DMAC value appears."
+    ::= { tnAceEtherEntry 3 }
+
+tnAceEtherDmacVal  OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the DMAC filter, you can enter a specific value.
+         The legal format is 'xx-xx-xx-xx-xx-xx' or 'xx.xx.xx.xx.xx.xx' or 'xxxxxxxxxxxx' (x is
+         a hexadecimal digit). A frame that hits this ACE matches this DMAC value."
+    ::= { tnAceEtherEntry 4 }
+
+tnAceEtherTypeFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the Ethernet type filter for this ACE:
+         any: No EtherType filter is specified. (EtherType filter status is 'don't-care'.
+         specific: If you want to filter a specific EtherType filter with this ACE, you can enter a
+                   specific EtherType value. A field for entering a EtherType value appears."
+    ::= { tnAceEtherEntry 5 }
+
+tnAceEtherTypeVal OBJECT-TYPE
+    SYNTAX          INTEGER (1536..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the EtherType filter, you can enter a specific EtherType value.
+         The allowed range is 0x600 to 0xFFFF but excluding 0x800(IPv4), 0x806(ARP) and 0x86DD(IPv6). A
+         frame that hits this ACE matches this EtherType value."
+    ::= { tnAceEtherEntry 6 }
+
+-- tnAceArpTable 
+tnAceArpTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnAceArpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the related configuration of ACE
+         when frame type is ARP."
+    ::= { tnAclMgmt 6 }
+
+tnAceArpEntry OBJECT-TYPE
+    SYNTAX          TnAceArpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an ARP related ACE configuration."
+    INDEX           { entPhysicalIndex, tnAceIndex }
+    ::= { tnAceArpTable 1 }
+
+TnAceArpEntry ::= SEQUENCE {
+    tnAceArpSmacFilter           INTEGER,
+    tnAceArpSmacVal              MacAddress,
+    tnAceArpDmacFilter           INTEGER,
+    tnAceArpParmArpRarp          INTEGER,
+    tnAceArpParmRequestReply     INTEGER,
+    tnAceArpParmSenderIpFilter   HostOrNetworkOrAny,
+    tnAceArpParmSenderIpAddress  InetAddress,
+    tnAceArpParmSenderIpMask     InetAddress,
+    tnAceArpParmTargetIpFilter   HostOrNetworkOrAny,
+    tnAceArpParmTargetIpAddress  InetAddress,
+    tnAceArpParmTargetIpMask     InetAddress,
+    tnAceArpSenderMacMatch       TruthValueOrAny,
+    tnAceArpRarpTargetMacMatch   TruthValueOrAny,
+    tnAceArpIpEthernetLength     TruthValueOrAny,
+    tnAceArpIp                   TruthValueOrAny,
+    tnAceArpEthernet             TruthValueOrAny
+}
+
+tnAceArpSmacFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the source MAC filter for this ACE.
+         any: No SMAC filter is specified. (SMAC filter status is 'dont-care'.)
+         specific: If you want to filter a specific source MAC address with this ACE, choose this value.
+                   A field for entering an SMAC value appears."
+    ::= { tnAceArpEntry 1 }
+
+tnAceArpSmacVal  OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the SMAC/DMAC filter, you can enter a specific value.
+         The legal format is 'xx-xx-xx-xx-xx-xx' or 'xx.xx.xx.xx.xx.xx' or 'xxxxxxxxxxxx' (x is
+         a hexadecimal digit).  A frame that hits this ACE matches this SMAC value."
+    ::= { tnAceArpEntry 2 }
+
+tnAceArpDmacFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      unicast(2),
+                      multicast(3),
+                      broadcast(4)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the destination MAC filter for this ACE.
+         any: No DMAC filter is specified. (DMAC filter status is 'dont-care'.)
+         unicast: Frame must be unicast.
+         multicast: Frame must be multicast.
+         broadcast: Frame must be broadcast. "
+    ::= { tnAceArpEntry 3 }
+
+tnAceArpParmArpRarp  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      arp(2),
+                      rarp(3),
+                      other(4)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the available ARP/RARP opcode (OP) flag for this ACE.
+         any: No ARP/RARP OP flag is specified. (OP is 'dont-care'.)
+         arp: Frame must have ARP/RARP opcode set to ARP.
+         rarp: Frame must have ARP/RARP opcode set to RARP.
+         other: Frame has unknown ARP/RARP Opcode flag."
+    ::= { tnAceArpEntry 4 }
+
+tnAceArpParmRequestReply  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      request(2),
+                      reply(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the available requset/reply opcode (OP) flag for this ACE.
+         any: No ARP/RARP OP flag is specified. (OP is 'dont-care'.)
+         request: Frame must have ARP Request or RARP Request OP flag set.
+         reply: Frame must have ARP Reply or RARP Reply OP flag."
+    ::= { tnAceArpEntry 5 }
+
+tnAceArpParmSenderIpFilter  OBJECT-TYPE
+    SYNTAX          HostOrNetworkOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the sender IP filter for this ACE.
+         any: No sender  filter is specified. (sender ip filter status is 'don't-care'.)
+         host: If you want to filter a specific host address with this ECE, choose this value. A field
+               for entering a host address appears.
+         network: If you want to filter a specific network address with this ECE, choose this value.
+                  A Two fields for entering a specific network address and network mask appears."
+    ::= { tnAceArpEntry 6 }
+
+tnAceArpParmSenderIpAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the sender ip filter, you can enter a specific host or
+         network address."
+    ::= { tnAceArpEntry 7 }
+
+tnAceArpParmSenderIpMask  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Network' is selected for the sender ip filter, you can enter a specific network mask."
+    ::= { tnAceArpEntry 8 }
+
+tnAceArpParmTargetIpFilter  OBJECT-TYPE
+    SYNTAX          HostOrNetworkOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the target IP filter for this ACE.
+         any: No sender  filter is specified. (target ip filter status is 'don't-care'.)
+         host: If you want to filter a specific host address with this ECE, choose this value. A field
+               for entering a host address appears.
+         network: If you want to filter a specific network address with this ECE, choose this value.
+                  A Two fields for entering a specific network address and network mask appears."
+    ::= { tnAceArpEntry 9 }
+
+tnAceArpParmTargetIpAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the target ip filter, you can enter a specific host or
+         network address."
+    ::= { tnAceArpEntry 10 }
+
+tnAceArpParmTargetIpMask  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Network' is selected for the target ip filter, you can enter a specific network mask."
+    ::= { tnAceArpEntry 11 }
+
+tnAceArpSenderMacMatch  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify whether frames can hit the action according to their sender hardware address field (SHA) settings.
+         0: ARP frames where SHA is not equal to the SMAC address.
+         1: ARP frames where SHA is equal to the SMAC address.
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceArpEntry 12 }
+
+tnAceArpRarpTargetMacMatch  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify whether frames can hit the action according to their target hardware address field (THA) settings.
+         0: RARP frames where THA is not equal to the SMAC address.
+         1: RARP frames where THA is equal to the SMAC address.
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceArpEntry 13 }
+
+tnAceArpIpEthernetLength  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify whether frames can hit the action according to their ARP/RARP hardware address length (HLN) and protocol
+         address length (PLN) settings.
+         0: ARP/RARP frames where the HLN is not equal to Ethernet (0x06) or the (PLN) is not equal to IPv4 (0x04).
+         1: ARP/RARP frames where the HLN is equal to Ethernet (0x06) and the (PLN) is equal to IPv4 (0x04).
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceArpEntry 14 }
+
+tnAceArpIp  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify whether frames can hit the action according to their ARP/RARP hardware address space (HRD) settings.
+         0: ARP/RARP frames where the HLD is not equal to Ethernet (1).
+         1: ARP/RARP frames where the HLD is equal to Ethernet (1).
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceArpEntry 15 }
+
+tnAceArpEthernet  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify whether frames can hit the action according to their ARP/RARP protocol address space (PRO) settings.
+         0: ARP/RARP frames where the PRO is not equal to IP (0x800).
+         1: ARP/RARP frames where the PRO is equal to IP (0x800).
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceArpEntry 16 }
+
+-- tnAceIpv4Table
+tnAceIpv4Table OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnAceIpv4Entry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the related configuration of ACE
+         when frame type is IPv4."
+    ::= { tnAclMgmt 7 }
+
+tnAceIpv4Entry OBJECT-TYPE
+    SYNTAX          TnAceIpv4Entry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an IPv4 related ACE configuration."
+    INDEX           { entPhysicalIndex, tnAceIndex }
+    ::= { tnAceIpv4Table 1 }
+
+TnAceIpv4Entry ::= SEQUENCE {
+    tnAceIpv4ProtoFilter           INTEGER,
+    tnAceIpv4ProtoValue            INTEGER,
+    tnAceIpv4Ttl                   INTEGER,
+    tnAceIpv4Fragment              INTEGER,
+    tnAceIpv4Option                INTEGER,
+    tnAceIpv4SipFilter             HostOrNetworkOrAny,
+    tnAceIpv4SipAddress            InetAddress,
+    tnAceIpv4SipMask               InetAddress,
+    tnAceIpv4DipFilter             HostOrNetworkOrAny,
+    tnAceIpv4DipAddress            InetAddress,
+    tnAceIpv4DipMask               InetAddress,
+    --ICMP
+    tnAceIpv4IcmpTypeFilter        INTEGER,
+    tnAceIpv4IcmpTypeValue         INTEGER,
+    tnAceIpv4IcmpCodeFilter        INTEGER,
+    tnAceIpv4IcmpCodeValue         INTEGER,
+    --UDP/TCP
+    tnAceIPv4SrcPortFilterType     INTEGER,
+    tnAceIPv4SrcPortFilterNo       INTEGER,
+    tnAceIPv4SrcPortRangeStart     INTEGER,
+    tnAceIPv4SrcPortRangeEnd       INTEGER,
+    tnAceIPv4DstPortFilterType     INTEGER,
+    tnAceIPv4DstPortFilterNo       INTEGER,
+    tnAceIPv4DstPortRangeStart     INTEGER,
+    tnAceIPv4DstPortRangeEnd       INTEGER,
+    --TCP
+    tnAceIPv4TcpFin                TruthValueOrAny,
+    tnAceIPv4TcpSyn                TruthValueOrAny,
+    tnAceIPv4TcpRst                TruthValueOrAny,
+    tnAceIPv4TcpPsh                TruthValueOrAny,
+    tnAceIPv4TcpAck                TruthValueOrAny,
+    tnAceIPv4TcpUrg                TruthValueOrAny
+}
+
+tnAceIpv4ProtoFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      other(2),
+                      icmp(3),
+                      udp(4),
+                      tcp(5)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the IP protocol filter for this ACE.
+         any: No IP protocol filter is specified. (Protocol filter status is 'don't-care'.)
+         other: If you want to filter a specific IP protocol filter with this ACE, choose this value.
+                   A field for entering an IP protocol filter appears.
+         icmp: Select ICMP to filter IPv4 ICMP protocol frames. Extra fields for defining ICMP parameters
+               will appear. These fields are explained later in this help file.
+         udp: Select UDP to filter IPv4 UDP protocol frames. Extra fields for defining UDP parameters will
+              appear. These fields are explained later in this help file.
+         tcp: Select TCP to filter IPv4 TCP protocol frames. Extra fields for defining TCP parameters will
+              appear. These fields are explained later in this help file."
+    ::= { tnAceIpv4Entry 1 }
+
+tnAceIpv4ProtoValue  OBJECT-TYPE
+    SYNTAX          INTEGER(0..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the IP protocol value, you can enter a specific value. The allowed
+         range is 0 to 255. A frame that hits this ACE matches this IP protocol value."
+    ::= { tnAceIpv4Entry 2 }
+
+tnAceIpv4Ttl  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      zero(2),
+                      nonZero(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the Time-to-Live settings for this ACE.
+         zero: IPv4 frames with a Time-to-Live field greater than zero must not be able to match this entry.
+         nonZero: IPv4 frames with a Time-to-Live field greater than zero must be able to match this entry.
+         any: Any value is allowed ('don't-care')."
+    ::= { tnAceIpv4Entry 3 }
+
+tnAceIpv4Fragment  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                      any(1),
+                      yes(2),
+                      no(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the fragment offset settings for this ACE. This involves the settings for the More Fragments (MF)
+         bit and the Fragment Offset (FRAG OFFSET) field for an IPv4 frame.
+         any: Any value is allowed ('don't-care').
+         yes: IPv4 frames where the MF bit is set or the FRAG OFFSET field is greater than zero must be able to
+              match this entry.
+         no: IPv4 frames where the MF bit is set or the FRAG OFFSET field is greater than zero must not be able
+             to match this entry."
+    ::= { tnAceIpv4Entry 4 }
+
+tnAceIpv4Option  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                      any(1),
+                      yes(2),
+                      no(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the options flag setting for this ACE.
+         any: Any value is allowed ('don't-care').
+         yes: IPv4 frames where the options flag is set must be able to match this entry.
+         no: IPv4 frames where the options flag is set must not be able to match this entry."
+    ::= { tnAceIpv4Entry 5 }
+
+tnAceIpv4SipFilter  OBJECT-TYPE
+    SYNTAX          HostOrNetworkOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the source IP filter for this ACE.
+         any: No source IP filter is specified. (source ip filter is 'don't-care'.)
+         host: Source IP filter is set to Host. Specify the source IP address in the SIP Address field that appears.
+         network: Source IP filter is set to Network. Specify the source IP address and source IP mask in the SIP
+                  Address and SIP Mask fields that appear."
+    ::= { tnAceIpv4Entry 6 }
+
+tnAceIpv4SipAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the source ip filter, you can enter a specific host or
+         network address."
+    ::= { tnAceIpv4Entry 7 }
+
+tnAceIpv4SipMask  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Network' is selected for the source ip filter, you can enter a specific network mask."
+    ::= { tnAceIpv4Entry 8 }
+
+tnAceIpv4DipFilter  OBJECT-TYPE
+    SYNTAX          HostOrNetworkOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the destination IP filter for this ACE.
+         any: No destination IP filter is specified. (source ip filter is 'don't-care'.)
+         host: Destination IP filter is set to Host. Specify the destination IP address in the SIP Address field that appears.
+         network: Destination IP filter is set to Network. Specify the destination IP address and source IP mask in the DIP
+                  Address and DIP Mask fields that appear."
+    ::= { tnAceIpv4Entry 9 }
+
+tnAceIpv4DipAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the destination ip filter, you can enter a specific host or
+         network address."
+    ::= { tnAceIpv4Entry 10 }
+
+tnAceIpv4DipMask  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Network' is selected for the destination ip filter, you can enter a specific network mask."
+    ::= { tnAceIpv4Entry 11 }
+
+tnAceIpv4IcmpTypeFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the ICMP filter for this ACE.
+         any: No ICMP filter is specified. (ICMP filter status is 'dont-care'.)
+         specific: If you want to filter a specific ICMP filter with this ACE, you can enter a specific ICMP value.
+                   A field for entering an ICMP value appears."
+    ::= { tnAceIpv4Entry 12 }
+
+tnAceIpv4IcmpTypeValue OBJECT-TYPE
+    SYNTAX          INTEGER (0..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the ICMP filter, you can enter a specific ICMP value. The allowed range is
+         0 to 255. A frame that hits this ACE matches this ICMP value."
+    ::= { tnAceIpv4Entry 13 }
+
+tnAceIpv4IcmpCodeFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the ICMP code filter for this ACE.
+         any: No ICMP code is specified. (ICMP filter status is 'dont-care'.)
+         specific: If you want to filter a specific ICMP code filter with this ACE, you can enter a specific ICMP
+                   code value. A field for entering an ICMP code value appears."
+    ::= { tnAceIpv4Entry 14 }
+
+tnAceIpv4IcmpCodeValue OBJECT-TYPE
+    SYNTAX          INTEGER (0..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the ICMP code filter, you can enter a specific ICMP code value. The allowed
+         range is 0 to 255. A frame that hits this ACE matches this ICMP code value."
+    ::= { tnAceIpv4Entry 15 }
+
+tnAceIPv4SrcPortFilterType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The TCP/UDP source port for matching the ACE. It only significant if protocol
+         filter 'UDP' or 'TCP' is selected. The possible values are:
+         any: No TCP/UDP source port filter is specified. (Source port filter status is 'don't-care'.)
+         specific: If you want to filter a specific TCP/UDP source port No. with this ACE, choose this value.
+                   A field for entering a specific source port No. appears.
+         range: If you want to filter a specific TCP/UDP source port range filter with this ACE, choose
+                this value. A field for entering a range appears."
+    ::= { tnAceIpv4Entry 16 }
+
+tnAceIPv4SrcPortFilterNo  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the source port filter, you can enter a specific value.
+         The allowed value is from 0 through 65535."
+    ::= { tnAceIpv4Entry 17 }
+
+tnAceIPv4SrcPortRangeStart  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the source port filter, you can enter a specific range.
+         The allowed range start is from 0 through 65535."
+    ::= { tnAceIpv4Entry 18 }
+
+tnAceIPv4SrcPortRangeEnd  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the source port filter, you can enter a specific range.
+         The allowed range end is from 0 through 65535."
+    ::= { tnAceIpv4Entry 19 }
+
+tnAceIPv4DstPortFilterType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The TCP/UDP destination port for matching the ACE. It only significant if protocol
+         filter 'UDP' or 'TCP' is selected. The possible values are:
+         any: No TCP/UDP destination port filter is specified. (Destination port filter status is 'don't-care'.)
+         specific: If you want to filter a specific TCP/UDP destination port No. with this ACE, choose this value.
+                   A field for entering a specific No. appears.
+         range: If you want to filter a specific TCP/UDP destination port range filter with this ACE, choose
+                this value. A field for entering a range appears."
+    ::= { tnAceIpv4Entry 20 }
+
+tnAceIPv4DstPortFilterNo  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the destination port filter, you can enter a specific value.
+         The allowed value is from 0 through 65535."
+    ::= { tnAceIpv4Entry 21 }
+
+tnAceIPv4DstPortRangeStart  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the destination port filter, you can enter a specific range.
+         The allowed range start is from 0 through 65535."
+    ::= { tnAceIpv4Entry 22 }
+
+tnAceIPv4DstPortRangeEnd  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the destination port filter, you can enter a specific range.
+         The allowed range end is from 0 through 65535."
+    ::= { tnAceIpv4Entry 23 }
+
+tnAceIPv4TcpFin  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the TCP 'No more data from sender' (FIN) value for this ACE.
+         0: TCP frames where the FIN field is set must not be able to match this entry.
+         1: TCP frames where the FIN field is set must be able to match this entry.
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceIpv4Entry 24 }
+
+tnAceIPv4TcpSyn  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the TCP 'Synchronize sequence numbers' (SYN) value for this ACE.
+         0: TCP frames where the SYN field is set must not be able to match this entry.
+         1: TCP frames where the SYN field is set must be able to match this entry.
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceIpv4Entry 25 }
+
+tnAceIPv4TcpRst  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the TCP 'Reset the connection' (RST) value for this ACE.
+         0: TCP frames where the RST field is set must not be able to match this entry.
+         1: TCP frames where the RST field is set must be able to match this entry.
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceIpv4Entry 26 }
+
+tnAceIPv4TcpPsh  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the TCP 'Push Function' (PSH) value for this ACE.
+         0: TCP frames where the PSH field is set must not be able to match this entry.
+         1: TCP frames where the PSH field is set must be able to match this entry.
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceIpv4Entry 27 }
+
+tnAceIPv4TcpAck  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the TCP 'Acknowledgment field significant' (ACK) value for this ACE.
+         0: TCP frames where the ACK field is set must not be able to match this entry.
+         1: TCP frames where the ACK field is set must be able to match this entry.
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceIpv4Entry 28 }
+
+tnAceIPv4TcpUrg  OBJECT-TYPE
+    SYNTAX          TruthValueOrAny
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the TCP 'Urgent Pointer field significant' (URG) value for this ACE.
+         0: TCP frames where the URG field is set must not be able to match this entry.
+         1: TCP frames where the URG field is set must be able to match this entry.
+         Any: Any value is allowed ('dont-care')."
+    ::= { tnAceIpv4Entry 29 }
+
+-- ACL Status
+
+tnAclStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnAclStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table shows the ACL status by different ACL users.
+         Each row describes the ACE that is defined. It is a
+         conflict if a specific ACE is not applied to the hardware
+         due to hardware limitations. The maximum number of ACEs
+         is 256 on each switch."
+    ::= { tnAclMgmt 8 }
+
+tnAclStatusEntry OBJECT-TYPE
+    SYNTAX          TnAclStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents ACL status by different ACL users."
+    INDEX           { entPhysicalIndex, tnAclStatusUser, tnAceIndex }
+    ::= { tnAclStatusTable 1 }
+
+TnAclStatusEntry ::= SEQUENCE {
+    tnAclStatusUser                   INTEGER,
+    tnAclStatusIngressPort            PortList,
+    tnAclStatusFrameType              INTEGER,
+    tnAclStatusEtypeVal               INTEGER,
+    tnAclStatusAction                 INTEGER,
+    tnAclStatusRateLimiter            RateLimiterValue,
+    tnAclStatusPortRedirect           PortList,
+    tnAclStatusMirror                 INTEGER,
+    tnAclStatusCpu                    INTEGER,
+    tnAclStatusCpuOnce                INTEGER,
+    tnAclStatusCounter                Counter32,
+    tnAclStatusConflict               INTEGER
+}
+
+tnAclStatusUser OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        static(1),
+                        ipsourceguard(2),
+                        ipmc(3),
+                        mep(4),
+                        arpinspection(5),
+                        ptp(6),
+                        dhcp(7),
+                        loopprotect(8),
+                        ethersat(9),
+                        linkoam(10)
+                    }
+
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Indicates the ACL user."
+    ::= { tnAclStatusEntry 1 }
+
+tnAclStatusIngressPort OBJECT-TYPE
+    SYNTAX          PortList
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the ingress port of the ACE. Possible values are:
+         All: The ACE will match all ingress port.
+         Port: The ACE will match a specific ingress port."
+    ::= { tnAclStatusEntry 2 }
+
+tnAclStatusFrameType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        any(1),
+                        eType(2),
+                        arp(3), 
+                        ipv4(4),
+                        ipv4icmp(5),
+                        ipv4udp(6),
+                        ipv4tcp(7),
+                        ipv4other(8),
+                        ipv6(9)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the frame type of the ACE. Possible values are:
+         Any: The ACE will match any frame type.
+         EType: The ACE will match Ethernet Type frames. Note that
+         an Ethernet Type based ACE will not get matched by IP and ARP frames.
+         ARP: The ACE will match ARP/RARP frames.
+         IPv4: The ACE will match all IPv4 frames.
+         IPv4/ICMP: The ACE will match IPv4 frames with ICMP protocol.
+         IPv4/UDP: The ACE will match IPv4 frames with UDP protocol.
+         IPv4/TCP: The ACE will match IPv4 frames with TCP protocol.
+         IPv4/Other: The ACE will match IPv4 frames, which are not ICMP/UDP/TCP.
+         IPv6: The ACE will match all IPv6 standard frames."
+    ::= { tnAclStatusEntry 3 }
+
+tnAclStatusEtypeVal OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the type value when frame type of the ACE is Ethernet Type."
+    ::= { tnAclStatusEntry 4 }
+
+tnAclStatusAction OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        permit(1),
+                        deny(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+         "Indicates the forwarding action of the ACE.
+          Permit: Frames matching the ACE may be forwarded and learned.
+          Deny: Frames matching the ACE are dropped."
+    ::= { tnAclStatusEntry 5 }
+
+tnAclStatusRateLimiter OBJECT-TYPE
+    SYNTAX          RateLimiterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the rate limiter number of the ACE.
+         The allowed range is 1 to 16. When Disabled is
+         displayed, the rate limiter operation is disabled."
+    ::= { tnAclStatusEntry 6 }
+
+tnAclStatusPortRedirect OBJECT-TYPE
+    SYNTAX          PortList
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the port redirect operation of the ACE.
+         Frames matching the ACE are redirected to the port
+         number. The allowed values are Disabled or a specific
+         port number. When Disabled is displayed, the port
+         redirect operation is disabled."
+    ::= { tnAclStatusEntry 7 }
+
+tnAclStatusMirror OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+         "Specify the mirror operation of this port. The allowed values are:
+          Enabled: Frames received on the port are mirrored.
+          Disabled: Frames received on the port are not mirrored.
+          The default value is 'Disabled'."
+    ::= { tnAclStatusEntry 8 }
+
+tnAclStatusCpu OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        yes(1),
+                        no(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+         "Forward packet that matched the specific ACE to CPU."
+    ::= { tnAclStatusEntry 9 }
+
+tnAclStatusCpuOnce OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        yes(1),
+                        no(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+         "Forward first packet that matched the specific ACE to CPU."
+    ::= { tnAclStatusEntry 10 }
+
+tnAclStatusCounter OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The counter indicates the number of times the ACE was hit by a frame."
+    ::= { tnAclStatusEntry 11 }
+
+tnAclStatusConflict OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        yes(1),
+                        no(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+         "Indicates the hardware status of the specific
+          ACE. The specific ACE is not applied to the
+          hardware due to hardware limitations."
+    ::= { tnAclStatusEntry 12 }
+END

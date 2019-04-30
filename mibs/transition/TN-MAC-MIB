@@ -1,0 +1,266 @@
+-- *****************************************************************
+-- TN-MAC-MIB.my : TN MAC TABLE MIB
+--
+-- Copyright (c) 2013 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+
+TN-MAC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, MacAddress
+        FROM SNMPv2-TC     -- [RFC2579]
+    PortList, VlanId
+        FROM Q-BRIDGE-MIB
+    ifIndex
+        FROM IF-MIB
+    tnProducts
+        FROM TRANSITION-SMI;
+  tnMacMib MODULE-IDENTITY
+  LAST-UPDATED "201306180000Z"
+  ORGANIZATION "Transition Networks, Inc."
+  CONTACT-INFO
+       "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+        E-mail: techsupport@transition.com
+       "
+  DESCRIPTION
+       "The mib module for managing configuration
+        of MAC.
+       "
+  ::= { tnProducts 142 }
+
+--
+-- main body
+--
+tnMacMibNotifications  OBJECT IDENTIFIER ::= { tnMacMib 0 }
+tnMacMibObjects        OBJECT IDENTIFIER ::= { tnMacMib 1 }
+tnMacMibConformance    OBJECT IDENTIFIER ::= { tnMacMib 2 }
+
+--Aging Configuration
+tnMacAgeAutomaticConfig      OBJECT IDENTIFIER ::= { tnMacMibObjects 1 }
+tnMacAgeAutomaticAgingDisable           OBJECT-TYPE
+    SYNTAX                              TruthValue
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "Disable the automatic aging of dynamic entries."
+    ::= { tnMacAgeAutomaticConfig 1 }
+
+tnMacAgeAutomaticAgingTime              OBJECT-TYPE
+    SYNTAX                              Integer32(10..1000000)
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "Configure aging time by entering a value here in
+         seconds.
+         The allowed range is 10 to 1000000 seconds.
+        "
+    ::= { tnMacAgeAutomaticConfig 2 }
+
+-- MAC Table Learning
+tnMacLearningTable                      OBJECT-TYPE
+    SYNTAX                              SEQUENCE OF TnMacLearningEntry
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "This table displays MAC table learning."
+    ::= { tnMacMibObjects 2 }
+
+tnMacLearningEntry                      OBJECT-TYPE
+    SYNTAX                              TnMacLearningEntry
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "The entry represents MAC table learning in each port."
+    INDEX { ifIndex }
+    ::= { tnMacLearningTable 1 }
+
+TnMacLearningEntry       ::= SEQUENCE {
+    tnMacTablePortLearning        INTEGER
+}
+
+tnMacTablePortLearning                  OBJECT-TYPE
+    SYNTAX                              INTEGER {
+                                            auto(1),
+                                            disable(2),
+                                            secure(3)
+                                        }
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "If the learning mode for a given port is greyed
+         out, another module is in control of the mode, so
+         that it cannot be changed by the user. An example
+         of such a module is the MAC-Based Authentication
+         under 802.1X.
+         Each port can do learning based upon the following
+         settings:
+         Auto
+         Learning is done automatically as soon as a frame
+         with unknown SMAC is received.
+         Disable
+         No learning is done.
+         Secure
+         Only static MAC entries are learned, all other frames
+         are dropped.
+         Note: Make sure that the link used for managing the
+         switch is added to the Static Mac Table before changing
+         to secure learning mode, otherwise the management link
+         is lost and can only be restored by using another
+         non-secure port or by connecting to the switch via the
+         serial interface.
+        "
+    ::= { tnMacLearningEntry 1 }
+
+-- Static MAC Table Configuration
+tnMacStaticConfigTable                  OBJECT-TYPE
+    SYNTAX                              SEQUENCE OF TnMacStaticConfigEntry
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "The static entries in the MAC table are shown in this
+         table. The static MAC table can contain 64 entries."
+    ::= { tnMacMibObjects 3 }
+
+tnMacStaticConfigEntry                  OBJECT-TYPE
+    SYNTAX                              TnMacStaticConfigEntry
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "The static entries in the MAC table are shown in this
+         table."
+    INDEX { tnStaticMacVlanId, tnStaticMacAddress }
+    ::= { tnMacStaticConfigTable 1 }
+
+TnMacStaticConfigEntry       ::= SEQUENCE {
+    tnStaticMacVlanId        VlanId,
+    tnStaticMacAddress       MacAddress,
+    tnStaticMacPortMembers   PortList,
+    tnStaticMacStatus        RowStatus
+}
+
+tnStaticMacVlanId                       OBJECT-TYPE
+    SYNTAX                              VlanId
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "The VLAN ID of the entry."
+    ::= { tnMacStaticConfigEntry 1 }
+
+tnStaticMacAddress                      OBJECT-TYPE
+    SYNTAX                              MacAddress
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "The MAC address of the entry."
+    ::= { tnMacStaticConfigEntry 2 }
+
+tnStaticMacPortMembers                  OBJECT-TYPE
+    SYNTAX                              PortList
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "Checkmarks indicate which ports are
+         members of the entry. Check or uncheck
+         as needed to modify the entry."
+    ::= { tnMacStaticConfigEntry 3 }
+
+tnStaticMacStatus                       OBJECT-TYPE
+    SYNTAX                              RowStatus
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "The status of the row.
+         The writable columns in a row can not be changed if the row
+         is active. All columns must have a valid value before a row
+         can be activated.
+        "
+    ::= { tnMacStaticConfigEntry 4 }
+
+-- MAC Address Table
+tnMacAddressTable                       OBJECT-TYPE
+    SYNTAX                              SEQUENCE OF TnMacAddressEntry
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "Navigating the MAC Table."
+    ::= { tnMacMibObjects 4 }
+
+tnMacAddressEntry                       OBJECT-TYPE
+    SYNTAX                              TnMacAddressEntry
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "Each entriy represents a MAC address."
+    INDEX { tnMacType, tnMacVlan, tnMacAddress }
+    ::= { tnMacAddressTable 1 }
+
+TnMacAddressEntry       ::= SEQUENCE {
+    tnMacType             INTEGER,
+    tnMacVlan             VlanId,
+    tnMacAddress          MacAddress,
+    tnMacPortMembers      PortList
+}
+
+tnMacType                               OBJECT-TYPE
+    SYNTAX                              INTEGER {
+                                            static(1),
+                                            dynamic(2)
+                                        }
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "Indicates whether the entry is a static or a
+         dynamic entry.
+        "
+    ::= { tnMacAddressEntry 1 }
+
+tnMacVlan                               OBJECT-TYPE
+    SYNTAX                              VlanId
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "The VLAN ID of the entry.
+        "
+    ::= { tnMacAddressEntry 2 }
+
+tnMacAddress                            OBJECT-TYPE
+    SYNTAX                              MacAddress
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "The MAC address of the entry.
+        "
+    ::= { tnMacAddressEntry 3 }
+
+tnMacPortMembers                        OBJECT-TYPE
+    SYNTAX                              PortList
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+        "The ports that are members of the entry.
+         The value of this object in high 8 bits describe the status
+         from the first port to last port. In low 8 bits, the valus of
+         first bit is the status of port mgmt, while the second is the
+         status of port cpu, the default value of other bits are zero.
+        "
+    ::= { tnMacAddressEntry 4 }
+
+tnMacDynamicClear                       OBJECT-TYPE
+    SYNTAX                              TruthValue
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "Flush all dynamic entries if the value is true.
+        "
+    ::= { tnMacMibObjects 5 }
+END
