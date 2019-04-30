@@ -57,7 +57,7 @@ class ArubaInstant extends OS implements
     {
         $processors = array();
         $ai_mib = 'AI-AP-MIB';
-        $ai_ap_data = $this->getCacheTable('aiAccessPointTable', $ai_mib);
+        $ai_ap_data = $this->getCacheTable('aiAccessPointEntry', $ai_mib);
 
         d_echo('ai_ap_data:'.PHP_EOL);
         d_echo($ai_ap_data);
@@ -93,8 +93,10 @@ class ArubaInstant extends OS implements
             // version is at least 8.4.0.0
             $ssid_data = $this->getCacheTable('aiWlanSSIDEntry', $ai_mib);
 
-            $ap_data = array_merge_recursive($this->getCacheTable('aiAccessPointEntry', $ai_mib), $this->getCacheTable('aiRadioClientNum', $ai_mib));
-            $ap_radio_clients_mib = 'aiRadioClientNum';
+            $ap_data = array_merge_recursive(
+                $this->getCacheTable('aiAccessPointEntry', $ai_mib),
+                $this->getCacheTable('aiRadioClientNum', $ai_mib)
+            );
 
             d_echo('SSID Array:'.PHP_EOL);
             d_echo($ssid_data);
@@ -121,7 +123,7 @@ class ArubaInstant extends OS implements
             // Clients Per Radio
             foreach ($ap_data as $index => $entry) {
                 foreach ($entry['aiRadioClientNum'] as $radio => $value) {
-                    $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiRadioClientNum', $radio);
+                    $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, 'aiRadioClientNum', Rewrite::oidMac($index), $radio);
                     $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
                     $description = sprintf('%s Radio %s', $entry['aiAPSerialNum'], $radio);
                     $sensor_index = sprintf('%s.%s', Rewrite::macToHex($index), $radio);
@@ -192,9 +194,15 @@ class ArubaInstant extends OS implements
     private function discoverInstantRadio($type, $mib, $desc = '%s Radio %s')
     {
         $ai_mib = 'AI-AP-MIB';
-        $ai_sg_data = $this->getCacheTable('aiStateGroup', $ai_mib);
+        $ai_sg_data = array_merge_recursive(
+            $this->getCacheTable('aiAPSerialNum', $ai_mib),
+            $this->getCacheTable('aiRadioChannel', $ai_mib),
+            $this->getCacheTable('aiRadioNoiseFloor', $ai_mib),
+            $this->getCacheTable('aiRadioTransmitPower', $ai_mib),
+            $this->getCacheTable('aiRadioUtilization64', $ai_mib)
+        );
 
-        $sensors = [];
+        $sensors = array();
 
         foreach ($ai_sg_data as $ai_ap => $ai_ap_oid) {
             if (isset($ai_ap_oid[$mib])) {

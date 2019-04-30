@@ -24,22 +24,23 @@
  */
 echo 'aruba-instant-MEMORY-POOL: ';
 
-$memory_pool_total = snmpwalk_group($device, 'aiAPTotalMemory', 'AI-AP-MIB');
-$memory_pool_free  = snmpwalk_group($device, 'aiAPMemoryFree', 'AI-AP-MIB');
-$ap_serial_numbers = snmpwalk_group($device, 'aiAPSerialNum', 'AI-AP-MIB');
+$mempool_data = snmpwalk_group($device, 'aiAPSerialNum', 'AI-AP-MIB');
+$mempool_data = snmpwalk_group($device, 'aiAPTotalMemory', 'AI-AP-MIB', 1, $mempool_data);
+$mempool_data = snmpwalk_group($device, 'aiAPMemoryFree', 'AI-AP-MIB', 1, $mempool_data);
 
-foreach ($memory_pool_total as $index => $entry) {
-    if ($entry['aiAPTotalMemory']) {
-        d_echo($ap_serial_numbers[$index]['aiAPSerialNum'].' '.$entry['aiAPTotalMemory'].' / '.$memory_pool_free[$index]['aiAPMemoryFree'].PHP_EOL);
+d_echo('$mempool_data:'.PHP_EOL);
+d_echo($mempool_data);
 
-        $total     = $entry['aiAPTotalMemory'];
-        $free      = $memory_pool_free[$index]['aiAPMemoryFree'];
-        $used      = $total - $free;
-        $perc      = ($used / $total * 100);
+foreach ($mempool_data as $index => $entry) {
+    d_echo($entry['aiAPSerialNum'].' '.$entry['aiAPTotalMemory'].' / '.$entry['aiAPMemoryFree'].PHP_EOL);
 
-        $mempool['total'] = $total;
-        $mempool['used']  = $used;
-        $mempool['free']  = $free;
-        $mempool['perc']  = $perc;
-    } //end if
+    $total     = $entry['aiAPTotalMemory'];
+    $free      = $entry['aiAPMemoryFree'];
+    $used      = $total - $free;
+    $perc      = ($used / $total * 100);
+
+    $mempool['total'] = $total;
+    $mempool['used']  = $used;
+    $mempool['free']  = $free;
+    $mempool['perc']  = $perc;
 } //end foreach

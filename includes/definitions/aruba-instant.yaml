@@ -5,8 +5,7 @@ icon: aruba
 mib_dir:
     - arubaos
 over:
-    - { graph: device_aruba-instant_numaps, text: 'Number of APs' }
-    - { graph: device_aruba-instant_numclients, text: 'Number of Clients' }
+    - { graph: device_wireless_clients, text: 'Client Count' }
 discovery:
     -
       sysObjectID: .1.3.6.1.4.1.14823.1.2. #Aruba apProducts (Aruba Instant)
