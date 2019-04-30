@@ -1,3 +1,122 @@
+##1.51
+*(2019-04-29)*
+
+A big thank you to the following 29 contributors this last month:
+
+  - murrant (19)
+  - PipoCanaja (8)
+  - CirnoT (7)
+  - spencerbutler (5)
+  - laf (4)
+  - pobradovic08 (3)
+  - TheGreatDoc (3)
+  - h-barnhart (2)
+  - twilley (2)
+  - djamp42 (2)
+  - smiles1969 (2)
+  - VVelox (1)
+  - kmpanilla (1)
+  - martijn-schmidt (1)
+  - petracvv (1)
+  - cppmonkey (1)
+  - tigerdjohnson (1)
+  - Slushnas (1)
+  - tim427 (1)
+  - n0taz (1)
+  - zombah (1)
+  - andrewimeson (1)
+  - tomarch (1)
+  - mattie47 (1)
+  - dmeiser (1)
+  - neszt (1)
+  - priiduonu (1)
+  - vitalisator (1)
+  - longchihang (1)
+
+#### Device
+* Serial number and more robust OS version for Netgear switches ([#10164](https://github.com/librenms/librenms/pull/10164)) - [CirnoT](https://github.com/CirnoT)
+* Extended sensors for Timos devices ([#10160](https://github.com/librenms/librenms/pull/10160)) - [vitalisator](https://github.com/vitalisator)
+* Added support for Zmtel greenpacket devices (os: zmtel) ([#10067](https://github.com/librenms/librenms/pull/10067)) - [spencerbutler](https://github.com/spencerbutler)
+* Get and display the image patch version on Huawei VRP devices ([#10099](https://github.com/librenms/librenms/pull/10099)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added packetlight support ([#10131](https://github.com/librenms/librenms/pull/10131)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fortinet SNMP Trap Handlers ([#10148](https://github.com/librenms/librenms/pull/10148)) - [h-barnhart](https://github.com/h-barnhart)
+* Adva SNMP Trap Handlers ([#10094](https://github.com/librenms/librenms/pull/10094)) - [h-barnhart](https://github.com/h-barnhart)
+* Add PSU state to Netgear discovery definition ([#10150](https://github.com/librenms/librenms/pull/10150)) - [CirnoT](https://github.com/CirnoT)
+* Add memory pool for Netgear switches ([#10146](https://github.com/librenms/librenms/pull/10146)) - [CirnoT](https://github.com/CirnoT)
+* Updates to planetos.yaml for additional models ([#10149](https://github.com/librenms/librenms/pull/10149)) - [kmpanilla](https://github.com/kmpanilla)
+* Add discovery ObjectID for Barracuda NGFW ([#10102](https://github.com/librenms/librenms/pull/10102)) - [pobradovic08](https://github.com/pobradovic08)
+* Added support dellNet devices ([#10016](https://github.com/librenms/librenms/pull/10016)) - [spencerbutler](https://github.com/spencerbutler)
+* Improved Linksys support, including POE ([#10075](https://github.com/librenms/librenms/pull/10075)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added Cisco Small business bootloader + HW version ([#10043](https://github.com/librenms/librenms/pull/10043)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added detection for ESW 5xx series of Cisco SB devices ([#10077](https://github.com/librenms/librenms/pull/10077)) - [laf](https://github.com/laf)
+* Extended card support for adva_fsp150 family ([#10049](https://github.com/librenms/librenms/pull/10049)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Updated RegEx string for correct definitions for Proxmox 4.x nodes ([#10048](https://github.com/librenms/librenms/pull/10048)) - [n0taz](https://github.com/n0taz)
+* Improve Huawei BGP polling + BGP webui & graphs patches ([#10010](https://github.com/librenms/librenms/pull/10010)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for Liebert PDUs ([#10062](https://github.com/librenms/librenms/pull/10062)) - [spencerbutler](https://github.com/spencerbutler)
+* Added initial support for teltonika ([#10059](https://github.com/librenms/librenms/pull/10059)) - [tomarch](https://github.com/tomarch)
+* Added support for TP-LINK T1600G-52TS ([#9983](https://github.com/librenms/librenms/pull/9983)) - [spencerbutler](https://github.com/spencerbutler)
+* Fix aruba-controller polling ([#10071](https://github.com/librenms/librenms/pull/10071)) - [twilley](https://github.com/twilley)
+* Added device WISI Tangram ([#10039](https://github.com/librenms/librenms/pull/10039)) - [djamp42](https://github.com/djamp42)
+* Added PPPoE Sessions Graph for Mikrotik ([#10056](https://github.com/librenms/librenms/pull/10056)) - [neszt](https://github.com/neszt)
+* Fix gw-eydfa detection ([#10052](https://github.com/librenms/librenms/pull/10052)) - [murrant](https://github.com/murrant)
+* Added support for IONODES video encoders ([#10031](https://github.com/librenms/librenms/pull/10031)) - [priiduonu](https://github.com/priiduonu)
+* Added support for DELLEMC-OS10-PRODUCTS-MIB (os: dell-os10) ([#10011](https://github.com/librenms/librenms/pull/10011)) - [spencerbutler](https://github.com/spencerbutler)
+
+#### Bug
+* Store IPv4 networks as network address and fix address search page showing networks not addresses ([#10144](https://github.com/librenms/librenms/pull/10144)) - [CirnoT](https://github.com/CirnoT)
+* Fix filter by device and interface type on IP address search page ([#10143](https://github.com/librenms/librenms/pull/10143)) - [CirnoT](https://github.com/CirnoT)
+* Fix services with scripts inheriting DS from previous service on detail view ([#10142](https://github.com/librenms/librenms/pull/10142)) - [CirnoT](https://github.com/CirnoT)
+* Fix call to shortDisplayName on null in MuninPluginController ([#10126](https://github.com/librenms/librenms/pull/10126)) - [CirnoT](https://github.com/CirnoT)
+* Fix install.php can't find config.php ([#10129](https://github.com/librenms/librenms/pull/10129)) - [murrant](https://github.com/murrant)
+* Fix call to isUnderMaintenance() on null ([#10090](https://github.com/librenms/librenms/pull/10090)) - [murrant](https://github.com/murrant)
+* Don't require db for config_to_json.php ([#10100](https://github.com/librenms/librenms/pull/10100)) - [murrant](https://github.com/murrant)
+* Bug - Nasty user_func vs divisor-multiplier issue ([#10122](https://github.com/librenms/librenms/pull/10122)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix to display minimum values in uptime graphs. ([#10078](https://github.com/librenms/librenms/pull/10078)) - [Slushnas](https://github.com/Slushnas)
+* Fix notification creation ([#10058](https://github.com/librenms/librenms/pull/10058)) - [murrant](https://github.com/murrant)
+* Fixed fail2ban jails eventlog spam ([#10061](https://github.com/librenms/librenms/pull/10061)) - [murrant](https://github.com/murrant)
+
+#### Webui
+* Easily setting font colors for RRD graphs is now possible ([#10083](https://github.com/librenms/librenms/pull/10083)) - [VVelox](https://github.com/VVelox)
+* New User Management ([#9348](https://github.com/librenms/librenms/pull/9348)) - [murrant](https://github.com/murrant)
+* Display number of connections for ASA on over ([#10106](https://github.com/librenms/librenms/pull/10106)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix to display minimum values in uptime graphs. ([#10078](https://github.com/librenms/librenms/pull/10078)) - [Slushnas](https://github.com/Slushnas)
+* Refactored Nvidia Application ([#10037](https://github.com/librenms/librenms/pull/10037)) - [tim427](https://github.com/tim427)
+* Improve Huawei BGP polling + BGP webui & graphs patches ([#10010](https://github.com/librenms/librenms/pull/10010)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix notification creation ([#10058](https://github.com/librenms/librenms/pull/10058)) - [murrant](https://github.com/murrant)
+* Add SysName to Oxidized view ([#10012](https://github.com/librenms/librenms/pull/10012)) - [smiles1969](https://github.com/smiles1969)
+
+#### Documentation
+* Updated Code-Structure.md ([#10156](https://github.com/librenms/librenms/pull/10156)) - [pobradovic08](https://github.com/pobradovic08)
+* Fix formatting ([#10135](https://github.com/librenms/librenms/pull/10135)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Fix paths of custom graph examples in Custom-Graphs.md ([#10128](https://github.com/librenms/librenms/pull/10128)) - [pobradovic08](https://github.com/pobradovic08)
+* Update Example-Hardware-Setup.md ([#10115](https://github.com/librenms/librenms/pull/10115)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Update Templates.md ([#10120](https://github.com/librenms/librenms/pull/10120)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Example Hardware - corrected markup ([#10117](https://github.com/librenms/librenms/pull/10117)) - [cppmonkey](https://github.com/cppmonkey)
+* Minor word usage corrections ([#10073](https://github.com/librenms/librenms/pull/10073)) - [andrewimeson](https://github.com/andrewimeson)
+* Update Smokeping.md ([#10064](https://github.com/librenms/librenms/pull/10064)) - [mattie47](https://github.com/mattie47)
+* Update SNMP-Configuration-Examples ([#10063](https://github.com/librenms/librenms/pull/10063)) - [dmeiser](https://github.com/dmeiser)
+* LibreNMS python service doc updates ([#10044](https://github.com/librenms/librenms/pull/10044)) - [murrant](https://github.com/murrant)
+
+#### Api
+* Allow Add_Device API to set sysName ([#10124](https://github.com/librenms/librenms/pull/10124)) - [djamp42](https://github.com/djamp42)
+* Fix api *log date format ([#10133](https://github.com/librenms/librenms/pull/10133)) - [murrant](https://github.com/murrant)
+* Fix arp api network query ([#10085](https://github.com/librenms/librenms/pull/10085)) - [murrant](https://github.com/murrant)
+* Fixed a duplicate route name in the api ([#10082](https://github.com/librenms/librenms/pull/10082)) - [laf](https://github.com/laf)
+* Add API call to list all ports FDB ([#10020](https://github.com/librenms/librenms/pull/10020)) - [zombah](https://github.com/zombah)
+* Added slms => zhoneolt mapping for Oxidized model ([#10068](https://github.com/librenms/librenms/pull/10068)) - [laf](https://github.com/laf)
+
+#### Alerting
+* Relax validation for smseagle hostname ([#10141](https://github.com/librenms/librenms/pull/10141)) - [petracvv](https://github.com/petracvv)
+* Removed legacy code from transports ([#10081](https://github.com/librenms/librenms/pull/10081)) - [laf](https://github.com/laf)
+
+#### Security
+* Fix unescaped variables in ajax_search.php ([#10088](https://github.com/librenms/librenms/pull/10088)) - [murrant](https://github.com/murrant)
+* Security fix: unauthorized access ([#10091](https://github.com/librenms/librenms/pull/10091)) - [murrant](https://github.com/murrant)
+
+#### Feature
+* Update json error message to show how to debug. ([#9998](https://github.com/librenms/librenms/pull/9998)) - [murrant](https://github.com/murrant)
+
+
 ##1.50
 *(2019-03-31)*
 
