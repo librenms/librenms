@@ -55,30 +55,25 @@ class ArubaInstant extends OS implements
      */
     public function discoverProcessors()
     {
-        // instant
-        return $this->discoverInstantCPU('aiAPCPUUtilization');
-    }
-
-
-    /**
-     * Aruba Instant CPU Discovery
-     *
-     * @return array Sensors
-     */
-    private function discoverInstantCPU($mib)
-    {
+        $processors = array();
         $ai_mib = 'AI-AP-MIB';
-        $ai_sg_data = $this->getCacheTable('aiStateGroup', $ai_mib);
-        $processors = [];
-        foreach ($ai_sg_data as $ai_ap => $ai_ap_oid) {
-            $value = $ai_ap_oid[$mib];
-            $combined_oid = sprintf('%s::%s.%s', $ai_mib, $mib, Rewrite::oidMac($ai_ap));
+        $ai_ap_data = $this->getCacheTable('aiAccessPointTable', $ai_mib);
+
+        d_echo('ai_ap_data:'.PHP_EOL);
+        d_echo($ai_ap_data);
+
+
+        foreach ($ai_ap_data as $ai_ap => $ai_ap_oid) {
+            $value = $ai_ap_oid['aiAPCPUUtilization'];
+            $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiAPCPUUtilization', Rewrite::oidMac($ai_ap));
             $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
-            $description = $ai_sg_data[$ai_ap]['aiAPSerialNum'];
+            $description = $ai_ap_data[$ai_ap]['aiAPSerialNum'];
             $processors[] = Processor::discover('aruba-instant', $this->getDeviceId(), $oid, Rewrite::macToHex($ai_ap), $description, 1, $value);
-            d_echo('Processor Array:'.PHP_EOL);
-            d_echo($processors);
-        }
+        } // end foreach
+
+        d_echo('Processor Array:'.PHP_EOL);
+        d_echo($processors);
+
         return $processors;
     }
 
@@ -90,7 +85,55 @@ class ArubaInstant extends OS implements
      */
     public function discoverWirelessClients()
     {
-        return $this->discoverInstantRadio('clients', 'aiRadioClientNum');
+        $sensors = array();
+        $device = $this->getDevice();
+        $ai_mib = 'AI-AP-MIB';
+
+        if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
+            // version is at least 8.4.0.0
+            $ssid_data = $this->getCacheTable('aiWlanSSIDEntry', $ai_mib);
+
+            $ap_data = array_merge_recursive($this->getCacheTable('aiAccessPointEntry', $ai_mib), $this->getCacheTable('aiRadioClientNum', $ai_mib));
+            $ap_radio_clients_mib = 'aiRadioClientNum';
+
+            d_echo('SSID Array:'.PHP_EOL);
+            d_echo($ssid_data);
+            d_echo('AP Array:'.PHP_EOL);
+            d_echo($ap_data);
+
+
+            $oids = array();
+            $total_clients = 0;
+
+            // Clients Per SSID
+            foreach ($ssid_data as $index => $entry) {
+                $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiSSIDClientNum', $index);
+                $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+                $description = sprintf('SSID %s Clients', $entry['aiSSID']);
+                $oids[] = $oid;
+                $total_clients += $entry['aiSSIDClientNum'];
+                $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $entry['aiSSIDClientNum']);
+            }
+
+            // Total Clients across all SSIDs
+            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oids, 'aruba-instant', 'total-clients', 'Total Clients', $total_clients);
+
+            // Clients Per Radio
+            foreach ($ap_data as $index => $entry) {
+                foreach ($entry['aiRadioClientNum'] as $radio => $value) {
+                    $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiRadioClientNum', $radio);
+                    $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+                    $description = sprintf('%s Radio %s', $entry['aiAPSerialNum'], $radio);
+                    $sensor_index = sprintf('%s.%s', Rewrite::macToHex($index), $radio);
+                    $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $sensor_index, $description, $value);
+                }
+            }
+        } else {
+            // version is lower than 8.4.0.0
+            // figure out a different way to get a client count, and then implement client polling too.
+        }
+
+        return $sensors;
     }
 
     /**
@@ -152,37 +195,6 @@ class ArubaInstant extends OS implements
         $ai_sg_data = $this->getCacheTable('aiStateGroup', $ai_mib);
 
         $sensors = [];
-
-        if ($type == 'clients') {
-            // clients per ssid
-            $device = $this->getDevice();
-            $ssid_data = $this->getCacheTable('AiWlanSSIDEntry', $ai_mib);
-            $ssid_name_mib = 'aiSSID';
-
-            d_echo('$device: '.var_export($device, 1).PHP_EOL);
-            d_echo('$ssid_data: '.var_export($ssid_data, 1).PHP_EOL);
-
-            $oids = array();
-            $total_clients = 0;
-            if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
-                // version >= 8.4.0.0
-                $ssid_clients_mib = 'aiSSIDClientNum';
-
-                foreach ($ssid_data as $index => $entry) {
-                    $combined_oid = sprintf('%s::%s.%s', $ai_mib, $ssid_clients_mib, $index);
-                    $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
-                    $description = sprintf('SSID %s Clients', $entry[$ssid_name_mib]);
-                    $oids[] = $oid;
-                    $total_clients += $entry[$ssid_clients_mib];
-                    $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $entry[$ssid_clients_mib]);
-                }
-
-                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oids, 'aruba-instant', null, 'Total Clients', $total_clients);
-            } else {
-                // version < 8.4.0.0
-                // count the number of clients per ssid and create a sensor...
-            }
-        } // end if
 
         foreach ($ai_sg_data as $ai_ap => $ai_ap_oid) {
             if (isset($ai_ap_oid[$mib])) {
