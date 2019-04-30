@@ -1,0 +1,417 @@
+-- *****************************************************************
+-- Event MIB
+-- *****************************************************************
+
+SL-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE 			     	FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, 
+	TruthValue, TimeStamp				FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+    slMain				      		   	FROM SL-MAIN-MIB;
+
+slEventMib MODULE-IDENTITY
+	LAST-UPDATED "200708280000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the configuration change and inventory events."
+	::= { slMain 22 }
+
+
+SlGenEventType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "The event types."
+       SYNTAX       INTEGER {
+            swUpgradeEvent(1),		-- Software Load Upgrade Events
+			remoteUnitFailEvent(2),	-- Remote unit has failed
+			alsOperStatus(3)		-- ALS activated/deactivated
+       }
+
+
+SlEventType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "The event types."
+       SYNTAX       INTEGER {
+            edDate(1),   		-- change date
+            rstProv(2),   		-- restore provisioning
+            edIp(3),   			-- change the ip
+            initPm(4),   		-- reset the PM counters
+            dltIpRoute(5),  	-- delete an entry from the routing table
+            edSys(6),   		-- change the system configuration 
+            setSid(7),  		-- change the sid
+            addUser(8),     	-- add a user
+            dltUser(9),     	-- remove a user
+			rmvFac(10),      	-- admin down to port
+			rstFac(11),      	-- admin up to port
+			edFac(12),          -- changed the provisioning
+            oprLoopback(13),	-- start port loopback
+            rlsLoopback(14),	-- stop port loopback
+            entAps(15),   		-- create an aps
+            dltAps(16),         -- remove an aps
+			oprProtSw(17), 		-- perform aps command
+			rlsProtSw(18), 		-- clear the aps command
+			oprAco(19),			-- operated the alarm-cutoff
+            rstProvCommit(20),   -- database commit completed
+            savProvStart(21),	-- database backup started
+            savProvComplete(22),-- database backup completed
+            savProvFailed(23),	-- database backup failed
+            swLoadUpgrade(24)	-- Software Load Upgrade 
+       }
+
+SlEventInventoryAction ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "The event inventory types."
+       SYNTAX       INTEGER {
+            inserted(1),   		-- module inserted
+            removed(2)		   	-- module removed
+       }
+
+SlEventInventoryType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "The event inventory types."
+       SYNTAX       INTEGER {
+            psu(1),   		-- power supply module
+            optics(2),   	-- optical module
+            fan(3)   		-- fan unit
+       }
+
+
+slEventConfig            OBJECT IDENTIFIER ::= { slEventMib 1 }
+slEventTraps             OBJECT IDENTIFIER ::= { slEventMib 2 }
+slEventTraps0             OBJECT IDENTIFIER ::= { slEventTraps 0 }
+
+--
+-- SL DB Change Events config Table
+--
+
+slEventConfigTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF SlEventConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+             "This table contains objects to configure the event."
+         ::= { slEventConfig 1 }
+ 
+slEventConfigEntry OBJECT-TYPE
+        SYNTAX  SlEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry exist for each type of event.
+             The entry describes the event properties."
+         INDEX   { slEventIfIndex, slEventType }
+         ::= { slEventConfigTable 1 }
+
+SlEventConfigEntry ::=
+              SEQUENCE {
+               slEventIfIndex              	InterfaceIndex,
+               slEventType            		SlEventType,
+               slEventVal					DisplayString,
+               slEventUser					DisplayString,
+               slEventCtag                  DisplayString,
+               slEventTid                   DisplayString
+              }
+ 
+slEventIfIndex OBJECT-TYPE
+     SYNTAX    InterfaceIndex 
+     MAX-ACCESS    read-only
+     STATUS    current
+     DESCRIPTION
+         "The corresponding interface index."
+     ::= { slEventConfigEntry 1 }
+ 
+slEventType OBJECT-TYPE
+     SYNTAX			SlEventType 
+     MAX-ACCESS		read-only
+     STATUS			current
+     DESCRIPTION
+         "The event type."
+     ::= { slEventConfigEntry 2 }
+
+slEventVal OBJECT-TYPE
+       SYNTAX    	 DisplayString (SIZE(0..20))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The changed value"
+        ::= { slEventConfigEntry 3 }
+
+slEventUser OBJECT-TYPE
+       SYNTAX    	 DisplayString (SIZE(0..20))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The user that made the change"
+        ::= { slEventConfigEntry 4 }
+
+slEventCtag OBJECT-TYPE
+       SYNTAX    	 DisplayString (SIZE(0..20))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The TL1 Correlation Tag of the event message"
+        ::= { slEventConfigEntry 5 }
+
+slEventTid OBJECT-TYPE
+       SYNTAX    	 DisplayString (SIZE(0..20))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The TL1 Target Identfier of the node"
+        ::= { slEventConfigEntry 6 }
+
+--
+-- SL Events Inventory Change Table
+--
+
+slEventInventoryTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF SlEventInventoryEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+             "This table contains objects to configure the event."
+         ::= { slEventConfig 2 }
+ 
+slEventInventoryEntry OBJECT-TYPE
+        SYNTAX  SlEventInventoryEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry describe an event of inventory change."
+         INDEX   { slEventInventoryIfIndex, slEventInventoryType }
+         ::= { slEventInventoryTable 1 }
+
+SlEventInventoryEntry ::=
+              SEQUENCE {
+               slEventInventoryIfIndex              InterfaceIndex,
+               slEventInventoryAction            	SlEventInventoryAction,
+               slEventInventoryType            		SlEventInventoryType,
+               slEventInventorySerial				DisplayString,
+               slEventInventoryPartnum				DisplayString
+              }
+ 
+slEventInventoryIfIndex OBJECT-TYPE
+     SYNTAX    InterfaceIndex 
+     MAX-ACCESS    read-only
+     STATUS    current
+     DESCRIPTION
+         "The corresponding interface index."
+     ::= { slEventInventoryEntry 1 }
+ 
+slEventInventoryAction OBJECT-TYPE
+     SYNTAX			SlEventInventoryAction 
+     MAX-ACCESS		read-only
+     STATUS			current
+     DESCRIPTION
+         "The inventory action."
+     ::= { slEventInventoryEntry 2 }
+ 
+slEventInventoryType OBJECT-TYPE
+     SYNTAX			SlEventInventoryType 
+     MAX-ACCESS		read-only
+     STATUS			current
+     DESCRIPTION
+         "The inventory type."
+     ::= { slEventInventoryEntry 3 }
+
+slEventInventorySerial OBJECT-TYPE
+       SYNTAX    	 DisplayString (SIZE(0..32))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The changed value"
+        ::= { slEventInventoryEntry 4 }
+
+slEventInventoryPartnum OBJECT-TYPE
+       SYNTAX    	 DisplayString
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The user that made the change"
+        ::= { slEventInventoryEntry 5 }
+
+
+--
+-- SL Generic Events config Table
+--
+
+slGenEventConfigTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF SlGenEventConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+             "This table contains objects to configure the event."
+         ::= { slEventConfig 3 }
+ 
+slGenEventConfigEntry OBJECT-TYPE
+        SYNTAX  SlGenEventConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry exist for each type of event.
+             The entry describes the event properties."
+         INDEX   { slGenEventIfIndex, slGenEventType }
+         ::= { slGenEventConfigTable 1 }
+
+SlGenEventConfigEntry ::=
+              SEQUENCE {
+               slGenEventIfIndex            InterfaceIndex,
+               slGenEventType            	SlGenEventType,
+               slGenEventVal				DisplayString,
+               slGenEventUser				DisplayString,
+               slGenEventCtag               DisplayString,
+               slGenEventTid                DisplayString
+              }
+ 
+slGenEventIfIndex OBJECT-TYPE
+     SYNTAX    InterfaceIndex 
+     MAX-ACCESS    read-only
+     STATUS    current
+     DESCRIPTION
+         "The corresponding interface index."
+     ::= { slGenEventConfigEntry 1 }
+ 
+slGenEventType OBJECT-TYPE
+     SYNTAX			SlGenEventType 
+     MAX-ACCESS		read-only
+     STATUS			current
+     DESCRIPTION
+         "The event type."
+     ::= { slGenEventConfigEntry 2 }
+
+slGenEventVal OBJECT-TYPE
+       SYNTAX    	 DisplayString (SIZE(0..20))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The changed value"
+        ::= { slGenEventConfigEntry 3 }
+
+slGenEventUser OBJECT-TYPE
+       SYNTAX    	 DisplayString (SIZE(0..20))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The user that made the change"
+        ::= { slGenEventConfigEntry 4 }
+
+slGenEventCtag OBJECT-TYPE
+       SYNTAX    	 DisplayString (SIZE(0..20))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The TL1 Correlation Tag of the event message"
+        ::= { slGenEventConfigEntry 5 }
+
+slGenEventTid OBJECT-TYPE
+       SYNTAX    	 DisplayString (SIZE(0..20))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+          "The TL1 Target Identfier of the node"
+        ::= { slGenEventConfigEntry 6 }
+
+--
+-- EVENT TRAPS
+--
+
+--
+-- The DB Change event trap
+--
+
+slEventTrap NOTIFICATION-TYPE
+       OBJECTS {slEventIfIndex,
+       			slEventType,
+       			slEventVal,
+       			slEventUser 
+       }
+       STATUS  current
+       DESCRIPTION
+               "An slEventTrap notification is sent when an configuration change occures."
+       ::= { slEventTraps 2 }
+
+slEventTrap0 NOTIFICATION-TYPE
+       OBJECTS {slEventIfIndex,
+       			slEventType,
+       			slEventVal,
+       			slEventUser 
+       }
+       STATUS  current
+       DESCRIPTION
+               "An slEventTrap notification is sent when an configuration change occures.
+               It is defined to support browsers that don't recognize RFC 2576."
+       ::= { slEventTraps0 2 }
+
+--
+-- The inventory change event trap
+--
+
+slEventInventoryTrap NOTIFICATION-TYPE
+       OBJECTS {slEventInventoryIfIndex,
+       			slEventInventoryAction,
+       			slEventInventoryType,
+       			slEventInventorySerial,
+       			slEventInventoryPartnum 
+       }
+       STATUS  current
+       DESCRIPTION
+               "An slInventoryEventTrap notification is sent when the node inventory is changed."
+       ::= { slEventTraps 3 }
+
+slEventInventoryTrap0 NOTIFICATION-TYPE
+       OBJECTS {slEventInventoryIfIndex,
+       			slEventInventoryAction,
+       			slEventInventoryType,
+       			slEventInventorySerial,
+       			slEventInventoryPartnum 
+       }
+       STATUS  current
+       DESCRIPTION
+               "An slInventoryEventTrap notification is sent when the node inventory is changed.]
+               It is defined to support browsers that don't recognize RFC 2576."
+       ::= { slEventTraps0 3 }
+
+
+--
+-- The generic change event trap
+--
+
+slGenEventTrap NOTIFICATION-TYPE
+       OBJECTS {slGenEventIfIndex,
+       			slGenEventType,
+       			slGenEventVal,
+       			slGenEventUser 
+       }
+       STATUS  current
+       DESCRIPTION
+               "An slEventTrap notification is sent when an configuration change occures."
+       ::= { slEventTraps 4 }
+
+slGenEventTrap0 NOTIFICATION-TYPE
+       OBJECTS {slGenEventIfIndex,
+       			slGenEventType,
+       			slGenEventVal,
+       			slGenEventUser 
+       }
+       STATUS  current
+       DESCRIPTION
+               "An slEventTrap notification is sent when an configuration change occures.
+               It is defined to support browsers that don't recognize RFC 2576."
+       ::= { slEventTraps0 4 }
+
+END
+
+
+

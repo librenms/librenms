@@ -200,7 +200,7 @@ class Permissions
     public function getBillPermissions()
     {
         if (is_null($this->billPermissions)) {
-            $this->billPermissions = DB::table('bill_ports')->get();
+            $this->billPermissions = DB::table('bill_perms')->get();
         }
 
         return $this->billPermissions;
@@ -212,7 +212,7 @@ class Permissions
      */
     private function getUserId($user)
     {
-        return $user instanceof User ? $user->user_id : (is_int($user) ? $user : Auth::id());
+        return $user instanceof User ? $user->user_id : (is_numeric($user) ? (int)$user : Auth::id());
     }
 
     /**
@@ -221,7 +221,7 @@ class Permissions
      */
     private function getDeviceId($device)
     {
-        return $device instanceof Device ? $device->device_id : (is_int($device) ? $device : 0);
+        return $device instanceof Device ? $device->device_id : (is_numeric($device) ? (int)$device : 0);
     }
 
     /**
@@ -230,7 +230,7 @@ class Permissions
      */
     private function getPortId($port)
     {
-        return $port instanceof Port ? $port->port_id : (is_int($port) ? $port : 0);
+        return $port instanceof Port ? $port->port_id : (is_numeric($port) ? (int)$port : 0);
     }
 
     /**
@@ -239,6 +239,6 @@ class Permissions
      */
     private function getBillId($bill)
     {
-        return $bill instanceof Bill ? $bill->bill_id : (is_int($bill) ? $bill : 0);
+        return $bill instanceof Bill ? $bill->bill_id : (is_numeric($bill) ? (int)$bill : 0);
     }
 }

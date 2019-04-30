@@ -1,0 +1,2295 @@
+TN-SA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, IpAddress, Counter32, Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    entPhysicalIndex FROM ENTITY-MIB
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB;
+
+tnSaMIB MODULE-IDENTITY
+    LAST-UPDATED "201310180000Z" -- October 18, 2013
+    ORGANIZATION "Transition Networks"
+    CONTACT-INFO
+        "Copyright (C) 2013  Transition Networks, Inc. All Rights Reserved."
+    DESCRIPTION
+        "A MIB module provides Service Activation management interface."
+    ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) transition (868) products (2) tnProducts(5) tnEtherSATMIB(108) 2 }
+
+--
+-- Textual conventions
+--
+
+TnSAEnabledState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Enabled state."
+    SYNTAX INTEGER {
+        disabled (0),       -- Disabled state
+        enabled (1)         -- Enabled state
+    }
+
+TnSATestDirection ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Test Direction."
+    SYNTAX INTEGER {
+        ne-to-fe (0),         -- Near End to Far End
+        fe-to-ne (1),         -- Far End to Near End
+        loopback (2)          -- Loopback
+    }
+
+TnSADirectionality ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Directionality of the test."
+    SYNTAX INTEGER {
+        unidirection (0),         -- uni-direction
+        bidirection  (1),         -- bi-direction
+        loopback     (2)
+    }
+
+TnSAFrameLevel ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Frame level."
+    SYNTAX INTEGER {
+        levelL2 (1),
+        levelL3 (2)
+    }
+
+TnSAPaylodFiller ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Payload filler."
+    SYNTAX INTEGER {
+        prbs (0),
+        fixed (2)
+    }
+
+TnSAL2Encaps ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Encapsulation type for L2 frames."
+    SYNTAX INTEGER {
+        none (0),
+        eth-tst (1),          -- ETH-TST frames
+        eth-tst-ethtype (2),  -- ETH-TST frames with custom Eth-Type
+        llc-snap (3)          -- LLC/SNAP frames
+    }
+
+TnSAL3Encaps ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Encapsulation type for L3 frames."
+    SYNTAX INTEGER {
+        none (0),
+        udp (1),          -- UDP/IP
+        tcp (2)           -- TCP/IP
+    }
+
+TnSATestStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Overall test status."
+    SYNTAX INTEGER {
+        status-none (1),
+        completed (2),
+        in-progress (3),
+        not-supported (4),
+        unable-to-run (5),
+        aborted (6),
+        failed (7),
+        unknown (8)
+    }
+
+TnSATestAction ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Test action."
+    SYNTAX INTEGER {
+        start (1),          -- Start test
+        stop (2)            -- Stop test
+    }
+
+TnSATestResStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Test result. fail NE – if near end to far end direction has failed. 
+         fail FE – if far end to near end direction has failed (For bidirectional mode only).
+         fail NE & FE – if both directions have failed (For bidirectional mode only)."
+    SYNTAX INTEGER {
+        fail-ne (1),  -- Fail Near End 
+        fail-fe (2),  -- Fail Far End
+        fail-ne-fe (3),
+        pass (4),
+        not-tested (5),
+        fail-exec (6)
+    }
+
+TnSATestStepResult ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Test step result."
+    SYNTAX INTEGER {
+        fail (0),
+        pass (1)
+    }
+
+TnSATestEncapsulationType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "VLAN Tag encapsulation type."
+    SYNTAX INTEGER {
+        utag (0),
+        ctag (1),
+        stag (2),
+        cctag (3),
+        sctag (4)
+    }
+
+tnSAProfileNextID OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object contains the next profile ID to use
+        when creating entries in the tnSAProfileTable.
+
+        When creating a new conceptual row (configuration
+        entry) in tnSAProfileTable with an SNMP SET operation the
+        command generator (Network Management Application) must
+        first issue a management protocol retrieval operation
+        to obtain the current value of this object.
+
+        If the command responder (agent) does not wish to allow
+        creation of more entries in tnSAProfileTable, possibly
+        because of resource exhaustion, this object MUST return
+        a value of 0.
+
+        If a non-zero value is returned the Network Management
+        Application must determine whether the value is indeed
+        still unused since two Network Management Applications
+        may attempt to create a row simultaneously and use the
+        same value.
+
+        If it is currently unused and the SET succeeds, the
+        agent MUST change the value of this object to a
+        currently unused non-zero value (according to an
+        implementation specific algorithm) or zero (if no
+        further row creation will be permitted).
+
+        If the value is in use, however, the SET fails and the
+        Network Management Application must then reread this
+        object to obtain a new usable value."
+    ::= { tnSaMIB 1 }
+
+tnSATestNextID OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object contains the next Test ID to use
+        when creating entries in the tnSATestTable.
+
+        When creating a new conceptual row (configuration
+        entry) in tnSATestTable with an SNMP SET operation the
+        command generator (Network Management Application) must
+        first issue a management protocol retrieval operation
+        to obtain the current value of this object.
+
+        If the command responder (agent) does not wish to allow
+        creation of more entries in tnSATestTable, possibly
+        because of resource exhaustion, this object MUST return
+        a value of 0.
+
+        If a non-zero value is returned the Network Management
+        Application must determine whether the value is indeed
+        still unused since two Network Management Applications
+        may attempt to create a row simultaneously and use the
+        same value.
+
+        If it is currently unused and the SET succeeds, the
+        agent MUST change the value of this object to a
+        currently unused non-zero value (according to an
+        implementation specific algorithm) or zero (if no
+        further row creation will be permitted).
+
+        If the value is in use, however, the SET fails and the
+        Network Management Application must then reread this
+        object to obtain a new usable value."
+    ::= { tnSaMIB 2 }
+
+tnSASysConfPeerCommunicationProto OBJECT-TYPE
+    SYNTAX TnSAEnabledState
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable the peer communication protocol. If this attribute is disabled a NID is unable to support 
+        unidirectional and bidirectional RFC2544 tests (both as Initiator and Collector) since it cannot communicate
+        with the far end. Only loopback tests can be executed in this case."
+    ::= { tnSaMIB 3 }
+
+tnSASysConfCollectorState OBJECT-TYPE
+    SYNTAX TnSAEnabledState
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Collector state. The Collector Flag determines will the SA module accept SA test requests from outside."
+    ::= { tnSaMIB 4 }
+
+tnSASysTestMacAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Test MAC address. The Test MAC Address is used as source MAC address of the generating frames."
+    ::= { tnSaMIB 5 }
+
+tnSAPtpClockNum OBJECT-TYPE
+    SYNTAX INTEGER(0..3)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        ""
+    ::= { tnSaMIB 6 }
+
+--
+--    SA Profile
+--
+tnSAProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSAProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Service Activation Profile Table.  Entries in this table
+        represent SA profiles.
+
+        The index structure is the profile ID."
+    ::= { tnSaMIB 7 }
+
+tnSAProfileEntry OBJECT-TYPE
+    SYNTAX TnSAProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tnSAProfileTable."
+    INDEX {
+        tnSAProfileID
+    }
+    ::= { tnSAProfileTable 1 }
+
+TnSAProfileEntry ::= SEQUENCE {
+    tnSAProfileID Unsigned32,
+    tnSAProfileName DisplayString,
+    tnSAProfileFrameLossRatio Unsigned32,
+    tnSAProfileCbsLineRate Unsigned32,
+    tnSAProfileYellowPcpList Unsigned32,
+    tnSAProfileFrameSizeMix OCTET STRING,
+    tnSAProfileRateDecStep Unsigned32,
+    tnSAProfileRateStepLength Unsigned32,
+    tnSAProfileDirectionality TnSADirectionality,
+    tnSAProfileStepsToExecute Unsigned32,
+    tnSAProfileRefCounter Unsigned32,
+    tnSAProfileRowStatus RowStatus
+}
+
+tnSAProfileID OBJECT-TYPE
+    SYNTAX Unsigned32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The profile entry ID."
+    ::= { tnSAProfileEntry 1 }
+
+tnSAProfileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the profile."
+    ::= { tnSAProfileEntry 2 }
+
+tnSAProfileFrameLossRatio OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Acceptable frame loss ratio (expressed in percentage, 
+         with 2 decimals (i.e. 99.99 %)."
+    ::= { tnSAProfileEntry 3 }
+
+tnSAProfileCbsLineRate OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Line rate at which burst traffic should be sent for the Back-to-back frames test. In Mbps."
+    ::= { tnSAProfileEntry 4 }
+
+tnSAProfileFrameSizeMix OBJECT-TYPE
+    SYNTAX OCTET STRING  (SIZE(1..20))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Traffic frame size mix, for throughput tests."
+    ::= { tnSAProfileEntry 5 }
+
+tnSAProfileRateDecStep OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "Rate decrease step size, in percentage. Default 25%."
+    DEFVAL { 25 }
+    ::= { tnSAProfileEntry 6 }
+
+tnSAProfileRateStepLength OBJECT-TYPE
+    SYNTAX Unsigned32 (10..60)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "Rate step length, in seconds."
+    DEFVAL { 20 }
+    ::= { tnSAProfileEntry 7 }
+
+tnSAProfileDirectionality OBJECT-TYPE
+    SYNTAX TnSADirectionality
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "Directionality of the tests: uni-directional, bi-directional or loopback based."
+    ::= { tnSAProfileEntry 8 }
+
+tnSAProfileYellowPcpList OBJECT-TYPE
+    SYNTAX Unsigned32 (0.. 255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "List of PCP values corresponding to yellow frame. Bitmask. Each bit number [0..7] corresponds to a PCP value [0..7].
+         Bit 0 corresponds to PCP 0, etc.
+
+         Example: yellow PCP list: 0,3,5. So, bits 0, 3 and 5 must be set to 1, while
+         other bits must be reset to zero: 101001 in binary format = 41 in decimal format.
+         So, the tnSAProfileYellowPcpList must be set to 41."
+    ::= { tnSAProfileEntry 9 }
+
+tnSAProfileStepsToExecute OBJECT-TYPE
+    SYNTAX Unsigned32 (0.. 2047)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "List of tests to execute – bitmask:
+             -Throughput (bit 1)
+             -Latency (bit 2)
+             -Frame Loss Rate (bit 3)
+             -Back To Back Frames (bit 4)"
+    ::= { tnSAProfileEntry 10 }
+
+tnSAProfileRefCounter OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Readonly field contains number of tests that use this profile. Profile can be deleted if it has no assigned tests."
+    ::= { tnSAProfileEntry 11 }
+
+tnSAProfileRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The row status.  To create a row, set the instance of
+        this variable for the new row to 'createAndGo'.  To
+        delete a row, set the instance of this variable for
+        the row to delete to 'destroy'."
+    ::= { tnSAProfileEntry 12 }
+
+--
+--    Frame format table for SA profile
+--
+tnSAFrameFormatProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSAFrameFormatProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The SA Profile Frame Format Table.  Entries in this table represent 
+        Frame Format attributes.  Each row in the table conceptually
+        augments the entries in the tnSAProfileTable.
+
+        The index structure is the SA profile ID."
+    ::= { tnSaMIB 8 }
+
+tnSAFrameFormatProfileEntry OBJECT-TYPE
+    SYNTAX TnSAFrameFormatProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tnSAFrameFormatProfileTable."
+    INDEX {
+        tnSAProfileID
+    }
+    ::= { tnSAFrameFormatProfileTable 1 }
+
+TnSAFrameFormatProfileEntry ::= SEQUENCE {
+    tnSAFrameFormatProfileFrameLevel TnSAFrameLevel,
+    tnSAFrameFormatProfilePaylodFiller TnSAPaylodFiller,
+    tnSAFrameFormatProfileEncapsulationL2 TnSAL2Encaps,
+    tnSAFrameFormatProfileEncapsulationL3 TnSAL3Encaps,
+    tnSAFrameFormatProfileEthType Unsigned32,
+    tnSAFrameFormatProfileIpDscp Unsigned32,
+    tnSAFrameFormatProfileIpEcn Unsigned32,
+    tnSAFrameFormatProfileIpFlags Unsigned32,
+    tnSAFrameFormatProfileIpTtl Unsigned32,
+    tnSAFrameFormatProfileUdpSrcPort Unsigned32,
+    tnSAFrameFormatProfileUdpDstPort Unsigned32,
+    tnSAFrameFormatProfileTcpSrcPort Unsigned32,
+    tnSAFrameFormatProfileTcpDstPort Unsigned32,
+    tnSAFrameFormatProfileTcpSeqNum Unsigned32,
+    tnSAFrameFormatProfileTcpAckNum Unsigned32,
+    tnSAFrameFormatProfileTcpControlBits Unsigned32,
+    tnSAFrameFormatProfileTcpWindowSize Unsigned32,
+    tnSAFrameFormatProfileLlcSnapOui Unsigned32,
+    tnSAFrameFormatProfileLlcSnapProto Unsigned32,
+    tnSAFrameFormatProfileIpDestIpAddress IpAddress,
+    tnSAFrameFormatProfileIpSrcIpAddress IpAddress,
+    tnSAFrameFormatProfilePayloadFillPattern Unsigned32,
+    tnSAFrameFormatProfileMEGLevel Unsigned32
+}
+
+tnSAFrameFormatProfileFrameLevel OBJECT-TYPE
+    SYNTAX TnSAFrameLevel
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Frame level – L2 or L3."
+    ::= { tnSAFrameFormatProfileEntry 1 }
+
+tnSAFrameFormatProfilePaylodFiller OBJECT-TYPE
+    SYNTAX TnSAPaylodFiller
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Paylod filler."
+    ::= { tnSAFrameFormatProfileEntry 2 }
+
+tnSAFrameFormatProfileEncapsulationL2 OBJECT-TYPE
+    SYNTAX TnSAL2Encaps
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Encapsulation type for L2 frames."
+    ::= { tnSAFrameFormatProfileEntry 3 }
+
+tnSAFrameFormatProfileEncapsulationL3 OBJECT-TYPE
+    SYNTAX TnSAL3Encaps
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Encapsulation type for L3 frames."
+    ::= { tnSAFrameFormatProfileEntry 4 }
+
+tnSAFrameFormatProfileEthType OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Custom Eth-Type for L2 ETH-TST frames."
+    ::= { tnSAFrameFormatProfileEntry 5 }
+
+tnSAFrameFormatProfileIpDscp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..63)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "DSCP value for L3 IP frames."
+    DEFVAL { 0 }
+    ::= { tnSAFrameFormatProfileEntry 6 }
+
+tnSAFrameFormatProfileIpEcn OBJECT-TYPE
+    SYNTAX Unsigned32 (0..3)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "ECN value for L3 IP frames."
+    DEFVAL { 0 }
+    ::= { tnSAFrameFormatProfileEntry 7 }
+
+tnSAFrameFormatProfileIpFlags OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Flags value for L3 IP frames."
+    DEFVAL { 0 }
+    ::= { tnSAFrameFormatProfileEntry 8 }
+
+tnSAFrameFormatProfileIpTtl OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "TTL value for L3 IP frames."
+    DEFVAL { 64 }
+    ::= { tnSAFrameFormatProfileEntry 9 }
+
+tnSAFrameFormatProfileUdpSrcPort OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Source port for L3 IP/UDP frames."
+    DEFVAL { 0 }
+    ::= { tnSAFrameFormatProfileEntry 10 }
+
+tnSAFrameFormatProfileUdpDstPort OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Destination port for L3 IP/UDP frames."
+    DEFVAL { 0 }
+    ::= { tnSAFrameFormatProfileEntry 11 }
+
+tnSAFrameFormatProfileTcpSrcPort OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Source port for L3 IP/TCP frames."
+    DEFVAL { 0 }
+    ::= { tnSAFrameFormatProfileEntry 12 }
+
+tnSAFrameFormatProfileTcpDstPort OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Destination port for L3 IP/TCP frames."
+    DEFVAL { 0 }
+    ::= { tnSAFrameFormatProfileEntry 13 }
+
+tnSAFrameFormatProfileTcpSeqNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Sequence number for L3 IP/TCP frames."
+    DEFVAL { 16 }
+    ::= { tnSAFrameFormatProfileEntry 14 }
+
+tnSAFrameFormatProfileTcpAckNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "ACK number for L3 IP/TCP frames."
+    DEFVAL { 16 }
+    ::= { tnSAFrameFormatProfileEntry 15 }
+
+tnSAFrameFormatProfileTcpControlBits OBJECT-TYPE
+    SYNTAX Unsigned32 (0..63)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Control bits for L3 IP/TCP frames."
+    DEFVAL { 16 }
+    ::= { tnSAFrameFormatProfileEntry 16 }
+
+tnSAFrameFormatProfileTcpWindowSize OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Window size for L3 IP/TCP frames."
+    DEFVAL { 16 }
+    ::= { tnSAFrameFormatProfileEntry 17 }
+
+tnSAFrameFormatProfileLlcSnapOui   OBJECT-TYPE
+    SYNTAX Unsigned32 (0.. 16777215)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " LLC/SNAP OUI field – 3 bytes"
+    ::= { tnSAFrameFormatProfileEntry 18 }
+
+tnSAFrameFormatProfileLlcSnapProto   OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " LLC/SNAP protocol field"
+    ::= { tnSAFrameFormatProfileEntry 19 }
+
+tnSAFrameFormatProfileIpDestIpAddress   OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " Destination IP address"
+    ::= { tnSAFrameFormatProfileEntry 20 }
+
+tnSAFrameFormatProfileIpSrcIpAddress   OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " Source IP address"
+    ::= { tnSAFrameFormatProfileEntry 21 }
+
+tnSAFrameFormatProfilePayloadFillPattern   OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " Payload filler pattern(value entered in decimal)."
+    ::= { tnSAFrameFormatProfileEntry 22 }
+
+tnSAFrameFormatProfileMEGLevel    OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " Level of MEG that is used by ETH-TST frames."
+    ::= { tnSAFrameFormatProfileEntry 23 }
+
+--
+--    DM bins threshold configuration table
+--
+tnDmBinThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnDmBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of DM bin thresholds."
+    ::= { tnSaMIB 9 }
+
+tnDmBinThresholdEntry  OBJECT-TYPE
+    SYNTAX TnDmBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the SA tnDmBinThresholdTable."
+    INDEX {
+        tnSAProfileID,
+        tnDmBinThresholdIndex
+    } ::= { tnDmBinThresholdTable 1 }
+
+TnDmBinThresholdEntry ::= SEQUENCE {
+    tnDmBinThresholdIndex Unsigned32,
+    tnDmBinThresholdValue Unsigned32
+}
+
+tnDmBinThresholdIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold index."
+    ::= { tnDmBinThresholdEntry 1 }
+
+tnDmBinThresholdValue OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold value in usec. Zero value is used to delete threshold."
+    ::= { tnDmBinThresholdEntry 2 }
+
+--
+--    DMV bins threshold configuration table
+--
+tnDmvBinThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnDmvBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of DMV bin thresholds."
+    ::= { tnSaMIB 10 }
+
+tnDmvBinThresholdEntry  OBJECT-TYPE
+    SYNTAX TnDmvBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the SA tnDmvBinThresholdTable."
+    INDEX {
+        tnSAProfileID,
+        tnDmvBinThresholdIndex
+    } ::= { tnDmvBinThresholdTable 1 }
+
+TnDmvBinThresholdEntry ::= SEQUENCE {
+    tnDmvBinThresholdIndex Unsigned32,
+    tnDmvBinThresholdValue Unsigned32
+}
+
+tnDmvBinThresholdIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold index."
+    ::= { tnDmvBinThresholdEntry 1 }
+
+tnDmvBinThresholdValue OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold value in usec. Zero value is used to delete threshold."
+    ::= { tnDmvBinThresholdEntry 2 }
+
+--
+--    SA Test table
+--
+tnSATestTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSATestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The SA Test Table.  Entries in this table
+        represent Service Activation test attributes.
+
+        The index structure is the test ID."
+    ::= { tnSaMIB 11 }
+
+tnSATestEntry OBJECT-TYPE
+    SYNTAX TnSATestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tnSATestTable."
+    INDEX {
+        tnSATestID
+    }
+    ::= { tnSATestTable 1 }
+
+TnSATestEntry ::= SEQUENCE {
+    tnSATestID Unsigned32,
+    tnSATestSAProfileId Unsigned32,
+    tnSATestIngressEncapsulationType TnSATestEncapsulationType,
+    tnSATestIngressInnerVid Unsigned32,
+    tnSATestIngressInnerPcp Unsigned32,
+    tnSATestIngressOuterVid Unsigned32,
+    tnSATestIngressOuterPcp Unsigned32,
+    tnSATestEgressEncapsulationType TnSATestEncapsulationType,
+    tnSATestEgressInnerVid Unsigned32,
+    tnSATestEgressInnerPcp Unsigned32,
+    tnSATestEgressOuterVid Unsigned32,
+    tnSATestEgressOuterPcp Unsigned32,
+    tnSATestIngressPort Unsigned32,
+    tnSATestCollectorIngressPort Unsigned32,
+    tnSATestCollectorIpAddr IpAddress,
+    tnSATestName DisplayString,
+    tnSATestCir Counter64,
+    tnSATestCbs Unsigned32,
+    tnSATestEir Counter64,
+    tnSATestEbs Unsigned32,
+    tnSATestTargettestMacAddr MacAddress,
+    tnSATestAction TnSATestAction,
+    tnSATestRowStatus RowStatus
+}
+
+tnSATestID OBJECT-TYPE
+    SYNTAX Unsigned32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The test entry ID."
+    ::= { tnSATestEntry 1 }
+
+tnSATestSAProfileId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SA profile ID for the test."
+    ::= { tnSATestEntry 2 }
+
+tnSATestIngressEncapsulationType OBJECT-TYPE
+    SYNTAX TnSATestEncapsulationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "VLAN tag encapsulation type."
+    ::= { tnSATestEntry 3 }
+
+tnSATestIngressInnerVid OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4095)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ingress Inner VLAN ID."
+    ::= { tnSATestEntry 4 }
+
+tnSATestIngressInnerPcp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ingress Inner PCP value."
+    ::= { tnSATestEntry 5 }
+
+tnSATestIngressOuterVid OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4095)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ingress Outer VLAN ID."
+    ::= { tnSATestEntry 6 }
+
+tnSATestIngressOuterPcp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ingress Outer PCP value."
+    ::= { tnSATestEntry 7 }
+
+tnSATestEgressEncapsulationType OBJECT-TYPE
+    SYNTAX TnSATestEncapsulationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "VLAN tag encapsulation type."
+    ::= { tnSATestEntry 8 }
+
+tnSATestEgressInnerVid OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4095)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Egress Inner VLAN ID."
+    ::= { tnSATestEntry 9 }
+
+tnSATestEgressInnerPcp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Egress Inner PCP value."
+    ::= { tnSATestEntry 10 }
+
+tnSATestEgressOuterVid OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4095)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Egress Outer VLAN ID."
+    ::= { tnSATestEntry 11 }
+
+tnSATestEgressOuterPcp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Egress Outer PCP value."
+    ::= { tnSATestEntry 12 }
+
+tnSATestIngressPort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ingress port number."
+    ::= { tnSATestEntry 13 }
+
+tnSATestCollectorIngressPort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Collector's ingress port number."
+    ::= { tnSATestEntry 14 }
+
+tnSATestCollectorIpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IP address of the collector."
+    ::= { tnSATestEntry 15 }
+
+tnSATestName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Test name."
+    ::= { tnSATestEntry 16 }
+
+tnSATestCir OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "CIR. In Kbps."
+    ::= { tnSATestEntry 17 }
+
+tnSATestCbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "CBS. In bytes."
+    ::= { tnSATestEntry 18 }
+
+tnSATestEir OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "EIR. In Kbps."
+    ::= { tnSATestEntry 19 }
+
+tnSATestEbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "EBS. In bytes."
+    ::= { tnSATestEntry 20 }
+
+tnSATestTargettestMacAddr OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Target Test MAC address (to be used for Loopback test only)."
+    ::= { tnSATestEntry 21 }
+
+tnSATestAction OBJECT-TYPE
+    SYNTAX TnSATestAction
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute allow start/stop test."
+    ::= { tnSATestEntry 22 }
+
+tnSATestRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The row status.  To create a row, set the instance of
+        this variable for the new row to 'createAndGo'.  To
+        delete a row, set the instance of this variable for
+        the row to delete to 'destroy'."
+    ::= { tnSATestEntry  23 }
+
+--
+-- Common Test Results
+--
+tnSACommonTestResultsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSACommonTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Common test results."
+    ::= { tnSaMIB 12 }
+
+tnSACommonTestResultsEntry OBJECT-TYPE
+    SYNTAX TnSACommonTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tnSACommonTestResultsTable."
+    INDEX {
+        tnSACommonTestResultsTestId
+    }
+    ::= { tnSACommonTestResultsTable 1 }
+
+TnSACommonTestResultsEntry ::= SEQUENCE {
+    tnSACommonTestResultsTestId Unsigned32,
+    tnSACommonTestResultsTestStatus TnSATestStatus,
+    tnSACommonTestResultsEgressPort Unsigned32,
+    tnSACommonTestResultsCbsLineRate Unsigned32,
+    tnSACommonTestResultsDirectionality TnSADirectionality,
+    tnSACommonTestResultsFrameLossRatio Unsigned32,
+    tnSACommonTestResultsYellowPcpList Unsigned32,
+    tnSACommonTestResultsFrameSizeMix OCTET STRING,
+    tnSACommonTestResultsRateDecStep Unsigned32,
+    tnSACommonTestResultsRateStepLength Unsigned32,
+    tnSACommonTestResultsFrameFormatFrameLevel TnSAFrameLevel,
+    tnSACommonTestResultsStepsToExecute Unsigned32,
+    tnSACommonTestResultsFrameFormatPaylodFiller TnSAPaylodFiller,
+    tnSACommonTestResultsFrameFormatEncapsulationL2 TnSAL2Encaps,
+    tnSACommonTestResultsFrameFormatEncapsulationL3 TnSAL3Encaps,
+    tnSACommonTestResultsFrameFormatEthType Unsigned32,
+    tnSACommonTestResultsFrameFormatIpDscp Unsigned32,
+    tnSACommonTestResultsFrameFormatIpEcn Unsigned32,
+    tnSACommonTestResultsFrameFormatIpFlags Unsigned32,
+    tnSACommonTestResultsFrameFormatIpTtl Unsigned32,
+    tnSACommonTestResultsFrameFormatUdpSrcPort Unsigned32,
+    tnSACommonTestResultsFrameFormatUdpDstPort Unsigned32,
+    tnSACommonTestResultsFrameFormatTcpSrcPort Unsigned32,
+    tnSACommonTestResultsFrameFormatTcpDstPort Unsigned32,
+    tnSACommonTestResultsFrameFormatTcpSeqNum Unsigned32,
+    tnSACommonTestResultsFrameFormatTcpAckNum Unsigned32,
+    tnSACommonTestResultsFrameFormatTcpControlBits Unsigned32,
+    tnSACommonTestResultsFrameFormatTcpWindowSize Unsigned32,
+    tnSACommonTestResultsFrameFormatLlcSnapOui Unsigned32,
+    tnSACommonTestResultsFrameFormatLlcSnapProto Unsigned32,
+    tnSACommonTestResultsFrameFormatIpDestIpAddress IpAddress,
+    tnSACommonTestResultsThroughputTestElapsedTime Unsigned32,
+    tnSACommonTestResultsLatencyTestElapsedTime Unsigned32,
+    tnSACommonTestResultsFlrTestElapsedTime Unsigned32,
+    tnSACommonTestResultsBacktoBackTestElapsedTime Unsigned32,
+    tnSACommonTestResultsThroughputTestResult TnSATestResStatus,
+    tnSACommonTestResultsLatencyTestResult TnSATestResStatus,
+    tnSACommonTestResultsFlrTestResult TnSATestResStatus,
+    tnSACommonTestResultsBacktoBackTestResult TnSATestResStatus,
+    tnSACommonTestResultsLastError DisplayString,
+    tnSACommonTestResultsTestIngressEncapsulationType TnSATestEncapsulationType,
+    tnSACommonTestResultsTestIngressInnerVid Unsigned32,
+    tnSACommonTestResultsTestIngressInnerPcp Unsigned32,
+    tnSACommonTestResultsTestIngressOuterVid Unsigned32,
+    tnSACommonTestResultsTestIngressOuterPcp Unsigned32,
+    tnSACommonTestResultsTestEgressEncapsulationType TnSATestEncapsulationType,
+    tnSACommonTestResultsTestEgressInnerVid Unsigned32,
+    tnSACommonTestResultsTestEgressInnerPcp Unsigned32,
+    tnSACommonTestResultsTestEgressOuterVid Unsigned32,
+    tnSACommonTestResultsTestEgressOuterPcp Unsigned32,
+    tnSACommonTestResultsTestIngressPort Unsigned32,
+    tnSACommonTestResultsTestCollectorIngressPort Unsigned32,
+    tnSACommonTestResultsTestCir Counter64,
+    tnSACommonTestResultsTestCbs Unsigned32,
+    tnSACommonTestResultsTestEir Counter64,
+    tnSACommonTestResultsTestEbs Unsigned32
+}
+
+tnSACommonTestResultsTestId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The report Test ID."
+    ::= { tnSACommonTestResultsEntry 1 }
+
+tnSACommonTestResultsTestStatus    OBJECT-TYPE
+    SYNTAX TnSATestStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Test status."
+    ::= { tnSACommonTestResultsEntry 2 }
+
+tnSACommonTestResultsEgressPort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Egress port number."
+    ::= { tnSACommonTestResultsEntry 3 }
+
+tnSACommonTestResultsCbsLineRate OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Line rate at which burst traffic should be sent for the Back-to-back frames test. In Mbps."
+    ::= { tnSACommonTestResultsEntry 4 }
+
+tnSACommonTestResultsDirectionality OBJECT-TYPE
+    SYNTAX TnSADirectionality
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Directionality of the tests: uni-directional, bi-directional or loopback based."
+    ::= { tnSACommonTestResultsEntry 5 }
+
+tnSACommonTestResultsFrameLossRatio OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Acceptable frame loss ratio (expressed in percentage, 
+         with 2 decimals (i.e. 99.99 %)."
+    ::= { tnSACommonTestResultsEntry 6 }
+
+tnSACommonTestResultsYellowPcpList OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "List of PCP values corresponding to yellow frame. Bitmask."
+    ::= { tnSACommonTestResultsEntry 7 }
+
+tnSACommonTestResultsFrameSizeMix OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(1..20))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Traffic frame size mix, for throughput tests."
+    ::= { tnSACommonTestResultsEntry 8 }
+
+tnSACommonTestResultsRateDecStep OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      " Rate decrease step size, in percentage."
+    ::= { tnSACommonTestResultsEntry 9 }
+
+tnSACommonTestResultsRateStepLength OBJECT-TYPE
+    SYNTAX Unsigned32 (10..60)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Rate step length, in seconds."
+    ::= { tnSACommonTestResultsEntry 10 }
+
+tnSACommonTestResultsFrameFormatFrameLevel OBJECT-TYPE
+    SYNTAX TnSAFrameLevel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Frame level – L2 or L3."
+    ::= { tnSACommonTestResultsEntry 11 }
+
+tnSACommonTestResultsStepsToExecute OBJECT-TYPE
+    SYNTAX Unsigned32 (0.. 2047)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "List of tests to execute – bitmask:
+             -Throughput (bit 1)
+             -Latency (bit 2)
+             -Frame Loss Rate (bit 3)
+             -Back To Back Frames (bit 4)"
+    ::= { tnSACommonTestResultsEntry 12 }
+
+tnSACommonTestResultsFrameFormatPaylodFiller OBJECT-TYPE
+    SYNTAX TnSAPaylodFiller
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Paylod filler."
+    ::= { tnSACommonTestResultsEntry 13 }
+
+tnSACommonTestResultsFrameFormatEncapsulationL2 OBJECT-TYPE
+    SYNTAX TnSAL2Encaps
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Encapsulation type for L2 frames."
+    ::= { tnSACommonTestResultsEntry 14 }
+
+tnSACommonTestResultsFrameFormatEncapsulationL3 OBJECT-TYPE
+    SYNTAX TnSAL3Encaps
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Encapsulation type for L3 frames."
+    ::= { tnSACommonTestResultsEntry 15 }
+
+tnSACommonTestResultsFrameFormatEthType OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Custom Eth-Type for L2 ETH-TST frames."
+    ::= { tnSACommonTestResultsEntry 16 }
+
+tnSACommonTestResultsFrameFormatIpDscp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..63)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DSCP value for L3 IP frames."
+    ::= { tnSACommonTestResultsEntry 17 }
+
+tnSACommonTestResultsFrameFormatIpEcn OBJECT-TYPE
+    SYNTAX Unsigned32 (0..3)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ECN value for L3 IP frames."
+    ::= { tnSACommonTestResultsEntry 18 }
+
+tnSACommonTestResultsFrameFormatIpFlags OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Flags value for L3 IP frames."
+    ::= { tnSACommonTestResultsEntry 19 }
+
+tnSACommonTestResultsFrameFormatIpTtl OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "TTL value for L3 IP frames."
+    ::= { tnSACommonTestResultsEntry 20 }
+
+tnSACommonTestResultsFrameFormatUdpSrcPort OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Source port for L3 IP/UDP frames."
+    ::= { tnSACommonTestResultsEntry 21 }
+
+tnSACommonTestResultsFrameFormatUdpDstPort OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Destination port for L3 IP/UDP frames."
+    ::= { tnSACommonTestResultsEntry 22 }
+
+tnSACommonTestResultsFrameFormatTcpSrcPort OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Source port for L3 IP/TCP frames."
+    ::= { tnSACommonTestResultsEntry 23 }
+
+tnSACommonTestResultsFrameFormatTcpDstPort OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Destination port for L3 IP/TCP frames."
+    ::= { tnSACommonTestResultsEntry 24 }
+
+tnSACommonTestResultsFrameFormatTcpSeqNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Sequence number for L3 IP/TCP frames."
+    ::= { tnSACommonTestResultsEntry 25 }
+
+tnSACommonTestResultsFrameFormatTcpAckNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ACK number for L3 IP/TCP frames."
+    ::= { tnSACommonTestResultsEntry 26 }
+
+tnSACommonTestResultsFrameFormatTcpControlBits OBJECT-TYPE
+    SYNTAX Unsigned32 (0..63)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Control bits for L3 IP/TCP frames."
+    ::= { tnSACommonTestResultsEntry 27 }
+
+tnSACommonTestResultsFrameFormatTcpWindowSize OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Window size for L3 IP/TCP frames."
+    ::= { tnSACommonTestResultsEntry 28 }
+
+tnSACommonTestResultsFrameFormatLlcSnapOui   OBJECT-TYPE
+    SYNTAX Unsigned32 (0.. 16777215)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " LLC/SNAP OUI field – 3 bytes"
+    ::= { tnSACommonTestResultsEntry 29 }
+
+tnSACommonTestResultsFrameFormatLlcSnapProto   OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " LLC/SNAP protocol field"
+    ::= { tnSACommonTestResultsEntry 30 }
+
+tnSACommonTestResultsFrameFormatIpDestIpAddress   OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " Destination IP address"
+    ::= { tnSACommonTestResultsEntry 31 }
+
+tnSACommonTestResultsThroughputTestElapsedTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total elapsed time for Throughput test in seconds."
+    ::= { tnSACommonTestResultsEntry 32 }
+
+tnSACommonTestResultsLatencyTestElapsedTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total elapsed time for Latency test in seconds."
+    ::= { tnSACommonTestResultsEntry 33 }
+
+tnSACommonTestResultsFlrTestElapsedTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total elapsed time for FLR test in seconds."
+    ::= { tnSACommonTestResultsEntry 34 }
+
+tnSACommonTestResultsBacktoBackTestElapsedTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total elapsed time for Back to Back test in seconds."
+    ::= { tnSACommonTestResultsEntry 35 }
+
+tnSACommonTestResultsThroughputTestResult OBJECT-TYPE
+    SYNTAX TnSATestResStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Throughput test result."
+    ::= { tnSACommonTestResultsEntry 36 }
+
+tnSACommonTestResultsLatencyTestResult OBJECT-TYPE
+    SYNTAX TnSATestResStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Latency test result."
+    ::= { tnSACommonTestResultsEntry 37 }
+
+tnSACommonTestResultsFlrTestResult OBJECT-TYPE
+    SYNTAX TnSATestResStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "FLR test result."
+    ::= { tnSACommonTestResultsEntry 38 }
+
+tnSACommonTestResultsBacktoBackTestResult OBJECT-TYPE
+    SYNTAX TnSATestResStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Back to back test result."
+    ::= { tnSACommonTestResultsEntry 39 }
+
+tnSACommonTestResultsLastError OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The last error string."
+    ::= { tnSACommonTestResultsEntry 40 }
+
+tnSACommonTestResultsTestIngressEncapsulationType OBJECT-TYPE
+    SYNTAX TnSATestEncapsulationType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN tag encapsulation type."
+    ::= { tnSACommonTestResultsEntry 41 }
+
+tnSACommonTestResultsTestIngressInnerVid OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ingress Inner VLAN ID."
+    ::= { tnSACommonTestResultsEntry 42 }
+
+tnSACommonTestResultsTestIngressInnerPcp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ingress Inner PCP value."
+    ::= { tnSACommonTestResultsEntry 43 }
+
+tnSACommonTestResultsTestIngressOuterVid OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ingress Outer VLAN ID."
+    ::= { tnSACommonTestResultsEntry 44 }
+
+tnSACommonTestResultsTestIngressOuterPcp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ingress Outer PCP value."
+    ::= { tnSACommonTestResultsEntry 45 }
+
+tnSACommonTestResultsTestEgressEncapsulationType OBJECT-TYPE
+    SYNTAX TnSATestEncapsulationType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN tag encapsulation type."
+    ::= { tnSACommonTestResultsEntry 46 }
+
+tnSACommonTestResultsTestEgressInnerVid OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Egress Inner VLAN ID."
+    ::= { tnSACommonTestResultsEntry 47 }
+
+tnSACommonTestResultsTestEgressInnerPcp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Egress Inner PCP value."
+    ::= { tnSACommonTestResultsEntry 48 }
+
+tnSACommonTestResultsTestEgressOuterVid OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4095)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Egress Outer VLAN ID."
+    ::= { tnSACommonTestResultsEntry 49 }
+
+tnSACommonTestResultsTestEgressOuterPcp OBJECT-TYPE
+    SYNTAX Unsigned32 (0..7)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Egress Outer PCP value."
+    ::= { tnSACommonTestResultsEntry 50 }
+
+tnSACommonTestResultsTestIngressPort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ingress port number."
+    ::= { tnSACommonTestResultsEntry 51 }
+
+tnSACommonTestResultsTestCollectorIngressPort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Collector's ingress port number."
+    ::= { tnSACommonTestResultsEntry 52 }
+
+tnSACommonTestResultsTestCir OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CIR. In Kbps."
+    ::= { tnSACommonTestResultsEntry 53 }
+
+tnSACommonTestResultsTestCbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CBS. In bytes."
+    ::= { tnSACommonTestResultsEntry 54 }
+
+tnSACommonTestResultsTestEir OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "EIR. In Kbps."
+    ::= { tnSACommonTestResultsEntry 55 }
+
+tnSACommonTestResultsTestEbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "EBS. In bytes."
+    ::= { tnSACommonTestResultsEntry 56 }
+
+--
+--    Common Test Results. DM bins threshold table
+--
+tnSACommonTestResultsDmBinThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSACommonTestResultsDmBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of DM bin thresholds used for this test."
+    ::= { tnSaMIB 13 }
+
+tnSACommonTestResultsDmBinThresholdEntry  OBJECT-TYPE
+    SYNTAX TnSACommonTestResultsDmBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the SA tnSACommonTestResultsDmBinThresholdTable."
+    INDEX {
+        tnSACommonTestResultsTestId,
+        tnSACommonTestResultsDmBinThresholdIndex
+    } ::= { tnSACommonTestResultsDmBinThresholdTable 1 }
+
+TnSACommonTestResultsDmBinThresholdEntry ::= SEQUENCE {
+    tnSACommonTestResultsDmBinThresholdIndex Unsigned32,
+    tnSACommonTestResultsDmBinThresholdValue Unsigned32
+}
+
+tnSACommonTestResultsDmBinThresholdIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold index."
+    ::= { tnSACommonTestResultsDmBinThresholdEntry 1 }
+
+tnSACommonTestResultsDmBinThresholdValue OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold value in usec."
+    ::= { tnSACommonTestResultsDmBinThresholdEntry 2 }
+
+--
+--    Common Test Results. DMV bins threshold table
+--
+tnSACommonTestResultsDmvBinThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSACommonTestResultsDmvBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of DMV bin thresholds used fot this test."
+    ::= { tnSaMIB 14 }
+
+tnSACommonTestResultsDmvBinThresholdEntry  OBJECT-TYPE
+    SYNTAX TnSACommonTestResultsDmvBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the SA tnSACommonTestResultsDmvBinThresholdTable."
+    INDEX {
+        tnSACommonTestResultsTestId,
+        tnSACommonTestResultsDmvBinThresholdIndex
+    } ::= { tnSACommonTestResultsDmvBinThresholdTable 1 }
+
+TnSACommonTestResultsDmvBinThresholdEntry ::= SEQUENCE {
+    tnSACommonTestResultsDmvBinThresholdIndex Unsigned32,
+    tnSACommonTestResultsDmvBinThresholdValue Unsigned32
+}
+
+tnSACommonTestResultsDmvBinThresholdIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold index."
+    ::= { tnSACommonTestResultsDmvBinThresholdEntry 1 }
+
+tnSACommonTestResultsDmvBinThresholdValue OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold value in usec. Zero value is used to delete threshold."
+    ::= { tnSACommonTestResultsDmvBinThresholdEntry 2 }
+
+--
+-- Throughput Test Results
+--
+tnSAThroughputTestResultsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSAThroughputTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for Throughput Test Results."
+    ::= { tnSaMIB 15 }
+
+tnSAThroughputTestResultsEntry OBJECT-TYPE
+    SYNTAX TnSAThroughputTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tnSAThroughputTestResultsTable."
+    INDEX {
+        tnSAThroughputTestResultsTestId,
+        tnSAThroughputTestResultsStepNumber
+    }
+    ::= { tnSAThroughputTestResultsTable 1 }
+
+TnSAThroughputTestResultsEntry ::= SEQUENCE {
+    tnSAThroughputTestResultsTestId Unsigned32,
+    tnSAThroughputTestResultsStepNumber Unsigned32,
+    tnSAThroughputTestResultsDirection TnSATestDirection,
+    tnSAThroughputTestResultsActualRate Counter64,
+    tnSAThroughputTestResultsStepDuration Unsigned32,
+    tnSAThroughputTestResultsTxFrames Counter64,
+    tnSAThroughputTestResultsRxGreenFrames Counter64,
+    tnSAThroughputTestResultsRxYellowFrames Counter64,
+    tnSAThroughputTestResultsStepResult TnSATestStepResult,
+    tnSAThroughputTestResultsFrameSize Unsigned32
+}
+
+tnSAThroughputTestResultsTestId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The report Test ID."
+    ::= { tnSAThroughputTestResultsEntry 1 }
+
+tnSAThroughputTestResultsStepNumber OBJECT-TYPE
+    SYNTAX Unsigned32(1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Test step number."
+    ::= { tnSAThroughputTestResultsEntry 2 }
+
+tnSAThroughputTestResultsDirection OBJECT-TYPE
+    SYNTAX TnSATestDirection
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The report direction."
+    ::= { tnSAThroughputTestResultsEntry 3 }
+
+tnSAThroughputTestResultsActualRate OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Actual rate in Kbps."
+    ::= { tnSAThroughputTestResultsEntry 4 }
+
+tnSAThroughputTestResultsStepDuration OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Step duration in seconds."
+    ::= { tnSAThroughputTestResultsEntry 5 }
+
+tnSAThroughputTestResultsTxFrames OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted frames."
+    ::= { tnSAThroughputTestResultsEntry 6 }
+
+tnSAThroughputTestResultsRxGreenFrames OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received green frames."
+    ::= { tnSAThroughputTestResultsEntry 7 }
+
+tnSAThroughputTestResultsRxYellowFrames OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received yellow frames."
+    ::= { tnSAThroughputTestResultsEntry 8 }
+
+tnSAThroughputTestResultsStepResult OBJECT-TYPE
+    SYNTAX TnSATestStepResult
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Step result."
+    ::= { tnSAThroughputTestResultsEntry 9 }
+
+tnSAThroughputTestResultsFrameSize OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Frame size."
+    ::= { tnSAThroughputTestResultsEntry 10 }
+
+--
+-- Latency Test Results
+--
+tnSALatencyTestResultsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSALatencyTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for Latency Test Results."
+    ::= { tnSaMIB 16 }
+
+tnSALatencyTestResultsEntry OBJECT-TYPE
+    SYNTAX TnSALatencyTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tnSALatencyTestResultsTable."
+    INDEX {
+        tnSALatencyTestResultsTestId,
+        tnSALatencyTestResultsStepNumber
+    }
+    ::= { tnSALatencyTestResultsTable 1 }
+
+TnSALatencyTestResultsEntry ::= SEQUENCE {
+    tnSALatencyTestResultsTestId Unsigned32,
+    tnSALatencyTestResultsStepNumber Unsigned32,
+    tnSALatencyTestResultsDirection TnSATestDirection,
+    tnSALatencyTestResultsStepDuration Unsigned32,
+    tnSALatencyTestResultsFrameSize Unsigned32,
+    tnSALatencyTestResultsStepResult TnSATestStepResult,
+    tnSALatencyTestResultsDmMin Unsigned32,
+    tnSALatencyTestResultsDmMax Unsigned32,
+    tnSALatencyTestResultsDmAvg Unsigned32,
+    tnSALatencyTestResultsDmvMin Unsigned32,
+    tnSALatencyTestResultsDmvMax Unsigned32,
+    tnSALatencyTestResultsDmvAvg Unsigned32
+}
+
+tnSALatencyTestResultsTestId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The report Test ID."
+    ::= { tnSALatencyTestResultsEntry 1 }
+
+tnSALatencyTestResultsStepNumber OBJECT-TYPE
+    SYNTAX Unsigned32(1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Test step number."
+    ::= { tnSALatencyTestResultsEntry 2 }
+
+tnSALatencyTestResultsDirection OBJECT-TYPE
+    SYNTAX TnSATestDirection
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The report direction."
+    ::= { tnSALatencyTestResultsEntry 3 }
+
+tnSALatencyTestResultsStepDuration OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Step duration in seconds."
+    ::= { tnSALatencyTestResultsEntry 4 }
+
+tnSALatencyTestResultsFrameSize OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Frame size."
+    ::= { tnSALatencyTestResultsEntry 5 }
+
+tnSALatencyTestResultsStepResult OBJECT-TYPE
+    SYNTAX TnSATestStepResult
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Step result."
+    ::= { tnSALatencyTestResultsEntry 6 }
+
+tnSALatencyTestResultsDmMin OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Minimal delay in us."
+    ::= { tnSALatencyTestResultsEntry 7 }
+
+tnSALatencyTestResultsDmMax OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximal delay in us."
+    ::= { tnSALatencyTestResultsEntry 8 }
+
+tnSALatencyTestResultsDmAvg OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average delay in us."
+    ::= { tnSALatencyTestResultsEntry 9 }
+
+tnSALatencyTestResultsDmvMin OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Minimal delay variation in us."
+    ::= { tnSALatencyTestResultsEntry 10 }
+
+tnSALatencyTestResultsDmvMax OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximal delay variation in us."
+    ::= { tnSALatencyTestResultsEntry 11 }
+
+tnSALatencyTestResultsDmvAvg OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average delay variation in us."
+    ::= { tnSALatencyTestResultsEntry 12 }
+
+
+
+--
+--    Latency DM bins threshold results table
+--
+tnSALatencyTestResultsDmBinThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSALatencyTestResultsDmBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for Latency test DM bin counters."
+    ::= { tnSaMIB 17 }
+
+tnSALatencyTestResultsDmBinThresholdEntry  OBJECT-TYPE
+    SYNTAX TnSALatencyTestResultsDmBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the SA tnSALatencyTestResultsDmBinThresholdTable."
+    INDEX {
+        tnSALatencyTestResultsTestId,
+        tnSALatencyTestResultsStepNumber,
+        tnSALatencyTestResultsDmBinThresholdIndex
+    } ::= { tnSALatencyTestResultsDmBinThresholdTable 1 }
+
+TnSALatencyTestResultsDmBinThresholdEntry ::= SEQUENCE {
+    tnSALatencyTestResultsDmBinThresholdIndex Unsigned32,
+    tnSALatencyTestResultsDmBinThresholdRange Unsigned32,
+    tnSALatencyTestResultsDmBinThresholdValue Unsigned32
+}
+
+tnSALatencyTestResultsDmBinThresholdIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold index."
+    ::= { tnSALatencyTestResultsDmBinThresholdEntry 1 }
+
+tnSALatencyTestResultsDmBinThresholdRange OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold range."
+    ::= { tnSALatencyTestResultsDmBinThresholdEntry 2 }
+
+tnSALatencyTestResultsDmBinThresholdValue OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DM bin counter."
+    ::= { tnSALatencyTestResultsDmBinThresholdEntry 3 }
+
+--
+--    Latency DMV bins threshold results table
+--
+tnSALatencyTestResultsDmvBinThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSALatencyTestResultsDmvBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for Latency test DMV bin counters."
+    ::= { tnSaMIB 18 }
+
+tnSALatencyTestResultsDmvBinThresholdEntry  OBJECT-TYPE
+    SYNTAX TnSALatencyTestResultsDmvBinThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the SA tnSALatencyTestResultsDmvBinThresholdTable."
+    INDEX {
+        tnSALatencyTestResultsTestId,
+        tnSALatencyTestResultsStepNumber,
+        tnSALatencyTestResultsDmvBinThresholdIndex
+    } ::= { tnSALatencyTestResultsDmvBinThresholdTable 1 }
+
+TnSALatencyTestResultsDmvBinThresholdEntry ::= SEQUENCE {
+    tnSALatencyTestResultsDmvBinThresholdIndex Unsigned32,
+    tnSALatencyTestResultsDmvBinThresholdRange Unsigned32,
+    tnSALatencyTestResultsDmvBinThresholdValue Unsigned32
+}
+
+tnSALatencyTestResultsDmvBinThresholdIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "DM bin threshold index."
+    ::= { tnSALatencyTestResultsDmvBinThresholdEntry 1 }
+
+tnSALatencyTestResultsDmvBinThresholdRange OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DMV bin threshold range."
+    ::= { tnSALatencyTestResultsDmvBinThresholdEntry 2 }
+
+tnSALatencyTestResultsDmvBinThresholdValue OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DMV bin counter."
+    ::= { tnSALatencyTestResultsDmvBinThresholdEntry 3 }
+
+--
+-- Flr Test Results
+--
+tnSAFlrTestResultsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSAFlrTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for FLR Test Results."
+    ::= { tnSaMIB 19 }
+
+tnSAFlrTestResultsEntry OBJECT-TYPE
+    SYNTAX TnSAFlrTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tnSAFlrTestResultsTable."
+    INDEX {
+        tnSAFlrTestResultsTestId,
+        tnSAFlrTestResultsStepNumber
+    }
+    ::= { tnSAFlrTestResultsTable 1 }
+
+TnSAFlrTestResultsEntry ::= SEQUENCE {
+    tnSAFlrTestResultsTestId Unsigned32,
+    tnSAFlrTestResultsStepNumber Unsigned32,
+    tnSAFlrTestResultsDirection TnSATestDirection,
+    tnSAFlrTestResultsActualRate Counter64,
+    tnSAFlrTestResultsStepDuration Unsigned32,
+    tnSAFlrTestResultsTxFrames Counter64,
+    tnSAFlrTestResultsRxGreenFrames Counter64,
+    tnSAFlrTestResultsRxYellowFrames Counter64,
+    tnSAFlrTestResultsFlr Unsigned32,
+    tnSAFlrTestResultsStepResult TnSATestStepResult,
+    tnSAFlrTestResultsFrameSize Unsigned32,
+    tnSAFlrTestResultsOutOfSeqEvents Unsigned32
+}
+
+tnSAFlrTestResultsTestId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The report Test ID."
+    ::= { tnSAFlrTestResultsEntry 1 }
+
+tnSAFlrTestResultsStepNumber OBJECT-TYPE
+    SYNTAX Unsigned32(1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Test step number."
+    ::= { tnSAFlrTestResultsEntry 2 }
+
+tnSAFlrTestResultsDirection OBJECT-TYPE
+    SYNTAX TnSATestDirection
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The report direction."
+    ::= { tnSAFlrTestResultsEntry 3 }
+
+tnSAFlrTestResultsActualRate OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Actual rate in Kbps."
+    ::= { tnSAFlrTestResultsEntry 4 }
+
+tnSAFlrTestResultsStepDuration OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Step duration in seconds."
+    ::= { tnSAFlrTestResultsEntry 5 }
+
+tnSAFlrTestResultsTxFrames OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted frames."
+    ::= { tnSAFlrTestResultsEntry 6 }
+
+tnSAFlrTestResultsRxGreenFrames OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received green frames."
+    ::= { tnSAFlrTestResultsEntry 7 }
+
+tnSAFlrTestResultsRxYellowFrames OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received yellow frames."
+    ::= { tnSAFlrTestResultsEntry 8 }
+
+tnSAFlrTestResultsFlr OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Calculated frame loss ratio."
+    ::= { tnSAFlrTestResultsEntry 9 }
+
+tnSAFlrTestResultsStepResult OBJECT-TYPE
+    SYNTAX TnSATestStepResult
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Step result."
+    ::= { tnSAFlrTestResultsEntry 10 }
+
+tnSAFlrTestResultsFrameSize OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Frame size."
+    ::= { tnSAFlrTestResultsEntry 11 }
+
+tnSAFlrTestResultsOutOfSeqEvents OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Out of sequence events."
+    ::= { tnSAFlrTestResultsEntry 12 }
+
+--
+-- BackToBack Test Results
+--
+tnSABackToBackTestResultsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSABackToBackTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for Back to Back Test Results."
+    ::= { tnSaMIB 20 }
+
+tnSABackToBackTestResultsEntry OBJECT-TYPE
+    SYNTAX TnSABackToBackTestResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tnSABackToBackTestResultsTable."
+    INDEX {
+        tnSABackToBackTestResultsTestId,
+        tnSABackToBackTestResultsStepNumber
+    }
+    ::= { tnSABackToBackTestResultsTable 1 }
+
+TnSABackToBackTestResultsEntry ::= SEQUENCE {
+    tnSABackToBackTestResultsTestId Unsigned32,
+    tnSABackToBackTestResultsStepNumber Unsigned32,
+    tnSABackToBackTestResultsDirection TnSATestDirection,
+    tnSABackToBackTestResultsActualRate Unsigned32,
+    tnSABackToBackTestResultsStepDuration Unsigned32,
+    tnSABackToBackTestResultsTxFrames Counter64,
+    tnSABackToBackTestResultsRxGreenFrames Counter64,
+    tnSABackToBackTestResultsRxYellowFrames Counter64,
+    tnSABackToBackTestResultsFlr Unsigned32,
+    tnSABackToBackTestResultsStepResult TnSATestStepResult,
+    tnSABackToBackTestResultsBurstSize Unsigned32
+}
+
+tnSABackToBackTestResultsTestId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The report Test ID."
+    ::= { tnSABackToBackTestResultsEntry 1 }
+
+tnSABackToBackTestResultsStepNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Test step number."
+    ::= { tnSABackToBackTestResultsEntry 2 }
+
+tnSABackToBackTestResultsDirection OBJECT-TYPE
+    SYNTAX TnSATestDirection
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The report direction."
+    ::= { tnSABackToBackTestResultsEntry 3 }
+
+tnSABackToBackTestResultsActualRate OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Actual rate in Kbps."
+    ::= { tnSABackToBackTestResultsEntry 4 }
+
+tnSABackToBackTestResultsStepDuration OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Step duration in seconds."
+    ::= { tnSABackToBackTestResultsEntry 5 }
+
+tnSABackToBackTestResultsTxFrames OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted frames."
+    ::= { tnSABackToBackTestResultsEntry 6 }
+
+tnSABackToBackTestResultsRxGreenFrames OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received green frames."
+    ::= { tnSABackToBackTestResultsEntry 7 }
+
+tnSABackToBackTestResultsRxYellowFrames OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received yellow frames."
+    ::= { tnSABackToBackTestResultsEntry 8 }
+
+tnSABackToBackTestResultsFlr OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Calculated frame loss ratio."
+    ::= { tnSABackToBackTestResultsEntry 9 }
+
+tnSABackToBackTestResultsStepResult OBJECT-TYPE
+    SYNTAX TnSATestStepResult
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Step result."
+    ::= { tnSABackToBackTestResultsEntry 10 }
+
+tnSABackToBackTestResultsBurstSize OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Burts size."
+    ::= { tnSABackToBackTestResultsEntry 11 }
+
+--
+-- Save Report
+--
+tnSAsaveRptTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSAsaveRptEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for saving results report to a file."
+    ::= { tnSaMIB 21 }
+
+tnSAsaveRptEntry OBJECT-TYPE
+    SYNTAX TnSAsaveRptEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the tnSAsaveRptTable."
+    INDEX {
+        entPhysicalIndex,
+    }
+    ::= { tnSAsaveRptTable 1 }
+
+TnSAsaveRptEntry ::= SEQUENCE {
+    tnSAsaveRptNumber Unsigned32,
+    tnSAsaveRptHostType InetAddressType,
+    tnSAsaveRptHostName InetAddress,
+    tnSAsaveRptFileName DisplayString,
+    tnSAsaveRpt Unsigned32
+}
+
+tnSAsaveRptNumber OBJECT-TYPE
+    SYNTAX Unsigned32 (1..16)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The report Test ID."
+    ::= { tnSAsaveRptEntry 1 }
+
+tnSAsaveRptHostType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address type of the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnSAsaveRptEntry 2 }
+
+tnSAsaveRptHostName OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address of the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnSAsaveRptEntry 3 }
+
+tnSAsaveRptFileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Name of text file to save the test results."
+    ::= { tnSAsaveRptEntry 4 }
+
+tnSAsaveRpt OBJECT-TYPE
+    SYNTAX      Unsigned32
+                {
+                    doNothing(0),
+                    save(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Save the test results in a text file. The text file is saved asynchronously after which
+                 the value of tnSAsaveRpt is returned to doNothing(0).
+                 The file is saved in under 5 seconds."
+    ::= { tnSAsaveRptEntry 5 }
+
+END

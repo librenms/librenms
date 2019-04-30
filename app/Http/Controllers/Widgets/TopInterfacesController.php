@@ -54,7 +54,7 @@ class TopInterfacesController extends WidgetController
             ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->where('poll_time', '>', Carbon::now()->subMinutes($data['time_interval'])->timestamp)
             ->has('device')
-            ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) DESC')
+            ->orderByRaw('SUM(LEAST(ifInOctets_rate, 9223372036854775807) + LEAST(ifOutOctets_rate, 9223372036854775807)) DESC')
             ->limit($data['interface_count']);
 
         if ($data['interface_filter']) {

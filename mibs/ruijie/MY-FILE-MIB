@@ -1,0 +1,256 @@
+-- *****************************************************************
+-- MY-FILE-MIB.mib:  My File MIB file
+--
+-- $Copyright$
+-- 
+-- *****************************************************************
+--
+
+MY-FILE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Counter32
+                FROM SNMPv2-SMI
+        TruthValue,
+        DisplayString,
+        RowStatus
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        myMgmt
+                FROM MY-SMI;
+
+myFileMIB MODULE-IDENTITY
+        LAST-UPDATED "200203200000Z"
+        ORGANIZATION "$Company$"
+        CONTACT-INFO
+                " 
+                Tel: $Telephone$ 
+
+                E-mail: $E-mail$"
+        DESCRIPTION
+                "This module defines my file mibs."
+        REVISION      "200203200000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { myMgmt 11}
+
+myFileMIBObjects OBJECT IDENTIFIER ::= { myFileMIB 1 }
+
+myFileTransTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyFileTransEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "list of file transfer parameters."
+        ::= { myFileMIBObjects 1 }
+        
+myFileTransEntry OBJECT-TYPE
+        SYNTAX MyFileTransEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of file transfer parameters."
+        INDEX { myFileTransIndex }
+        ::= { myFileTransTable 1 }
+    
+MyFileTransEntry ::=
+        SEQUENCE {
+        myFileTransIndex Integer32,
+        myFileTransMeans    INTEGER,
+        myFileTransOperType INTEGER,
+        myFileTransSrcFileName DisplayString,
+        myFileTransDescFileName DisplayString,
+        myFileTransServerAddr IpAddress,
+        myFileTransResult INTEGER,
+        myFileTransComplete TruthValue,
+        myFileTransDataLength Gauge32,
+        myFileTransEntryStatus RowStatus
+        }
+    
+myFileTransIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A value unique idenify the entry in the file transfer table.
+            the index is assigned by agent random."
+        ::= { myFileTransEntry 1 }
+    
+myFileTransMeans     OBJECT-TYPE
+        SYNTAX     INTEGER{
+                 tftp(1),
+                 xmodem(2),
+                 other(3)
+        }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "The way to be used for any copy. Transport file by xmodem work in 
+                 only in outband.other(3) mean transfer file by a way other than tftp(1) 
+                 and xmodem(2)"
+        DEFVAL  { tftp }
+        ::= { myFileTransEntry 2 }
+    
+myFileTransOperType OBJECT-TYPE
+        SYNTAX INTEGER {
+            upload(1),      -- upload a file to the board
+            download(2),    -- download file frome the board
+            synchronize(3)  -- synchronize file 
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object can be used for specifying the file transfer
+            operation type, upload or download. using tftp service 
+            file transfer can implemente between the station and agent.
+            in current agent,if synchronizing file,this object has no weight."
+        ::= { myFileTransEntry 3 }
+    
+myFileTransSrcFileName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object tell the tftp client to know the file name
+            required to be received in tftp transfer mode;and send the file name list 
+            which separate with '\t' to synchronizing server."
+        ::= { myFileTransEntry 4 }
+        
+myFileTransDescFileName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "File name the file will save as. The object has no weight to file synchronizing."
+        ::= { myFileTransEntry 5 }        
+    
+myFileTransServerAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object tell the address of transfer destination
+            when required for file transmittion. "
+        ::= { myFileTransEntry 6 }
+    
+myFileTransResult OBJECT-TYPE
+        SYNTAX INTEGER {
+            success(1),
+            failure(2),
+            parametersIllegel(3),
+            timeout(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "While the status of this entry is completed, this field of this
+            entry is valid, and carry the operation result of file transfer."
+        ::= { myFileTransEntry 7 }
+        
+myFileTransComplete OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "while the file transfer of use parameters stored by this entry is
+            completed the value of this field will be true(1), and if not completed
+            false(2)."
+        ::= { myFileTransEntry 8 }
+
+myFileTransDataLength OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "the file length transferred, after the transfer is complete, this
+            value is come to valid -- the valude of field myFileTransComplete
+            is true(1)."
+        ::= { myFileTransEntry 9 }
+    
+myFileTransEntryStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "entry status of this entry. and the means in this enviraments can
+            reffer to the text-convention definition of the RowStatus."
+        ::= { myFileTransEntry 10 }
+
+myFileSystemMaxRoom OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "the max room of file system in units of byte."
+        ::= { myFileMIBObjects 2 }
+
+myFileSystemAvailableRoom OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "the available room of file system in units of byte."
+        ::= { myFileMIBObjects 3 }
+
+-- conformance information
+
+myFileMIBConformance OBJECT IDENTIFIER ::= { myFileMIB 2 }
+myFileMIBCompliances OBJECT IDENTIFIER ::= { myFileMIBConformance 1 }
+myFileMIBGroups      OBJECT IDENTIFIER ::= { myFileMIBConformance 2 }
+
+
+-- compliance statements
+
+myFileMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the My File MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { myFileMIBGroup }
+                GROUP       myFileTransMeansMIBGroup
+                DESCRIPTION
+                     "This group is mandatory only for those system which support
+                     other transport protocal but tftp."   
+        ::= { myFileMIBCompliances 1 }
+        
+        
+-- units of conformance
+
+myFileMIBGroup OBJECT-GROUP
+        OBJECTS {
+                myFileTransIndex,
+                myFileTransOperType,
+                myFileTransSrcFileName,
+                myFileTransDescFileName,
+                myFileTransServerAddr,
+                myFileTransResult,
+                myFileTransComplete,
+                myFileTransDataLength,
+                myFileTransEntryStatus,
+                myFileSystemMaxRoom,
+                myFileSystemAvailableRoom
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing file ability to a
+                My agent."
+        ::= { myFileMIBGroups 1 }      
+        
+myFileTransMeansMIBGroup OBJECT-GROUP
+        OBJECTS {
+            myFileTransMeans
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing myFileTransMeans to a
+                My agent."
+        ::= { myFileMIBGroups 2 }            
+        
+END

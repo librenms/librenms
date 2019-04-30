@@ -189,8 +189,31 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
     echo PHP_EOL;
 } elseif (Config::get('autodiscovery.xdp') === true) {
     echo ' LLDP-MIB: ';
-    $lldp_array  = snmpwalk_group($device, 'lldpRemTable', 'LLDP-MIB', 3);
+    $lldp_array = snmpwalk_group($device, 'lldpRemTable', 'LLDP-MIB', 3);
     if (!empty($lldp_array)) {
+        $lldp_remAddr_num = snmpwalk_cache_multi_oid($device, '.1.0.8802.1.1.2.1.4.2.1.3', [], 'LLDP-MIB', null, '-OQun');
+        foreach ($lldp_remAddr_num as $key => $value) {
+            $res = preg_match("/1\.0\.8802\.1\.1\.2\.1\.4\.2\.1\.3\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*).(([^\.]*)(\.([^\.]*))+)/", $key, $matches);
+            if ($res) {
+                //collect the Management IP address from the OID
+                if ($matches[5] == 4) {
+                    $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $matches[6];
+                } else {
+                    $ipv6 = implode(
+                        ':',
+                        array_map(
+                            function ($v) {
+                                return sprintf('%02x', $v);
+                            },
+                            explode('.', $matches[6])
+                        )
+                    );
+                    $ipv6 = preg_replace('/([^:]{2}):([^:]{2})/i', '$1$2', $ipv6);
+                    $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $ipv6;
+                }
+            }
+        }
+
         $dot1d_array = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
         $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
     }
@@ -231,6 +254,9 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
                                 break;
                             }
                         }
+                        if (!$remote_device_id && isset($lldp['lldpRemManAddr'])) {
+                            $remote_device_id = discover_new_device($lldp['lldpRemManAddr'], $device, 'LLDP', $interface);
+                        }
                         unset($ptopo_array);
                     }
                 }
@@ -238,6 +264,18 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
                 $remote_device = device_by_id_cache($remote_device_id);
                 if ($remote_device['os'] == 'calix') {
                     $lldp['lldpRemPortId'] = 'EthPort ' . $lldp['lldpRemPortId'];
+                }
+
+                if ($remote_device['os'] == 'xos') {
+                    $slot_port = explode(':', $lldp['lldpRemPortId']);
+                    if (sizeof($slot_port) == 2) {
+                        $n_slot = (int)$slot_port[0];
+                        $n_port = (int)$slot_port[1];
+                    } else {
+                        $n_slot = 1;
+                        $n_port = (int)$slot_port[0];
+                    }
+                    $lldp['lldpRemPortId'] = (string)($n_slot * 1000 + $n_port);
                 }
 
                 $remote_port_id = find_port_id(

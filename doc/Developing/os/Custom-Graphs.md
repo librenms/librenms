@@ -61,7 +61,7 @@ The specific graphs are not displayed automatically so we need to write the foll
 **Pulse Sessions**
 
 ```bash
-html/includes/graphs/device/pulse_sessions.inc.php
+includes/html/graphs/device/pulse_sessions.inc.php
 ```
 
 ```php
@@ -89,7 +89,7 @@ require 'includes/graphs/generic_simplex.inc.php';
 **Pulse Users**
 
 ```bash
-html/includes/graphs/device/pulse_users.inc.php
+includes/html/graphs/device/pulse_users.inc.php
 ```
 
 ```php

@@ -171,7 +171,7 @@ function record_sensor_data($device, $all_sensors)
             $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
         }
 
-        if (isset($sensor['user_func']) && function_exists($sensor['user_func'])) {
+        if (isset($sensor['user_func']) && is_callable($sensor['user_func'])) {
             $sensor_value = $sensor['user_func']($sensor_value);
         }
 
@@ -243,12 +243,16 @@ function poll_device($device, $force_module = false)
     unset($array);
 
     // Start counting device poll time
-    echo 'Hostname: ' . $device['hostname'] . PHP_EOL;
-    echo 'Device ID: ' . $device['device_id'] . PHP_EOL;
-    echo 'OS: ' . $device['os'];
+    echo 'Hostname:    ' . $device['hostname'] . PHP_EOL;
+    echo 'Device ID:   ' . $device['device_id'] . PHP_EOL;
+    echo 'OS:          ' . $device['os'] . PHP_EOL;
     $ip = dnslookup($device);
 
-    $db_ip = isset($ip) ? inet_pton($ip) : null;
+    $db_ip = null;
+    if (!empty($ip)) {
+        echo 'Resolved IP: '.$ip.PHP_EOL;
+        $db_ip = inet_pton($ip);
+    }
 
     if (!empty($db_ip) && inet6_ntop($db_ip) != inet6_ntop($device['ip'])) {
         log_event('Device IP changed to ' . $ip, $device, 'system', 3);

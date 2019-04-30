@@ -29,23 +29,10 @@ class Rocket extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
+        $rocket_opts = $this->parseUserOptions($this->config['rocket-options']);
         $rocket_opts['url'] = $this->config['rocket-url'];
-        foreach (explode(PHP_EOL, $this->config['rocket-options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $rocket_opts[$k] = $v;
-        }
-        return $this->contactRocket($obj, $rocket_opts);
-    }
 
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $tmp_api) {
-            $this->contactRocket($obj, $tmp_api);
-        }
-        return true;
+        return $this->contactRocket($obj, $rocket_opts);
     }
 
     public static function contactRocket($obj, $api)

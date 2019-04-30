@@ -13,7 +13,7 @@ matrix:
   - php: 7.3
     env: SKIP_STYLE_CHECK=1
   - php: 7.2
-    env: SKIP_UNIT_CHECK=1 BROWSER_TEST=1
+    env: SKIP_UNIT_CHECK=1 BROWSER_TEST=1 CHROME_HEADLESS=1
   - php: 7.1
     env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
 
@@ -38,6 +38,7 @@ after_failure:
   - tail /tmp/snmpsimd.log
 
 before_script:
+  - test -z "$BROWSER_TEST" || php artisan dusk:update `google-chrome --version | grep -oE "[0-9]+" | head -n 1`
   - test -z "$BROWSER_TEST" || php artisan serve --env=dusk.testing  2>/dev/null &
 
 script:

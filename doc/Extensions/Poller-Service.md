@@ -4,15 +4,15 @@ path: blob/master/doc/
 
 > Status: BETA
 
-The new poller service (`librenms-service.py`) replaces the old poller service (`poller-service.py`), improving its reliability. It's mostly compatible with the old service, but testing is recommended before switching over.
+The new LibreNMS service (`librenms-service.py`) replaces the old poller service (`poller-service.py`), improving its reliability. It's mostly a drop in replacement for the old service, but testing is recommended before switching over.
 
 If you are currently using the old poller service, it's strongly recommended that you migrate away - it has a serious defect under certain versions of mysql/mariadb, and may be inadvertently DoS'ing your devices. The new service does not have this issue,
 
-Make sure you uninstall the old poller service before deploying the new one.
+Make sure you uninstall the old poller service before deploying the new service.
 
 ## External Requirements
 #### A recent version of Python
-The poller service won't work under Python 2.7+; some features require behaviour only found in Python3.4+.
+The LibreNMS service won't work under Python 2.7+; some features require behaviour only found in Python3.4+.
 
 #### Python modules
  - PyMySQL is recommended as it requires no C compiler to install. MySQLclient can also be used, but does require compilation.
@@ -30,7 +30,7 @@ If you want to use distributed polling, you'll need a redis instance to coordina
 It's strongly recommended that you deploy a resilient cluster of redis systems, and use redis-sentinel.
 
 #### MySQL
-You should already have this, but the pollers do need access to the SQL database. The poller service runs much faster and more aggressively than the standard poller, so keep an eye on the number of open connections and other important health metrics.
+You should already have this, but the pollers do need access to the SQL database. The LibreNMS service runs much faster and more aggressively than the standard poller, so keep an eye on the number of open connections and other important health metrics.
 
 ## Configuration
 
@@ -95,7 +95,7 @@ distributed_poller_group                       = 0;     # Which group to poll
 ```
 
 ## Cron Scripts
-Once the poller service is installed, the cron scripts used by LibreNMS are no longer required and must be removed.
+Once the LibreNMS service is installed, the cron scripts used by LibreNMS are no longer required and must be removed.
 
 ## Service Installation
 A systemd unit file is provided - the sysv and upstart init scripts could also be used with a little modification.
@@ -106,7 +106,7 @@ A systemd unit file can be found in `misc/librenms.service`. To install run `cp 
 ## OS-Specific Instructions
 
 ### RHEL/CentOS
-To get the poller service running under python3.4+ on RHEL-derivatives with minimal fuss, you can use the software collections build:
+To get the LibreNMS service running under python3.4+ on RHEL-derivatives with minimal fuss, you can use the software collections build:
 
 First, enable SCL's on your system:
 
