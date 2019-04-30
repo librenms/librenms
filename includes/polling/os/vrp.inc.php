@@ -11,6 +11,11 @@ if (!empty($matches[2])) {
     $version .= " (" . trim($matches[2]) . ")";
 }
 
+$patch = snmp_getnext($device, 'HUAWEI-SYS-MAN-MIB::hwPatchVersion', '-OQv');
+if ($patch) {
+    $version .= " [$patch]";
+}
+
 $oidList = [
     'HUAWEI-ENTITY-EXTENT-MIB::hwEntityExtentMIB.6.5.0',
     'HUAWEI-DEVICE-EXT-MIB::hwProductName.0',

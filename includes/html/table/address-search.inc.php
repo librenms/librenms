@@ -42,12 +42,12 @@ if ($vars['search_type'] == 'ipv4') {
 }//end if
 if (is_numeric($vars['device_id'])) {
     $sql    .= ' AND I.device_id = ?';
-    $param[] = array($vars['device_id']);
+    $param[] = $vars['device_id'];
 }
 
 if ($vars['interface']) {
-    $sql    .= " AND I.ifDescr LIKE '?'";
-    $param[] = array($vars['interface']);
+    $sql    .= " AND I.ifDescr LIKE ?";
+    $param[] = $vars['interface'];
 }
 
 if ($vars['search_type'] == 'ipv4') {
@@ -85,11 +85,11 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     $type  = humanmedia($interface['ifType']);
 
     if ($vars['search_type'] == 'ipv6') {
-        $address = (string)IP::parse($interface['ipv6_network'], true);
+        $address = (string)IP::parse($interface['ipv6_address'], true) . '/' . $interface['ipv6_prefixlen'];
     } elseif ($vars['search_type'] == 'mac') {
         $address = formatMac($interface['ifPhysAddress']);
     } else {
-        $address = (string)IP::parse($interface['ipv4_network'], true);
+        $address = (string)IP::parse($interface['ipv4_address'], true) . '/' . $interface['ipv4_prefixlen'];
     }
 
     if ($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {

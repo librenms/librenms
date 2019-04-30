@@ -1,0 +1,221 @@
+-- *****************************************************************
+-- TN-THERMAL-PROTECTION-MIB
+--
+-- Copyright (c) 2012, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+TN-THERMAL-PROTECTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Integer32   FROM SNMPv2-SMI
+    NOTIFICATION-GROUP  FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, TimeStamp,
+    RowStatus, TruthValue  FROM SNMPv2-TC
+    entPhysicalIndex  FROM ENTITY-MIB
+    tnProducts FROM TRANSITION-SMI
+    ifIndex, InterfaceIndex FROM IF-MIB;
+
+tnThermalProtectionMIB MODULE-IDENTITY
+        LAST-UPDATED "201209120000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for thermal protection on ports"
+
+        REVISION "201209120000Z"    -- 12 September, 2012
+        DESCRIPTION
+        "Initial Revision of this module"
+
+    ::= { tnProducts 32 }
+
+
+tnThermalProtectionMIBNotifications
+        OBJECT IDENTIFIER ::= { tnThermalProtectionMIB 0 }
+
+tnThermalProtectionMIBObjects
+        OBJECT IDENTIFIER ::= { tnThermalProtectionMIB 1 }
+
+
+--
+-- Textual Conventions
+--
+
+
+
+--
+-- MIB variables
+--
+
+tnThermalProtectionMgmt
+    OBJECT IDENTIFIER ::= { tnThermalProtectionMIBObjects 1 }
+
+
+
+--
+-- tnThermalProtectionPriorityTable
+--
+
+tnThermalProtectionPriorityTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnThermalProtectionPriorityEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table is for user to configure the temperature and its priority
+        which the ports belong to."
+    ::= { tnThermalProtectionMgmt 1 }
+
+tnThermalProtectionPriorityEntry OBJECT-TYPE
+    SYNTAX        TnThermalProtectionPriorityEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry represents a temperature and its priority, 4 priorities are
+        supported."
+    INDEX { tnThermalProtectionPriorityIndex }
+    ::= { tnThermalProtectionPriorityTable 1 }
+
+TnThermalProtectionPriorityEntry ::= SEQUENCE {
+    tnThermalProtectionPriorityIndex        INTEGER,
+    tnThermalProtectionPriorityTemperature  INTEGER
+    }
+
+tnThermalProtectionPriorityIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..3)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The priority the port belongs to. 4 priorities are supported."
+    ::= { tnThermalProtectionPriorityEntry 1 }
+
+tnThermalProtectionPriorityTemperature OBJECT-TYPE
+    SYNTAX INTEGER (0..255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The temperature at which the ports with the corresponding priority will
+        be turned off. Temperatures between 0 and 255 C are supported."
+    ::= { tnThermalProtectionPriorityEntry 2 }
+
+
+
+--
+-- tnThermalProtectionIfTable
+--
+
+tnThermalProtectionIfTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnThermalProtectionIfEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table lets user to configure the temperature priority of each port
+        for thermal protection. When the temperature exceeds the configured
+        thermal protection temperature, ports will be turned off in order to
+        protect the chip from getting overheated or decrease the power consumption."
+    ::= { tnThermalProtectionMgmt 2 }
+
+tnThermalProtectionIfEntry OBJECT-TYPE
+    SYNTAX        TnThermalProtectionIfEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry lists the temperature priority of each port."
+    INDEX { ifIndex }
+    ::= { tnThermalProtectionIfTable 1 }
+
+TnThermalProtectionIfEntry ::= SEQUENCE {
+    tnThermalProtectionIfPriority    INTEGER
+    }
+
+tnThermalProtectionIfPriority OBJECT-TYPE
+    SYNTAX     INTEGER (0..3)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The temperature priority of current port belongs to. Refer to
+        tnThermalProtectionPriorityIndex"
+    ::= { tnThermalProtectionIfEntry 1 }
+
+
+
+--
+-- tnThermalProtectionIfStatusTable
+--
+
+tnThermalProtectionIfStatusTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnThermalProtectionIfStatusEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table allows the user to inspect status information related to
+        thermal protection."
+    ::= { tnThermalProtectionMgmt 3 }
+
+tnThermalProtectionIfStatusEntry OBJECT-TYPE
+    SYNTAX        TnThermalProtectionIfStatusEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry lists the temperature priority of each port."
+    INDEX { ifIndex }
+    ::= { tnThermalProtectionIfStatusTable 1 }
+
+TnThermalProtectionIfStatusEntry ::= SEQUENCE {
+    tnThermalProtectionIfStatusTemperature    INTEGER,
+    tnThermalProtectionIfStatusCode           INTEGER
+    }
+
+
+tnThermalProtectionIfStatusTemperature OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Shows the current chip temperature in degrees Celsius."
+    ::= { tnThermalProtectionIfStatusEntry 1 }
+
+tnThermalProtectionIfStatusCode OBJECT-TYPE
+    SYNTAX     INTEGER
+    {
+        normal(0),
+        linkdown(1)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Shows if the port is thermally protected (link is down) or if the port
+        is operating normally. "
+    ::= { tnThermalProtectionIfStatusEntry 2 }
+
+--
+-- Notifications
+--
+
+tnThermalProtectionPortStatusChangedNotification NOTIFICATION-TYPE
+    OBJECTS
+    {
+        ifIndex,
+        tnThermalProtectionPriorityTemperature,
+        tnThermalProtectionIfStatusTemperature,
+        tnThermalProtectionIfStatusCode
+    }
+    STATUS current
+    DESCRIPTION
+    "A notification generated by the local device sensing a change in the thermal
+    protection port status. The change indicates the current temperature of a port
+    turns to be higher, or lower, than its priority temperature."
+::= { tnThermalProtectionMIBNotifications  1 }
+
+
+END
