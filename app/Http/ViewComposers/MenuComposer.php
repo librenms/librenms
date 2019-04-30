@@ -62,7 +62,7 @@ class MenuComposer
         /** @var User $user */
         $user = Auth::user();
 
-        $vars['navbar'] = in_array(Config::get('site_style'), ['mono', 'dark']) ? 'navbar-inverse' : '';
+        $vars['navbar'] = \LibreNMS\Util\Colors::navbarClass();
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $site_style = Config::get('site_style', 'light');

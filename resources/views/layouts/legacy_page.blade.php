@@ -68,7 +68,7 @@
     @endif
 
     @config('enable_footer')
-    <nav class="navbar navbar-default {{ $navbar ?? '' }} navbar-fixed-bottom">
+    <nav class="navbar navbar-default {{ $navbar }} navbar-fixed-bottom">
         <div class="container">
             <div class="row">
                 <div class="col-md-12 text-center">

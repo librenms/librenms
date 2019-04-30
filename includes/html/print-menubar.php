@@ -5,38 +5,7 @@ use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
-//$service_status   = get_service_status();
-//$typeahead_limit  = $config['webui']['global_search_result_limit'];
-//$if_alerts        = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
-if (Auth::user()->hasGlobalRead()) {
-    $links['count']        = dbFetchCell("SELECT COUNT(*) FROM `links`");
-} else {
-    $links['count']       = dbFetchCell("SELECT COUNT(*) FROM `links` AS `L`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `L`.`local_device_id` = `D`.`device_id`", array(Auth::id()));
-}
-
-if (isset($config['enable_bgp']) && $config['enable_bgp']) {
-//    $bgp_alerts = dbFetchCell("SELECT COUNT(bgpPeer_id) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'");
-}
-
-if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config['site_style'] == 'mono')) {
-    $navbar = 'navbar-inverse';
-} else {
-    $navbar = '';
-}
-
-?>
-
-<nav class="navbar navbar-default <?php echo $navbar; ?> navbar-fixed-top" role="navigation">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-<?php
 
 if ($config['title_image']) {
     echo('<a class="hidden-md hidden-sm navbar-brand" href=""><img src="' . $config['title_image'] . '" /></a>');
