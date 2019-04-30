@@ -82,7 +82,6 @@ class ArubaInstant extends OS implements
         return $processors;
     }
 
-
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -143,27 +142,67 @@ class ArubaInstant extends OS implements
     }
 
     /**
-     * Aruba Instant Radio Discovery
-     *
-     * @return array Sensors
-     */
+    * Aruba Instant Radio Discovery
+    *
+    * @return array Sensors
+    */
     private function discoverInstantRadio($type, $mib, $desc = '%s Radio %s')
     {
         $ai_mib = 'AI-AP-MIB';
         $ai_sg_data = $this->getCacheTable('aiStateGroup', $ai_mib);
 
         $sensors = [];
+
+        if ($type == 'clients') {
+            // clients per ssid
+            $device = $this->getDevice();
+            $ssid_data = $this->getCacheTable('AiWlanSSIDEntry', $ai_mib);
+            $ssid_name_mib = 'aiSSID';
+
+            d_echo('$device: '.var_export($device, 1).PHP_EOL);
+            d_echo('$ssid_data: '.var_export($ssid_data, 1).PHP_EOL);
+
+            $oids = array();
+            $total_clients = 0;
+            if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
+                // version >= 8.4.0.0
+                $ssid_clients_mib = 'aiSSIDClientNum';
+
+                foreach ($ssid_data as $index => $entry) {
+                    $combined_oid = sprintf('%s::%s.%s', $ai_mib, $ssid_clients_mib, $index);
+                    $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+                    $description = sprintf('SSID %s Clients', $entry[$ssid_name_mib]);
+                    $oids[] = $oid;
+                    $total_clients += $entry[$ssid_clients_mib];
+                    $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $entry[$ssid_clients_mib]);
+                }
+
+                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oids, 'aruba-instant', null, 'Total Clients', $total_clients);
+            } else {
+                // version < 8.4.0.0
+                // count the number of clients per ssid and create a sensor...
+            }
+        } // end if
+
         foreach ($ai_sg_data as $ai_ap => $ai_ap_oid) {
             if (isset($ai_ap_oid[$mib])) {
                 foreach ($ai_ap_oid[$mib] as $ai_ap_radio => $value) {
+                    $multiplier = 1;
                     if ($type == 'frequency') {
                         $value = WirelessSensor::channelToFrequency($this->decodeChannel($value));
                     }
+
+                    if ($type == 'noise-floor') {
+                        $multiplier = -1;
+                        $value = $value * $multiplier;
+                    }
+
                     $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, $mib, Rewrite::oidMac($ai_ap), $ai_ap_radio);
                     $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
                     $description = sprintf($desc, $ai_sg_data[$ai_ap]['aiAPSerialNum'], $ai_ap_radio);
                     $index = sprintf('%s.%s', Rewrite::macToHex($ai_ap), $ai_ap_radio);
-                    $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $value);
+
+                    $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $value, $multiplier);
                 } // end foreach
             } // end if
         } // end foreach
