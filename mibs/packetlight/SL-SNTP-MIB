@@ -1,0 +1,266 @@
+-- *****************************************************************
+-- SNTP MIB
+-- *****************************************************************
+
+SL-SNTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, Integer32, TimeTicks
+					 			     	FROM SNMPv2-SMI
+	DisplayString, TruthValue, RowStatus,
+	TimeStamp					  		FROM SNMPv2-TC
+    SnmpAdminString						FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+    IpAddress        FROM SNMPv2-SMI
+	slMain				      			FROM SL-MAIN-MIB;
+
+slSntp MODULE-IDENTITY
+	LAST-UPDATED "200007240000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the SNTP Client"
+	::= { slMain 21 }
+
+
+slSntpConfig   		OBJECT IDENTIFIER ::= { slSntp 1 }
+slSntpTraps  		OBJECT IDENTIFIER ::= { slSntp 2 }
+
+
+-- ----------------------------------------------------------------------   
+-- SNTP client configuration parameters
+-- ----------------------------------------------------------------------
+      
+slSntpConfigMode OBJECT-TYPE
+      SYNTAX      INTEGER {
+                      disabled(1),
+                      unicast(2),
+                      broadcast(3)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Current operational mode of SNTP client"
+      ::= { slSntpConfig 1 }
+
+slSntpConfigPollInterval OBJECT-TYPE
+      SYNTAX      Integer32 (30..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Period of time (in seconds) between succesive attempts to 
+                  perform an update via SNTP"
+	  DEFVAL { 60 }
+      ::= { slSntpConfig 2 }
+    
+slSntpConfigRetryCount OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write    
+    STATUS  current
+    DESCRIPTION
+    "The number of query attempts the SNTP client should perform before reporting
+    that the SNTP client cannot communicate with the peer."
+    DEFVAL { 3 }        
+    ::= { slSntpConfig 3 }
+
+slSntpConfigTimeZone   OBJECT-TYPE
+    SYNTAX          INTEGER (0..23)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "The time zone this node is currently located in, expressed as
+    an integer ranging from 0 to 23, representing the 24 hr time-
+    zones starting at UTC which is equal to 0 and proceeding in
+    the positive westerly direction. ie: Boston = 5, California=8.
+    Note:  Daylight savings time is not automatically calculated."
+    DEFVAL { 0 }
+
+    ::= { slSntpConfig 4 }
+
+slSntpConfigDayLightSaving   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "It specifies if daylight saving time is applicable."
+    DEFVAL { false }
+    ::= { slSntpConfig 5 }
+
+
+-- ----------------------------------------------------------------------
+-- Table for configuring Servers
+-- ----------------------------------------------------------------------
+
+slSntpConfigTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF SlSntpConfigEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "A table containing trusted SNTP servers to be queried in 
+                  unicast mode"
+      ::= { slSntpConfig 10 }
+
+slSntpConfigEntry OBJECT-TYPE
+      SYNTAX      SlSntpConfigEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "A trusted server and its expected version number"
+      INDEX       { slSntpConfigAddress }
+      ::= { slSntpConfigTable 1 }
+
+SlSntpConfigEntry ::=
+      SEQUENCE {
+         slSntpConfigAddress        		IpAddress,
+         slSntpConfigVersion        		Integer32,
+         slSntpConfigPriority       		Integer32,
+         slSntpConfigRowStatus      		RowStatus,        
+         slSntpConfigMaxVariance 			INTEGER,
+         slSntpConfigVariance				INTEGER,
+         slSntpConfigVarianceDetectEnable	TruthValue,
+         slSntpConfigServerStatus			INTEGER
+      }
+      
+
+slSntpConfigAddress OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION "Ip Address of a trusted SNTP server."
+      ::= { slSntpConfigEntry 1 }
+
+slSntpConfigVersion OBJECT-TYPE
+      SYNTAX      Integer32 (1..7)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION "Protocol version used by this SNTP server"
+      ::= { slSntpConfigEntry 2 }
+
+slSntpConfigPriority OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION "Priority given to this server."
+      ::= { slSntpConfigEntry 3 }
+
+slSntpConfigRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION "The Status of this SNTP server information."
+      ::= { slSntpConfigEntry 4 }
+    
+slSntpConfigMaxVariance  OBJECT-TYPE
+    SYNTAX  INTEGER (1..7200000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "The variance expressed as the number of milliseconds between client and 
+    peer which will trigger an alarm.  This is useful in determining if the 
+    historical data recorded in NOVRAM for statistics trending or timestamps 
+    used for traps is outside the configured variance parameter."
+    DEFVAL { 1000 }        
+    ::= { slSntpConfigEntry 5 }
+
+slSntpConfigVariance  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The amount of time expressed as the number of milliseconds delta between 
+    client and peer."    
+    ::= { slSntpConfigEntry 6 }
+        
+slSntpConfigVarianceDetectEnable  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Used to enable or disable variance threshold alarms."
+    DEFVAL { false }        
+    ::= { slSntpConfigEntry 7 }
+        
+slSntpConfigServerStatus  OBJECT-TYPE
+    SYNTAX    INTEGER {
+    	unknown(0),
+		disconnected(1),
+		connected(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The status of this srever."
+    ::= { slSntpConfigEntry 8 }
+
+
+-- ----------------------------------------------------------------------
+-- SNTP Trap Definitions
+-- ----------------------------------------------------------------------
+
+slSntpPeerFailureTrap  NOTIFICATION-TYPE
+    OBJECTS { 
+        slSntpConfigAddress 
+    }
+    STATUS  current
+    DESCRIPTION
+    "The SNTP Client is unable to communicate with the NTP Server which 
+    has been configured."   
+    ::= { slSntpTraps 1 }
+    
+slSntpConfigVarianceTrap  NOTIFICATION-TYPE
+    OBJECTS { 
+        slSntpConfigAddress, 
+        slSntpConfigMaxVariance, 
+        slSntpConfigVariance 
+    }
+    STATUS  current
+    DESCRIPTION
+    "The difference in time between client and peer exceeds the configured
+    variance."    
+    ::= { slSntpTraps 2 }
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
