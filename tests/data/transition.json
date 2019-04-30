@@ -10,10 +10,10 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "os": "generic",
-                    "type": "server",
+                    "os": "transition",
+                    "type": "network",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "transition.png",
                     "location": null
                 }
             ]
@@ -28,10 +28,10 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "os": "generic",
-                    "type": "server",
+                    "os": "transition",
+                    "type": "network",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "transition.png",
                     "location": "<private>"
                 }
             ]
