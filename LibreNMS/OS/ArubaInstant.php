@@ -29,18 +29,24 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessApCountPolling;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 use LibreNMS\Util\Rewrite;
 
 class ArubaInstant extends OS implements
     ProcessorDiscovery,
+    WirelessApCountDiscovery,
+    WirelessApCountPolling,
     WirelessClientsDiscovery,
+    WirelessClientsPolling,
     WirelessFrequencyDiscovery,
     WirelessFrequencyPolling,
     WirelessNoiseFloorDiscovery,
@@ -132,8 +138,45 @@ class ArubaInstant extends OS implements
             }
         } else {
             // version is lower than 8.4.0.0
-            // figure out a different way to get a client count, and then implement client polling too.
+            // fetch the MAC addresses of currently connected clients, then count them to get an overall total
+            $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
+
+            d_echo('client_data:'.PHP_EOL);
+            d_echo($client_data);
+
+            $total_clients = sizeof($client_data);
+
+            $combined_oid = sprintf('%s::%s', $ai_mib, 'aiClientMACAddress');
+            $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+
+            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', 'total-clients', 'Total Clients', $total_clients);
         }
+
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless AP counts. Type is ap-count.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessApCount()
+    {
+        $sensors = array();
+
+        $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
+
+        d_echo('ap_data:'.PHP_EOL);
+        d_echo($ap_data);
+
+        $total_aps = sizeof($ap_data);
+
+        $combined_oid = sprintf('%s::%s', $ai_mib, 'aiAPSerialNum');
+        $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+
+        $sensors[] = new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'aruba-instant', 'total-clients', 'Total APs', $total_aps);
+
 
         return $sensors;
     }
@@ -244,5 +287,89 @@ class ArubaInstant extends OS implements
     public function pollWirelessFrequency(array $sensors)
     {
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
+    }
+
+    /**
+     * Poll wireless clients
+     * The returned array should be sensor_id => value pairs
+     *
+     * @param array $sensors Array of sensors needed to be polled
+     * @return array of polled data
+     */
+    public function pollWirelessClients(array $sensors)
+    {
+        $data = array();
+        if (!empty($sensors)) {
+            $device = $this->getDevice();
+
+            if (intval(explode('.', $device['version'])[0]) >= 8 && intval(explode('.', $device['version'])[1]) >= 4) {
+                // version is at least 8.4.0.0
+                $oids = array();
+
+                foreach ($sensors as $sensor) {
+                    $oids[$sensor['sensor_id']] = current($sensor['sensor_oids']);
+                }
+
+                $snmp_data = snmp_get_multi_oid($this->getDevice(), $oids);
+
+                foreach ($oids as $id => $oid) {
+                      $data[$id] = $snmp_data[$oid];
+                }
+            } else {
+                // version is lower than 8.4.0.0
+                $ai_mib = 'AI-AP-MIB';
+                $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
+
+                d_echo('client_data:'.PHP_EOL);
+                d_echo($client_data);
+
+                if (empty($client_data)) {
+                    $total_clients = 0;
+                } else {
+                    $total_clients = sizeof($client_data);
+                }
+
+                d_echo('total_clients:'.PHP_EOL);
+                d_echo($total_clients);
+
+                $data = array('total-clients'=>$total_clients);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Poll AP Count
+     * The returned array should be sensor_id => value pairs
+     *
+     * @param array $sensors Array of sensors needed to be polled
+     * @return array of polled data
+     */
+    public function pollWirelessApCount(array $sensors)
+    {
+        $data = array();
+        if (!empty($sensors)) {
+            $device = $this->getDevice();
+
+            $ai_mib = 'AI-AP-MIB';
+            $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
+
+            d_echo('ap_data:'.PHP_EOL);
+            d_echo($ap_data);
+
+            if (empty($ap_data)) {
+                $total_aps = 0;
+            } else {
+                $total_aps = sizeof($ap_data);
+            }
+
+            d_echo('total_aps:'.PHP_EOL);
+            d_echo($total_aps);
+
+            $data = array('total-aps'=>$total_aps);
+        }
+
+        return $data;
     }
 }
