@@ -165,6 +165,7 @@ class ArubaInstant extends OS implements
     {
         $sensors = array();
 
+        $ai_mib = 'AI-AP-MIB';
         $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
 
         d_echo('ap_data:'.PHP_EOL);
