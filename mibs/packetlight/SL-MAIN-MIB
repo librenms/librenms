@@ -1,0 +1,1203 @@
+-- *****************************************************************
+-- Main Control Card MIB
+-- *****************************************************************
+
+SL-MAIN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+	Integer32, IpAddress, Opaque, Gauge32,
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, TimeTicks		FROM SNMPv2-SMI
+	DisplayString, TruthValue, 
+	RowStatus, TimeStamp, DateAndTime	FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+	sitelight				      		FROM SL-NE-MIB;
+
+slMain MODULE-IDENTITY
+	LAST-UPDATED "200008280000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the Main Board"
+	::= { sitelight 3 }
+
+-- The Main MIB consists of the following groups:
+--    System Info
+--    Authentication Table
+--    Traps Table
+--    Software Versions Table
+--    Connections Info
+--    Log Files Table
+--    Configuration Files Table
+
+slmSys			OBJECT IDENTIFIER ::= { slMain 1 }
+slmAdmin 		OBJECT IDENTIFIER ::= { slMain 2 }
+slmAuth 		OBJECT IDENTIFIER ::= { slMain 3 }
+slmLogin 		OBJECT IDENTIFIER ::= { slMain 4 }
+slmTrap 		OBJECT IDENTIFIER ::= { slMain 5 }
+-- slmEntity	OBJECT IDENTIFIER ::= { slMain 6 }
+-- slmMpls  	OBJECT IDENTIFIER ::= { slMain 7 }
+slmLogFile 		OBJECT IDENTIFIER ::= { slMain 8 }
+slmConfigFile 	OBJECT IDENTIFIER ::= { slMain 9 }
+-- slTopology  	OBJECT IDENTIFIER ::= { slMain 10 }
+-- slClocks  	OBJECT IDENTIFIER ::= { slMain 11 }
+slmChPass 		OBJECT IDENTIFIER ::= { slMain 12 }
+-- slTests 		OBJECT IDENTIFIER ::= { slMain 13 }
+-- slLed 		OBJECT IDENTIFIER ::= { slMain 14 }
+-- slMplsPm  	OBJECT IDENTIFIER ::= { slMain 15 }
+-- slEntityAps 	OBJECT IDENTIFIER ::= { slMain 16 }
+slmLicense 		OBJECT IDENTIFIER ::= { slMain 17 }
+
+--
+-- Textual Conventions
+--
+
+UserLogin ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "The User Login Type."
+    SYNTAX         DisplayString (SIZE (1..20))
+
+UserPassword ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "The User Password Type."
+    SYNTAX         DisplayString (SIZE (1..20))
+
+UserCommunity ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "The User Community Type."
+    SYNTAX         DisplayString (SIZE (1..20))
+
+SoftwareRevision ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "The Software Revision Name."
+    SYNTAX         DisplayString (SIZE (1..20))
+
+AdminAccess ::= TEXTUAL-CONVENTION
+	STATUS      	current
+	DESCRIPTION		"The administration access level."
+	SYNTAX		INTEGER {
+		none(0),      		--  User has no access rights
+		read(1),	  		--  Report only and Retrieve user
+		readwrite(2), 		--  Change access
+		provisioning(3), 	--  User is allowed to create connections
+		admin(4)      		--  User admin priviledge
+	}
+
+-- The System Info 
+
+
+slmSysGatewayAddr    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"Gateway node IP Address."
+	::= { slmSys 1 }
+
+slmSysSubnetMask    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"Subnetwork Mask IP Address."
+	::= { slmSys 2 }
+
+slmSysIpAddr    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"Node IP Address."
+	::= { slmSys 3 }
+
+slmSysAlmAct	OBJECT-TYPE
+	SYNTAX			INTEGER (0..30)
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"Alarm Activation Time specified in Half-Seconds units. 
+		Alarm will be considered active only if it     
+        has been stable for that time."
+	::= { slmSys 4 }
+
+slmSysAlmDeact	OBJECT-TYPE
+	SYNTAX			INTEGER (0..30)
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"Alarm Clearance Time specified in Half-Seconds units. 
+		Alarm will be considered clear only if it
+        has been stable for that time."
+	::= { slmSys 5 }
+
+slmSysAdminStatus	OBJECT-TYPE
+	SYNTAX			INTEGER {
+		up(1),
+		down(2),
+		warmBoot(3),
+		coldBoot(4),
+		factoryBoot(5),
+		testing(6),
+		hotBoot(7)
+	}
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"Instruct the system to perform the boot
+        according to the specified type."
+	::= { slmSys 6 }
+
+slmSysOperStatus	OBJECT-TYPE
+	SYNTAX			INTEGER {
+		up(1),
+		down(2),
+		testing(3)
+	}
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	
+		"The operational system state."
+	::= { slmSys 7 }
+
+slmBoxSize	OBJECT-TYPE
+	SYNTAX			INTEGER {
+		half(1),
+		full(2)
+	}
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	
+		"The box size as was configured in the SEEP."
+	::= { slmSys 8 }
+
+slmSysCalendarTime	OBJECT-TYPE
+	SYNTAX			DateAndTime
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"The system calendar time."
+	::= { slmSys 9 }
+
+slmSysPmStartOfDay OBJECT-TYPE
+    SYNTAX      INTEGER (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time of day that marks the beginning of each 1-day interval
+        used in the performance monitoring parameters for all interfaces 
+        in the NE. This time is on an hour boundary."
+    DEFVAL      { 0 }  -- Midnight, local time
+    ::= { slmSys 10 }
+
+slmSysActiveSwVersion OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	swRevA(1),
+    	swRevB(2),
+    	swRevFtpStart(3),
+    	swRevFtpEnd(4),
+    	swRevAHot(5),
+    	swRevBHot(6)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines the active software version. This is the version that will
+        be loaded by rebooted cards. It is not legal to set this object
+        to the id of an illegal system software version.
+        swRevFtpStart(3) - is set by the NMS to signal the FTP start.
+        swRevFtpEnd(4) - is set by the NMS to signal the FTP completion.
+        swRevAHot(5) - means to change the active software version to A,
+                       and to preform hot restart to all cards.
+        swRevBHot(6) - means to change the active software version to B,
+                       and to preform hot restart to all cards.
+        Reading the object returns the current active software version."
+    ::= { slmSys 11 } 
+    
+slmSwRevTable	OBJECT-TYPE
+	SYNTAX			SEQUENCE OF SlmSwRevEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"This table keeps the information about the system
+		software revisions."
+	::= { slmSys 12 }
+
+slmConfigSysUptime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of timer ticks at the last configuration command."
+    ::= { slmSys 13 }
+
+slmConfigSysSignalType OBJECT-TYPE
+    SYNTAX  INTEGER  {
+               sonet(1),
+               sdh(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This variable identifies whether a SONET
+       or a SDH signal is used across this node.
+       This value is configured by the NMS."
+    ::= { slmSys 14 }
+    
+slmRebootDelay OBJECT-TYPE
+	SYNTAX  INTEGER (0..300)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"The number of seconds to wait before reboot.
+		When this number equal to 0 the reboot should occur immediately.
+		After the reboot command is initiated, the value of this object
+		decrements accordingly.
+		Initially, the object value is 0.
+		It is also possible to change this value after starting the reboot
+		process.
+		Getting the value 0 means that there is no
+		pending reboot process in the background."
+    ::= { slmSys 16 } 
+    
+slmVcatDelay OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The value of the VCAT delay as was read from the SEEP."
+    ::= { slmSys 17 } 
+    
+slmTid OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..20))
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+            "The SL TL1 name."
+    ::= { slmSys 18 } 
+    
+slmPsuNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+            "Let the NMS to configure the number of PSU in the system.
+            If this number mismatch the reality, a mismatch alarm is declared."
+    ::= { slmSys 19 } 
+    
+slmOemType OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+            "This value tells the NMS the type of the OEM.
+            This value is read from the SEEP."
+    ::= { slmSys 20 } 
+    
+slmSysName OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+            "This value is the shadow of the sysName object."
+    ::= { slmSys 21 } 
+    
+slmSysLocation OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+            "This value is the shadow of the sysLocation object."
+    ::= { slmSys 22 } 
+    
+slmSysResetPm OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+            "Writing 1 to this object reset the system PM counters."
+    ::= { slmSys 23 } 
+    
+slmSysUplinkRate OBJECT-TYPE
+    SYNTAX  INTEGER  {
+               up100(1),  -- FE
+               up1000(2)  -- GbE
+            }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+            "This object is used to configure the rate of the Uplink.
+            The configured rate applies to both Uplink ports."
+    ::= { slmSys 24 } 
+    
+slmSysChassisId OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+            "This object is used to configure the chassis-id.
+            Node with the same value are considered to be stacked."
+    ::= { slmSys 25 } 
+    
+slmSysNetworkPrefix OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+            "This object is used to configure the Network Prefix.
+            The prefix is used when the IP address of the node is 
+            assigned automatically.
+            The automatic IP address of the node has the form A.x.y.z 
+            where x.y.z is the last 3 bytes of the 
+            MAC address 00:05:fd:x:y:z of the box.
+            The A is the assigned Network Prefix.
+            For example if the A is 10 and the MAC address is
+            00:05:fd:f6:55:11 the automatic IP of the node shall be
+            10.253.85.17."
+    ::= { slmSys 26 } 
+
+slmSysLanIpAddr    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"Node LAN IP Address."
+	::= { slmSys 27 }
+
+slmSysLanSubnetAddr    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"Node LAN Subnet Address."
+	::= { slmSys 28 }
+    
+slmPmAvailable OBJECT-TYPE
+	SYNTAX  TruthValue
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+         "This value tells the NMS if the PM support is available.
+          The value is taken from the SEEP and can not be changed."
+    ::= { slmSys 29 } 
+    
+slmPortsNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+         "The number of ports in the system.
+          The value is taken from the SEEP."
+    ::= { slmSys 30 } 
+    
+slmEdfaNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+         "The number of EDFA units in the system.
+          The value is taken from the SEEP."
+    ::= { slmSys 31 } 
+    
+slmMuxNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+         "The number of MUX units in the system.
+          The value is taken from the SEEP."
+    ::= { slmSys 32 } 
+    
+slmOpticalSwitchExist  OBJECT-TYPE
+	SYNTAX  TruthValue
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+         "Should an Optical Switch unit exist in the system.
+          The value is taken from the SEEP."
+    ::= { slmSys 33 } 
+    
+slmReadCommunity OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+         "The SNMP read-only community.
+         This object should be accessible only by the Admin users of the Web."
+    ::= { slmSys 34 } 
+    
+slmWriteCommunity OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+         "The SNMP read-write community.
+         This object should be accessible only by the Admin users of the Web."
+    ::= { slmSys 35 } 
+
+slmSysEffectiveSubnetMask    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	
+		"Effective Management subnetwork mask IP Address."
+	::= { slmSys 36 }
+
+slmSysEffectiveIpAddr    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	
+		"Effective Management IP Address."
+	::= { slmSys 37 }
+
+slmSysLanEffectiveIpAddr    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	
+		"Effective LAN IP Address."
+	::= { slmSys 38 }
+
+slmSysLanEffectiveSubnetAddr    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	
+		"Effective LAN subnetwork mask address."
+	::= { slmSys 39 }
+
+slmSysGatewayEffectiveIpAddr    	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	
+		"Effective Gateway IP Address."
+	::= { slmSys 40 }
+
+slmSysMode    	OBJECT-TYPE
+	SYNTAX			INTEGER
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"System Mode configuration (this object applies to muxponder)."
+	::= { slmSys 41 }
+
+slmSysTrapFormat   	OBJECT-TYPE
+    SYNTAX  INTEGER  {
+               fullIfIndex(1),  -- RADview and Tivoli
+               portIfIndex(2)  	-- HPOV and SNMPc
+            }
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"The format of the sent trap:
+		 1 - the full ifIndex is sent.
+		 2 - only the port number part of the ifIndex is sent."
+	::= { slmSys 42 }
+
+slmSysTemperature   OBJECT-TYPE
+	SYNTAX			INTEGER
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	
+		"The temperature of the PL device in Celsius."
+	::= { slmSys 43 }
+
+slmNetworkMode   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+               routing(1),  	-- Layer 3 Routing is required between the LAN to the OSC
+               switching(2)  	-- Layer 2 switching is required between the LAN and OSC
+            }
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"1 - means that the LAN is define on a different vlan than the MNG ports.
+		 2 - means that the LAN is on the same vlan and the MNG ports"
+	::= { slmSys 44 }
+ 
+    
+--
+-- Software Revision Table
+--
+
+slmSwRevEntry	OBJECT-TYPE
+	SYNTAX			SlmSwRevEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"An entry exist per system revsion type (A or B)."
+	INDEX	{ slmSwRevDirectory }
+	::= { slmSwRevTable 1 }
+
+SlmSwRevEntry ::=
+	SEQUENCE {
+		slmSwRevDirectory		INTEGER,
+		slmSwRevStatus			INTEGER,
+		slmSwRevName			SoftwareRevision,
+		slmSwRevDate			DateAndTime
+	}
+
+slmSwRevDirectory	OBJECT-TYPE
+    SYNTAX      	INTEGER {
+    	swRevDirA(1),
+    	swRevDirB(2)
+    }
+	MAX-ACCESS  	read-only
+    STATUS      	current
+	DESCRIPTION
+		"The directory name A or B of this system software
+		revision."
+	::= { slmSwRevEntry 1 }
+
+slmSwRevStatus    	OBJECT-TYPE
+    SYNTAX      	INTEGER {
+    	valid(1),
+    	invalid(2),
+    	copyingToStandby(3)
+    }
+	MAX-ACCESS  	read-only
+    STATUS      	current
+	DESCRIPTION
+		"The status of the system software directory content. 
+		The value valid(1) means that the data of this entry is 
+		valid and that the software is loaded correctly and is 
+		currently used.
+		The value copyingToStandby(3) means that the SW is currently
+		being copied to the Standby Switch. During this period
+		the NMS is not allowed to upgrade the SW version. This value
+		is applicable only to the Standby software version. 
+		The value invalid(2) means otherwise. This value is applicable
+		only to the Standby software version."
+	::= { slmSwRevEntry 2 }
+
+slmSwRevName    	OBJECT-TYPE
+	SYNTAX      	SoftwareRevision
+	MAX-ACCESS  	read-only
+    STATUS      	current
+	DESCRIPTION
+		"The identification string of the system software revision.
+		This value is taken from the content of the system software
+		configuration data that is downloded with the rest of the
+		software files."
+	::= { slmSwRevEntry 3 }
+
+slmSwRevDate    	OBJECT-TYPE
+	SYNTAX      	DateAndTime
+	MAX-ACCESS  	read-only
+    STATUS      	current
+	DESCRIPTION
+		"The release date of the system software revision.
+		This value is taken from the content of the system software
+		configuration data that is downloded with the rest of the
+		software files."
+	::= { slmSwRevEntry 4 }
+
+--  The admin table
+--
+-- This table is used to store per each authorised user
+-- its corresponding access level.
+-- This table may be accessed and changed only by the system
+-- administrator.
+-- The table is used by the GNE during the login session
+-- to return the user its community string according to
+-- its access level.
+-- The initial table contains one entry with:
+--     Login='admin', Password='root', Access=admin(3)
+-- At least one entry with Access=admin(3) should remain in
+-- the table.
+--
+
+slmAdminTable	OBJECT-TYPE
+	SYNTAX			SEQUENCE OF SlmAdminEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"The admin table is used to supply the access 
+		level for the user login."
+	::= { slmAdmin 1 }
+
+slmAdminEntry	OBJECT-TYPE
+	SYNTAX			SlmAdminEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"An entry exist per user."
+	INDEX	{ slmAdminLogin }
+	::= { slmAdminTable 1 }
+
+SlmAdminEntry ::=
+	SEQUENCE {
+		slmAdminLogin		UserLogin,
+		slmAdminPassword	UserPassword,
+		slmAdminRowStatus	RowStatus,
+		slmAdminAccess		AdminAccess
+	}
+
+slmAdminLogin    	OBJECT-TYPE
+	SYNTAX      	UserLogin
+	MAX-ACCESS  	read-create
+    STATUS      	current
+	DESCRIPTION
+		"The user login."
+	::= { slmAdminEntry 3 }
+	
+slmAdminPassword	OBJECT-TYPE
+	SYNTAX			UserPassword
+	MAX-ACCESS		read-create
+    STATUS			current
+	DESCRIPTION
+		"The user password."
+	::= { slmAdminEntry 4 }
+
+slmAdminRowStatus 	OBJECT-TYPE
+    SYNTAX      	RowStatus
+    MAX-ACCESS  	read-create
+    STATUS      	current
+    DESCRIPTION
+        "This object is used to create and delete rows in the
+        slmAdminTable."
+       ::= { slmAdminEntry 5 }
+    
+slmAdminAccess OBJECT-TYPE
+	SYNTAX		AdminAccess
+	MAX-ACCESS  	read-create
+	STATUS      	current
+	DESCRIPTION
+		"The user access level."
+	::= { slmAdminEntry 6 }
+
+--  The authentication table
+--
+-- This table is used to retrieve a community string
+-- according to the user login and password
+-- The rows of the table are temporary and used
+-- to avoid access to the data by more than one user at a time.
+-- After the completion of the operation the entry is
+-- erased.
+--
+
+slmAuthTable	OBJECT-TYPE
+	SYNTAX			SEQUENCE OF SlmAuthEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"The authentication table is used
+		for creating authentication requests."
+	::= { slmAuth 1 }
+
+slmAuthEntry	OBJECT-TYPE
+	SYNTAX			SlmAuthEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"The entry is used to compute the slmAuthCommunity based
+		on the indexes Login and Password. Note that the table contains
+		no data, and when using GetNext it apears to be empty.
+		To compute the community the NMS should Get the field
+		slmAuthCommunity with the corresponding indexes."
+	INDEX	{ slmAuthLogin, slmAuthPassword }
+	::= { slmAuthTable 1 }
+
+SlmAuthEntry ::=
+	SEQUENCE {
+		slmAuthLogin		UserLogin,
+		slmAuthPassword		UserPassword,
+		slmAuthCommunity	UserCommunity
+	}
+
+slmAuthLogin    OBJECT-TYPE
+	SYNTAX      	UserLogin
+	MAX-ACCESS  	not-accessible
+    STATUS      	current
+	DESCRIPTION
+		"The user login."
+	::= { slmAuthEntry 1 }
+	
+slmAuthPassword		OBJECT-TYPE
+	SYNTAX			UserPassword
+	MAX-ACCESS		not-accessible
+    STATUS			current
+	DESCRIPTION
+		"The user password."
+	::= { slmAuthEntry 2 }
+    
+slmAuthCommunity OBJECT-TYPE
+	SYNTAX	    	UserCommunity
+	MAX-ACCESS  	read-only
+	STATUS      	current
+	DESCRIPTION
+		"The user community name correponds to slmAuthLogin and
+		slmAuthPassword and which defines user'a access scope.
+		The value of this object is available for reading only
+		after the the first three colunms have been filled"
+	::= { slmAuthEntry 3 }
+
+--
+--  The change password table
+--
+-- This table is used to allow a user to change its password
+--
+
+slmChPassTable		OBJECT-TYPE
+	SYNTAX			SEQUENCE OF SlmChPassEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"The table is used for changing the user passowrd."
+	::= { slmChPass 1 }
+
+slmChPassEntry		OBJECT-TYPE
+	SYNTAX			SlmChPassEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"The entry is used to set the slmChPassNewPass. 
+		Note that the table contains no data, and when 
+		using GetNext it apears to be empty.
+		To change the password, the NMS should issue a SET
+		command with the new password while the two indexes
+		equal to the old user login and password."
+	INDEX	{ slmChPassLogin, slmChPassOldPass }
+	::= { slmChPassTable 1 }
+
+SlmChPassEntry ::=
+	SEQUENCE {
+		slmChPassLogin		UserLogin,
+		slmChPassOldPass	UserPassword,
+		slmChPassNewPass	UserPassword
+	}
+
+slmChPassLogin    OBJECT-TYPE
+	SYNTAX      	UserLogin
+	MAX-ACCESS  	not-accessible
+    STATUS      	current
+	DESCRIPTION
+		"The user login."
+	::= { slmChPassEntry 1 }
+	
+slmChPassOldPass	OBJECT-TYPE
+	SYNTAX			UserPassword
+	MAX-ACCESS		not-accessible
+    STATUS			current
+	DESCRIPTION
+		"The user password."
+	::= { slmChPassEntry 2 }
+	
+slmChPassNewPass	OBJECT-TYPE
+	SYNTAX			UserPassword
+	MAX-ACCESS		read-write
+    STATUS			current
+	DESCRIPTION
+		"The user password."
+	::= { slmChPassEntry 3 }
+
+
+-- Trap Destination Table
+--
+-- This table defines the destination addresses for traps generated
+-- from the device.  This table maps a community to one or more trap
+-- destination entries.
+--
+-- The same trap will be sent to all destinations specified in the
+-- entries that have the same trapDestCommunity as the eventCommunity
+-- (as defined by RMON MIB).  
+--
+
+slmTrapDestTable 	OBJECT-TYPE
+    SYNTAX     		SEQUENCE OF SlmTrapDestEntry
+    MAX-ACCESS 		not-accessible
+    STATUS     		current
+    DESCRIPTION
+        "A list of trap destination entries."
+    ::= { slmTrap 1 }
+
+slmTrapDestEntry  		OBJECT-TYPE
+    SYNTAX     		SlmTrapDestEntry
+    MAX-ACCESS 		not-accessible
+    STATUS     		current
+    DESCRIPTION
+        "This entry includes a destination IP address to which to send
+        traps for this community. An entry in the table is created by
+        the NMS.
+        In order to keep the entry in the table the management should
+        refresh the entry periodicaly. Otherwise it will be deleted
+        by the GNE after 5 minutes."
+    INDEX { slmTrapDestAddress }
+    ::= { slmTrapDestTable 1 }
+
+SlmTrapDestEntry ::= SEQUENCE {
+    slmTrapDestAddress			Integer32,
+    slmTrapDestRowStatus		RowStatus,
+    slmTrapDestCommunity		UserCommunity,
+    slmTrapDestProtVersion		INTEGER,
+	slmTrapUserLogin			UserLogin,
+	slmTrapUserAccess			AdminAccess,
+	slmTrapEnable				TruthValue,
+	slmTrapPort					INTEGER,
+    slmTrapDestIpAddress		IpAddress
+}
+
+slmTrapDestAddress		OBJECT-TYPE
+    SYNTAX     		Integer32
+    MAX-ACCESS 		read-create
+    STATUS     		current
+    DESCRIPTION
+        "A copy of slmTrapDestIpAddress represented as an integer.
+        Needed due to VxWorks failure to handle an ip address as a table index."
+    ::= { slmTrapDestEntry 1 }
+
+slmTrapDestRowStatus 	OBJECT-TYPE
+       SYNTAX      	RowStatus
+       MAX-ACCESS  	read-create
+       STATUS      	current
+       DESCRIPTION
+    	     "This object is used to create and delete rows in the
+	     trapDestTable."
+       ::= { slmTrapDestEntry 2 }
+
+slmTrapDestCommunity  	OBJECT-TYPE
+    SYNTAX     		UserCommunity
+    MAX-ACCESS 		read-create
+    STATUS     		current
+    DESCRIPTION
+        "A community to which this destination address belongs.
+        This entry is associated with any eventEntries in the RMON
+        MIB whose value of eventCommunity is equal to the value of
+        this object.  Every time an associated event entry sends a
+        trap due to an event, that trap will be sent to each
+        address in the trapDestTable with a trapDestCommunity equal to
+        eventCommunity.
+        This object may not be modified if the associated
+        trapDestStatus object is equal to active(1)."
+    ::= { slmTrapDestEntry 3 }
+
+slmTrapDestProtVersion OBJECT-TYPE
+    SYNTAX     		INTEGER {
+		snmpVer1(1),
+		snmpVer2(2)
+    }
+    MAX-ACCESS 		read-create
+    STATUS     		current
+    DESCRIPTION
+        "The SNMP version of the traps which this manager expects to receive."
+    DEFVAL { snmpVer2 }
+    ::= { slmTrapDestEntry 4 }
+    
+slmTrapUserLogin    OBJECT-TYPE
+	SYNTAX      	UserLogin
+	MAX-ACCESS  	read-create
+    STATUS      	current
+	DESCRIPTION
+		"The user login. This is used to describe to the manager
+		the current active login sessions. The NMS should read
+		this value periodicaly in order to refresh its entry, otherwise
+		the entry will be deleted by the GNE after a timeout of 5 minutes."
+	::= { slmTrapDestEntry 5 }
+    
+slmTrapUserAccess    OBJECT-TYPE
+	SYNTAX      	AdminAccess
+	MAX-ACCESS  	read-create
+    STATUS      	current
+	DESCRIPTION
+		"The user access."
+	::= { slmTrapDestEntry 6 }
+    
+slmTrapEnable    OBJECT-TYPE
+	SYNTAX      	TruthValue
+	MAX-ACCESS  	read-create
+    STATUS      	current
+	DESCRIPTION
+		"TRUE - means that that the alarms are allowed.
+		FALSE - means that all alarms should not be sent for this session."
+	::= { slmTrapDestEntry 7 }
+    
+slmTrapPort    OBJECT-TYPE
+	SYNTAX      	INTEGER
+	MAX-ACCESS  	read-create
+    STATUS      	current
+	DESCRIPTION
+		"The destination port for to send the trap. 
+		The default value is 162."
+	::= { slmTrapDestEntry 8 }
+
+slmTrapDestIpAddress	OBJECT-TYPE
+    SYNTAX     		IpAddress
+    MAX-ACCESS 		read-create
+    STATUS     		current
+    DESCRIPTION
+        "The address to send traps on behalf of this entry.
+        This object may not be modified if the associated
+        slmTrapDestStatus object is equal to active(1)."
+    ::= { slmTrapDestEntry 9 }
+
+
+-- Trap Log Table
+--
+-- This table keeps the log of the sent traps
+--
+
+slmTrapLogTable 	OBJECT-TYPE
+    SYNTAX     		SEQUENCE OF SlmTrapLogEntry
+    MAX-ACCESS 		not-accessible
+    STATUS     		current
+    DESCRIPTION
+        "A list of trap log entries."
+    ::= { slmTrap 2 }
+
+slmTrapLogEntry  		OBJECT-TYPE
+    SYNTAX     		SlmTrapLogEntry
+    MAX-ACCESS 		not-accessible
+    STATUS     		current
+    DESCRIPTION
+        "An entry in the table keeps the log of a single trap."
+    INDEX { slmTrapLogId }
+    ::= { slmTrapLogTable 1 }
+
+SlmTrapLogEntry ::= SEQUENCE {
+    slmTrapLogId			Gauge32,
+    slmTrapLogName			OCTET STRING,
+    slmTrapLogTimeStamp		TimeTicks,
+    slmTrapLogParam1		OCTET STRING,
+    slmTrapLogParam2		OCTET STRING,
+    slmTrapLogParam3		OCTET STRING,
+    slmTrapLogParam4		OCTET STRING,
+    slmTrapLogParam5		OCTET STRING,
+    slmTrapLogParam6		OCTET STRING
+}
+
+slmTrapLogId		OBJECT-TYPE
+    SYNTAX     		Gauge32
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The trap log id. The id increments each time a new log
+        entry arrives."
+    ::= { slmTrapLogEntry 1 }
+
+slmTrapLogName		OBJECT-TYPE
+    SYNTAX     		OCTET STRING (SIZE (0..80))
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The object id of the trap."
+    ::= { slmTrapLogEntry 2 }
+
+slmTrapLogTimeStamp		OBJECT-TYPE
+    SYNTAX     		TimeTicks
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The trap time stamp."
+    ::= { slmTrapLogEntry 3 }
+
+slmTrapLogParam1	OBJECT-TYPE
+    SYNTAX     		OCTET STRING (SIZE (0..80))
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The first parameter of the trap."
+    ::= { slmTrapLogEntry 4 }
+
+slmTrapLogParam2	OBJECT-TYPE
+    SYNTAX     		OCTET STRING (SIZE (0..80))
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The second parameter of the trap."
+    ::= { slmTrapLogEntry 5 }
+
+slmTrapLogParam3	OBJECT-TYPE
+    SYNTAX     		OCTET STRING (SIZE (0..80))
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The third parameter of the trap."
+    ::= { slmTrapLogEntry 6 }
+
+slmTrapLogParam4	OBJECT-TYPE
+    SYNTAX     		OCTET STRING (SIZE (0..80))
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The forth parameter of the trap."
+    ::= { slmTrapLogEntry 7 }
+
+slmTrapLogParam5	OBJECT-TYPE
+    SYNTAX     		OCTET STRING (SIZE (0..80))
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The fifth parameter of the trap."
+    ::= { slmTrapLogEntry 8 }
+
+slmTrapLogParam6	OBJECT-TYPE
+    SYNTAX     		OCTET STRING (SIZE (0..80))
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The sixth parameter of the trap."
+    ::= { slmTrapLogEntry 9 }
+
+
+--
+--  Other Traps
+--
+
+slmTrapSoftwareStatusChange NOTIFICATION-TYPE
+	OBJECTS { slmSwRevDirectory, slmSwRevStatus }
+	STATUS  current
+	DESCRIPTION
+		"A slmTrapSoftwareStatusChange trap is sent when the
+		value of the slmSwRevStatus of one of the directories changes."
+	::= { slmTrap 4 }
+
+slmTrapSysNameChange NOTIFICATION-TYPE
+	OBJECTS { slmSysName }
+	STATUS  current
+	DESCRIPTION
+		"A slmTrapSysNameChange trap is sent when the
+		value of the slmSysName is changed."
+	::= { slmTrap 5 }
+
+slmTrapSysLocationChange NOTIFICATION-TYPE
+	OBJECTS { slmSysLocation }
+	STATUS  current
+	DESCRIPTION
+		"A slmTrapSysLocationChange trap is sent when the
+		value of the slmSysLocation is changed."
+	::= { slmTrap 6 }
+
+-- 
+-- Syslog Destination Table
+--
+
+slmSyslogDestTable 	OBJECT-TYPE
+    SYNTAX     		SEQUENCE OF SlmSyslogDestEntry
+    MAX-ACCESS 		not-accessible
+    STATUS     		current
+    DESCRIPTION
+        "A list of syslog destination entries."
+    ::= { slmTrap 7 }
+
+slmSyslogDestEntry  		OBJECT-TYPE
+    SYNTAX     		SlmSyslogDestEntry
+    MAX-ACCESS 		not-accessible
+    STATUS     		current
+    DESCRIPTION
+        "This entry includes a destination IP addresses to which to send
+        log messages." 
+    INDEX { slmSyslogDestAddress }
+    ::= { slmSyslogDestTable 1 }
+
+SlmSyslogDestEntry ::= SEQUENCE {
+    slmSyslogDestAddress		Integer32,
+    slmSyslogDestRowStatus		RowStatus,
+    slmSyslogLevel				INTEGER,
+	slmSyslogPort				INTEGER,
+    slmSyslogDestIpAddress		IpAddress
+}
+
+slmSyslogDestAddress		OBJECT-TYPE
+    SYNTAX     		Integer32
+    MAX-ACCESS 		read-create
+    STATUS     		current
+    DESCRIPTION
+        "A copy of slmSyslogDestTable represented as an integer.
+        Needed due to VxWorks failure to handle an ip address as a table index."
+    ::= { slmSyslogDestEntry 1 }
+
+slmSyslogDestRowStatus 	OBJECT-TYPE
+       SYNTAX      	RowStatus
+       MAX-ACCESS  	read-create
+       STATUS      	current
+       DESCRIPTION
+    	   "This object is used to create and delete rows in the slmSyslogDestTable."
+       ::= { slmSyslogDestEntry 2 }
+
+slmSyslogLevel OBJECT-TYPE
+    SYNTAX     		INTEGER {
+		traps(1), 	-- send traps only
+		log(2),     -- send all log messages
+		debug(3)	-- send also debug meesages
+    }
+    MAX-ACCESS 		read-create
+    STATUS     		current
+    DESCRIPTION
+        "The level of log messages which this manager expects to receive."
+    ::= { slmSyslogDestEntry 3 }
+    
+slmSyslogPort    OBJECT-TYPE
+	SYNTAX      	INTEGER
+	MAX-ACCESS  	read-create
+    STATUS      	current
+	DESCRIPTION
+		"The destination port for to send the log message. 
+		The default value is 514."
+	::= { slmSyslogDestEntry 4 }
+
+slmSyslogDestIpAddress	OBJECT-TYPE
+    SYNTAX     		IpAddress
+    MAX-ACCESS 		read-create
+    STATUS     		current
+    DESCRIPTION
+        "The address to send log messages on behalf of this entry."
+    ::= { slmSyslogDestEntry 5 }
+
+-- 
+-- License Table
+--
+
+slmLicenseTable 	OBJECT-TYPE
+    SYNTAX     		SEQUENCE OF SlmLicenseEntry
+    MAX-ACCESS 		not-accessible
+    STATUS     		current
+    DESCRIPTION
+        "A list of License entries."
+    ::= { slmLicense 1 }
+
+slmLicenseEntry  		OBJECT-TYPE
+    SYNTAX     		SlmLicenseEntry
+    MAX-ACCESS 		not-accessible
+    STATUS     		current
+    DESCRIPTION
+        "An entry in the table correspond to installed license." 
+    INDEX { slmLicenseIndex }
+    ::= { slmLicenseTable 1 }
+
+SlmLicenseEntry ::= SEQUENCE {
+    slmLicenseIndex			INTEGER,
+    slmLicenseExpiration	INTEGER,
+    slmLicenseId			DisplayString
+}
+
+slmLicenseIndex		OBJECT-TYPE
+    SYNTAX     		INTEGER
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The license index."
+    ::= { slmLicenseEntry 1 }
+
+slmLicenseExpiration 	OBJECT-TYPE
+	SYNTAX      	INTEGER
+	MAX-ACCESS  	read-only
+	STATUS      	current
+	DESCRIPTION
+		"The number of seconds to expiration. 
+		Value -1 for permanent."
+	::= { slmLicenseEntry 2 }
+
+slmLicenseId OBJECT-TYPE
+	SYNTAX     		DisplayString (SIZE (0..80))
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+        "The license text"
+    ::= { slmLicenseEntry 3 }
+    
+END

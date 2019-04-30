@@ -56679,5 +56679,43 @@
                 }
             ]
         }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2011.2.23.291",
+                    "sysDescr": "S5720-56C-PWR-EI-AC\nHuawei Versatile Routing Platform Software \r\n VRP (R) software,Version 5.170 (S5720 V200R010C00SPC600) \r\n Copyright (C) 2007 Huawei Technologies Co., Ltd.",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "vrp",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "huawei.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2011.2.23.291",
+                    "sysDescr": "S5720-56C-PWR-EI-AC\nHuawei Versatile Routing Platform Software \r\n VRP (R) software,Version 5.170 (S5720 V200R010C00SPC600) \r\n Copyright (C) 2007 Huawei Technologies Co., Ltd.",
+                    "sysContact": "<private>",
+                    "version": "5.170 (V200R010C00SPC600) [1]",
+                    "hardware": "Huawei S5720",
+                    "features": null,
+                    "os": "vrp",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "huawei.svg",
+                    "location": "<private>"
+                }
+            ]
+        }
     }
 }
