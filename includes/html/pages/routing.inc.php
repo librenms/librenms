@@ -15,15 +15,7 @@ if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {
 }
 
 $user = Auth::user();
-$routing_count = [
-    'vrf' => Vrf::hasAccess($user)->count(),
-    'ospf' => OspfInstance::hasAccess($user)->count(),
-    'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
-    'bgp' => BgpPeer::hasAccess($user)->count(),
-    'cef' => CefSwitching::hasAccess($user)->count(),
-];
-\View::share('routing_count', $routing_count); // share with menubar
-
+$routing_count = \LibreNMS\Util\ObjectCache::routing();
 // $datas[] = 'overview';
 // $routing_count is populated by print-menubar.inc.php
 // $type_text['overview'] = "Overview";

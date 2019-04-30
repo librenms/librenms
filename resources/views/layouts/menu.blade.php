@@ -241,7 +241,7 @@
                                 @if($loop->first)
                                     <li role="presentation" class="divider"></li>
                                 @endif
-                                <li><a href="{{ url('health/metric=' . $sensor_menu_entry->sensor_class) }}"><i class="fa fa-{{ $sensor_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $sensor_menu_entry->classDescr() }}</a></li>
+                                <li><a href="{{ url('health/metric=' . $sensor_menu_entry['class']) }}"><i class="fa fa-{{ $sensor_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $sensor_menu_entry['descr'] }}</a></li>
                             @endforeach
                         @endforeach
 

@@ -47,6 +47,7 @@ use Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use LibreNMS\Config;
+use LibreNMS\Util\ObjectCache;
 
 class MenuComposer
 {
@@ -108,27 +109,7 @@ class MenuComposer
         ];
 
         // Sensor menu
-        $sensor_menu = [];
-        $sensor_classes = Sensor::hasAccess($user)->select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
-
-        foreach ($sensor_classes as $sensor_model) {
-            /** @var Sensor $sensor_model */
-            $class = $sensor_model->sensor_class;
-            if (in_array($class, ['fanspeed', 'humidity', 'temperature', 'signal'])) {
-                // First group
-                $group = 0;
-            } elseif (in_array($class, ['current', 'frequency', 'power', 'voltage', 'power_factor', 'power_consumed'])) {
-                // Second group
-                $group = 1;
-            } else {
-                // anything else
-                $group = 2;
-            }
-
-            $sensor_menu[$group][] = $sensor_model;
-        }
-        ksort($sensor_menu); // ensure menu order
-        $vars['sensor_menu'] = $sensor_menu;
+        $vars['sensor_menu'] = ObjectCache::sensors();
 
         // Wireless menu
         $wireless_menu_order = array_keys(\LibreNMS\Device\WirelessSensor::getTypes());
@@ -141,27 +122,13 @@ class MenuComposer
             });
 
         // Application menu
-        $vars['app_menu'] = Application::hasAccess($user)
-            ->select('app_type', 'app_instance')
-            ->groupBy('app_type', 'app_instance')
-            ->orderBy('app_type')
-            ->get()
-            ->groupBy('app_type');
+        $vars['app_menu'] = ObjectCache::applications();
 
         // Routing menu
         // FIXME queries use relationships to user
         $routing_menu = [];
         if ($user->hasGlobalRead()) {
-            $routing_count = \View::shared('routing_count', function () {}); // shared from routing page
-            if (!$routing_count) {
-                $routing_count = [
-                    'vrf' => Vrf::hasAccess($user)->count(),
-                    'ospf' => OspfInstance::hasAccess($user)->count(),
-                    'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
-                    'bgp' => BgpPeer::hasAccess($user)->count(),
-                    'cef' => CefSwitching::hasAccess($user)->count(),
-                ];
-            }
+            $routing_count = ObjectCache::routing();
 
             if ($routing_count['vrf']) {
                 $routing_menu[] = [

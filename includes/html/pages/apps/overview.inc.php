@@ -9,7 +9,7 @@ $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width']  = '400';
 $graph_array['legend']      = 'no';
 
-foreach ($app_list as $app) {
+foreach (\LibreNMS\Util\ObjectCache::applications() as $app) {
     echo '<div style="clear: both;">';
     echo '<h2>'.generate_link(nicecase($app['app_type']), array('page' => 'apps', 'app' => $app['app_type'])).'</h2>';
     $app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ?', array($app['app_type']));

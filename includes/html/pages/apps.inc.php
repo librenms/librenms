@@ -287,7 +287,7 @@ $link_array = array(
     'device' => $device['device_id'],
     'tab'    => 'apps',
 );
-foreach ($app_list as $app) {
+foreach (\LibreNMS\Util\ObjectCache::applications() as $app) {
     echo $sep;
     if ($vars['app'] == $app['app_type']) {
         echo "<span class='pagemenu-selected'>";
@@ -300,9 +300,10 @@ foreach ($app_list as $app) {
 }
 echo '</div>';
 echo '<div class="panel-body">';
-if ($vars['app']) {
-    if (is_file('includes/html/pages/apps/'.mres($vars['app']).'.inc.php')) {
-        include 'includes/html/pages/apps/'.mres($vars['app']).'.inc.php';
+if (isset($vars['app'])) {
+    $app = basename($vars['app']);
+    if (is_file("includes/html/pages/apps/$app.inc.php")) {
+        include "includes/html/pages/apps/$app.inc.php";
     } else {
         include 'includes/html/pages/apps/default.inc.php';
     }

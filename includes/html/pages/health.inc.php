@@ -17,118 +17,48 @@
 
 $no_refresh = true;
 
-$datas = array('mempool','processor','storage');
-if ($used_sensors['temperature']) {
-    $datas[] = 'temperature';
-}
-if ($used_sensors['charge']) {
-    $datas[] = 'charge';
-}
-if ($used_sensors['humidity']) {
-    $datas[] = 'humidity';
-}
-if ($used_sensors['fanspeed']) {
-    $datas[] = 'fanspeed';
-}
-if ($used_sensors['voltage']) {
-    $datas[] = 'voltage';
-}
-if ($used_sensors['frequency']) {
-    $datas[] = 'frequency';
-}
-if ($used_sensors['runtime']) {
-    $datas[] = 'runtime';
-}
-if ($used_sensors['current']) {
-    $datas[] = 'current';
-}
-if ($used_sensors['power']) {
-    $datas[] = 'power';
-}
-if ($used_sensors['power_consumed']) {
-    $datas[] = 'power_consumed';
-}
-if ($used_sensors['power_factor']) {
-    $datas[] = 'power_factor';
-}
-if ($used_sensors['dbm']) {
-    $datas[] = 'dbm';
-}
-if ($used_sensors['load']) {
-    $datas[] = 'load';
-}
-if ($used_sensors['state']) {
-    $datas[] = 'state';
-}
-if ($used_sensors['count']) {
-    $datas[] = 'count';
-}
-if ($used_sensors['signal']) {
-    $datas[] = 'signal';
-}
-if ($used_sensors['snr']) {
-    $datas[] = 'snr';
-}
-if ($used_sensors['pressure']) {
-    $datas[] = 'pressure';
-}
-if ($used_sensors['cooling']) {
-    $datas[] = 'cooling';
-}
-if ($used_sensors['toner']) {
-    $datas[] = 'toner';
-}
-if ($used_sensors['delay']) {
-    $datas[] = 'delay';
-}
-if ($used_sensors['quality_factor']) {
-    $datas[] = 'quality_factor';
-}
-if ($used_sensors['chromatic_dispersion']) {
-    $datas[] = 'chromatic_dispersion';
-}
-if ($used_sensors['ber']) {
-    $datas[] = 'ber';
-}
-if ($used_sensors['eer']) {
-    $datas[] = 'eer';
-}
-if ($used_sensors['waterflow']) {
-    $datas[] = 'waterflow';
+$datas = ['mempool','processor','storage'];
+
+$used_sensors = \LibreNMS\Util\ObjectCache::sensors();
+foreach ($used_sensors as $group => $types) {
+    foreach ($types as $entry) {
+        $datas[] = $entry['class'];
+    }
 }
 
-$type_text['overview'] = "Overview";
-$type_text['temperature'] = "Temperature";
-$type_text['charge'] = "Battery Charge";
-$type_text['humidity'] = "Humidity";
-$type_text['mempool'] = "Memory";
-$type_text['storage'] = "Storage";
-$type_text['diskio'] = "Disk I/O";
-$type_text['processor'] = "Processor";
-$type_text['voltage'] = "Voltage";
-$type_text['fanspeed'] = "Fanspeed";
-$type_text['frequency'] = "Frequency";
-$type_text['runtime'] = "Runtime";
-$type_text['current'] = "Current";
-$type_text['power'] = "Power";
-$type_text['power_consumed'] = "Power Consumed";
-$type_text['power_factor'] = "Power Factor";
-$type_text['toner'] = "Toner";
-$type_text['dbm'] = "dBm";
-$type_text['load'] = "Load";
-$type_text['state'] = "State";
-$type_text['count'] = "Count";
-$type_text['signal'] = "Signal";
-$type_text['snr'] = "SNR";
-$type_text['pressure'] = "Pressure";
-$type_text['cooling'] = "Cooling";
-$type_text['toner'] = 'Toner';
-$type_text['delay'] = 'Delay';
-$type_text['quality_factor'] = 'Quality factor';
-$type_text['chromatic_dispersion'] = 'Chromatic Dispersion';
-$type_text['ber'] = 'Bit Error Rate';
-$type_text['eer'] = 'Energy Efficiency Ratio';
-$type_text['waterflow'] = 'Water Flow Rate';
+$type_text = [
+    'overview' => "Overview",
+    'temperature' => "Temperature",
+    'charge' => "Battery Charge",
+    'humidity' => "Humidity",
+    'mempool' => "Memory",
+    'storage' => "Storage",
+    'diskio' => "Disk I/O",
+    'processor' => "Processor",
+    'voltage' => "Voltage",
+    'fanspeed' => "Fanspeed",
+    'frequency' => "Frequency",
+    'runtime' => "Runtime",
+    'current' => "Current",
+    'power' => "Power",
+    'power_consumed' => "Power Consumed",
+    'power_factor' => "Power Factor",
+    'dbm' => "dBm",
+    'load' => "Load",
+    'state' => "State",
+    'count' => "Count",
+    'signal' => "Signal",
+    'snr' => "SNR",
+    'pressure' => "Pressure",
+    'cooling' => "Cooling",
+    'toner' => 'Toner',
+    'delay' => 'Delay',
+    'quality_factor' => 'Quality factor',
+    'chromatic_dispersion' => 'Chromatic Dispersion',
+    'ber' => 'Bit Error Rate',
+    'eer' => 'Energy Efficiency Ratio',
+    'waterflow' => 'Water Flow Rate',
+];
 
 $active_metric = basename($vars['metric'] ?? 'processor');
 
@@ -176,12 +106,7 @@ if ($vars['view'] != "graphs") {
     $displayoptions .= '</span>';
 }
 
-$valid_metrics = array_merge(array_keys($used_sensors), [
-    'processor',
-    'storage',
-    'toner',
-    'mempool',
-]);
+$valid_metrics = array_keys($used_sensors);
 
 if (in_array($active_metric, $valid_metrics)) {
     include("includes/html/pages/health/$active_metric.inc.php");
