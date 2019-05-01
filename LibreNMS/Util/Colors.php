@@ -25,8 +25,6 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
-
 class Colors
 {
     public static function percentage($percentage, $component_perc_warn = null)

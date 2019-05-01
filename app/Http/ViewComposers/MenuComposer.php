@@ -26,27 +26,20 @@
 namespace App\Http\ViewComposers;
 
 use App\Models\AlertRule;
-use App\Models\Application;
 use App\Models\BgpPeer;
-use App\Models\CefSwitching;
-use App\Models\Component;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
 use App\Models\Notification;
-use App\Models\OspfInstance;
 use App\Models\Package;
 use App\Models\Port;
 use App\Models\Pseudowire;
-use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\User;
-use App\Models\Vrf;
 use App\Models\WirelessSensor;
 use Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use function in_array;
 use LibreNMS\Config;
 use LibreNMS\Util\ObjectCache;
 
@@ -64,7 +57,7 @@ class MenuComposer
         /** @var User $user */
         $user = Auth::user();
 
-        $vars['navbar'] = in_array(Config::get('site_style'), ['dark', 'mono']) ? 'navbar-inverse' : '';
+        $vars['navbar'] = in_array(Config::get('site_style'), ['mono', 'dark']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $site_style = Config::get('site_style', 'light');

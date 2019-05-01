@@ -15,27 +15,28 @@
  * @author     LibreNMS Contributors
 */
 
-$graph_type = htmlentities($vars['graph_type']);
-$unit       = $vars['unit'];
-$class      = htmlentities($vars['class']);
+use LibreNMS\Authentication\LegacyAuth;
+
+$graph_type = mres($vars['graph_type']);
+$unit       = mres($vars['unit']);
+$class      = mres($vars['class']);
 
 $sql = " FROM `$table` AS S, `devices` AS D";
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql .= ', devices_perms as P';
 }
 
 $sql .= " WHERE S.sensor_class=? AND S.device_id = D.device_id ";
-$param[] = $vars['class'];
+$param[] = mres($vars['class']);
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql .= " AND D.device_id = P.device_id AND P.user_id = ?";
-    $param[] = Auth::id();
+    $param[] = LegacyAuth::id();
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE ? OR `sensor_descr` LIKE ? OR `sensor_current` LIKE ?)";
-    array_push($param, "%$searchPhrase%", "%$searchPhrase%", "%$searchPhrase");
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `sensor_descr` LIKE '%$searchPhrase%' OR `sensor_current` LIKE '%searchPhrase')";
 }
 
 $count_sql = "SELECT COUNT(`sensor_id`) $sql";
