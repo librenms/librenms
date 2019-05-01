@@ -65,10 +65,6 @@ class ArubaInstant extends OS implements
         $ai_mib = 'AI-AP-MIB';
         $ai_ap_data = $this->getCacheTable('aiAccessPointEntry', $ai_mib);
 
-        d_echo('ai_ap_data:'.PHP_EOL);
-        d_echo($ai_ap_data);
-
-
         foreach ($ai_ap_data as $ai_ap => $ai_ap_oid) {
             $value = $ai_ap_oid['aiAPCPUUtilization'];
             $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiAPCPUUtilization', Rewrite::oidMac($ai_ap));
@@ -76,9 +72,6 @@ class ArubaInstant extends OS implements
             $description = $ai_ap_data[$ai_ap]['aiAPSerialNum'];
             $processors[] = Processor::discover('aruba-instant', $this->getDeviceId(), $oid, Rewrite::macToHex($ai_ap), $description, 1, $value);
         } // end foreach
-
-        d_echo('Processor Array:'.PHP_EOL);
-        d_echo($processors);
 
         return $processors;
     }
@@ -103,12 +96,6 @@ class ArubaInstant extends OS implements
                 $this->getCacheTable('aiAccessPointEntry', $ai_mib),
                 $this->getCacheTable('aiRadioClientNum', $ai_mib)
             );
-
-            d_echo('SSID Array:'.PHP_EOL);
-            d_echo($ssid_data);
-            d_echo('AP Array:'.PHP_EOL);
-            d_echo($ap_data);
-
 
             $oids = array();
             $total_clients = 0;
@@ -314,17 +301,11 @@ class ArubaInstant extends OS implements
                     $ai_mib = 'AI-AP-MIB';
                     $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
 
-                    d_echo('client_data:'.PHP_EOL);
-                    d_echo($client_data);
-
                     if (empty($client_data)) {
                         $total_clients = 0;
                     } else {
                         $total_clients = sizeof($client_data);
                     }
-
-                    d_echo('total_clients:'.PHP_EOL);
-                    d_echo($total_clients);
 
                     $data[$sensors[0]['sensor_id']] = $total_clients;
                 }
