@@ -324,6 +324,7 @@
                         @endadmin
                     </ul>
                 </li>
+                @includeIf('menu.custom')
             </ul>
 
 {{-- User --}}
