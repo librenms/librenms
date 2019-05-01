@@ -23,7 +23,6 @@
  * @author     Timothy Willey <developer@timothywilley.net>
  */
 $ai_mib = 'AI-AP-MIB';
-// $oids = snmpwalk_group($device, 'aiStateGroup', $ai_mib);
 $oids = snmpwalk_group($device, 'aiAPSerialNum', $ai_mib);
 $oids = snmpwalk_group($device, 'aiAPStatus', $ai_mib, 1, $oids);
 $oids = snmpwalk_group($device, 'aiRadioStatus', $ai_mib, 1, $oids);
