@@ -18,7 +18,7 @@ class LegacyController extends Controller
         $no_refresh = false;
         $init_modules = ['web', 'auth'];
         require base_path('/includes/init.php');
-        require base_path('/includes/html/vars.inc.php'); // TODO replace with code that parses Request
+//        require base_path('/includes/html/vars.inc.php'); // TODO replace with code that parses Request
 
         set_debug(str_contains($request->path(), 'debug'));
 

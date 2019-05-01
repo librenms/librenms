@@ -144,6 +144,7 @@ if (module_selected('discovery', $init_modules) && !update_os_cache()) {
     load_all_os();
 } elseif (module_selected('web', $init_modules)) {
     load_all_os(!module_selected('nodb', $init_modules));
+    include 'includes/html/vars.inc.php';
 }
 
 $console_color = new Console_Color2();
