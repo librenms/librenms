@@ -176,7 +176,7 @@ class ArubaInstant extends OS implements
         $combined_oid = sprintf('%s::%s', $ai_mib, 'aiAPSerialNum');
         $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
 
-        $sensors[] = new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'aruba-instant', 'total-clients', 'Total APs', $total_aps);
+        $sensors[] = new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'aruba-instant', 'total-aps', 'Total APs', $total_aps);
 
 
         return $sensors;
