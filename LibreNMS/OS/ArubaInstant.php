@@ -359,9 +359,9 @@ class ArubaInstant extends OS implements
             d_echo('ap_data:'.PHP_EOL);
             d_echo($ap_data);
 
-            if (empty($ap_data)) {
-                $total_aps = 0;
-            } else {
+            $total_aps = 0;
+            
+            if (!empty($ap_data)) {
                 $total_aps = sizeof($ap_data);
             }
 
