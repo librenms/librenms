@@ -141,9 +141,6 @@ class ArubaInstant extends OS implements
             // fetch the MAC addresses of currently connected clients, then count them to get an overall total
             $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
 
-            d_echo('client_data:'.PHP_EOL);
-            d_echo($client_data);
-
             $total_clients = sizeof($client_data);
 
             $combined_oid = sprintf('%s::%s', $ai_mib, 'aiClientMACAddress');
@@ -164,12 +161,8 @@ class ArubaInstant extends OS implements
     public function discoverWirelessApCount()
     {
         $sensors = array();
-
         $ai_mib = 'AI-AP-MIB';
         $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
-
-        d_echo('ap_data:'.PHP_EOL);
-        d_echo($ap_data);
 
         $total_aps = sizeof($ap_data);
 
@@ -177,7 +170,6 @@ class ArubaInstant extends OS implements
         $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
 
         $sensors[] = new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'aruba-instant', 'total-aps', 'Total APs', $total_aps);
-
 
         return $sensors;
     }
@@ -318,22 +310,24 @@ class ArubaInstant extends OS implements
                 }
             } else {
                 // version is lower than 8.4.0.0
-                $ai_mib = 'AI-AP-MIB';
-                $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
+                if (!empty($sensors) and sizeof($sensors) == 1) {
+                    $ai_mib = 'AI-AP-MIB';
+                    $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
 
-                d_echo('client_data:'.PHP_EOL);
-                d_echo($client_data);
+                    d_echo('client_data:'.PHP_EOL);
+                    d_echo($client_data);
 
-                if (empty($client_data)) {
-                    $total_clients = 0;
-                } else {
-                    $total_clients = sizeof($client_data);
+                    if (empty($client_data)) {
+                        $total_clients = 0;
+                    } else {
+                        $total_clients = sizeof($client_data);
+                    }
+
+                    d_echo('total_clients:'.PHP_EOL);
+                    d_echo($total_clients);
+
+                    $data[$sensors[0]['sensor_id']] = $total_clients);
                 }
-
-                d_echo('total_clients:'.PHP_EOL);
-                d_echo($total_clients);
-
-                $data = array('total-clients'=>$total_clients);
             }
         }
 
@@ -350,25 +344,19 @@ class ArubaInstant extends OS implements
     public function pollWirelessApCount(array $sensors)
     {
         $data = array();
-        if (!empty($sensors)) {
+        if (!empty($sensors) and sizeof($sensors) == 1) {
             $device = $this->getDevice();
 
             $ai_mib = 'AI-AP-MIB';
             $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
 
-            d_echo('ap_data:'.PHP_EOL);
-            d_echo($ap_data);
-
             $total_aps = 0;
-            
+
             if (!empty($ap_data)) {
                 $total_aps = sizeof($ap_data);
             }
 
-            d_echo('total_aps:'.PHP_EOL);
-            d_echo($total_aps);
-
-            $data = array('total-aps'=>$total_aps);
+            $data[$sensors[0]['sensor_id']] = $total_aps;
         }
 
         return $data;
