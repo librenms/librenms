@@ -26,22 +26,10 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-#use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\LaravelTestCase;
-#use App\Models\Ipv4Address;
-#use App\Models\Port;
 
-
-/*
- * Factories:
- *
- * $device = factory(Device::class)->create();
- * $device->ports()->save($port);
- * $ipv4 = factory(Ipv4Address::class)->make(); // test ipv4 lookup of device
- * $port->ipv4()->save($ipv4);
- */
 class RuckusSzEventTest extends LaravelTestCase
 {
     public function testSzApConf()

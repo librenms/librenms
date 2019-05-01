@@ -20,10 +20,12 @@
  * Ruckus ruckusSZClusterInMaintenanceStateTrap is sent whtn a
  * Virtual Smartzone cluster state changed to "in service" *
  *
+ * Ruckus Smartzone Cluster in maintenance state.
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
- * @author     <your name> <your email>
+ * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
 namespace LibreNMS\Snmptrap\Handlers;
@@ -45,7 +47,7 @@ class RuckusSzClusterInMaintenance implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap) 
     {
-        $clusterName = $traps->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName'));
+        $clusterName = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName'));
         Log::event("Smartzone cluster $clusterName state changed to maintenance", $device->device_id, 'trap', 3);
     }
 }

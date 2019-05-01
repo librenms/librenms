@@ -45,7 +45,7 @@ class RuckusSzClusterInService implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap) 
     {
-        $clusterName = $traps->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName'));
+        $clusterName = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName'));
         Log::event("Smartzone cluster $clusterName is now in service", $device->device_id, 'trap', 2);
     }
 }
