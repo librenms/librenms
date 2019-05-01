@@ -1,6 +1,6 @@
 <?php
 /**
- * RuckusSzApReboot.php
+ * RuckusSzApConnect.php
  *
  * -Description-
  *
@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Ruckus ruckusSZAPRebootTrap occurs when an access point connected
- * to the SmartZone reboots.
+ * Ruckus ruckusSZAPConnectedTrap is sent when an access point connects
+ * to a Smartzone controller.
  *
  * @package    LibreNMS
  * @link       http://librenms.org
@@ -34,7 +34,7 @@ use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Snmptrap\Handlers\RuckusSzSeverity;
 use Log;
 
-class RuckusSzApReboot implements SnmptrapHandler
+class RuckusSzApConnect implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -44,11 +44,11 @@ class RuckusSzApReboot implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) 
+    public function handle(Device $device, Trap $trap)
     {
         $location = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation'));
         $reason = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason'));
         $severity = RuckusSzSeverity::getSeverity($trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity')));
-        Log::event("AP at site $location rebooted with reason $reason", $device->device_id, 'trap', $severity);
+        Log::event("AP at location $location has connected to the SmartZone with reason $reason", $device->device_id, 'trap', $severity);
     }
 }
