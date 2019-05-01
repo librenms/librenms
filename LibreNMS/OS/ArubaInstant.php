@@ -297,7 +297,7 @@ class ArubaInstant extends OS implements
                 }
             } else {
                 // version is lower than 8.4.0.0
-                if (!empty($sensors) and sizeof($sensors) == 1) {
+                if (!empty($sensors) && sizeof($sensors) == 1) {
                     $ai_mib = 'AI-AP-MIB';
                     $client_data = $this->getCacheTable('aiClientMACAddress', $ai_mib);
 
@@ -325,9 +325,7 @@ class ArubaInstant extends OS implements
     public function pollWirelessApCount(array $sensors)
     {
         $data = array();
-        if (!empty($sensors) and sizeof($sensors) == 1) {
-            $device = $this->getDevice();
-
+        if (!empty($sensors) && sizeof($sensors) == 1) {
             $ai_mib = 'AI-AP-MIB';
             $ap_data = $this->getCacheTable('aiAPSerialNum', $ai_mib);
 

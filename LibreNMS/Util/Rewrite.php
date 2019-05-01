@@ -130,7 +130,7 @@ class Rewrite
      * 00:02:04:0B:0D:0F becomes 0.2.4.11.13.239
      * 0:2:4:B:D:F       becomes 0.2.4.11.13.15
      *
-     * @param $mac
+     * @param string $mac
      * @return string oid representation of a MAC address
      */
     public static function oidMac($mac)
@@ -151,7 +151,7 @@ class Rewrite
      * 00:02:04:0B:0D:0F becomes 0002040B0D0F
      * 0:2:4:B:D:F       becomes 0002040B0D0F
      *
-     * @param string hexadecimal MAC address with or without common delimiters
+     * @param string $mac hexadecimal MAC address with or without common delimiters
      * @return string undelimited hexadecimal MAC address
      */
     public static function macToHex($mac)
