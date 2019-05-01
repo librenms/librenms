@@ -326,7 +326,7 @@ class ArubaInstant extends OS implements
                     d_echo('total_clients:'.PHP_EOL);
                     d_echo($total_clients);
 
-                    $data[$sensors[0]['sensor_id']] = $total_clients);
+                    $data[$sensors[0]['sensor_id']] = $total_clients;
                 }
             }
         }
