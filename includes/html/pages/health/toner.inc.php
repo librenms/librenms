@@ -21,7 +21,7 @@ $pagetitle[] = "Health :: Toner";
     <div class="panel-heading">
         <div class="row" style="padding:0px 10px 0px 10px;">
             <div class="pull-left">
-                <?php echo \LibreNMS\Util\Colors::navbarClass(); ?>
+                <?php echo $navbar; ?>
             </div>
 
             <div class="pull-right">

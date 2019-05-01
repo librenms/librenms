@@ -66,7 +66,7 @@ if (!$vars['view']) {
     $vars['view'] = "detail";
 }
 
-$link_array = array('page'    => 'health');
+$link_array = ['page' => 'health'];
 
 $navbar = '<span style="font-weight: bold;">Health</span> &#187; ';
 $sep = "";
@@ -106,9 +106,7 @@ if ($vars['view'] != "graphs") {
     $displayoptions .= '</span>';
 }
 
-$valid_metrics = array_keys($used_sensors);
-
-if (in_array($active_metric, $valid_metrics)) {
+if (in_array($active_metric, $datas)) {
     include("includes/html/pages/health/$active_metric.inc.php");
 } else {
     echo("No sensors of type $active_metric found.");

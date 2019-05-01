@@ -46,6 +46,7 @@ use App\Models\WirelessSensor;
 use Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use function in_array;
 use LibreNMS\Config;
 use LibreNMS\Util\ObjectCache;
 
@@ -63,7 +64,7 @@ class MenuComposer
         /** @var User $user */
         $user = Auth::user();
 
-        $vars['navbar'] = \LibreNMS\Util\Colors::navbarClass();
+        $vars['navbar'] = in_array(Config::get('site_style'), ['dark', 'mono']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $site_style = Config::get('site_style', 'light');

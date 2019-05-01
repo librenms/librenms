@@ -70,13 +70,4 @@ class Colors
             'right' => 'bbd392'
         ];
     }
-
-    /**
-     * Get the class for the navbar (navbar-inverse or '')
-     * @return string
-     */
-    public static function navbarClass()
-    {
-        return in_array(Config::get('site_style'), ['dark', 'mono']) ? 'navbar-inverse' : '';
-    }
 }
