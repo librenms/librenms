@@ -30,7 +30,7 @@ if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || port_permitted
         $out = snmp_get($device, 'ifOutOctets.'.$port['ifIndex'], '-OUqnv', 'IF-MIB');
     }
 
-    $time = time();
+    $time = microtime(true);
 
-    printf("%lf|%s|%s\n", time(), $in, $out);
+    printf("%lf|%s|%s\n", $time, $in, $out);
 }
