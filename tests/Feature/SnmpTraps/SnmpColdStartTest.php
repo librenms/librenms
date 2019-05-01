@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * Tests SNMP Cold Start trap handler.
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Heath Barnhart
@@ -32,9 +34,9 @@ use LibreNMS\Tests\LaravelTestCase;
 
 class SnmpColdStartTest extends LaravelTestCase
 {
-	public function testSnmpColdStart()
-	{
-		$device = factory(Device::class)->create();
+    public function testSnmpColdStart()
+    {
+        $device = factory(Device::class)->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
@@ -47,5 +49,5 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::coldStart";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle SNMPColdStart');
-	}
+    }
 }
