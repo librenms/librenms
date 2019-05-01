@@ -28,7 +28,6 @@
 
 namespace LibreNMS\Snmptrap\Handlers;
 
-
 class RuckusSzSeverity
 {
     public static function getSeverity($severity)

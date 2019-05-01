@@ -17,6 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * ruckusEventSetErrorTrap is sent when there is error setting a
+ * value via SNMP. Contains the OID that is errored.
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
@@ -40,7 +43,7 @@ class RuckusSetError implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) 
+    public function handle(Device $device, Trap $trap)
     {
         $errorOidDirty = $trap->getOidData($trap->findOid('RUCKUS-EVENT-MIB::ruckusEventSetErrorOID'));
         $errorOid = substr($errorOidDirty, 43);

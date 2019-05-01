@@ -17,10 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * ruckusSZAPConfUpdatedTrap is sent when the SmartZone updates the
+ * configuration of an access point. Contains a configuration ID
+ * number string.
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
- * @author     <your name> <your email>
+ * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
 namespace LibreNMS\Snmptrap\Handlers;
@@ -29,7 +33,7 @@ use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Snmptrap\Handlers\RuckusSzSeverity;
-Use Log;
+use Log;
 
 class RuckusSzApConf implements SnmptrapHandler
 {
@@ -41,9 +45,9 @@ class RuckusSzApConf implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) 
+    public function handle(Device $device, Trap $trap)
     {
-        $location = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation')); 
+        $location = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation'));
         $configId = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZAPConfigID'));
         $severity = RuckusSzSeverity::getSeverity($trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity')));
         Log::event("AP at location $location configuration updated with config-id $configId", $device->device_id, 'trap', $severity);

@@ -20,7 +20,8 @@
  * Ruckus ruckusSZClusterInMaintenanceStateTrap is sent whtn a
  * Virtual Smartzone cluster state changed to "in service" *
  *
- * Ruckus Smartzone Cluster in maintenance state.
+ * Ruckus ruckusSZClusterInMaintenanceStateTrap is sent when the
+ * Smartzone Cluster enters a maintenance state.
  *
  * @package    LibreNMS
  * @link       http://librenms.org

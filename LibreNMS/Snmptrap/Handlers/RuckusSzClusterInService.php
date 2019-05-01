@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Ruckus ruckusSZClusterInMaintenanceStateTrap is sent whtn a
+ * Ruckus ruckusSZClusterInServiceStateTrap is sent whtn a
  * Virtual Smartzone cluster state changed to "in service"
  *
  * @package    LibreNMS
@@ -43,7 +43,7 @@ class RuckusSzClusterInService implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) 
+    public function handle(Device $device, Trap $trap)
     {
         $clusterName = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName'));
         Log::event("Smartzone cluster $clusterName is now in service", $device->device_id, 'trap', 2);

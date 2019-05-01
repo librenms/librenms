@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Ruckus ruckusSZAPMiscEventTrap occurs when the SmartZone receives 
+ * Ruckus ruckusSZAPMiscEventTrap occurs when the SmartZone receives
  * an event from a connected access point.
  *
  * @package    LibreNMS
@@ -44,10 +44,10 @@ class RuckusSzApMiscEvent implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) 
+    public function handle(Device $device, Trap $trap)
     {
         $severity = RuckusSzSeverity::getSeverity($trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity')));
-        $eventDescr = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription'));        
+        $eventDescr = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription'));
         Log::event("AP event: $eventDescr", $device->device_id, 'trap', $severity);
     }
 }

@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * SNMP Cold Start trap is sent when a device boots cold.
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
@@ -42,6 +44,6 @@ class SnmpColdStart implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event("$device->hostname booted from cold start", $device->device_id, 'trap', 2);        
+        Log::event("$device->hostname booted from cold start", $device->device_id, 'trap', 2);
     }
 }
