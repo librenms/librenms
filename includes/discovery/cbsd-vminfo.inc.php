@@ -38,7 +38,7 @@ if ($device['os'] == 'freebsd') {
 
         if ($vmwVmState == 'Off') {
             $vmwVmState="powered off";
-        } elseif ($vmwVmState == 'Off') {
+        } elseif ($vmwVmState == 'On') {
             $vmwVmState="powered on";
         }
 
