@@ -833,6 +833,7 @@ $config['discovery_modules']['junose-atm-vp']        = false;
 $config['discovery_modules']['bgp-peers']            = true;
 $config['discovery_modules']['vlans']                = true;
 $config['discovery_modules']['vmware-vminfo']        = false;
+$config['discovery_modules']['cbsd-vminfo']        = false;
 $config['discovery_modules']['libvirt-vminfo']       = false;
 $config['discovery_modules']['toner']                = false;
 $config['discovery_modules']['ucd-diskio']           = true;
