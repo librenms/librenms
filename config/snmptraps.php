@@ -76,7 +76,6 @@ return [
         'RUCKUS-SZ-EVENT-MIB::ruckusSZClusterInMaintenanceStateTrap' => \LibreNMS\Snmptrap\Handlers\RuckusSzClusterInMaintenance::class,
         'RUCKUS-SZ-EVENT-MIB::ruckusSZClusterBackToInServiceTrap' => \LibreNMS\Snmptrap\Handlers\RuckusSzClusterInService::class,
         'RUCKUS-SZ-EVENT-MIB::ruckusSZBackupClusterSuccessTrap' => \LibreNMS\Snmptrap\Handlers\RuckusSzBackupClstrSuccess::class,
-        'SNMPv2-MIB::coldStart' => \LibreNMS\Snmptrap\Handlers\SnmpColdStart::class,
         'SNMPv2-MIB::authenticationFailure' => \LibreNMS\Snmptrap\Handlers\AuthenticationFailure::class,
     ]
 ];
