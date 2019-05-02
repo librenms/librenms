@@ -2,6 +2,8 @@
 
 use LibreNMS\Exceptions\JsonAppException;
 
+require_once 'includes/polling/functions.inc.php';
+
 /*
  * Try to discover any Virtual Machines.
  */
