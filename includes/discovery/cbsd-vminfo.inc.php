@@ -36,6 +36,12 @@ if ($device['os'] == 'freebsd') {
         $vmwVmState       = $cbsd{data}{$vm}{status};
         $vmwVmCpus        = $cbsd{data}{$vm}{vm_cpus};
 
+        if ($vmwVmState == 'Off') {
+            $vmwVmState="powered off";
+        } elseif ($vmwVmState == 'Off') {
+            $vmwVmState="powered on";
+        }
+
         /*
          * Check whether the Virtual Machine is already known for this host.
          */
