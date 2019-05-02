@@ -51,7 +51,7 @@ foreach (explode(PHP_EOL, $data) as $line) {
     }
 
     if (!$processed) {
-        $pre_cache[$oid] = [$value];
+        $pre_cache[$oid] = [[$oid => $value]];
     }
 }
 
