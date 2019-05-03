@@ -45,9 +45,9 @@ if ($device['os'] == 'freebsd') {
         /*
          * Check whether the Virtual Machine is already known for this host.
          */
-        if (dbFetchCell("SELECT COUNT(id) FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND vm_type='cbsd'", array($device['device_id'], $vm)) == 0) {
-            $vmid = dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'cnsd', 'vmwVmVMID' => $vm, 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
-            log_event(mres($vmwVmDisplayName) . " ($vmwVmMemSize GB / $vmwVmCpus vCPU) Discovered", $device, 'system', 3, $vmid);
+        if (dbFetchCell("SELECT COUNT(id) FROM `vminfo` WHERE `device_id` = ? AND `vmwVmDisplayName` = ? AND vm_type='cbsd'", array($device['device_id'], $vm)) == 0) {
+            $vmid = dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'cbsd', 'vmwVmVMID' => 0, 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
+            log_event(mres($vmwVmDisplayName) . " ($vmwVmMemSize GB / $vmwVmCpus vCPU) Discovered", $device, 'system', 3);
             echo '+';
             // FIXME eventlog
         } else {
@@ -58,7 +58,7 @@ if ($device['os'] == 'freebsd') {
          * Save the discovered Virtual Machine.
          */
 
-        $vmlist[] = array(
+        $vmlist[$vm] = array(
             vmwVmDisplayName=>$vmwVmDisplayName,
             vmwVmGuestOS=>$vmwVmGuestOS,
             vmwVmMemSize=>$vmwVmMemSize,
@@ -78,9 +78,9 @@ if ($device['os'] == 'freebsd') {
          * Delete the Virtual Machines that are removed from the host.
          */
 
-        if (!in_array($db_vm['vmwVmVMID'], $vmlist)) {
+        if (!in_array($db_vm['vmwVmDisplayName'], $vmlist)) {
             dbDelete('vminfo', '`id` = ?', array($db_vm['id']));
-            log_event(mres($db_vm['vmwVmDisplayName']) . ' Removed', $device, 'system', 4, $db_vm['vmwVmVMID']);
+            log_event(mres($db_vm['vmwVmDisplayName']) . ' Removed', $device, 'system', 4, $db_vm['vmwVmDisplayName']);
             echo '-';
             // FIXME eventlog
         }
