@@ -78,7 +78,7 @@ if ($device['os'] == 'freebsd') {
          * Delete the Virtual Machines that are removed from the host.
          */
 
-        if (!in_array($db_vm['vmwVmDisplayName'], $vmlist)) {
+        if (!isset($vmlist[$db_vm['vmwVmDisplayName']])) {
             dbDelete('vminfo', '`id` = ?', array($db_vm['id']));
             log_event(mres($db_vm['vmwVmDisplayName']) . ' Removed', $device, 'system', 4, $db_vm['vmwVmDisplayName']);
             echo '-';
