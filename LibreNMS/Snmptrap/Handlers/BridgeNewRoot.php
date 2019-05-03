@@ -1,8 +1,8 @@
 <?php
 /**
- * linux.inc.php
+ * BridgeNewRoot.php
  *
- * LibreNMS pre-cache discovery module for Linux
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,27 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-echo 'RaspberryPi ';
-$pre_cache['raspberry_pi_sensors'] = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121', [], "NET-SNMP-EXTEND-MIB");
+namespace LibreNMS\Snmptrap\Handlers;
+
+use App\Models\Device;
+use LibreNMS\Interfaces\SnmptrapHandler;
+use LibreNMS\Snmptrap\Trap;
+use Log;
+
+class BridgeNewRoot implements SnmptrapHandler
+{
+    /**
+     * Handle snmptrap.
+     * Data is pre-parsed and delivered as a Trap.
+     *
+     * @param Device $device
+     * @param Trap $trap
+     * @return void
+     */
+    public function handle(Device $device, Trap $trap)
+    {
+        Log::event('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', $device->device_id, 'trap', 3);
+    }
+}
