@@ -81,7 +81,6 @@ if ($device['os'] == 'freebsd') {
             dbDelete('vminfo', '`id` = ?', array($db_vm['id']));
             log_event(mres($db_vm['vmwVmDisplayName']) . ' Removed', $device, 'system', 4, $db_vm['vmwVmDisplayName']);
             echo '-';
-            // FIXME eventlog
         }
     }
 
