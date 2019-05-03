@@ -46,7 +46,7 @@ if ($device['os'] == 'freebsd') {
          * Check whether the Virtual Machine is already known for this host.
          */
         if (dbFetchCell("SELECT COUNT(id) FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND vm_type='cbsd'", array($device['device_id'], $vm)) == 0) {
-            $vmid = dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'cbsd', 'vmwVmVMID' => $vm, 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
+            $vmid = dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'cnsd', 'vmwVmVMID' => $vm, 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
             log_event(mres($vmwVmDisplayName) . " ($vmwVmMemSize GB / $vmwVmCpus vCPU) Discovered", $device, 'system', 3, $vmid);
             echo '+';
             // FIXME eventlog
