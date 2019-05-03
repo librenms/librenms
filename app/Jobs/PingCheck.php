@@ -253,7 +253,7 @@ class PingCheck implements ShouldQueue
 
                 echo "Device $device->hostname changed status to $type, running alerts\n";
                 $rules = new AlertRules;
-                $rules-runRules($device->device_id);
+                $rules->runRules($device->device_id);
             }
 
             $device->save(); // only saves if needed (which is every time because of last_ping)

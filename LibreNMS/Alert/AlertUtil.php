@@ -27,6 +27,8 @@ namespace LibreNMS\Alert;
 
 use LibreNMS\Config;
 use App\Models\Device;
+use PHPMailer\PHPMailer\PHPMailer;
+use LibreNMS\Authentication\LegacyAuth;
 
 class AlertUtil
 {
@@ -215,7 +217,7 @@ class AlertUtil
         }
         if (strstr($rule, "%macros.")) {
             if (++$x < 30) {
-                $rule = RunMacros($rule, $x);
+                $rule = runMacros($rule, $x);
             } else {
                 return false;
             }

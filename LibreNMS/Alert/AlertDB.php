@@ -44,7 +44,7 @@ class AlertDB
      * @param $query_builder
      * @return bool|string
      */
-    public function genSQL($rule, $query_builder = false)
+    public static function genSQL($rule, $query_builder = false)
     {
         if ($query_builder) {
             return QueryBuilderParser::fromJson($query_builder)->toSql();
@@ -60,7 +60,7 @@ class AlertDB
      */
     public function genSQLOld($rule)
     {
-        $rule = AlertUtil::RunMacros($rule);
+        $rule = AlertUtil::runMacros($rule);
         if (empty($rule)) {
             //Cannot resolve Macros due to recursion. Rule is invalid.
             return false;

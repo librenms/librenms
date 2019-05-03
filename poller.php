@@ -174,7 +174,8 @@ foreach (dbFetch($query) as $device) {
     }
 
     echo "#### Start Alerts ####\n";
-    runRules($device['device_id']);
+    $rules = new AlertRules();
+    $rules->runRules($device['device_id']);
     echo "#### End Alerts ####\r\n";
     $polled_devices++;
 }

@@ -37,6 +37,7 @@ use LibreNMS\Alert\AlertData;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
 use PHPMailer\PHPMailer\PHPMailer;
 use LibreNMS\Util\Time;
