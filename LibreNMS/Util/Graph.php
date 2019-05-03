@@ -32,7 +32,7 @@ class Graph
 {
     public static function getTypes()
     {
-        return ['device', 'port', 'application', 'munin'];
+        return ['device', 'port', 'application', 'munin', 'service'];
     }
 
     /**

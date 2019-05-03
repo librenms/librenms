@@ -30,6 +30,7 @@ use App\Models\Bill;
 use App\Models\Device;
 use App\Models\MuninPlugin;
 use App\Models\Port;
+use App\Models\Service;
 use App\Models\UserWidget;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -50,6 +51,7 @@ class GraphController extends WidgetController
         'graph_port' => null,
         'graph_application' => null,
         'graph_munin' => null,
+        'graph_service' => null,
         'graph_ports' => [],
         'graph_custom' => [],
         'graph_manual' => null,
@@ -86,6 +88,10 @@ class GraphController extends WidgetController
         } elseif ($type == 'munin') {
             if ($munin = MuninPlugin::find($settings['graph_munin'])) {
                 return $munin->device->displayName() . ' / ' . $munin->mplug_type . ' / ' . $settings['graph_type'];
+            }
+        } elseif ($type == 'service') {
+            if ($service = Service::find($settings['graph_service'])) {
+                return $service->device->displayName() . ' / ' . $service->service_type . ' (' . $service->service_desc . ')' . ' / ' . $settings['graph_type'];
             }
         }
 
@@ -133,6 +139,11 @@ class GraphController extends WidgetController
         }
         $data['munin_text'] = isset($mplug) ? $mplug->device->displayName() . ' - ' . $mplug->mplug_type : __('Munin plugin does not exist');
 
+        if ($primary == 'service' && $data['graph_service']) {
+            $service = Service::with('device')->find($data['graph_service']);
+        }
+        $data['service_text'] = isset($service) ? $service->device->displayName() . ' - ' . $service->service_type . ' (' . $service->service_desc . ')' : __('Service does not exist');
+
         $data['graph_ports'] = Port::whereIn('port_id', $data['graph_ports'])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
             ->with(['device' => function ($query) {
@@ -170,6 +181,11 @@ class GraphController extends WidgetController
             if ($mplug = MuninPlugin::find($settings['graph_munin'])) {
                 $params[] = 'device='.$mplug->device_id;
                 $params[] = 'plugin='.$mplug->mplug_type;
+            }
+        } elseif ($type == 'service') {
+            if ($service = Service::find($settings['graph_service'])) {
+                $params[] = 'device='.$service->device_id;
+                $params[] = 'id='.$service->service_id;
             }
         } elseif ($type == 'aggregate') {
             $aggregate_type = $this->getGraphType(false);
@@ -255,6 +271,7 @@ class GraphController extends WidgetController
             $settings['graph_port'] = $this->convertLegacySettingId($settings['graph_port'], 'port_id');
             $settings['graph_application'] = $this->convertLegacySettingId($settings['graph_application'], 'app_id');
             $settings['graph_munin'] = $this->convertLegacySettingId($settings['graph_munin'], 'mplug_id');
+            $settings['graph_service'] = $this->convertLegacySettingId($settings['graph_service'], 'service_id');
             $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_bill'], 'bill_id');
 
             $settings['graph_custom'] = (array)$settings['graph_custom'];
