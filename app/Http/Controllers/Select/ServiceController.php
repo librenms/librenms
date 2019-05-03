@@ -1,6 +1,6 @@
 <?php
 /**
- * MuninPluginController.php
+ * ServiceController.php
  *
  * -Description-
  *
