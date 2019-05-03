@@ -16,21 +16,25 @@
  */
 
 $session_rate = [
-    'Sessions/sec 10m avg' => '.1.3.6.1.4.1.12356.101.4.1.12.0',  //FORTINET-FORTIGATE-MIB::fgSysSesRate10.0
-    'Sessions/sec 60m avg' => '.1.3.6.1.4.1.12356.101.4.1.14.0',  //FORTINET-FORTIGATE-MIB::fgSysSesRate60.0
+    'Sessions/sec 1m avg' => ['.1.3.6.1.4.1.12356.101.4.1.11', 'fgSysSesRate1'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate1.0
+    'Sessions/sec 10m avg' => ['.1.3.6.1.4.1.12356.101.4.1.12', 'fgSysSesRate10'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate10.0
+    'Sessions/sec 30m avg' => ['.1.3.6.1.4.1.12356.101.4.1.13', 'fgSysSesRate30'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate30.0
+    'Sessions/sec 60m avg' => ['.1.3.6.1.4.1.12356.101.4.1.14', 'fgSysSesRate60'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate60.0
+    'Session count' => ['.1.3.6.1.4.1.12356.101.4.1.8', 'fgSysSesCount'],  //FORTINET-FORTIGATE-MIB::fgSysSesCount.0
 ];
 
-$index = 0;
 foreach ($session_rate as $descr => $oid) {
-    $result = snmp_get($device, $oid, '-Ovq');
+    $oid_num = $oid[0];
+    $oid_txt = $oid[1];
+    $result = snmp_getnext($device, $oid_txt, '-Ovq', 'FORTINET-FORTIGATE-MIB');
     $result = str_replace(' Sessions Per Second', '', $result);
 
     discover_sensor(
         $valid['sensor'],
         'count',
         $device,
-        $oid,
-        $index,
+        $oid_num . '.0',
+        $oid_txt . '.0',
         'sessions',
         $descr,
         1,
@@ -41,25 +45,4 @@ foreach ($session_rate as $descr => $oid) {
         null,
         $result
     );
-    $index++;
 }
-
-$oid = '.1.3.6.1.4.1.12356.101.4.1.8.0'; //FORTINET-FORTIGATE-MIB::fgSysSesCount.0
-$result = snmp_get($device, $oid, '-Ovq');
-discover_sensor(
-    $valid['sensor'],
-    'count',
-    $device,
-    $oid,
-    $index,
-    'sessions',
-    'Current sessions',
-    1,
-    1,
-    null,
-    null,
-    null,
-    null,
-    $result
-);
-$index++;
