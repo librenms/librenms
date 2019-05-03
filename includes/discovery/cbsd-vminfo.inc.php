@@ -30,11 +30,11 @@ if ($device['os'] == 'freebsd') {
     $cbsd_keys=array_keys($cbsd[data]);
 
     foreach ($cbsd_keys as $vm) {
-        $vmwVmDisplayName = $cbsd{data}{$vm}{jname};
-        $vmwVmGuestOS     = $cbsd{data}{$vm}{vm_os_type};
-        $vmwVmMemSize     = $cbsd{data}{$vm}{vm_ram};
-        $vmwVmState       = $cbsd{data}{$vm}{status};
-        $vmwVmCpus        = $cbsd{data}{$vm}{vm_cpus};
+        $vmwVmDisplayName = $cbsd{data}{$vm}{'jname'};
+        $vmwVmGuestOS     = $cbsd{data}{$vm}{'vm_os_type'};
+        $vmwVmMemSize     = $cbsd{data}{$vm}{'vm_ram'};
+        $vmwVmState       = $cbsd{data}{$vm}{'status'};
+        $vmwVmCpus        = $cbsd{data}{$vm}{'vm_cpus'};
 
         if ($vmwVmState == 'Off') {
             $vmwVmState="powered off";
