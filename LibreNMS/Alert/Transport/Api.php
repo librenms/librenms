@@ -45,11 +45,8 @@ class Api extends Transport
         $method = strtolower($method);
         $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
-        //Split the line of options
-        $params_lines = preg_split("/\\r\\n|\\r|\\n/", $options);
-
-        //get the key-values and process blades
-        foreach ($params_lines as $current_line) {
+        //get each line of key-values and process blades
+        foreach (preg_split("/\\r\\n|\\r|\\n/", $options) as $current_line) {
             list($k, $v) = explode('=', $current_line, 2);
             try {
                 // process the variables on the value
@@ -63,20 +60,18 @@ class Api extends Transport
         }
 
         $client = new \GuzzleHttp\Client();
-        
         if (isset($auth) && !empty($auth[0])) {
             $request_opts['auth'] = $auth;
         }
         if ($method == "get") {
             $request_opts['query'] = $query;
             $res = $client->request('GET', $host, $request_opts);
-        } else {
+        } else { //Method POST
             $request_opts['form_params'] = $query;
             $res = $client->request('POST', $host, $request_opts);
         }
 
         $code = $res->getStatusCode();
-
         if ($code != 200) {
             var_dump("API '$host' returned Error");
             var_dump("Params:");
@@ -86,7 +81,6 @@ class Api extends Transport
             var_dump("Return: ".$res->getReasonPhrase());
             return 'HTTP Status code '.$code;
         }
-
         return true;
     }
 
