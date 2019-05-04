@@ -9,7 +9,7 @@
             </button>
             <a class="hidden-md hidden-sm navbar-brand" href>
             @if($title_image)
-                <img src="{{ $title_image }}" alt="{{ $project_name }}">
+                <img src="{{ asset($title_image) }}" alt="{{ $project_name }}">
             @else
                 {{ $project_name }}
             @endif
@@ -93,7 +93,7 @@
                 <li class="dropdown">
                     <a href="{{ url('devices/') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Devices</span></a>
                     <ul class="dropdown-menu">
-                    @if($device_types)
+                    @if($device_types->isNotEmpty())
                         <li class="dropdown-submenu">
                             <a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> All Devices</a>
                             <ul class="dropdown-menu scrollable-menu">
@@ -115,7 +115,7 @@
                         </li>
                     @endif
 
-                    @if($locations)
+                    @if($locations->isNotEmpty())
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('Geo Locations')</a>
@@ -151,7 +151,7 @@
                         <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Services</span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> All Services </a></li>
-                            @if($service_status)
+                            @if($service_status->isNotEmpty())
                                 <li role="presentation" class="divider"></li>
                                 @if($service_warning)
                                     <li><a href="{{ url('services/state=warning') }}"><i class="fa fa-bell fa-col-warning fa-fw fa-lg" aria-hidden="true"></i> Warning ({{ $service_warning }})</a></li>

@@ -61,7 +61,7 @@ class MenuComposer
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $site_style = Config::get('site_style', 'light');
-        $vars['title_image'] = asset(Config::get('title_image', "images/librenms_logo_$site_style.svg"));
+        $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
 
         // Device menu
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->select('device_groups.id', 'name', 'desc')->get();
@@ -72,7 +72,7 @@ class MenuComposer
         if (Config::get('show_locations') && Config::get('show_locations_dropdown')) {
             $vars['locations'] = Location::hasAccess($user)->select('location')->get()->map->display()->filter();
         } else {
-            $vars['locations'] = [];
+            $vars['locations'] = collect();
         }
 
         // Service menu
