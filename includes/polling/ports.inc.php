@@ -395,9 +395,10 @@ if ($config['enable_ports_poe']) {
             $port_stats[$if_id] = array_merge($port_stats[$if_id], $value);
         }
     } else {
-        //Any other device, generic polling
-        $port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
-        $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
+        //Any other device, there is no 'generic' polling available to graph POE port consumption
+        //the table below can only say if yes or no POE is currently enabled and active.
+        //nothing really helpful for the moment. 
+        //$port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
     }
 }
 
