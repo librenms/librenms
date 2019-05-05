@@ -29,16 +29,22 @@ use App\Models\Application;
 use App\Models\BgpPeer;
 use App\Models\CefSwitching;
 use App\Models\Component;
+use App\Models\Device;
 use App\Models\OspfInstance;
+use App\Models\Port;
 use App\Models\Sensor;
+use App\Models\Service;
+use App\Models\User;
 use App\Models\Vrf;
 use Cache;
 
 class ObjectCache
 {
+    private static $cache_time = 5;
+
     public static function applications()
     {
-        return Cache::remember('ObjectCache:applications_list', 5, function () {
+        return Cache::remember('ObjectCache:applications_list', self::$cache_time, function () {
             return Application::hasAccess(auth()->user())
                 ->select('app_type', 'app_instance')
                 ->groupBy('app_type', 'app_instance')
@@ -50,7 +56,7 @@ class ObjectCache
 
     public static function routing()
     {
-        return Cache::remember('ObjectCache:routing_counts', 5, function () {
+        return Cache::remember('ObjectCache:routing_counts', self::$cache_time, function () {
             $user = auth()->user();
             return [
                 'vrf' => Vrf::hasAccess($user)->count(),
@@ -64,7 +70,7 @@ class ObjectCache
 
     public static function sensors()
     {
-        return Cache::remember('ObjectCache:sensor_list', 5, function () {
+        return Cache::remember('ObjectCache:sensor_list', self::$cache_time, function () {
             $sensor_classes = Sensor::hasAccess(auth()->user())->select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
 
             $sensor_menu = [];
@@ -92,4 +98,114 @@ class ObjectCache
             return $sensor_menu;
         });
     }
+
+    /**
+     * @param int $device_id device id of the device to get counts for, 0 means all
+     * @param array $fields array of counts to get. Valid options: total, up, down, ignored, shutdown, disabled, deleted, errored
+     * @return mixed
+     */
+    public static function portCounts($fields = ['total'], $device_id = 0)
+    {
+        $result = [];
+        foreach ($fields as $field) {
+            $result[$field] = self::getPortCount($field, $device_id);
+        }
+        return $result;
+    }
+
+    private static function getPortCount($field, $device_id) {
+        return Cache::remember("ObjectCache:port_{$field}_count:$device_id", self::$cache_time, function () use ($field, $device_id) {
+            $query = Port::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+                $query->where('device_id', $device_id);
+            });
+            switch ($field) {
+                case 'down':
+                    return $query->isNotDeleted()->isDown()->count();
+                case 'up':
+                    return $query->isNotDeleted()->isUp()->count();
+                case 'ignored':
+                    return $query->isNotDeleted()->isIgnored()->count();
+                case 'shutdown':
+                    return $query->isNotDeleted()->isShutdown()->count();
+                case 'disabled':
+                    return $query->isNotDeleted()->isDisabled()->count();
+                case 'deleted':
+                    return $query->isDeleted()->count();
+                case 'errored':
+                    return $query->isNotDeleted()->hasErrors()->count();
+                case 'total':
+                default:
+                    return $query->isNotDeleted()->count();
+            }
+        });
+    }
+
+    /**
+     * @param array $fields array of counts to get. Valid options: total, up, down, ignored, disabled
+     * @return array
+     */
+    public static function deviceCounts($fields = ['total'])
+    {
+        $result = [];
+        foreach ($fields as $field) {
+            $result[$field] = self::getDeviceCount($field);
+        }
+        return $result;
+    }
+
+    private static function getDeviceCount($field)
+    {
+        return Cache::remember("ObjectCache:device_{$field}_count", self::$cache_time, function () use ($field) {
+            $query = Device::hasAccess(auth()->user());
+            switch ($field) {
+                case 'down':
+                    return $query->isDown()->count();
+                case 'up':
+                    return $query->isUp()->count();
+                case 'ignored':
+                    return $query->isIgnored()->count();
+                case 'disabled':
+                    return $query->isDisabled()->count();
+                case 'total':
+                default:
+                    return $query->count();
+            }
+        });
+    }
+
+    /**
+     * @param array $fields array of counts to get. Valid options: total, ok, warning, critical, ignored, disabled
+     * @return array
+     */
+    public static function serviceCounts($fields = ['total'])
+    {
+        $result = [];
+        foreach ($fields as $field) {
+            $result[$field] = self::getServiceCount($field);
+        }
+        return $result;
+    }
+
+    private static function getServiceCount($field)
+    {
+        return Cache::remember("ObjectCache:service_{$field}_count", self::$cache_time, function () use ($field) {
+            $query = Service::hasAccess(auth()->user());
+            switch ($field) {
+                case 'ok':
+                    return $query->isOk()->count();
+                case 'warning':
+                    return $query->isWarning()->count();
+                case 'critical':
+                    return $query->isCritical()->count();
+                case 'ignored':
+                    return $query->isIgnored()->count();
+                case 'disabled':
+                    return $query->isDisabled()->count();
+                case 'total':
+                default:
+                    return $query->count();
+            }
+        });
+    }
+
 }

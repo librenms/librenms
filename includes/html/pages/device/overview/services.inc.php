@@ -1,7 +1,11 @@
 <?php
 
-if ($services['total']) {
+use LibreNMS\Util\ObjectCache;
+
+if (ObjectCache::serviceCounts()['total'] > 0) {
     // Build the string.
+    $break = '';
+    $output = '';
     foreach (service_get($device['device_id']) as $data) {
         if ($data['service_status'] == '0') {
             // Ok
@@ -16,9 +20,11 @@ if ($services['total']) {
             // Unknown
             $status = 'grey';
         }
-        $string .= $break . '<a class=' . $status . '>' . strtolower($data['service_type']) . '</a>';
+        $output .= $break . '<a class=' . $status . '>' . strtolower($data['service_type']) . '</a>';
         $break = ', ';
     }
+
+    $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical']);
     ?>
         <div class="row">
             <div class="col-md-12">
@@ -29,12 +35,12 @@ if ($services['total']) {
                     <table class="table table-hover table-condensed table-striped">
                         <tr>
                             <td title="Total"><i class="fa fa-cog" style="color:#0080FF" aria-hidden="true"></i> <?php echo $services['total']?></td>
-                            <td title="Status - Ok"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> <?php echo $services[0]?></td>
-                            <td title="Status - Warning"><i class="fa fa-cog" style="color:orange" aria-hidden="true"></i> <?php echo $services[1]?></td>
-                            <td title="Status - Critical"><i class="fa fa-cog" style="color:red" aria-hidden="true"></i> <?php echo $services[2]?></td>
+                            <td title="Status - Ok"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> <?php echo $services['ok']?></td>
+                            <td title="Status - Warning"><i class="fa fa-cog" style="color:orange" aria-hidden="true"></i> <?php echo $services['warning']?></td>
+                            <td title="Status - Critical"><i class="fa fa-cog" style="color:red" aria-hidden="true"></i> <?php echo $services['critical']?></td>
                         </tr>
                         <tr>
-                            <td colspan='4'><?php echo $string?></td>
+                            <td colspan='4'><?php echo $output?></td>
                         </tr>
                     </table>
                 </div>
