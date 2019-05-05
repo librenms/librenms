@@ -121,7 +121,7 @@ UDP: [$device->ip]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 3:4:17:32.35
 SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::newRoot";
 
-        Log::shouldReceive('event')->once()->with('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', $device->device_id, 'trap', 3);
+        Log::shouldReceive('event')->once()->with('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', $device->device_id, 'stp', 3);
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap));
@@ -139,7 +139,7 @@ UDP: [$device->ip]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 3:4:17:32.35
 SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::topologyChange";
 
-        Log::shouldReceive('event')->once()->with('SNMP Trap: Topology of Spanning Tree instance on device ' . $device->displayName() . ' was changed', $device->device_id, 'trap', 3);
+        Log::shouldReceive('event')->once()->with('SNMP Trap: Topology of Spanning Tree Instance on device ' . $device->displayName() . ' was changed', $device->device_id, 'stp', 3);
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap));

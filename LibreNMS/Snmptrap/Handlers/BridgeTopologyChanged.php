@@ -40,6 +40,6 @@ class BridgeTopologyChanged implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event('SNMP Trap: Topology of Spanning Tree instance on device ' . $device->displayName() . ' was changed', $device->device_id, 'trap', 3);
+        Log::event('SNMP Trap: Topology of Spanning Tree Instance on device ' . $device->displayName() . ' was changed', $device->device_id, 'stp', 3);
     }
 }
