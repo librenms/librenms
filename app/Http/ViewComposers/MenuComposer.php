@@ -81,6 +81,17 @@ class MenuComposer
             ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down', 'pseudowire']) :
             ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down']);
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
+        $vars['custom_port_descr'] = collect(\LibreNMS\Config::get('custom_descr', []))
+            ->filter()
+            ->map(function ($descr) {
+                return strtolower($descr);
+            });
+        $vars['port_groups_exist'] = Config::get('int_customers') ||
+            Config::get('int_transit') ||
+            Config::get('int_peering') ||
+            Config::get('int_core') ||
+            Config::get('int_l2tp') ||
+            $vars['custom_port_descr']->isNotEmpty();
 
         // Sensor menu
         $vars['sensor_menu'] = ObjectCache::sensors();

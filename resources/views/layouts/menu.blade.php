@@ -190,28 +190,30 @@
                         @endif
 
                         @if(auth()->user()->hasGlobalRead())
-                            <li role="presentation" class="divider"></li>
-                            @config('int_customers')
-                                <li><a href="{{ url('customers') }}"><i class="fa fa-users fa-fw fa-lg" aria-hidden="true"></i> Customers</a></li>
-                            @endconfig
-                            @config('int_l2tp')
-                                <li><a href="{{ url('iftype/type=l2tp') }}"><i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i> L2TP</a></li>
-                            @endconfig
-                            @config('int_transit')
-                                <li><a href="{{ url('iftype/type=transit') }}"><i class="fa fa-truck fa-fw fa-lg" aria-hidden="true"></i> Transit</a></li>
-                            @endconfig
-                            @config('int_peering')
-                                <li><a href="{{ url('iftype/type=peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg" aria-hidden="true"></i> Peering</a></li>
-                            @endconfig
-                            @if(\LibreNMS\Config::get('int_peering') && \LibreNMS\Config::get('int_transit'))
-                                <li><a href="{{ url('iftype/type=peering,transit') }}"><i class="fa fa-rocket fa-fw fa-lg" aria-hidden="true"></i> Peering + Transit</a></li>
+                            @if($port_groups_exist)
+                                <li role="presentation" class="divider"></li>
+                                @config('int_customers')
+                                    <li><a href="{{ url('customers') }}"><i class="fa fa-users fa-fw fa-lg" aria-hidden="true"></i> Customers</a></li>
+                                @endconfig
+                                @config('int_l2tp')
+                                    <li><a href="{{ url('iftype/type=l2tp') }}"><i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i> L2TP</a></li>
+                                @endconfig
+                                @config('int_transit')
+                                    <li><a href="{{ url('iftype/type=transit') }}"><i class="fa fa-truck fa-fw fa-lg" aria-hidden="true"></i> Transit</a></li>
+                                @endconfig
+                                @config('int_peering')
+                                    <li><a href="{{ url('iftype/type=peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg" aria-hidden="true"></i> Peering</a></li>
+                                @endconfig
+                                @if(\LibreNMS\Config::get('int_peering') && \LibreNMS\Config::get('int_transit'))
+                                    <li><a href="{{ url('iftype/type=peering,transit') }}"><i class="fa fa-rocket fa-fw fa-lg" aria-hidden="true"></i> Peering + Transit</a></li>
+                                @endif
+                                @config('int_core')
+                                    <li><a href="{{ url('iftype/type=core') }}"><i class="fa fa-code-fork fa-fw fa-lg" aria-hidden="true"></i> Core</a></li>
+                                @endconfig
+                                @foreach($custom_port_descr as $custom_descr)
+                                    <li><a href="{{ url('iftype/type=' . urlencode($custom_descr)) }}"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr) }}</a></li>
+                                @endforeach
                             @endif
-                            @config('int_core')
-                                <li><a href="{{ url('iftype/type=core') }}"><i class="fa fa-code-fork fa-fw fa-lg" aria-hidden="true"></i> Core</a></li>
-                            @endconfig
-                            @foreach(collect(\LibreNMS\Config::get('custom_descr', []))->filter() as $custom_type)
-                                <li><a href="{{ url('iftype/type=' . urlencode(strtolower($custom_type))) }}"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($custom_type) }}</a></li>
-                            @endforeach
 
                             <li role="presentation" class="divider"></li>
 
