@@ -209,9 +209,9 @@
                             @config('int_core')
                                 <li><a href="{{ url('iftype/type=core') }}"><i class="fa fa-code-fork fa-fw fa-lg" aria-hidden="true"></i> Core</a></li>
                             @endconfig
-                            @foreach((array)\LibreNMS\Config::get('custom_descr', []) as $custom_type)
+                            @foreach(collect(\LibreNMS\Config::get('custom_descr', []))->filter() as $custom_type)
                                 <li><a href="{{ url('iftype/type=' . urlencode(strtolower($custom_type))) }}"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($custom_type) }}</a></li>
-                           @endforeach
+                            @endforeach
 
                             <li role="presentation" class="divider"></li>
 
