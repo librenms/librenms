@@ -287,13 +287,14 @@ $link_array = array(
     'device' => $device['device_id'],
     'tab'    => 'apps',
 );
-foreach (\LibreNMS\Util\ObjectCache::applications() as $app) {
+$apps = \LibreNMS\Util\ObjectCache::applications()->flatten()->sortBy('app_type');
+foreach ($apps as $app) {
     echo $sep;
-    if ($vars['app'] == $app['app_type']) {
+    if ($vars['app'] == $app->app_type) {
         echo "<span class='pagemenu-selected'>";
     }
-    echo generate_link(nicecase($app['app_type']), array('page' => 'apps', 'app' => $app['app_type']));
-    if ($vars['app'] == $app['app_type']) {
+    echo generate_link($app->displayName(), array('page' => 'apps', 'app' => $app->app_type));
+    if ($vars['app'] == $app->app_type) {
         echo '</span>';
     }
     $sep = ' | ';

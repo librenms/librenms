@@ -9,24 +9,24 @@ $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width']  = '400';
 $graph_array['legend']      = 'no';
 
-foreach (\LibreNMS\Util\ObjectCache::applications() as $app) {
+foreach ($apps as $app) {
     echo '<div style="clear: both;">';
-    echo '<h2>'.generate_link(nicecase($app['app_type']), array('page' => 'apps', 'app' => $app['app_type'])).'</h2>';
-    $app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ?', array($app['app_type']));
+    echo '<h2>'.generate_link($app->displayName(), array('page' => 'apps', 'app' => $app->app_type)).'</h2>';
+    $app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ?', array($app->app_type));
 
     foreach ($app_devices as $app_device) {
-        $graph_type = $graphs[$app['app_type']][0];
+        $graph_type = $graphs[$app->app_type][0];
 
-        $graph_array['type']      = 'application_'.$app['app_type'].'_'.$graph_type;
+        $graph_array['type']      = 'application_'.$app->app_type.'_'.$graph_type;
         $graph_array['id']        = $app_device['app_id'];
-        $graph_array_zoom['type'] = 'application_'.$app['app_type'].'_'.$graph_type;
+        $graph_array_zoom['type'] = 'application_'.$app->app_type.'_'.$graph_type;
         $graph_array_zoom['id']   = $app_device['app_id'];
 
         $link_array           = $graph_array;
         $link_array['page']   = 'device';
         $link_array['device'] = $app_device['device_id'];
         $link_array['tab']    = 'apps';
-        $link_array['app']    = $app['app_type'];
+        $link_array['app']    = $app->app_type;
         unset($link_array['height'], $link_array['width']);
         $overlib_url = generate_url($link_array);
 

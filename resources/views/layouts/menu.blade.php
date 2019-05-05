@@ -250,7 +250,7 @@
                     </ul>
                 </li>
 {{-- Wireless --}}
-                @if($wireless_menu->count())
+                @if($wireless_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('wireless') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wifi fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Wireless</span></a>
                         <ul class="dropdown-menu">
@@ -261,13 +261,13 @@
                     </li>
                 @endif
 {{-- App --}}
-                @if($app_menu->count())
+                @if($app_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Apps</span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url('apps') }}"><i class="fa fa-object-group fa-fw fa-lg" aria-hidden="true"></i> Overview</a></li>
                             @foreach($app_menu as $app_type => $app_instances)
-                                @if($app_instances->filter->app_instance->count() > 0)
+                                @if($app_instances->filter->app_instance->isNotEmpty())
                                     <li class="dropdown-submenu">
                                         <a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a>
                                         <ul class="dropdown-menu scrollable-menu">
