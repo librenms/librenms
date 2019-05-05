@@ -77,30 +77,14 @@ class MenuComposer
 
         // Service menu
         if (Config::get('show_services')) {
-            $vars['service_status'] = Service::hasAccess($user)->groupBy('service_status')
-                ->select('service_status', DB::raw('count(*) as count'))
-                ->whereIn('service_status', [1, 2])
-                ->get()
-                ->keyBy('service_status');
-
-            $warning = $vars['service_status']->get(1);
-            $vars['service_warning'] = $warning ? $warning->count : 0;
-            $critical = $vars['service_status']->get(2);
-            $vars['service_critical'] = $critical ? $critical->count : 0;
+            $vars['service_counts'] = ObjectCache::serviceCounts(['total', 'warning', 'critical']);
         }
 
         // Port menu
-        $vars['port_counts'] = [
-            'count' => Port::hasAccess($user)->count(),
-            'up' => Port::hasAccess($user)->isUp()->count(),
-            'down' => Port::hasAccess($user)->isDown()->count(),
-            'shutdown' => Port::hasAccess($user)->isDisabled()->count(),
-            'errored' => Port::hasAccess($user)->hasErrors()->count(),
-            'ignored' => Port::hasAccess($user)->isIgnored()->count(),
-            'deleted' => Port::hasAccess($user)->isDeleted()->count(),
-            'pseudowire' => Config::get('enable_pseudowires') ? Pseudowire::hasAccess($user)->count() : 0,
-            'alerted' => 0, // not actually supported on old...
-        ];
+        $vars['port_counts'] = Config::get('enable_pseudowires') ?
+            ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down', 'pseudowire']) :
+            ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down']);
+        $vars['port_counts']['alerted'] = 0; // not actually supported on old...
 
         // Sensor menu
         $vars['sensor_menu'] = ObjectCache::sensors();

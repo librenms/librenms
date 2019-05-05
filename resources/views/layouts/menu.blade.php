@@ -151,13 +151,13 @@
                         <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Services</span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> All Services </a></li>
-                            @if($service_status->isNotEmpty())
+                            @if($service_counts['total'])
                                 <li role="presentation" class="divider"></li>
-                                @if($service_warning)
-                                    <li><a href="{{ url('services/state=warning') }}"><i class="fa fa-bell fa-col-warning fa-fw fa-lg" aria-hidden="true"></i> Warning ({{ $service_warning }})</a></li>
+                                @if($service_counts['warning'])
+                                    <li><a href="{{ url('services/state=warning') }}"><i class="fa fa-bell fa-col-warning fa-fw fa-lg" aria-hidden="true"></i> Warning ({{ $service_counts['warning'] }})</a></li>
                                 @endif
-                                @if($service_critical)
-                                    <li><a href="{{ url('services/state=critical') }}"><i class="fa fa-bell fa-col-danger fa-fw fa-lg" aria-hidden="true"></i> Critical ({{ $service_critical }})</a></li>
+                                @if($service_counts['critical'])
+                                    <li><a href="{{ url('services/state=critical') }}"><i class="fa fa-bell fa-col-danger fa-fw fa-lg" aria-hidden="true"></i> Critical ({{ $service_counts['critical'] }})</a></li>
                                 @endif
                             @endif
                             @admin

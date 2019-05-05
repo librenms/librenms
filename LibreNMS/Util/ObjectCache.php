@@ -32,6 +32,7 @@ use App\Models\Component;
 use App\Models\Device;
 use App\Models\OspfInstance;
 use App\Models\Port;
+use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\User;
@@ -101,7 +102,7 @@ class ObjectCache
 
     /**
      * @param int $device_id device id of the device to get counts for, 0 means all
-     * @param array $fields array of counts to get. Valid options: total, up, down, ignored, shutdown, disabled, deleted, errored
+     * @param array $fields array of counts to get. Valid options: total, up, down, ignored, shutdown, disabled, deleted, errored, pseudowire
      * @return mixed
      */
     public static function portCounts($fields = ['total'], $device_id = 0)
@@ -133,6 +134,8 @@ class ObjectCache
                     return $query->isDeleted()->count();
                 case 'errored':
                     return $query->isNotDeleted()->hasErrors()->count();
+                case 'pseudowire':
+                    return Pseudowire::hasAccess(auth()->user())->count();
                 case 'total':
                 default:
                     return $query->isNotDeleted()->count();
