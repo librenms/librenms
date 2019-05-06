@@ -151,7 +151,7 @@
                         <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Services</span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> All Services </a></li>
-                            @if($service_counts['total'])
+                            @if($service_counts['warning'] || $service_counts['critical'])
                                 <li role="presentation" class="divider"></li>
                                 @if($service_counts['warning'])
                                     <li><a href="{{ url('services/state=warning') }}"><i class="fa fa-bell fa-col-warning fa-fw fa-lg" aria-hidden="true"></i> Warning ({{ $service_counts['warning'] }})</a></li>

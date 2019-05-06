@@ -73,7 +73,7 @@ class MenuComposer
 
         // Service menu
         if (Config::get('show_services')) {
-            $vars['service_counts'] = ObjectCache::serviceCounts(['total', 'warning', 'critical']);
+            $vars['service_counts'] = ObjectCache::serviceCounts(['warning', 'critical']);
         }
 
         // Port menu
