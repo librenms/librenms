@@ -64,9 +64,9 @@ class Smseagle extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'SMSEagle URL',
+                    'title' => 'SMSEagle Host',
                     'name' => 'smseagle-url',
-                    'descr' => 'SMSEagle URL',
+                    'descr' => 'SMSEagle Host',
                     'type' => 'text',
                 ],
                 [
@@ -89,7 +89,7 @@ class Smseagle extends Transport
                 ],
             ],
             'validation' => [
-                'smseagle-url'     => 'required|url',
+                'smseagle-url'     => 'required|string',
                 'smseagle-user'    => 'required|string',
                 'smseagle-pass'    => 'required|string',
                 'smseagle-mobiles' => 'required',

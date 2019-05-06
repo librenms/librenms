@@ -57,7 +57,7 @@ class Pagerduty extends Transport
         $data = [
             'routing_key'  => $config['service_key'],
             'event_action' => $obj['event_type'],
-            'dedup_key'    => $obj['alert_id'],
+            'dedup_key'    => (string)$obj['alert_id'],
             'payload'    => [
                 'custom_details'  => substr(implode(PHP_EOL, array_column($obj['faults'], 'string')), 0, 1020) . '....' ?: 'Test',
                 'source'   => $obj['hostname'],

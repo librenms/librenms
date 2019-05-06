@@ -1107,7 +1107,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     }
 
                     //user_func must be applied after divisor/multiplier
-                    if (isset($user_function) && function_exists($user_function)) {
+                    if (isset($user_function) && is_callable($user_function)) {
                         $value = $user_function($value);
                     }
 

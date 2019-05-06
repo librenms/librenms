@@ -1,0 +1,859 @@
+-- *****************************************************************
+-- TN-ERPS-MIB.my : TN Ethernet Ring Protection Switch MIB
+--
+-- Author : Tony Lei
+-- update by Angela Xing
+-- Copyright (c) 2009 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+--
+
+TN-ERPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32,
+    Gauge32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    RowStatus,TruthValue,
+    MacAddress,
+    DisplayString
+        FROM SNMPv2-TC     -- [RFC2579]  
+    VlanId
+        FROM Q-BRIDGE-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    Dot1agCfmMepId
+    FROM IEEE8021-CFM-MIB
+    tnProducts
+        FROM TRANSITION-SMI
+    tnProtectionMIB
+        FROM TN-PROTECTION-MIB;
+--
+-- main body
+--
+
+tnERPSMIB       OBJECT IDENTIFIER ::= { tnProtectionMIB 3 }
+
+tnERPSMIBNotifications  OBJECT IDENTIFIER ::= { tnERPSMIB 1 }
+tnERPSMgmtObjects       OBJECT IDENTIFIER ::= { tnERPSMIB 2 }
+tnERPSMIBConformance  OBJECT IDENTIFIER ::= { tnERPSMIB 3 }
+
+-- Textual Conventions
+
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- These notifications will be sent to the management entity
+-- whenever a ERPS Node loses/restores contact with the adjacent ring nodes.
+-- ******************************************************************
+tnErpsAlarmDown NOTIFICATION-TYPE
+    OBJECTS     { 
+                  tnERPSState,
+                  tnERPSStatePort0,
+                  tnERPSStatePort1,
+                  tnERPSStateRPLUnBlocked,
+                  tnERPSStateNoApsReceived,
+                  tnERPSStatePort0Blockstatus,
+                  tnERPSStatePort1Blockstatus
+                }
+    STATUS      current
+    DESCRIPTION
+       "A ERPS has a persistent defect condition. A notification
+        (fault alarm) is sent to the management entity with the OID
+        of the ERPS that has detected the fault.
+
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the ERPS reporting the defect
+        by the indices in the OID of the variables in the notification:
+
+           tnErpsInstance - Also the index of the ERPS state table entry
+                              (tnERPSStateTable).
+       "
+     ::= { tnERPSMIBNotifications 2 }
+
+tnErpsAlarmUp NOTIFICATION-TYPE
+    OBJECTS     { 
+                  tnERPSState,
+                  tnERPSStatePort0,
+                  tnERPSStatePort1,
+                  tnERPSStateRPLUnBlocked,
+                  tnERPSStateNoApsReceived,
+                  tnERPSStatePort0Blockstatus,
+                  tnERPSStatePort1Blockstatus
+                }
+    STATUS      current
+    DESCRIPTION
+       "A ERPS has cleared a defect condition. A notification
+        (fault clearance alarm) is sent to the management entity with the OID
+        of the ERPS that has cleared the fault.
+
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the ERPS reporting the alarm
+        by the indices in the OID of the variables in the notification:
+
+           tnErpsInstance - Also the index of the ERPS state table entry
+                              (tnERPSStateTable).
+       "
+     ::= { tnERPSMIBNotifications 1 }
+
+
+-- ******************************************************************
+-- EPRS table 
+tnERPSTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnERPSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table displays and sets current Ethernet Protection Switching configurations.
+        "
+    ::= { tnERPSMgmtObjects 1 }
+
+tnERPSEntry OBJECT-TYPE
+    SYNTAX          TnERPSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an Ethernet Ring Protection Switching configuration."
+    INDEX           { tnERPSinstance }
+    ::= { tnERPSTable 1 }
+
+TnERPSEntry ::= SEQUENCE {
+        tnERPSinstance             Unsigned32,
+        tnERPSPort0                INTEGER,
+        tnERPSPort1                INTEGER,
+        tnERPSPort0ApsMep          INTEGER,
+        tnERPSPort1ApsMep          INTEGER,
+        tnERPSPort0SfMep           INTEGER,
+        tnERPSPort1SfMep           INTEGER,
+        tnERPSRingType             INTEGER,
+        tnERPSInterconnectednode   TruthValue,
+        tnERPSVirtualChannel       TruthValue,
+        tnERPSMajorRingID          INTEGER,
+        tnERPSAlarm                INTEGER,
+        tnERPSRowStatus               RowStatus
+}
+
+tnERPSinstance OBJECT-TYPE
+     SYNTAX     Unsigned32(1..4294967295)
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+        "The ID of the ERPS.
+        "
+    ::= { tnERPSEntry 1 }
+
+tnERPSPort0 OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This will create a Port 0 of the switch in the ring.
+        "
+    ::= { tnERPSEntry 2 }
+
+tnERPSPort1  OBJECT-TYPE
+    SYNTAX         INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This will create 'Port 1' of the switch in the Ring. 
+        As interconnected sub-ring will have only one ring port, 
+        'Port 1' is configured as '0' for interconnected sub-ring.
+        '0' in this field indicates that no 'Port 1' is associated with this instance
+        "
+    ::= { tnERPSEntry 3 }
+
+tnERPSPort0ApsMep OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Port 0 APS PDU handling MEP.
+         "
+    ::= { tnERPSEntry 4 }
+
+tnERPSPort1ApsMep OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Port 1 APS PDU handling MEP. As only one APS MEP is associated with interconnected 
+         sub-ring without virtual channel, it is configured as '0' for such ring instances. 
+        '0' in this field indicates that no Port 1 APS MEP is associated with this instance.  
+         "
+    ::= { tnERPSEntry 5 }
+          
+tnERPSPort0SfMep OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Port 0 Signal Fail reporting MEP.
+         "
+    ::= { tnERPSEntry 6 }
+    
+tnERPSPort1SfMep OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Port 1 Signal Fail reporting MEP.
+         "
+    ::= { tnERPSEntry 7 }
+
+tnERPSRingType OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       major (1),
+                       sub   (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Type of Protecting ring. It can be either major ring or sub-ring. As per G.8032v2,
+        they are defined as :
+             Major Ring: A Major ring is the Ethernet ring that is connected on two ports to 
+                         an interconnection node.
+             Sub Ring :A sub-ring is an Ethernet ring which is connected to (an)other Ethernet
+                       ring(s) or network(s) through the use of a pair of interconnection nodes. 
+                       On their own, the sub-ring links do not form a closed loop. 
+                       A closed connection of traffic may be formed by the sub-ring links and 
+                       one or more links, that are controlled by (an)other Ethernet ring(s) or network(s),
+                       between interconnection nodes
+         "
+    ::= { tnERPSEntry 8 }
+
+tnERPSInterconnectednode OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Interconnected Node indicates that the ring instance is interconnected. 
+         Click on the checkbox to configure this. 
+         'True' indicates it is an interconnected node for this instance. 
+         'False' indicates that the configured instance is not interconnected.
+         "
+    ::= { tnERPSEntry 9 }
+
+tnERPSVirtualChannel OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Sub-rings can either have virtual channel or not on the interconnected node.
+         'True' indicates it is a sub-ring with virtual channel. 
+         'False' indicates, sub-ring doesn't have virtual channel.
+         "
+    ::= { tnERPSEntry 10 }
+
+tnERPSMajorRingID OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Major ring group ID for the interconnected sub-ring. 
+         It is used to send topology change updates on major ring. 
+         If ring is major, this value is same as the protection group ID of this ring.
+         "
+    ::= { tnERPSEntry 11 }
+
+tnERPSAlarm OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       active (1),
+                       notActive (2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "There is an active alarm on the ERPS.
+         "
+    ::= { tnERPSEntry 12 }
+
+tnERPSRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The rowstatus of the Ethernet Ring Protection Switch.
+         "
+    ::= { tnERPSEntry 13 }
+-- ******************************************************************
+-- TN ERPS Cfg Table
+-- ******************************************************************
+tnERPSConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnERPSConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of Instance Configuration."
+    ::= { tnERPSMgmtObjects 2 }
+
+tnERPSConfigEntry OBJECT-TYPE
+    SYNTAX        TnERPSConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an ERPS.
+        "
+    INDEX           { tnERPSinstance }
+    ::= { tnERPSConfigTable 1 }
+
+TnERPSConfigEntry ::= SEQUENCE {
+        tnERPSConfigStatus       INTEGER,
+        tnERPSConfigGuardTime    INTEGER,
+        tnERPSConfigWtrTime      INTEGER,
+        tnERPSConfigHoldOffTime  INTEGER,
+        tnERPSConfigVersion      INTEGER,
+        tnERPSConfigRevertive    TruthValue
+}
+
+tnERPSConfigStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     down (0),
+                     up (1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+             "Red: This ERPS is only created and has not yet been configured - is not active.
+              Green: This ERPS is configured - is active¡£
+              "
+        ::= { tnERPSConfigEntry 1 }
+
+tnERPSConfigGuardTime OBJECT-TYPE
+    SYNTAX    INTEGER
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Guard timeout value to be used to prevent ring nodes from receiving outdated R-APS messages.
+         The period of the guard timer can be configured in 10 ms steps between 10 ms and 2 seconds, 
+         with a default value of 500 ms
+        "
+    ::= { tnERPSConfigEntry 2 }
+
+tnERPSConfigWtrTime OBJECT-TYPE
+    SYNTAX          INTEGER{
+                     t1min (1),
+                     t2min (2),
+                     t3min (3),
+                     t4min (4),
+                     t5min (5),
+                     t6min (6),
+                     t7min (7),
+                     t8min (8),
+                     t9min (9),
+                     t10min (10),
+                     t11min (11),
+                     t12min (12)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The Wait To Restore timing value to be used in revertive switching.
+         The period of the WTR time can be configured by the operator 
+         in 1 minute steps between 1 and 12 minutes with a default value of 5 minutes.
+         "
+    ::= { tnERPSConfigEntry 3 }
+
+tnERPSConfigHoldOffTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The timing value to be used to make persistent check on Signal Fail before switching.
+         The range of the hold off timer is 0 to 10 seconds in steps of 100 ms
+        "
+    ::= { tnERPSConfigEntry 4 }
+
+tnERPSConfigVersion  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                     v1 (1),
+                     v2 (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Select v1 or v2 as the ERPS version to be used. For fields such as Version, OpCode, Flags, and End TLV, the values used are as defined in ITU-T Y.1731 (Version 0x01 is transmitted per 
+         the current version of this Recommendation at the time of this publication.)
+         G.8032v1 supported a single ring topology and G.8032v2 supports multiple rings/ladder topology.
+         v1: G.8032 v1 supports a single ring topology. The v1 protocol is robust enough to work for unidirectional failure and 
+             multiple link failure scenarios in a ring topology. 
+             It allows mechanism to force switch (FS) or manual switch (MS) to take care of field maintenance scenario.
+         v2: G.8032 v2 supports multiple rings/ladder topology. 
+             The v2 protocol also introduced other features such as Revertive/ Non-revertive mode after condition, 
+             that is causing the switch, is cleared, Administrative commands - Forced Switch (FS), 
+             Manual Switch (MS) for blocking a particular ring port, Flush FDB (Filtering database),
+             and support of multiple ERP instances on a single ring.
+         "
+    ::= { tnERPSConfigEntry 5 }
+
+tnERPSConfigRevertive OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "In Revertive mode, after the conditions causing a protection switch has cleared, 
+         the traffic channel is restored to the working transport entity, i.e., blocked on the RPL.
+         In Non-Revertive mode, the traffic channel continues to use the RPL, 
+         if it is not failed, after a protection switch condition has cleared.
+        "
+    ::= { tnERPSConfigEntry 6 }
+  
+-- erps vlan Configuration tables
+tnERPSVlanTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnERPSVlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of vlan Configuration."
+    ::= { tnERPSMgmtObjects 6 }
+
+tnERPSVlanEntry OBJECT-TYPE
+    SYNTAX          TnERPSVlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an vlan.
+        "
+    INDEX           { tnERPSinstance,tnERPSVlanInstance }
+    ::= { tnERPSVlanTable 1 }
+
+TnERPSVlanEntry ::= SEQUENCE { 
+		tnERPSVlanInstance    Unsigned32,
+        tnERPSVlanId          VlanId,
+        tnERPSVlanRowStatus   RowStatus
+}      
+
+tnERPSVlanInstance OBJECT-TYPE
+	     SYNTAX     Unsigned32(1..63)
+	     MAX-ACCESS not-accessible
+	     STATUS     current
+	     DESCRIPTION
+	        "The instance of the ERPS vlan.
+	        "
+	    ::= { tnERPSVlanEntry 1 }
+
+tnERPSVlanId OBJECT-TYPE
+        SYNTAX      VlanId
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "vlan id.
+                    "
+        ::= { tnERPSVlanEntry 2 }
+
+tnERPSVlanRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "row status.
+                    "
+        ::= { tnERPSVlanEntry 3 } 
+   
+-- RPL Configuration tables
+
+tnERPSRPLTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnERPSRPLEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of RPL Configuration."
+    ::= { tnERPSMgmtObjects 3 }
+
+tnERPSRPLEntry OBJECT-TYPE
+    SYNTAX          TnERPSRPLEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an RPL.
+        "
+    INDEX           { tnERPSinstance }
+    ::= { tnERPSRPLTable 1 }
+
+TnERPSRPLEntry ::= SEQUENCE {
+        tnERPSRPLRole     INTEGER,
+        tnERPSRPLPort     INTEGER,
+        tnERPSRPLClear    TruthValue
+}
+
+tnERPSRPLRole OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     none (1),
+                     owner (2),
+                     neighbour (3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "It can be either RPL owner or RPL Neighbour.
+                    "
+        ::= { tnERPSRPLEntry 1 }
+
+tnERPSRPLPort OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     none (1),
+                     port0 (2),
+                     port1 (3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This allows to select the east port or west port as the RPL block.
+                    "
+        ::= { tnERPSRPLEntry 2 } 
+
+tnERPSRPLClear OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "If the owner has to be changed, 
+                     then the clear check box allows to clear the RPL owner for that ERPS ring.
+                    "
+        ::= { tnERPSRPLEntry 3 }
+
+-- Command Configuration tables
+
+tnERPSCommandTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnERPSCommandEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of Command Configuration."
+    ::= { tnERPSMgmtObjects 4 }
+
+tnERPSCommandEntry OBJECT-TYPE
+    SYNTAX          TnERPSCommandEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an Command.
+        "
+    INDEX           { tnERPSinstance }
+    ::= { tnERPSCommandTable 1 }
+
+TnERPSCommandEntry ::= SEQUENCE {
+        tnERPSCommand     INTEGER,
+        tnERPSCommandPort INTEGER
+}
+
+tnERPSCommand OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     none    (1),
+                     manual  (2),                 
+                     forced  (3),
+                     clear   (4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Administrative command.
+                     A port can be administratively configured to be in either manual switch or
+                     forced switch state.
+                    "
+        ::= { tnERPSCommandEntry 1 }
+
+tnERPSCommandPort OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     none (1),
+                     port0 (2),
+                     port1 (3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Port selection - Port0 or Port1 of the protection Group on which the command is applied.
+                    "
+        ::= { tnERPSCommandEntry 2 } 
+
+-- Instance State tables
+
+tnERPSStateTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnERPSStateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of EVC control entry."
+    ::= { tnERPSMgmtObjects 5 }
+
+tnERPSStateEntry OBJECT-TYPE
+    SYNTAX          TnERPSStateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an instance State.
+        "
+    INDEX           { tnERPSinstance }
+    ::= { tnERPSStateTable 1 }
+
+TnERPSStateEntry ::= SEQUENCE {
+        tnERPSState                  INTEGER,
+        tnERPSStatePort0             INTEGER,
+        tnERPSStatePort1             INTEGER,
+        tnERPSStateTxAps             DisplayString,
+        tnERPSStatePort0RxAps        DisplayString,
+        tnERPSStatePort1RxAps        DisplayString,
+        tnERPSStateWtrRemaining      INTEGER,
+        tnERPSStateRPLUnBlocked      INTEGER,
+        tnERPSStateNoApsReceived     TruthValue,
+        tnERPSStatePort0Blockstatus  INTEGER,
+        tnERPSStatePort1Blockstatus  INTEGER,
+        tnERPSStateFopAlarm          TruthValue
+}
+
+tnERPSState OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     idle  (1),
+                     protected (2),
+                     manual    (3),
+                     forced    (4),
+                     pending   (5),
+                     unknown   (6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "ERPS state according to State Transition Tables in G.8032.
+                    "
+        ::= { tnERPSStateEntry 1 }
+
+tnERPSStatePort0 OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     ok   (1),
+                     sf   (2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "
+             OK: State of East port is ok.
+             SF: State of East port is Signal Fail.
+          "
+        ::= { tnERPSStateEntry 2 }
+
+tnERPSStatePort1 OBJECT-TYPE
+    SYNTAX    INTEGER{
+                     ok   (1),
+                     sf   (2)
+                    }
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+           "OK: State of East port is ok.
+            SF: State of East port is Signal Fail.
+           "
+    ::= { tnERPSStateEntry 3 }
+
+tnERPSStateTxAps  OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The transmitted APS according to State Transition Tables in G.8032."
+    ::= { tnERPSStateEntry 4 }
+
+tnERPSStatePort0RxAps  OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The received APS on Port 0 according to State Transition Tables in G.8032."
+    ::= { tnERPSStateEntry 5 }
+
+tnERPSStatePort1RxAps  OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The received APS on Port 1 according to State Transition Tables in G.8032."
+    ::= { tnERPSStateEntry 6 }
+
+tnERPSStateWtrRemaining  OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Remaining WTR timeout in milliseconds"
+    ::= { tnERPSStateEntry 7 }
+
+tnERPSStateRPLUnBlocked  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      block (0),
+                      unblock (1)
+                     }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "APS is received on the working flow."
+    ::= { tnERPSStateEntry 8 }
+
+tnERPSStateNoApsReceived  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      noapsReceived (0),
+                      apsReceived (1)
+                     }
+
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "RAPS PDU is not received from the other end."
+    ::= { tnERPSStateEntry 9 }
+
+tnERPSStatePort0Blockstatus OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      block (0),
+                      unblock (1)
+                     }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Block status for Port 0 (Both traffic and R-APS block status). 
+         R-APS channel is never blocked on sub-rings without virtual channel."
+    ::= { tnERPSStateEntry 10 }
+
+tnERPSStatePort1Blockstatus   OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      block (0),
+                      unblock (1)
+                     }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Block status for Port 1 (Both traffic and R-APS block status). 
+         R-APS channel is never blocked on sub-rings without virtual channel"
+    ::= { tnERPSStateEntry 11 }
+
+tnERPSStateFopAlarm   OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Failure of Protocol Defect(FOP) status. 
+         If FOP is detected, the red LED lights; otherwise the green LED lights. "
+    ::= { tnERPSStateEntry 12 }
+
+-- Sub-Ring Configuration tables
+tnERPSSubRingCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnERPSSubRingCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of Command Configuration."
+    ::= { tnERPSMgmtObjects 7 }
+
+tnERPSSubRingCfgEntry OBJECT-TYPE
+    SYNTAX          TnERPSSubRingCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an sub ring configuration.
+        "
+    INDEX           { tnERPSinstance }
+    ::= { tnERPSSubRingCfgTable 1 }
+
+TnERPSSubRingCfgEntry ::= SEQUENCE {
+        tnERPSSubRingType             DisplayString,
+        tnERPSSubRingTopologyChange   TruthValue
+}
+
+tnERPSSubRingType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "erps ring type.
+                    "
+        ::= { tnERPSSubRingCfgEntry 1 }
+
+tnERPSSubRingTopologyChange OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Clicking this checkbox indicates that the topology changes in the sub-ring are propagated in the major ring.
+                    "
+        ::= { tnERPSSubRingCfgEntry 2 }
+       
+-- erps statistics tables
+tnERPSStatisticsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnERPSStatisticsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the display of erps statistics."
+    ::= { tnERPSMgmtObjects 8 }
+
+tnERPSStatisticsEntry OBJECT-TYPE
+    SYNTAX          TnERPSStatisticsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an sub ring configuration.
+        "
+    INDEX           { tnERPSinstance }
+    ::= { tnERPSStatisticsTable 1 }
+
+TnERPSStatisticsEntry ::= SEQUENCE {
+        tnERPSRAPSPDUReceived         INTEGER,
+        tnERPSRAPSPDUDropped          INTEGER,
+        tnERPSLocalSFOccurred         INTEGER,
+        tnERPSLocalSFCleared          INTEGER,
+        tnERPSRemoteSFReceived        INTEGER,
+        tnERPSRemoteFSReceived        INTEGER,
+        tnERPSNRMessageSent           INTEGER
+}
+
+tnERPSRAPSPDUReceived OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "erps R-APS PDU received.
+                    "
+        ::= { tnERPSStatisticsEntry 1 }
+
+tnERPSRAPSPDUDropped OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "erps R-APS PDU dropped.
+                    "
+        ::= { tnERPSStatisticsEntry 2 }    
+        
+tnERPSLocalSFOccurred OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "erps local SF occurred.
+                    "
+        ::= { tnERPSStatisticsEntry 3 }
+        
+tnERPSLocalSFCleared OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "erps local SF cleared.
+                    "
+        ::= { tnERPSStatisticsEntry 4 }
+        
+tnERPSRemoteSFReceived OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "erps remote SF received.
+                    "
+        ::= { tnERPSStatisticsEntry 5 }
+        
+tnERPSRemoteFSReceived OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "erps remote FS received.
+                    "
+        ::= { tnERPSStatisticsEntry 6 }
+        
+tnERPSNRMessageSent OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "erps NR message sent.
+                    "
+        ::= { tnERPSStatisticsEntry 7 }
+END

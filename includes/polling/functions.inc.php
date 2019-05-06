@@ -171,7 +171,7 @@ function record_sensor_data($device, $all_sensors)
             $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
         }
 
-        if (isset($sensor['user_func']) && function_exists($sensor['user_func'])) {
+        if (isset($sensor['user_func']) && is_callable($sensor['user_func'])) {
             $sensor_value = $sensor['user_func']($sensor_value);
         }
 
