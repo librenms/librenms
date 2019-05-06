@@ -145,16 +145,18 @@ function dbBulkInsert($data, $table)
         return false;
     }
 
+    // make sure we have fields to insert
+    $fields = array_keys(reset($data));
+    if (empty($fields)) {
+        return false;
+    }
+
     // Break into managable chunks to prevent situations where insert
     // fails due to prepared statement having too many placeholders.
     $data_chunks = array_chunk($data, 10000, true);
 
     foreach ($data_chunks as $data_chunk) {
-        // make sure we have fields to insert
-        $fields = array_keys(reset($data_chunk));
-        if (empty($fields)) {
-            return false;
-        }
+
         try {
             $result = Eloquent::DB()->table($table)->insert((array)$data_chunk);
 
@@ -164,7 +166,9 @@ function dbBulkInsert($data, $table)
             // FIXME query?
             dbHandleException(new QueryException("Bulk insert $table", $data_chunk, $pdoe));
         }
+
     }
+
     return false;
 }//end dbBulkInsert()
 
