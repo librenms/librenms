@@ -51,6 +51,7 @@ class ServiceConfig:
 
     debug = False
     log_level = 20
+    max_db_failures = 5
 
     alerting = PollerConfig(1, 60)
     poller = PollerConfig(24, 300)
@@ -185,6 +186,7 @@ class Service:
     discovery_manager = None
     last_poll = {}
     terminate_flag = False
+    db_failures = 0
 
     def __init__(self):
         self.config.populate()
@@ -241,7 +243,7 @@ class Service:
         # Main dispatcher loop
         try:
             while not self.terminate_flag:
-                master_lock = self._lm.lock('dispatch.master', self.config.unique_name, self.config.master_timeout, True)
+                master_lock = self._acquire_master()
                 if master_lock:
                     if not self.is_master:
                         info("{} is now the master dispatcher".format(self.config.name))
@@ -270,6 +272,12 @@ class Service:
         info("Dispatch loop terminated")
         self.shutdown()
 
+    def _acquire_master(self):
+        return self._lm.lock('dispatch.master', self.config.unique_name, self.config.master_timeout, True)
+
+    def _release_master(self):
+        self._lm.unlock('dispatch.master', self.config.unique_name)
+
     # ------------ Discovery ------------
     def dispatch_immediate_discovery(self, device_id, group):
         if not self.discovery_manager.is_locked(device_id):
@@ -294,7 +302,7 @@ class Service:
             poller_find_time = self.config.poller.frequency - 1
             discovery_find_time = self.config.discovery.frequency - 1
 
-            return self._db.query('''SELECT `device_id`,
+            result = self._db.query('''SELECT `device_id`,
                   `poller_group`,
                   COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1) AS `poll`,
                   IF(snmp_disable=1 OR status=0, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1)) AS `discover`
@@ -306,7 +314,13 @@ class Service:
                     `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND)
                 )
                 ORDER BY `last_polled_timetaken` DESC''', (poller_find_time, discovery_find_time, poller_find_time, discovery_find_time))
+            self.db_failures = 0
+            return result
         except pymysql.err.Error:
+            self.db_failures += 1
+            if self.db_failures > self.config.max_db_failures:
+                warning("Too many DB failures ({}), attempting to release master".format(self.db_failures))
+                self._release_master()
             return []
 
     def run_maintenance(self):
@@ -371,7 +385,7 @@ class Service:
 
         info('Restarting service... ')
         self._stop_managers_and_wait()
-        self._lm.unlock('dispatch.master', self.config.unique_name)
+        self._release_master()
 
         python = sys.executable
         os.execl(python, python, *sys.argv)
@@ -394,7 +408,7 @@ class Service:
         info('Shutting down, waiting for running jobs to complete...')
 
         self.stop_dispatch_timers()
-        self._lm.unlock('dispatch.master', self.config.unique_name)
+        self._release_master()
 
         self.daily_timer.stop()
         self.stats_timer.stop()
