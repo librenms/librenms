@@ -3,6 +3,7 @@ import LibreNMS
 import json
 import logging
 import os
+import pymysql
 import subprocess
 import threading
 import sys
@@ -289,21 +290,24 @@ class Service:
                           .format(device_id, elapsed))
 
     def fetch_immediate_device_list(self):
-        poller_find_time = self.config.poller.frequency - 1
-        discovery_find_time = self.config.discovery.frequency - 1
+        try:
+            poller_find_time = self.config.poller.frequency - 1
+            discovery_find_time = self.config.discovery.frequency - 1
 
-        return self._db.query('''SELECT `device_id`,
-              `poller_group`,
-              COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1) AS `poll`,
-              IF(snmp_disable=1 OR status=0, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1)) AS `discover`
-            FROM `devices`
-            WHERE `disabled` = 0 AND (
-                `last_polled` IS NULL OR
-                `last_discovered` IS NULL OR
-                `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND) OR
-                `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND)
-            )
-            ORDER BY `last_polled_timetaken` DESC''', (poller_find_time, discovery_find_time, poller_find_time, discovery_find_time))
+            return self._db.query('''SELECT `device_id`,
+                  `poller_group`,
+                  COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1) AS `poll`,
+                  IF(snmp_disable=1 OR status=0, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1)) AS `discover`
+                FROM `devices`
+                WHERE `disabled` = 0 AND (
+                    `last_polled` IS NULL OR
+                    `last_discovered` IS NULL OR
+                    `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND) OR
+                    `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND)
+                )
+                ORDER BY `last_polled_timetaken` DESC''', (poller_find_time, discovery_find_time, poller_find_time, discovery_find_time))
+        except pymysql.err.Error:
+            return []
 
     def run_maintenance(self):
         """
@@ -477,5 +481,5 @@ class Service:
                                        getattr(self.config, worker_type).workers,
                                        getattr(self.config, worker_type).frequency)
                                )
-        except Exception:
+        except pymysql.err.Error:
             exception("Unable to log performance statistics - is the database still online?")

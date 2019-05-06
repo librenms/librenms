@@ -105,10 +105,23 @@ class DB:
         :param args:
         :return: the cursor with results
         """
-        cursor = self.db_conn().cursor()
-        cursor.execute(query, args)
-        cursor.close()
-        return cursor
+        try:
+            cursor = self.db_conn().cursor()
+            cursor.execute(query, args)
+            cursor.close()
+            return cursor
+        except Exception as e:
+            critical("DB Connection exception {}".format(e))
+            self.close()
+            raise
+
+    def close(self):
+        """
+        Close the connection owned by this thread.
+        """
+        conn = self._db.pop(threading.get_ident(), None)
+        if conn:
+            conn.close()
 
 
 class RecurringTimer:

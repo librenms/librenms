@@ -1,3 +1,4 @@
+import pymysql
 import subprocess
 import threading
 import traceback
@@ -302,9 +303,12 @@ class PingQueueManager(TimedQueueManager):
         self._db = LibreNMS.DB(self.config)
 
     def do_dispatch(self):
-        groups = self._db.query("SELECT DISTINCT (`poller_group`) FROM `devices`")
-        for group in groups:
-            self.post_work('', group[0])
+        try:
+            groups = self._db.query("SELECT DISTINCT (`poller_group`) FROM `devices`")
+            for group in groups:
+                self.post_work('', group[0])
+        except pymysql.err.Error:
+            pass
 
     def do_work(self, context, group):
         if self.lock(group, 'group', timeout=self.config.ping.frequency):
@@ -328,10 +332,13 @@ class ServicesQueueManager(TimedQueueManager):
         self._db = LibreNMS.DB(self.config)
 
     def do_dispatch(self):
-        devices = self._db.query("SELECT DISTINCT(`device_id`), `poller_group` FROM `services`"
-                                 " LEFT JOIN `devices` USING (`device_id`) WHERE `disabled`=0")
-        for device in devices:
-            self.post_work(device[0], device[1])
+        try:
+            devices = self._db.query("SELECT DISTINCT(`device_id`), `poller_group` FROM `services`"
+                                     " LEFT JOIN `devices` USING (`device_id`) WHERE `disabled`=0")
+            for device in devices:
+                self.post_work(device[0], device[1])
+        except pymysql.err.Error:
+            pass
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=self.config.services.frequency):
@@ -419,9 +426,12 @@ class DiscoveryQueueManager(TimedQueueManager):
         self._db = LibreNMS.DB(self.config)
 
     def do_dispatch(self):
-        devices = self._db.query("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
-        for device in devices:
-            self.post_work(device[0], device[1])
+        try:
+            devices = self._db.query("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
+            for device in devices:
+                self.post_work(device[0], device[1])
+        except pymysql.err.Error:
+            pass
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=LibreNMS.normalize_wait(self.config.discovery.frequency)):
