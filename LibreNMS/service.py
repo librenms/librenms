@@ -321,6 +321,7 @@ class Service:
             if self.db_failures > self.config.max_db_failures:
                 warning("Too many DB failures ({}), attempting to release master".format(self.db_failures))
                 self._release_master()
+                sleep(self.config.master_resolution)  # sleep to give another node a chance to acquire
             return []
 
     def run_maintenance(self):
