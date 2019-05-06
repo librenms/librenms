@@ -156,7 +156,6 @@ function dbBulkInsert($data, $table)
     $data_chunks = array_chunk($data, 10000, true);
 
     foreach ($data_chunks as $data_chunk) {
-
         try {
             $result = Eloquent::DB()->table($table)->insert((array)$data_chunk);
 
@@ -166,7 +165,6 @@ function dbBulkInsert($data, $table)
             // FIXME query?
             dbHandleException(new QueryException("Bulk insert $table", $data_chunk, $pdoe));
         }
-
     }
 
     return false;
