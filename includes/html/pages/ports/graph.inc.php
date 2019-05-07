@@ -5,7 +5,7 @@ echo '<div class="panel-heading">';
 echo $displayLists;
 echo '</div>';
 echo '<div class="panel-body">';
-// FIXME GLOBAL $ports
+
 foreach ($ports as $port) {
     $speed = humanspeed($port['ifSpeed']);
     $type  = humanmedia($port['ifType']);

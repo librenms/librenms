@@ -55,7 +55,6 @@ abstract class DeviceSummaryController extends WidgetController
     protected function getData(Request $request)
     {
         $data = $this->getSettings();
-        $user = $request->user();
 
         $data['devices'] = ObjectCache::deviceCounts(['total', 'up', 'down', 'ignored', 'disabled']);
 
