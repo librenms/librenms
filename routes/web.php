@@ -33,7 +33,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::group(['prefix' => '2fa', 'namespace' => 'Auth'], function () {
         Route::get('', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
         Route::post('', 'TwoFactorController@verifyTwoFactor')->name('2fa.verify');
-        Route::post('add', 'TwoFactorController@create');
+        Route::post('add', 'TwoFactorController@create')->name('2fa.add');
         Route::post('cancel', 'TwoFactorController@cancelAdd')->name('2fa.cancel');
         Route::post('remove', 'TwoFactorController@destroy')->name('2fa.remove');
 

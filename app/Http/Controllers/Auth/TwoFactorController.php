@@ -89,7 +89,7 @@ class TwoFactorController extends Controller
 
         return view('auth.2fa')->with([
             'key' => $twoFactorSettings['key'],
-            'uri' => $this->genUri($request->user(), $twoFactorSettings),
+            'uri' => TwoFactor::generateUri($request->user()->username, $twoFactorSettings['key'], $twoFactorSettings['counter'] !== false),
         ])->withErrors($errors);
     }
 
@@ -210,19 +210,5 @@ class TwoFactorController extends Controller
         }
 
         return UserPref::getPref($user, 'twofactor');
-    }
-
-    private function genUri($user, $settings)
-    {
-        $title = "LibreNMS:" . urlencode($user->username);
-        $key = $settings['key'];
-
-        // time based
-        if ($settings['counter'] === false) {
-            return "otpauth://totp/$title?issuer=LibreNMS&secret=$key";
-        }
-
-        // counter based
-        return "otpauth://hotp/$title?issuer=LibreNMS&counter=1&secret=$key";
     }
 }

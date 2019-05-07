@@ -107,7 +107,6 @@
 
 @yield('content')
 
-
 {!! Toastr::render() !!}
 
 </body>

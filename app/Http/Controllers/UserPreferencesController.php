@@ -25,7 +25,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\UserPref;
+use Auth;
 use Illuminate\Http\Request;
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Authentication\TwoFactor;
+use LibreNMS\Config;
 
 class UserPreferencesController extends Controller
 {
@@ -34,9 +40,22 @@ class UserPreferencesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('user.preferences');
+        $data = [
+            'can_change_password' => LegacyAuth::get()->canUpdatePasswords(Auth::user()->username),
+            'twofactor_uri' => '',
+        ];
+
+        if (Config::get('twofactor')) {
+            $twofactor = UserPref::getPref($request->user(), 'twofactor');
+            if ($twofactor) {
+                $data['twofactor_uri'] = TwoFactor::generateUri($request->user()->username, $twofactor['key'], $twofactor['counter'] !== false);
+            }
+            $data['twofactor'] = $twofactor;
+        }
+
+        return view('user.preferences', $data);
     }
 
     /**
