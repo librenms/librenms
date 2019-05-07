@@ -36,7 +36,6 @@ modules:
           index: "total-{{ $hwSlotIndex }}"
           group: Frames
 
-
     temperature:
       data:
         -
@@ -107,6 +106,7 @@ modules:
           group: SFPs
           divisor: 1000
           skip_value_gt: 999999
+          
     count:
       data:
         -
