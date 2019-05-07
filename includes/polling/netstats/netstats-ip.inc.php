@@ -5,7 +5,6 @@ use LibreNMS\RRD\RrdDefinition;
 if (!starts_with($device['os'], ['Snom', 'asa'])) {
     echo ' IP';
 
-    // These are at the start of large trees that we don't want to walk the entirety of, so we snmp_get_multi them
     $oids = [
         'ipForwDatagrams',
         'ipInDelivers',
@@ -24,7 +23,6 @@ if (!starts_with($device['os'], ['Snom', 'asa'])) {
         'ipInHdrErrors',
         'ipInAddrErrors',
     ];
-
     $data = snmp_getnext_multi($device, $oids, '-OQUs', 'IP-MIB');
 
     $rrd_def = new RrdDefinition();
@@ -34,13 +32,14 @@ if (!starts_with($device['os'], ['Snom', 'asa'])) {
         $fields[$oid] = is_numeric($data[$oid]) ? $data[$oid] : 'U';
     }
 
-    if (isset($data['ipOutRequests']) && isset($data['ipInReceives'])) {
+    if (isset($fields['ipOutRequests']) && isset($fields['ipInReceives'])) {
         $tags = compact('rrd_def');
         data_update($device, 'netstats-ip', $tags, $fields);
 
         $graphs['netstat_ip']      = true;
         $graphs['netstat_ip_frag'] = true;
     }
-}//end if
 
-unset($oids, $data, $rrd_def, $fields, $tags);
+    unset($oids, $data, $rrd_def, $fields, $tags, $oid);
+
+}//end if
