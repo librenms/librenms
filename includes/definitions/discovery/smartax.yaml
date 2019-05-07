@@ -7,7 +7,9 @@ modules:
           value: hwMusaBoardCpuRate
           num_oid: '.1.3.6.1.4.1.2011.2.6.7.1.1.2.1.5.{{ $index }}'
           type: smartax
+          index: hwSlotIndex
           descr: "Slot {{ $hwSlotIndex }} {{ $hwMusaBoardSlotDesc }}"
+
   sensors:
     pre-cache:
       data:
@@ -19,6 +21,106 @@ modules:
               - hwPowerIndex
               - hwPowerName
               - ifName
+
+    power:
+      data:
+        -
+          oid: hwMusaBoardPower
+          num_oid: '.1.3.6.1.4.1.2011.2.6.7.1.1.2.1.11.{{ $index }}'
+          descr: " Slot {{ $hwSlotIndex }} ({{ $hwSlotTypeName }})"
+          group: Boards
+        -
+          oid: hwMusaFramePower
+          num_oid: '.1.3.6.1.4.1.2011.2.6.7.1.1.1.1.11.{{ $index }}'
+          descr: "Frame {{ $hwFrameIndex }} ({{ $hwFrameTypeName }})"
+          index: "total-{{ $hwSlotIndex }}"
+          group: Frames
+
+
+    temperature:
+      data:
+        -
+          oid: hwSlotTemprature
+          num_oid: '.1.3.6.1.4.1.2011.6.3.3.2.1.13.{{ $index }}'
+          descr: "Slot {{ $hwSlotIndex }} ({{ $hwSlotTypeName }})"
+          group: Boards
+          skip_value_gt: 99999
+        -
+          oid: hwGponOltOpticsDdmInfoEntry
+          value: hwGponOltOpticsDdmInfoTemperature
+          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.23.1.1.{{ $index }}'
+          descr:  "SFP {{ $ifName }}"
+          group: SFPs
+          skip_value_gt: 999999
+
+    voltage:
+      data:
+        -
+          oid: hwACVoltA
+          num_oid: '.1.3.6.1.4.1.2011.6.2.1.2.1.3.{{ $index }}'
+          divisor: 1000
+          descr: AC Input A
+          group: Power
+        -
+          oid: hwDCVoltageOut
+          num_oid: '.1.3.6.1.4.1.2011.6.2.1.3.1.1.{{ $index }}'
+          divisor: 1000
+          descr: DC Output
+          group: Power
+        -
+          oid: hwGponOltOpticsDdmInfoSupplyVoltage
+          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.23.1.2.{{ $index }}'
+          descr:  "SFP {{ $ifName }}"
+          group: SFPs
+          divisor: 100
+          skip_value_gt: 999999
+
+    dbm:
+      data:
+        -
+          oid: hwGponOltOpticsDdmInfoTxPower
+          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.23.1.4.{{ $index }}'
+          descr: "SFP {{ $ifName }} TX"
+          group: SFPs TX
+          index: 'tx-{{ $index }}'
+          divisor: 100
+          skip_value_gt: 999999
+
+    current:
+      data:
+        -
+          oid: hwDCOutLoadCurrent
+          num_oid: '.1.3.6.1.4.1.2011.6.2.1.3.1.10.{{ $index }}'
+          divisor: 1000
+          descr: DC Total Output Load
+          group: Power
+        -
+          oid: hwBatteryCurrent
+          num_oid: '.1.3.6.1.4.1.2011.6.2.1.6.3.1.6.{{ $index }}'
+          divisor: 1000
+          descr: Battery
+          group: Power
+        -
+          oid: hwGponOltOpticsDdmInfoTxBiasCurrent
+          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.23.1.3.{{ $index }}'
+          descr:  "SFP {{ $ifName }}"
+          group: SFPs
+          divisor: 1000
+          skip_value_gt: 999999
+    count:
+      data:
+        -
+          oid: hwGponDeviceOltControlOntNum
+          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.21.1.16.{{ $index }}'
+          descr: "{{ $ifName }} Added ONTs"
+          group: ONTs Count
+          index: 'count-{{ $index }}'
+        -
+          oid: hwGponDeviceOltControlTcontNumInCard
+          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.21.1.21.{{ $index }}'
+          descr: "{{ $ifName }} T-CONT's"
+          group: T-CONTs Count
+          index: 'tconts-{{ $index }}'
 
     state:
       data:
@@ -67,8 +169,8 @@ modules:
           state_name: hwDCVoltageOutState
           states:
             - { value: 1, generic: 0, graph: 1, descr: 'normal' }
-            - { value: 2, generic: 2, graph: 1, descr: 'exceedVoltage' }
-            - { value: 3, generic: 2, graph: 1, descr: 'belowVoltage' }
+            - { value: 2, generic: 1, graph: 1, descr: 'exceedVoltage' }
+            - { value: 3, generic: 1, graph: 1, descr: 'belowVoltage' }
         -
           oid: hwSlotOperStatus
           num_oid: '.1.3.6.1.4.1.2011.6.3.3.2.1.8.{{ $index }}'
@@ -79,19 +181,19 @@ modules:
             - { value: 1, generic: 0, graph: 1, descr: 'online' }
             - { value: 2, generic: 0, graph: 1, descr: 'normal' }
             - { value: 3, generic: 2, graph: 1, descr: 'fault' }
-            - { value: 4, generic: 1, graph: 1, descr: 'forbidden' }
-            - { value: 5, generic: 1, graph: 1, descr: 'autofind' }
+            - { value: 4, generic: 3, graph: 1, descr: 'forbidden' }
+            - { value: 5, generic: 0, graph: 1, descr: 'autofind' }
             - { value: 6, generic: 1, graph: 1, descr: 'config' }
             - { value: 7, generic: 3, graph: 1, descr: 'offline' }
             - { value: 8, generic: 2, graph: 1, descr: 'abnormal' }
             - { value: 9, generic: 1, graph: 1, descr: 'versionerr' }
             - { value: 10, generic: 1, graph: 1, descr: 'autoload' }
-            - { value: 11, generic: 2, graph: 1, descr: 'outofservice' }
+            - { value: 11, generic: 3, graph: 1, descr: 'outofservice' }
             - { value: 12, generic: 2, graph: 1, descr: 'graceful' }
             - { value: 13, generic: 3, graph: 1, descr: 'shutdown' }
-            - { value: 14, generic: 2, graph: 1, descr: 'energysavingshutdown' }
+            - { value: 14, generic: 1, graph: 1, descr: 'energysavingshutdown' }
             - { value: 15, generic: 2, graph: 1, descr: 'hightemperatureshutdown' }
-            - { value: 16, generic: 1, graph: 1, descr: 'manualshutdown' }
+            - { value: 16, generic: 3, graph: 1, descr: 'manualshutdown' }
             - { value: 17, generic: 1, graph: 1, descr: 'mismatch' }
             - { value: 18, generic: 2, graph: 1, descr: 'acoffshutdown' }
         -
@@ -103,87 +205,3 @@ modules:
           states:
             - { value: 1, generic: 0, graph: 1, descr: 'Up' }
             - { value: 2, generic: 2, graph: 1, descr: 'Down' }
-
-    temperature:
-      data:
-        -
-          oid: hwSlotTemprature
-          num_oid: '.1.3.6.1.4.1.2011.6.3.3.2.1.13.{{ $index }}'
-          descr: "Slot {{ $hwSlotIndex }} ({{ $hwSlotTypeName }})"
-          group: Boards
-          skip_value_gt: 99999
-        -
-          oid: hwGponOltOpticsDdmInfoEntry
-          value: hwGponOltOpticsDdmInfoTemperature
-          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.23.1.1.{{ $index }}'
-          descr:  "SFP {{ $ifName }}"
-          group: SFPs
-          skip_value_gt: 999999
-
-    voltage:
-      data:
-        -
-          oid: hwACVoltA
-          num_oid: '.1.3.6.1.4.1.2011.6.2.1.2.1.3.{{ $index }}'
-          divisor: 1000
-          descr: AC Input A
-          group: Power
-        -
-          oid: hwDCVoltageOut
-          num_oid: '.1.3.6.1.4.1.2011.6.2.1.3.1.1.{{ $index }}'
-          divisor: 1000
-          descr: DC Output
-          group: Power
-        -
-          oid: hwGponOltOpticsDdmInfoSupplyVoltage
-          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.23.1.2.{{ $index }}'
-          descr:  "SFP {{ $ifName }}"
-          group: SFPs
-          divisor: 100
-          skip_value_gt: 999999
-
-
-    current:
-      data:
-        -
-          oid: hwDCOutLoadCurrent
-          num_oid: '.1.3.6.1.4.1.2011.6.2.1.3.1.10.{{ $index }}'
-          divisor: 1000
-          descr: DC Total Output Load
-          group: Power
-        -
-          oid: hwBatteryCurrent
-          num_oid: '.1.3.6.1.4.1.2011.6.2.1.6.3.1.6.{{ $index }}'
-          divisor: 1000
-          descr: Battery
-          group: Power
-        -
-          oid: hwGponOltOpticsDdmInfoTxBiasCurrent
-          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.23.1.3.{{ $index }}'
-          descr:  "SFP {{ $ifName }}"
-          group: SFPs
-          divisor: 1000
-          skip_value_gt: 999999
-
-    power:
-      data:
-        -
-          oid: hwMusaFramePower
-          num_oid: '.1.3.6.1.4.1.2011.2.6.7.1.1.1.1.11.{{ $index }}'
-          descr: "Frame {{ $hwFrameIndex }} ({{ $hwFrameTypeName }})"
-          group: Frames
-        -
-          oid: hwMusaBoardPower
-          num_oid: '.1.3.6.1.4.1.2011.2.6.7.1.1.2.1.11.{{ $index }}'
-          descr: " Slot {{ $hwSlotIndex }} ({{ $hwSlotTypeName }})"
-          group: Boards
-    dbm:
-      data:
-        -
-          oid: hwGponOltOpticsDdmInfoTxPower
-          num_oid: '.1.3.6.1.4.1.2011.6.128.1.1.2.23.1.4.{{ $index }}'
-          descr: "SFP {{ $ifName }} TX"
-          group: SFPs TX
-          index: 'tx-{{ $index }}'
-          divisor: 100
-          skip_value_gt: 999999
