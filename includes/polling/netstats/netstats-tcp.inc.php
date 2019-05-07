@@ -6,29 +6,26 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
     echo ' TCP';
 
     $oids = array(
-        'tcpActiveOpens',
-        'tcpPassiveOpens',
-        'tcpAttemptFails',
-        'tcpEstabResets',
-        'tcpCurrEstab',
-        'tcpInSegs',
-        'tcpOutSegs',
-        'tcpRetransSegs',
-        'tcpInErrs',
-        'tcpOutRsts',
+        'TCP-MIB::tcpActiveOpens.0',
+        'TCP-MIB::tcpPassiveOpens.0',
+        'TCP-MIB::tcpAttemptFails.0',
+        'TCP-MIB::tcpEstabResets.0',
+        'TCP-MIB::tcpCurrEstab.0',
+        'TCP-MIB::tcpInSegs.0',
+        'TCP-MIB::tcpOutSegs.0',
+        'TCP-MIB::tcpRetransSegs.0',
+        'TCP-MIB::tcpInErrs.0',
+        'TCP-MIB::tcpOutRsts.0',
     );
 
     $rrd_def = new RrdDefinition();
-    $snmpstring = '';
     foreach ($oids as $oid) {
         $rrd_def->addDataset($oid, 'COUNTER', null, 10000000);
-        $snmpstring .= ' TCP-MIB::'.$oid.'.0';
     }
 
-    $snmpstring .= ' tcpHCInSegs.0';
-    $snmpstring .= ' tcpHCOutSegs.0';
+    array_push($oids,'TCP-MIB::tcpHCInSegs.0', 'TCP-MIB::tcpHCOutSegs.0');
 
-    $data = snmp_get_multi($device, $snmpstring, '-OQUs', 'TCP-MIB');
+    $data = snmp_get_multi($device, $oids, '-OQUs', 'TCP-MIB');
     $data = $data[0];
 
     if (isset($data['tcpInSegs']) && isset($data['tcpOutSegs'])) {

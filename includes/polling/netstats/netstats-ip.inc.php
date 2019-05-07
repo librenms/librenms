@@ -7,32 +7,30 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
 
     // These are at the start of large trees that we don't want to walk the entirety of, so we snmp_get_multi them
     $oids = array(
-        'ipForwDatagrams',
-        'ipInDelivers',
-        'ipInReceives',
-        'ipOutRequests',
-        'ipInDiscards',
-        'ipOutDiscards',
-        'ipOutNoRoutes',
-        'ipReasmReqds',
-        'ipReasmOKs',
-        'ipReasmFails',
-        'ipFragOKs',
-        'ipFragFails',
-        'ipFragCreates',
-        'ipInUnknownProtos',
-        'ipInHdrErrors',
-        'ipInAddrErrors',
+        'IP-MIB::ipForwDatagrams.0',
+        'IP-MIB::ipInDelivers.0',
+        'IP-MIB::ipInReceives.0',
+        'IP-MIB::ipOutRequests.0',
+        'IP-MIB::ipInDiscards.0',
+        'IP-MIB::ipOutDiscards.0',
+        'IP-MIB::ipOutNoRoutes.0',
+        'IP-MIB::ipReasmReqds.0',
+        'IP-MIB::ipReasmOKs.0',
+        'IP-MIB::ipReasmFails.0',
+        'IP-MIB::ipFragOKs.0',
+        'IP-MIB::ipFragFails.0',
+        'IP-MIB::ipFragCreates.0',
+        'IP-MIB::ipInUnknownProtos.0',
+        'IP-MIB::ipInHdrErrors.0',
+        'IP-MIB::ipInAddrErrors.0',
     );
 
     $rrd_def = new RrdDefinition();
-    $snmpstring = '';
     foreach ($oids as $oid) {
         $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
-        $snmpstring .= ' IP-MIB::'.$oid.'.0';
     }
 
-    $data = snmp_get_multi($device, $snmpstring, '-OQUs', 'IP-MIB');
+    $data = snmp_get_multi($device, $oids, '-OQUs', 'IP-MIB');
 
     $fields = array();
     foreach ($oids as $oid) {

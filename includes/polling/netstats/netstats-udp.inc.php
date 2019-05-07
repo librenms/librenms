@@ -7,20 +7,18 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
 
     // These are at the start of large trees that we don't want to walk the entirety of, so we snmpget_multi them
     $oids = array(
-        'udpInDatagrams',
-        'udpOutDatagrams',
-        'udpInErrors',
-        'udpNoPorts',
+        'UDP-MIB::udpInDatagrams.0',
+        'UDP-MIB::udpOutDatagrams.0',
+        'UDP-MIB::udpInErrors.0',
+        'UDP-MIB::udpNoPorts.0',
     );
 
     $rrd_def = new RrdDefinition();
-    $snmpstring = '';
     foreach ($oids as $oid) {
         $rrd_def->addDataset($oid, 'COUNTER', null, 1000000); // Limit to 1MPPS?
-        $snmpstring .= ' UDP-MIB::'.$oid.'.0';
     }
 
-    $data = snmp_get_multi($device, $snmpstring, '-OQUs', 'UDP-MIB');
+    $data = snmp_get_multi($device, $oids, '-OQUs', 'UDP-MIB');
 
     $fields = array();
     foreach ($oids as $oid) {
