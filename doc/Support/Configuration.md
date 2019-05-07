@@ -427,7 +427,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Alerting/Rules.md)
+[Alerting](../Alerting/index.md)
 
 ### Billing
 
