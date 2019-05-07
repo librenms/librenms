@@ -17,7 +17,7 @@ path: blob/master/doc/
 #### Install LibreNMS
 
     cd /opt
-    composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
+    export COMPOSER_ALLOW_SUPERUSER=1  && composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
 
 ## DB Server ##
 
@@ -52,6 +52,9 @@ Ensure date.timezone is set in php.ini to your preferred time zone.  See http://
     vim /etc/php/7.0/fpm/php.ini
     vim /etc/php/7.0/cli/php.ini
 
+    vi /etc/php/7.0/fpm/pool.d/www.conf
+    Change the user and group from www-data to librenms
+
     phpenmod mcrypt
     systemctl restart php7.0-fpm
 
@@ -59,7 +62,7 @@ Ensure date.timezone is set in php.ini to your preferred time zone.  See http://
 
     vim /etc/nginx/conf.d/librenms.conf
 
-Add the following config, edit `server_name` as required:
+Add the following config, edit `server_name` as required, or add _ if you want this vhost to match everything:
 
 ```nginx
 server {

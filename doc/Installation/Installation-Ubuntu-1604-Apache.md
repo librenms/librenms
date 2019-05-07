@@ -17,8 +17,7 @@ path: blob/master/doc/
 #### Install LibreNMS
 
     cd /opt
-    composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
-
+    export COMPOSER_ALLOW_SUPERUSER=1  && composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
 
 ## DB Server ##
 
