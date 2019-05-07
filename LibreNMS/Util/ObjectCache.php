@@ -76,8 +76,8 @@ class ObjectCache
 
             $sensor_menu = [];
             foreach ($sensor_classes as $sensor_model) {
-//            /** @var Sensor $sensor_model */
-            $class = $sensor_model->sensor_class;
+                /** @var Sensor $sensor_model */
+                $class = $sensor_model->sensor_class;
                 if (in_array($class, ['fanspeed', 'humidity', 'temperature', 'signal'])) {
                     // First group
                     $group = 0;
@@ -114,7 +114,8 @@ class ObjectCache
         return $result;
     }
 
-    private static function getPortCount($field, $device_id) {
+    private static function getPortCount($field, $device_id)
+    {
         return Cache::remember("ObjectCache:port_{$field}_count:$device_id:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
             $query = Port::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
                 $query->where('device_id', $device_id);
@@ -210,5 +211,4 @@ class ObjectCache
             }
         });
     }
-
 }
