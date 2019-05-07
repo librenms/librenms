@@ -23,6 +23,8 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // pages
     Route::get('locations', 'LocationController@index');
+    Route::resource('preferences', 'UserPreferencesController');
+    Route::resource('users', 'UserController');
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'pollers/tab=log/');
@@ -38,8 +40,6 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         Route::post('{user}/unlock', 'TwoFactorManagementController@unlock')->name('2fa.unlock');
         Route::delete('{user}', 'TwoFactorManagementController@destroy')->name('2fa.delete');
     });
-
-    Route::resource('users', 'UserController');
 
     // Ajax routes
     Route::group(['prefix' => 'ajax'], function () {
