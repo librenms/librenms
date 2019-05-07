@@ -41,5 +41,4 @@ if (!starts_with($device['os'], ['Snom', 'asa'])) {
     }
 
     unset($oids, $data, $rrd_def, $fields, $tags, $oid);
-
 }//end if
