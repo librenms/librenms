@@ -23,7 +23,7 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
         $rrd_def->addDataset($oid, 'COUNTER', null, 10000000);
     }
 
-    array_push($oids,'TCP-MIB::tcpHCInSegs.0', 'TCP-MIB::tcpHCOutSegs.0');
+    array_push($oids, 'TCP-MIB::tcpHCInSegs.0', 'TCP-MIB::tcpHCOutSegs.0');
 
     $data = snmp_get_multi($device, $oids, '-OQUs', 'TCP-MIB');
     $data = $data[0];
