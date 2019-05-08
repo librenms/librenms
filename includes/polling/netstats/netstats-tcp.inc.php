@@ -25,23 +25,26 @@ if (!starts_with($device['os'], ['Snom', 'asa'])) {
     ];
     $hc_data = snmp_getnext_multi($device, $hc_oids, '-OQUs', 'TCP-MIB');
 
-    $rrd_def = new RrdDefinition();
-    $fields = [];
-    foreach ($oids as $oid) {
-        $rrd_def->addDataset($oid, 'COUNTER', null, 10000000);
-        $fields[$oid] = is_numeric($data[$oid]) ? $data[$oid] : 'U';
-    }
+    if ((is_numeric($data['tcpInSegs']) && is_numeric($data['tcpOutSegs'])) || (is_numeric($hc_data['tcpHCInSegs']) && is_numeric($hc_data['tcpHCOutSegs']))) {
 
-    // Replace Segs with HC Segs if we have them.
-    $fields['tcpInSegs'] = !empty($hc_data['tcpHCInSegs']) ? $hc_data['tcpHCInSegs'] : $fields['tcpInSegs'];
-    $fields['tcpOutSegs'] = !empty($hc_data['tcpHCOutSegs']) ? $hc_data['tcpHCOutSegs'] : $fields['tcpOutSegs'];
+        $rrd_def = new RrdDefinition();
+        $fields = [];
+        foreach ($oids as $oid) {
+            $rrd_def->addDataset($oid, 'COUNTER', null, 10000000);
+            $fields[$oid] = is_numeric($data[$oid]) ? $data[$oid] : 'U';
+        }
+
+        // Replace Segs with HC Segs if we have them.
+        $fields['tcpInSegs'] = !empty($hc_data['tcpHCInSegs']) ? $hc_data['tcpHCInSegs'] : $fields['tcpInSegs'];
+        $fields['tcpOutSegs'] = !empty($hc_data['tcpHCOutSegs']) ? $hc_data['tcpHCOutSegs'] : $fields['tcpOutSegs'];
     
-    if (isset($fields['tcpInSegs']) && isset($fields['tcpOutSegs'])) {
         $tags = compact('rrd_def');
         data_update($device, 'netstats-tcp', $tags, $fields);
 
         $graphs['netstat_tcp'] = true;
+
+        unset($rrd_def, $fields, $tags, $oid);
     }
 
-    unset($oids, $hc_oids, $data, $hc_data, $fields, $oid);
+    unset($oids, $hc_oids, $data, $hc_data);
 }//end if

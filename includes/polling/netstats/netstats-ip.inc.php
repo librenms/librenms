@@ -25,20 +25,23 @@ if (!starts_with($device['os'], ['Snom', 'asa'])) {
     ];
     $data = snmp_getnext_multi($device, $oids, '-OQUs', 'IP-MIB');
 
-    $rrd_def = new RrdDefinition();
-    $fields = [];
-    foreach ($oids as $oid) {
-        $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
-        $fields[$oid] = is_numeric($data[$oid]) ? $data[$oid] : 'U';
-    }
+    if (is_numeric($data['ipOutRequests']) && is_numeric($data['ipInReceives'])) {
 
-    if (isset($fields['ipOutRequests']) && isset($fields['ipInReceives'])) {
+        $rrd_def = new RrdDefinition();
+        $fields = [];
+        foreach ($oids as $oid) {
+            $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
+            $fields[$oid] = is_numeric($data[$oid]) ? $data[$oid] : 'U';
+        }
+
         $tags = compact('rrd_def');
         data_update($device, 'netstats-ip', $tags, $fields);
 
         $graphs['netstat_ip']      = true;
         $graphs['netstat_ip_frag'] = true;
+
+        unset($rrd_def, $fields, $tags, $oid);
     }
 
-    unset($oids, $data, $rrd_def, $fields, $tags, $oid);
+    unset($oids, $data);
 }//end if
