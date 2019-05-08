@@ -26,7 +26,6 @@ if (!starts_with($device['os'], ['Snom', 'asa'])) {
     $hc_data = snmp_getnext_multi($device, $hc_oids, '-OQUs', 'TCP-MIB');
 
     if ((is_numeric($data['tcpInSegs']) && is_numeric($data['tcpOutSegs'])) || (is_numeric($hc_data['tcpHCInSegs']) && is_numeric($hc_data['tcpHCOutSegs']))) {
-
         $rrd_def = new RrdDefinition();
         $fields = [];
         foreach ($oids as $oid) {

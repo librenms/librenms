@@ -26,7 +26,6 @@ if (!starts_with($device['os'], ['Snom', 'asa'])) {
     $data = snmp_getnext_multi($device, $oids, '-OQUs', 'IP-MIB');
 
     if (is_numeric($data['ipOutRequests']) && is_numeric($data['ipInReceives'])) {
-
         $rrd_def = new RrdDefinition();
         $fields = [];
         foreach ($oids as $oid) {

@@ -14,7 +14,6 @@ if (!starts_with($device['os'], ['Snom', 'asa'])) {
     $data = snmp_getnext_multi($device, $oids, '-OQUs', 'UDP-MIB');
 
     if (is_numeric($data['udpInDatagrams']) && is_numeric($data['udpOutDatagrams'])) {
-
         $rrd_def = new RrdDefinition();
         $fields = [];
         foreach ($oids as $oid) {
