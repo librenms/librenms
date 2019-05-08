@@ -17,7 +17,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
         list($oid,$ifIndex) = explode(' ', $data);
         $mask               = trim(snmp_get($device, "ipAdEntNetMask.$oid", '-Oqv', 'IP-MIB'));
         $cidr               = IPv4::netmask2cidr($mask);
-        if(!$oid || $cidr == 0) {
+        if (!$oid || $cidr == 0) {
             continue;
         }
         $ipv4               = new IPv4("$oid/$cidr");
