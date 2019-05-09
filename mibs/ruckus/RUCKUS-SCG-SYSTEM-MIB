@@ -1,0 +1,155 @@
+--
+-- Copyright 2010-2014 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-SCG-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusSCGSystemModule
+        FROM RUCKUS-ROOT-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusSystemMIB MODULE-IDENTITY
+    LAST-UPDATED "201405191100Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        T: +1 (650) 265-4200
+        F: +1 (408) 738-2065
+        EMail: info@ruckuswireless.com
+        Web: www.ruckuswireless.com"
+    DESCRIPTION
+        "Ruckus System mib"
+    ::= { ruckusSCGSystemModule 1 }
+
+ruckusSystemObjects OBJECT IDENTIFIER     ::= { ruckusSystemMIB 1 }
+
+--
+-- Zone Director System Statistics, Operation Status
+--
+ruckusSystemStats OBJECT IDENTIFIER    ::= { ruckusSystemObjects 15 }
+
+ruckusSystemStatsNumAP OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of AP"
+    ::= { ruckusSystemStats 1 }
+
+ruckusSystemStatsNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of associated client devices"
+    ::= { ruckusSystemStats 2 }
+
+-- ruckusSystemStatsNumRogue OBJECT-TYPE
+--     SYNTAX  Unsigned32 
+--     MAX-ACCESS read-only
+--     STATUS current
+--     DESCRIPTION
+--         "Number of rogue devices"
+--     ::= { ruckusSystemStats 3 }
+
+ruckusSystemStatsWLANTotalRxPkts OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received packets of wireless interfaces"
+    ::= { ruckusSystemStats 5 }
+
+ruckusSystemStatsWLANTotalRxBytes OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received bytes of wireless interfaces"
+    ::= { ruckusSystemStats 6 }
+
+ruckusSystemStatsWLANTotalRxMulticast OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received multicast packets of wireless interfaces"
+    ::= { ruckusSystemStats 7 }
+
+ruckusSystemStatsWLANTotalTxPkts OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted packets of wireless interfaces"
+    ::= { ruckusSystemStats 8 }
+
+ruckusSystemStatsWLANTotalTxBytes OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted bytes of wireless interfaces"
+    ::= { ruckusSystemStats 9 }
+
+ruckusSystemStatsWLANTotalTxMulticast OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted multicast packets of wireless interfaces"
+    ::= { ruckusSystemStats 10 }
+
+ruckusSystemStatsWLANTotalTxFail OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted fail packets of wireless interfaces"
+    ::= { ruckusSystemStats 11 }
+
+ruckusSystemStatsWLANTotalTxRetry OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted retry packets of wireless interfaces"
+    ::= { ruckusSystemStats 12 }
+
+ruckusSystemStatsSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial Number"
+    ::= { ruckusSystemStats 13 }
+
+END

@@ -1,0 +1,986 @@
+--
+-- Copyright 2010-2014 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-SCG-WLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusSCGWLANModule
+        FROM RUCKUS-ROOT-MIB
+    RuckusAdminStatus,
+    RuckusRadioMode,
+    RuckusSSID,
+    RuckusdB,
+    RuckusRateLimiting
+        FROM RUCKUS-TC-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    PhysAddress,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    IANAifType
+        FROM IANAifType-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC;
+
+ruckusWLANMIB MODULE-IDENTITY
+    LAST-UPDATED "201405191100Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        T: +1 (650) 265-4200
+        F: +1 (408) 738-2065
+        EMail: info@ruckuswireless.com
+        Web: www.ruckuswireless.com"
+    DESCRIPTION
+        "Ruckus WLAN mib"
+    ::= { ruckusSCGWLANModule 1 }
+
+ruckusWLANObjects OBJECT IDENTIFIER     ::= { ruckusWLANMIB 1 }
+
+ruckusWLANInfo OBJECT IDENTIFIER    ::= { ruckusWLANObjects 1 }
+
+
+ruckusWLANTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION
+        "WLAN table."
+    ::= { ruckusWLANInfo 1 }
+
+ruckusWLANEntry OBJECT-TYPE
+    SYNTAX  RuckusWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each WLAN entry."
+    INDEX {
+       ruckusWLANIndex }
+    ::= { ruckusWLANTable 1 }
+
+RuckusWLANEntry ::= SEQUENCE {
+  ruckusWLANSSID                      RuckusSSID,
+--  ruckusWLANDescription               DisplayString,
+--  ruckusWLANAuthentication            DisplayString,
+--  ruckusWLANEncryption                DisplayString,
+--  ruckusWLANIsGuest                   TruthValue,
+--  ruckusWLANSSIDBcastDisable          TruthValue,
+--  ruckusWLANVlanID                    INTEGER,
+--  ruckusWLANRateLimitingUp            OCTET STRING,
+--  ruckusWLANRateLimitingDown          OCTET STRING,
+--  ruckusWLANTunnelWLAN                TruthValue,
+--  ruckusWLANNumVAP                    Unsigned32,
+  ruckusWLANNumSta                    Unsigned32,
+--  ruckusWLANRxPkts                    Counter64,
+  ruckusWLANRxBytes                   Counter64,
+--  ruckusWLANTxPkts                    Counter64,
+  ruckusWLANTxBytes                   Counter64,
+--  ruckusWLANAuthTotal                 Counter64, 
+--  ruckusWLANAuthResp                  Counter64, 
+--  ruckusWLANAuthSuccessTotal          Counter64, 
+--  ruckusWLANAuthFail                  Counter64, 
+--  ruckusWLANAssocTotal                Counter64, 
+--  ruckusWLANAssocResp                 Counter64, 
+--  ruckusWLANReassocReq                Counter64, 
+--  ruckusWLANReassocResp               Counter64, 
+--  ruckusWLANAssocSuccess              Counter64, 
+--  ruckusWLANAssocFail                 Counter64, 
+--  ruckusWLANAssocDenied               Counter64, 
+--  ruckusWLANDiassocAbnormal           Counter64, 
+--  ruckusWLANDiassocCapacity           Counter64, 
+--  ruckusWLANDiassocLeave              Counter64, 
+--  ruckusWLANDiassocMisc               Counter64,
+--  ruckusWLANRxByteRate                Unsigned32,
+--  ruckusWLANTxByteRate                Unsigned32,
+--  ruckusWLANRxDataFrameOnLan          Counter64,
+--  ruckusWLANRxByteOnLan               Counter64,
+--  ruckusWLANTxByteOnLan               Counter64,
+--  ruckusWLANDownDropFrame             Counter64,
+--  ruckusWLANDownRetxFrame             Counter64,
+--  ruckusWLANDownTotalFrame            Counter64,
+--  ruckusWLANDownTotalErrFrame         Counter64,
+--  ruckusWLANUpTotalFrame              Counter64,
+--  ruckusWLANUpDropFrame               Counter64,
+--  ruckusWLANUpRetxFrame               Counter64,
+--  ruckusWLANNAME                      RuckusSSID,
+    ruckusWLANIndex						Integer32
+}
+
+ruckusWLANSSID OBJECT-TYPE
+    SYNTAX  RuckusSSID
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID."
+    ::= { ruckusWLANEntry 1 }
+
+ruckusWLANNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of client devices."
+    ::= { ruckusWLANEntry 12 }
+
+-- ruckusWLANRxPkts OBJECT-TYPE
+--     SYNTAX  Counter64
+--     MAX-ACCESS read-only
+--     STATUS current
+--     DESCRIPTION
+--         "Received packets."
+--     ::= { ruckusWLANEntry 13 }
+
+ruckusWLANRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes."
+    ::= { ruckusWLANEntry 14 }
+
+-- ruckusWLANTxPkts OBJECT-TYPE
+--     SYNTAX  Counter64
+--     MAX-ACCESS read-only
+--     STATUS current
+--     DESCRIPTION
+--         "Transmitted packets."
+--     ::= { ruckusWLANEntry 15 }
+
+ruckusWLANTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { ruckusWLANEntry 16 }
+
+ruckusWLANIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION        "A unique value for each WLAN."
+    ::= { ruckusWLANEntry 99 }
+
+ruckusWLANAPInfo OBJECT IDENTIFIER    ::= { ruckusWLANObjects 2 }
+
+ruckusWLANAPTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusWLANAPEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION
+        "WLAN AP table."
+    ::= { ruckusWLANAPInfo 1 }
+
+ruckusWLANAPEntry OBJECT-TYPE
+    SYNTAX  RuckusWLANAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each WLAN AP entry."
+    INDEX {
+        ruckusWLANAPMacAddr }
+    ::= { ruckusWLANAPTable 1 }
+
+RuckusWLANAPEntry ::= SEQUENCE {
+  ruckusWLANAPMacAddr					MacAddress,
+--  ruckusWLANAPDescription				DisplayString,
+--  ruckusWLANAPStatus					INTEGER,
+--  ruckusWLANAPModel					DisplayString,
+--  ruckusWLANAPSerialNumber			DisplayString,
+  ruckusWLANAPUptime					TimeTicks,
+  ruckusWLANAPSWversion				DisplayString,
+--  ruckusWLANAPHWversion				DisplayString,
+  ruckusWLANAPIPAddr					IpAddress,
+-- ruckusWLANAPNumRadios				Unsigned32,
+--  ruckusWLANAPNumVAP					Unsigned32,
+  ruckusWLANAPNumSta					Unsigned32
+--  ruckusWLANAPNumRogues				Unsigned32,
+--  ruckusWLANAPConnectionMode			INTEGER,
+--  ruckusWLANAPMeshEnable				TruthValue,
+--  ruckusWLANAPMeshHops				Unsigned32,
+--  ruckusWLANAPMeshType				INTEGER,
+--  ruckusWLANAPLANStatsRXByte			Counter32,
+--  ruckusWLANAPLANStatsRXPkt			Counter32,
+--  ruckusWLANAPLANStatsRXPktErr		Counter32,
+--  ruckusWLANAPLANStatsRXPKTSucc		Counter32,
+--  ruckusWLANAPLANStatsTXByte			Counter32,
+--  ruckusWLANAPLANStatsTXPkt			Counter32,
+--  ruckusWLANAPMemUtil					INTEGER,
+--  ruckusWLANAPMemTotal				Unsigned32,
+--  ruckusWLANAPCPUUtil					INTEGER,
+--  ruckusWLANAPFWSize					Unsigned32,
+--  ruckusWLANAPFWAvail					Unsigned32,
+--  ruckusWLANAPEthStatus				INTEGER,
+--  ruckusWLANAPLANStatsRXPKTBcast      Counter32,
+--  ruckusWLANAPLANStatsRXPKTMcast      Counter32,
+--  ruckusWLANAPLANStatsRXPKTUcast      Counter32,
+--  ruckusWLANAPLANStatsTXPKTBcast      Counter32,
+--  ruckusWLANAPLANStatsTXPKTMcast      Counter32,
+--  ruckusWLANAPLANStatsTXPKTUcast      Counter32,
+--  ruckusWLANAPLANStatsDropped         Counter32,
+--  ruckusWLANAPMeshUpPortCntUpdown     Counter32,
+--  ruckusWLANAPMeshDownPortCntUpdown   Counter32,
+--  ruckusWLANAPTxFrameDropped			Counter32,
+--  ruckusWLANAPTxFrameError			Counter32,
+--  ruckusWLANAPCoverageTech			INTEGER,
+--  ruckusWLANAPStaTxBytes				Counter32,
+--  ruckusWLANAPStaRxBytes				Counter32,
+--  ruckusWLANAPNetmask					IpAddress,
+--  ruckusWLANAPGateway					IpAddress,
+--  ruckusWLANAPDNS1					IpAddress,
+--  ruckusWLANAPDNS2					IpAddress,
+--  ruckusWLANAPTotalUser				Unsigned32,
+--  ruckusWLANAPLANStatsRXByteRate		Counter32,
+--  ruckusWLANAPLANStatsTXByteRate		Counter32,
+}
+
+ruckusWLANAPMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC address."
+    ::= { ruckusWLANAPEntry 1 }
+
+ruckusWLANAPUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time."
+    ::= { ruckusWLANAPEntry 6 }
+
+ruckusWLANAPSWversion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software version."
+    ::= { ruckusWLANAPEntry 7 }
+
+ruckusWLANAPIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address."
+    ::= { ruckusWLANAPEntry 10 }
+
+-- ruckusWLANAPNumRadios OBJECT-TYPE
+--     SYNTAX  Unsigned32
+--     MAX-ACCESS read-only
+--     STATUS current
+--     DESCRIPTION
+--         "Number of radios."
+--     ::= { ruckusWLANAPEntry 13 }
+
+-- ruckusWLANAPNumVAP OBJECT-TYPE
+--     SYNTAX  Unsigned32
+--     MAX-ACCESS read-only
+--     STATUS current
+--     DESCRIPTION
+--         "Number of APs."
+--     ::= { ruckusWLANAPEntry 14 }
+
+ruckusWLANAPNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of authenticated terminal which is using currently on this AP."
+    ::= { ruckusWLANAPEntry 15 }
+
+-- ruckusWLANAPNumRogues OBJECT-TYPE
+--     SYNTAX  Unsigned32
+--     MAX-ACCESS read-only
+--     STATUS current
+--     DESCRIPTION
+--         "Number of rogue devices."
+--     ::= { ruckusWLANAPEntry 16 }
+
+ruckusSCGWLANTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusSCGWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "SCG WLAN table."
+    ::= { ruckusWLANInfo 2 }
+
+ruckusSCGWLANEntry OBJECT-TYPE
+    SYNTAX  RuckusSCGWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each SCG WLAN entry."
+    INDEX {
+       ruckusSCGWLANIndex }
+    ::= { ruckusSCGWLANTable 1 }
+
+RuckusSCGWLANEntry ::= SEQUENCE {
+  ruckusSCGWLANSSID                     RuckusSSID,
+  ruckusSCGWLANZone                     DisplayString,
+  ruckusSCGWLANDomain                   DisplayString,
+--  ruckusWLANEncryption                DisplayString,
+--  ruckusWLANIsGuest                   TruthValue,
+--  ruckusWLANSSIDBcastDisable          TruthValue,
+--  ruckusWLANVlanID                    INTEGER,
+--  ruckusWLANRateLimitingUp            OCTET STRING,
+--  ruckusWLANRateLimitingDown          OCTET STRING,
+--  ruckusWLANTunnelWLAN                TruthValue,
+--  ruckusWLANNumVAP                    Unsigned32,
+  ruckusSCGWLANNumSta                   Unsigned32,
+--  ruckusWLANRxPkts                    Counter64,
+  ruckusSCGWLANRxBytes                  Counter64,
+--  ruckusWLANTxPkts                    Counter64,
+  ruckusSCGWLANTxBytes                  Counter64,
+--  ruckusWLANAuthTotal                 Counter64, 
+--  ruckusWLANAuthResp                  Counter64, 
+--  ruckusWLANAuthSuccessTotal          Counter64, 
+--  ruckusWLANAuthFail                  Counter64, 
+--  ruckusWLANAssocTotal                Counter64, 
+--  ruckusWLANAssocResp                 Counter64, 
+--  ruckusWLANReassocReq                Counter64, 
+--  ruckusWLANReassocResp               Counter64, 
+--  ruckusWLANAssocSuccess              Counter64, 
+--  ruckusWLANAssocFail                 Counter64, 
+--  ruckusWLANAssocDenied               Counter64, 
+--  ruckusWLANDiassocAbnormal           Counter64, 
+--  ruckusWLANDiassocCapacity           Counter64, 
+--  ruckusWLANDiassocLeave              Counter64, 
+--  ruckusWLANDiassocMisc               Counter64,
+--  ruckusWLANRxByteRate                Unsigned32,
+--  ruckusWLANTxByteRate                Unsigned32,
+--  ruckusWLANRxDataFrameOnLan          Counter64,
+--  ruckusWLANRxByteOnLan               Counter64,
+--  ruckusWLANTxByteOnLan               Counter64,
+--  ruckusWLANDownDropFrame             Counter64,
+--  ruckusWLANDownRetxFrame             Counter64,
+--  ruckusWLANDownTotalFrame            Counter64,
+--  ruckusWLANDownTotalErrFrame         Counter64,
+--  ruckusWLANUpTotalFrame              Counter64,
+--  ruckusWLANUpDropFrame               Counter64,
+--  ruckusWLANUpRetxFrame               Counter64,
+--  ruckusWLANNAME                      RuckusSSID,
+  ruckusSCGWLANAuthType			DisplayString,
+  ruckusSCGWLANIndex			Integer32
+}
+
+ruckusSCGWLANSSID OBJECT-TYPE
+    SYNTAX  RuckusSSID
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID."
+    ::= { ruckusSCGWLANEntry 1 }
+
+ruckusSCGWLANZone OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Zone name."
+    ::= { ruckusSCGWLANEntry 2 }
+
+ruckusSCGWLANDomain OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Domain name."
+    ::= { ruckusSCGWLANEntry 3 }
+    
+ruckusSCGWLANNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of client devices."
+    ::= { ruckusSCGWLANEntry 12 }
+
+ruckusSCGWLANRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes."
+    ::= { ruckusSCGWLANEntry 14 }
+
+ruckusSCGWLANTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { ruckusSCGWLANEntry 16 }
+
+ruckusSCGWLANAuthType OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication Type."
+    ::= { ruckusSCGWLANEntry 17 }
+
+    
+ruckusSCGWLANIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION        "A unique value for each WLAN."
+    ::= { ruckusSCGWLANEntry 99 }
+
+
+ruckusSCGAPTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusSCGAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "SCG AP table."
+    ::= { ruckusWLANAPInfo 2 }
+
+ruckusSCGAPEntry OBJECT-TYPE
+    SYNTAX  RuckusSCGAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each AP entry."
+    INDEX {
+        ruckusSCGAPMac }
+    ::= { ruckusSCGAPTable 1 }
+
+RuckusSCGAPEntry ::= SEQUENCE {
+  ruckusSCGAPMac			MacAddress,
+  ruckusSCGAPGroup			DisplayString,
+  ruckusSCGAPZone                   	DisplayString,
+  ruckusSCGAPDomain                 	DisplayString,
+  ruckusSCGAPName			DisplayString,
+  ruckusSCGAPUptime			TimeTicks,
+  ruckusSCGAPFWversion			DisplayString,
+  ruckusSCGAPModel			DisplayString,
+  ruckusSCGAPSerial			DisplayString,
+--  ruckusWLANAPHWversion		DisplayString,
+  ruckusSCGAPIp				IpAddress,
+  ruckusSCGAPIPType			DisplayString,
+  ruckusSCGAPExtIp			IpAddress,
+  ruckusSCGAPExtPort			Unsigned32,
+  ruckusSCGAPNumSta			Unsigned32,
+  ruckusSCGAPConnStatus			DisplayString,
+  ruckusSCGAPRegStatus			DisplayString,
+  ruckusSCGAPConfigStatus		DisplayString,
+  ruckusSCGAPLocation			DisplayString,
+  ruckusSCGAPGPSInfo			DisplayString,
+  ruckusSCGAPMeshRole			DisplayString,
+  ruckusSCGAPDescription		DisplayString,
+  ruckusSCGAPRXBytes			Counter64,
+  ruckusSCGAPTXBytes			Counter64,
+  ruckusSCGAPIpsecSessionTime			Unsigned32,
+  ruckusSCGAPIpsecTXPkts			Counter64,
+  ruckusSCGAPIpsecRXPkts			Counter64,
+  ruckusSCGAPIpsecTXBytes			Counter64,
+  ruckusSCGAPIpsecRXBytes			Counter64,
+  ruckusSCGAPIpsecTXPktsDropped			Counter64,
+  ruckusSCGAPIpsecRXPktsDropped			Counter64,
+  ruckusSCGAPIpsecTXIdleTime			Unsigned32,
+  ruckusSCGAPIpsecRXIdleTime			Unsigned32,
+  ruckusSCGAPIPV6Addr			Ipv6Address
+--  ruckusWLANAPNumRogues		Unsigned32,
+--  ruckusWLANAPConnectionMode		INTEGER,
+--  ruckusWLANAPMeshEnable		TruthValue,
+--  ruckusWLANAPMeshHops		Unsigned32,
+--  ruckusWLANAPMeshType		INTEGER,
+--  ruckusWLANAPLANStatsRXByte		Counter32,
+--  ruckusWLANAPLANStatsRXPkt		Counter32,
+--  ruckusWLANAPLANStatsRXPktErr	Counter32,
+--  ruckusWLANAPLANStatsRXPKTSucc	Counter32,
+--  ruckusWLANAPLANStatsTXByte		Counter32,
+--  ruckusWLANAPLANStatsTXPkt		Counter32,
+--  ruckusWLANAPMemUtil			INTEGER,
+--  ruckusWLANAPMemTotal		Unsigned32,
+--  ruckusWLANAPCPUUtil			INTEGER,
+--  ruckusWLANAPFWSize			Unsigned32,
+--  ruckusWLANAPFWAvail			Unsigned32,
+--  ruckusWLANAPEthStatus		INTEGER,
+--  ruckusWLANAPLANStatsRXPKTBcast      Counter32,
+--  ruckusWLANAPLANStatsRXPKTMcast      Counter32,
+--  ruckusWLANAPLANStatsRXPKTUcast      Counter32,
+--  ruckusWLANAPLANStatsTXPKTBcast      Counter32,
+--  ruckusWLANAPLANStatsTXPKTMcast      Counter32,
+--  ruckusWLANAPLANStatsTXPKTUcast      Counter32,
+--  ruckusWLANAPLANStatsDropped         Counter32,
+--  ruckusWLANAPMeshUpPortCntUpdown     Counter32,
+--  ruckusWLANAPMeshDownPortCntUpdown   Counter32,
+--  ruckusWLANAPTxFrameDropped		Counter32,
+--  ruckusWLANAPTxFrameError		Counter32,
+--  ruckusWLANAPCoverageTech		INTEGER,
+--  ruckusWLANAPStaTxBytes		Counter32,
+--  ruckusWLANAPStaRxBytes		Counter32,
+--  ruckusWLANAPNetmask			IpAddress,
+--  ruckusWLANAPGateway			IpAddress,
+--  ruckusWLANAPDNS1			IpAddress,
+--  ruckusWLANAPDNS2			IpAddress,
+--  ruckusWLANAPTotalUser		Unsigned32,
+--  ruckusWLANAPLANStatsRXByteRate	Counter32,
+--  ruckusWLANAPLANStatsTXByteRate	Counter32,
+}
+
+ruckusSCGAPMac OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC address."
+    ::= { ruckusSCGAPEntry 1 }
+
+ruckusSCGAPGroup OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP Group."
+    ::= { ruckusSCGAPEntry 2 }
+
+ruckusSCGAPZone OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Zone of this AP."
+    ::= { ruckusSCGAPEntry 3 }
+
+ruckusSCGAPDomain OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Domain of this AP."
+    ::= { ruckusSCGAPEntry 4 }
+
+ruckusSCGAPName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of this AP."
+    ::= { ruckusSCGAPEntry 5 }
+
+ruckusSCGAPUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time."
+    ::= { ruckusSCGAPEntry 6 }
+
+ruckusSCGAPFWversion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Firmware version."
+    ::= { ruckusSCGAPEntry 7 }
+
+ruckusSCGAPModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model of this AP."
+    ::= { ruckusSCGAPEntry 8 }
+
+ruckusSCGAPSerial OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial of this AP."
+    ::= { ruckusSCGAPEntry 9 }
+
+ruckusSCGAPIp OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address."
+    ::= { ruckusSCGAPEntry 10 }
+
+ruckusSCGAPIPType OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address type."
+    ::= { ruckusSCGAPEntry 11 }
+
+ruckusSCGAPExtIp OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "External IP address."
+    ::= { ruckusSCGAPEntry 12 }
+
+ruckusSCGAPExtPort OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "External Port."
+    ::= { ruckusSCGAPEntry 13 }
+
+ruckusSCGAPNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of authenticated terminal which is using currently on this AP."
+    ::= { ruckusSCGAPEntry 15 }
+
+ruckusSCGAPConnStatus OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Connection Status of this AP."
+    ::= { ruckusSCGAPEntry 16 }
+
+ruckusSCGAPRegStatus OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Registration Status of this AP."
+    ::= { ruckusSCGAPEntry 17 }
+
+ruckusSCGAPConfigStatus OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Configuration Status of this AP."
+    ::= { ruckusSCGAPEntry 18 }
+
+ruckusSCGAPLocation OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Location of this AP."
+    ::= { ruckusSCGAPEntry 19 }
+
+ruckusSCGAPGPSInfo OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "GPS Information of this AP."
+    ::= { ruckusSCGAPEntry 20 }
+
+ruckusSCGAPMeshRole OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Mesh Role of this AP."
+    ::= { ruckusSCGAPEntry 21 }
+
+ruckusSCGAPDescription OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description of this AP."
+    ::= { ruckusSCGAPEntry 22 }
+
+ruckusSCGAPRXBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes."
+    ::= { ruckusSCGAPEntry 30 }
+
+ruckusSCGAPTXBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { ruckusSCGAPEntry 31 }
+    
+ruckusSCGAPIpsecSessionTime OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec session time lasting, unit: seconds."
+    ::= { ruckusSCGAPEntry 50 }  
+    
+ruckusSCGAPIpsecTXPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec transmitted packet counts."
+    ::= { ruckusSCGAPEntry 55 }
+    
+ruckusSCGAPIpsecRXPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec received packet counts."
+    ::= { ruckusSCGAPEntry 56 }
+    
+ruckusSCGAPIpsecTXBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec transmitted byte counts."
+    ::= { ruckusSCGAPEntry 57 }
+    
+ruckusSCGAPIpsecRXBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec received byte counts."
+    ::= { ruckusSCGAPEntry 58 }
+    
+ruckusSCGAPIpsecTXPktsDropped OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec transmitted dropped packet counts."
+    ::= { ruckusSCGAPEntry 59 }
+    
+ruckusSCGAPIpsecRXPktsDropped OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec received dropped packet counts."
+    ::= { ruckusSCGAPEntry 60 }   
+    
+ruckusSCGAPIpsecTXIdleTime OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "In seconds since last seen transmitted packet."
+    ::= { ruckusSCGAPEntry 65 }  
+    
+ruckusSCGAPIpsecRXIdleTime OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "In seconds since last seen received packet."
+    ::= { ruckusSCGAPEntry 66 }                                 
+
+ruckusSCGAPIPV6Addr OBJECT-TYPE
+    SYNTAX  Ipv6Address
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IPv6 address."
+    ::= { ruckusSCGAPEntry 150 }
+
+ruckusSCGWLANAPSoftGREStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusSCGWLANAPSoftGREStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "SCG WLAN AP SoftGRE Stats table."
+    ::= { ruckusWLANAPInfo 3 }
+
+ruckusSCGWLANAPSoftGREStatsEntry OBJECT-TYPE
+    SYNTAX  RuckusSCGWLANAPSoftGREStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each SCG WLAN AP SoftGRE Stats entry."
+    INDEX {
+        ruckusSCGWLANAPSoftGREMacAddr,
+        ruckusSCGWLANAPSoftGREIndex }
+    ::= { ruckusSCGWLANAPSoftGREStatsTable 1 }
+
+RuckusSCGWLANAPSoftGREStatsEntry ::= SEQUENCE {
+  ruckusSCGWLANAPSoftGREMacAddr          MacAddress,
+  ruckusSCGWLANAPSoftGREIndex            Unsigned32,
+  ruckusSCGWLANAPSoftGREGWAddr           DisplayString,
+  ruckusSCGWLANAPSoftGREActive           Unsigned32,
+  ruckusSCGWLANAPSoftGRETxPkts           Counter64,
+  ruckusSCGWLANAPSoftGRETxBytes          Counter64,
+  ruckusSCGWLANAPSoftGRERxPkts           Counter64,
+  ruckusSCGWLANAPSoftGRERxBytes          Counter64,
+  ruckusSCGWLANAPSoftGRETxPktsErr        Counter64,
+  ruckusSCGWLANAPSoftGRERxPktsErr        Counter64,
+  ruckusSCGWLANAPSoftGRETxPktsDropped    Counter64,
+  ruckusSCGWLANAPSoftGRERxPktsDropped    Counter64,
+  ruckusSCGWLANAPSoftGRETxPktsFrag       Counter64,
+  ruckusSCGWLANAPSoftGREICMPTotal        Counter64,
+  ruckusSCGWLANAPSoftGREICMPNoReply      Counter64,
+  ruckusSCGWLANAPSoftGREDisconnect       Counter64
+}
+
+ruckusSCGWLANAPSoftGREMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP MAC address."
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 1 }
+
+ruckusSCGWLANAPSoftGREIndex OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of GRE server"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 2 }
+
+
+ruckusSCGWLANAPSoftGREGWAddr OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP/FQDN of the server"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 3 }
+
+
+ruckusSCGWLANAPSoftGREActive OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Active or inactive"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 4 }
+
+
+ruckusSCGWLANAPSoftGRETxPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted packets."
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 5 }
+
+ruckusSCGWLANAPSoftGRETxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 6 }
+
+
+ruckusSCGWLANAPSoftGRERxPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received packets."
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 7 }
+
+
+ruckusSCGWLANAPSoftGRERxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes."
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 8 }
+
+
+ruckusSCGWLANAPSoftGRETxPktsErr OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted error packet"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 9 }
+
+ruckusSCGWLANAPSoftGRERxPktsErr OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received error packet"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 10 }
+
+
+ruckusSCGWLANAPSoftGRETxPktsDropped OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted dropped packet"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 11 }
+
+ruckusSCGWLANAPSoftGRERxPktsDropped OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received dropped packet"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 12 }
+
+ruckusSCGWLANAPSoftGRETxPktsFrag OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter of oversize TX packets"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 13 }
+
+ruckusSCGWLANAPSoftGREICMPTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter of ICMP keep-alive request messages"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 14 }
+
+ruckusSCGWLANAPSoftGREICMPNoReply OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter of non-reply ICMP keep-alive request messages"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 15 }
+
+ruckusSCGWLANAPSoftGREDisconnect OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counter of disconnected"
+    ::= { ruckusSCGWLANAPSoftGREStatsEntry 16 }
+
+
+END
