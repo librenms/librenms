@@ -20,7 +20,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     }
 
     if (($graph_type == 'sensor_state') && !empty($state_translation['0']['state_descr'])) {
-        $sensor_current = get_state_label($sensor['state_generic_value'], $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")");
+        $sensor_current = get_state_label($state_translation[0]['state_generic_value'], $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")");
     } else {
         $current_label = get_sensor_label_color($sensor);
         $sensor_current = "<span class='label $current_label'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
