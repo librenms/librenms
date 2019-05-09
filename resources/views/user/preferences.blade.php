@@ -15,25 +15,25 @@
             <form method="post" action="preferences/" class="form-horizontal" role="form">
                 <input type=hidden name="action" value="changepass">
                 <div class="form-group">
-                    <label for="old_pass" class="col-sm-2 control-label">@lang('Current Password')</label>
+                    <label for="old_pass" class="col-sm-4 control-label">@lang('Current Password')</label>
                     <div class="col-sm-4">
                         <input type="password" name="old_pass" autocomplete="off" class="form-control input-sm">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="new_pass" class="col-sm-2 control-label">@lang('New Password')</label>
+                    <label for="new_pass" class="col-sm-4 control-label">@lang('New Password')</label>
                     <div class="col-sm-4">
                         <input type="password" name="new_pass" autocomplete="off" class="form-control input-sm">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="new_pass2" class="col-sm-2 control-label">@lang('New Password')</label>
+                    <label for="new_pass2" class="col-sm-4 control-label">@lang('New Password')</label>
                     <div class="col-sm-4">
                         <input type="password" name="new_pass2" autocomplete="off" class="form-control input-sm">
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-sm-4 col-sm-offset-2">
+                    <div class="col-sm-4 col-sm-offset-3">
                         <button type="submit" class="btn btn-default">@lang('Change Password')</button>
                     </div>
                 </div>
@@ -42,6 +42,30 @@
         </div>
     </div>
     @endif
+
+    <div class="panel panel-default panel-condensed">
+        <div class="panel-heading">@lang('User Preferences')</div>
+        <div class="panel-body">
+            <form method="post" action="{{ route('preferences.store') }}" class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="dashboard" class="col-sm-4 control-label">@lang('Dashboard')</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" name="dashboard" id="dashboard-select" data-previous="{{ $default_dashboard }}">
+                            @foreach($dashboards as $dash)
+                                <option value="{{ $dash->dashboard_id }}" @if($dash->dashboard_id == $default_dashboard) selected @endif>{{ $dash->user ? $dash->user->username : __('<deleted>') }}:{{ $dash->dashboard_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dashboard" class="col-sm-4 control-label">@lang('Add schedule notes to devices notes')</label>
+                    <div class="col-sm-4">
+                        <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     @config('twofactor')
     <div class="panel panel-default panel-condensed">
@@ -56,14 +80,14 @@
             <div id="twofactorkeycontainer">
                 <form id="twofactorkey" class="form-horizontal" role="form">
                     <div class="form-group">
-                        <label for="twofactorkey" class="col-sm-2 control-label">@lang('Secret Key')</label>
+                        <label for="twofactorkey" class="col-sm-4 control-label">@lang('Secret Key')</label>
                         <div class="col-sm-4">
                             <input type="text" name="twofactorkey" autocomplete="off" disabled class="form-control input-sm" value="{{ $twofactor['key'] }}" />
                         </div>
                     </div>
                     @if($twofactor['counter'] !== false)
                     <div class="form-group">
-                        <label for="twofactorcounter" class="col-sm-2 control-label">@lang('Counter')</label>
+                        <label for="twofactorcounter" class="col-sm-4 control-label">@lang('Counter')</label>
                         <div class="col-sm-4">
                             <input type="text" name="twofactorcounter" autocomplete="off" disabled class="form-control input-sm" value="{{ $twofactor['counter'] }}" />
                         </div>
@@ -79,7 +103,7 @@
         @else
             <form method="post" class="form-horizontal" role="form" action="{{ route('2fa.add') }}">
                 <div class="form-group">
-                    <label for="twofactortype" class="col-sm-2 control-label">@lang('TwoFactor Type')</label>
+                    <label for="twofactortype" class="col-sm-4 control-label">@lang('TwoFactor Type')</label>
                     <div class="col-sm-4">
                         <select name="twofactortype" class="select form-control">
                             <option value="time">@lang('Time Based (TOTP)')</option>
@@ -88,7 +112,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-sm-4 col-sm-offset-2">
+                    <div class="col-sm-4 col-sm-offset-3">
                         <button class="btn btn-default" type="submit" id="twofactor-generate">@lang('Generate TwoFactor Secret Key')</button>
                     </div>
                 </div>
@@ -97,56 +121,6 @@
         </div>
     </div>
     @endconfig
-
-    <div class="panel panel-default panel-condensed">
-        <div class="panel-heading">@lang('Default Dashboard')</div>
-        <div class="panel-body">
-            <form method="post" action="preferences/" class="form-horizontal" role="form">
-                <div class="form-group">
-                    <input type=hidden name="action" value="changedash">
-                    <div class="form-group">
-                        <label for="dashboard" class="col-sm-2 control-label">Dashboard</label>
-                        <div class="col-sm-4">
-                            <select class="form-control" name="dashboard">
-                                <option value="1">murrant:Default</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-4 col-sm-offset-2">
-                            <button type="submit" class="btn btn-default">Update Dashboard</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="panel panel-default panel-condensed">
-        <div class="panel-heading">@lang('Add schedule notes to devices notes')</div>
-        <div class="panel-body">
-            <form method="post" action="preferences/" class="form-horizontal" role="form">
-                <div class="form-group">
-                    <input type=hidden name="action" value="changenote">
-                    <div class="form-group">
-                        <label for="dashboard" class="col-sm-3 control-label">Add schedule notes to
-                            devices notes</label>
-                        <div class="col-sm-4">
-                            <input id="notetodevice" type="checkbox" name="notetodevice"
-                                   data-size="small">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-4 col-sm-offset-3">
-                            <button type="submit" class="btn btn-default">Update preferences</button>
-                        </div>
-                        <div class="col-sm-6"></div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
 
     <div class="panel panel-default panel-condensed">
         <div class="panel-heading">@lang('Device Permissions')</div>
@@ -159,9 +133,66 @@
 
 @section('javascript')
     <script src="{{ asset('js/jquery.qrcode.min.js') }}"></script>
+    @endsection
+
+@section('scripts')
     <script>
-        $(document).ready( function() {
-            $("[name='notetodevice']").bootstrapSwitch('offColor', 'danger');
+        $("[name='notetodevice']")
+            .bootstrapSwitch('offColor', 'danger')
+            .on('switchChange.bootstrapSwitch', function (e, state) {
+                var $this = $(this);
+                $.ajax({
+                    url: '{{ route('preferences.store') }}',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: {
+                        action: 'changenote',
+                        state: state ? 1 : 0
+                    },
+                    success: function () {
+                        $this.closest('.form-group').addClass('has-success');
+                        setTimeout(function () {
+                            $this.closest('.form-group').removeClass('has-success');
+                        }, 2000);
+                    },
+                    error: function () {
+                        $this.bootstrapSwitch('toggleState', true);
+                        $this.closest('.form-group').addClass('has-error');
+                        setTimeout(function(){
+                            $this.closest('.form-group').removeClass('has-error');
+                        }, 2000);
+                    }
+                });
+            });
+
+        $('#dashboard-select').change(function () {
+            var $this = $(this);
+            var value = $this.val();
+            $.ajax({
+                url: '{{ route('preferences.store') }}',
+                dataType: 'json',
+                type: 'POST',
+                data: {
+                    action: 'changedash',
+                    dashboard: value
+                },
+                success: function () {
+                    $this.data('previous', value);
+                    toastr.success('@lang('Dashboard updated')');
+                    $this.closest('.form-group').addClass('has-success');
+                    setTimeout(function () {
+                        $this.closest('.form-group').removeClass('has-success');
+                    }, 2000);
+                },
+                error: function () {
+                    $this.val($this.data('previous'));
+                    toastr.error('@lang('Failed to update dashboard ')');
+                    $this.closest('.form-group').addClass('has-error');
+                    setTimeout(function(){
+                        $this.closest('.form-group').removeClass('has-error');
+                    }, 2000);
+                }
+            });
         });
     </script>
 @endsection

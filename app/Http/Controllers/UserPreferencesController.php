@@ -25,9 +25,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Dashboard;
 use App\Models\UserPref;
-use Auth;
 use Illuminate\Http\Request;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
@@ -38,19 +37,23 @@ class UserPreferencesController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
+        $user = $request->user();
         $data = [
-            'can_change_password' => LegacyAuth::get()->canUpdatePasswords(Auth::user()->username),
-            'twofactor_uri' => '',
+            'can_change_password' => LegacyAuth::get()->canUpdatePasswords($user->username),
+            'dashboards' => Dashboard::allAvailable($user)->with('user')->get(),
+            'default_dashboard' => UserPref::getPref($user, 'dashboard'),
+            'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
         ];
 
         if (Config::get('twofactor')) {
-            $twofactor = UserPref::getPref($request->user(), 'twofactor');
+            $twofactor = UserPref::getPref($user, 'twofactor');
             if ($twofactor) {
-                $data['twofactor_uri'] = TwoFactor::generateUri($request->user()->username, $twofactor['key'], $twofactor['counter'] !== false);
+                $data['twofactor_uri'] = TwoFactor::generateUri($user->username, $twofactor['key'], $twofactor['counter'] !== false);
             }
             $data['twofactor'] = $twofactor;
         }
@@ -76,7 +79,17 @@ class UserPreferencesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if ($request->action == 'changedash') {
+            $this->validate($request, ['dashboard' => 'required|integer']);
+            UserPref::setPref($request->user(), 'dashboard', $request->dashboard);
+            return response()->json(['status' => 'success']);
+        } elseif ($request->action == 'changenote') {
+            $this->validate($request, ['state' => 'required|integer']);
+            UserPref::setPref($request->user(), 'add_schedule_note_to_device', $request->state);
+            return response()->json(['status' => 'success']);
+        }
+
+        return response()->json('Invalid action', 422);
     }
 
     /**
@@ -110,7 +123,6 @@ class UserPreferencesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
     }
 
     /**
