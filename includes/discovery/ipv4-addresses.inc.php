@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\IPv4;
+use LibreNMS\Exceptions\InvalidIpException;
 
 if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!= 0)) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
@@ -17,7 +18,11 @@ foreach ($vrfs_lite_cisco as $vrf) {
         list($oid,$ifIndex) = explode(' ', $data);
         $mask               = trim(snmp_get($device, "ipAdEntNetMask.$oid", '-Oqv', 'IP-MIB'));
         $cidr               = IPv4::netmask2cidr($mask);
-        $ipv4               = new IPv4("$oid/$cidr");
+        try {
+            $ipv4               = new IPv4("$oid/$cidr");
+        } catch (InvalidIpException $e) {
+            continue;
+        }
         $network            = $ipv4->getNetworkAddress() . '/' . $ipv4->cidr;
 
 
