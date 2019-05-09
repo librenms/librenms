@@ -41,16 +41,12 @@ daily cleanup tasks.
 
 For 95th Percentile billing, the default behavior is to use the highest of the input 
 or output 95th Percentile calculation.
-
 To instead use the combined total of inout + output to derive the 95th percentile,
-This can be changed on a per bill basis by setting 95th Calculation to "Aggregate".
-
-To change the default option to Aggregate,
 add the following the `config.php`:
 
 ```php
-$config['billing']['95th_default_agg'] = 1;  // Set aggregate 95th as default
+$config['billing_aggregate_95th'] = 1;  // Combine in + out throughput before calculating 95th
 ```
 
-This configuration setting is cosmetic and only changes the default selected option 
-when adding a new bill
+Note that the aggregate option changes how billing summaries are calculated and stored in the database.
+Changing this setting will make any values already stored for the current billing cycle inaccurate.

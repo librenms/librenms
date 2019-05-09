@@ -1,16 +1,19 @@
 <?php
 
-use LibreNMS\Config;
 
 function format_bytes_billing($value)
 {
-    return format_number($value, Config::get('billing.base')).'B';
+    global $config;
+
+    return format_number($value, $config['billing']['base']).'B';
 }//end format_bytes_billing()
 
 
 function format_bytes_billing_short($value)
 {
-    return format_number($value, Config::get('billing.base'), 2, 3);
+    global $config;
+
+    return format_number($value, $config['billing']['base'], 2, 3);
 }//end format_bytes_billing_short()
 
 
@@ -72,8 +75,10 @@ function getPredictedUsage($bill_day, $cur_used)
 
 function getValue($host, $port, $id, $inout)
 {
+    global $config;
+
     $oid    = 'IF-MIB::ifHC'.$inout.'Octets.'.$id;
-    $device = dbFetchRow("SELECT * from `devices` WHERE `hostname` = ? LIMIT 1", array($host));
+    $device = dbFetchRow("SELECT * from `devices` WHERE `hostname` = '".mres($host)."' LIMIT 1");
     $value  = snmp_get($device, $oid, '-Oqv');
 
     if (!is_numeric($value)) {
@@ -120,54 +125,57 @@ function getLastMeasurement($bill_id)
 
 function get95thagg($bill_id, $datefrom, $dateto)
 {
-    $mq_sql           = "SELECT count(delta) FROM bill_data WHERE bill_id = ?";
-    $mq_sql          .= " AND timestamp > ? AND timestamp <= ?";
-    $measurements     = dbFetchCell($mq_sql, array($bill_id, $datefrom, $dateto));
+    $mq_sql           = "SELECT count(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."'";
+    $mq_sql          .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'";
+    $measurements     = dbFetchCell($mq_sql);
     $measurement_95th = (round(($measurements / 100 * 95)) - 1);
 
-    $q_95_sql  = "SELECT (delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?";
-    $q_95_sql .= " AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC";
-    $a_95th    = dbFetchColumn($q_95_sql, array($bill_id, $datefrom, $dateto));
+    $q_95_sql  = "SELECT (delta / period * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
+    $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY rate ASC";
+    $a_95th    = dbFetchColumn($q_95_sql);
     $m_95th    = $a_95th[$measurement_95th];
 
     return (round($m_95th, 2));
 }//end get95thagg()
 
 
-function get95thIn($bill_id, $datefrom, $dateto)
+function get95thin($bill_id, $datefrom, $dateto)
 {
-    $mq_sql           = "SELECT count(delta) FROM bill_data WHERE bill_id = ?";
-    $mq_sql          .= " AND timestamp > ? AND timestamp <= ?";
-    $measurements     = dbFetchCell($mq_sql, array($bill_id, $datefrom, $dateto));
+    $mq_sql           = "SELECT count(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."'";
+    $mq_sql          .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'";
+    $measurements     = dbFetchCell($mq_sql);
     $measurement_95th = (round(($measurements / 100 * 95)) - 1);
 
-    $q_95_sql  = "SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?";
-    $q_95_sql .= " AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC";
-    $a_95th    = dbFetchColumn($q_95_sql, array($bill_id, $datefrom, $dateto));
+    $q_95_sql  = "SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
+    $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY rate ASC";
+    $a_95th    = dbFetchColumn($q_95_sql);
     $m_95th    = $a_95th[$measurement_95th];
 
     return (round($m_95th, 2));
-}//end get95thIn()
+}//end get95thin()
 
 
 function get95thout($bill_id, $datefrom, $dateto)
 {
-    $mq_sql           = "SELECT count(delta) FROM bill_data WHERE bill_id = ?";
-    $mq_sql          .= " AND timestamp > ? AND timestamp <= ?";
-    $measurements     = dbFetchCell($mq_sql, array($bill_id, $datefrom, $dateto));
+    $mq_sql           = "SELECT count(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."'";
+    $mq_sql          .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'";
+    $measurements     = dbFetchCell($mq_sql);
     $measurement_95th = (round(($measurements / 100 * 95)) - 1);
 
-    $q_95_sql  = "SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?";
-    $q_95_sql .= " AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC";
-    $a_95th    = dbFetchColumn($q_95_sql, array($bill_id, $datefrom, $dateto));
-    $m_95th    = $a_95th[$measurement_95th];
+    $q_95_sql  = "SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
+    $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY rate ASC";
+
+    $a_95th = dbFetchColumn($q_95_sql);
+    $m_95th = $a_95th[$measurement_95th];
 
     return (round($m_95th, 2));
 }//end get95thout()
 
 
-function getRates($bill_id, $datefrom, $dateto, $dir_95th)
+function getRates($bill_id, $datefrom, $dateto)
 {
+    global $config;
+
     $data = [];
 
     $sum_data = getSum($bill_id, $datefrom, $dateto);
@@ -177,10 +185,10 @@ function getRates($bill_id, $datefrom, $dateto, $dir_95th)
     $ptot     = $sum_data['period'];
 
     $data['rate_95th_in']  = get95thIn($bill_id, $datefrom, $dateto);
-    $data['rate_95th_out'] = get95thout($bill_id, $datefrom, $dateto);
+    $data['rate_95th_out'] = get95thOut($bill_id, $datefrom, $dateto);
 
-    if ($dir_95th == 'agg') {
-        $data['rate_95th'] = get95thagg($bill_id, $datefrom, $dateto);
+    if( $config['billing_aggregate_95th'] == 1 ) {
+        $data['rate_95th'] = get95thAgg($bill_id, $datefrom, $dateto);
         $data['dir_95th'] = 'agg';
     } else {
         if ($data['rate_95th_out'] > $data['rate_95th_in']) {
@@ -206,21 +214,21 @@ function getRates($bill_id, $datefrom, $dateto, $dir_95th)
 
 function getTotal($bill_id, $datefrom, $dateto)
 {
-    $mtot = dbFetchCell("SELECT SUM(delta) FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?", array($bill_id, $datefrom, $dateto));
+    $mtot = dbFetchCell("SELECT SUM(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."' AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'");
     return ($mtot);
 }//end getTotal()
 
 
 function getSum($bill_id, $datefrom, $dateto)
 {
-    $sum = dbFetchRow("SELECT SUM(period) as period, SUM(delta) as total, SUM(in_delta) as inbound, SUM(out_delta) as outbound FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?", array($bill_id, $datefrom, $dateto));
+    $sum = dbFetchRow("SELECT SUM(period) as period, SUM(delta) as total, SUM(in_delta) as inbound, SUM(out_delta) as outbound FROM bill_data WHERE bill_id = '".mres($bill_id)."' AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'");
     return ($sum);
 }//end getSum()
 
 
 function getPeriod($bill_id, $datefrom, $dateto)
 {
-    $ptot = dbFetchCell("SELECT SUM(period) FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?", array($bill_id, $datefrom, $dateto));
+    $ptot = dbFetchCell("SELECT SUM(period) FROM bill_data WHERE bill_id = '".mres($bill_id)."' AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'");
     return ($ptot);
 }//end getPeriod()
 
