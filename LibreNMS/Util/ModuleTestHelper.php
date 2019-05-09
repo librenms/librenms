@@ -57,6 +57,7 @@ class ModuleTestHelper
         'vlans' => ['ports', 'vlans'],
         'vrf' => ['ports', 'vrf'],
         'nac' => ['ports', 'nac'],
+        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
     ];
 
 
