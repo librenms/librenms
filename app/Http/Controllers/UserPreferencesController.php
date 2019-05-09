@@ -28,12 +28,19 @@ namespace App\Http\Controllers;
 use App\Models\Dashboard;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Config;
 
 class UserPreferencesController extends Controller
 {
+    private $valid_prefs = [
+        'dashboard' => 'required|integer',
+        'add_schedule_note_to_device' => 'required|integer',
+        'locale' => 'required|in:en,ru',
+    ];
+
     /**
      * Display a listing of the resource.
      *
@@ -48,6 +55,11 @@ class UserPreferencesController extends Controller
             'dashboards' => Dashboard::allAvailable($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
+            'locale' => UserPref::getPref($user, 'locale') ?: 'en',
+            'locales' => [
+                'en' => 'English',
+                'ru' => 'русский',
+            ],
         ];
 
         if (Config::get('twofactor')) {
@@ -79,17 +91,13 @@ class UserPreferencesController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->action == 'changedash') {
-            $this->validate($request, ['dashboard' => 'required|integer']);
-            UserPref::setPref($request->user(), 'dashboard', $request->dashboard);
-            return response()->json(['status' => 'success']);
-        } elseif ($request->action == 'changenote') {
-            $this->validate($request, ['state' => 'required|integer']);
-            UserPref::setPref($request->user(), 'add_schedule_note_to_device', $request->state);
-            return response()->json(['status' => 'success']);
-        }
+        $this->validate($request, [
+            'pref' => ['required', Rule::in(array_keys($this->valid_prefs))],
+            'value' => $this->valid_prefs[$request->pref] ?? 'required|integer',
+        ]);
 
-        return response()->json('Invalid action', 422);
+        UserPref::setPref($request->user(), $request->pref, $request->value);
+        return response()->json(['status' => 'success']);
     }
 
     /**

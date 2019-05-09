@@ -46,11 +46,11 @@
     <div class="panel panel-default panel-condensed">
         <div class="panel-heading">@lang('User Preferences')</div>
         <div class="panel-body">
-            <form method="post" action="{{ route('preferences.store') }}" class="form-horizontal" role="form">
+            <form class="form-horizontal" role="form">
                 <div class="form-group">
                     <label for="dashboard" class="col-sm-4 control-label">@lang('Dashboard')</label>
                     <div class="col-sm-4">
-                        <select class="form-control" name="dashboard" id="dashboard-select" data-previous="{{ $default_dashboard }}">
+                        <select class="form-control ajax-select" name="dashboard" data-pref="dashboard" data-previous="{{ $default_dashboard }}">
                             @foreach($dashboards as $dash)
                                 <option value="{{ $dash->dashboard_id }}" @if($dash->dashboard_id == $default_dashboard) selected @endif>{{ $dash->user ? $dash->user->username : __('<deleted>') }}:{{ $dash->dashboard_name }}</option>
                             @endforeach
@@ -58,7 +58,17 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="dashboard" class="col-sm-4 control-label">@lang('Add schedule notes to devices notes')</label>
+                    <label for="locale" class="col-sm-4 control-label">@lang('Language')</label>
+                    <div class="col-sm-4">
+                        <select class="form-control ajax-select" name="locale" data-pref="locale" data-previous="{{ $locale }}">
+                            @foreach($locales as $lang => $descr)
+                                <option value="{{ $lang }}" @if($lang == $locale) selected @endif>{{ $descr }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="notetodevice" class="col-sm-4 control-label">@lang('Add schedule notes to devices notes')</label>
                     <div class="col-sm-4">
                         <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
                     </div>
@@ -146,8 +156,8 @@
                     dataType: 'json',
                     type: 'POST',
                     data: {
-                        action: 'changenote',
-                        state: state ? 1 : 0
+                        pref: 'add_schedule_note_to_device',
+                        value: state ? 1 : 0
                     },
                     success: function () {
                         $this.closest('.form-group').addClass('has-success');
@@ -165,20 +175,20 @@
                 });
             });
 
-        $('#dashboard-select').change(function () {
+        $('.ajax-select').change(function () {
             var $this = $(this);
             var value = $this.val();
+            console.log($this.data('pref'));
             $.ajax({
                 url: '{{ route('preferences.store') }}',
                 dataType: 'json',
                 type: 'POST',
                 data: {
-                    action: 'changedash',
-                    dashboard: value
+                    pref: $this.data('pref'),
+                    value: value
                 },
                 success: function () {
                     $this.data('previous', value);
-                    toastr.success('@lang('Dashboard updated')');
                     $this.closest('.form-group').addClass('has-success');
                     setTimeout(function () {
                         $this.closest('.form-group').removeClass('has-success');
@@ -186,7 +196,6 @@
                 },
                 error: function () {
                     $this.val($this.data('previous'));
-                    toastr.error('@lang('Failed to update dashboard ')');
                     $this.closest('.form-group').addClass('has-error');
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-error');
