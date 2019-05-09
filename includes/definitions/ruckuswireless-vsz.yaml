@@ -1,0 +1,31 @@
+os: ruckuswireless-vsz
+text: 'Ruckus Wireless Virtual SmartZone'
+type: wireless
+icon: ruckus
+mib_dir:
+    - ruckus
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_wireless_ap-count, text: 'Number of APs' }
+    - { graph: device_wireless_clients, text: 'Number of Clients' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.25053.3.1.10
+ignore_mount_string:
+    - ruckuswireless
+    - etc
+    - var
+    - java
+    - cassandra
+    - home
+    - usr
+    - boot_mbr
+    - dev
+    - cgroup
+    - media
+    - tmp
+    - data
+poller_modules:
+    wireless: true
+discovery_modules:
+    wireless: true
