@@ -123,6 +123,21 @@ function getLastMeasurement($bill_id)
     return ($return);
 }//end getLastMeasurement()
 
+function get95thagg($bill_id, $datefrom, $dateto)
+{
+    $mq_sql           = "SELECT count(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."'";
+    $mq_sql          .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'";
+    $measurements     = dbFetchCell($mq_sql);
+    $measurement_95th = (round(($measurements / 100 * 95)) - 1);
+
+    $q_95_sql  = "SELECT (delta / period * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
+    $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY rate ASC";
+    $a_95th    = dbFetchColumn($q_95_sql);
+    $m_95th    = $a_95th[$measurement_95th];
+
+    return (round($m_95th, 2));
+}//end get95thagg()
+
 
 function get95thin($bill_id, $datefrom, $dateto)
 {
@@ -159,6 +174,8 @@ function get95thout($bill_id, $datefrom, $dateto)
 
 function getRates($bill_id, $datefrom, $dateto)
 {
+    global $config;
+
     $data = [];
 
     $sum_data = getSum($bill_id, $datefrom, $dateto);
@@ -170,12 +187,17 @@ function getRates($bill_id, $datefrom, $dateto)
     $data['rate_95th_in']  = get95thIn($bill_id, $datefrom, $dateto);
     $data['rate_95th_out'] = get95thOut($bill_id, $datefrom, $dateto);
 
-    if ($data['rate_95th_out'] > $data['rate_95th_in']) {
-        $data['rate_95th'] = $data['rate_95th_out'];
-        $data['dir_95th']  = 'out';
+    if( $config['billing_aggregate_95th'] == 1 ) {
+        $data['rate_95th'] = get95thAgg($bill_id, $datefrom, $dateto);
+        $data['dir_95th'] = 'agg';
     } else {
-        $data['rate_95th'] = $data['rate_95th_in'];
-        $data['dir_95th']  = 'in';
+        if ($data['rate_95th_out'] > $data['rate_95th_in']) {
+            $data['rate_95th'] = $data['rate_95th_out'];
+            $data['dir_95th']  = 'out';
+        } else {
+            $data['rate_95th'] = $data['rate_95th_in'];
+            $data['dir_95th']  = 'in';
+        }
     }
 
     $data['total_data']     = $mtot;
