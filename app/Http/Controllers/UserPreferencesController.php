@@ -26,12 +26,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dashboard;
+use App\Models\Device;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Config;
+use Session;
 
 class UserPreferencesController extends Controller
 {
@@ -70,6 +72,10 @@ class UserPreferencesController extends Controller
             $data['twofactor'] = $twofactor;
         }
 
+        if (!$user->hasGlobalRead()) {
+            $data['devices'] = Device::hasAccess($user)->get();
+        }
+
         return view('user.preferences', $data);
     }
 
@@ -97,6 +103,11 @@ class UserPreferencesController extends Controller
         ]);
 
         UserPref::setPref($request->user(), $request->pref, $request->value);
+
+        if ($request->pref == 'locale') {
+            Session::put('locale', $request->value);
+        }
+
         return response()->json(['status' => 'success']);
     }
 

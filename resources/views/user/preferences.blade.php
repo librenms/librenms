@@ -135,7 +135,17 @@
     <div class="panel panel-default panel-condensed">
         <div class="panel-heading">@lang('Device Permissions')</div>
         <div class="panel-body">
-            <strong class="blue">Global Administrative Access</strong>
+            @if(auth()->user()->hasGlobalAdmin())
+                <strong class="blue">@lang('Global Administrative Access')</strong>
+            @elseif(auth()->user()->hasGlobalRead())
+                <strong class="green">@lang('Global Viewing Access')</strong>
+            @else
+                @forelse($devices as $device)
+                    {!! \LibreNMS\Util\Url::deviceLink($device) !!} <br />
+                @empty
+                    <strong class="red">@lang('No access!')</strong>
+                @endforelse
+            @endif
         </div>
     </div>
 </div>
