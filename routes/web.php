@@ -23,7 +23,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // pages
     Route::get('locations', 'LocationController@index');
-    Route::resource('preferences', 'UserPreferencesController');
+    Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
 
     // old route redirects
