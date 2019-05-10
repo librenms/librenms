@@ -16,7 +16,7 @@
         <tbody>
             <tr>
                 <td><a href="{{ url('devices') }}">@lang('Devices')</a></td>
-                <td><a href="{{ url('devices') }}"><span> {{ $devices['count'] }}</span></a></td>
+                <td><a href="{{ url('devices') }}"><span> {{ $devices['total'] }}</span></a></td>
                 <td><a href="{{ url('devices/state=up/format=list_detail') }}"><span class="green"> {{ $devices['up'] }}</span></a></td>
                 <td><a href="{{ url('devices/state=down/format=list_detail') }}"><span class="red"> {{ $devices['down'] }}</span></a></td>
                 <td><a href="{{ url('devices/ignore=1/format=list_detail') }}"><span class="grey"> {{ $devices['ignored'] }}</span></a></td>
@@ -27,7 +27,7 @@
             </tr>
             <tr>
                 <td><a href="{{ url('ports') }}">@lang('Ports')</a></td>
-                <td><a href="{{ url('ports') }}"><span>{{ $ports['count'] }}</span></a></td>
+                <td><a href="{{ url('ports') }}"><span>{{ $ports['total'] }}</span></a></td>
                 <td><a href="{{ url('ports/format=list_detail/state=up') }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
                 <td><a href="{{ url('ports/format=list_detail/state=down') }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
                 <td><a href="{{ url('ports/format=list_detail/ignore=1') }}"><span class="grey"> {{ $ports['ignored'] }}</span></a></td>
@@ -39,9 +39,9 @@
             @if($show_services)
                 <tr>
                     <td><a href="{{ url('services') }}">@lang('Services')</a></td>
-                    <td><a href="{{ url('services') }}"><span>{{ $services['count'] }}</span></a></td>
-                    <td><a href="{{ url('services/state=ok/view=details') }}"><span class="green">{{ $services['up'] }}</span></a></td>
-                    <td><a href="{{ url('services/state=critical/view=details') }}"><span class="red"> {{ $services['down'] }}</span></a></td>
+                    <td><a href="{{ url('services') }}"><span>{{ $services['total'] }}</span></a></td>
+                    <td><a href="{{ url('services/state=ok/view=details') }}"><span class="green">{{ $services['ok'] }}</span></a></td>
+                    <td><a href="{{ url('services/state=critical/view=details') }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
                     <td><a href="{{ url('services/ignore=1/view=details') }}"><span class="grey"> {{ $services['ignored'] }}</span></a></td>
                     <td><a href="{{ url('services/disabled=1/view=details') }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>
                     @if($summary_errors)

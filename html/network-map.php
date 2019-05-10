@@ -59,6 +59,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
     if (!LegacyAuth::check()) {
         $map .= "\"Not authenticated\" [fontsize=20 fillcolor=\"lightblue\", URL=\"/\" shape=box3d]\n";
     } else {
+        $locations = getlocations();
         $loc_count = 1;
         foreach (dbFetch("SELECT *, locations.location FROM devices LEFT JOIN locations ON devices.location_id = locations.id WHERE 1 ".$where, $param) as $device) {
             if ($device) {

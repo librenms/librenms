@@ -6,7 +6,7 @@ unset($vars['page']);
 
 // Setup here
 
-if ($_SESSION['widescreen']) {
+if (session('widescreen')) {
     $graph_width=1700;
     $thumb_width=180;
 } else {

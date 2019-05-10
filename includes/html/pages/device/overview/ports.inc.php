@@ -1,6 +1,6 @@
 <?php
 
-if ($ports['total']) {
+if (\LibreNMS\Util\ObjectCache::portCounts(['total'])['total'] > 0) {
     echo '<div class="row">
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
@@ -45,6 +45,7 @@ if ($ports['total']) {
     echo '  </td>
         </tr>';
 
+    $ports = \LibreNMS\Util\ObjectCache::portCounts(['total', 'up', 'down', 'disabled']);
     echo '
     <tr>
       <td><i class="fa fa-link fa-lg" style="color:black" aria-hidden="true"></i> '.$ports['total'].'</td>
