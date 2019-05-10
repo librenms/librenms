@@ -39,6 +39,11 @@ use Toastr;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('deny-demo');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -159,9 +164,8 @@ class UserController extends Controller
         }
 
         $user->fill($request->all());
-        $user->can_modify_passwd = $request->get('can_modify_passwd'); // checkboxes are missing when unchecked
 
-        if ($this->updateDashboard($user, $request->get('dashboard'))) {
+        if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
             Toastr::success(__('Updated dashboard for :username', ['username' => $user->username]));
         }
 
@@ -170,11 +174,10 @@ class UserController extends Controller
                 Toastr::success(__('User :username updated', ['username' => $user->username]));
             } else {
                 Toastr::error(__('Failed to update user :username', ['username' => $user->username]));
-                return redirect()->back();
+//                return redirect()->back();
             }
         }
-
-        return redirect(route('users.index'));
+//        return redirect(route('users.index'));
     }
 
     /**

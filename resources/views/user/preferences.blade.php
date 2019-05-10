@@ -12,24 +12,24 @@
     <div class="panel panel-default panel-condensed">
         <div class="panel-heading">@lang('Change Password')</div>
         <div class="panel-body">
-            <form method="post" action="preferences/" class="form-horizontal" role="form">
-                <input type=hidden name="action" value="changepass">
+            <form method="POST" action="{{ route('users.update', [$user->user_id]) }}" class="form-horizontal" role="form">
+                <input type="hidden" name="_method" value="PATCH">
                 <div class="form-group">
-                    <label for="old_pass" class="col-sm-4 control-label">@lang('Current Password')</label>
+                    <label for="old_password" class="col-sm-4 control-label">@lang('Current Password')</label>
                     <div class="col-sm-4">
-                        <input type="password" name="old_pass" autocomplete="off" class="form-control input-sm">
+                        <input type="password" name="old_password" autocomplete="off" class="form-control input-sm">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="new_pass" class="col-sm-4 control-label">@lang('New Password')</label>
+                    <label for="new_password" class="col-sm-4 control-label">@lang('New Password')</label>
                     <div class="col-sm-4">
-                        <input type="password" name="new_pass" autocomplete="off" class="form-control input-sm">
+                        <input type="password" name="new_password" autocomplete="off" class="form-control input-sm">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="new_pass2" class="col-sm-4 control-label">@lang('New Password')</label>
+                    <label for="new_password_confirmation" class="col-sm-4 control-label">@lang('New Password')</label>
                     <div class="col-sm-4">
-                        <input type="password" name="new_pass2" autocomplete="off" class="form-control input-sm">
+                        <input type="password" name="new_password_confirmation" autocomplete="off" class="form-control input-sm">
                     </div>
                 </div>
                 <div class="form-group">

@@ -43,6 +43,11 @@ class UserPreferencesController extends Controller
         'locale' => 'required|in:en,ru',
     ];
 
+    public function __construct()
+    {
+        $this->middleware('deny-demo');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -53,6 +58,7 @@ class UserPreferencesController extends Controller
     {
         $user = $request->user();
         $data = [
+            'user' => $user,
             'can_change_password' => LegacyAuth::get()->canUpdatePasswords($user->username),
             'dashboards' => Dashboard::allAvailable($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
