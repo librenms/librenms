@@ -53,7 +53,7 @@
     @endif
 
     <div class="panel panel-default panel-condensed">
-        <div class="panel-heading">@lang('User Preferences')</div>
+        <div class="panel-heading">@lang('Preferences')</div>
         <div class="panel-body">
             <form class="form-horizontal" role="form">
                 <div class="form-group">
@@ -74,6 +74,9 @@
                                 <option value="{{ $lang }}" @if($lang == $locale) selected @endif>{{ $descr }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <small>* @lang('Translation not fully supported')</small>
                     </div>
                 </div>
                 <div class="form-group">
