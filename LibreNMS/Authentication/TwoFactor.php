@@ -210,6 +210,5 @@ class TwoFactor
         return $counter ?
             "otpauth://hotp/$title?issuer=LibreNMS&counter=1&secret=$key" : // counter based
             "otpauth://totp/$title?issuer=LibreNMS&secret=$key"; // time based
-
     }
 }
