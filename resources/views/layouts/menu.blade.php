@@ -185,7 +185,7 @@
                             <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg" aria-hidden="true"></i> Traffic Bills</a></li>
                         @endconfig
 
-                        @if($port_counts['pseudowire'] > 0))
+                        @if($port_counts['pseudowire'] > 0)
                             <li><a href="{{ url('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg" aria-hidden="true"></i> Pseudowires</a></li>
                         @endif
 

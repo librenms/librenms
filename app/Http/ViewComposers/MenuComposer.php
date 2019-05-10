@@ -75,9 +75,9 @@ class MenuComposer
         }
 
         // Port menu
-        $vars['port_counts'] = Config::get('enable_pseudowires') ?
-            ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down', 'pseudowire']) :
-            ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down']);
+        $vars['port_counts'] = ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down']);
+        $vars['port_counts']['pseudowire'] = Config::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
+
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
         $vars['custom_port_descr'] = collect(\LibreNMS\Config::get('custom_descr', []))
             ->filter()
