@@ -76,6 +76,7 @@ nav:
       - Extensions/IRC-Bot-Extensions.md
       - Extensions/SNMP-Proxy.md
       - Extensions/SNMP-Trap-Handler.md
+      - Extensions/Customizing-the-Web-UI.md
       - Support/Cleanup-options.md
   - 6. 3rd Party Integration:
       - Extensions/Gateone.md
