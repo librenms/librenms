@@ -1,7 +1,5 @@
 <?php
 
-global $config;
-
 $mdadm_arrays = get_arrays_with_mdadm($device, $app['app_id']);
 
 print_optionbar_start();
