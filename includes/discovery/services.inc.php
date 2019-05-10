@@ -3,15 +3,6 @@
 use LibreNMS\Config;
 
 if (Config::get('discover_services')) {
-    // FIXME: use /etc/services?
-    $known_services = array(
-        22  => 'ssh',
-        25  => 'smtp',
-        53  => 'dns',
-        80  => 'http',
-        110 => 'pop',
-        143 => 'imap',
-    );
 
     // Services
     if ($device['type'] == 'server') {
@@ -23,8 +14,8 @@ if (Config::get('discover_services')) {
                 if (trim($tcpstatus) == 'listen') {
                     $split_oid = explode('.', $oid);
                     $tcp_port  = $split_oid[(count($split_oid) - 6)];
-                    if ($known_services[$tcp_port]) {
-                        discover_service($device, $known_services[$tcp_port]);
+                    if ($service = getservbyport($tcp_port, 'tcp')) {
+                        discover_service($device, $service);
                     }
                 }
             }
