@@ -30,12 +30,10 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
-use Hash;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use Toastr;
+use URL;
 
 class UserController extends Controller
 {
@@ -174,10 +172,11 @@ class UserController extends Controller
                 Toastr::success(__('User :username updated', ['username' => $user->username]));
             } else {
                 Toastr::error(__('Failed to update user :username', ['username' => $user->username]));
-//                return redirect()->back();
+                return redirect()->back();
             }
         }
-//        return redirect(route('users.index'));
+
+        return redirect(route(str_contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
     }
 
     /**

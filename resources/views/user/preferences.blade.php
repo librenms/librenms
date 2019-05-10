@@ -8,6 +8,16 @@
         <legend>@lang('User Preferences')</legend>
     </row>
 
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @if($can_change_password)
     <div class="panel panel-default panel-condensed">
         <div class="panel-heading">@lang('Change Password')</div>
@@ -27,7 +37,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="new_password_confirmation" class="col-sm-4 control-label">@lang('New Password')</label>
+                    <label for="new_password_confirmation" class="col-sm-4 control-label">@lang('Verify New Password')</label>
                     <div class="col-sm-4">
                         <input type="password" name="new_password_confirmation" autocomplete="off" class="form-control input-sm">
                     </div>
@@ -37,7 +47,6 @@
                         <button type="submit" class="btn btn-default">@lang('Change Password')</button>
                     </div>
                 </div>
-
             </form>
         </div>
     </div>
