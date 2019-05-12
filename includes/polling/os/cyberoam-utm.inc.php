@@ -26,6 +26,7 @@
 $cyberoam_data = snmp_get_multi_oid($device, ['applianceModel.0', 'cyberoamVersion.0'], '-OQUs', 'CYBEROAM-MIB');
 $hardware = $cyberoam_data['applianceModel.0'];
 $version  = $cyberoam_data['cyberoamVersion.0'];
+$serial   = $cyberoam_data['applianceKey.0'];
 
 unset(
     $cyberoam_data
