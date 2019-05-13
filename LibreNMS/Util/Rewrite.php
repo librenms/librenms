@@ -123,6 +123,46 @@ class Rewrite
     }
 
     /**
+     * Reformat hex MAC as oid MAC (dotted-decimal)
+     *
+     * 00:12:34:AB:CD:EF becomes 0.18.52.171.205.239
+     * 0:12:34:AB:CD:EF  becomes 0.18.52.171.205.239
+     * 00:02:04:0B:0D:0F becomes 0.2.4.11.13.239
+     * 0:2:4:B:D:F       becomes 0.2.4.11.13.15
+     *
+     * @param string $mac
+     * @return string oid representation of a MAC address
+     */
+    public static function oidMac($mac)
+    {
+        return implode('.', array_map('hexdec', explode(':', $mac)));
+    }
+
+    /**
+     * Reformat Hex MAC with delimiters to Hex String without delimiters
+     *
+     * Assumes the MAC address is well-formed and in a common format.
+     * 00:12:34:ab:cd:ef becomes 001234abcdef
+     * 00:12:34:AB:CD:EF becomes 001234ABCDEF
+     * 0:12:34:AB:CD:EF  becomes 001234ABCDEF
+     * 00-12-34-AB-CD-EF becomes 001234ABCDEF
+     * 001234-ABCDEF     becomes 001234ABCDEF
+     * 0012.34AB.CDEF    becomes 001234ABCDEF
+     * 00:02:04:0B:0D:0F becomes 0002040B0D0F
+     * 0:2:4:B:D:F       becomes 0002040B0D0F
+     *
+     * @param string $mac hexadecimal MAC address with or without common delimiters
+     * @return string undelimited hexadecimal MAC address
+     */
+    public static function macToHex($mac)
+    {
+        $mac_array = explode(':', str_replace(['-','.'], ':', $mac));
+        $mac_padding = array_fill(0, count($mac_array), 12/count($mac_array));
+
+        return implode(array_map('zeropad', $mac_array, $mac_padding));
+    }
+
+    /**
      * Make Cisco hardware human readable
      *
      * @param Device $device
