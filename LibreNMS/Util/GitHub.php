@@ -26,9 +26,10 @@
 
 namespace LibreNMS\Util;
 
-use Requests;
 use DateTime;
-use SebastianBergmann\CodeCoverage\Report\PHP;
+use Exception;
+use Requests;
+use Requests_Response;
 
 class GitHub
 {
@@ -97,7 +98,6 @@ class GitHub
      *
      * Get a single pull request information
      *
-     * @return mixed
      */
     public function getPullRequest()
     {
@@ -137,7 +137,7 @@ class GitHub
                         // If not, assign this PR to the array
                         $this->pull_requests[] = $pr;
                     }
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return false;
                 }
             }
@@ -159,17 +159,17 @@ class GitHub
                 $this->changelog_users[$pr['user']['login']] = 0;
             }
             if ($pr['merged_at']) {
-                foreach ($pr['labels'] as $key => $label) {
+                $labels = array_map(function ($label) {
                     $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
-                    $name = str_replace('-', ' ', $name);
+                    return str_replace('-', ' ', $name);
+                }, $pr['labels']);
 
-                    // check allowed labels in order
-                    foreach ($valid_labels as $valid_label) {
-                        if ($name == $valid_label) {
-                            $title = ucwords(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
-                            $this->changelog[$name][] = "$title ([#{$pr['number']}]({$pr['html_url']})) - [{$pr['user']['login']}]({$pr['user']['html_url']})" . PHP_EOL;
-                            break 2; // only put in the first found label
-                        }
+                // check valid labels in order
+                foreach ($valid_labels as $valid_label) {
+                    if (in_array($valid_label, $labels) && !in_array('ignore changelog', $labels)) {
+                        $title = ucwords(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
+                        $this->changelog[$valid_label][] = "$title ([#{$pr['number']}]({$pr['html_url']})) - [{$pr['user']['login']}]({$pr['user']['html_url']})" . PHP_EOL;
+                        break; // only put in the first found label
                     }
                 }
                 $this->changelog_users[$pr['user']['login']] += 1;
@@ -236,6 +236,10 @@ class GitHub
         return $this->markdown;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function createRelease()
     {
         // push the changelog and version bump
@@ -260,7 +264,7 @@ class GitHub
     /**
      * Function to control the creation of creating a change log.
      * @param bool $write
-     * @throws \Exception
+     * @throws Exception
      */
     public function createChangelog($write = true)
     {
@@ -270,7 +274,7 @@ class GitHub
         }
 
         if (!isset($previous_release['published_at'])) {
-            throw new \Exception("Could not find previous release tag.");
+            throw new Exception("Could not find previous release tag.");
         }
 
         $this->getPullRequests($previous_release['published_at']);
@@ -295,11 +299,11 @@ class GitHub
      * @param string $file Path in git repo
      * @param string $contents new file contents
      * @param string $message The commit message
-     * @return \Requests_Response
+     * @return Requests_Response
      */
     private function pushFileContents($file, $contents, $message)
     {
-        $existing = \Requests::get($this->github . '/contents/' . $file, $this->getHeaders());
+        $existing = Requests::get($this->github . '/contents/' . $file, $this->getHeaders());
         $existing_sha = json_decode($existing->body)->sha;
 
         $updated = Requests::put($this->github . '/contents/' . $file, $this->getHeaders(), json_encode([
