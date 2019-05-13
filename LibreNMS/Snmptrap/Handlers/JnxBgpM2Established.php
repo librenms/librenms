@@ -46,6 +46,20 @@ class JnxBgpM2Established implements SnmptrapHandler
         
         $peerState = $trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState'));
         $peerAddr = IP::fromHexString($trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.')));
-        Log::event("BGP Peer $peerAddr is now in the $peerState state", $device->device_id, 'trap', 1);
+
+        $bgpPeer = $device->bgppeers()->where('bgpPeerIdentifier', $peerAddr)->first();
+
+        if (!$bgpPeer) {
+            Log::error('Unknown bgp peer handling bgpEstablished trap: ' . $peerAddr);
+            return;
+        }
+
+        $bgpPeer->bgpPeerState = $peerState;
+
+        if ($bgpPeer->isDirty('bgpPeerState')) {
+            Log::event("BGP Peer $peerAddr is now in the $peerState state", $device->device_id, 'trap', 1);
+        }
+
+        $bgpPeer->save();
     }
 }
