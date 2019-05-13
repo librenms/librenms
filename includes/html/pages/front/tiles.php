@@ -66,9 +66,9 @@ if ($default_dash == 0 && empty($user_dashboards)) {
 
         // $dashboard was requested, but doesn't exist
         if (!empty($orig)) {
-            $msg_box[] = array('type' => 'error', 'message' => 'Dashboard <code>#'.$orig.
-                '</code> does not exist! Loaded <code>'.$vars['dashboard']['dashboard_name'].
-                '</code> instead.','title' => 'Requested Dashboard Not Found!');
+            Toastr::error('Dashboard <code>#' . $orig .
+                '</code> does not exist! Loaded <code>' . htmlentities($vars['dashboard']['dashboard_name']) .
+                '</code> instead.', 'Requested Dashboard Not Found!');
         }
     }
 }

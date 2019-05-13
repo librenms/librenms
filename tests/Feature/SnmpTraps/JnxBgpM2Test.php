@@ -27,6 +27,7 @@
 
 namespace LibreNMS\Tests;
 
+use App\Models\BgpPeer;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
@@ -35,7 +36,7 @@ use Log;
 class JnxBgpM2Test extends LaravelTestCase
 {
 
-    public function testBgpBackwardTrasition()
+    public function testBgpPeerUnknown()
     {
 
         $device = factory(Device::class)->create();
@@ -53,8 +54,42 @@ BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240";
 
         $trap = new Trap($trapText);
+
+        $error = "Unknown bgp peer handling bgpEstablished trap: 2001:d88:1::2";
+        \Log::shouldReceive('error')->once()->with($error);
+
         $message = "BGP Peer 2001:d88:1::2 is now in the idle state";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 3);
+        \Log::shouldReceive('event')->never()->with($message, $device->device_id, 'trap', 3);
+
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxBgpM2BackwardsTransition trap');
+    }
+
+    public function testBgpBackwardTrasition()
+    {
+
+        $device = factory(Device::class)->create();
+        $bgppeer = factory(BgpPeer::class)->make(['bgpPeerIdentifier' => '2001:d88:1::2', 'bgpPeerState' => 'established']);
+        $device->bgppeers()->save($bgppeer);
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:64610->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
+SNMPv2-MIB::snmpTrapOID.0 BGP4-V2-MIB-JUNIPER::jnxBgpM2BackwardTransition
+BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddrType.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 ipv6
+BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 \"20 01 0D 88 00 01 00 00 00 00 00 00 00 00 00 01 \"
+BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddrType.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 ipv6
+BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 \"20 01 0D 88 00 01 00 00 00 00 00 00 00 00 00 02 \"
+BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 \"00 00 \"
+BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 idle
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240";
+
+        $trap = new Trap($trapText);
+
+        $error = "Unknown bgp peer handling bgpEstablished trap: 2001:d88:1::2";
+        \Log::shouldReceive('error')->never()->with($error);
+
+        $message = "BGP Peer 2001:d88:1::2 is now in the idle state";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxBgpM2BackwardsTransition trap');
     }
@@ -62,6 +97,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     public function testBgpEstablished()
     {
         $device = factory(Device::class)->create();
+        $bgppeer = factory(BgpPeer::class)->make(['bgpPeerIdentifier' => '2001:d88:1::2', 'bgpPeerState' => 'idle']);
+        $device->bgppeers()->save($bgppeer);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
@@ -76,6 +113,10 @@ BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240";
 
         $trap = new Trap($trapText);
+
+        $error = "Unknown bgp peer handling bgpEstablished trap: 2001:d88:1::2";
+        \Log::shouldReceive('error')->never()->with($error);
+
         $message = "BGP Peer 2001:d88:1::2 is now in the established state";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
 

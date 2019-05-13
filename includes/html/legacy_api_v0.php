@@ -14,7 +14,7 @@
 use LibreNMS\Config;
 
 $init_modules = array('web', 'alerts');
-require realpath(__DIR__ . '/..') . '/includes/init.php';
+require realpath(__DIR__ . '/..') . '/init.php';
 
 if (!Auth::check()) {
     die('Unauthorized');

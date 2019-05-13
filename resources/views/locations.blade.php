@@ -3,6 +3,10 @@
 @section('title', __('Locations'))
 
 @section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+
     <script id="location-graph-template" type="text/x-handlebars-template">
         <tr class="bg-fixer-@{{id}}"></tr>
         <tr id="location-graph-@{{id}}" class="location_graphs">
@@ -54,6 +58,9 @@
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('css')
