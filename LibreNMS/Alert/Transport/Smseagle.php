@@ -44,7 +44,8 @@ class Smseagle extends Transport
             'to' => implode(',', $opts['to']),
             'message' => $obj['title'],
         ];
-        $url    = 'http://' . $opts['url'] . '/index.php/http_api/send_sms?' . http_build_query($params);
+        $url = starts_with($opts['url'], 'http') ? '' : 'http://';
+        $url .= $opts['url'] . '/index.php/http_api/send_sms?' . http_build_query($params);
         $curl   = curl_init($url);
 
         set_curl_proxy($curl);
@@ -64,7 +65,7 @@ class Smseagle extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'SMSEagle Host',
+                    'title' => 'SMSEagle Base URL',
                     'name' => 'smseagle-url',
                     'descr' => 'SMSEagle Host',
                     'type' => 'text',
@@ -89,7 +90,7 @@ class Smseagle extends Transport
                 ],
             ],
             'validation' => [
-                'smseagle-url'     => 'required|string',
+                'smseagle-url' => 'required|url',
                 'smseagle-user'    => 'required|string',
                 'smseagle-pass'    => 'required|string',
                 'smseagle-mobiles' => 'required',
