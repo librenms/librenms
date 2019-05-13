@@ -2074,7 +2074,7 @@ function list_fdb()
         ->get();
 
     if ($fdb->isEmpty()) {
-        api_error(404, 'MAC does not exist');
+        api_error(404, 'Fdb do not exist');
     }
 
     api_success($fdb, 'ports_fdb');
