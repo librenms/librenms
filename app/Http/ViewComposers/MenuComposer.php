@@ -66,7 +66,7 @@ class MenuComposer
         $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->get()->pluck('type')->filter();
 
         $vars['locations'] = Config::get('show_locations') && Config::get('show_locations_dropdown') ?
-            Location::hasAccess($user)->select('location')->get()->map->display()->filter() :
+            Location::hasAccess($user)->where('location', '!=', '')->select('location', 'id')->get() :
             collect();
 
         // Service menu
