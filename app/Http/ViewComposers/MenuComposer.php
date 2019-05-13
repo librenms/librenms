@@ -60,7 +60,7 @@ class MenuComposer
         $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
 
         // Device menu
-        $vars['device_groups'] = DeviceGroup::hasAccess($user)->select('device_groups.id', 'name', 'desc')->get();
+        $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->select('device_groups.id', 'name', 'desc')->get();
         $vars['package_count'] = Package::hasAccess($user)->count();
 
         $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->get()->pluck('type')->filter();
