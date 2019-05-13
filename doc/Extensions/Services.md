@@ -57,7 +57,7 @@ Note that some services (procs, inodes, load and similar) will always poll the l
 To enable autodiscovery of services in the server device category add the following line to config.php:
 
 ```php
-$config[discover_services] = 'true';
+$config['discover_services'] = true;
 ```
 
 When discovery runs LibreNMS will identify what listening TCP services on monitored servers and automatically add them. Addition setup maybe required (ex, MySQL credentials).
