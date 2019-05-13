@@ -58,7 +58,7 @@
                         @endif
                         <li class="dropdown-submenu">
                             <a href="{{ url('overview') }}"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> Tools</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
                                 @config('oxidized.enabled')
                                     <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>
@@ -368,7 +368,7 @@
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="{{ url('pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="{{ url('pollers/tab=pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a></li>
                                 @config('distributed_poller')
                                 <li><a href="{{ url('pollers/tab=groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
@@ -380,7 +380,7 @@
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> API</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="{{ url('api-access') }}"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
                                 <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
                             </ul>
@@ -390,7 +390,7 @@
                         @if (isset($refresh))
                         <li class="dropdown-submenu">
                             <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
                             </ul>
                         </li>
