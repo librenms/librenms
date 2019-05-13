@@ -111,7 +111,6 @@ class GitHub
      *
      * @param $date
      * @param int $page
-     * @return bool
      */
     public function getPullRequests($date, $page = 1)
     {
@@ -132,17 +131,19 @@ class GitHub
                         continue;
                     } elseif ($created < $end_date && $merged < $end_date && $updated < $end_date) {
                         // If the date of this PR is older than the last release we're done
-                        return true;
+                        return;
                     } else {
                         // If not, assign this PR to the array
                         $this->pull_requests[] = $pr;
                     }
                 } catch (Exception $e) {
-                    return false;
+                    return;
                 }
             }
         }
-        return $this->getPullRequests($date, $page + 1);
+
+        // recurse through the pages
+        $this->getPullRequests($date, $page + 1);
     }
 
     /**
