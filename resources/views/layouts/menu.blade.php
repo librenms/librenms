@@ -122,7 +122,7 @@
                             <ul class="dropdown-menu scrollable-menu">
                                 <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('All Locations')</a></li>
                             @foreach($locations as $location)
-                                    <li><a href="{{ url("devices/location=" . urlencode($location)) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location }}</a></li>
+                                    <li><a href="{{ url("devices/location=" . $location->id) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location->display() }}</a></li>
                             @endforeach
                             </ul>
                         </li>
