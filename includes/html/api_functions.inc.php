@@ -2050,8 +2050,13 @@ function get_fdb()
     }
     check_device_permission($device_id);
 
-    $fdb = \App\Models\PortsFdb::find($device_id);
-    api_success($fdb, 'ports_fdb');
+    $device = \App\Models\Device::find($device_id);
+    if ($device) {
+        $fdb = $device->portsFdb;
+        api_success($fdb, 'ports_fdb');
+    }
+
+    api_error(404, 'Device does not exist');
 }
 
 
@@ -2063,13 +2068,13 @@ function list_fdb()
     $router     = $app->router()->getCurrentRoute()->getParams();
     $mac        = $router['mac'];
 
-    if (empty($mac)) {
-            $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())->get();
-    } else {
-            $fdb = \App\Models\PortsFdb::find($mac);
-    }
-    $total_fdb = $fdb->count();
-    if ($total_fdb == 0) {
+    $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())
+        ->when(!empty($mac), function ($query) use ($mac) {
+            return $query->where('mac_address', $mac);
+        })
+        ->get();
+
+    if ($fdb->isEmpty()) {
         api_error(404, 'Fdb do not exist');
     }
 
