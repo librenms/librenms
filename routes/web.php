@@ -72,6 +72,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::get('syslog', 'SyslogController');
             Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
+            Route::get('service', 'ServiceController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });
