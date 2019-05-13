@@ -52,6 +52,16 @@ Now you can add services via the main Services link in the navbar, or via the 'A
 
 Note that some services (procs, inodes, load and similar) will always poll the local LibreNMS server it's running on, regardless of which device you add it to.
 
+## Autodiscovery
+
+To enable autodiscovery of services in the server device category add the following line to config.php:
+
+```php
+$config[discover_services] = 'true';
+```
+
+When discovery runs LibreNMS will identify what listening TCP services on monitored servers and automatically add them. Addition setup maybe required (ex, MySQL credentials).
+
 ## Performance data
 
 By default, the check-services script will collect all performance data that the Nagios script returns and display each datasource on a separate graph. LibreNMS expects scripts to return using Nagios convention for the response message structure: [AEN200](https://nagios-plugins.org/doc/guidelines.html#AEN200)
