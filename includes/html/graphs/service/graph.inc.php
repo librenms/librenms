@@ -16,10 +16,10 @@ require_once 'includes/services.inc.php';
 $services = service_get($device['device_id']);
 
 // Determine which key is the service we want to show.
-if (isset($vars['service'])) {
+if (isset($vars['id'])) {
     // Service is set, find its key.
     foreach ($services as $key => $service) {
-        if ($service['service_id'] == $vars['service']) {
+        if ($service['service_id'] == $vars['id']) {
             // We have found the service we want.
             $vars['service'] = $key;
         }
