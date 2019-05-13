@@ -2067,12 +2067,13 @@ function list_fdb()
     $router     = $app->router()->getCurrentRoute()->getParams();
     $mac        = $router['mac'];
 
-    if (empty($mac)) {
-            $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())->get();
-    } else {
-            $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())->where('mac_address', $mac)->get();
-    }
-    if (!$fdb || $fdb->count() == 0) {
+    $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())
+        ->when(!empty($mac), function ($query) use ($mac) {
+            return $query->where('mac_address', $mac);
+        })
+        ->get();
+
+    if ($fdb->isEmpty()) {
         api_error(404, 'MAC does not exist');
     }
 
