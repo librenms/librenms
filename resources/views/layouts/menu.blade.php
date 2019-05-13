@@ -43,13 +43,15 @@
                         @if(auth()->user()->isAdmin() || \LibreNMS\Plugins::count())
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> Plugins</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 {!! \LibreNMS\Plugins::call('menu') !!}
                                 @admin
                                     @if(\LibreNMS\Plugins::count())
                                         <li role="presentation" class="divider"></li>
                                     @endif
-                                    <li><a href="{{ url('plugin', ['view' => 'admin']) }}"> <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>Plugin Admin</a></li>
+                                <li><a href="{{ url('plugin/view=admin') }}"> <i class="fa fa-lock fa-fw fa-lg"
+                                                                                 aria-hidden="true"></i>Plugin Admin</a>
+                                </li>
                                 @endadmin
                             </ul>
                         </li>
