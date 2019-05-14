@@ -31,7 +31,7 @@ use LibreNMS\Tests\LaravelTestCase;
 
 class EdgeCosSuccessUserLoginTest extends LaravelTestCase
 {
-    public function testManagedSeries()
+    public function test3528Series()
     {
         $device = factory(Device::class)->create();
 
@@ -40,14 +40,14 @@ class EdgeCosSuccessUserLoginTest extends LaravelTestCase
         DISMAN-EVENT-MIB::sysUpTimeInstance 0:6:11:31.55
         SNMPv2-MIB::snmpTrapOID.0 ES3528MO-MIB::swAuthenticationSuccess";
 
-        $message = "SNMP Trap: Success User Login: {$device->displayName()}";
+        $message = "SNMP Trap: Authentication Success: {$device->displayName()}";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'auth', 3);
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ES3528MO-MIB::swAuthenticationSuccess trap');
     }
 
-    public function testSmartSeries()
+    public function test4210Series()
     {
         $device = factory(Device::class)->create();
 
@@ -56,7 +56,7 @@ class EdgeCosSuccessUserLoginTest extends LaravelTestCase
         DISMAN-EVENT-MIB::sysUpTimeInstance 30:22:57:58.00
         SNMPv2-MIB::snmpTrapOID.0 ECS4210-MIB::swLoginSucceedTrap";
         
-        $message = "SNMP Trap: Success User Login: {$device->displayName()}";
+        $message = "SNMP Trap: Authentication Success: {$device->displayName()}";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'auth', 3);
 
         $trap = new Trap($trapText);
