@@ -19,6 +19,7 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
+ * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
