@@ -47,7 +47,6 @@ class EdgeCosFailedUserLoginTest extends LaravelTestCase
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ES3528MO-MIB::swAuthenticationSuccess trap');
     }
-
     public function test4210Series()
     {
         $device = factory(Device::class)->create();
