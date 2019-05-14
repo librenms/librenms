@@ -94,7 +94,7 @@ if (empty($f2b['jails'])) {
     $f2bc[$id]['label'] = 'Fail2ban Jails';
     $jails = array_keys($f2b['jails']);
     sort($jails);
-    $f2bc[$id]['jails'] = json_encode($jails);
+    $f2bc[$id]['jails'] = json_encode(array_values($jails));
 
     $component->setComponentPrefs($device_id, $f2bc);
 }
