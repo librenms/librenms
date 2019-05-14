@@ -37,7 +37,7 @@ class EdgeCosFailedUserLoginTest extends LaravelTestCase
         $device = factory(Device::class)->create();
 
         $trapText = "$device->hostname
-        UDP: [$device->ip]:44298->[192.168.5.5]:162
+        UDP: [$device->ip]:44298->[10.0.1.21]:162
         DISMAN-EVENT-MIB::sysUpTimeInstance 0:6:11:31.55
         SNMPv2-MIB::snmpTrapOID.0 ES3528MO-MIB::swAuthenticationFailure";
 
@@ -53,7 +53,7 @@ class EdgeCosFailedUserLoginTest extends LaravelTestCase
         $device = factory(Device::class)->create();
 
         $trapText = "$device->hostname
-        UDP: [$device->ip]:1026->[192.168.5.5]:162
+        UDP: [$device->ip]:1026->[10.0.1.21]:162
         DISMAN-EVENT-MIB::sysUpTimeInstance 30:22:57:58.00
         SNMPv2-MIB::snmpTrapOID.0 ECS4210-MIB::swLoginFailureTrap";
 
