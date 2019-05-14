@@ -59,6 +59,8 @@ Ensure date.timezone is set in php.ini to your preferred time zone.  See http://
 
 ### Configure Apache
 
+Create the librenms.conf:
+
     vi /etc/httpd/conf.d/librenms.conf
 
 Add the following config, edit `ServerName` as required:
