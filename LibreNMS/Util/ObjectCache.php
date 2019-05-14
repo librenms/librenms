@@ -35,6 +35,7 @@ use App\Models\Port;
 use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
+use App\Models\Toner;
 use App\Models\User;
 use App\Models\Vrf;
 use Cache;
@@ -95,6 +96,17 @@ class ObjectCache
                     'descr' => $sensor_model->classDescr()
                 ];
             }
+
+            if (Toner::hasAccess(auth()->user())->exists()) {
+                $sensor_menu[3] = [
+                    [
+                        'class' => 'toner',
+                        'icon' => 'print',
+                        'descr' => __('Toner')
+                    ]
+                ];
+            }
+
             ksort($sensor_menu); // ensure menu order
             return $sensor_menu;
         });
