@@ -15,7 +15,7 @@ if ($device['os'] == 'freebsd') {
     $vmlist = array();
 
     /*
-     * CONSOLE: Start the VMware discovery process.
+     * CONSOLE: Start the discovery process.
      */
 
     /*
@@ -27,7 +27,7 @@ if ($device['os'] == 'freebsd') {
         # This is just empty and exists to catch it not existing.
     }
 
-    $cbsd_keys=array_keys($cbsd[data]);
+    $cbsd_keys=array_keys($cbsd['data']);
 
     foreach ($cbsd_keys as $vm) {
         $vmwVmDisplayName = $cbsd['data'][$vm]['jname'];
@@ -85,7 +85,7 @@ if ($device['os'] == 'freebsd') {
     }
 
     /*
-     * Finished discovering VMware information.
+     * Finished discovering CBSD information.
      */
 
     echo "\n";
