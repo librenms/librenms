@@ -220,7 +220,7 @@ echo "
         event.preventDefault();
         $.ajax({
             type: 'POST',
-            url: 'ajax/form',
+            url: '<?php echo url('/ajax/form'); ?>',
             data: { type: "callback-statistics", state: state},
             dataType: "json",
             success: function(data){
@@ -234,7 +234,7 @@ echo "
         event.preventDefault();
         $.ajax({
             type: 'POST',
-            url: 'ajax/form',
+            url: '<?php echo url('/ajax/form'); ?>',
             data: { type: "callback-clear"},
             dataType: "json",
             success: function(data){
