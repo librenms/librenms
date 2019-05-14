@@ -17,10 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Autodiscovers TCP services on devices in the 'server' device type.
- * To use set in config.php:
- * [discover_services] = 'true';
- *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
@@ -29,26 +25,19 @@
 
 use LibreNMS\Config;
 
-if (Config::get('discover_services')) {
-    // Services
-    if ($device['type'] == 'server') {
-        $oidV4 = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4.1.4.0.0.0.0', '-Osqn'));
-        $oidV6 = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4.2.16.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0', '-Osqn'));
-        $oids = $oidV4 . $oidV6;
-        foreach (explode("\n", $oids) as $data) {
-            $data = trim($data);
-            if ($data) {
-                list($oid, $tcpstatus) = explode(' ', $data);
-                $split_oid = explode('.', $oid);
-                $tcp_port  = $split_oid[(count($split_oid) - 1)];
-                if (getservbyport($tcp_port, 'tcp')) {
-                    $services[] = getservbyport($tcp_port, 'tcp');
-                }
-            }
-        }
-        foreach ($services as $service) {
+$oidV4 = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4.1.4.0.0.0.0', '-Osqn'));
+$oidV6 = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4.2.16.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0', '-Osqn'));
+$oids = $oidV4 . $oidV6;
+foreach (explode("\n", $oids) as $data) {
+    $data = trim($data);
+    if ($data) {
+        list($oid, $tcpstatus) = explode(' ', $data);
+        $split_oid = explode('.', $oid);
+        $tcp_port  = $split_oid[(count($split_oid) - 1)];
+        $services[] = $tcp_port;
+        if (($service = getservbyport($tcp_port, 'tcp')) && (1 === count(array_keys($services, $tcp_port)))) {
             discover_service($device, $service);
         }
     }
-    echo "\n";
 }
+echo "\n";
