@@ -3,8 +3,10 @@ text: ArubaOS
 type: wireless
 icon: aruba
 over:
-    - { graph: device_arubacontroller_numaps, text: 'Number of APs' }
-    - { graph: device_arubacontroller_numclients, text: 'Number of Clients' }
+    - { graph: device_wireless_ap-count, text: 'AP Count' }
+    - { graph: device_wireless_clients, text: 'Client Count' }
+    - { graph: device_arubacontroller_numaps, text: 'Number of APs (Legacy)' }
+    - { graph: device_arubacontroller_numclients, text: 'Number of Clients (Legacy)' }
 poller_modules:
     aruba-controller: true
 discovery:

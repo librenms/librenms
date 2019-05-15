@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -35,6 +36,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 
 class Arubaos extends OS implements
+    WirelessApCountDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessFrequencyPolling,
@@ -50,9 +52,23 @@ class Arubaos extends OS implements
      */
     public function discoverWirelessClients()
     {
-        $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated
+        $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2.0'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0
         return [
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Clients')
+            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Client Count')
+        ];
+    }
+
+    /**
+     * Discover wireless AP counts. Type is ap-count.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessApCount()
+    {
+        $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.1.0'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumAccessPoints.0
+        return [
+            new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'arubaos', 1, 'AP Count')
         ];
     }
 
