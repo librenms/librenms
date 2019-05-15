@@ -16,7 +16,7 @@ $oidList = [
     'HUAWEI-DEVICE-EXT-MIB::hwProductName.0',
     'HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1',
     'HUAWEI-MIB::mlsr.20.1.1.1.3.0',
-    ];
+];
 
 foreach ($oidList as $oid) {
     $hardware_tmp = snmp_get($device, $oid, '-OQv');
@@ -34,39 +34,38 @@ if (empty($hardware_tmp) && !empty($matches[1])) {
 
 // Polling the Wireless data
 
-global $config;
 use LibreNMS\RRD\RrdDefinition;
 
 // check for Wireless Capability
-$apTable = array();
-$apTable = snmpwalk_group($device, 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2, $apTable);
+$apTable = snmpwalk_group($device, 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);
 
 //Check for exitence of at least 1 AP to continue the polling)
 if (!empty($apTable)) {
-    $apTableOids = array(
-            'hwWlanApSn',
-            'hwWlanApTypeInfo',
-            );
+    $apTableOids = [
+        'hwWlanApSn',
+        'hwWlanApTypeInfo',
+    ];
     foreach ($apTableOids as $apTableOid) {
         $apTable = snmpwalk_group($device, $apTableOid, 'HUAWEI-WLAN-AP-MIB', 2, $apTable);
     }
 
-    $apRadioTableOids = array( // hwWlanRadioInfoTable
-            'hwWlanRadioMac',
-            'hwWlanRadioChUtilizationRate',
-            'hwWlanRadioChInterferenceRate',
-            'hwWlanRadioActualEIRP',
-            'hwWlanRadioFreqType',
-            'hwWlanRadioWorkingChannel',
-            );
+    $apRadioTableOids = [ // hwWlanRadioInfoTable
+        'hwWlanRadioMac',
+        'hwWlanRadioChUtilizationRate',
+        'hwWlanRadioChInterferenceRate',
+        'hwWlanRadioActualEIRP',
+        'hwWlanRadioFreqType',
+        'hwWlanRadioWorkingChannel',
+    ];
 
-    $radioTable = array();
+    $clientPerRadio = [];
+    $radioTable = [];
     foreach ($apRadioTableOids as $apRadioTableOid) {
         $radioTable = snmpwalk_group($device, $apRadioTableOid, 'HUAWEI-WLAN-AP-RADIO-MIB', 2, $radioTable);
     }
 
     $numClients = 0;
-    $vapInfoTable = snmpwalk_group($device, 'hwWlanVapStaOnlineCnt', 'HUAWEI-WLAN-VAP-MIB', 3, array());
+    $vapInfoTable = snmpwalk_group($device, 'hwWlanVapStaOnlineCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
     foreach ($vapInfoTable as $ap_id => $ap) {
         //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
         //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
@@ -84,15 +83,15 @@ if (!empty($apTable)) {
         ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
         ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
 
-    $fields = array(
-            'NUMAPS'     => $numRadios,
-            'NUMCLIENTS' => $numClients,
-            );
+    $fields = [
+        'NUMAPS'     => $numRadios,
+        'NUMCLIENTS' => $numClients,
+    ];
 
     $tags = compact('rrd_def');
     data_update($device, 'vrp', $tags, $fields);
 
-    $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', array($device['device_id']));
+    $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', [$device['device_id']]);
 
     foreach ($radioTable as $ap_id => $ap) {
         foreach ($ap as $r_id => $radio) {
@@ -130,7 +129,7 @@ if (!empty($apTable)) {
             d_echo("  numasoclients: $numasoclients\n");
             d_echo("  interference: $interference\n");
 
-            $rrd_name = array('arubaap', $name.$radionum);
+            $rrd_name = ['arubaap', $name.$radionum];
             $rrd_def = RrdDefinition::make()
                 ->addDataset('channel', 'GAUGE', 0, 200)
                 ->addDataset('txpow', 'GAUGE', 0, 200)
@@ -140,15 +139,15 @@ if (!empty($apTable)) {
                 ->addDataset('numasoclients', 'GAUGE', 0, 500)
                 ->addDataset('interference', 'GAUGE', 0, 2000);
 
-            $fields = array(
-                    'channel'         => $channel,
-                    'txpow'           => $txpow,
-                    'radioutil'       => $radioutil,
-                    'nummonclients'   => $nummonclients,
-                    'nummonbssid'     => $nummonbssid,
-                    'numasoclients'   => $numasoclients,
-                    'interference'    => $interference,
-                    );
+            $fields = [
+                'channel'         => $channel,
+                'txpow'           => $txpow,
+                'radioutil'       => $radioutil,
+                'nummonclients'   => $nummonclients,
+                'nummonbssid'     => $nummonbssid,
+                'numasoclients'   => $numasoclients,
+                'interference'    => $interference,
+            ];
 
             $tags = compact('name', 'radionum', 'rrd_name', 'rrd_def');
             data_update($device, 'arubaap', $tags, $fields);
@@ -165,7 +164,7 @@ if (!empty($apTable)) {
 
             if ($foundid == 0) {
                 $ap_id = dbInsert(
-                    array(
+                    [
                         'device_id' => $device['device_id'],
                         'name' => $name,
                         'radio_number' => $radionum,
@@ -179,12 +178,12 @@ if (!empty($apTable)) {
                         'numactbssid' => $numactbssid,
                         'nummonbssid' => $nummonbssid,
                         'interference' => $interference
-                        ),
+                    ],
                     'access_points'
                 );
             } else {
                 dbUpdate(
-                    array(
+                    [
                         'mac_addr' => $mac,
                         'type' => $type,
                         'deleted' => 0,
@@ -196,10 +195,10 @@ if (!empty($apTable)) {
                         'numactbssid' => $numactbssid,
                         'nummonbssid' => $nummonbssid,
                         'interference' => $interference
-                        ),
+                    ],
                     'access_points',
                     '`accesspoint_id` = ?',
-                    array($foundid)
+                    [$foundid]
                 );
             }
         }//end foreach 1
@@ -207,7 +206,7 @@ if (!empty($apTable)) {
 
     for ($z = 0; $z < sizeof($ap_db); $z++) {
         if (!isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted'] == 0) {
-            dbUpdate(array('deleted' => 1), 'access_points', '`accesspoint_id` = ?', array($ap_db[$z]['accesspoint_id']));
+            dbUpdate(['deleted' => 1], 'access_points', '`accesspoint_id` = ?', [$ap_db[$z]['accesspoint_id']]);
         }
     }
 }
