@@ -14,10 +14,7 @@ $data = explode(" ", $device['sysDescr']);
 $hardware = $data[0];
 $version = $data[9];
 
-if (str_contains($data, 'PLANET IGS-')) {
+if (str_contains($data[1], 'PLANET IGS-')) {
     $hardware = $data[1];
-    $version = trim(snmp_get($device, "1.3.6.1.2.1.47.1.1.1.1.10.1", "-Ovq"), '"');
-} else {
-    $hardware = $data[0];
-    $version = $data[9];
+    $version = snmp_get($device, "1.3.6.1.2.1.47.1.1.1.1.10.1", "-Ovq");
 }
