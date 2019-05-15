@@ -34,10 +34,6 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 
-//use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
-//use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
-//use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
-
 class Vrp extends OS implements
     ProcessorDiscovery,
     NacPolling,
