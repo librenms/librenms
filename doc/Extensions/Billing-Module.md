@@ -49,7 +49,7 @@ To change the default option to Aggregate,
 add the following the `config.php`:
 
 ```php
-$config['95th_default_agg'] = 1;  // Set aggregate 95th as default
+$config['billing']['95th_default_agg'] = 1;  // Set aggregate 95th as default
 ```
 
 This configuration setting is cosmetic and only changes the default selected option 
