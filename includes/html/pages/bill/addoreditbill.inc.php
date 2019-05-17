@@ -43,19 +43,19 @@
     <div class="col-sm-8">
       <label class="radio-inline">
        <input type="radio" name="dir_95th" id="dir_95th_inout" value="in"
-            <?php
-            if ($bill_data['dir_95th'] == 'in' || $bill_data['dir_95th'] == 'out') {
-                 echo "checked";
-            }
-            ?> /> Max In/Out
+           <?php
+           if ($bill_data['dir_95th'] == 'in' || $bill_data['dir_95th'] == 'out') {
+                echo "checked";
+           }
+           ?> /> Max In/Out
        </label>
       <label class="radio-inline">
        <input type="radio" name="dir_95th" id="dir_95th_agg" value="agg"
-            <?php
-            if ($bill_data['dir_95th'] == 'agg') {
-                 echo "checked";
-            }
-            ?> /> Aggregate
+           <?php
+           if ($bill_data['dir_95th'] == 'agg') {
+                echo "checked";
+           }
+           ?> /> Aggregate
        </label>
     </div>
   </div>
