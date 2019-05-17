@@ -74,7 +74,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
 
 <?php
 
-    if (Config::get('95th_default_agg') == 1) {
+    if (Config::get('billing.95th_default_agg') == 1) {
         $bill_data['dir_95th'] = 'agg';
     } else {
         $bill_data['dir_95th'] = 'in';
