@@ -43,7 +43,7 @@ For 95th Percentile billing, the default behavior is to use the highest of the i
 or output 95th Percentile calculation.
 
 To instead use the combined total of inout + output to derive the 95th percentile,
-This can be changed on a per basis by setting 95th Calculation to "Aggregate".
+This can be changed on a per bill basis by setting 95th Calculation to "Aggregate".
 
 To change the default option to Aggregate,
 add the following the `config.php`:
