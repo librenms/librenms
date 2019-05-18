@@ -1,8 +1,9 @@
 <?php
 use Librenms\Config;
+
 $no_refresh = true;
 ?>
-<table id="inetCidrRoute" class="table table-condensed table-hover table-striped">
+<table id="routes" class="table table-condensed table-hover table-striped">
     <thead>
         <tr>
             <th data-column-id="context_name" data-width="125px">VRF</th>
@@ -22,7 +23,7 @@ $no_refresh = true;
 <div>Warning: Routing Table is only retrieved during device discovery. Devices are skipped if they have more than <?php echo Config::get('routes.max_number');?> routes.</div>
 <script>
 
-var grid = $("#inetCidrRoute").bootgrid({
+var grid = $("#routes").bootgrid({
     ajax: true,
     post: function ()
     {
@@ -30,6 +31,6 @@ var grid = $("#inetCidrRoute").bootgrid({
             device_id: "<?php echo $device['device_id']; ?>",
         };
     },
-    url: "ajax/table/inetCidrRoute"
+    url: "ajax/table/routes"
 });
 </script>

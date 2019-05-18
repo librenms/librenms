@@ -24,7 +24,7 @@ $ipForwardMibRoutesNumber = snmp_get($device, 'IP-FORWARD-MIB::inetCidrRouteNumb
 $ipForwardNb = snmp_get_multi($device, ['inetCidrRouteNumber.0', 'ipCidrRouteNumber.0'], '-OQUs', 'IP-FORWARD-MIB');
 
 //Get the configured max routes number
-$max_routes = 10000;
+$max_routes = 1000;
 if (null != (Config::get('routes.max_number'))) {
     $max_routes = Config::get('routes.max_number');
 }
@@ -84,10 +84,14 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
         $entryClean['inetCidrRouteIfIndex'] = $ipRoute['ipRouteIfIndex'];
         $entryClean['context_name'] = '';
         $entryClean['device_id'] = $device['device_id'];
+        $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
         $entryClean['updated_at'] = array('NOW()');
         $entryClean['inetCidrRouteNextHop_device_id'] = $device['device_id'];
         if ($entryClean['inetCidrRouteNextHop'] != '127.0.0.1' && $entryClean['inetCidrRouteNextHop'] != 'fe80::') {
-            $entryClean['inetCidrRouteNextHop_device_id'] = Device::findByIp($entryClean['inetCidrRouteNextHop'])->device_id;
+            $next_device = Device::findByIp($entryClean['inetCidrRouteNextHop']);
+            if ($next_device) {
+                $entryClean['inetCidrRouteNextHop_device_id'] = $next_device->device_id;
+            }
         };
         $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
         if (isset($current) && isset($current['db']) && count($current['db']) > 0 &&  $delete_row[$current['db']['inetCidrRoute_id']] != 1) {
@@ -133,6 +137,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                     $entry['inetCidrRouteNextHop'] = $inetCidrRouteNextHop;
                     $entry['context_name'] = '';
                     $entry['device_id'] = $device['device_id'];
+                    $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
                     $entry['updated_at'] = array('NOW()');
                     $entry['inetCidrRouteNextHop_device_id'] = $device['device_id'];
                     if ($entry['inetCidrRouteNextHop'] != '127.0.0.1') {
@@ -200,6 +205,7 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
                     $entryClean['inetCidrRouteNextHopAS'] = $entry['ipCidrRouteNextHopAS'];
                     $entryClean['context_name'] = '';
                     $entryClean['device_id'] = $device['device_id'];
+                    $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
                     $entryClean['updated_at'] = array('NOW()');
                     $entryClean['inetCidrRouteNextHop_device_id'] = $device['device_id'];
                     if ($entryClean['inetCidrRouteNextHop'] != '127.0.0.1' && $entryClean['inetCidrRouteNextHop'] != 'fe80::') {
@@ -261,6 +267,7 @@ if ($mpls_skip != 1) {
                         $entry['inetCidrRouteNextHop'] = $inetCidrRouteNextHop;
                         $entry['context_name'] = $vpnId;
                         $entry['device_id'] = $device['device_id'];
+                        $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
                         $entry['updated_at'] = array('NOW()');
                         $entry['inetCidrRouteNextHop_device_id'] = $device['device_id'];
                         if ($entry['inetCidrRouteNextHop'] != '127.0.0.1') {
@@ -303,12 +310,9 @@ if ($mpls_skip != 1) {
         }
     }
 }
-echo "\n";
+echo "\nProcessing: ";
 
 // We can now process the data into the DB
-
-d_echo('Delete');
-d_echo($delete_row);
 foreach ($delete_row as $k => $v) {
     if ($v > 0) {
         dbDelete(
@@ -321,20 +325,19 @@ foreach ($delete_row as $k => $v) {
     }
 }
 
-d_echo('Update');
-//d_echo($update_row);
 foreach ($update_row as $upd_entry) {
     dbUpdate(
-            $upd_entry,
-            'inetCidrRoute',
-            '`inetCidrRoute_id` = ?',
-            array($upd_entry['inetCidrRoute_id'])
-            );
+        $upd_entry,
+        'inetCidrRoute',
+        '`inetCidrRoute_id` = ?',
+        array($upd_entry['inetCidrRoute_id'])
+    );
     echo '.';
 }
-d_echo('Create');
-d_echo($create_row);
+
 foreach ($create_row as $new_entry) {
     dbInsert($new_entry, 'inetCidrRoute');
     echo '+';
 }
+
+// EOF

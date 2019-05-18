@@ -19,6 +19,7 @@ class UpdateRouteTable extends Migration
               $table->increments('inetCidrRoute_id');
               $table->timestamps();
               $table->unsignedInteger('device_id');
+              $table->unsignedInteger('port_id');
               $table->string('context_name')->nullable();
               $table->bigInteger('inetCidrRouteIfIndex');
               $table->unsignedInteger('inetCidrRouteType');

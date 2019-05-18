@@ -161,7 +161,10 @@ class RoutesTablesController extends TableController
         }
 
         if ($route_entry->inetCidrRouteIfIndex) {
-            $item['inetCidrRouteIfIndex'] = Url::portLink($route_entry->getPort(), $route_entry->getPort()->getShortLabel());
+            $port = $route_entry->port()->first();
+            if ($port) {
+                $item['inetCidrRouteIfIndex'] = Url::portLink($port, $port->getShortLabel());
+            }
         }
 
         if ($route_entry->inetCidrRouteNextHop_device_id) {
