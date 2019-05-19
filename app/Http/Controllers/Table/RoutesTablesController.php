@@ -127,30 +127,6 @@ class RoutesTablesController extends TableController
 
     public function formatItem($route_entry)
     {
-        $translateProto[1] = '1-other';
-        $translateProto[2] = '2-local';
-        $translateProto[3] = '3-netmgmt';
-        $translateProto[4] = '4-icmp';
-        $translateProto[5] = '5-egp';
-        $translateProto[6] = '6-ggp';
-        $translateProto[7] = '7-hello';
-        $translateProto[8] = '8-rip';
-        $translateProto[9] = '9-isIs';
-        $translateProto[10] = '10-esIs';
-        $translateProto[11] = '11-ciscoIgrp';
-        $translateProto[12] = '12-bbnSpfIgp';
-        $translateProto[13] = '13-ospf';
-        $translateProto[14] = '14-bgp';
-        $translateProto[15] = '15-idpr';
-        $translateProto[16] = '16-ciscoEigrp';
-        $translateProto[17] = '17-dvmrp';
-
-        $translateType[1] = '1-other';
-        $translateType[2] = '2-reject';
-        $translateType[3] = '3-local';
-        $translateType[4] = '4-remote';
-        $translateType[5] = '5-blackhole';
-
         $item = $route_entry->toArray();
 
         if ($route_entry->updated_at) {
@@ -175,15 +151,14 @@ class RoutesTablesController extends TableController
                 $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . "<br>(" . Url::deviceLink($device) . ")";
             }
         }
-        if ($route_entry->inetCidrRouteProto && $translateProto[$route_entry->inetCidrRouteProto]) {
-            $item['inetCidrRouteProto'] = $translateProto[$route_entry->inetCidrRouteProto];
+        if ($route_entry->inetCidrRouteProto && $route_entry::$translateProto[$route_entry->inetCidrRouteProto]) {
+            $item['inetCidrRouteProto'] = $route_entry::$translateProto[$route_entry->inetCidrRouteProto];
         }
-        if ($route_entry->inetCidrRouteType && $translateType[$route_entry->inetCidrRouteType]) {
-            $item['inetCidrRouteType'] = $translateType[$route_entry->inetCidrRouteType];
+        if ($route_entry->inetCidrRouteType && $route_entry::$translateType[$route_entry->inetCidrRouteType]) {
+            $item['inetCidrRouteType'] = $route_entry::$translateType[$route_entry->inetCidrRouteType];
         }
-        if ($route_entry->context_name == '') {
-            $item['context_name'] = '[global]';
-        } else {
+        $item['context_name'] = '[global]';
+        if ($route_entry->context_name != '') {
             $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . $route_entry->context_name . '</a>' ;
         }
         return $item;
