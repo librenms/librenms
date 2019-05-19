@@ -94,37 +94,27 @@ class RoutesTablesController extends TableController
     public function sort($request, $query)
     {
         $sort = $request->get('sort');
-
         if (isset($sort['inetCidrRouteIfIndex'])) {
             $query->join('ports', function ($join) {
-                    $join->on('inetCidrRoute.inetCidrRouteIfIndex', 'ports.ifIndex')
-                    ->on('inetCidrRoute.device_id', '=', 'ports.device_id');
+                    $join->on('inetCidrRoute.port_id', 'ports.port_id');
             })
             ->orderBy('ports.ifDescr', $sort['inetCidrRouteIfIndex']);
         }
-        if (isset($sort['inetCidrRouteProto'])) {
-            $query->orderBy('inetCidrRouteProto', $sort['inetCidrRouteProto']);
-        }
-        if (isset($sort['inetCidrRouteType'])) {
-            $query->orderBy('inetCidrRouteType', $sort['inetCidrRouteType']);
-        }
-        if (isset($sort['inetCidrRouteMetric1'])) {
-            $query->orderBy('inetCidrRouteMetric1', $sort['inetCidrRouteMetric1']);
-        }
-        if (isset($sort['inetCidrRoutePfxLen'])) {
-            $query->orderBy('inetCidrRoutePfxLen', $sort['inetCidrRoutePfxLen']);
-        }
-        if (isset($sort['inetCidrRouteNextHop'])) {
-            $query->orderBy('inetCidrRouteNextHop', $sort['inetCidrRouteNextHop']);
-        }
-        if (isset($sort['updated_at'])) {
-            $query->orderBy('updated_at', $sort['updated_at']);
-        }
-        if (isset($sort['created_at'])) {
-            $query->orderBy('created_at', $sort['created_at']);
-        }
-        if (isset($sort['context_name'])) {
-            $query->orderBy('context_name', $sort['context_name']);
+        // Simple fields to sort
+        $s_fields = [
+            'inetCidrRouteDestType',
+            'inetCidrRouteType',
+            'inetCidrRouteMetric1',
+            'inetCidrRoutePfxLen',
+            'inetCidrRouteNextHop',
+            'updated_at',
+            'created_at',
+            'context_name'
+        ];
+        foreach ($s_fields as $s_field) {
+            if (isset($sort[$s_field])) {
+                $query->orderBy($s_field, $sort[$s_field]);
+            }
         }
         return $query;
     }
