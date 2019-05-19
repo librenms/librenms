@@ -134,19 +134,19 @@ class ObjectCache
             });
             switch ($field) {
                 case 'down':
-                    return $query->isNotDeleted()->isDown()->count();
+                    return $query->isDown()->count();
                 case 'up':
-                    return $query->isNotDeleted()->isUp()->count();
+                    return $query->isUp()->count();
                 case 'ignored':
-                    return $query->isNotDeleted()->isIgnored()->count();
+                    return $query->isIgnored()->count();
                 case 'shutdown':
-                    return $query->isNotDeleted()->isShutdown()->count();
+                    return $query->isShutdown()->count();
                 case 'disabled':
-                    return $query->isNotDeleted()->isDisabled()->count();
+                    return $query->isDisabled()->count();
                 case 'deleted':
                     return $query->isDeleted()->count();
                 case 'errored':
-                    return $query->isNotDeleted()->hasErrors()->count();
+                    return $query->hasErrors()->count();
                 case 'pseudowire':
                     return Pseudowire::hasAccess(auth()->user())->count();
                 case 'total':
