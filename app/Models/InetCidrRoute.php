@@ -6,7 +6,7 @@ class InetCidrRoute extends DeviceRelatedModel
 {
     protected $table = 'inetCidrRoute';
     protected $primaryKey = 'inetCidrRoute_id';
-    static $translateProto = [
+    public static $translateProto = [
         '0-undefined',
         '1-other',
         '2-local',
@@ -27,7 +27,7 @@ class InetCidrRoute extends DeviceRelatedModel
         '17-dvmrp'
     ];
 
-    static $translateType = [
+    public static $translateType = [
         '0-undefined',
         '1-other',
         '2-reject',

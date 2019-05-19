@@ -45,7 +45,7 @@ class RoutesTablesController extends TableController
     {
         return [
             'device_id' => 'nullable|integer',
-            'searchby' => 'in:inetCidrRouteNextHop,inetCidrRouteDest,inetCidrRouteProto,inetCidrRouteType',
+            'searchby' => 'in:inetCidrRouteNextHop,inetCidrRouteDest',
             ];
     }
 
@@ -102,26 +102,30 @@ class RoutesTablesController extends TableController
             })
             ->orderBy('ports.ifDescr', $sort['inetCidrRouteIfIndex']);
         }
-
         if (isset($sort['inetCidrRouteProto'])) {
             $query->orderBy('inetCidrRouteProto', $sort['inetCidrRouteProto']);
         }
         if (isset($sort['inetCidrRouteType'])) {
             $query->orderBy('inetCidrRouteType', $sort['inetCidrRouteType']);
         }
-
+        if (isset($sort['inetCidrRouteMetric1'])) {
+            $query->orderBy('inetCidrRouteMetric1', $sort['inetCidrRouteMetric1']);
+        }
+        if (isset($sort['inetCidrRoutePfxLen'])) {
+            $query->orderBy('inetCidrRoutePfxLen', $sort['inetCidrRoutePfxLen']);
+        }
+        if (isset($sort['inetCidrRouteNextHop'])) {
+            $query->orderBy('inetCidrRouteNextHop', $sort['inetCidrRouteNextHop']);
+        }
         if (isset($sort['updated_at'])) {
             $query->orderBy('updated_at', $sort['updated_at']);
         }
-
         if (isset($sort['created_at'])) {
             $query->orderBy('created_at', $sort['created_at']);
         }
-
         if (isset($sort['context_name'])) {
             $query->orderBy('context_name', $sort['context_name']);
         }
-
         return $query;
     }
 
