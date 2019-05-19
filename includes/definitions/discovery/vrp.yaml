@@ -30,7 +30,15 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.5.{{ $index }}'
                     descr: '{{ $entPhysicalName }}'
                     index: '{{ $index }}'
-                    skip_value_lt: -50
+                    skip_values: 
+                        - 
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+                        - 
+                            oid: hwEntityOpticalTemperature
+                            op: '<'
+                            value: '-50'
                 -
                     oid: hwEntityStateTable
                     value: hwEntityTemperature
@@ -108,8 +116,16 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.6.{{ $index }}'
                     descr: '{{ $entPhysicalName }}'
                     index: '{{ $index }}'
-                    skip_values: -1
                     divisor: 1000
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalVoltage
+                            op: '='
+                            value: '-1'
+                        - 
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
         current:
             data:
                 -
@@ -118,8 +134,16 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.7.{{ $index }}'
                     descr: '{{ $entPhysicalName }}'
                     index: '{{ $index }}'
-                    skip_values: -1
                     divisor: 1000000
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: '-1' 
+                        - 
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
         power:
             data:
                 -
