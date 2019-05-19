@@ -1,0 +1,2147 @@
+-- ============================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The mib is used for configuring the information of the SERVICE.
+-- Reference: 
+-- Version: V1.16
+-- ============================================================================
+-- Module definition
+
+	HUAWEI-WLAN-AP-SERVICE-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			hwWlan
+				FROM HUAWEI-WLAN-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+				FROM SNMPv2-CONF
+			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
+			MODULE-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+			MacAddress, RowStatus, DateAndTime
+				FROM SNMPv2-TC;
+		--1.3.6.1.4.1.2011.6.139.19
+		hwWlanService MODULE-IDENTITY
+			LAST-UPDATED "201607291458Z"		-- July 29, 2016 at 14:58 GMT
+			ORGANIZATION
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO
+			 "Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+				  "
+			DESCRIPTION 
+				"V1.16, Add nodes of hwWlanBLESiteAgingTimeout."
+			REVISION "201607291458Z"		-- July 29, 2016 at 14:58 GMT 
+			DESCRIPTION 
+				"V1.15, Add nodes of hwWlanRadioCalibrationSwitchRecordTable."
+			REVISION "201607211046Z"		-- July 21, 2016 at 10:46 GMT
+		        DESCRIPTION 
+				"V1.14, Add nodes of hwWlanApIotCardSupportInfo."
+			REVISION "201607121146Z"		-- July 12, 2016 at 11:46 GMT     
+		        DESCRIPTION 
+				"V1.13, Add nodes of hwWlanApIotCardApName."
+			REVISION "201606011653Z"		-- June 1, 2016 at 16:53 GMT                                                                
+                                                                DESCRIPTION
+				"V1.12, Add hwWlanWdsLinkSecondChannel and hwWlanMeshLinkSecondChannel."
+			REVISION "201605271453Z"		-- May 27, 2016 at 14:53 GMT
+			
+                                                                DESCRIPTION
+				"V1.11, modify the index of hwWlanApIotCardTable."
+			REVISION "201605141130Z"		-- May 14, 2016 at 11:30 GMT
+
+		        DESCRIPTION 
+				"V1.10, Add nodes of hwWlanRadioChSwitchRecordOldSecChannel and hwWlanRadioChSwitchRecordNewSecChannel."
+			REVISION "201605051434Z"		-- May 5, 2016 at 14:34 GMT
+						DESCRIPTION 
+				"V1.09, Add hwWlanRadioCalibrationSwitchRecordTable."
+			REVISION "201604151434Z"		-- April 15, 2016 at 14:34 GMT
+                        DESCRIPTION 
+				"V1.08, Add hwWlanRadioCalibrateStatisicsApId."
+			REVISION "201601121534Z"		-- Feb 16, 2016 at 15:34 GMT
+                        DESCRIPTION 
+				"The MIB module defines the information of the SERVICE."
+			REVISION "201601121534Z"		-- Jan 12, 2016 at 15:34 GMT
+			DESCRIPTION
+				"V1.07, Add hwWlanBLESiteInfoTable and hwWlanApIotCardTable."
+			REVISION "201509011030Z"		-- Sept 1, 2015 at 10:30 GMT
+			DESCRIPTION
+				"V1.05, modify the value of hwWlanMeshLinkPeerAPStatus and hwWlanWdsLinkPeerAPStatus."
+			REVISION "201508051030Z"		-- Aug 5, 2015 at 10:30 GMT
+			DESCRIPTION
+				"V1.05, modify the value of hwWlanMeshLinkPeerAPStatus and hwWlanWdsLinkPeerAPStatus."
+			REVISION "201505121542Z"		-- May 12, 2015 at 15:42 GMT
+			DESCRIPTION
+				"V1.04, Add the description of mib nodes."
+			REVISION "201505041542Z"		-- May 4, 2015 at 15:42 GMT
+			DESCRIPTION
+				"V1.03, modify the value of hwWlanMeshLinkPeerAPStatus and hwWlanWdsLinkPeerAPStatus and the name of hwWlanNeighborApUpdateTime"
+			REVISION "201504231611Z"		-- April 23, 2015 at 16:11 GMT
+			DESCRIPTION
+				"V1.02, modify the name of the node of hwWlanMacWdsLinkWdsMode."
+			REVISION "201504081131Z"		-- April 8, 2015 at 11:31 GMT
+			DESCRIPTION
+				"V1.01, Delete the name of the node of hwWlanWdsLinkResendFrames,hwWlanWdsLinkSendDropFrames,hwWlanWdsLinkResendFrames,
+				hwWlanMeshLinkResendFrames,hwWlanMeshLinkSendDropFrames,hwWlanMeshLinkResendFrames."
+	                REVISION "201502051055Z"		-- February 5, 2015 at 10:55 GMT
+			DESCRIPTION
+				"V1.00, Inital version."
+			::= { hwWlan 19 }
+
+--
+--Node definitions
+--
+
+		--1.3.6.1.4.1.2011.6.139.19.1
+		hwWlanServiceObjects OBJECT IDENTIFIER ::= { hwWlanService 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.1
+		hwWlanWds OBJECT IDENTIFIER ::= { hwWlanServiceObjects 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.1.1
+		hwWlanWdsVapInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWdsVapInfoEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query WDS VAP information."
+			::= { hwWlanWds 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.1.1.1
+		hwWlanWdsVapInfoEntry OBJECT-TYPE
+			SYNTAX HwWlanWdsVapInfoEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanWdsVapApMac, hwWlanWdsVapRadioIndex, and hwWlanWdsVapWdsProfileName."
+			INDEX { hwWlanWdsVapApMac, hwWlanWdsVapRadioIndex, hwWlanWdsVapWdsProfileName }
+			::= { hwWlanWdsVapInfoTable 1 }
+
+
+		HwWlanWdsVapInfoEntry ::=
+			SEQUENCE {				
+				hwWlanWdsVapApMac
+					MacAddress,
+				hwWlanWdsVapRadioIndex
+					Integer32,
+				hwWlanWdsVapWdsProfileName
+					OCTET STRING,
+				hwWlanWdsVapBssid
+					OCTET STRING 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.1.1.1
+		hwWlanWdsVapApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the AP."
+			::= { hwWlanWdsVapInfoEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.1.1.2
+		hwWlanWdsVapRadioIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio index."
+			::= { hwWlanWdsVapInfoEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.1.1.3
+		hwWlanWdsVapWdsProfileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the WDS profile name."
+			::= { hwWlanWdsVapInfoEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.1.1.4
+		hwWlanWdsVapBssid OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the BSS ID."
+			::= { hwWlanWdsVapInfoEntry 4 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.1.2
+		hwWlanWdsLinkTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWdsLinkEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query WDS link information."
+			::= { hwWlanWds 2 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.1.2.1
+		hwWlanWdsLinkEntry OBJECT-TYPE
+			SYNTAX HwWlanWdsLinkEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanWdsLinkApMac, hwWlanWdsLinkApRadioId, and hwWlanWdsLinkIndex."
+			INDEX { hwWlanWdsLinkApMac, hwWlanWdsLinkApRadioId, hwWlanWdsLinkIndex }
+			::= { hwWlanWdsLinkTable 1 }
+
+
+		HwWlanWdsLinkEntry ::=
+			SEQUENCE {				
+				hwWlanWdsLinkApMac
+					MacAddress,
+				hwWlanWdsLinkApRadioId
+					Integer32,
+				hwWlanWdsLinkIndex
+					Integer32,
+				hwWlanWdsLinkWlanID
+					Integer32,
+				hwWlanWdsLinkApName
+					OCTET STRING,
+				hwWlanWdsLinkApGroup
+					OCTET STRING,
+				hwWlanWdsLinkPeerApMac
+					MacAddress,
+				hwWlanWdsLinkPeerApName
+					OCTET STRING,
+				hwWlanWdsLinkWdsProfileName
+					OCTET STRING,
+				hwWlanMacWdsLinkWdsMode
+					INTEGER,
+				hwWlanWdsLinkWdsType
+					INTEGER,
+				hwWlanWdsLinkStpMode
+					INTEGER,
+				hwWlanWdsLinkInstanceIdList
+					OCTET STRING,
+				hwWlanWdsLinkInstanceStateList
+					OCTET STRING,
+				hwWlanWdsLinkCoverageDistance
+					Integer32,
+				hwWlanWdsLinkChannel
+					Integer32,
+				hwWlanWdsLinkMaxRssi
+					Integer32,
+				hwWlanWdsLinkRssi
+					Integer32,
+				hwWlanWdsLinkSnr
+					Integer32,
+				hwWlanWdsLinkPER
+					Integer32,
+				hwWlanWdsLinkResendRatio
+					Integer32,
+				hwWlanWdsLinkPeerAPStatus
+					INTEGER,
+				hwWlanWdsLinkApId
+					Unsigned32,
+				hwWlanWdsLinkPeerApId
+					Unsigned32,
+				hwWlanWdsLinkSecondChannel
+					Integer32
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.1
+		hwWlanWdsLinkApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the local AP."
+			::= { hwWlanWdsLinkEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.2
+		hwWlanWdsLinkApRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio ID of the local AP."
+			::= { hwWlanWdsLinkEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.3
+		hwWlanWdsLinkIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the index of the virtual link."
+			::= { hwWlanWdsLinkEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.4
+		hwWlanWdsLinkWlanID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the WLAN ID."
+			::= { hwWlanWdsLinkEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.5
+		hwWlanWdsLinkApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the local AP."
+			::= { hwWlanWdsLinkEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.6
+		hwWlanWdsLinkApGroup OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the group to which the local AP belongs."
+			::= { hwWlanWdsLinkEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.7
+		hwWlanWdsLinkPeerApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the peer AP."
+			::= { hwWlanWdsLinkEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.8
+		hwWlanWdsLinkPeerApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the peer AP."
+			::= { hwWlanWdsLinkEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.9
+		hwWlanWdsLinkWdsProfileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the WDS profile."
+			::= { hwWlanWdsLinkEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.10
+		hwWlanMacWdsLinkWdsMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				middle(1) ,
+				root(2) ,
+				leaf(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the role of the local AP."
+			::= { hwWlanWdsLinkEntry 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.11
+		hwWlanWdsLinkWdsType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				sta(1),
+				ap(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the link subtype."
+			::= { hwWlanWdsLinkEntry 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.12
+		hwWlanWdsLinkStpMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				stp(1),
+				mstp(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the STP mode."
+			::= { hwWlanWdsLinkEntry 12 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.13
+		hwWlanWdsLinkInstanceIdList OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the forwarding state ID of the instance."
+			::= { hwWlanWdsLinkEntry 13 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.14
+		hwWlanWdsLinkInstanceStateList OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the forwarding state of the instance."
+			::= { hwWlanWdsLinkEntry 14 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.15
+		hwWlanWdsLinkCoverageDistance OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the coverage distance of the local AP. The unit is 100 m."
+			::= { hwWlanWdsLinkEntry 15 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.16
+		hwWlanWdsLinkChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the link channel."
+			::= { hwWlanWdsLinkEntry 16 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.17
+		hwWlanWdsLinkMaxRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the maximum RSSI of the link."
+			::= { hwWlanWdsLinkEntry 17 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.18
+		hwWlanWdsLinkRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the RSSI of the link."
+			::= { hwWlanWdsLinkEntry 18 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.19
+		hwWlanWdsLinkSnr OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the SNR. The unit is 0.01 dB."
+			::= { hwWlanWdsLinkEntry 19 }
+
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.20
+		hwWlanWdsLinkPER OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the packet error rate."
+			::= { hwWlanWdsLinkEntry 20 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.21
+		hwWlanWdsLinkResendRatio OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the packet retransmission ratio."
+			::= { hwWlanWdsLinkEntry 21 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.22
+		hwWlanWdsLinkPeerAPStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				idle(1) ,
+				autofind(2) ,
+				typeNotMatch(3) ,
+				fault(4) ,
+				config(5) ,
+				configFailed(6) ,
+				download(7) ,
+				normal(8) ,
+				committing(9) ,
+				commitFailed(10) ,
+				standby(11) ,
+				verMismatch(12),
+				nameConflicted(13),
+				invalid(14)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the status of the peer AP."
+			::= { hwWlanWdsLinkEntry 22 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.1.2.1.23
+		hwWlanWdsLinkApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP ID."
+			::= { hwWlanWdsLinkEntry 23 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.1.2.1.24
+		hwWlanWdsLinkPeerApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the peer AP ID."
+			::= { hwWlanWdsLinkEntry 24 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.1.2.1.25
+		hwWlanWdsLinkSecondChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the second channel ID."
+			::= { hwWlanWdsLinkEntry 25 }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2
+		hwWlanMesh OBJECT IDENTIFIER ::= { hwWlanServiceObjects 2 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.2.1
+		hwWlanMeshVapInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanMeshVapInfoEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query Mesh VAP information."
+			::= { hwWlanMesh 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.2.1.1
+		hwWlanMeshVapInfoEntry OBJECT-TYPE
+			SYNTAX HwWlanMeshVapInfoEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanMeshVapApMac, hwWlanMeshVapRadioIndex, and hwWlanMeshVapMeshProfileName."
+			INDEX { hwWlanMeshVapApMac, hwWlanMeshVapRadioIndex, hwWlanMeshVapMeshProfileName }
+			::= { hwWlanMeshVapInfoTable 1 }
+
+
+		HwWlanMeshVapInfoEntry ::=
+			SEQUENCE {				
+				hwWlanMeshVapApMac
+					MacAddress,
+				hwWlanMeshVapRadioIndex
+					Integer32,
+				hwWlanMeshVapMeshProfileName
+					OCTET STRING,
+				hwWlanMeshVapBssid
+					MacAddress 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.1.1.1
+		hwWlanMeshVapApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP index."
+			::= { hwWlanMeshVapInfoEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.1.1.2
+		hwWlanMeshVapRadioIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio index."
+			::= { hwWlanMeshVapInfoEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.1.1.3
+		hwWlanMeshVapMeshProfileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Mesh profile name."
+			::= { hwWlanMeshVapInfoEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.1.1.4
+		hwWlanMeshVapBssid OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the BSS ID."
+			::= { hwWlanMeshVapInfoEntry 4 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.2.2
+		hwWlanMeshLinkTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanMeshLinkEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query Mesh link information."
+			::= { hwWlanMesh 2 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.2.2.1
+		hwWlanMeshLinkEntry OBJECT-TYPE
+			SYNTAX HwWlanMeshLinkEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanMeshLinkApMac, hwWlanMeshLinkApRadioId, and hwWlanMeshLinkIndex."
+			INDEX { hwWlanMeshLinkApMac, hwWlanMeshLinkApRadioId, hwWlanMeshLinkIndex }
+			::= { hwWlanMeshLinkTable 1 }
+
+
+		HwWlanMeshLinkEntry ::=
+			SEQUENCE {				
+				hwWlanMeshLinkApMac
+					MacAddress,
+				hwWlanMeshLinkApRadioId
+					Integer32,
+				hwWlanMeshLinkIndex
+					Integer32,
+				hwWlanMeshLinkApName
+					OCTET STRING,
+				hwWlanMeshLinkApGroup
+					OCTET STRING,
+				hwWlanMeshLinkMeshRole
+					INTEGER,
+				hwWlanMeshLinkWlanID
+					Integer32,
+				hwWlanMeshLinkPeerApMac
+					MacAddress,
+				hwWlanMeshLinkPeerApName
+					OCTET STRING,
+				hwWlanMeshLinkChannelID
+					Integer32,
+				hwWlanMeshLinkCoverageDistance
+					Integer32,
+				hwWlanMeshLinkRssiValue
+					Integer32,
+				hwWlanMeshLinkMaxRssi
+					Integer32,
+				hwWlanMeshLinkSnr
+					Integer32,
+				hwWlanMeshLinkPER
+					Integer32,
+				hwWlanMeshLinkResendRatio
+					Integer32,
+				hwWlanMeshLinkPeerAPStatus
+					INTEGER,
+				hwWlanMeshLinkApId
+					Unsigned32,
+				hwWlanMeshLinkPeerApId
+					Unsigned32,
+				hwWlanMeshLinkSecondChannel
+					Integer32
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.1
+		hwWlanMeshLinkApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the local AP."
+			::= { hwWlanMeshLinkEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.2
+		hwWlanMeshLinkApRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio ID of the local AP."
+			::= { hwWlanMeshLinkEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.3
+		hwWlanMeshLinkIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Mesh link index."
+			::= { hwWlanMeshLinkEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.4
+		hwWlanMeshLinkApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the local AP."
+			::= { hwWlanMeshLinkEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.5
+		hwWlanMeshLinkApGroup OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the group to which the local AP belongs."
+			::= { hwWlanMeshLinkEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.6
+		hwWlanMeshLinkMeshRole OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				meshNode(1) ,
+				meshPortal(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the role of the local AP."
+			::= { hwWlanMeshLinkEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.7
+		hwWlanMeshLinkWlanID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the WLAN ID."
+			::= { hwWlanMeshLinkEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.8
+		hwWlanMeshLinkPeerApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the peer AP."
+			::= { hwWlanMeshLinkEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.9
+		hwWlanMeshLinkPeerApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the peer AP."
+			::= { hwWlanMeshLinkEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.10
+		hwWlanMeshLinkChannelID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel ID."
+			::= { hwWlanMeshLinkEntry 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.11
+		hwWlanMeshLinkCoverageDistance OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the coverage distance of the local AP. The unit is 100 m."
+			::= { hwWlanMeshLinkEntry 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.12
+		hwWlanMeshLinkRssiValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the RSSI value."
+			::= { hwWlanMeshLinkEntry 12 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.13
+		hwWlanMeshLinkMaxRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the maximum RSSI."
+			::= { hwWlanMeshLinkEntry 13 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.14
+		hwWlanMeshLinkSnr OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the SNR. The unit is 0.01 dB."
+			::= { hwWlanMeshLinkEntry 14 }
+
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.15
+		hwWlanMeshLinkPER OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the packet error rate."
+			::= { hwWlanMeshLinkEntry 15 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.16
+		hwWlanMeshLinkResendRatio OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the packet retransmission ratio."
+			::= { hwWlanMeshLinkEntry 16 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.17
+		hwWlanMeshLinkPeerAPStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				idle(1) ,
+				autofind(2) ,
+				typeNotMatch(3) ,
+				fault(4) ,
+				config(5) ,
+				configFailed(6) ,
+				download(7) ,
+				normal(8) ,
+				committing(9) ,
+				commitFailed(10) ,
+				standby(11) ,
+				verMismatch(12),
+				nameConflicted(13),
+				invalid(14)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the status of the peer AP."
+			::= { hwWlanMeshLinkEntry 17 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.18
+		hwWlanMeshLinkApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP ID."
+			::= { hwWlanMeshLinkEntry 18 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.19
+		hwWlanMeshLinkPeerApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the peer AP ID."
+			::= { hwWlanMeshLinkEntry 19 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.20
+		hwWlanMeshLinkSecondChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the second channel ID."
+			::= { hwWlanMeshLinkEntry 20 }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.3
+		hwWlanCalibrateInfo OBJECT IDENTIFIER ::= { hwWlanServiceObjects 3 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.3.1
+		hwWlanRadioCalibrateStatisicsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanRadioCalibrateStatisicsEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query and clear the number of radio environment deterioration reporting and the number of times that transmit power and channel are automatically calibrated."
+			::= { hwWlanCalibrateInfo 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.3.1.1
+		hwWlanRadioCalibrateStatisicsEntry OBJECT-TYPE
+			SYNTAX HwWlanRadioCalibrateStatisicsEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanRadioCalibrateStatisicsApMac and hwWlanRadioCalibrateStatisicsRadioId."
+			INDEX { hwWlanRadioCalibrateStatisicsApMac, hwWlanRadioCalibrateStatisicsRadioId }
+			::= { hwWlanRadioCalibrateStatisicsTable 1 }
+
+
+		HwWlanRadioCalibrateStatisicsEntry ::=
+			SEQUENCE {				
+				hwWlanRadioCalibrateStatisicsApMac
+					MacAddress,
+				hwWlanRadioCalibrateStatisicsRadioId
+					Unsigned32,
+				hwWlanRadioCalStatisSignalBadCount
+					Unsigned32,
+				hwWlanRadioCalStatisCalibratePowerCount
+					Unsigned32,
+				hwWlanRadioCalStatisCalibrateChannelCount
+					Unsigned32,
+				hwWlanRadioCalibrateStatisicsOperMode
+					INTEGER,
+				hwWlanRadioCalibrateStatisicsApId
+					Unsigned32
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.1.1.1
+		hwWlanRadioCalibrateStatisicsApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the AP."
+			::= { hwWlanRadioCalibrateStatisicsEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.1.1.2
+		hwWlanRadioCalibrateStatisicsRadioId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio ID."
+			::= { hwWlanRadioCalibrateStatisicsEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.1.1.3
+		hwWlanRadioCalStatisSignalBadCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of times that radio parameters are automatically calibrated because the packet loss ratio or collision ratio exceeds the threshold."
+			::= { hwWlanRadioCalibrateStatisicsEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.1.1.4
+		hwWlanRadioCalStatisCalibratePowerCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of times transmit power is automatically calibrated."
+			::= { hwWlanRadioCalibrateStatisicsEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.1.1.5
+		hwWlanRadioCalStatisCalibrateChannelCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of times the channel is automatically calibrated."
+			::= { hwWlanRadioCalibrateStatisicsEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.1.1.6
+		hwWlanRadioCalibrateStatisicsOperMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				invalid(-1) ,
+				clearstatistic(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the operation mode."
+			::= { hwWlanRadioCalibrateStatisicsEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.3.1.1.7
+		hwWlanRadioCalibrateStatisicsApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRadioCalibrateStatisicsEntry 7 }
+
+		
+		--1.3.6.1.4.1.2011.6.139.19.1.3.2
+		hwWlanRadioChannelSwitchRecordTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanRadioChannelSwitchRecordEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query the channel switching history, including the changed radio, reason for channel switching, channel switching time, and channels before and after switching."
+			::= { hwWlanCalibrateInfo 2 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.3.2.1
+		hwWlanRadioChannelSwitchRecordEntry OBJECT-TYPE
+			SYNTAX HwWlanRadioChannelSwitchRecordEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanRadioChannelSwitchRecordTimeIndex and hwWlanRadioChannelSwitchRecordSubIndex."
+			INDEX { hwWlanRadioChannelSwitchRecordTimeIndex, hwWlanRadioChannelSwitchRecordSubIndex }
+			::= { hwWlanRadioChannelSwitchRecordTable 1 }
+
+
+		HwWlanRadioChannelSwitchRecordEntry ::=
+			SEQUENCE {				
+				hwWlanRadioChannelSwitchRecordTimeIndex
+					Unsigned32,
+				hwWlanRadioChannelSwitchRecordSubIndex
+					Unsigned32,
+				hwWlanRadioChannelSwitchRecordApName
+					OCTET STRING,
+				hwWlanRadioChannelSwitchRecordRadioId
+					Unsigned32,
+				hwWlanRadioChannelSwitchRecordOldChannel
+					Unsigned32,
+				hwWlanRadioChannelSwitchRecordNewChannel
+					Unsigned32,
+				hwWlanRadioChannelSwitchRecordReason
+					OCTET STRING,
+				hwWlanRadioChannelSwitchRecordTime
+					OCTET STRING, 
+				hwWlanRadioChSwitchRecordOldSecChannel
+					Unsigned32,
+				hwWlanRadioChSwitchRecordNewSecChannel
+					Unsigned32
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.1
+		hwWlanRadioChannelSwitchRecordTimeIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the internal index of the table."
+			::= { hwWlanRadioChannelSwitchRecordEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.2
+		hwWlanRadioChannelSwitchRecordSubIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the internal subindex of the table."
+			::= { hwWlanRadioChannelSwitchRecordEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.3
+		hwWlanRadioChannelSwitchRecordApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP name."
+			::= { hwWlanRadioChannelSwitchRecordEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.4
+		hwWlanRadioChannelSwitchRecordRadioId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio ID."
+			::= { hwWlanRadioChannelSwitchRecordEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.5
+		hwWlanRadioChannelSwitchRecordOldChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel before the switchover."
+			::= { hwWlanRadioChannelSwitchRecordEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.6
+		hwWlanRadioChannelSwitchRecordNewChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel after the switchover."
+			::= { hwWlanRadioChannelSwitchRecordEntry 6 }
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.7
+		hwWlanRadioChannelSwitchRecordReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the reason for channel switching."
+			::= { hwWlanRadioChannelSwitchRecordEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.8
+		hwWlanRadioChannelSwitchRecordTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel switching time."
+			::= { hwWlanRadioChannelSwitchRecordEntry 8 }
+			
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.9
+		hwWlanRadioChSwitchRecordOldSecChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the second channel before the switchover."
+			::= { hwWlanRadioChannelSwitchRecordEntry 9 }
+			
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.2.1.10
+		hwWlanRadioChSwitchRecordNewSecChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the second channel after the switchover."
+			::= { hwWlanRadioChannelSwitchRecordEntry 10 }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.3.3
+		hwWlanRadioResetChannelSwitchRecord OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates deletion of all information.Default value: 1"
+			::= { hwWlanCalibrateInfo 3 }
+			
+			-- 1.3.6.1.4.1.2011.6.139.19.1.3.4
+		hwWlanRadioCalibrationSwitchRecordTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanRadioCalibrationSwitchRecordEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query the channel or power switching history causing by calibration, including the changed radio, reason for channel switching, channel switching time, and channels before and after switching."
+			::= { hwWlanCalibrateInfo 4 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.3.4.1
+		hwWlanRadioCalibrationSwitchRecordEntry OBJECT-TYPE
+			SYNTAX HwWlanRadioCalibrationSwitchRecordEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanRadioCalibrationSwitchRecordTimeIndex and hwWlanRadioCalibrationSwitchRecordSubIndex."
+			INDEX { hwWlanRadioCalibrationSwitchRecordTimeIndex, hwWlanRadioCalibrationSwitchRecordSubIndex }
+			::= { hwWlanRadioCalibrationSwitchRecordTable 1 }
+
+
+		HwWlanRadioCalibrationSwitchRecordEntry ::=
+			SEQUENCE {				
+				hwWlanRadioCalibrationSwitchRecordTimeIndex
+					Unsigned32,
+				hwWlanRadioCalibrationSwitchRecordSubIndex
+					Unsigned32,
+                                hwWlanRadioCalibrationSwitchRecordApId
+					Unsigned32,
+				hwWlanRadioCalibrationSwitchRecordApName
+					OCTET STRING,
+				hwWlanRadioCalibrationSwitchRecordRadioId
+					Unsigned32,
+				hwWlanRadioCalibrationSwitchRecordOldChannel
+					Unsigned32,
+				hwWlanRadioCalibrationSwitchRecordNewChannel
+					Unsigned32,
+			        hwWlanRadioCalibrationSwitchRecordOldEirp
+			                Unsigned32,
+			        hwWlanRadioCalibrationSwitchRecordNewEirp
+			                Unsigned32,
+			        hwWlanRadioCalibrationSwitchRecordOldRssi
+			                Integer32,
+			        hwWlanRadioCalibrationSwitchRecordNewRssi
+			                Integer32,			                
+				hwWlanRadioCalibrationSwitchRecordReason
+					OCTET STRING,
+				hwWlanRadioCalibrationSwitchRecordTime
+					OCTET STRING,
+			        hwWlanRadioCalibrationSwitchRecordNewBandwidth
+			                INTEGER,
+                                hwWlanRadioCalibrationSwitchRecordOldBandwidth
+                                        INTEGER,
+                                hwWlanRadioCalibrationSwitchRecordNewSecChannel
+                                        Unsigned32,
+                                hwWlanRadioCalibrationSwitchRecordOldSecChannel
+                                        Unsigned32    
+			          }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.1
+		hwWlanRadioCalibrationSwitchRecordTimeIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the internal index of the table."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.2
+		hwWlanRadioCalibrationSwitchRecordSubIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the internal subindex of the table."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 2 }
+	        
+	        --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.3
+		hwWlanRadioCalibrationSwitchRecordApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP index."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.4
+		hwWlanRadioCalibrationSwitchRecordApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP name."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.5
+		hwWlanRadioCalibrationSwitchRecordRadioId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio ID."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.6
+		hwWlanRadioCalibrationSwitchRecordOldChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel before the switchover."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.7
+		hwWlanRadioCalibrationSwitchRecordNewChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel after the switchover."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 7 }
+               --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.8
+		hwWlanRadioCalibrationSwitchRecordOldEirp OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel before the switchover."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.9
+		hwWlanRadioCalibrationSwitchRecordNewEirp OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel after the switchover."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 9 }
+			
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.10
+		hwWlanRadioCalibrationSwitchRecordOldRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel before the switchover."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.11
+		hwWlanRadioCalibrationSwitchRecordNewRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel after the switchover."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.12
+		hwWlanRadioCalibrationSwitchRecordReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the reason for channel switching."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 12 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.3.4.1.13
+		hwWlanRadioCalibrationSwitchRecordTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel switching time."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 13 }
+			
+		--1.3.6.1.4.1.2011.6.139.19.1.3.4.1.14
+		hwWlanRadioCalibrationSwitchRecordNewBandwidth OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ht20(1) ,
+				ht40Plus(2) ,
+				ht40Minus(3) ,
+				ht80(4) ,
+				ht160(5),
+				unknown(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the bandwidth after calibration."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 14 }
+			
+		--1.3.6.1.4.1.2011.6.139.19.1.3.4.1.15
+		hwWlanRadioCalibrationSwitchRecordOldBandwidth OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ht20(1) ,
+				ht40Plus(2) ,
+				ht40Minus(3) ,
+				ht80(4) ,
+				ht160(5),
+				unknown(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the bandwidth before calibration."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 15 }
+			
+		--1.3.6.1.4.1.2011.6.139.19.1.3.4.1.16
+		hwWlanRadioCalibrationSwitchRecordNewSecChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the second channel before calibration."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 16 }
+			
+		--1.3.6.1.4.1.2011.6.139.19.1.3.4.1.17
+		hwWlanRadioCalibrationSwitchRecordOldSecChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the second channel after calibration."
+			::= { hwWlanRadioCalibrationSwitchRecordEntry 17 }
+			
+		--1.3.6.1.4.1.2011.6.139.19.1.4
+		hwWlanSpectrum OBJECT IDENTIFIER ::= { hwWlanServiceObjects 4 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.4.1
+		hwWlanSpectrumReporterTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanSpectrumReporterEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query the radio enabled with spectrum analysis data reporting."
+			::= { hwWlanSpectrum 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.4.1.1
+		hwWlanSpectrumReporterEntry OBJECT-TYPE
+			SYNTAX HwWlanSpectrumReporterEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanSpectrumReporterApMac and hwWlanSpectrumReporterRadioId."
+			INDEX { hwWlanSpectrumReporterApMac, hwWlanSpectrumReporterRadioId }
+			::= { hwWlanSpectrumReporterTable 1 }
+
+
+		HwWlanSpectrumReporterEntry ::=
+			SEQUENCE {				
+				hwWlanSpectrumReporterApMac
+					MacAddress,
+				hwWlanSpectrumReporterRadioId
+					Integer32,
+				hwWlanSpectrumReporterApName
+					OCTET STRING 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.4.1.1.1
+		hwWlanSpectrumReporterApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the AP."
+			::= { hwWlanSpectrumReporterEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.4.1.1.2
+		hwWlanSpectrumReporterRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio ID."
+			::= { hwWlanSpectrumReporterEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.4.1.1.3
+		hwWlanSpectrumReporterApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP name."
+			::= { hwWlanSpectrumReporterEntry 3 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.5
+		hwWlanVehicleGroundFastLinkHandover OBJECT IDENTIFIER ::= { hwWlanServiceObjects 5 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.5.1
+		hwWlanProxyTrackSideEquipTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanProxyTrackSideEquipEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVehicleGroundFastLinkHandover 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.5.1.1
+		hwWlanProxyTrackSideEquipEntry OBJECT-TYPE
+			SYNTAX HwWlanProxyTrackSideEquipEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwWlanProxyTrackSideEquipIndex }
+			::= { hwWlanProxyTrackSideEquipTable 1 }
+
+
+		HwWlanProxyTrackSideEquipEntry ::=
+			SEQUENCE {				
+				hwWlanProxyTrackSideEquipIndex
+					Integer32,
+				hwWlanProxyTrackSideEquipMac
+					MacAddress,
+				hwWlanProxyTrackSideEquipVlanID
+					Integer32,
+				hwWlanProxyTrackSideEquipRowStatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.1.1.1
+		hwWlanProxyTrackSideEquipIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanProxyTrackSideEquipEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.1.1.2
+		hwWlanProxyTrackSideEquipMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanProxyTrackSideEquipEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.1.1.3
+		hwWlanProxyTrackSideEquipVlanID OBJECT-TYPE
+			SYNTAX Integer32 (1..4094)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanProxyTrackSideEquipEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.1.1.4
+		hwWlanProxyTrackSideEquipRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanProxyTrackSideEquipEntry 4 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.5.2
+		hwWlanProxyOnBoardEquipTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanProxyOnBoardEquipEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVehicleGroundFastLinkHandover 2 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.5.2.1
+		hwWlanProxyOnBoardEquipEntry OBJECT-TYPE
+			SYNTAX HwWlanProxyOnBoardEquipEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwWlanProxyOnBoardEquipIndex }
+			::= { hwWlanProxyOnBoardEquipTable 1 }
+
+
+		HwWlanProxyOnBoardEquipEntry ::=
+			SEQUENCE {				
+				hwWlanProxyOnBoardEquipIndex
+					Integer32,
+				hwWlanProxyOnBoardEquipMac
+					MacAddress,
+				hwWlanProxyOnBoardEquipVlanID
+					Integer32,
+				hwWlanProxyOnBoardEquipRowStatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.2.1.1
+		hwWlanProxyOnBoardEquipIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanProxyOnBoardEquipEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.2.1.2
+		hwWlanProxyOnBoardEquipMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanProxyOnBoardEquipEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.2.1.3
+		hwWlanProxyOnBoardEquipVlanID OBJECT-TYPE
+			SYNTAX Integer32 (1..4094)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanProxyOnBoardEquipEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.2.1.4
+		hwWlanProxyOnBoardEquipRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanProxyOnBoardEquipEntry 4 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.5.3
+		hwWlanHandoverTraceTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanHandoverTraceEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVehicleGroundFastLinkHandover 3 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.5.3.1
+		hwWlanHandoverTraceEntry OBJECT-TYPE
+			SYNTAX HwWlanHandoverTraceEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwWlanHandoverTraceIndex }
+			::= { hwWlanHandoverTraceTable 1 }
+
+
+		HwWlanHandoverTraceEntry ::=
+			SEQUENCE {				
+				hwWlanHandoverTraceIndex
+					Integer32,
+				hwWlanHandoverTimeStamp
+					OCTET STRING,
+				hwWlanHandoverFromApMac
+					MacAddress,
+				hwWlanHandoverFromApRssi
+					Integer32,
+				hwWlanHandoverToApMac
+					MacAddress,
+				hwWlanHandoverToApRssi
+					Integer32,
+				hwWlanHandoverFromApLocationID
+					Unsigned32,
+				hwWlanHandoverToApLocationID
+					Unsigned32 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.3.1.1
+		hwWlanHandoverTraceIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanHandoverTraceEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.3.1.2
+		hwWlanHandoverTimeStamp OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanHandoverTraceEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.3.1.3
+		hwWlanHandoverFromApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanHandoverTraceEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.3.1.4
+		hwWlanHandoverFromApRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanHandoverTraceEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.3.1.5
+		hwWlanHandoverToApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanHandoverTraceEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.3.1.6
+		hwWlanHandoverToApRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanHandoverTraceEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.3.1.7
+		hwWlanHandoverFromApLocationID OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanHandoverTraceEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.3.1.8
+		hwWlanHandoverToApLocationID OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanHandoverTraceEntry 8 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.5.4
+		hwWlanNeighborApTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanNeighborApEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query the RSSI values of an AP's neighboring APs or specified APs."
+			::= { hwWlanVehicleGroundFastLinkHandover 4 }
+
+		--1.3.6.1.4.1.2011.6.139.19.1.5.4.1
+		hwWlanNeighborApEntry OBJECT-TYPE
+			SYNTAX HwWlanNeighborApEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanNeighborApLocalApMac and hwWlanNeighborApLocalRadioId."
+			INDEX { hwWlanNeighborApLocalApMac, hwWlanNeighborApLocalRadioId }
+			::= { hwWlanNeighborApTable 1 }
+
+
+		HwWlanNeighborApEntry ::=
+			SEQUENCE {				
+				hwWlanNeighborApLocalApMac
+					MacAddress,
+				hwWlanNeighborApLocalRadioId
+					Integer32,
+				hwWlanNeighborApLocalApName
+					OCTET STRING,
+				hwWlanNeighborApMacList
+					OCTET STRING,
+				hwWlanNeighborApNameList
+					OCTET STRING,
+				hwWlanNeighborApRssiList
+					OCTET STRING,
+				hwWlanNeighborApUpdateTime
+					OCTET STRING,
+				hwWlanNeighborApLocationIDList
+					OCTET STRING,
+				hwWlanNeighborApLocalLocationID
+					Unsigned32,
+				hwWlanNeighborApLocalApId
+					Unsigned32,
+				hwWlanNeighborApIdList
+					OCTET STRING
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.4.1.1
+		hwWlanNeighborApLocalApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the AP."
+			::= { hwWlanNeighborApEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.4.1.2
+		hwWlanNeighborApLocalRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio ID."
+			::= { hwWlanNeighborApEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.4.1.3
+		hwWlanNeighborApLocalApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP name."
+			::= { hwWlanNeighborApEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.4.1.4
+		hwWlanNeighborApMacList OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..3840))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the neighboring AP."
+			::= { hwWlanNeighborApEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.4.1.5
+		hwWlanNeighborApNameList OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..8960))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the neighboring AP."
+			::= { hwWlanNeighborApEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.4.1.6
+		hwWlanNeighborApRssiList OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..1280))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the RSSI of the neighboring AP."
+			::= { hwWlanNeighborApEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.4.1.7
+		hwWlanNeighborApUpdateTime OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..5120))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the update time of the neighboring AP."
+			::= { hwWlanNeighborApEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.4.1.8
+		hwWlanNeighborApLocationIDList OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..1550))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates location information of the neighboring AP."
+			::= { hwWlanNeighborApEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.5.4.1.9
+		hwWlanNeighborApLocalLocationID OBJECT-TYPE
+			SYNTAX Unsigned32 (0..65536)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates location information of the local AP."
+			::= { hwWlanNeighborApEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.5.4.1.10
+		hwWlanNeighborApLocalApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP ID."
+			::= { hwWlanNeighborApEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.5.4.1.11
+		hwWlanNeighborApIdList OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..3840))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP ID list."
+			::= { hwWlanNeighborApEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6
+		hwWlanBLESiteInfo OBJECT IDENTIFIER ::= { hwWlanServiceObjects 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1
+		hwWlanBLESiteInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanBLESiteInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfo 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1
+		hwWlanBLESiteInfoEntry OBJECT-TYPE
+			SYNTAX HwWlanBLESiteInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanBLESiteMacAddress }
+			::= { hwWlanBLESiteInfoTable 1 }
+
+		
+		HwWlanBLESiteInfoEntry ::=
+			SEQUENCE { 
+				hwWlanBLESiteMacAddress
+					MacAddress,
+				hwWlanBLESiteRssi
+					Integer32,
+				hwWlanBLESitePower
+					Integer32,
+				hwWlanBLESiteAdvData
+					OCTET STRING,
+				hwWlanBLESiteAgingTimeout
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.1
+		hwWlanBLESiteMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfoEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.2
+		hwWlanBLESiteRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfoEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.3
+		hwWlanBLESitePower OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfoEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.4
+		hwWlanBLESiteAdvData OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfoEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.5
+		hwWlanBLESiteAgingTimeout OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfoEntry 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7
+		hwWlanApIotCardInfo OBJECT IDENTIFIER ::= { hwWlanServiceObjects 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1
+		hwWlanApIotCardTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApIotCardEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardInfo 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1
+		hwWlanApIotCardEntry OBJECT-TYPE
+			SYNTAX HwWlanApIotCardEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanApIotCardApId, hwWlanApIotCardIndex }
+			::= { hwWlanApIotCardTable 1 }
+
+		
+		HwWlanApIotCardEntry ::=
+			SEQUENCE { 
+				hwWlanApIotCardApId
+					Unsigned32,
+				hwWlanApIotCardIndex
+					Integer32,
+				hwWlanApIotCardState
+					INTEGER,
+				hwWlanApIotCardApName
+					OCTET STRING,
+				hwWlanApIotCardSupportInfo
+					INTEGER,
+				hwWlanApIotCardProtocolVer
+					OCTET STRING,
+				hwWlanApIotCardWirelessStard
+					OCTET STRING,
+				hwWlanApIotCardFreq
+					OCTET STRING,
+				hwWlanApIotCardVendorName
+					OCTET STRING,
+				hwWlanApIotCardCardType
+					OCTET STRING,
+				hwWlanApIotCardHardwareVer
+					OCTET STRING,
+				hwWlanApIotCardFirmwareVer
+					OCTET STRING,
+				hwWlanApIotCardSN
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.1
+		hwWlanApIotCardApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.2
+		hwWlanApIotCardIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..3)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.3
+		hwWlanApIotCardState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				present(1),
+				absent(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.4
+		hwWlanApIotCardApName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.5
+		hwWlanApIotCardSupportInfo OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				no(1),
+				yes(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.6
+		hwWlanApIotCardProtocolVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 6 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.7
+		hwWlanApIotCardWirelessStard OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 7 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.8
+		hwWlanApIotCardFreq OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 8 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.9
+		hwWlanApIotCardVendorName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 9 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.10
+		hwWlanApIotCardCardType OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 10 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.11
+		hwWlanApIotCardHardwareVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 11 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.12
+		hwWlanApIotCardFirmwareVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 12 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.13
+		hwWlanApIotCardSN OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 13 }
+		
+-- 1.3.6.1.4.1.2011.6.139.19.2
+		-- 1.3.6.1.4.1.2011.6.139.19.2
+		hwWlanServiceConformance OBJECT IDENTIFIER ::= { hwWlanService 2 }
+
+		--1.3.6.1.4.1.2011.6.139.19.2.1
+		hwWlanServiceCompliances OBJECT IDENTIFIER ::= { hwWlanServiceConformance 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.2.1.1
+		hwWlanServiceCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE
+					MANDATORY-GROUPS { hwWlanWdsGroup, hwWlanMeshGroup, hwWlanCalibrateInfoGroup, hwWlanVehicleGroundFastLinkHandoverGroup}
+			::= { hwWlanServiceCompliances 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.2.2
+		hwWlanServiceObjectGroups OBJECT IDENTIFIER ::= { hwWlanServiceConformance 2 }
+
+		--1.3.6.1.4.1.2011.6.139.19.2.2.1
+		hwWlanWdsGroup OBJECT-GROUP
+			OBJECTS {hwWlanWdsVapBssid, 
+				hwWlanWdsLinkWlanID, hwWlanWdsLinkApName, hwWlanWdsLinkApGroup, 
+				hwWlanWdsLinkPeerApMac, hwWlanWdsLinkPeerApName, hwWlanWdsLinkWdsProfileName, hwWlanMacWdsLinkWdsMode, hwWlanWdsLinkWdsType, 
+				hwWlanWdsLinkStpMode, hwWlanWdsLinkInstanceIdList, hwWlanWdsLinkInstanceStateList, hwWlanWdsLinkCoverageDistance, hwWlanWdsLinkChannel, 
+				hwWlanWdsLinkMaxRssi, hwWlanWdsLinkRssi, hwWlanWdsLinkSnr, hwWlanWdsLinkPER, hwWlanWdsLinkResendRatio, hwWlanWdsLinkPeerAPStatus, 
+				hwWlanWdsLinkApId, hwWlanWdsLinkPeerApId, hwWlanWdsLinkSecondChannel }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanServiceObjectGroups 1 }
+
+		--1.3.6.1.4.1.2011.6.139.19.2.2.2
+		hwWlanMeshGroup OBJECT-GROUP
+			OBJECTS {hwWlanMeshVapBssid, 
+				hwWlanMeshLinkApName, hwWlanMeshLinkApGroup, hwWlanMeshLinkMeshRole, 
+				hwWlanMeshLinkWlanID, hwWlanMeshLinkPeerApMac, hwWlanMeshLinkPeerApName, hwWlanMeshLinkChannelID, hwWlanMeshLinkCoverageDistance, 
+				hwWlanMeshLinkRssiValue, hwWlanMeshLinkMaxRssi, hwWlanMeshLinkSnr, hwWlanMeshLinkPER, hwWlanMeshLinkResendRatio, hwWlanMeshLinkPeerAPStatus, 
+				hwWlanMeshLinkApId, hwWlanMeshLinkPeerApId, hwWlanMeshLinkSecondChannel }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanServiceObjectGroups 2 }
+
+		--1.3.6.1.4.1.2011.6.139.19.2.2.3
+		hwWlanCalibrateInfoGroup OBJECT-GROUP
+			OBJECTS {hwWlanRadioCalStatisSignalBadCount, hwWlanRadioCalStatisCalibratePowerCount, hwWlanRadioCalStatisCalibrateChannelCount, 
+			hwWlanRadioCalibrateStatisicsOperMode, hwWlanRadioChannelSwitchRecordApName, hwWlanRadioChannelSwitchRecordRadioId, hwWlanRadioChannelSwitchRecordOldChannel, 
+			hwWlanRadioChannelSwitchRecordNewChannel, hwWlanRadioChannelSwitchRecordReason, hwWlanRadioChannelSwitchRecordTime,hwWlanRadioResetChannelSwitchRecord,
+			hwWlanRadioCalibrationSwitchRecordApName, hwWlanRadioCalibrationSwitchRecordRadioId, hwWlanRadioCalibrationSwitchRecordOldChannel, 
+			hwWlanRadioCalibrationSwitchRecordNewChannel, 
+			hwWlanRadioCalibrationSwitchRecordOldEirp, hwWlanRadioCalibrationSwitchRecordNewEirp,hwWlanRadioCalibrationSwitchRecordOldRssi, 
+			hwWlanRadioCalibrationSwitchRecordNewRssi,hwWlanRadioCalibrationSwitchRecordReason, hwWlanRadioCalibrationSwitchRecordTime }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanServiceObjectGroups 3 }
+			
+                --1.3.6.1.4.1.2011.6.139.19.2.2.4
+                hwWlanSpectrumReporterGroup OBJECT-GROUP
+                        OBJECTS {hwWlanSpectrumReporterApName }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanServiceObjectGroups 4 }
+                
+		--1.3.6.1.4.1.2011.6.139.19.2.2.5
+		hwWlanVehicleGroundFastLinkHandoverGroup OBJECT-GROUP
+			OBJECTS {hwWlanProxyTrackSideEquipMac, hwWlanProxyTrackSideEquipVlanID, hwWlanProxyTrackSideEquipRowStatus, 
+				hwWlanProxyOnBoardEquipMac, hwWlanProxyOnBoardEquipVlanID, hwWlanProxyOnBoardEquipRowStatus,hwWlanHandoverTimeStamp, 
+				hwWlanHandoverFromApMac, hwWlanHandoverFromApRssi, hwWlanHandoverToApMac, hwWlanHandoverToApRssi, hwWlanHandoverFromApLocationID, 
+				hwWlanHandoverToApLocationID,hwWlanNeighborApLocalApName, hwWlanNeighborApMacList, 
+				hwWlanNeighborApNameList, hwWlanNeighborApRssiList, hwWlanNeighborApUpdateTime, hwWlanNeighborApLocationIDList, hwWlanNeighborApLocalLocationID, 
+				hwWlanNeighborApLocalApId, hwWlanNeighborApIdList }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanServiceObjectGroups 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.2.2.6
+		hwWlanBLESiteInfoGroup OBJECT-GROUP
+			OBJECTS { hwWlanBLESiteRssi, hwWlanBLESitePower, hwWlanBLESiteAdvData }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanServiceObjectGroups 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.2.2.7
+		hwWlanApIotCardInfoGroup OBJECT-GROUP
+			OBJECTS { hwWlanApIotCardState, hwWlanApIotCardApName, hwWlanApIotCardSupportInfo, hwWlanApIotCardProtocolVer, hwWlanApIotCardWirelessStard, hwWlanApIotCardFreq,
+				hwWlanApIotCardVendorName, hwWlanApIotCardCardType, hwWlanApIotCardHardwareVer, hwWlanApIotCardFirmwareVer, hwWlanApIotCardSN }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanServiceObjectGroups 7 }
+
+		
+	
+	END
+--
+-- HUAWEI-WLAN-SERVICE-MIB.mib
+--
