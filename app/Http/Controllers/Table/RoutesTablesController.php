@@ -129,14 +129,9 @@ class RoutesTablesController extends TableController
         if ($route_entry->created_at) {
             $item['created_at'] = $route_entry->created_at->toDateTimeString();
         }
-
-        if ($route_entry->inetCidrRouteIfIndex) {
-            $port = $route_entry->port()->first();
-            if ($port) {
-                $item['inetCidrRouteIfIndex'] = Url::portLink($port, $port->getShortLabel());
-            }
+        if ($port = $route_entry->port()->first()) {
+            $item['inetCidrRouteIfIndex'] = Url::portLink($port, $port->getShortLabel());
         }
-
         if ($route_entry->inetCidrRouteNextHop_device_id) {
             $device = Device::where('device_id', '=', $route_entry->inetCidrRouteNextHop_device_id)->first();
             if ($device->device_id == $route_entry->device_id) {
