@@ -1,15 +1,42 @@
+import os
+import subprocess
 import threading
+import timeit
+from collections import deque
 
 from logging import critical, info, debug, exception
 from math import ceil
+from queue import Queue
 from time import time
 
 from .service import Service, ServiceConfig
-from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager
+from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager, ServicesQueueManager, \
+    AlertQueueManager, PollerQueueManager, DiscoveryQueueManager
 
 
 def normalize_wait(seconds):
     return ceil(seconds - (time() % seconds))
+
+
+def call_script(script, args=()):
+    """
+    Run a LibreNMS script.  Captures all output and throws an exception if a non-zero
+    status is returned.  Blocks parent signals (like SIGINT and SIGTERM).
+    :param script: the name of the executable relative to the base directory
+    :param args: a tuple of arguments to send to the command
+    :returns the output of the command
+    """
+    if script.endswith('.php'):
+        # save calling the sh process
+        base = ('/usr/bin/env', 'php')
+    else:
+        base = ()
+
+    base_dir = os.path.realpath(os.path.dirname(__file__) + "/..")
+    cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
+    debug("Running {}".format(cmd))
+    # preexec_fn=os.setsid here keeps process signals from propagating
+    return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid, close_fds=True).decode()
 
 
 class DB:
@@ -78,10 +105,23 @@ class DB:
         :param args:
         :return: the cursor with results
         """
-        cursor = self.db_conn().cursor()
-        cursor.execute(query, args)
-        cursor.close()
-        return cursor
+        try:
+            cursor = self.db_conn().cursor()
+            cursor.execute(query, args)
+            cursor.close()
+            return cursor
+        except Exception as e:
+            critical("DB Connection exception {}".format(e))
+            self.close()
+            raise
+
+    def close(self):
+        """
+        Close the connection owned by this thread.
+        """
+        conn = self._db.pop(threading.get_ident(), None)
+        if conn:
+            conn.close()
 
 
 class RecurringTimer:
@@ -185,7 +225,7 @@ class ThreadingLock(Lock):
         return Lock.check_lock(self, name)
 
     def print_locks(self):
-            Lock.print_locks(self)
+        Lock.print_locks(self)
 
 
 class RedisLock(Lock):
@@ -220,7 +260,6 @@ class RedisLock(Lock):
             exception("Unable to obtain lock, local state: name: %s, owner: %s, expiration: %s, allow_owner_relock: %s",
                       name, owner, expiration, allow_owner_relock)
 
-
     def unlock(self, name, owner):
         """
         Release the named lock.
@@ -242,7 +281,7 @@ class RedisLock(Lock):
             print("{} locked by {}, expires in {} seconds".format(key, self._redis.get(key), self._redis.ttl(key)))
 
 
-class RedisQueue(object):
+class RedisUniqueQueue(object):
     def __init__(self, name, namespace='queue', **redis_kwargs):
         import redis
         redis_kwargs['decode_responses'] = True
@@ -250,25 +289,24 @@ class RedisQueue(object):
         self._redis.ping()
         self.key = "{}:{}".format(namespace, name)
 
+        # clean up from previous implementations
+        if self._redis.type(self.key) != 'zset':
+            self._redis.delete(self.key)
+
     def qsize(self):
-        return self._redis.llen(self.key)
+        return self._redis.zcount(self.key, '-inf', '+inf')
 
     def empty(self):
         return self.qsize() == 0
 
     def put(self, item):
-        # commented code allows unique entries, but shuffles the queue
-        # p = self._redis.pipeline()
-        # p.lrem(self.key, 1, item)
-        # p.lpush(self.key, item)
-        # p.execute()
-        self._redis.rpush(self.key, item)
+        self._redis.zadd(self.key, {item: time()}, nx=True)
 
     def get(self, block=True, timeout=None):
         if block:
-            item = self._redis.blpop(self.key, timeout=timeout)
+            item = self._redis.bzpopmin(self.key, timeout=timeout)
         else:
-            item = self._redis.lpop(self.key)
+            item = self._redis.zpopmin(self.key)
 
         if item:
             item = item[1]
@@ -276,3 +314,96 @@ class RedisQueue(object):
 
     def get_nowait(self):
         return self.get(False)
+
+
+class UniqueQueue(Queue):
+    def _init(self, maxsize):
+        self.queue = deque()
+        self.setqueue = set()
+
+    def _put(self, item):
+        if item not in self.setqueue:
+            self.setqueue.add(item)
+            self.queue.append(item)
+
+    def _get(self):
+        item = self.queue.popleft()
+        self.setqueue.remove(item)
+        return item
+
+
+class PerformanceCounter(object):
+    """
+    This is a simple counter to record execution time and number of jobs. It's unique to each
+    poller instance, so does not need to be globally syncronised, just locally.
+    """
+
+    def __init__(self):
+        self._count = 0
+        self._jobs = 0
+        self._lock = threading.Lock()
+
+    def add(self, n):
+        """
+        Add n to the counter and increment the number of jobs by 1
+        :param n: Number to increment by
+        """
+        with self._lock:
+            self._count += n
+            self._jobs += 1
+
+    def split(self, precise=False):
+        """
+        Return the current counter value and keep going
+        :param precise: Whether floating point precision is desired
+        :return: ((INT or FLOAT), INT)
+        """
+        return (self._count if precise else int(self._count)), self._jobs
+
+    def reset(self, precise=False):
+        """
+        Return the current counter value and then zero it.
+        :param precise: Whether floating point precision is desired
+        :return: ((INT or FLOAT), INT)
+        """
+        with self._lock:
+            c = self._count
+            j = self._jobs
+            self._count = 0
+            self._jobs = 0
+
+            return (c if precise else int(c)), j
+
+
+class TimeitContext(object):
+    """
+    Wrapper around timeit to allow the timing of larger blocks of code by wrapping them in "with"
+    """
+
+    def __init__(self):
+        self._t = timeit.default_timer()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        del self._t
+
+    def delta(self):
+        """
+        Calculate the elapsed time since the context was initialised
+        :return: FLOAT
+        """
+        if not self._t:
+            raise ArithmeticError("Timer has not been started, cannot return delta")
+
+        return timeit.default_timer() - self._t
+
+    @classmethod
+    def start(cls):
+        """
+        Factory method for TimeitContext
+        :param cls:
+        :return: TimeitContext
+        """
+        return cls()
