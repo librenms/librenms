@@ -31,7 +31,7 @@
                                 @if($device_groups->isNotEmpty())
                                     <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">
                                         @foreach($device_groups as $group)
-                                            <li><a href="{{ url('map', [$group->id]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
+                                            <li><a href="{{ url("map/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
                                                 {{ ucfirst($group->name) }}
                                             </a></li>
                                         @endforeach
