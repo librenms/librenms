@@ -611,7 +611,7 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
         if( widget_id > 0 && widget_settings != {} ) {
             $.ajax({
                 type: 'PUT',
-                url: 'ajax/form/widget-settings/' + widget_id,
+                url: '<?php echo url('/ajax/form/widget-settings/'); ?>' + widget_id,
                 data: {settings: widget_settings},
                 dataType: "json",
                 success: function (data) {
@@ -642,7 +642,7 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
         }
         $.ajax({
             type: 'POST',
-            url: 'ajax/dash/' + data_type,
+            url: ajax_url + '/dash/' + data_type,
             data: {
                 id: id,
                 dimensions: {x:$widget_body.width(), y:$widget_body.height()},
