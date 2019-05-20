@@ -129,6 +129,9 @@ class RoutesTablesController extends TableController
         if ($route_entry->created_at) {
             $item['created_at'] = $route_entry->created_at->toDateTimeString();
         }
+        if ($item['inetCidrRouteIfIndex'] == 0) {
+            $item['inetCidrRouteIfIndex'] = 'Undefined';
+        }
         if ($port = $route_entry->port()->first()) {
             $item['inetCidrRouteIfIndex'] = Url::portLink($port, $port->getShortLabel());
         }

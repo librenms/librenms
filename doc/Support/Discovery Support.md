@@ -145,7 +145,7 @@ configured to be ignored by config options.
 
 `ipv6-addresses`: IPv6 Address detection
 
-`route`: Route detection
+`route`: This module will load the routing table of the device. The default route limit is 1000 (configurable in config.php with ```$config['routes']['max_number'] = 1000;```)
 
 `sensors`: Sensor detection such as Temperature, Humidity, Voltages + More
 
