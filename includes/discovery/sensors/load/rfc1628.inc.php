@@ -7,7 +7,7 @@ $load_data = snmpwalk_group($device, 'upsOutputPercentLoad', 'UPS-MIB');
 foreach ($load_data as $index => $data) {
     $load_oid = ".1.3.6.1.2.1.33.1.4.4.1.5.$index";
 
-    if (isset($data['upsOutputPercentLoad'][0])) {
+    if (is_array($data['upsOutputPercentLoad'])) {
         $load_oid .= ".0";
         $value = $data['upsOutputPercentLoad'][0];
     } else {
