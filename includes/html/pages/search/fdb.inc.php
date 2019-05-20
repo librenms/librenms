@@ -122,7 +122,7 @@ echo '"'.$vars['searchPhrase'].'"+';
             dns: $("#fdb-search").bootgrid("getColumnSettings")[6].visible
         };
     },
-    url: "ajax/table/fdb-tables"
+    url: "<?php echo url('/ajax/table/fdb-tables'); ?>"
 });
 
 </script>

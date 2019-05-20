@@ -208,7 +208,7 @@ class Url
     {
         $vars = array_merge($vars, $new_vars);
 
-        $url = $vars['page'] . '/';
+        $url = url($vars['page']) . '/';
         unset($vars['page']);
 
         foreach ($vars as $var => $value) {

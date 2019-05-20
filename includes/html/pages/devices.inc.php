@@ -343,7 +343,7 @@ if ($format == "graph") {
                     group: '<?php echo mres($vars['group']); ?>',
                 };
             },
-            url: "ajax/table/device"
+            url: "<?php echo url('/ajax/table/device') ?>"
         });
 
         <?php

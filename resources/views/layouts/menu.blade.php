@@ -31,7 +31,7 @@
                                 @if($device_groups->isNotEmpty())
                                     <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">
                                         @foreach($device_groups as $group)
-                                            <li><a href="{{ url('map', [$group->id]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
+                                            <li><a href="{{ url("map/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
                                                 {{ ucfirst($group->name) }}
                                             </a></li>
                                         @endforeach
@@ -43,20 +43,22 @@
                         @if(auth()->user()->isAdmin() || \LibreNMS\Plugins::count())
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> Plugins</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 {!! \LibreNMS\Plugins::call('menu') !!}
                                 @admin
                                     @if(\LibreNMS\Plugins::count())
                                         <li role="presentation" class="divider"></li>
                                     @endif
-                                    <li><a href="{{ url('plugin', ['view' => 'admin']) }}"> <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>Plugin Admin</a></li>
+                                <li><a href="{{ url('plugin/view=admin') }}"> <i class="fa fa-lock fa-fw fa-lg"
+                                                                                 aria-hidden="true"></i>Plugin Admin</a>
+                                </li>
                                 @endadmin
                             </ul>
                         </li>
                         @endif
                         <li class="dropdown-submenu">
                             <a href="{{ url('overview') }}"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> Tools</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
                                 @config('oxidized.enabled')
                                     <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>
@@ -332,7 +334,8 @@
 {{-- User --}}
             <form role="search" class="navbar-form navbar-right global-search">
                 <div class="form-group">
-                    <input class="form-control typeahead" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
+                    <input class="form-control typeahead" type="search" id="gsearch" name="gsearch"
+                           placeholder="Global Search" autocomplete="off">
                 </div>
             </form>
             <ul class="nav navbar-nav navbar-right">
@@ -366,7 +369,7 @@
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="{{ url('pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="{{ url('pollers/tab=pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a></li>
                                 @config('distributed_poller')
                                 <li><a href="{{ url('pollers/tab=groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
@@ -378,7 +381,7 @@
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> API</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="{{ url('api-access') }}"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
                                 <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
                             </ul>
@@ -388,7 +391,7 @@
                         @if (isset($refresh))
                         <li class="dropdown-submenu">
                             <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
                             </ul>
                         </li>

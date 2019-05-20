@@ -26,7 +26,7 @@ var grid = $("#port-fdb").bootgrid({
             dns: $("#port-fdb").bootgrid("getColumnSettings")[4].visible
         };
     },
-    url: "ajax/table/fdb-tables"
+    url: "<?php echo url('/ajax/table/fdb-tables'); ?>"
 });
 </script>
 

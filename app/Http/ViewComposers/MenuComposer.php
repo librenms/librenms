@@ -60,13 +60,13 @@ class MenuComposer
         $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
 
         // Device menu
-        $vars['device_groups'] = DeviceGroup::hasAccess($user)->select('device_groups.id', 'name', 'desc')->get();
+        $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
         $vars['package_count'] = Package::hasAccess($user)->count();
 
-        $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->get()->pluck('type')->filter();
+        $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->where('type', '!=', '')->orderBy('type')->pluck('type');
 
-        $vars['locations'] = Config::get('show_locations') && Config::get('show_locations_dropdown') ?
-            Location::hasAccess($user)->where('location', '!=', '')->select('location', 'id')->get() :
+        $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
+            Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
             collect();
 
         // Service menu
@@ -96,9 +96,9 @@ class MenuComposer
 
         // Wireless menu
         $wireless_menu_order = array_keys(\LibreNMS\Device\WirelessSensor::getTypes());
-        $vars['wireless_menu'] = WirelessSensor::hasAccess($user)->select('sensor_class')
+        $vars['wireless_menu'] = WirelessSensor::hasAccess($user)
             ->groupBy('sensor_class')
-            ->get()
+            ->get(['sensor_class'])
             ->sortBy(function ($wireless_sensor) use ($wireless_menu_order) {
                 $pos = array_search($wireless_sensor->sensor_class, $wireless_menu_order);
                 return $pos === false ? 100 : $pos; // unknown at bottom
