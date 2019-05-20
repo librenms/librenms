@@ -125,7 +125,7 @@ $tmp_output .= '
                 range: "' . (isset($_POST['range']) ? mres($_POST['range']) : '')  . '"
             };
         },
-        url: "ajax/table/graylog",
+        url: "' . url('/ajax/table/graylog') . '",
     });
     
     init_select2("#stream", "graylog-streams", {}, "' . (isset($_POST['stream']) ? mres($_POST['stream']) : '') . '");

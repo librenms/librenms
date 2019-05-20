@@ -147,7 +147,7 @@ $pagetitle[] = 'Syslog';
         allowClear: true,
         placeholder: "All Devices",
         ajax: {
-            url: 'ajax/select/device',
+            url: '<?php echo url('/ajax/select/device'); ?>',
             delay: 200
         }
     })<?php echo $device_id ? ".val($device_id).trigger('change');" : ''; ?>;
@@ -160,7 +160,7 @@ $pagetitle[] = 'Syslog';
         allowClear: true,
         placeholder: "All Programs",
         ajax: {
-            url: 'ajax/select/syslog',
+            url: '<?php echo url('/ajax/select/syslog'); ?>',
             delay: 200,
             data: function(params) {
                 return {
@@ -180,7 +180,7 @@ $pagetitle[] = 'Syslog';
         allowClear: true,
         placeholder: "All Priorities",
         ajax: {
-            url: 'ajax/select/syslog',
+            url: '<?php echo url('/ajax/select/syslog'); ?>',
             delay: 200,
             data: function(params) {
                 return {
