@@ -1,0 +1,51 @@
+mib: TRIPPLITE-PRODUCTS
+modules:
+    sensors:
+        runtime:
+            data:
+                -
+                    oid: tlpUpsEstimatedMinutesRemaining
+                    num_oid: '.1.3.6.1.4.1.850.1.1.3.1.3.1.1.1.3.{{ $index }}'
+                    index: '.1.3.6.1.4.1.850.1.1.3.1.3.1.1.1.3.{{ $index }}'
+                    descr: Estimated
+                    grouop: "Battery"
+
+        temperature:
+            data:
+                -
+                    oid: tlpUpsDeviceTemperatureC
+                    num_oid: '.1.3.6.1.4.1.850.1.1.3.1.2.1.1.7.{{ $index }}'
+                    index: '.1.3.6.1.4.1.850.1.1.3.1.2.1.1.7.{{ $index }}'
+                    descr: Temperature
+                    divisor: 10
+        state:
+            data:
+                -
+                    oid: tlpUpsDeviceTable
+                    value: tlpUpsDeviceMainLoadState
+                    num_oid: '.1.3.6.1.4.1.850.1.1.3.1.2.1.1.1.{{ $index }}'
+                    descr: Load State
+                    index: '{{ $index }}'
+                    state_name: tlpUpsDeviceMainLoadState
+                    states:
+                        - { descr: unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: off, graph: 0, value: 1, generic: 2 }
+                        - { descr: on, graph: 0, value: 2, generic: 0 }
+        charge:
+            data:
+                -
+                    oid: tlpUpsBatteryDetailTable
+                    value: tlpUpsBatteryDetailCapacity
+                    num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.1.2.1.3.{{ $index }}"
+                    descr: "Charge %"
+                    divisor: 10
+                    group: "Battery"
+        current:
+            data:
+                -
+                    oid: tlpUpsOutputLineCurrent
+                    value: tlpUpsOutputLineCurrent
+                    num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.3.2.1.3.{{ $index }}"
+                    divisor: 100
+                    descr: "Current {{ $index }}"
+                    group: "Output"
