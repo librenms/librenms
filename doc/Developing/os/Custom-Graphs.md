@@ -97,7 +97,7 @@ includes/html/graphs/device/pulse_users.inc.php
 
 $rrd_filename = rrd_name($device['hostname'], 'pulse_users');
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ds = 'users';
 
@@ -110,7 +110,7 @@ $graph_max = 1;
 
 $unit_text = 'Users';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';
 ```
 
 That should be it, after data has started to be collected graphs should appear in the WebUI.
