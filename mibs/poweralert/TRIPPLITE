@@ -1,0 +1,35 @@
+-- ------------------------------------------------------
+-- TRIPP LITE MIB
+-- Copyright (c) 1999-2018 Tripp Lite
+-- All rights reserved
+--
+-- Revision History:
+-- 06/22/2016 Restructured Tripp Lite MIB files
+-- ------------------------------------------------------
+
+-- TrippLite { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) tripplite(850) }
+
+TRIPPLITE DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY,
+  enterprises
+    FROM SNMPv2-SMI;
+
+tripplite MODULE-IDENTITY
+  LAST-UPDATED "201606221115Z"
+  ORGANIZATION "Tripp Lite"
+  CONTACT-INFO
+    "Software Engineering
+    Tripp Lite
+    1111 W. 35th St.
+    Chicago, IL 60609"
+  DESCRIPTION
+    "The base MIB module that defines the root objects from Tripp Lite's
+    OID tree (850)."
+  REVISION "201606221115Z"
+  DESCRIPTION
+    "Restructured Tripp Lite MIB files"
+  ::= { enterprises 850 }
+
+END

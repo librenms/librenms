@@ -1,10 +1,16 @@
 os: poweralert
 text: 'Tripp Lite PowerAlert'
 type: power
+mib_dir:
+    - poweralert
 over:
     - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_runtime, text: Runtime }
 icon: tripplite
-rfc1628_compat: 1
+rfc1628_compat: false
 discovery:
     - sysDescr_regex:
         - '/POWERALERT/i'
+    - sysObjectID:
+        - .1.3.6.1.4.1.850.1
