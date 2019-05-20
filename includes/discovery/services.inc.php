@@ -25,19 +25,31 @@
 
 use LibreNMS\Config;
 
-$oidV4 = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4.1.4.0.0.0.0', '-Osqn'));
-$oidV6 = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4.2.16.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0', '-Osqn'));
-$oids = $oidV4 . $oidV6;
+$oids = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4', '-Osqn'));
 foreach (explode("\n", $oids) as $data) {
     $data = trim($data);
     if ($data) {
         list($oid, $tcpstatus) = explode(' ', $data);
         $split_oid = explode('.', $oid);
         $tcp_port  = $split_oid[(count($split_oid) - 1)];
+        $ipVersion = $split_oid[12];
+        if ($ipVersion == 4) {
+            $listenV4 = implode(".", [$split_oid[13], $split_oid[14], $split_oid[15], $split_oid[16]]);
+            if ($listenV4 == "127.0.0.1") {
+                continue;
+            }
+        } else {
+            for ($i = 13, $arrayV6 = []; $i < 29; $i++) {
+                $arrayV6[] = $split_oid[$i];
+            }
+            $listenV6 = implode($arrayV6);
+            if ($listenV6 == "0000000000000001") {
+                continue;
+            }
+        }
         $services[] = $tcp_port;
         if (($service = getservbyport($tcp_port, 'tcp')) && (1 === count(array_keys($services, $tcp_port)))) {
             discover_service($device, $service);
         }
     }
 }
-echo "\n";
