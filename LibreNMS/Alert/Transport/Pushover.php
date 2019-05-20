@@ -43,24 +43,10 @@ class Pushover extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $pushover_opts = $this->config;
         $pushover_opts['options'] = $this->parseUserOptions($this->config['options']);
 
         return $this->contactPushover($obj, $pushover_opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $api) {
-            $response = $this->contactPushover($obj, $api);
-            if ($response !== true) {
-                return $response;
-            }
-        }
-        return true;
     }
 
     public function contactPushover($obj, $api)

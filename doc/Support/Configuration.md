@@ -131,6 +131,13 @@ $config['unflatten']        = "/usr/bin/unflatten";
 $config['neato']            = "/usr/bin/neato";
 $config['sfdp']             = "/usr/bin/sfdp";
 ```
+### Authentication
+
+Generic Authentication settings.
+
+```php
+$config['password']['min_length'] = 8;  // password minimum length for auth that allows user creation
+```
 
 ### Proxy support
 
@@ -420,7 +427,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Alerting/Rules.md)
+[Alerting](../Alerting/index.md)
 
 ### Billing
 

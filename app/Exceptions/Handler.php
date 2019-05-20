@@ -55,14 +55,14 @@ class Handler extends ExceptionHandler
         return parent::render($request, $exception);
     }
 
-    /**
-     * @param array $convert
-     * @return Handler
-     */
-    public function setConvert(array $convert): Handler
+    protected function convertExceptionToArray(Exception $e)
     {
-        $this->convert = $convert;
-        return $this;
+        // override the non-debug error output to clue in user on how to debug
+        if (!config('app.debug') && !$this->isHttpException($e)) {
+            return ['message' => 'Server Error: Set APP_DEBUG=true to see details.'];
+        }
+
+        return parent::convertExceptionToArray($e);
     }
 
     /**

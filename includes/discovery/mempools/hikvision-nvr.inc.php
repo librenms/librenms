@@ -26,9 +26,9 @@
 if ($device['os'] === 'hikvision-nvr') {
     echo 'hikvision-nvr:';
 
-        $index = 0;
-        $type = 'hikvision-nvr';
-        $descr = 'Memory';
-        $precision = '1'; 
-        discover_mempool($valid_mempool, $device, $index, $type, $descr, $precision, null, null);
+    $index = 0;
+    $type = 'hikvision-nvr';
+    $descr = 'Memory';
+    $precision = '1';
+    discover_mempool($valid_mempool, $device, $index, $type, $descr, $precision, null, null);
 }

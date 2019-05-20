@@ -11,7 +11,7 @@ Some users may want to know if devices stop responding to ping more quickly than
 to run ping checks as quickly as possible without increasing snmp load on your devices by switching to 1 minute polling.
 
 > **WARNING**: If you do not have an alert rule that alerts on device status, enabling this will be a waste of resources.
-> You can find one in the [Alert Rules Collection](../Alerting/Rules.md#Alert Rules Collection).
+> You can find one in the [Alert Rules Collection](../Alerting/Rules.md#alert-rules-collection).
                          
 
 

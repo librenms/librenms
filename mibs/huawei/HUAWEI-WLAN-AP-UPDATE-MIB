@@ -1,0 +1,855 @@
+-- ============================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The mib is used for update the ap's program version.
+-- Reference: HUAWEI-WLAN-MIB
+-- Version: V1.10
+-- ============================================================================
+-- Module definition
+
+	HUAWEI-WLAN-AP-UPDATE-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			hwWlan
+				FROM HUAWEI-WLAN-MIB
+		        hwWlanApType
+		                FROM HUAWEI-WLAN-AP-MIB
+		        hwAPGroupName
+		                FROM HUAWEI-WLAN-CONFIGURATION-MIB
+		        hwWlanApName
+		                FROM HUAWEI-WLAN-AP-MIB
+		        hwWlanApMac
+		                FROM HUAWEI-WLAN-AP-MIB
+			hwWlanApId
+				FROM HUAWEI-WLAN-AP-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+				FROM SNMPv2-CONF
+			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
+			MODULE-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+			MacAddress, RowStatus, DateAndTime
+				FROM SNMPv2-TC;
+		--1.3.6.1.4.1.2011.6.139.14
+		hwWlanApUpdate MODULE-IDENTITY
+			LAST-UPDATED "201611071451Z"		-- Nov 7, 2016 at 14:51 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+			"Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+				  "
+			
+                                                                DESCRIPTION 
+				"The MIB module defines the AP update operation."
+				     
+			REVISION "201611071451Z"		-- Nov 7, 2016 at 14:51 GMT
+			DESCRIPTION 
+				"V1.10, Modify the hwWlanApUpdateProgressStatus."
+			
+			REVISION "201606021520Z"		-- June 2, 2016 at 15:20 GMT
+			DESCRIPTION 
+				"V1.09, Add the hwWlanApUpdateOperEntry."
+				
+			REVISION "201605171015Z"		-- May 17, 2016 at 10:15 GMT
+			DESCRIPTION 
+				"V1.08, Add the hwWlanApUpdateFileType in the hwWlanApUpdateProgressTable."
+				
+			REVISION "201604181120Z"		-- April 18, 2016 at 11:20 GMT
+			DESCRIPTION 
+				"V1.07, Add the hwWlanApUpdateScheduleTaskTable and the hwWlanApUpdateType in the hwWlanApUpdateProgressTable."
+			
+			REVISION "201603231009Z"		-- March 23, 2016 at 10:09 GMT
+
+                                                                DESCRIPTION 
+				"The MIB module defines the AP update operation."
+			REVISION "201512180926Z"		-- December 18, 2015 at 09:26 GMT
+			DESCRIPTION 
+				"
+				V1.05, Add the value of hwWlanApUpdateProgressStatus.
+				"
+			REVISION "201509151030Z"		-- sept 15, 2015 at 10:30 GMT
+			DESCRIPTION 
+				"V1.04, Add the AP ID in the trap node."
+			REVISION "201508261030Z"		-- Aug 26, 2015 at 10:30 GMT
+			DESCRIPTION 
+				"V1.03, Add the AP ID in the trap node."
+			REVISION "201505111725Z"		-- May 11, 2015 at 17:25 GMT
+			DESCRIPTION 
+				"
+				V1.02, Add the description of mib nodes.
+				"
+			REVISION "201504071725Z"		-- April 07, 2015 at 17:25 GMT
+			DESCRIPTION 
+				"
+				V1.01, Add the value of hwWlanApUpdateProgressStatus.
+				"
+			REVISION "201502021009Z"		-- February 02, 2015 at 10:09 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			::= { hwWlan 14 }
+
+--
+--Node definitions
+--
+
+		--1.3.6.1.4.1.2011.6.139.14.1
+		hwWlanApUpdateTrap OBJECT IDENTIFIER ::= { hwWlanApUpdate 1 }
+
+		--1.3.6.1.4.1.2011.6.139.14.1.1
+		hwWlanApUpdateBeginTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApName, hwWlanApMac, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates an AP upgrade start alarm.."
+			::= { hwWlanApUpdateTrap 1 }
+
+		--1.3.6.1.4.1.2011.6.139.14.1.2
+		hwWlanApUpdateResultTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApName, hwWlanApUpdateResult, hwWlanApMac, hwWlanApUpdateTime, hwWlanApUpdateByFileName, 
+			hwWlanApUpdateNextOper, hwWlanApUpdateResultStatus, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the upgrade result alarm."
+			::= { hwWlanApUpdateTrap 2 }
+
+		--1.3.6.1.4.1.2011.6.139.14.1.3
+		hwWlanApUpdateUbootNotMatchTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApName, hwWlanApMac, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the Uboot version does not match the AP version."
+			::= { hwWlanApUpdateTrap 3 }
+
+		--1.3.6.1.4.1.2011.6.139.14.2
+		hwWlanApUpdateTrapObjects OBJECT IDENTIFIER ::= { hwWlanApUpdate 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.2.1
+		hwWlanApUpdateResult OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				success(1) ,
+				failureUnknownError(2) ,
+				failureInsufficientMemory(3) ,
+				failureDownloadFileFailure(4) ,
+				failureMismatchVersionEfsAndFileName(5) ,
+				failureInvalidFileName(6) ,
+				failureMismatchApTypeInEfs(7) ,
+				failureFileContentError(8) ,
+				failureWriteFlashFailure(9) ,
+				failureTimeoutForUpgrade(10) ,
+				failureCommunicationFaultApAndAc(11)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"AP upgrade result."
+			::= { hwWlanApUpdateTrapObjects 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.2.2
+		hwWlanApUpdateTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"AP upgrade time."
+			::= { hwWlanApUpdateTrapObjects 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.2.3
+		hwWlanApUpdateByFileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"AP upgrade file name."
+			::= { hwWlanApUpdateTrapObjects 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.2.4
+		hwWlanApUpdateNextOper OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				notReset(1) ,
+				reset(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Action after the upgrade."
+			::= { hwWlanApUpdateTrapObjects 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.2.5
+		hwWlanApUpdateResultStatus OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"AP upgrade result status."
+			::= { hwWlanApUpdateTrapObjects 5 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3
+		hwWlanApUpdateObjects OBJECT IDENTIFIER ::= { hwWlanApUpdate 3 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.1
+		hwWlanApUpdateConfig OBJECT IDENTIFIER ::= { hwWlanApUpdateObjects 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.1
+		hwWlanApUpdateFTPIPAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the IP address of the FTP server used in FTP upgrade mode."
+			::= { hwWlanApUpdateConfig 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.2
+		hwWlanApUpdateFTPUsername OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the user name of the FTP client used in FTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateFTPIPAddress or hwWlanApUpdateFTPIPv6Address."
+			::= { hwWlanApUpdateConfig 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.3
+		hwWlanApUpdateFTPPassword OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the password of the FTP client used in FTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateFTPIPAddress or hwWlanApUpdateFTPIPv6Address."
+			::= { hwWlanApUpdateConfig 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.4
+		hwWlanApUpdateMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ftp(1) ,
+				ac(2) ,
+				sftp(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP upgrade mode."
+			::= { hwWlanApUpdateConfig 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.5
+		hwWlanApUpdateSFTPIPAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the IP address of the SFTP server used in SFTP upgrade mode."
+			::= { hwWlanApUpdateConfig 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.6
+		hwWlanApUpdateSFTPUsername OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the user name of the SFTP client used in SFTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateSFTPIPAddress or hwWlanApUpdateSFTPIPv6Address."
+			::= { hwWlanApUpdateConfig 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.7
+		hwWlanApUpdateSFTPPassword OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the password of the SFTP client used in SFTP upgrade mode. NOTE: It should be configured together with hwWlanApUpdateSFTPIPAddress or hwWlanApUpdateSFTPIPv6Address."
+			::= { hwWlanApUpdateConfig 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.8
+		hwWlanApUpdateFTPMaxConnectNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the maximum number of FTP connections."
+			::= { hwWlanApUpdateConfig 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.9
+		hwWlanApUpdateSFTPMaxConnectNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the maximum number of SFTP connections."
+			::= { hwWlanApUpdateConfig 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.10
+		hwWlanApUpdateFTPIPv6Address OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the IPv6 address of the FTP server."
+			::= { hwWlanApUpdateConfig 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.1.11
+		hwWlanApUpdateSFTPIPv6Address OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the IPv6 address of the SFTP server."
+			::= { hwWlanApUpdateConfig 11 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.2
+		hwWlanApUpdateTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApUpdateEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table maps AP types to upgrade file names. It allows you to upgrade APs in batches based on AP types."
+			::= { hwWlanApUpdateObjects 2 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.2.1
+		hwWlanApUpdateEntry OBJECT-TYPE
+			SYNTAX HwWlanApUpdateEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The index of this table is hwWlanApType."
+			INDEX { hwWlanApType }
+			::= { hwWlanApUpdateTable 1 }
+
+
+		HwWlanApUpdateEntry ::=
+			SEQUENCE {				
+				hwWlanApUpdateFilename
+					OCTET STRING,
+				hwWlanApUpdateAdminOper
+					INTEGER,
+				hwWlanApUpdatePercent
+					Integer32,
+				hwWlanApUpdateRowStatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.2.1.1
+		hwWlanApUpdateFilename OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the upgrade file matching the type of the APs to be upgraded."
+			::= { hwWlanApUpdateEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.2.1.2
+		hwWlanApUpdateAdminOper OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				start(1) ,
+				reset(2) ,
+				cancel(3)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the APs begin to upgrade start(1): The AP upgrade starts reset(2): After the upgrade is complete, the APs are restarted cancel(3): The upgrade is canceled."
+			::= { hwWlanApUpdateEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.2.1.3
+		hwWlanApUpdatePercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP upgrade progress, namely, the percentage of upgraded APs to all APs of the same type."
+			::= { hwWlanApUpdateEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.2.1.4
+		hwWlanApUpdateRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the row status of this table."
+			::= { hwWlanApUpdateEntry 4 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.3
+		hwWlanApUpdateProgressTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApUpdateProgressEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query the AP upgrade progress."
+			::= { hwWlanApUpdateObjects 3 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.3.1
+		hwWlanApUpdateProgressEntry OBJECT-TYPE
+			SYNTAX HwWlanApUpdateProgressEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The index of this table is hwWlanApMac."
+			INDEX { hwWlanApMac }
+			::= { hwWlanApUpdateProgressTable 1 }
+
+
+		HwWlanApUpdateProgressEntry ::=
+			SEQUENCE {				
+				hwWlanApUpdateProgressStatus
+					INTEGER,
+				hwWlanApUpdateProgress
+					Integer32,
+				hwWlanApFlashProgress
+					Integer32,   
+				hwWlanApUpdateType
+					INTEGER,
+				hwWlanApUpdateFileType
+					INTEGER 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.3.1.1
+		hwWlanApUpdateProgressStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				noUpdateResult(1) ,
+				updating(2) ,
+				updateSuccessful(3) ,
+				updateFailed(4) ,
+				insufficientApMemory(5) ,
+				failToDownloadFile(6) ,
+				efsAndVersionMismatched(7) ,
+				invalidFileName(8) ,
+				efsAndApTypeMismatched(9) ,
+				fileContentError(10) ,
+				writingMemoryError(11) ,
+				updateTimeout(12) ,
+				apAcLinkDown(13) ,
+				noNeedToUpdate(14) ,
+				updateCancel(15) ,
+				sendFirstFileFailed(16) ,
+				receiveFileFailed(17),
+				retransferFileFailed(18),
+				updateOverMaxTime(19),
+				noResult(20),
+				waitForNextBatch(21),
+				noNeedUpdateNeedReset(22) ,
+				neitherNeedUpdateNorReset(23) ,
+				fileLoading(24),
+				identifierErr(25) ,
+				notInConfig(26),
+				getFtpInfoFailed(27),
+				getSftpInfoFailed(28) ,
+				blockFull(29),
+				readFileFailed(30) ,
+				normalToStandby(31) ,
+				modeChanged(32),
+				succeedNeedReset(33),
+				succeedAutoResetting(34),
+				sendUpgradeCfgErr(35),
+				sendUpgradeRequestErr(36),
+				waitFragmentationTimeout(37),
+				upgradeCfgResponseErr(38),
+				processUpgradeFilenameErr(39),
+				cannotGetApType(40),
+				batchUpgradeApTypeMismatched(41),
+				analyzeVersionErr(42),
+				ageTimeOut(43),
+				isUpdatingNow(44),
+				succeedNeedModeSwitch(45),		
+				updateFsmStateCheckFailed(46),  
+				fileChanged(47),
+				noUpdateProgressStatus(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP upgrade status."
+			::= { hwWlanApUpdateProgressEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.3.1.2
+		hwWlanApUpdateProgress OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP upgrade progress."
+			::= { hwWlanApUpdateProgressEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.3.1.3
+		hwWlanApFlashProgress OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the flash writing progress."
+			::= { hwWlanApUpdateProgressEntry 3 }     
+			
+		--1.3.6.1.4.1.2011.6.139.14.3.3.1.4
+		hwWlanApUpdateType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				autoUpdate(1) ,
+				onlineUpdate(2)				
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP upgrade type."
+			::= { hwWlanApUpdateProgressEntry 4 }   
+			
+		--1.3.6.1.4.1.2011.6.139.14.3.3.1.5
+		hwWlanApUpdateFileType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				fit(1) ,
+				fat(2) ,
+				fatCloud(3) 			
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP upgrade file type."
+			::= { hwWlanApUpdateProgressEntry 5 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.4
+		hwWlanSingleApUpdateTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanSingleApUpdateEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to specify the mapping relationship between AP IDs and upgrade file names and to perform upgrade based on specified APs."
+			::= { hwWlanApUpdateObjects 4 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.4.1
+		hwWlanSingleApUpdateEntry OBJECT-TYPE
+			SYNTAX HwWlanSingleApUpdateEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The index of this table is hwWlanApMac."
+			INDEX { hwWlanApMac }
+			::= { hwWlanSingleApUpdateTable 1 }
+
+
+		HwWlanSingleApUpdateEntry ::=
+			SEQUENCE {				
+				hwWlanSingleApUpdateAdminOper
+					INTEGER,
+				hwWlanSingleApUpdatePercent
+					Integer32,
+				hwWlanSingleApUpdateFilename
+					OCTET STRING 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.4.1.1
+		hwWlanSingleApUpdateAdminOper OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				start(1) ,
+				reset(2) ,
+				cancel(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates a single AP upgrade start(1): The AP upgrade starts reset(2): After the upgrade is complete, the AP is restarted cancel(3): The upgrade is canceled."
+			::= { hwWlanSingleApUpdateEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.4.1.2
+		hwWlanSingleApUpdatePercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the single AP upgrade progress."
+			::= { hwWlanSingleApUpdateEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.4.1.3
+		hwWlanSingleApUpdateFilename OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the upgrade file matching the type of the AP to be upgraded."
+			::= { hwWlanSingleApUpdateEntry 3 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.5
+		hwWlanApTypeGroupUpdateTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApTypeGroupUpdateEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to map AP types and AP groups to upgrade file names. It allows you to upgrade APs in batches based on AP types and AP groups."
+			::= { hwWlanApUpdateObjects 5 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.5.1
+		hwWlanApTypeGroupUpdateEntry OBJECT-TYPE
+			SYNTAX HwWlanApTypeGroupUpdateEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanApType and hwAPGroupName."
+			INDEX { hwWlanApType, hwAPGroupName }
+			::= { hwWlanApTypeGroupUpdateTable 1 }
+
+
+		HwWlanApTypeGroupUpdateEntry ::=
+			SEQUENCE {				
+				hwWlanApTypeGroupUpdateFilename
+					OCTET STRING,
+				hwWlanApTypeGroupUpdateAdminOper
+					INTEGER,
+				hwWlanApTypeGroupUpdatePercent
+					Integer32,
+				hwWlanApTypeGroupUpdateRowStatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.5.1.1
+		hwWlanApTypeGroupUpdateFilename OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the name of the upgrade file matching the type of the APs to be upgraded."
+			::= { hwWlanApTypeGroupUpdateEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.5.1.2
+		hwWlanApTypeGroupUpdateAdminOper OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				start(1) ,
+				reset(2) ,
+				cancel(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates an upgrade operation start(1): The AP upgrade starts reset(2): After the upgrade is complete, the APs are restarted cancel(3): The upgrade is canceled."
+			::= { hwWlanApTypeGroupUpdateEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.5.1.3
+		hwWlanApTypeGroupUpdatePercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP upgrade progress, namely, the percentage of upgraded APs to all APs of the same type."
+			::= { hwWlanApTypeGroupUpdateEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.14.3.5.1.4
+		hwWlanApTypeGroupUpdateRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the row status of this table."
+			::= { hwWlanApTypeGroupUpdateEntry 4 } 
+		
+		--1.3.6.1.4.1.2011.6.139.14.3.6
+		hwWlanApUpdateScheduleTaskTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApUpdateScheduleTaskEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to create, query, and delete scheduled upgrade tasks."
+			::= { hwWlanApUpdateObjects 6 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.6.1
+		hwWlanApUpdateScheduleTaskEntry OBJECT-TYPE
+			SYNTAX HwWlanApUpdateScheduleTaskEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table is hwWlanApUpdateScheduleTaskId."
+			INDEX { hwWlanApUpdateScheduleTaskId }
+			::= { hwWlanApUpdateScheduleTaskTable 1 }
+
+
+		HwWlanApUpdateScheduleTaskEntry ::=
+			SEQUENCE {				
+				hwWlanApUpdateScheduleTaskId  
+					Integer32,
+				hwWlanApUpdateScheduleTaskStartTime				
+					OCTET STRING, 
+				hwWlanApUpdateScheduleTaskStopTime				
+					OCTET STRING, 
+				hwWlanApUpdateScheduleTaskApType
+					Integer32,
+			    hwWlanApUpdateScheduleTaskApGroup
+					OCTET STRING,
+				hwWlanApUpdateScheduleTaskState
+					INTEGER,
+				hwWlanApUpdateScheduleTaskRowStatus
+					RowStatus 
+			 }  
+		
+		--1.3.6.1.4.1.2011.6.139.14.3.6.1.1
+		hwWlanApUpdateScheduleTaskId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the ID of the task."
+			::= { hwWlanApUpdateScheduleTaskEntry 1 }
+        
+        --1.3.6.1.4.1.2011.6.139.14.3.6.1.2
+		hwWlanApUpdateScheduleTaskStartTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the starting time that is in the format of 'YYYY/MM/DD,HH:MM'."
+			::= { hwWlanApUpdateScheduleTaskEntry 2 }   
+			        
+        --1.3.6.1.4.1.2011.6.139.14.3.6.1.3
+		hwWlanApUpdateScheduleTaskStopTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the stopping time that is in the format of 'YYYY/MM/DD,HH:MM'."
+			::= { hwWlanApUpdateScheduleTaskEntry 3 }   
+					
+		--1.3.6.1.4.1.2011.6.139.14.3.6.1.4
+		hwWlanApUpdateScheduleTaskApType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the type of the APs to be upgraded."
+			::= { hwWlanApUpdateScheduleTaskEntry 4 }
+
+        --1.3.6.1.4.1.2011.6.139.14.3.6.1.5
+		hwWlanApUpdateScheduleTaskApGroup OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the group of the APs to be upgraded."
+			::= { hwWlanApUpdateScheduleTaskEntry 5 } 
+						
+		--1.3.6.1.4.1.2011.6.139.14.3.6.1.6
+		hwWlanApUpdateScheduleTaskState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				idle(1) ,
+				running(2) ,
+				waitting(3),
+				done(4),
+				overtime(5),
+				dead(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the state of the task."
+			::= { hwWlanApUpdateScheduleTaskEntry 6 }
+
+        --1.3.6.1.4.1.2011.6.139.14.3.6.1.7
+		hwWlanApUpdateScheduleTaskRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the row status."
+			::= { hwWlanApUpdateScheduleTaskEntry 7 }
+       
+        --1.3.6.1.4.1.2011.6.139.14.3.7
+		hwWlanApUpdateOperEntry OBJECT IDENTIFIER ::= { hwWlanApUpdateObjects 7 }
+
+		--1.3.6.1.4.1.2011.6.139.14.3.7.1
+		hwWlanApUpdateOperAdminOper OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				start(1) ,
+				reset(2) ,
+				cancel(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the APs begin to upgrade start(1): The AP upgrade starts reset(2): After the upgrade is complete, the APs are restarted cancel(3): The upgrade is canceled."
+			::= { hwWlanApUpdateOperEntry 1 }   
+			
+		--1.3.6.1.4.1.2011.6.139.14.3.7.2
+		hwWlanApUpdateOperApType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the type of the APs to be upgraded."
+			::= { hwWlanApUpdateOperEntry 2 }  
+			
+		--1.3.6.1.4.1.2011.6.139.14.3.7.3
+		hwWlanApUpdateOperApGroup OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the group of the APs to be upgraded."
+			::= { hwWlanApUpdateOperEntry 3 }
+
+        --1.3.6.1.4.1.2011.6.139.14.3.7.4
+		hwWlanApUpdateOperPercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP upgrade progress, namely, the percentage of upgraded APs to all APs."
+			::= { hwWlanApUpdateOperEntry 4 }
+
+		--1.3.6.1.4.1.2011.6.139.14.4
+		hwWlanApUpdateConformance OBJECT IDENTIFIER ::= { hwWlanApUpdate 4 }
+
+		--1.3.6.1.4.1.2011.6.139.14.4.1
+		hwWlanApUpdateCompliances OBJECT IDENTIFIER ::= { hwWlanApUpdateConformance 1 }
+
+		--1.3.6.1.4.1.2011.6.139.14.4.1.1
+		hwWlanApUpdateCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE
+					MANDATORY-GROUPS { hwWlanApUpdateTrapObjectsGroup, hwWlanApUpdateObjectsGroup }
+			::= { hwWlanApUpdateCompliances 1 }
+
+		--1.3.6.1.4.1.2011.6.139.14.4.2
+		hwWlanApUpdateObjectGroups OBJECT IDENTIFIER ::= { hwWlanApUpdateConformance 2 }
+
+		--1.3.6.1.4.1.2011.6.139.14.4.2.1
+		hwWlanApUpdateTrapGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwWlanApUpdateBeginTrap, hwWlanApUpdateResultTrap, hwWlanApUpdateUbootNotMatchTrap }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanApUpdateObjectGroups 1 }
+
+		--1.3.6.1.4.1.2011.6.139.14.4.2.2
+		hwWlanApUpdateTrapObjectsGroup OBJECT-GROUP
+			OBJECTS { hwWlanApUpdateResult, hwWlanApUpdateTime, hwWlanApUpdateByFileName, hwWlanApUpdateNextOper, hwWlanApUpdateResultStatus }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanApUpdateObjectGroups 2 }
+
+		--1.3.6.1.4.1.2011.6.139.14.4.2.3
+		hwWlanApUpdateObjectsGroup OBJECT-GROUP
+			OBJECTS { hwWlanApUpdateFTPIPAddress, hwWlanApUpdateFTPUsername, hwWlanApUpdateFTPPassword, hwWlanApUpdateMode, hwWlanApUpdateSFTPIPAddress, 
+			hwWlanApUpdateSFTPUsername, hwWlanApUpdateSFTPPassword, hwWlanApUpdateFTPMaxConnectNum, hwWlanApUpdateSFTPMaxConnectNum, hwWlanApUpdateFTPIPv6Address, 
+			hwWlanApUpdateSFTPIPv6Address, hwWlanApUpdateFilename, hwWlanApUpdateAdminOper, hwWlanApUpdatePercent, hwWlanApUpdateRowStatus, 
+			hwWlanApUpdateProgressStatus, hwWlanApUpdateProgress, hwWlanApFlashProgress, hwWlanApUpdateType, hwWlanApUpdateFileType, hwWlanSingleApUpdateAdminOper, hwWlanSingleApUpdatePercent, 
+			hwWlanSingleApUpdateFilename, hwWlanApTypeGroupUpdateFilename, hwWlanApTypeGroupUpdateAdminOper, hwWlanApTypeGroupUpdatePercent, hwWlanApTypeGroupUpdateRowStatus,
+			hwWlanApUpdateScheduleTaskStartTime, hwWlanApUpdateScheduleTaskStopTime, hwWlanApUpdateScheduleTaskApType, 
+			hwWlanApUpdateScheduleTaskApGroup, hwWlanApUpdateScheduleTaskState, hwWlanApUpdateScheduleTaskRowStatus, hwWlanApUpdateOperAdminOper, hwWlanApUpdateOperApType,
+			hwWlanApUpdateOperApGroup, hwWlanApUpdateOperPercent }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanApUpdateObjectGroups 3 }
+
+
+	END
+--
+-- HUAWEI-WLAN-AP-UPDATE-MIB.mib
+--

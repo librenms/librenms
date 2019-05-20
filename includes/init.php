@@ -72,10 +72,10 @@ if (module_selected('mocksnmp', $init_modules)) {
 require_once $install_dir . '/includes/services.inc.php';
 require_once $install_dir . '/includes/functions.php';
 require_once $install_dir . '/includes/rewrites.php';
+require_once $install_dir . '/includes/device-groups.inc.php';
 
 if (module_selected('web', $init_modules)) {
-    chdir($install_dir . '/html');
-    require_once $install_dir . '/html/includes/functions.inc.php';
+    require_once $install_dir . '/includes/html/functions.inc.php';
 }
 
 if (module_selected('discovery', $init_modules)) {
@@ -83,12 +83,10 @@ if (module_selected('discovery', $init_modules)) {
 }
 
 if (module_selected('polling', $init_modules)) {
-    require_once $install_dir . '/includes/device-groups.inc.php';
     require_once $install_dir . '/includes/polling/functions.inc.php';
 }
 
 if (module_selected('alerts', $init_modules)) {
-    require_once $install_dir . '/includes/device-groups.inc.php';
     require_once $install_dir . '/includes/alerts.inc.php';
 }
 
@@ -149,11 +147,7 @@ if (module_selected('discovery', $init_modules) && !update_os_cache()) {
 }
 
 if (module_selected('web', $init_modules)) {
-    umask(0002);
-    if (!isset($config['title_image'])) {
-        $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
-    }
-    require $install_dir . '/html/includes/vars.inc.php';
+    require $install_dir . '/includes/html/vars.inc.php';
 }
 
 $console_color = new Console_Color2();

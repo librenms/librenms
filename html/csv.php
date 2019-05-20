@@ -12,20 +12,27 @@
  * the source code distribution for details.
  */
 
-$init_modules = array('web', 'auth');
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
+
+$init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+if (!LegacyAuth::check()) {
+    die('Unauthorized');
+}
 
 set_debug(strpos($_SERVER['PATH_INFO'], 'debug'));
 
-$report = mres($vars['report']);
-if (!empty($report) && file_exists("includes/reports/$report.csv.inc.php")) {
+$report = basename($vars['report']);
+if ($report && file_exists(Config::get('install_dir') . "/includes/html/reports/$report.csv.inc.php")) {
     if ($debug === false) {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="'.$report.'-'.date('Ymd').'.csv"');
     }
 
-    $csv = array();
-    require $config['install_dir'] . "/html/includes/reports/$report.csv.inc.php";
+    $csv = [];
+    require Config::get('install_dir') . "/includes/html/reports/$report.csv.inc.php";
     foreach ($csv as $line) {
         echo implode(',', $line)."\n";
     }

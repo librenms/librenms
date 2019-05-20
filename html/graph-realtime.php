@@ -57,6 +57,7 @@ $attribs['out']='fill="blue" font-family="Tahoma, Verdana, Arial, Helvetica, san
 $attribs['graph_in']='fill="none" stroke="green" stroke-opacity="0.8"';
 $attribs['graph_out']='fill="none" stroke="blue" stroke-opacity="0.8"';
 $attribs['legend']='fill="black" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4"';
+$attribs['cachewarning']='fill="darkorange" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4"';
 $attribs['graphname']='fill="#435370" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="9"';
 $attribs['hostname']='fill="#435370" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="6"';
 $attribs['grid_txt']='fill="gray" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="6"';
@@ -96,6 +97,7 @@ print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
     <text id="switch_scale" x="<?php echo($width*0.48) ?>" y="11" <?php echo($attribs['switch_scale']) ?>>AutoScale (<?php echo($scale_type) ?>)</text>
     <text id="datetime" x="<?php echo($width*0.33) ?>" y="5" <?php echo($attribs['legend']) ?>> </text>
     <text id="graphlast" x="<?php echo($width*0.48) ?>" y="17" <?php echo($attribs['legend']) ?>>Graph shows last <?php echo($time_interval*$nb_plot) ?> seconds</text>
+    <text id="cachewarning" x="<?php echo($width*0.48) ?>" y="22" <?php echo($attribs['cachewarning']) ?> visibility="hidden">Caching may be in effect (<tspan id="cacheinterval">?</tspan>s)</text>
     <polygon id="axis_arrow_x" <?php echo($attribs['axis']) ?> points="<?php echo($width . "," . $height) ?> <?php echo(($width-2) . "," . ($height-2)) ?> <?php echo(($width-2) . "," . $height) ?>"/>
     <text id="error" x="<?php echo($width*0.5) ?>" y="<?php echo($height*0.5) ?>"  visibility="hidden" <?php echo($attribs['error']) ?> text-anchor="middle"><?php echo($error_text) ?></text>
     <text id="collect_initial" x="<?php echo($width*0.5) ?>" y="<?php echo($height*0.5) ?>"  visibility="hidden" <?php echo($attribs['collect_initial']) ?> text-anchor="middle">Collecting initial data, please wait...</text>
@@ -151,9 +153,11 @@ var SVGDoc = null;
 var last_ifin = 0;
 var last_ifout = 0;
 var last_ugmt = 0;
+var last_real = 0;
+var real_interval = 0;
 var max = 0;
-var plot_in = new Array();
-var plot_out = new Array();
+var plot_in = [];
+var plot_out = [];
 
 var max_num_points = <?php echo($nb_plot) ?>;  // maximum number of plot data points
 var step = <?php echo($width) ?> / max_num_points ;
@@ -207,6 +211,21 @@ function plot_data(obj) {
   var diff_ifin  = ifin - last_ifin;
   var diff_ifout = ifout - last_ifout;
 
+  if (diff_ifin === 0 && diff_ifout === 0) {
+      handle_error('cachewarning');
+  } else {
+      var diff_real = ugmt - last_real;
+      last_real = ugmt;
+      if (real_interval === 0) {
+          if (diff_real < 10000) {
+              real_interval = diff_real;
+          }
+      } else {
+          // running average to smooth out the numbers a bit
+          real_interval = (diff_real + real_interval) / 2;
+      }
+  }
+
   if (diff_ugmt == 0)
     diff_ugmt = 1;  /* avoid division by zero */
 
@@ -226,28 +245,26 @@ function plot_data(obj) {
         break;
     case max_num_points:
         // shift plot to left if the maximum number of plot points has been reached
-        var i = 0;
-        while (i < max_num_points) {
-          plot_in[i] = plot_in[i+1];
-          plot_out[i] = plot_out[++i];
-        }
-        plot_in.length--;
-        plot_out.length--;
+        plot_in.shift();
+        plot_out.shift();
   }
 
-  plot_in[plot_in.length] = diff_ifin / diff_ugmt;
-  plot_out[plot_out.length]= diff_ifout / diff_ugmt;
-  var index_plot = plot_in.length - 1;
+  var current_in = diff_ifin / diff_ugmt;
+  var current_out = diff_ifout / diff_ugmt;
+  plot_in.push(current_in);
+  plot_out.push(current_out);
 
-  SVGDoc.getElementById('graph_in_txt').firstChild.data = formatSpeed(plot_in[index_plot], unit);
-  SVGDoc.getElementById('graph_out_txt').firstChild.data = formatSpeed(plot_out[index_plot], unit);
+  if (current_in !== 0 && current_out !== 0) {
+      SVGDoc.getElementById('graph_in_txt').firstChild.data = formatSpeed(current_in, unit);
+      SVGDoc.getElementById('graph_out_txt').firstChild.data = formatSpeed(current_out, unit);
+  }
 
   /* determine peak for sensible scaling */
   if (scale_type == 'up') {
-    if (plot_in[index_plot] > max)
-      max = plot_in[index_plot];
-    if (plot_out[index_plot] > max)
-      max = plot_out[index_plot];
+    if (current_in > max)
+      max = current_in;
+    if (current_out > max)
+      max = current_out;
   }
   else if (scale_type == 'follow') {
     i = 0;
@@ -304,10 +321,12 @@ function plot_data(obj) {
   for (i = 1; i < plot_in.length; i++)
   {
     var x = step * i;
-    var y_in = <?php echo($height) ?> - (plot_in[i] * scale);
-    var y_out = <?php echo($height) ?> - (plot_out[i] * scale);
-    path_in += " L" + x + " " + y_in;
-    path_out += " L" + x + " " + y_out;
+    if (plot_in[i] !== 0 && plot_out[i] !== 0) {
+        var y_in = <?php echo($height) ?> - (plot_in[i] * scale);
+        var y_out = <?php echo($height) ?> - (plot_out[i] * scale);
+        path_in += " L" + x + " " + y_in;
+        path_out += " L" + x + " " + y_out;
+    }
   }
 
   SVGDoc.getElementById('error').setAttributeNS(null, 'visibility', 'hidden');
@@ -317,8 +336,15 @@ function plot_data(obj) {
   setTimeout('fetch_data()',<?php echo(1000*$time_interval) ?>);
 }
 
-function handle_error() {
-  SVGDoc.getElementById("error").setAttributeNS(null, 'visibility', 'visible');
+function handle_error(type) {
+  if (type === 'cachewarning') {
+    SVGDoc.getElementById("cachewarning").setAttributeNS(null, 'visibility', 'visible');
+    if (real_interval !== 0) {
+        SVGDoc.getElementById('cacheinterval').firstChild.data = Math.round(real_interval);
+    }
+  } else {
+    SVGDoc.getElementById("error").setAttributeNS(null, 'visibility', 'visible');
+  }
   setTimeout('fetch_data()',<?php echo(1000*$time_interval) ?>);
 }
 

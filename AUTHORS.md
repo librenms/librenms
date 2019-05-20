@@ -211,6 +211,8 @@ LibreNMS contributors:
 - Joel Kociolek <joel@kociolek.org> (lejoko)
 - Rémy Jacquin <remy@remyj.fr> (remyj38)
 - PipoCanaja <pipocanaja@gmail.com> [pipocanaja](https://github.com/pipocanaja/)
+- Tim de Boer <tim+github@tim427.net> (tim427)
+- Pavle Obradovic <pobradovic08@gmail.com> (pobradovic08)
 
 Observium was written by:
 - Adam Armstrong

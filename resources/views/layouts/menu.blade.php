@@ -9,7 +9,7 @@
             </button>
             <a class="hidden-md hidden-sm navbar-brand" href>
             @if($title_image)
-                <img src="{{ $title_image }}" alt="{{ $project_name }}">
+                <img src="{{ asset($title_image) }}" alt="{{ $project_name }}">
             @else
                 {{ $project_name }}
             @endif
@@ -28,10 +28,10 @@
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Availability</a></li>
                                 <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg" aria-hidden="true"></i> Network</a></li>
-                                @if($device_groups)
+                                @if($device_groups->isNotEmpty())
                                     <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">
                                         @foreach($device_groups as $group)
-                                            <li><a href="{{ url('map', [$group->id]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
+                                            <li><a href="{{ url("map/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
                                                 {{ ucfirst($group->name) }}
                                             </a></li>
                                         @endforeach
@@ -43,20 +43,22 @@
                         @if(auth()->user()->isAdmin() || \LibreNMS\Plugins::count())
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> Plugins</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 {!! \LibreNMS\Plugins::call('menu') !!}
                                 @admin
                                     @if(\LibreNMS\Plugins::count())
                                         <li role="presentation" class="divider"></li>
                                     @endif
-                                    <li><a href="{{ url('plugin', ['view' => 'admin']) }}"> <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>Plugin Admin</a></li>
+                                <li><a href="{{ url('plugin/view=admin') }}"> <i class="fa fa-lock fa-fw fa-lg"
+                                                                                 aria-hidden="true"></i>Plugin Admin</a>
+                                </li>
                                 @endadmin
                             </ul>
                         </li>
                         @endif
                         <li class="dropdown-submenu">
                             <a href="{{ url('overview') }}"><i class="fa fa-wrench fa-fw fa-lg" aria-hidden="true"></i> Tools</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg" aria-hidden="true"></i> RIPE NCC API</a></li>
                                 @config('oxidized.enabled')
                                     <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg" aria-hidden="true"></i> Oxidized</a></li>
@@ -93,7 +95,7 @@
                 <li class="dropdown">
                     <a href="{{ url('devices/') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Devices</span></a>
                     <ul class="dropdown-menu">
-                    @if($device_types)
+                    @if($device_types->isNotEmpty())
                         <li class="dropdown-submenu">
                             <a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> All Devices</a>
                             <ul class="dropdown-menu scrollable-menu">
@@ -105,7 +107,7 @@
                         <li class="dropdown-submenu"><a href="#">No devices</a></li>
                     @endif
 
-                    @if($device_groups)
+                    @if($device_groups->isNotEmpty())
                         <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups</a>
                             <ul class="dropdown-menu scrollable-menu">
                             @foreach($device_groups as $group)
@@ -115,14 +117,14 @@
                         </li>
                     @endif
 
-                    @if($locations)
+                    @if($locations->isNotEmpty())
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('Geo Locations')</a>
                             <ul class="dropdown-menu scrollable-menu">
                                 <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('All Locations')</a></li>
                             @foreach($locations as $location)
-                                    <li><a href="{{ url("devices/location=" . urlencode($location)) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location }}</a></li>
+                                    <li><a href="{{ url("devices/location=" . $location->id) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location->display() }}</a></li>
                             @endforeach
                             </ul>
                         </li>
@@ -151,13 +153,13 @@
                         <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Services</span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> All Services </a></li>
-                            @if($service_status)
+                            @if($service_counts['warning'] || $service_counts['critical'])
                                 <li role="presentation" class="divider"></li>
-                                @if($service_warning)
-                                    <li><a href="{{ url('services/state=warning') }}"><i class="fa fa-bell fa-col-warning fa-fw fa-lg" aria-hidden="true"></i> Warning ({{ $service_warning }})</a></li>
+                                @if($service_counts['warning'])
+                                    <li><a href="{{ url('services/state=warning') }}"><i class="fa fa-bell fa-col-warning fa-fw fa-lg" aria-hidden="true"></i> Warning ({{ $service_counts['warning'] }})</a></li>
                                 @endif
-                                @if($service_critical)
-                                    <li><a href="{{ url('services/state=critical') }}"><i class="fa fa-bell fa-col-danger fa-fw fa-lg" aria-hidden="true"></i> Critical ({{ $service_critical }})</a></li>
+                                @if($service_counts['critical'])
+                                    <li><a href="{{ url('services/state=critical') }}"><i class="fa fa-bell fa-col-danger fa-fw fa-lg" aria-hidden="true"></i> Critical ({{ $service_counts['critical'] }})</a></li>
                                 @endif
                             @endif
                             @admin
@@ -185,33 +187,35 @@
                             <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg" aria-hidden="true"></i> Traffic Bills</a></li>
                         @endconfig
 
-                        @if($port_counts['pseudowire'] > 0))
+                        @if($port_counts['pseudowire'] > 0)
                             <li><a href="{{ url('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg" aria-hidden="true"></i> Pseudowires</a></li>
                         @endif
 
                         @if(auth()->user()->hasGlobalRead())
-                            <li role="presentation" class="divider"></li>
-                            @config('int_customers')
-                                <li><a href="{{ url('customers') }}"><i class="fa fa-users fa-fw fa-lg" aria-hidden="true"></i> Customers</a></li>
-                            @endconfig
-                            @config('int_l2tp')
-                                <li><a href="{{ url('iftype/type=l2tp') }}"><i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i> L2TP</a></li>
-                            @endconfig
-                            @config('int_transit')
-                                <li><a href="{{ url('iftype/type=transit') }}"><i class="fa fa-truck fa-fw fa-lg" aria-hidden="true"></i> Transit</a></li>
-                            @endconfig
-                            @config('int_peering')
-                                <li><a href="{{ url('iftype/type=peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg" aria-hidden="true"></i> Peering</a></li>
-                            @endconfig
-                            @if(\LibreNMS\Config::get('int_peering') && \LibreNMS\Config::get('int_transit'))
-                                <li><a href="{{ url('iftype/type=peering,transit') }}"><i class="fa fa-rocket fa-fw fa-lg" aria-hidden="true"></i> Peering + Transit</a></li>
+                            @if($port_groups_exist)
+                                <li role="presentation" class="divider"></li>
+                                @config('int_customers')
+                                    <li><a href="{{ url('customers') }}"><i class="fa fa-users fa-fw fa-lg" aria-hidden="true"></i> Customers</a></li>
+                                @endconfig
+                                @config('int_l2tp')
+                                    <li><a href="{{ url('iftype/type=l2tp') }}"><i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i> L2TP</a></li>
+                                @endconfig
+                                @config('int_transit')
+                                    <li><a href="{{ url('iftype/type=transit') }}"><i class="fa fa-truck fa-fw fa-lg" aria-hidden="true"></i> Transit</a></li>
+                                @endconfig
+                                @config('int_peering')
+                                    <li><a href="{{ url('iftype/type=peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg" aria-hidden="true"></i> Peering</a></li>
+                                @endconfig
+                                @if(\LibreNMS\Config::get('int_peering') && \LibreNMS\Config::get('int_transit'))
+                                    <li><a href="{{ url('iftype/type=peering,transit') }}"><i class="fa fa-rocket fa-fw fa-lg" aria-hidden="true"></i> Peering + Transit</a></li>
+                                @endif
+                                @config('int_core')
+                                    <li><a href="{{ url('iftype/type=core') }}"><i class="fa fa-code-fork fa-fw fa-lg" aria-hidden="true"></i> Core</a></li>
+                                @endconfig
+                                @foreach($custom_port_descr as $custom_descr)
+                                    <li><a href="{{ url('iftype/type=' . urlencode($custom_descr)) }}"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> {{ ucwords($custom_descr) }}</a></li>
+                                @endforeach
                             @endif
-                            @config('int_core')
-                                <li><a href="{{ url('iftype/type=core') }}"><i class="fa fa-code-fork fa-fw fa-lg" aria-hidden="true"></i> Core</a></li>
-                            @endconfig
-                            @foreach((array)\LibreNMS\Config::get('custom_descr', []) as $custom_type)
-                                <li><a href="{{ url('iftype/type=' . urlencode(strtolower($custom_type))) }}"><i class="fa fa-connectdevelop fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($custom_type) }}</a></li>
-                           @endforeach
 
                             <li role="presentation" class="divider"></li>
 
@@ -241,14 +245,14 @@
                                 @if($loop->first)
                                     <li role="presentation" class="divider"></li>
                                 @endif
-                                <li><a href="{{ url('health/metric=' . $sensor_menu_entry->sensor_class) }}"><i class="fa fa-{{ $sensor_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $sensor_menu_entry->classDescr() }}</a></li>
+                                <li><a href="{{ url('health/metric=' . $sensor_menu_entry['class']) }}"><i class="fa fa-{{ $sensor_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $sensor_menu_entry['descr'] }}</a></li>
                             @endforeach
                         @endforeach
 
                     </ul>
                 </li>
 {{-- Wireless --}}
-                @if($wireless_menu->count())
+                @if($wireless_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('wireless') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wifi fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Wireless</span></a>
                         <ul class="dropdown-menu">
@@ -259,13 +263,13 @@
                     </li>
                 @endif
 {{-- App --}}
-                @if($app_menu->count())
+                @if($app_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span class="hidden-sm">Apps</span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url('apps') }}"><i class="fa fa-object-group fa-fw fa-lg" aria-hidden="true"></i> Overview</a></li>
                             @foreach($app_menu as $app_type => $app_instances)
-                                @if($app_instances->filter->app_instance->count() > 0)
+                                @if($app_instances->filter->app_instance->isNotEmpty())
                                     <li class="dropdown-submenu">
                                         <a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a>
                                         <ul class="dropdown-menu scrollable-menu">
@@ -324,12 +328,14 @@
                         @endadmin
                     </ul>
                 </li>
+                @includeIf('menu.custom')
             </ul>
 
 {{-- User --}}
             <form role="search" class="navbar-form navbar-right global-search">
                 <div class="form-group">
-                    <input class="form-control typeahead" type="search" id="gsearch" name="gsearch" placeholder="Global Search">
+                    <input class="form-control typeahead" type="search" id="gsearch" name="gsearch"
+                           placeholder="Global Search" autocomplete="off">
                 </div>
             </form>
             <ul class="nav navbar-nav navbar-right">
@@ -358,16 +364,12 @@
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>
                         <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>
                         <li role="presentation" class="divider"></li>
-                        @if(\LibreNMS\Authentication\LegacyAuth::get()->canManageUsers())
-                            <li><a href="{{ url('adduser') }}"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
-                            <li><a href="{{ url('deluser') }}"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>
-                        @endif
-                        <li><a href="{{ url('edituser') }}"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
+                        <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Manage Users</a></li>
                         <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="{{ url('pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="{{ url('pollers/tab=pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a></li>
                                 @config('distributed_poller')
                                 <li><a href="{{ url('pollers/tab=groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
@@ -379,13 +381,22 @@
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> API</a>
-                            <ul class="dropdown-menu scrollable-menu">
+                            <ul class="dropdown-menu">
                                 <li><a href="{{ url('api-access') }}"><i class="fa fa-cog fa-fw fa-lg" aria-hidden="true"></i> API Settings</a></li>
                                 <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> API Docs</a></li>
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
                         @endadmin
+                        @if (isset($refresh))
+                        <li class="dropdown-submenu">
+                            <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
+                            </ul>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        @endif
                         <li><a href="{{ url('about') }}"><i class="fa fa-info-circle fa-fw fa-lg" aria-hidden="true"></i> About&nbsp;{{ \LibreNMS\Config::get('project_name') }}</a></li>
                     </ul>
                 </li>

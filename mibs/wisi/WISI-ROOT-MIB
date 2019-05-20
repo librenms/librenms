@@ -1,0 +1,21 @@
+WISI-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+	    FROM SNMPv2-SMI;
+
+	wisi			OBJECT IDENTIFIER ::= { enterprises 7465 }
+	equipment		OBJECT IDENTIFIER ::= { wisi 20 }
+	common			OBJECT IDENTIFIER ::= { equipment 1 }
+	devices			OBJECT IDENTIFIER ::= { equipment 2 }
+	hfc			OBJECT IDENTIFIER ::= { devices 1 }
+	transponders		OBJECT IDENTIFIER ::= { devices 2 }
+	configuration		OBJECT IDENTIFIER ::= { devices 3 }
+	ioBoards			OBJECT IDENTIFIER ::= { devices 4 }
+	compact			OBJECT IDENTIFIER ::= { devices 5 }
+	headend			OBJECT IDENTIFIER ::= { devices 6 }
+	scrambler			OBJECT IDENTIFIER ::= { devices 7 }
+	remultiplexer		OBJECT IDENTIFIER ::= { devices 8 }
+	tangram			OBJECT IDENTIFIER ::= { devices 9 }
+
+END
