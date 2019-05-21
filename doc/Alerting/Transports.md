@@ -51,13 +51,13 @@ It is possible to configure as much label values as required in Alertmanager Opt
 ## API
 API transports definitions are a bit more complex than the E-Mail configuration.
 
-The URL can have the same placeholders as defined in the [Template-Syntax](Templates#syntax).
+The URL can have the same placeholders as defined in the [Template-Syntax](Templates.md#syntax).
 
 If the `Api Method` is `get`, all placeholders will be URL-Encoded.
 
 The API transport uses cURL to call the APIs, therefore you might need to install `php curl` to make it work.
 
-__Note__: it is highly recommended to define your own [Templates](Templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
+__Note__: it is highly recommended to define your own [Templates](Templates.md) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
 
 **Example:**
 
@@ -415,7 +415,7 @@ Destination numbers are one per line, with no spaces. They can be in either loca
 
 | Config | Example |
 | ------ | ------- |
-| SMSEagle URL | ip.add.re.ss |
+| SMSEagle Host | ip.add.re.ss |
 | User | smseagle_user |
 | Password | smseagle_user_password |
 | Mobiles | +3534567890 |

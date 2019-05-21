@@ -30,7 +30,7 @@ use LibreNMS\DB\Eloquent;
 class Version
 {
     // Update this on release
-    const VERSION = '1.49';
+    const VERSION = '1.51';
 
     protected $is_git_install = false;
 
@@ -46,8 +46,8 @@ class Version
 
     public function local()
     {
-        if ($this->is_git_install) {
-            return rtrim(shell_exec('git describe --tags'));
+        if ($this->is_git_install && $version = $this->fromGit()) {
+            return $version;
         }
 
         return self::VERSION;
@@ -68,5 +68,10 @@ class Version
         }
 
         return ['last' => 'Not Connected', 'total' => 0];
+    }
+
+    private function fromGit()
+    {
+        return rtrim(shell_exec('git describe --tags 2>/dev/null'));
     }
 }

@@ -224,8 +224,12 @@ $config['alerts']['port_util_perc'] = 85;
 $config['uptime_warning'] = '84600';
 // Time in seconds to display a "Device Rebooted" Alert. 0 to disable warnings.
 // Cosmetics
-$config['rrdgraph_def_text']  = '-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5';
+$config['rrdgraph_def_text']  = '-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5';
 $config['rrdgraph_def_text'] .= ' -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal';
+// This is largely for people who are using a dark CSS override system.
+// For multi-user installs, likely best to leave it at the default or pick one that works nicely for both.
+// If you want a color that works nice for both a dark or light BG, 0000FF seems to.
+$config['rrdgraph_def_text_color'] = '000000';
 $config['rrdgraph_real_percentile'] = false;
 $config['percentile_value'] = 95;
 // Set to TRUE if you want to display the 95% based on the highest value. (aka real 95%)
@@ -884,8 +888,8 @@ $config['allow_duplicate_sysName'] = false;// Set to true if you want to allow d
 
 $config['enable_port_relationship'] = true;
 // Set this to false to not display neighbour relationships for ports
-$config['enable_footer'] = 1;
-// Set this to 0 if you want to disable the footer copyright in the web interface
+$config['enable_footer'] = false;
+// Set this to true if you want to enable the footer in the web interface
 $config['api_demo'] = 0;
 // Set this to 1 if you want to disable some untrusting features for the API
 // Distributed Poller-Settings

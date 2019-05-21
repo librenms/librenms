@@ -34,6 +34,6 @@
                 range: "{{ $range }}"
             };
         },
-        url: "ajax/table/graylog"
+        url: "{{ url('/ajax/table/graylog') }}"
     });
 </script>

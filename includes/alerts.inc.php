@@ -158,7 +158,8 @@ function GetRules($device_id)
  */
 function IsMaintenance($device_id)
 {
-    return \App\Models\Device::find($device_id)->isUnderMaintenance();
+    $device = \App\Models\Device::find($device_id);
+    return !is_null($device) && $device->isUnderMaintenance();
 }
 /**
  * Run all rules for a device

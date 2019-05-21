@@ -1,22 +1,16 @@
-import random
+import pymysql
+import subprocess
 import threading
 import traceback
-from logging import debug, info, error, critical
-from multiprocessing import Queue
+from logging import debug, info, error, critical, warning
+from queue import Empty
 from subprocess import CalledProcessError
-
-import sys
 
 import LibreNMS
 
-if sys.version_info[0] < 3:
-    from Queue import Empty
-else:
-    from queue import Empty
-
 
 class QueueManager:
-    def __init__(self, config, type_desc, work_function, auto_start=True):
+    def __init__(self, config, lock_manager, type_desc, work_function, auto_start=True):
         """
         This class manages a queue of jobs and can be used to submit jobs to the queue with post_work()
         and process jobs in that queue in worker threads using the work_function
@@ -26,16 +20,19 @@ class QueueManager:
         You can start or stop the worker threads with start(), stop(), and stop_and_wait()
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: A LibreNMS.Lock instance to help with locks
         :param type_desc: description for this queue manager type
         :param work_function: function that will be called to perform the task
         :param auto_start: automatically start worker threads
         """
         self.type = type_desc
         self.config = config
+        self.performance = LibreNMS.PerformanceCounter()
 
         self._threads = []
         self._queues = {}
         self._queue_create_lock = threading.Lock()
+        self._lm = lock_manager
 
         self._work_function = work_function
         self._stop_event = threading.Event()
@@ -48,14 +45,29 @@ class QueueManager:
             self.start()
 
     def _service_worker(self, work_func, queue_id):
+        debug("Worker started {}".format(threading.current_thread().getName()))
         while not self._stop_event.is_set():
+            debug("Worker {} checking queue {} ({}) for work".format(threading.current_thread().getName(), queue_id,
+                                                                     self.get_queue(queue_id).qsize()))
             try:
                 # cannot break blocking request with redis-py, so timeout :(
-                device_id = self.get_queue(queue_id).get(True, 3)
+                device_id = self.get_queue(queue_id).get(True, 10)
 
-                if device_id:  # None returned by redis after timeout when empty
-                    debug("Queues: {}".format(self._queues))
-                    work_func(device_id)
+                if device_id is not None:  # None returned by redis after timeout when empty
+                    debug(
+                        "Worker {} ({}) got work {} ".format(threading.current_thread().getName(), queue_id, device_id))
+                    with LibreNMS.TimeitContext.start() as t:
+                        debug("Queues: {}".format(self._queues))
+                        target_desc = "{} ({})".format(device_id if device_id else '',
+                                                       queue_id) if queue_id else device_id
+                        if work_func:
+                            work_func(device_id)
+                        else:
+                            self.do_work(device_id, queue_id)
+
+                        runtime = t.delta()
+                        info("Completed {} run for {} in {:.2f}s".format(self.type, target_desc, runtime))
+                        self.performance.add(runtime)
             except Empty:
                 pass  # ignore empty queue exception from subprocess.Queue
             except CalledProcessError as e:
@@ -91,6 +103,9 @@ class QueueManager:
                 debug("Started {} {} threads for group {}".format(group_workers, self.type, group))
         else:
             self.spawn_worker(self.type.title(), 0)
+
+    def do_work(self, device_id, group):
+        pass
 
     def spawn_worker(self, thread_name, group):
         pt = threading.Thread(target=self._service_worker, name=thread_name,
@@ -147,14 +162,14 @@ class QueueManager:
         """
         info("Creating queue {}".format(self.queue_name(queue_type, group)))
         try:
-            return LibreNMS.RedisQueue(self.queue_name(queue_type, group),
-                                       namespace='librenms.queue',
-                                       host=self.config.redis_host,
-                                       port=self.config.redis_port,
-                                       db=self.config.redis_db,
-                                       password=self.config.redis_pass,
-                                       unix_socket_path=self.config.redis_socket
-                                       )
+            return LibreNMS.RedisUniqueQueue(self.queue_name(queue_type, group),
+                                             namespace='librenms.queue',
+                                             host=self.config.redis_host,
+                                             port=self.config.redis_port,
+                                             db=self.config.redis_db,
+                                             password=self.config.redis_pass,
+                                             unix_socket_path=self.config.redis_socket
+                                             )
         except ImportError:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")
@@ -166,7 +181,7 @@ class QueueManager:
                 critical("Could not connect to Redis. {}".format(e))
                 exit(2)
 
-        return Queue()
+        return LibreNMS.UniqueQueue()
 
     @staticmethod
     def queue_name(queue_type, group):
@@ -175,9 +190,28 @@ class QueueManager:
         else:
             raise ValueError("Refusing to create improperly scoped queue - parameters were invalid or not set")
 
+    def record_runtime(self, duration):
+        self.performance.add(duration)
+
+    # ------ Locking Helpers ------
+    def lock(self, context, context_name='device', allow_relock=False, timeout=0):
+        return self._lm.lock(self._gen_lock_name(context, context_name), self._gen_lock_owner(), timeout, allow_relock)
+
+    def unlock(self, context, context_name='device'):
+        return self._lm.unlock(self._gen_lock_name(context, context_name), self._gen_lock_owner())
+
+    def is_locked(self, context, context_name='device'):
+        return self._lm.check_lock(self._gen_lock_name(context, context_name))
+
+    def _gen_lock_name(self, context, context_name):
+        return '{}.{}.{}'.format(self.type, context_name, context)
+
+    def _gen_lock_owner(self):
+        return "{}-{}".format(self.config.unique_name, threading.current_thread().name)
+
 
 class TimedQueueManager(QueueManager):
-    def __init__(self, config, type_desc, work_function, dispatch_function, auto_start=True):
+    def __init__(self, config, lock_manager, type_desc, work_function=None, dispatch_function=None, auto_start=True):
         """
         A queue manager that periodically dispatches work to the queue
         The times are normalized like they started at 0:00
@@ -187,7 +221,8 @@ class TimedQueueManager(QueueManager):
         :param dispatch_function: function that will be called when the timer is up, should call post_work()
         :param auto_start: automatically start worker threads
         """
-        QueueManager.__init__(self, config, type_desc, work_function, auto_start)
+        dispatch_function = dispatch_function if dispatch_function else self.do_dispatch
+        QueueManager.__init__(self, config, lock_manager, type_desc, work_function, auto_start)
         self.timer = LibreNMS.RecurringTimer(self.get_poller_config().frequency, dispatch_function)
 
     def start_dispatch(self):
@@ -209,21 +244,22 @@ class TimedQueueManager(QueueManager):
         self.stop_dispatch()
         QueueManager.stop(self)
 
+    def do_dispatch(self):
+        pass
+
 
 class BillingQueueManager(TimedQueueManager):
-    def __init__(self, config, work_function, poll_dispatch_function, calculate_dispatch_function,
-                 auto_start=True):
+    def __init__(self, config, lock_manager, auto_start=True):
         """
         A TimedQueueManager with two timers dispatching poll billing and calculate billing to the same work queue
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
-        :param work_function: function that will be called to perform the task
-        :param poll_dispatch_function: function that will be called when the timer is up, should call post_work()
-        :param calculate_dispatch_function: function that will be called when the timer is up, should call post_work()
+        :param lock_manager: the single instance of lock manager
         :param auto_start: automatically start worker threads
         """
-        TimedQueueManager.__init__(self, config, 'billing', work_function, poll_dispatch_function, auto_start)
-        self.calculate_timer = LibreNMS.RecurringTimer(self.get_poller_config().calculate, calculate_dispatch_function, 'calculate_billing_timer')
+        TimedQueueManager.__init__(self, config, lock_manager, 'billing', None, None, auto_start)
+        self.calculate_timer = LibreNMS.RecurringTimer(self.get_poller_config().calculate,
+                                                       self.dispatch_calculate_billing, 'calculate_billing_timer')
 
     def start_dispatch(self):
         """
@@ -238,3 +274,176 @@ class BillingQueueManager(TimedQueueManager):
         """
         self.calculate_timer.stop()
         TimedQueueManager.stop_dispatch(self)
+
+    def dispatch_calculate_billing(self):
+        self.post_work('calculate', 0)
+
+    def do_dispatch(self):
+        self.post_work('poll', 0)
+
+    def do_work(self, run_type, group):
+        if run_type == 'poll':
+            info("Polling billing")
+            LibreNMS.call_script('poll-billing.php')
+        else:  # run_type == 'calculate'
+            info("Calculating billing")
+            LibreNMS.call_script('billing-calculate.php')
+
+
+class PingQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager to manage dispatch and workers for Ping
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        :param auto_start: automatically start worker threads
+        """
+        TimedQueueManager.__init__(self, config, lock_manager, 'ping', auto_start=auto_start)
+        self._db = LibreNMS.DB(self.config)
+
+    def do_dispatch(self):
+        try:
+            groups = self._db.query("SELECT DISTINCT (`poller_group`) FROM `devices`")
+            for group in groups:
+                self.post_work('', group[0])
+        except pymysql.err.Error:
+            pass
+
+    def do_work(self, context, group):
+        if self.lock(group, 'group', timeout=self.config.ping.frequency):
+            try:
+                info("Running fast ping")
+                LibreNMS.call_script('ping.php', ('-g', group))
+            finally:
+                self.unlock(group, 'group')
+
+
+class ServicesQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager to manage dispatch and workers for Services
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        :param auto_start: automatically start worker threads
+        """
+        TimedQueueManager.__init__(self, config, lock_manager, 'services', auto_start=auto_start)
+        self._db = LibreNMS.DB(self.config)
+
+    def do_dispatch(self):
+        try:
+            devices = self._db.query("SELECT DISTINCT(`device_id`), `poller_group` FROM `services`"
+                                     " LEFT JOIN `devices` USING (`device_id`) WHERE `disabled`=0")
+            for device in devices:
+                self.post_work(device[0], device[1])
+        except pymysql.err.Error:
+            pass
+
+    def do_work(self, device_id, group):
+        if self.lock(device_id, timeout=self.config.services.frequency):
+            try:
+                info("Checking services on device {}".format(device_id))
+                LibreNMS.call_script('check-services.php', ('-h', device_id))
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 5:
+                    info("Device {} is down, cannot poll service, waiting {}s for retry"
+                         .format(device_id, self.config.down_retry))
+                    self.lock(device_id, allow_relock=True, timeout=self.config.down_retry)
+            else:
+                self.unlock(device_id)
+
+
+class AlertQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager to manage dispatch and workers for Alerts
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        :param auto_start: automatically start worker threads
+        """
+        TimedQueueManager.__init__(self, config, lock_manager, 'alerting', auto_start=auto_start)
+        self._db = LibreNMS.DB(self.config)
+
+    def do_dispatch(self):
+        self.post_work('alerts', 0)
+
+    def do_work(self, device_id, group):
+        try:
+            info("Checking alerts")
+            LibreNMS.call_script('alerts.php')
+        except subprocess.CalledProcessError as e:
+            if e.returncode == 1:
+                warning("There was an error issuing alerts: {}".format(e.output))
+            else:
+                raise
+
+
+class PollerQueueManager(QueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager to manage dispatch and workers for Alerts
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        :param auto_start: automatically start worker threads
+        """
+        QueueManager.__init__(self, config, lock_manager, 'poller', None, auto_start=auto_start)
+
+    def do_work(self, device_id, group):
+        if self.lock(device_id, timeout=self.config.poller.frequency):
+            info('Polling device {}'.format(device_id))
+
+            try:
+                LibreNMS.call_script('poller.php', ('-h', device_id))
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 6:
+                    warning('Polling device {} unreachable, waiting {}s for retry'.format(device_id,
+                                                                                          self.config.down_retry))
+                    # re-lock to set retry timer
+                    self.lock(device_id, allow_relock=True, timeout=self.config.down_retry)
+                else:
+                    error('Polling device {} failed! {}'.format(device_id, e))
+                    self.unlock(device_id)
+            else:
+                info('Polling complete {}'.format(device_id))
+                self.unlock(device_id)
+        else:
+            debug('Tried to poll {}, but it is locked'.format(device_id))
+
+
+class DiscoveryQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager to manage dispatch and workers for Alerts
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        :param auto_start: automatically start worker threads
+        """
+        TimedQueueManager.__init__(self, config, lock_manager, 'discovery', None, auto_start=auto_start)
+        self._db = LibreNMS.DB(self.config)
+
+    def do_dispatch(self):
+        try:
+            devices = self._db.query("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
+            for device in devices:
+                self.post_work(device[0], device[1])
+        except pymysql.err.Error:
+            pass
+
+    def do_work(self, device_id, group):
+        if self.lock(device_id, timeout=LibreNMS.normalize_wait(self.config.discovery.frequency)):
+            try:
+                info("Discovering device {}".format(device_id))
+                LibreNMS.call_script('discovery.php', ('-h', device_id))
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 5:
+                    info("Device {} is down, cannot discover, waiting {}s for retry"
+                         .format(device_id, self.config.down_retry))
+                    self.lock(device_id, allow_relock=True, timeout=self.config.down_retry)
+                else:
+                    self.unlock(device_id)
+            else:
+                self.unlock(device_id)

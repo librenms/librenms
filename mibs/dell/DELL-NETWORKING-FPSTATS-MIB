@@ -1,0 +1,2743 @@
+DELL-NETWORKING-FPSTATS-MIB DEFINITIONS ::= BEGIN
+--  This module provides authoritative definitions for Dell Networking OS
+--  forward plane statistics MIB.
+--
+--  This module will be extended, as needed.
+--
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        Counter32, Counter64, Integer32
+                FROM SNMPv2-SMI
+        dellNetMgmt
+                FROM DELL-NETWORKING-SMI
+
+        DellNetDeviceType
+                FROM DELL-NETWORKING-TC
+
+        ifIndex
+                FROM IF-MIB;
+
+
+dellNetFpStatsMib MODULE-IDENTITY
+        LAST-UPDATED "201409041200Z" -- Sep 04,2014 12:00:00 GMT
+        ORGANIZATION
+                "Dell Inc"
+        CONTACT-INFO
+                "support.dell.com"
+
+        DESCRIPTION
+                "Dell Networking OS forward plane statistics mib."
+
+        REVISION     "201409041200Z"
+        DESCRIPTION
+                "Initial draft version of unified FP statistics mib."
+
+        ::= { dellNetMgmt 27 }
+
+
+-- ### Groups ###
+
+dellNetFpStatsObjects OBJECT IDENTIFIER ::={ dellNetFpStatsMib 1 }
+
+--
+-- Textual Convention
+--
+
+ComType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Enums to indicate the queue type(Unicast/Multicast)"
+        SYNTAX INTEGER
+        {
+            unicast(1),
+            multicast(2)
+        }
+
+QState  ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Enums to indicate the queue state(Normal/Drop)"
+        SYNTAX INTEGER
+        {
+            normal(1),
+            drop(2)
+        }
+
+--
+-- CPU dataplane statistics table
+--
+dellNetFpCpuDataPlaneTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpCpuDataPlaneStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "The data plane statistics table contains the data plane 
+                statistics of a stack unit/line card which includes the 
+                received, dropped statistics and per COS transmission and 
+                reception statistics . In case of multi CPU platforms, this
+		table contains the data plane statistics for each cpu. The 
+		table index will represent the CPUs in order as {CP cpus, 
+		RP cpus, LP cpus}."
+        ::= { dellNetFpStatsObjects 1 }
+
+dellNetFpCpuDataPlaneStatsEntry OBJECT-TYPE
+        SYNTAX        DellNetFpCpuDataPlaneStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Data plane statistics"
+        INDEX         { dellNetProcessorDeviceType,
+                        dellNetProcessorDeviceIndex }
+        ::= { dellNetFpCpuDataPlaneTable 1 }
+
+DellNetFpCpuDataPlaneStatsEntry ::= SEQUENCE {
+        dellNetProcessorDeviceType     DellNetDeviceType,
+        dellNetProcessorDeviceIndex    Integer32,
+        dellNetFpRxHandle        INTEGER,
+        dellNetFpNoMhdr          INTEGER,
+        dellNetFpNoMBuf          INTEGER,
+        dellNetFpNoClus          INTEGER,  
+        dellNetFpRecvd           INTEGER,  
+        dellNetFpDropped         INTEGER,  
+        dellNetFpRecvToNet       INTEGER,  
+        dellNetFpRxError         INTEGER,  
+        dellNetFpRxDatapathError INTEGER,  
+        dellNetFpRxPktCOS0       INTEGER,  
+        dellNetFpRxPktCOS1       INTEGER,  
+        dellNetFpRxPktCOS2       INTEGER,  
+        dellNetFpRxPktCOS3       INTEGER,  
+        dellNetFpRxPktCOS4       INTEGER,  
+        dellNetFpRxPktCOS5       INTEGER,  
+        dellNetFpRxPktCOS6       INTEGER,  
+        dellNetFpRxPktCOS7       INTEGER,  
+        dellNetFpRxPktUnit0      INTEGER,  
+        dellNetFpRxPktUnit1      INTEGER,  
+        dellNetFpRxPktUnit2      INTEGER,  
+        dellNetFpRxPktUnit3      INTEGER,  
+        dellNetFpTransmitted     INTEGER,  
+        dellNetFpTxRequested     INTEGER,  
+        dellNetFpNoTxDesc        INTEGER,  
+        dellNetFpTxError         INTEGER,  
+        dellNetFpTxReqTooLarge   INTEGER,  
+        dellNetFpTxInternalError INTEGER,  
+        dellNetFpTxDatapathErr   INTEGER,  
+        dellNetFpTxPktCOS0       INTEGER,  
+        dellNetFpTxPktCOS1       INTEGER,  
+        dellNetFpTxPktCOS2       INTEGER,  
+        dellNetFpTxPktCOS3       INTEGER,  
+        dellNetFpTxPktCOS4       INTEGER,  
+        dellNetFpTxPktCOS5       INTEGER,  
+        dellNetFpTxPktCOS6       INTEGER,  
+        dellNetFpTxPktCOS7       INTEGER,  
+        dellNetFpTxPktUnit0      INTEGER,  
+        dellNetFpTxPktUnit1      INTEGER,  
+        dellNetFpTxPktUnit2      INTEGER,  
+        dellNetFpTxPktUnit3      INTEGER  
+}
+
+dellNetProcessorDeviceType        OBJECT-TYPE
+         SYNTAX        DellNetDeviceType
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+              "Identify the type of device the processor reside
+               (linecard,port extender etc..)
+              "
+        ::= { dellNetFpCpuDataPlaneStatsEntry  1 }
+ 
+dellNetProcessorDeviceIndex        OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+                "A unique device index within the device type." 
+        ::= { dellNetFpCpuDataPlaneStatsEntry  2 }
+
+dellNetFpRxHandle   OBJECT-TYPE
+        SYNTAX        INTEGER    
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Reception Handle"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 3 }
+
+dellNetFpNoMhdr     OBJECT-TYPE
+        SYNTAX        INTEGER   
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of Message header"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 4 }
+
+dellNetFpNoMBuf     OBJECT-TYPE
+        SYNTAX        INTEGER   
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of Message buffer"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 5 }
+
+dellNetFpNoClus     OBJECT-TYPE
+        SYNTAX        INTEGER   
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of Clusters."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 6 }
+
+dellNetFpRecvd       OBJECT-TYPE
+        SYNTAX        INTEGER   
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Received statistics."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 7 }
+
+dellNetFpDropped     OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Dropped statistics."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 8 }
+
+dellNetFpRecvToNet    OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Received to network."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 9 }
+
+dellNetFpRxError  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Gives statistics about the reception error"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 10 }
+
+dellNetFpRxDatapathError  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Statistics of reception data path error."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 11}
+
+dellNetFpRxPktCOS0   OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets received in COS 0"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 12}
+
+dellNetFpRxPktCOS1  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets received in COS 1"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 13 }
+
+dellNetFpRxPktCOS2  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets received in COS 2"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 14 }
+
+dellNetFpRxPktCOS3  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets received in COS 3"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 15}
+ 
+dellNetFpRxPktCOS4 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets received in COS 4"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 16}
+
+dellNetFpRxPktCOS5 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets received in COS 5"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 17}
+
+dellNetFpRxPktCOS6  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets received in COS 6"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 18}
+
+dellNetFpRxPktCOS7  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets received in COS 7"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 19}
+
+dellNetFpRxPktUnit0  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets received in Unit 0"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 20}
+
+dellNetFpRxPktUnit1 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets received in Unit 1"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 21}
+
+dellNetFpRxPktUnit2 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets received in Unit 2"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 22}
+
+dellNetFpRxPktUnit3 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets received in Unit  3"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 23}
+
+dellNetFpTransmitted  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Transmitted statistics"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 24}
+
+dellNetFpTxRequested  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Transmission requested."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 25}
+
+dellNetFpNoTxDesc  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Transmission descriptor"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 26}
+
+dellNetFpTxError  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Error in transmitted packets."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 27}
+
+dellNetFpTxReqTooLarge  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Transmission requested too large."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 28}
+
+dellNetFpTxInternalError  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Internal error in transmitted data."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 29}
+
+dellNetFpTxDatapathErr OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Data path error in transmitted data."
+        ::= { dellNetFpCpuDataPlaneStatsEntry 30}
+
+dellNetFpTxPktCOS0   OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets Transmitted from COS Queue 0"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 31}
+
+dellNetFpTxPktCOS1  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets Transmitted from COS Queue 1"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 32}
+
+dellNetFpTxPktCOS2  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets Transmitted from COS Queue 2"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 33}
+
+dellNetFpTxPktCOS3 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets Transmitted from COS Queue 3"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 34}
+
+dellNetFpTxPktCOS4 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets Transmitted from COS Queue 4"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 35}
+
+dellNetFpTxPktCOS5 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets Transmitted from COS Queue 5"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 36}
+
+dellNetFpTxPktCOS6  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets Transmitted from COS Queue 6"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 37}
+
+dellNetFpTxPktCOS7  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+                "Packets Transmitted from COS Queue 7"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 38}
+
+dellNetFpTxPktUnit0  OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets Transmitted from Unit 0"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 39}
+
+dellNetFpTxPktUnit1 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets Transmitted from Unit 1"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 40}
+
+dellNetFpTxPktUnit2 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets Transmitted from Unit 2"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 41 }
+
+dellNetFpTxPktUnit3 OBJECT-TYPE
+        SYNTAX        INTEGER  
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets transmitted from Unit3"
+        ::= { dellNetFpCpuDataPlaneStatsEntry 42 }
+
+--
+-- Party bus statistics table
+--
+dellNetFpCpuPartyBusTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpCpuPartyBusStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "The party bus statistics table contains statistics 
+                about the number of input and output packets, bytes, error 
+                and the number of input packets dropped in a 
+                stack unit/line card."
+        ::= { dellNetFpStatsObjects 2 }
+
+dellNetFpCpuPartyBusStatsEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpCpuPartyBusStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Cpu party bus statistics"
+        INDEX         { dellNetProcessorDeviceType,
+                        dellNetProcessorDeviceIndex }
+        ::= { dellNetFpCpuPartyBusTable 1 }
+
+DellNetFpCpuPartyBusStatsEntry ::= SEQUENCE {
+        dellNetFpPartyBusInputPackets  Counter32,
+        dellNetFpPartyBusInputBytes    Counter32,
+        dellNetFpPartyBusInputDropped  Counter32,
+        dellNetFpPartyBusInputError    Counter32,
+        dellNetFpPartyBusOutputPackets Counter32,
+        dellNetFpPartyBusOutputBytes   Counter32,
+        dellNetFpPartyBusOutputError   Counter32
+}
+
+dellNetFpPartyBusInputPackets OBJECT-TYPE
+        SYNTAX        Counter32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input packets."
+        ::= { dellNetFpCpuPartyBusStatsEntry 1 }
+
+dellNetFpPartyBusInputBytes OBJECT-TYPE
+        SYNTAX        Counter32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input bytes."
+        ::= { dellNetFpCpuPartyBusStatsEntry 2 }
+
+dellNetFpPartyBusInputDropped OBJECT-TYPE
+        SYNTAX        Counter32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input packets dropped."
+        ::= { dellNetFpCpuPartyBusStatsEntry 3 }
+
+dellNetFpPartyBusInputError OBJECT-TYPE
+        SYNTAX        Counter32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Error in input packets."
+        ::= { dellNetFpCpuPartyBusStatsEntry 4 }
+
+dellNetFpPartyBusOutputPackets OBJECT-TYPE
+        SYNTAX        Counter32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets."
+        ::= { dellNetFpCpuPartyBusStatsEntry 5 }
+
+dellNetFpPartyBusOutputBytes OBJECT-TYPE
+        SYNTAX        Counter32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of bytes transmitted."
+        ::= { dellNetFpCpuPartyBusStatsEntry 6 }
+
+dellNetFpPartyBusOutputError OBJECT-TYPE
+        SYNTAX        Counter32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Error in output "
+        ::= { dellNetFpCpuPartyBusStatsEntry 7 }
+
+--
+-- Per port drop counter table
+--
+dellNetFpDropsTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpDropsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "The forwarding plane drops table contains the list of various 
+                drops per port in a stack unit/line card."
+        ::= { dellNetFpStatsObjects 3 }
+
+dellNetFpDropsEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpDropsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "drops"
+        INDEX         { ifIndex }
+        ::= { dellNetFpDropsTable 1 }
+
+DellNetFpDropsEntry ::= SEQUENCE {
+        dellNetFpIngressDrops              Counter64,
+        dellNetFpIngIBPCBPFullDrops        Counter64,
+        dellNetFpIngPortSTPnotFwdDrops     Counter64,
+        dellNetFpIngIPv4L3Discards         Counter64,
+        dellNetFpIngPolicyDiscards         Counter64,
+        dellNetFpIngPacketsDroppedByDELLNETFP     Counter64,
+        dellNetFpIngL2L3Drops              Counter64,
+        dellNetFpIngPortBitMapZeroDrops    Counter64,
+        dellNetFpIngRxVLANDrops            Counter64,
+        dellNetFpIngressFCSDrops           Counter64,
+        dellNetFpIngressMTUExceeds         Counter64,
+        dellNetFpMMUHOLDrops               Counter64,
+        dellNetFpMMUTxPurgeCellErr         Counter64,
+        dellNetFpMMUAgedDrops              Counter64,
+        dellNetFpEgressFCSDrops            Counter64,
+        dellNetFpEgIPv4L3UCAgedDrops       Counter64,
+        dellNetFpEgTTLThresholdDrops       Counter64,
+        dellNetFpEgInvalidVLANCounterDrops Counter64,
+        dellNetFpEgL2MCDrops               Counter64,
+        dellNetFpEgPktDropsOfAnyCondition  Counter64,
+        dellNetFpEgHgMacUnderFlow          Counter64,
+        dellNetFpEgTxErrPktCounter         Counter64,
+        dellNetFpFlowControlDrops          Counter64,
+        dellNetFpIngressDropsBytes	       Counter64,
+        dellNetFpIngressFECBitErrors       Counter64,
+        dellNetFpIngressFECUncorrectedCodeWords Counter64,
+        dellNetFpIngressPreFECBitErrorRatio     OCTET STRING,
+        dellNetFpIngressFCSErrorRatio           OCTET STRING,
+        dellNetFpWredGreenDrops            Counter64,
+        dellNetFpWredYellowDrops           Counter64,
+        dellNetFpWredOutOfProfileDrops     Counter64
+}
+
+dellNetFpIngressDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Ingress Drops"
+        ::= { dellNetFpDropsEntry 1 }
+
+dellNetFpIngIBPCBPFullDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "The number of packets discarded because of Ingress Back Pressure (flow control),
+                or because the Common Buffer Pool is full."
+        ::= { dellNetFpDropsEntry 2 }
+
+dellNetFpIngPortSTPnotFwdDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets dropped due to Spanning Tree State not in forwarding state."
+        ::= { dellNetFpDropsEntry 3 }
+
+dellNetFpIngIPv4L3Discards OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "IPv4 L3 Discards "
+        ::= { dellNetFpDropsEntry 4 }
+
+dellNetFpIngPolicyDiscards OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packet dropped due to policy discards."
+        ::= { dellNetFpDropsEntry 5 }
+
+dellNetFpIngPacketsDroppedByDELLNETFP OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Packets dropped by forwarding plane."
+        ::= { dellNetFpDropsEntry 6 }
+
+dellNetFpIngL2L3Drops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "L2 L3 packets dropped."
+        ::= { dellNetFpDropsEntry 7 }
+
+dellNetFpIngPortBitMapZeroDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Port bitmap zero drop condition."
+        ::= { dellNetFpDropsEntry 8 }
+
+dellNetFpIngRxVLANDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Rx VLAN drop condition."
+        ::= { dellNetFpDropsEntry 9 }
+
+dellNetFpIngressFCSDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Ingress FCSDrops"
+        ::= { dellNetFpDropsEntry 10 }
+
+dellNetFpIngressMTUExceeds OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Ingress MTUExceeds"
+        ::= { dellNetFpDropsEntry 11 }
+
+dellNetFpMMUHOLDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "MMU HOL DROPS"
+        ::= { dellNetFpDropsEntry 12 }
+
+dellNetFpMMUTxPurgeCellErr OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "TxPurge CellErr"
+        ::= { dellNetFpDropsEntry 13 }
+
+dellNetFpMMUAgedDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Aged Drops "
+        ::= { dellNetFpDropsEntry 14 }
+
+dellNetFpEgressFCSDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Egress FCS Drops"
+        ::= { dellNetFpDropsEntry 15 }
+
+dellNetFpEgIPv4L3UCAgedDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "IPv4 L3UC Aged & Drops"
+        ::= { dellNetFpDropsEntry 16 }
+
+dellNetFpEgTTLThresholdDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "TTL Threshold Drops"
+        ::= { dellNetFpDropsEntry 17 }
+
+dellNetFpEgInvalidVLANCounterDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "INVALID VLAN CNTR Drops "
+        ::= { dellNetFpDropsEntry 18 }
+
+dellNetFpEgL2MCDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "L2MC Drops  "
+        ::= { dellNetFpDropsEntry 19 }
+
+dellNetFpEgPktDropsOfAnyCondition OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "PKT Drops of ANY Conditions "
+        ::= { dellNetFpDropsEntry 20 }
+
+dellNetFpEgHgMacUnderFlow OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only 
+        STATUS        current
+        DESCRIPTION
+                "Hg MacUnderflow   "
+        ::= { dellNetFpDropsEntry 21 }
+
+dellNetFpEgTxErrPktCounter OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "TX Err PKT Counter  "
+        ::= { dellNetFpDropsEntry 22 }
+dellNetFpFlowControlDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Flow Control Drops "
+        ::= { dellNetFpDropsEntry 23 }
+
+dellNetFpIngressDropsBytes  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Ingress Drops Byte Counter "
+        ::= { dellNetFpDropsEntry 24 }
+
+dellNetFpIngressFECBitErrors OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Ingress FEC Bit Errors "
+        ::= { dellNetFpDropsEntry 25 }
+
+dellNetFpIngressFECUncorrectedCodeWords OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Ingress FEC Uncorrected Code Words "
+        ::= { dellNetFpDropsEntry 26 }
+
+dellNetFpIngressPreFECBitErrorRatio OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (16))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Ingress preFEC Bit Error Ratio "
+        ::= { dellNetFpDropsEntry 27 }
+
+dellNetFpIngressFCSErrorRatio OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (16))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Ingress FCS Drops Error Ratio "
+        ::= { dellNetFpDropsEntry 28 }
+
+dellNetFpWredGreenDrops   OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION 
+                "Wred Green Drops Counter"
+        ::= { dellNetFpDropsEntry 29 }
+
+dellNetFpWredYellowDrops  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Wred Yellow Drops Counter"
+        ::= { dellNetFpDropsEntry 30 }
+
+dellNetFpWredOutOfProfileDrops OBJECT-TYPE
+       SYNTAX         Counter64
+       MAX-ACCESS     read-only
+       STATUS         current
+       DESCRIPTION
+               "Wred Out-Of-Profile Drops Counter"
+       ::= { dellNetFpDropsEntry 31 }
+
+--
+-- Per unit(NPU) packet buffer stats table
+--
+dellNetFpPacketBufferTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpPacketBufferEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "The packet buffer table contains the modular packet buffers details
+                per stack unit/line card and the mode of allocation."
+        ::= { dellNetFpStatsObjects 4 }
+
+dellNetFpPacketBufferEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpPacketBufferEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Packet buffer details per stack unit/line card."
+        INDEX         { dellNetProcessorDeviceType,                     
+                        dellNetProcessorDeviceIndex,
+                        dellNetFpPortPipe }
+        ::= { dellNetFpPacketBufferTable 1 }
+
+DellNetFpPacketBufferEntry ::= SEQUENCE {
+        dellNetFpPortPipe           INTEGER,
+        dellNetFpTotalPacketBuffer  Counter32,
+        dellNetFpCurrentAvailBuffer Counter32,
+        dellNetFpPacketBufferAlloc  Counter32
+}
+
+dellNetFpPortPipe OBJECT-TYPE
+        SYNTAX        INTEGER (1..6)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "dellNetFpPortPipe denotes the portpipe in the stack unit/line card."
+        ::= { dellNetFpPacketBufferEntry 1 }
+
+dellNetFpTotalPacketBuffer OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Total packet buffer."
+        ::= { dellNetFpPacketBufferEntry 2 }
+
+dellNetFpCurrentAvailBuffer OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Current available buffer."
+        ::= { dellNetFpPacketBufferEntry 3 }
+
+dellNetFpPacketBufferAlloc  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Static or Dynamic allocation."
+        ::= { dellNetFpPacketBufferEntry 4 }
+
+--
+-- Per port packet buffer stats table
+--
+dellNetFpStatsPerPortTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpStatsPerPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "The forward plane stats per port table  contains 
+                the packet buffer usage per port per stack unit/line card."
+        ::= { dellNetFpStatsObjects 5}
+
+dellNetFpStatsPerPortEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpStatsPerPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Per port stats and per COS stats."
+        INDEX         { ifIndex }
+::= { dellNetFpStatsPerPortTable 1 }
+
+DellNetFpStatsPerPortEntry ::= SEQUENCE {
+        dellNetFpCurrentUsagePerPort    Counter32,
+        dellNetFpDefaultPacketBuffAlloc Counter32,
+        dellNetFpMaxLimitPerPort        Counter32
+}
+
+dellNetFpCurrentUsagePerPort OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Current usage per port."
+        ::= { dellNetFpStatsPerPortEntry 1 }
+
+dellNetFpDefaultPacketBuffAlloc OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Default packet buffer allocated."
+        ::= { dellNetFpStatsPerPortEntry 2 }
+
+dellNetFpMaxLimitPerPort OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "MAx limit per port."
+        ::= { dellNetFpStatsPerPortEntry 3 }
+
+--
+-- Per cos(queue) packet buffer stats table
+--
+dellNetFpStatsPerCOSTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpStatsPerCOSEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "The forwarding plane statistics per COS table gives 
+                packet buffer statistics per COS per port."
+        ::=  { dellNetFpStatsObjects 6 }
+
+dellNetFpStatsPerCOSEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpStatsPerCOSEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Per port stats and per COS stats."
+        INDEX         { ifIndex,
+                        dellNetFpPerPortCOSNumber }
+        ::= { dellNetFpStatsPerCOSTable 1 }
+
+DellNetFpStatsPerCOSEntry ::= SEQUENCE {
+        dellNetFpPerPortCOSNumber             INTEGER,
+        dellNetFpCurrentUsagePerCOS           Counter32,
+        dellNetFpDefaultPacketBuffAllocPerCOS Counter32,
+        dellNetFpMaxLimitPerCOS               Counter32,
+        dellNetFpHOLDropsPerCOS              Counter64
+}
+
+dellNetFpPerPortCOSNumber OBJECT-TYPE
+        SYNTAX        INTEGER (1..21)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "COS queue number"
+        ::= { dellNetFpStatsPerCOSEntry 1 }
+
+dellNetFpCurrentUsagePerCOS  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Current usage per COS per port."
+        ::= { dellNetFpStatsPerCOSEntry 2 }
+
+dellNetFpDefaultPacketBuffAllocPerCOS OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Default packet buffer allocated per COS."
+        ::= { dellNetFpStatsPerCOSEntry 3 }
+
+dellNetFpMaxLimitPerCOS OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Max limit per port."
+        ::= { dellNetFpStatsPerCOSEntry 4 }
+
+dellNetFpHOLDropsPerCOS OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "HOL Drops Per Queue."
+        ::= { dellNetFpStatsPerCOSEntry 5 }
+
+--
+-- Per cos(queue) table for COS queues in CPU dataplane
+--
+dellNetFpCpuDataPlaneCOSTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpCpuDataPlaneCOSEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "The CPU data plane COS table contains the per COS
+                 transmission and reception statistics of CPU dataplane."
+        ::= { dellNetFpStatsObjects 7 }
+
+dellNetFpCpuDataPlaneCOSEntry OBJECT-TYPE
+        SYNTAX        DellNetFpCpuDataPlaneCOSEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "CPU Data plane per COS statistics"
+        INDEX         { dellNetProcessorDeviceType, 
+                        dellNetProcessorDeviceIndex,
+                        dellNetFpCOSIndex }
+        ::= { dellNetFpCpuDataPlaneCOSTable 1 }
+
+DellNetFpCpuDataPlaneCOSEntry ::= SEQUENCE {
+        dellNetFpCOSIndex   Integer32,
+        dellNetFpRxPktCOS   Counter32,
+        dellNetFpTxPktCOS   Counter32
+}
+
+dellNetFpCOSIndex OBJECT-TYPE
+        SYNTAX        Integer32 (1..12)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "CPU dataplane COS queue number."
+        ::= { dellNetFpCpuDataPlaneCOSEntry 1 }
+
+dellNetFpRxPktCOS OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Receive COS queue statistics in CPU dataplane."
+        ::= { dellNetFpCpuDataPlaneCOSEntry 2 }
+
+dellNetFpTxPktCOS OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Transmit COS queue statistics in CPU dataplane."
+        ::= { dellNetFpCpuDataPlaneCOSEntry 3 }
+
+--
+-- Party bus per port statistics table
+--
+
+dellNetFpCpuPartyBusPortStatsTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpCpuPartyBusPortStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "The party bus port statistics table contains statistics
+                about the number of input and output packets, bytes, error
+                and the number of input packets dropped in a party bus port.
+                This table is applicable to platforms which support 
+                party bus statistics at per port level."
+        ::= { dellNetFpStatsObjects 12 }
+
+dellNetFpCpuPartyBusPortStatsEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpCpuPartyBusPortStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Cpu party bus statistics"
+        INDEX         { dellNetProcessorDeviceType, 
+                        dellNetProcessorDeviceIndex,
+                        dellNetFpStackPortIndex }
+        ::= { dellNetFpCpuPartyBusPortStatsTable 1 }
+
+DellNetFpCpuPartyBusPortStatsEntry ::= SEQUENCE {
+        dellNetFpStackPortIndex INTEGER,
+        dellNetFpCpuPartyBusPortStatsOutOctets Counter64,
+        dellNetFpCpuPartyBusPortStatsOutDropPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutCOS0Pkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutCOS1Pkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutCOS2Pkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutCOS3Pkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutCOS4Pkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutCOS5Pkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutUnicastPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutMulticastPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutBroadcastPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutPausePkts Counter32,
+        dellNetFpCpuPartyBusPortStatsOutCollisions Counter32,
+        dellNetFpCpuPartyBusPortStatsOutSingleCollisions Counter32,
+        dellNetFpCpuPartyBusPortStatsOutMultiCollisions Counter32,
+        dellNetFpCpuPartyBusPortStatsOutLateCollisions Counter32,
+        dellNetFpCpuPartyBusPortStatsOutExcessCollisions Counter32,
+        dellNetFpCpuPartyBusPortStatsOutDeferred Counter32,
+        dellNetFpCpuPartyBusPortStatsOutDiscarded Counter32,
+        dellNetFpCpuPartyBusPortStatsInOctets Counter64,
+        dellNetFpCpuPartyBusPortStatsInUndersizePkts Counter32,
+        dellNetFpCpuPartyBusPortStatsInOversizePkts Counter32,
+        dellNetFpCpuPartyBusPortStatsInPausePkts Counter32,
+        dellNetFpCpuPartyBusPortStatsIn64OctetPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsIn65To127OctetPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsIn128To255OctetPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsIn256To511OctetPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsIn512To1023OctetPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsIn1024ToMaxOctetPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsInJabbers Counter32,
+        dellNetFpCpuPartyBusPortStatsInAlignErrors Counter32,
+        dellNetFpCpuPartyBusPortStatsInFcsErrors Counter32,
+        dellNetFpCpuPartyBusPortStatsInGoodOctets Counter32,
+        dellNetFpCpuPartyBusPortStatsInDropPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsInUnicastPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsInMulticastPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsInBroadcastPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsInSrcAddrChanges Counter32,
+        dellNetFpCpuPartyBusPortStatsInFragments Counter32,
+        dellNetFpCpuPartyBusPortStatsInJumboPkts Counter32,
+        dellNetFpCpuPartyBusPortStatsInSymbolErrors Counter32,
+        dellNetFpCpuPartyBusPortStatsInInRangeErrors Counter32,
+        dellNetFpCpuPartyBusPortStatsInOutRangeErrors Counter32
+}
+
+dellNetFpStackPortIndex OBJECT-TYPE
+        SYNTAX        INTEGER (1..192)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Stack/line card port number."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 1 }
+
+dellNetFpCpuPartyBusPortStatsOutOctets  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output octets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 2 }
+
+dellNetFpCpuPartyBusPortStatsOutDropPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets dropped."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 3 }
+
+dellNetFpCpuPartyBusPortStatsOutCOS0Pkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets in COS queue 0."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 4 }
+
+dellNetFpCpuPartyBusPortStatsOutCOS1Pkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets in COS queue 1."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 5 }
+
+dellNetFpCpuPartyBusPortStatsOutCOS2Pkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets in COS queue 2."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 6 }
+
+dellNetFpCpuPartyBusPortStatsOutCOS3Pkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets in COS queue 3."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 7 }
+
+dellNetFpCpuPartyBusPortStatsOutCOS4Pkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets in COS queue 4."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 8 }
+
+dellNetFpCpuPartyBusPortStatsOutCOS5Pkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets in COS queue 5."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 9 }
+
+dellNetFpCpuPartyBusPortStatsOutUnicastPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of unicast output packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 10 }
+
+dellNetFpCpuPartyBusPortStatsOutMulticastPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of multicast output packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 11 }
+
+dellNetFpCpuPartyBusPortStatsOutBroadcastPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of broadcast output packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 12 }
+
+dellNetFpCpuPartyBusPortStatsOutPausePkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output pause packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 13 }
+
+dellNetFpCpuPartyBusPortStatsOutCollisions  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output collisions."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 14 }
+
+dellNetFpCpuPartyBusPortStatsOutSingleCollisions  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of single output collisions."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 15 }
+
+dellNetFpCpuPartyBusPortStatsOutMultiCollisions  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of multiple output collisions."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 16 }
+
+dellNetFpCpuPartyBusPortStatsOutLateCollisions  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of late output collisions."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 17 }
+
+dellNetFpCpuPartyBusPortStatsOutExcessCollisions  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of excess output collisions."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 18 }
+
+dellNetFpCpuPartyBusPortStatsOutDeferred  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets deferred."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 19 }
+
+dellNetFpCpuPartyBusPortStatsOutDiscarded  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of output packets discarded."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 20 }
+
+dellNetFpCpuPartyBusPortStatsInOctets  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input octets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 21 }
+
+dellNetFpCpuPartyBusPortStatsInUndersizePkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of undersize input packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 22 }
+
+dellNetFpCpuPartyBusPortStatsInOversizePkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of oversize input packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 23 }
+
+dellNetFpCpuPartyBusPortStatsInPausePkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input pause packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 24 }
+
+dellNetFpCpuPartyBusPortStatsIn64OctetPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input packets of size 64 octets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 25 }
+
+dellNetFpCpuPartyBusPortStatsIn65To127OctetPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input packets of size 65 to 127 octets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 26 }
+
+dellNetFpCpuPartyBusPortStatsIn128To255OctetPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input packets of size 128 to 255 octets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 27 }
+
+dellNetFpCpuPartyBusPortStatsIn256To511OctetPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input packets of size 256 to 511 octets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 28 }
+
+dellNetFpCpuPartyBusPortStatsIn512To1023OctetPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input packets of size 512 to 1023 octets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 29 }
+
+dellNetFpCpuPartyBusPortStatsIn1024ToMaxOctetPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input packets of size more than 1024 octets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 30 }
+
+dellNetFpCpuPartyBusPortStatsInJabbers  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input jabbers."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 31 }
+
+dellNetFpCpuPartyBusPortStatsInAlignErrors  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input align errors."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 32 }
+
+dellNetFpCpuPartyBusPortStatsInFcsErrors  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input FCS errors."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 33 }
+
+dellNetFpCpuPartyBusPortStatsInGoodOctets  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of good input octets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 34 }
+
+dellNetFpCpuPartyBusPortStatsInDropPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input packets dropped."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 35 }
+
+dellNetFpCpuPartyBusPortStatsInUnicastPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of unicast input packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 36 }
+
+dellNetFpCpuPartyBusPortStatsInMulticastPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of multicast input packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 37 }
+
+dellNetFpCpuPartyBusPortStatsInBroadcastPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of broadcast input packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 38 }
+
+dellNetFpCpuPartyBusPortStatsInSrcAddrChanges  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input source address changes."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 39 }
+
+dellNetFpCpuPartyBusPortStatsInFragments  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input fragments."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 40 }
+
+dellNetFpCpuPartyBusPortStatsInJumboPkts  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of jumbo input packets."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 41 }
+
+dellNetFpCpuPartyBusPortStatsInSymbolErrors  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input symbol error."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 42 }
+
+dellNetFpCpuPartyBusPortStatsInInRangeErrors  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input in-range errors."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 43 }
+
+dellNetFpCpuPartyBusPortStatsInOutRangeErrors  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of input out-of-range errors."
+        ::= { dellNetFpCpuPartyBusPortStatsEntry 44 }
+
+-- Per port per queue table for Buffer Statistics Tracking(BST) 
+-- at Egress level.
+--
+
+dellNetFpEgrQBuffSnapshotTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpEgrQBuffSnapshotEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Table to Show Egress queue level snapshot statistics. There
+                 are total of 21 queues out of which 12[1..12] are unicast 
+                 queues and the remaining 9[13..21] are multicast queues."
+        ::= { dellNetFpStatsObjects 8 }
+
+dellNetFpEgrQBuffSnapshotEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpEgrQBuffSnapshotEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Egress queue snapshot info."
+        INDEX        { ifIndex,
+                       dellNetFpPerPortCOSNumber }
+        ::= { dellNetFpEgrQBuffSnapshotTable 1}
+
+DellNetFpEgrQBuffSnapshotEntry ::= SEQUENCE {
+       dellNetFpEgrQTotBuffCells   Counter32
+}
+
+dellNetFpEgrQTotBuffCells OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Total Cell count per Egress queue."
+        ::= { dellNetFpEgrQBuffSnapshotEntry 1 }
+
+--
+-- Per port per priority-group(PG) table for Buffer Statistics Tracking(BST) 
+-- at Ingress level.
+--
+
+dellNetFpIngPgBuffSnapshotTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpIngPgBuffSnapshotEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Table to Show Ingress priority-group level snapshot statistics
+                 for all priority-groups[1..8]."
+        ::= { dellNetFpStatsObjects 9 }
+
+dellNetFpIngPgBuffSnapshotEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpIngPgBuffSnapshotEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Priority group snapshot info."
+        INDEX        { ifIndex,
+                       dellNetFpPerPortPGIndex }
+        ::= { dellNetFpIngPgBuffSnapshotTable 1 }
+
+DellNetFpIngPgBuffSnapshotEntry  ::= SEQUENCE {
+        dellNetFpPerPortPGIndex    INTEGER,
+        dellNetFpIngSharedCells    Counter32,
+        dellNetFpIngHeadroomCells  Counter32
+}
+
+dellNetFpPerPortPGIndex OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   
+                "Priority-Group number."
+        ::= { dellNetFpIngPgBuffSnapshotEntry 1 }
+
+dellNetFpIngSharedCells OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Shared cell count per priority group."
+        ::= { dellNetFpIngPgBuffSnapshotEntry 2 }
+
+dellNetFpIngHeadroomCells OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Headroom cell count per priority group."
+        ::= { dellNetFpIngPgBuffSnapshotEntry 3 }
+
+--
+-- Per port per priority-group(PG) table for Buffer Statistics at 
+-- Ingress level.
+--
+
+dellNetFpStatsPerPgTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpStatsPerPgEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "The forwarding plane statistics per PG table gives 
+                 packet buffer allocated and used count per PG per port."
+
+        ::= { dellNetFpStatsObjects 10 }
+
+dellNetFpStatsPerPgEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpStatsPerPgEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Buffer statistics per PG per port."
+        INDEX        { ifIndex,
+                       dellNetFpPerPortPGIndex }
+        ::= { dellNetFpStatsPerPgTable 1 }
+
+DellNetFpStatsPerPgEntry ::= SEQUENCE {
+    dellNetFpStatsPgLimitMinCells         INTEGER,
+    dellNetFpStatsPgSharedCells           INTEGER,
+    dellNetFpStatsPgSharedMode            INTEGER,
+    dellNetFpStatsPgHdrmCells             INTEGER,
+    dellNetFpStatsPgCounterMinCells       Counter32,
+    dellNetFpStatsPgCounterSharedCells    Counter32,
+    dellNetFpStatsPgCounterHdrmCells      Counter32
+}
+
+dellNetFpStatsPgLimitMinCells  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Min cells allocated per Priority Group."
+    ::= { dellNetFpStatsPerPgEntry 1 }
+
+dellNetFpStatsPgSharedCells  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Shared cells allocated per Priority Group."
+    ::= { dellNetFpStatsPerPgEntry 2 }
+
+dellNetFpStatsPgSharedMode  OBJECT-TYPE
+    SYNTAX      INTEGER{
+                        static(0),
+                        dynamic(1)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Priority group shared mode[static/dynamic]."
+    ::= { dellNetFpStatsPerPgEntry 3 }
+
+dellNetFpStatsPgHdrmCells  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Headroom cells allocated per Priority group."
+    ::= { dellNetFpStatsPerPgEntry 4 }
+
+dellNetFpStatsPgCounterMinCells  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Priority Group Min cell count."
+    ::= {  dellNetFpStatsPerPgEntry 5 }
+
+dellNetFpStatsPgCounterSharedCells  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Priority Group Shared cell count."
+    ::= { dellNetFpStatsPerPgEntry 6 }
+
+dellNetFpStatsPgCounterHdrmCells  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Priority group Headroom cell count."
+    ::= { dellNetFpStatsPerPgEntry 7 }
+
+--
+-- Per port per priority table for PFC Statistics.  
+--
+dellNetPfcPerPrioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DellNetPfcPerPrioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            " This table is used to fetch the number of  tx and rx PFC frame counts
+              per port per priority."
+         ::= { dellNetFpStatsObjects 11 }
+
+dellNetPfcPerPrioEntry OBJECT-TYPE
+    SYNTAX      DellNetPfcPerPrioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Rx and Tx PFC frame counter info."
+    REFERENCE
+           "802.1Qbb clause 12.18"
+    INDEX        { ifIndex,
+                   dellNetPrioIndex }
+
+        ::= { dellNetPfcPerPrioTable 1 }
+
+DellNetPfcPerPrioEntry  ::= 
+      SEQUENCE {
+         dellNetPrioIndex               INTEGER,
+         dellNetPfcPerPrioRequests      Counter64,
+         dellNetPfcPerPrioIndications   Counter64
+    }   
+
+dellNetPrioIndex          OBJECT-TYPE
+    SYNTAX             INTEGER (1..8)
+    MAX-ACCESS         not-accessible
+    STATUS             current
+    DESCRIPTION
+                "Priority Index."
+        ::= { dellNetPfcPerPrioEntry 1 }
+
+dellNetPfcPerPrioRequests  OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "Requests"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "PFC tx counters."
+          ::= { dellNetPfcPerPrioEntry 2 }
+
+dellNetPfcPerPrioIndications  OBJECT-TYPE
+     SYNTAX      Counter64
+     UNITS       "Indications"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "PFC rx counters."
+     ::= { dellNetPfcPerPrioEntry 3 }
+
+--
+-- Per interface drop counter table
+--
+dellNetFpDropsIfTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpDropsIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+            ""
+        ::= { dellNetFpStatsObjects 13 }
+
+dellNetFpDropsIfEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpDropsIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        INDEX         { ifIndex }
+        ::= { dellNetFpDropsIfTable 1 }
+
+DellNetFpDropsIfEntry ::= SEQUENCE {
+        dellNetFpIfIngressDrops              Counter64,
+        dellNetFpIfIngIBPCBPFullDrops        Counter64,
+        dellNetFpIfIngPortSTPnotFwdDrops     Counter64,
+        dellNetFpIfIngIPv4L3Discards         Counter64,
+        dellNetFpIfIngPolicyDiscards         Counter64,
+        dellNetFpIfIngPacketsDroppedByFP     Counter64,
+        dellNetFpIfIngL2L3Drops              Counter64,
+        dellNetFpIfIngPortBitMapZeroDrops    Counter64,
+        dellNetFpIfIngRxVLANDrops            Counter64,
+        dellNetFpIfIngressFCSDrops           Counter64,
+        dellNetFpIfIngressMTUExceeds         Counter64,
+        dellNetFpIfMMUHOLDrops               Counter64,
+        dellNetFpIfMMUTxPurgeCellErr         Counter64,
+        dellNetFpIfMMUAgedDrops              Counter64,
+        dellNetFpIfEgressFCSDrops            Counter64,
+        dellNetFpIfEgIPv4L3UCAgedDrops       Counter64,
+        dellNetFpIfEgTTLThresholdDrops       Counter64,
+        dellNetFpIfEgInvalidVLANCounterDrops Counter64,
+        dellNetFpIfEgL2MCDrops               Counter64,
+        dellNetFpIfEgPktDropsOfAnyCondition  Counter64,
+        dellNetFpIfEgHgMacUnderFlow          Counter64,
+        dellNetFpIfEgTxErrPktCounter         Counter64
+}
+
+dellNetFpIfIngressDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 1 }
+
+dellNetFpIfIngIBPCBPFullDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 2 }
+
+dellNetFpIfIngPortSTPnotFwdDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 3 }
+
+dellNetFpIfIngIPv4L3Discards OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 4 }
+
+dellNetFpIfIngPolicyDiscards OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 5 }
+
+dellNetFpIfIngPacketsDroppedByFP OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 6 }
+dellNetFpIfIngL2L3Drops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 7 }
+
+dellNetFpIfIngPortBitMapZeroDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 8 }
+
+dellNetFpIfIngRxVLANDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 9 }
+
+dellNetFpIfIngressFCSDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 10 }
+
+dellNetFpIfIngressMTUExceeds OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 11 }
+
+dellNetFpIfMMUHOLDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 12 }
+dellNetFpIfMMUTxPurgeCellErr OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 13 }
+
+dellNetFpIfMMUAgedDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+               ""
+        ::= { dellNetFpDropsIfEntry 14 }
+
+dellNetFpIfEgressFCSDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 15 }
+
+dellNetFpIfEgIPv4L3UCAgedDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 16 }
+
+dellNetFpIfEgTTLThresholdDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 17 }
+
+dellNetFpIfEgInvalidVLANCounterDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 18 }
+dellNetFpIfEgL2MCDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 19 }
+
+dellNetFpIfEgPktDropsOfAnyCondition OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 20 }
+
+dellNetFpIfEgHgMacUnderFlow OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 21 }
+
+dellNetFpIfEgTxErrPktCounter OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpDropsIfEntry 22 }
+--
+-- Per interface packet buffer stats table
+--
+dellNetFpStatsPerIfTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpStatsPerIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsObjects 14 }
+
+dellNetFpStatsPerIfEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpStatsPerIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        INDEX         { ifIndex }
+::= { dellNetFpStatsPerIfTable 1 }
+
+DellNetFpStatsPerIfEntry ::= SEQUENCE {
+        dellNetFpIfCurrentUsagePerPort    Counter32,
+        dellNetFpIfDefaultPacketBuffAlloc Counter32,
+        dellNetFpIfMaxLimitPerPort        Counter32
+}
+
+dellNetFpIfCurrentUsagePerPort OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsPerIfEntry 1 }
+
+dellNetFpIfDefaultPacketBuffAlloc OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsPerIfEntry 2 }
+dellNetFpIfMaxLimitPerPort OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsPerIfEntry 3 }
+
+--
+-- Per cos(queue) packet buffer stats table
+--
+dellNetFpStatsPerIfCOSTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpStatsPerIfCOSEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::=  { dellNetFpStatsObjects 15 }
+
+dellNetFpStatsPerIfCOSEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpStatsPerIfCOSEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        INDEX         { ifIndex,
+                        dellNetFpIfPerCOSNumber }
+        ::= { dellNetFpStatsPerIfCOSTable 1 }
+
+DellNetFpStatsPerIfCOSEntry ::= SEQUENCE {
+        dellNetFpIfPerCOSNumber                 INTEGER,
+        dellNetFpIfCurrentUsagePerCOS           Counter32,
+        dellNetFpIfDefaultPacketBuffAllocPerCOS Counter32,
+        dellNetFpIfMaxLimitPerCOS               Counter32,
+        dellNetFpIfHOLDropsPerCOS               Counter64
+}
+
+dellNetFpIfPerCOSNumber OBJECT-TYPE
+        SYNTAX        INTEGER (1..21)
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsPerIfCOSEntry 1 }
+
+dellNetFpIfCurrentUsagePerCOS  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsPerIfCOSEntry 2 }
+
+dellNetFpIfDefaultPacketBuffAllocPerCOS OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsPerIfCOSEntry 3 }
+
+dellNetFpIfMaxLimitPerCOS OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsPerIfCOSEntry 4 }
+
+dellNetFpIfHOLDropsPerCOS OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsPerIfCOSEntry 5 }
+
+-- Per interface per queue table for Buffer Statistics Tracking(BST) 
+-- at Egress level.
+--
+
+dellNetFpEgrQBuffSnapshotIfTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpEgrQBuffSnapshotIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                 ""
+        ::= { dellNetFpStatsObjects 16 }
+
+dellNetFpEgrQBuffSnapshotIfEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpEgrQBuffSnapshotIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        INDEX        { ifIndex,
+                       dellNetFpIfPerCOSNumber }
+        ::= { dellNetFpEgrQBuffSnapshotIfTable 1}
+
+DellNetFpEgrQBuffSnapshotIfEntry ::= SEQUENCE {
+       dellNetFpIfEgrQTotBuffCells   Counter32
+}
+
+dellNetFpIfEgrQTotBuffCells OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpEgrQBuffSnapshotIfEntry 1 }
+
+--
+-- Per interface per priority-group(PG) table for Buffer Statistics Tracking(BST) 
+-- at Ingress level.
+--
+
+dellNetFpIngPgBuffSnapshotIfTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpIngPgBuffSnapshotIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpStatsObjects 17 }
+
+dellNetFpIngPgBuffSnapshotIfEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpIngPgBuffSnapshotIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        INDEX        { ifIndex,
+                       dellNetFpIfPerPGIndex }
+        ::= { dellNetFpIngPgBuffSnapshotIfTable 1 }
+
+DellNetFpIngPgBuffSnapshotIfEntry  ::= SEQUENCE {
+        dellNetFpIfPerPGIndex    INTEGER,
+        dellNetFpIfIngSharedCells    Counter32,
+        dellNetFpIfIngHeadroomCells  Counter32
+}
+
+dellNetFpIfPerPGIndex OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION   
+                ""
+        ::= { dellNetFpIngPgBuffSnapshotIfEntry 1 }
+
+dellNetFpIfIngSharedCells OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpIngPgBuffSnapshotIfEntry 2 }
+
+dellNetFpIfIngHeadroomCells OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        ::= { dellNetFpIngPgBuffSnapshotIfEntry 3 }
+
+--
+-- Per interface per priority-group(PG) table for Buffer Statistics at 
+-- Ingress level.
+--
+
+dellNetFpStatsPerPgIfTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpStatsPerPgIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                 ""
+
+        ::= { dellNetFpStatsObjects 18 }
+
+dellNetFpStatsPerPgIfEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpStatsPerPgIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        obsolete
+        DESCRIPTION
+                ""
+        INDEX        { ifIndex,
+                       dellNetFpIfPerPGIndex }
+        ::= { dellNetFpStatsPerPgIfTable 1 }
+
+DellNetFpStatsPerPgIfEntry ::= SEQUENCE {
+    dellNetFpIfStatsPgLimitMinCells         INTEGER,
+    dellNetFpIfStatsPgSharedCells           INTEGER,
+    dellNetFpIfStatsPgSharedMode            INTEGER,
+    dellNetFpIfStatsPgHdrmCells             INTEGER,
+    dellNetFpIfStatsPgCounterMinCells       Counter32,
+    dellNetFpIfStatsPgCounterSharedCells    Counter32,
+    dellNetFpIfStatsPgCounterHdrmCells      Counter32
+}
+
+dellNetFpIfStatsPgLimitMinCells  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+            ""
+    ::= { dellNetFpStatsPerPgIfEntry 1 }
+
+dellNetFpIfStatsPgSharedCells  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+            ""
+    ::= { dellNetFpStatsPerPgIfEntry 2 }
+
+dellNetFpIfStatsPgSharedMode  OBJECT-TYPE
+    SYNTAX      INTEGER{
+                        static(0),
+                        dynamic(1)
+                    }
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+            ""
+    ::= { dellNetFpStatsPerPgIfEntry 3 }
+
+dellNetFpIfStatsPgHdrmCells  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+            ""
+    ::= { dellNetFpStatsPerPgIfEntry 4 }
+
+dellNetFpIfStatsPgCounterMinCells  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+            ""
+    ::= {  dellNetFpStatsPerPgIfEntry 5 }
+
+dellNetFpIfStatsPgCounterSharedCells  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+            ""
+    ::= { dellNetFpStatsPerPgIfEntry 6 }
+
+dellNetFpIfStatsPgCounterHdrmCells  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+            ""
+    ::= { dellNetFpStatsPerPgIfEntry 7 }
+
+--
+-- Per interface per priority table for PFC Statistics.  
+--
+dellNetPfcPerPrioIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DellNetPfcPerPrioIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+            ""
+         ::= { dellNetFpStatsObjects 19 }
+
+dellNetPfcPerPrioIfEntry OBJECT-TYPE
+    SYNTAX      DellNetPfcPerPrioIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+            ""
+    REFERENCE
+           "802.1Qbb clause 12.18"
+    INDEX        { ifIndex,
+                   dellNetIfPrioIndex }
+
+        ::= { dellNetPfcPerPrioIfTable 1 }
+
+DellNetPfcPerPrioIfEntry  ::= 
+      SEQUENCE {
+         dellNetIfPrioIndex               INTEGER,
+         dellNetIfPfcPerPrioRequests      Counter64,
+         dellNetIfPfcPerPrioIndications   Counter64
+    }   
+
+dellNetIfPrioIndex          OBJECT-TYPE
+    SYNTAX             INTEGER (1..8)
+    MAX-ACCESS         not-accessible
+    STATUS             obsolete
+    DESCRIPTION
+                ""
+        ::= { dellNetPfcPerPrioIfEntry 1 }
+
+dellNetIfPfcPerPrioRequests  OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "Requests"
+      MAX-ACCESS  not-accessible
+      STATUS      obsolete
+      DESCRIPTION
+              ""
+          ::= { dellNetPfcPerPrioIfEntry 2 }
+
+dellNetIfPfcPerPrioIndications  OBJECT-TYPE
+     SYNTAX      Counter64
+     UNITS       "Indications"
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+             ""
+     ::= { dellNetPfcPerPrioIfEntry 3 }
+
+--
+-- Counters for all Unicast/Multicast Egress Queues on per port basis.  
+--
+dellNetFpEgrQIfCounterTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpEgrQIfCounterEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Table to Show Egress queue Counters for Unicast/Multicast queues on per port per queue basis."
+        ::= { dellNetFpStatsObjects 20 }
+
+dellNetFpEgrQIfCounterEntry  OBJECT-TYPE
+        SYNTAX        DellNetFpEgrQIfCounterEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Table entry of Egress queue counters"
+        INDEX        { ifIndex, 
+                               dellNetFpEgrQComType,
+                       dellNetFpPerPortCOSNumber}
+        ::= { dellNetFpEgrQIfCounterTable 1}
+
+DellNetFpEgrQIfCounterEntry ::= SEQUENCE {
+       dellNetFpEgrQComType             ComType,
+       dellNetFpEgrQTxPackets           Counter64,
+       dellNetFpEgrQTxBytes             Counter64,
+       dellNetFpEgrQDroppedPackets      Counter64,
+       dellNetFpEgrQDroppedBytes        Counter64,
+       dellNetFpEgrQTxPacketsRate       Counter64,
+       dellNetFpEgrQTxBytesRate         Counter64,
+       dellNetFpEgrQDroppedPacketsRate  Counter64,
+       dellNetFpEgrQDroppedBytesRate    Counter64
+}
+
+dellNetFpEgrQComType OBJECT-TYPE
+        SYNTAX        ComType
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Queue Type (Unicast/Multicast)"
+        ::= { dellNetFpEgrQIfCounterEntry 1 }
+
+dellNetFpEgrQTxPackets OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of Packets transmitted per Unicast/Multicast Egress queue."
+        ::= { dellNetFpEgrQIfCounterEntry 2 }
+
+dellNetFpEgrQTxBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of Bytes transmitted per Unicast/Multicast Egress queue."
+        ::= { dellNetFpEgrQIfCounterEntry 3 }
+
+dellNetFpEgrQDroppedPackets OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of Packets dropped per Unicast/Multicast Egress queue."
+        ::= { dellNetFpEgrQIfCounterEntry 4 }
+
+dellNetFpEgrQDroppedBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Number of Bytes dropped per Unicast/Multicast Egress queue."
+        ::= { dellNetFpEgrQIfCounterEntry 5 }
+
+dellNetFpEgrQTxPacketsRate OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Rate of Packets transmitted per Unicast/Multicast Egress queue."
+        ::= { dellNetFpEgrQIfCounterEntry 6 }
+
+dellNetFpEgrQTxBytesRate OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Rate of Bytes transmitted per Unicast/Multicast Egress queue."
+        ::= { dellNetFpEgrQIfCounterEntry 7 }
+
+dellNetFpEgrQDroppedPacketsRate OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Rate of Packets dropped per Unicast/Multicast Egress queue."
+        ::= { dellNetFpEgrQIfCounterEntry 8 }
+
+dellNetFpEgrQDroppedBytesRate OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                "Rate of Bytes dropped per Unicast/Multicast Egress queue."
+        ::= { dellNetFpEgrQIfCounterEntry 9 }
+
+
+---
+--- Counters of Storm-control Pfc on per port per priority basis
+---
+dellNetFpPfcStormControl
+        OBJECT IDENTIFIER ::= { dellNetFpStatsObjects 21 }
+
+dellNetFpPfcStormControlStatus
+        OBJECT IDENTIFIER ::= { dellNetFpPfcStormControl 1 }
+
+dellNetFpPfcStormControlStatusTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpPfcStormControlStatusEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION 
+                "Table to show counters of Pfc Storm-Control on per port per priority basis"
+        ::= { dellNetFpPfcStormControlStatus 1 }
+
+
+dellNetFpPfcStormControlStatusEntry OBJECT-TYPE
+        SYNTAX        DellNetFpPfcStormControlStatusEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Table Entry of Pfc Storm-control status counters"
+        INDEX        { ifIndex,
+                       dellNetPrioIndex } 
+        ::= { dellNetFpPfcStormControlStatusTable 1}
+
+
+DellNetFpPfcStormControlStatusEntry ::= SEQUENCE {
+       dellNetFpPfcStormControlQueueState                       QState,
+       dellNetFpPfcStormControlDurationInDiscardState           Counter64,
+       dellNetFpPfcStormControlDroppedPacketsIngress            Counter64,
+       dellNetFpPfcStormControlDroppedPacketsEgress             Counter64,
+       dellNetFpPfcStormControlCumulativeDroppedPacketsIngress  Counter64,
+       dellNetFpPfcStormControlCumulativeDroppedPacketsEgress   Counter64
+}
+
+dellNetFpPfcStormControlQueueState OBJECT-TYPE
+       SYNTAX          QState
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+               "Queue State (Normal/Drop)"
+       ::= { dellNetFpPfcStormControlStatusEntry 1}
+
+dellNetFpPfcStormControlDurationInDiscardState OBJECT-TYPE
+       SYNTAX          Counter64
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+               "Number of milliSecs the Queue is in Discard State"
+       ::= { dellNetFpPfcStormControlStatusEntry 2}
+
+dellNetFpPfcStormControlDroppedPacketsIngress OBJECT-TYPE
+       SYNTAX          Counter64
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+               "Number of Packets dropped on Ingress"
+       ::= { dellNetFpPfcStormControlStatusEntry 3}
+
+dellNetFpPfcStormControlDroppedPacketsEgress OBJECT-TYPE
+       SYNTAX          Counter64
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+               "Number of Packets dropped on Egress"
+       ::= { dellNetFpPfcStormControlStatusEntry 4}
+
+dellNetFpPfcStormControlCumulativeDroppedPacketsIngress OBJECT-TYPE
+       SYNTAX          Counter64
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+               "Cumulative Number of Packets dropped on Ingress"
+       ::= { dellNetFpPfcStormControlStatusEntry 5}
+
+dellNetFpPfcStormControlCumulativeDroppedPacketsEgress OBJECT-TYPE
+      SYNTAX           Counter64
+      MAX-ACCESS       read-only
+      STATUS           current
+      DESCRIPTION 
+              "Cumulative Number of Packets dropped on Egress"
+      ::= { dellNetFpPfcStormControlStatusEntry 6}
+
+dellNetFpPfcStormControlStatistics
+        OBJECT IDENTIFIER ::= { dellNetFpPfcStormControl 2 }
+
+dellNetFpPfcStormControlStatisticsTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetFpPfcStormControlStatisticsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Table to show counters of Pfc Storm-Control on per port per priority basis"
+        ::= { dellNetFpPfcStormControlStatistics 1 }
+
+dellNetFpPfcStormControlStatisticsEntry OBJECT-TYPE
+        SYNTAX        DellNetFpPfcStormControlStatisticsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "Table Entry of Pfc Storm-control statistics counters"
+        INDEX        { ifIndex,
+                       dellNetPrioIndex }
+        ::= { dellNetFpPfcStormControlStatisticsTable 1 }
+
+DellNetFpPfcStormControlStatisticsEntry ::= SEQUENCE {
+       dellNetFpPfcStormControlDiscardStateCount               Counter32,
+       dellNetFpPfcStormControlDiscardStateForcedClearCount    Counter32,
+       dellNetFpPfcStormControlDiscardStateNorxPfcClearCount   Counter32
+}
+
+dellNetFpPfcStormControlDiscardStateCount OBJECT-TYPE
+       SYNTAX         Counter32
+       MAX-ACCESS     read-only
+       STATUS         current
+       DESCRIPTION
+               "Number of times the queue is moved to Drop state"
+       ::= { dellNetFpPfcStormControlStatisticsEntry 1 }
+
+dellNetFpPfcStormControlDiscardStateForcedClearCount OBJECT-TYPE
+       SYNTAX         Counter32
+       MAX-ACCESS     read-only
+       STATUS         current
+       DESCRIPTION
+               "Number of times the queue is moved forcefully to Normal state"
+       ::= { dellNetFpPfcStormControlStatisticsEntry 2 }
+
+dellNetFpPfcStormControlDiscardStateNorxPfcClearCount OBJECT-TYPE
+       SYNTAX         Counter32
+       MAX-ACCESS     read-only
+       STATUS         current
+       DESCRIPTION
+               "Number of times the queue is moved to Normal state due to No rxPFC"
+       ::= { dellNetFpPfcStormControlStatisticsEntry 3 }
+
+---
+--- Counters of pfc-nodrop-priority l2-dlf drop feature on per stack-unit per
+--- portpipe per priority basis
+---
+
+dellNetFpPfcL2DlfDropCounterTable  OBJECT-TYPE
+       SYNTAX         SEQUENCE OF DellNetFpPfcL2DlfDropCounterEntry
+       MAX-ACCESS     not-accessible
+       STATUS         current
+       DESCRIPTION 
+               "Table to show the drop counters of pfc-nodrop-priority l2-dlf drop"
+       ::= { dellNetFpStatsObjects 22 }
+
+dellNetFpPfcL2DlfDropCounterEntry  OBJECT-TYPE
+       SYNTAX         DellNetFpPfcL2DlfDropCounterEntry
+       MAX-ACCESS     not-accessible
+       STATUS         current
+       DESCRIPTION 
+               "Table to show the drop counters of pfc-nodrop-priority l2-dlf drop"
+       INDEX        { dellNetProcessorDeviceIndex, 
+       	              dellNetFpPortPipe, 
+       	              dellNetPrioIndex }
+       ::= { dellNetFpPfcL2DlfDropCounterTable 1 }
+
+DellNetFpPfcL2DlfDropCounterEntry ::= SEQUENCE { 
+	 dellNetFpPfcL2DlfDropCounters    Counter64
+}
+
+dellNetFpPfcL2DlfDropCounters  OBJECT-TYPE
+       SYNTAX         Counter64
+       MAX-ACCESS     read-only
+       STATUS         current
+       DESCRIPTION
+               "Number of packets dropped due to Pfc-nodrop-priority l2-dlf
+               drop feature"
+       ::= {  dellNetFpPfcL2DlfDropCounterEntry 1 }
+
+---
+--- Configured buffer and Used buffer sizes per XPE
+--- Both lossy and lossless
+--- 
+
+dellNetFpServicePoolBufferSizeTable OBJECT-TYPE
+       SYNTAX        SEQUENCE OF DellNetFpServicePoolBufferSizeEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+              "Table to show the sizes of configured and used lossy as well as
+              lossless service pools"
+       ::= { dellNetFpStatsObjects 23 }
+
+dellNetFpServicePoolBufferSizeEntry OBJECT-TYPE
+       SYNTAX        DellNetFpServicePoolBufferSizeEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+              "Table to show the sizes of configured and used lossy as well as
+              lossless service pools"
+       INDEX       { dellNetProcessorDeviceIndex,
+                     dellNetFpPortPipe,
+                     dellNetFpXPENumber }
+       ::= { dellNetFpServicePoolBufferSizeTable 1 }
+
+DellNetFpServicePoolBufferSizeEntry ::= SEQUENCE {
+	dellNetFpXPENumber                                Counter32,
+	dellNetFpLossyServicePoolConfiguredBuffSize       Counter32,
+	dellNetFpLossyServicePoolUsedBuffSize             Counter32,
+	dellNetFpLosslessServicePoolConfiguredBuffSize    Counter32,
+	dellNetFpLosslessServicePoolUsedBuffSize          Counter32
+}
+
+dellNetFpXPENumber    OBJECT-TYPE
+       SYNTAX         Counter32
+       MAX-ACCESS     not-accessible
+       STATUS         current
+       DESCRIPTION
+              "Denotes XPE number in the MMU"
+       ::= {  dellNetFpServicePoolBufferSizeEntry 1 }
+
+dellNetFpLossyServicePoolConfiguredBuffSize  OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION 
+              "Configured Size of the lossy Service-Pool"
+       ::= {  dellNetFpServicePoolBufferSizeEntry 2 }
+
+dellNetFpLossyServicePoolUsedBuffSize  OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+              "Used Size of the lossy service-Pool"
+       ::= {  dellNetFpServicePoolBufferSizeEntry 3 }
+
+dellNetFpLosslessServicePoolConfiguredBuffSize  OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+              "Configured Size of the lossless Service-Pool"
+       ::= {  dellNetFpServicePoolBufferSizeEntry 4 }
+
+dellNetFpLosslessServicePoolUsedBuffSize  OBJECT-TYPE
+       SYNTAX        Counter32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+              "Used Size of the lossless Service-Pool"
+       ::= {  dellNetFpServicePoolBufferSizeEntry 5 }
+
+---
+--- ECN packet counter Details
+---
+
+dellNetFpEcnPacketsTable  OBJECT-TYPE
+       SYNTAX        SEQUENCE OF DellNetFpEcnPacketsEntry
+	   MAX-ACCESS    not-accessible
+	   STATUS        current
+	   DESCRIPTION
+	          "Table to show ECN packets counters"
+	   ::= { dellNetFpStatsObjects 24 }
+
+dellNetFpEcnPacketsEntry  OBJECT-TYPE
+       SYNTAX        DellNetFpEcnPacketsEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+             "Table to show ECN packets counters"
+       INDEX       { ifIndex }
+	   ::= { dellNetFpEcnPacketsTable 1 }
+
+DellNetFpEcnPacketsEntry ::= SEQUENCE {
+    dellNetFpEcnMarkedTxPkts                        Counter32,
+    dellNetFpTotalDropPktsOnEcnEnabledQueues        Counter64
+}
+
+dellNetFpEcnMarkedTxPkts    OBJECT-TYPE
+       SYNTAX         Counter32
+       MAX-ACCESS     read-only
+       STATUS         current
+       DESCRIPTION
+              "Count of ECN Marked packets that are Transmitted"
+       ::= {  dellNetFpEcnPacketsEntry 1 }
+
+dellNetFpTotalDropPktsOnEcnEnabledQueues  OBJECT-TYPE
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+              "Total count of Drop packets over all the ECN enabled Queues in the interface"
+       ::= {  dellNetFpEcnPacketsEntry 2 }
+
+END

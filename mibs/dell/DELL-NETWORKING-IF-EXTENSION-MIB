@@ -1,0 +1,923 @@
+    DELL-NETWORKING-IF-EXTENSION-MIB DEFINITIONS ::= BEGIN
+    --  This module provides authoritative definitions for 
+    --  Dell Networking OS extenstion to the IF MIB.
+    --
+    --  This module will be extended, as needed.
+    --  
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        Counter64, Unsigned32 
+            FROM SNMPv2-SMI
+        TimeStamp, DisplayString, TruthValue
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        ifIndex
+            FROM IF-MIB
+        Integer32
+            FROM SNMPv2-SMI
+        dellNetMgmt
+            FROM DELL-NETWORKING-SMI;
+        
+    dellNetIfExtensionMib MODULE-IDENTITY
+    LAST-UPDATED "201203061200Z"  -- Mar 6, 2012 12:00:00 GMT
+    ORGANIZATION
+      "Dell Inc"
+    CONTACT-INFO
+      "http://www.dell.com/support" 
+
+    DESCRIPTION
+       "Dell Networking OS IF Extenstion MIB. "
+   
+    REVISION     "201408121200Z"
+    DESCRIPTION
+          "Added dellNetIfPortListBitPos.Removed dellNetIfDhcpAdminStatus and dellNetIfDhcpOperStatus."
+ 
+    REVISION     "201203061200Z"
+    DESCRIPTION
+          "Added DHCP Client attributes."
+
+    REVISION     "201008111200Z"
+    DESCRIPTION
+        "Add dellNetIfOutThrottles."
+        
+    REVISION     "201008101200Z"
+    DESCRIPTION
+          "Initial version of this mib module."
+    
+           ::= { dellNetMgmt 11 }   
+
+
+    -- ### Groups ###
+
+    dellNetIfExtensionMibObject OBJECT IDENTIFIER ::={ dellNetIfExtensionMib 1 }
+    dellNetIfExtensionParams    OBJECT IDENTIFIER ::={ dellNetIfExtensionMibObject 1 }
+    dellNetIfExtensionStats     OBJECT IDENTIFIER ::={ dellNetIfExtensionMibObject 2 }
+    dellNetIfTransceiverData     OBJECT IDENTIFIER ::={ dellNetIfExtensionMibObject 3 }
+    dellNetIfAlarmObjects        OBJECT IDENTIFIER ::={ dellNetIfExtensionMibObject 4 }
+        
+    -- ### Dell Networking OS IF Extenstion Tables
+    
+    --
+    -- Interface Table
+    --
+
+      dellNetIfTable     OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Dell Networking OS Extension ifTable contains
+            generic interface parameters."
+        ::= { dellNetIfExtensionParams 1 }
+
+      dellNetIfEntry  OBJECT-TYPE 
+        SYNTAX        DellNetIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            " A row defintion of Dell Networking OS Interface
+            Extension parameters." 
+        INDEX    { ifIndex }
+        ::= { dellNetIfTable 1 }
+      DellNetIfEntry    ::=
+        SEQUENCE {
+           dellNetIfIpMtu                 Unsigned32,
+           dellNetIfDuplexMode            INTEGER,
+           dellNetIfQueueingStrategy      DisplayString,
+           dellNetIfRxFlowCtrl            TruthValue,
+           dellNetIfTxFlowCtrl            TruthValue,
+           dellNetIfDescr                 OCTET STRING,
+           dellNetIfAdminStatus           INTEGER,
+           dellNetIfRateInterval          Unsigned32,
+           dellNetIfSpeed                 INTEGER,
+           dellNetIfPortListBitPos        Integer32
+        }
+        
+       dellNetIfIpMtu     OBJECT-TYPE
+        SYNTAX        Unsigned32 (594..9252)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The IP (Internet Protocol), Maximum 
+            Transmission Unit value."
+        ::= { dellNetIfEntry 1 }
+
+       dellNetIfDuplexMode  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                      half(1),
+                      full(2),
+                      auto(3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Duplex mode of the interface. 
+            This will be read-write only for s60"
+        ::= { dellNetIfEntry 2 }
+
+       dellNetIfQueueingStrategy OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..32))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Queueing strategy used for packets."
+        ::= { dellNetIfEntry 3 }
+
+       dellNetIfRxFlowCtrl OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Flow control receive. This will be read-write only for s60"
+        ::= { dellNetIfEntry 4 }
+
+       dellNetIfTxFlowCtrl OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Flow Control transmit.This will be read-only only for s60"
+        ::= { dellNetIfEntry 5 }
+                
+       dellNetIfDescr  OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "A textual string containing information about the interface.
+            This will be read-write only for s60"
+        ::= { dellNetIfEntry 6 }
+
+       dellNetIfAdminStatus OBJECT-TYPE
+        SYNTAX        INTEGER{
+                        up (1),
+                        down(2)
+                        }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "A admin status of any interface.
+            This will be read-write only for s60"
+        ::= { dellNetIfEntry 7 }
+
+       dellNetIfRateInterval  OBJECT-TYPE
+        SYNTAX        Unsigned32 (30..299)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The rate info interval for the interface.
+            This will be read-write only for s60"
+        ::= { dellNetIfEntry 8 }
+
+       dellNetIfSpeed  OBJECT-TYPE
+        SYNTAX        INTEGER{
+                  auto (1),
+                  tenMbps (10),
+                  hundredMbps (100),
+                  thousandMbps (1000)
+               }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The interface's current bandwidth in bits per second.
+            This will be read-write only for s60"
+        ::= { dellNetIfEntry 9 }
+
+        dellNetIfPortListBitPos    OBJECT-TYPE
+        SYNTAX         Integer32 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "This is used for identifying the bit position in PortList Object for a given interface."
+        ::= { dellNetIfEntry 10 }
+
+
+    --
+    -- Interface Statistics Table
+    --
+    
+      dellNetIfStaticsTable     OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetIfStaticsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The statistcs information of the interfaces for performance monitoring." 
+        ::= { dellNetIfExtensionStats 1 }
+
+      dellNetIfStaticsEntry  OBJECT-TYPE 
+        SYNTAX        DellNetIfStaticsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A row defintion of Dell Networking OS Extension 
+             interface statistics."
+        INDEX    { ifIndex }
+        ::= { dellNetIfStaticsTable 1 }
+
+      DellNetIfStaticsEntry    ::=
+        SEQUENCE {
+           dellNetIfInVlanPkts                Counter64,
+           dellNetIfIn64BytePkts              Counter64,
+           dellNetIfIn65To127BytePkts         Counter64,
+           dellNetIfIn128To255BytePkts        Counter64,
+           dellNetIfIn256To511BytePkts        Counter64, 
+           dellNetIfIn512To1023BytePkts       Counter64,
+           dellNetIfInOver1023BytePkts        Counter64,
+           dellNetIfInThrottles               Counter64,
+           dellNetIfInRunts                   Counter64,
+           dellNetIfInGiants                  Counter64,
+           dellNetIfInCRC                     Counter64,
+           dellNetIfInOverruns                Counter64, 
+           dellNetIfOutVlanPkts               Counter64,
+           dellNetIfOutUnderruns              Counter64,
+           dellNetIfOutUnicasts               Counter64,
+           dellNetIfOutCollisions             Counter64,
+           dellNetIfOutWredDrops              Counter64,
+           dellNetIfOut64BytePkts             Counter64,
+           dellNetIfOut65To127BytePkts        Counter64,
+           dellNetIfOut128To255BytePkts       Counter64,
+           dellNetIfOut256To511BytePkts       Counter64,
+           dellNetIfOut512To1023BytePkts      Counter64,
+           dellNetIfOutOver1023BytePkts       Counter64,
+           dellNetIfOutThrottles              Counter64,
+           dellNetIfLastDiscontinuityTime     TimeStamp,
+           dellNetIfInCentRate                Integer32,
+           dellNetIfOutCentRate               Integer32
+        }
+       
+       dellNetIfInVlanPkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of valid VLAN Tagged 
+             frames received." 
+        ::= { dellNetIfStaticsEntry 1 }
+        
+       dellNetIfIn64BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames (including bad
+             frames) received that were 64 octets in length 
+             (excluding framing bits but in-cluding FCS octets)." 
+        ::= { dellNetIfStaticsEntry 2 }
+
+       dellNetIfIn65To127BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames (including bad 
+             frames) received that were between 65 and 127
+             octets in length inclusive (ex-cluding framing
+             bits but including FCS octets)." 
+        ::= { dellNetIfStaticsEntry 3 }
+                
+       dellNetIfIn128To255BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames (including bad
+             frames) received that were between 128 and 255 
+             octets in length inclusive (excluding framing
+             bits but including FCS octets)." 
+        ::= { dellNetIfStaticsEntry 4 }
+        
+       dellNetIfIn256To511BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames (including bad 
+             frames) received that were between 256 and 511 
+             octets in length inclusive (excluding framing 
+             bits but including FCS octets)." 
+        ::= { dellNetIfStaticsEntry 5 }        
+        
+       dellNetIfIn512To1023BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames (including bad 
+             frames) received that were between 512 and 1023
+             octets in length inclusive (excluding framing 
+             bits but including FCS octets)." 
+        ::= { dellNetIfStaticsEntry 6 }
+                
+       dellNetIfInOver1023BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames received that
+              were longer than 1023 (1025 Bytes in case of
+              VLAN Tag) octets (excluding framing bits, but
+              including FCS octets) and were otherwise
+              well formed. This counter is not incremented 
+              for too long frames."  
+        ::= { dellNetIfStaticsEntry 7 }
+                
+       dellNetIfInThrottles OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This counter is incremented when a valid 
+             frame with a length or type field value equal
+             to 0x8808 (Control Frame) is re-ceived." 
+        ::= { dellNetIfStaticsEntry 8 }
+                
+       dellNetIfInRunts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames received that were
+             less than 64 octets long (excluding framing bits, 
+             but including FCS octets) and were otherwise 
+             well formed."  
+        ::= { dellNetIfStaticsEntry 9 }
+                
+       dellNetIfInGiants OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames received that were 
+             longer than 1518 (1522 Bytes in case of VLAN Tag) 
+             octets (excluding framing bits, but including FCS
+             octets) and were otherwise well formed. This counter
+             is not incremented for too long frames."  
+        ::= { dellNetIfStaticsEntry 10 }
+                
+       dellNetIfInCRC OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames received that had
+             a length (ex-cluding framing bits, but including
+             FCS octets) of between 64 and 1518 octets, 
+             inclusive, but had a bad CRC."  
+        ::= { dellNetIfStaticsEntry 11 }
+                
+       dellNetIfInOverruns OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames dropped because 
+             of buffer issue." 
+        ::= { dellNetIfStaticsEntry 12 }
+                
+       dellNetIfOutVlanPkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The Number of Good VLAN Tagged Frames sent 
+             successfully." 
+        ::= { dellNetIfStaticsEntry 13 }
+                
+       dellNetIfOutUnderruns OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The total number of frames dropped because 
+             of buffer underrun." 
+        ::= { dellNetIfStaticsEntry 14 }
+                
+       dellNetIfOutUnicasts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The Number of Good Unicast Frames sent successfully." 
+        ::= { dellNetIfStaticsEntry 15 }
+                
+       dellNetIfOutCollisions OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "A count of the frames that due to excessive 
+             or late collisions are not transmitted successfully."  
+        ::= { dellNetIfStaticsEntry 16 }
+                
+       dellNetIfOutWredDrops OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "A count of the frames that are dropped using 
+             WRED policy because of to excessive traffic." 
+        ::= { dellNetIfStaticsEntry 17 }
+                
+       dellNetIfOut64BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The Number of Good Frames sent successfully 
+             whose size was 64 Bytes." 
+        ::= { dellNetIfStaticsEntry 18 }
+                
+       dellNetIfOut65To127BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The Number of Good Frames sent successfully 
+             whose size was in the range of 65 to 127 Bytes." 
+        ::= { dellNetIfStaticsEntry 19 } 
+               
+       dellNetIfOut128To255BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The Number of Good Frames sent successfully 
+             whose size was in the range of 128 to 255 Bytes." 
+        ::= { dellNetIfStaticsEntry 20 }
+               
+       dellNetIfOut256To511BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The Number of Good Frames sent successfully 
+             whose size was in the range of 256 to 511 Bytes." 
+        ::= { dellNetIfStaticsEntry 21 }
+                       
+       dellNetIfOut512To1023BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The Number of Good Frames sent successfully 
+             whose size was in the range of 512 to 1023 Bytes." 
+        ::= { dellNetIfStaticsEntry 22 }             
+          
+       dellNetIfOutOver1023BytePkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "The Number of Good Frames sent successfully 
+             whose size was greater than 1023 Bytes." 
+        ::= { dellNetIfStaticsEntry 23 }               
+                
+       dellNetIfOutThrottles OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This counter is incremented when a valid 
+             frame with a length or type field value equal
+             to 0x8808 (Control Frame) is sent." 
+        ::= { dellNetIfStaticsEntry 24 }
+               
+       dellNetIfLastDiscontinuityTime OBJECT-TYPE
+        SYNTAX        TimeStamp
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The value of sysUpTime on the most recent occasion
+            at which this interface's counters suffered a 
+            discontinuity via a reset. If no such discontinuities 
+            have occurred since the last reinitialization of 
+            the local management subsystem, then this object
+            contains a zero value."
+        ::= { dellNetIfStaticsEntry 25 }
+
+       dellNetIfInCentRate OBJECT-TYPE
+        SYNTAX        Integer32 (0..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This is the ingress rate in percentage.
+             This is an integer value which can go from 0 to 100." 
+        ::= { dellNetIfStaticsEntry 26 }
+
+       dellNetIfOutCentRate OBJECT-TYPE
+        SYNTAX        Integer32 (0..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This is the egress rate in percentage.
+             This is an integer value which can go from 0 to 100." 
+        ::= { dellNetIfStaticsEntry 27 }
+
+       dellNetIfTransceiverDataTable     OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DellNetIfTransceiverDataEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION  
+             "The information to monitor transceiver data."
+        ::= { dellNetIfTransceiverData 1 }
+ 
+       dellNetIfTransceiverDataEntry     OBJECT-TYPE
+        SYNTAX        DellNetIfTransceiverDataEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A row defintion of Dell Networking OS Extension
+             transceiver data."
+        INDEX    { ifIndex }
+        ::= { dellNetIfTransceiverDataTable 1 }
+  
+       DellNetIfTransceiverDataEntry::=
+        SEQUENCE {
+           dellNetIfTransDeviceName                OCTET STRING,
+           dellNetIfTransPort                      OCTET STRING,
+           dellNetIfTransOpticsPresent             TruthValue,
+           dellNetIfTransOpticsType                OCTET STRING,
+           dellNetIfTransVendorName                OCTET STRING,
+           dellNetIfTransPartNumber                OCTET STRING,
+           dellNetIfTransSerialNumber              OCTET STRING,
+           dellNetIfTransTransmitPowerLane1        OCTET STRING,
+           dellNetIfTransTransmitPowerLane2        OCTET STRING,
+           dellNetIfTransTransmitPowerLane3        OCTET STRING,
+           dellNetIfTransTransmitPowerLane4        OCTET STRING,
+           dellNetIfTransReceivePowerLane1         OCTET STRING, 
+           dellNetIfTransReceivePowerLane2         OCTET STRING,
+           dellNetIfTransReceivePowerLane3         OCTET STRING,
+           dellNetIfTransReceivePowerLane4         OCTET STRING,
+           dellNetIfTransTemperature               OCTET STRING,
+           dellNetIfTransVoltage                   OCTET STRING,
+           dellNetIfTransTransmitBiasCurrentLane1  OCTET STRING,
+           dellNetIfTransTransmitBiasCurrentLane2  OCTET STRING,
+           dellNetIfTransTransmitBiasCurrentLane3  OCTET STRING,
+           dellNetIfTransTransmitBiasCurrentLane4  OCTET STRING
+        }
+	     
+       dellNetIfTransDeviceName      OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - DeviceName"
+	::= { dellNetIfTransceiverDataEntry 1 }
+ 
+       dellNetIfTransPort      OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241)) 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Port"
+ 	::= { dellNetIfTransceiverDataEntry 2 }
+
+        dellNetIfTransOpticsPresent OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - OpticsPresent shows the presence of optic.
+             The possible values are 1 when the optic is inserted and 2 when the optic is not inserted."
+        ::= { dellNetIfTransceiverDataEntry 3 }
+
+ 
+       dellNetIfTransOpticsType      OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241)) 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Type"
+	::= { dellNetIfTransceiverDataEntry 4 }
+  
+       dellNetIfTransVendorName       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Name"
+ 	::= { dellNetIfTransceiverDataEntry 5 }
+  
+       dellNetIfTransPartNumber       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241)) 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - PartNumber"
+ 	::= { dellNetIfTransceiverDataEntry 6 }
+  
+       dellNetIfTransSerialNumber       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241)) 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - SerialNumber"
+	::= { dellNetIfTransceiverDataEntry 7 }
+  
+       dellNetIfTransTransmitPowerLane1       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241)) 
+        UNITS         "dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Transmit Power in Lane 1 in unit dBm.
+             For optics supporting power, valid float value will be 
+             displayed or 'null string' will be displayed."
+ 	::= { dellNetIfTransceiverDataEntry 8 }
+  
+       dellNetIfTransTransmitPowerLane2       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241))
+        UNITS         "dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Transmit Power in Lane 2 in unit dBm.
+             For optics supporting power, valid float value will be 
+             displayed or 'null string' will be displayed."
+        ::= { dellNetIfTransceiverDataEntry 9 }
+
+       dellNetIfTransTransmitPowerLane3       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241))
+        UNITS         "dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Transmit Power in Lane 3 in unit dBm.
+             For optics supporting power, valid float value will be 
+             displayed or 'null string' will be displayed."
+        ::= { dellNetIfTransceiverDataEntry 10 }
+
+       dellNetIfTransTransmitPowerLane4       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241))
+        UNITS         "dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Transmit Power in Lane 4 in unit dBm.
+             For optics supporting power, valid float value will be 
+             displayed or 'null string' will be displayed."
+        ::= { dellNetIfTransceiverDataEntry 11 }
+
+       dellNetIfTransReceivePowerLane1       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241)) 
+        UNITS         "dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Receive Power in Lane 1 in unit dBm.
+             For optics supporting power, valid float value will be 
+             displayed or 'null string' will be displayed."
+ 	::= { dellNetIfTransceiverDataEntry 12 }
+
+       dellNetIfTransReceivePowerLane2       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241))
+        UNITS         "dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Receive Power in Lane 2 in unit dBm.
+             For optics supporting power, valid float value will be 
+             displayed or 'null string' will be displayed."
+        ::= { dellNetIfTransceiverDataEntry 13 }
+
+       dellNetIfTransReceivePowerLane3       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241))
+        UNITS         "dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Receive Power in Lane 3 in unit dBm.
+             For optics supporting power, valid float value will be 
+             displayed or 'null string' will be displayed."
+        ::= { dellNetIfTransceiverDataEntry 14 }
+
+       dellNetIfTransReceivePowerLane4       OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..241))
+        UNITS         "dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TransceiverData - Receive Power in Lane 4 in unit dBm.
+             For optics supporting power, valid float value will be 
+             displayed or 'null string' will be displayed."
+        ::= { dellNetIfTransceiverDataEntry 15 }
+
+        dellNetIfTransTemperature       OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..241))
+         UNITS         "degree Celsius"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "TransceiverData - Temperature in unit degree Celsius.
+              For optics supporting temperature, valid float value will be 
+              displayed or 'null string' will be displayed."
+         ::= { dellNetIfTransceiverDataEntry 16 }
+
+        dellNetIfTransVoltage       OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..241))
+         UNITS         "volts"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "TransceiverData - Voltage in unit volts.
+              For optics supporting voltage, valid float value will be 
+              displayed or 'null string' will be displayed."
+         ::= { dellNetIfTransceiverDataEntry 17 }
+
+        dellNetIfTransTransmitBiasCurrentLane1       OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..241))
+         UNITS         "mA"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "TransceiverData - Transmit Bias Current in Lane 1 in unit mA.
+              For optics supporting current, valid float value will be
+              displayed or 'null string' will be displayed."
+         ::= { dellNetIfTransceiverDataEntry 18 }
+
+        dellNetIfTransTransmitBiasCurrentLane2       OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..241))
+         UNITS         "mA"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "TransceiverData - Transmit Bias Current in Lane 2 in unit mA.
+              For optics supporting current, valid float value will be 
+              displayed or 'null string' will be displayed."
+         ::= { dellNetIfTransceiverDataEntry 19 }
+
+        dellNetIfTransTransmitBiasCurrentLane3       OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..241))
+         UNITS         "mA"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "TransceiverData - Transmit Bias Current in Lane 3 in unit mA.
+              For optics supporting current, valid float value will be 
+              displayed or 'null string' will be displayed."
+         ::= { dellNetIfTransceiverDataEntry 20 }
+
+        dellNetIfTransTransmitBiasCurrentLane4       OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..241))
+         UNITS         "mA"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "TransceiverData - Transmit Bias Current in Lane 4 in unit mA.
+              For optics supporting current, valid float value will be 
+              displayed or 'null string' will be displayed."
+         ::= { dellNetIfTransceiverDataEntry 21 }
+
+    dellNetIfAlarmMibNotifications     OBJECT IDENTIFIER ::= { dellNetIfAlarmObjects 1 }
+   
+    -- ## Traps
+
+    dellNetIfAlarmHighBer     NOTIFICATION-TYPE
+        OBJECTS         {   ifIndex 
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when the
+             Bit error rate is high on an interface."
+        ::= { dellNetIfAlarmMibNotifications 1 }
+
+    dellNetIfAlarmHighBerClr     NOTIFICATION-TYPE
+        OBJECTS         {   ifIndex 
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when the
+             high Bit error rate alarm on an interface is cleared."
+        ::= { dellNetIfAlarmMibNotifications 2 }
+
+    dellNetIfAlarmFastRetrain     NOTIFICATION-TYPE
+        OBJECTS         {   ifIndex 
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when the
+             retrain event is observed on an interface."
+        ::= { dellNetIfAlarmMibNotifications 3 }
+
+
+    -- ### conformance information ###
+    dellNetIfExtensionMibConformance OBJECT IDENTIFIER ::= { dellNetIfExtensionMib 2 }
+    dellNetIfExtensionMibCompliances OBJECT IDENTIFIER ::= { dellNetIfExtensionMibConformance 1 }
+    dellNetIfExtensionMibGroups      OBJECT IDENTIFIER ::= { dellNetIfExtensionMibConformance 2 }
+
+    -- ## compliance statements
+    dellNetIfExtensionMibCompliance    MODULE-COMPLIANCE
+        STATUS                  current
+        DESCRIPTION
+            "The compliance statement for Dell Networking OS
+            IF Extension MIB."
+        MODULE    -- this module
+        MANDATORY-GROUPS {
+            dellNetIfParamsGroup,
+            dellNetIfStatsGroup,
+            dellNetIfTransceiverDataGroup,
+            dellNetIfNotificationGroup 
+        }
+        ::= { dellNetIfExtensionMibCompliances 1 }
+
+    -- ## units of conformance
+
+    dellNetIfParamsGroup OBJECT-GROUP
+        OBJECTS {
+           dellNetIfIpMtu,
+           dellNetIfDuplexMode,
+           dellNetIfQueueingStrategy,
+           dellNetIfRxFlowCtrl,
+           dellNetIfTxFlowCtrl,
+           dellNetIfDescr,
+           dellNetIfAdminStatus,
+           dellNetIfRateInterval,
+           dellNetIfSpeed, 
+           dellNetIfPortListBitPos 
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing the
+            Dell Networking OS IF Extenstion parameters."
+        ::= { dellNetIfExtensionMibGroups 1 }
+
+    dellNetIfStatsGroup    OBJECT-GROUP
+        OBJECTS {
+           dellNetIfInVlanPkts,
+           dellNetIfIn64BytePkts,
+           dellNetIfIn65To127BytePkts,
+           dellNetIfIn128To255BytePkts,
+           dellNetIfIn256To511BytePkts, 
+           dellNetIfIn512To1023BytePkts,
+           dellNetIfInOver1023BytePkts,
+           dellNetIfInThrottles,
+           dellNetIfInRunts,
+           dellNetIfInGiants,
+           dellNetIfInCRC,
+           dellNetIfInOverruns, 
+           dellNetIfOutVlanPkts,
+           dellNetIfOutUnderruns,
+           dellNetIfOutUnicasts,
+           dellNetIfOutCollisions,
+           dellNetIfOutWredDrops,
+           dellNetIfOut64BytePkts,
+           dellNetIfOut65To127BytePkts,
+           dellNetIfOut128To255BytePkts,
+           dellNetIfOut256To511BytePkts,
+           dellNetIfOut512To1023BytePkts,
+           dellNetIfOutOver1023BytePkts,
+           dellNetIfOutThrottles,
+           dellNetIfLastDiscontinuityTime,
+           dellNetIfInCentRate,
+           dellNetIfOutCentRate
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing the
+            interface statistics."
+        ::= { dellNetIfExtensionMibGroups 2 }
+
+    dellNetIfTransceiverDataGroup OBJECT-GROUP
+ 	OBJECTS {
+           dellNetIfTransDeviceName,
+           dellNetIfTransPort,     
+           dellNetIfTransOpticsPresent,     
+           dellNetIfTransOpticsType,          
+           dellNetIfTransVendorName,          
+           dellNetIfTransPartNumber,    
+           dellNetIfTransSerialNumber,  
+           dellNetIfTransTransmitPowerLane1,
+           dellNetIfTransTransmitPowerLane2,
+           dellNetIfTransTransmitPowerLane3,
+           dellNetIfTransTransmitPowerLane4,
+           dellNetIfTransReceivePowerLane1,
+           dellNetIfTransReceivePowerLane2,
+           dellNetIfTransReceivePowerLane3,
+           dellNetIfTransReceivePowerLane4,
+           dellNetIfTransTemperature,
+           dellNetIfTransVoltage,
+           dellNetIfTransTransmitBiasCurrentLane1,
+           dellNetIfTransTransmitBiasCurrentLane2,
+           dellNetIfTransTransmitBiasCurrentLane3,
+           dellNetIfTransTransmitBiasCurrentLane4
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing the
+            Dell Networking OS Transceiver Data."
+ 	::= { dellNetIfExtensionMibGroups 3 }
+
+    dellNetIfNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+        dellNetIfAlarmHighBer,
+        dellNetIfAlarmHighBerClr,
+        dellNetIfAlarmFastRetrain
+        }
+        STATUS    current
+        DESCRIPTION
+            "Notifications for Dell Networking OS Interface mib"
+        ::= { dellNetIfExtensionMibGroups 4 }
+    END
+

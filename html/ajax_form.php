@@ -12,22 +12,19 @@
  * the source code distribution for details.
  */
 
-// FUA
-
 use LibreNMS\Authentication\LegacyAuth;
 
-$init_modules = array('web', 'auth', 'alerts', 'laravel');
+$init_modules = array('web', 'auth', 'alerts');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+if (!LegacyAuth::check()) {
+    die('Unauthorized');
+}
 
 set_debug(isset($_REQUEST['debug']) ? $_REQUEST['debug'] : false);
 
-if (!LegacyAuth::check()) {
-    echo 'unauthenticated';
-    exit;
-}
-
 if (preg_match('/^[a-zA-Z0-9\-]+$/', $_POST['type']) == 1) {
-    if (file_exists('includes/forms/'.$_POST['type'].'.inc.php')) {
-        include_once 'includes/forms/'.$_POST['type'].'.inc.php';
+    if (file_exists('includes/html/forms/'.$_POST['type'].'.inc.php')) {
+        include_once 'includes/html/forms/'.$_POST['type'].'.inc.php';
     }
 }
