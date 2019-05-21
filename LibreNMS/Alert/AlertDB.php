@@ -49,7 +49,7 @@ class AlertDB
         if ($query_builder) {
             return QueryBuilderParser::fromJson($query_builder)->toSql();
         } else {
-            return genSQLOld($rule);
+            return self::genSQLOld($rule);
         }
     }
 
@@ -58,7 +58,7 @@ class AlertDB
      * @param string $rule Rule to generate SQL for
      * @return string|boolean
      */
-    public function genSQLOld($rule)
+    public static function genSQLOld($rule)
     {
         $rule = AlertUtil::runMacros($rule);
         if (empty($rule)) {

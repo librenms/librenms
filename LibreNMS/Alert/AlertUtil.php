@@ -217,7 +217,7 @@ class AlertUtil
         }
         if (strstr($rule, "%macros.")) {
             if (++$x < 30) {
-                $rule = runMacros($rule, $x);
+                $rule = self::runMacros($rule, $x);
             } else {
                 return false;
             }
