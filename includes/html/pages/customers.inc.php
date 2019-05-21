@@ -25,7 +25,7 @@ $no_refresh = true;
     var grid = $("#customers").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
-        url: "ajax/table/customers",
+        url: "<?php echo url('/ajax/table/customers'); ?>",
         formatters: {
             customer: function (column, row) {
                 return '<strong>' + row[column.id] + '</strong>';

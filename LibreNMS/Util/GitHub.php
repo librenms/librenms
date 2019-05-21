@@ -26,9 +26,10 @@
 
 namespace LibreNMS\Util;
 
-use Requests;
 use DateTime;
-use SebastianBergmann\CodeCoverage\Report\PHP;
+use Exception;
+use Requests;
+use Requests_Response;
 
 class GitHub
 {
@@ -39,17 +40,28 @@ class GitHub
     protected $pr;
     protected $stop = false;
     protected $pull_requests = [];
-    protected $changelog = [];
+    protected $changelog = [
+        'feature' => [],
+        'enhancement' => [],
+        'breaking change' => [],
+        'device' => [],
+        'webui' => [],
+        'api' => [],
+        'alerting' => [],
+        'security' => [],
+        'bug' => [],
+        'documentation' => [],
+    ];
+    protected $changelog_users = [];
     protected $markdown;
-    protected $labels = ['webui', 'api', 'documentation', 'security', 'feature', 'enhancement', 'device', 'bug', 'alerting','Breaking-Change'];
     protected $github = 'https://api.github.com/repos/librenms/librenms';
 
     public function __construct($tag, $from, $file, $token = null, $pr = null)
     {
-        $this->tag  = $tag;
+        $this->tag = $tag;
         $this->from = $from;
         $this->file = $file;
-        $this->pr   = $pr;
+        $this->pr = $pr;
         if (!is_null($token) || getenv('GH_TOKEN')) {
             $this->token = $token ?: getenv('GH_TOKEN');
         }
@@ -86,7 +98,6 @@ class GitHub
      *
      * Get a single pull request information
      *
-     * @return mixed
      */
     public function getPullRequest()
     {
@@ -100,7 +111,6 @@ class GitHub
      *
      * @param $date
      * @param int $page
-     * @return bool
      */
     public function getPullRequests($date, $page = 1)
     {
@@ -108,26 +118,32 @@ class GitHub
         $prs = json_decode($prs->body, true);
         foreach ($prs as $k => $pr) {
             if ($pr['merged_at']) {
-                $created    = new DateTime($pr['created_at']);
-                $merged     = new DateTime($pr['merged_at']);
-                $updated    = new DateTime($pr['updated_at']);
-                $end_date   = new DateTime($date);
-                if (isset($this->pr['merged_at']) && $merged > new DateTime($this->pr['merged_at'])) {
-                    // If the date of this PR is newer than the final PR then skip over it
-                    continue;
-                } elseif ($created < $end_date && $merged < $end_date && $updated >= $end_date) {
-                    // If this PR was created and merged before the last tag but has been updated since then skip over
-                    continue;
-                } elseif ($created < $end_date && $merged < $end_date && $updated < $end_date) {
-                    // If the date of this PR is older than the last release we're done
-                    return true;
-                } else {
-                    // If not, assign this PR to the array
-                    $this->pull_requests[] = $pr;
+                try {
+                    $created = new DateTime($pr['created_at']);
+                    $merged = new DateTime($pr['merged_at']);
+                    $updated = new DateTime($pr['updated_at']);
+                    $end_date = new DateTime($date);
+                    if (isset($this->pr['merged_at']) && $merged > new DateTime($this->pr['merged_at'])) {
+                        // If the date of this PR is newer than the final PR then skip over it
+                        continue;
+                    } elseif ($created < $end_date && $merged < $end_date && $updated >= $end_date) {
+                        // If this PR was created and merged before the last tag but has been updated since then skip over
+                        continue;
+                    } elseif ($created < $end_date && $merged < $end_date && $updated < $end_date) {
+                        // If the date of this PR is older than the last release we're done
+                        return;
+                    } else {
+                        // If not, assign this PR to the array
+                        $this->pull_requests[] = $pr;
+                    }
+                } catch (Exception $e) {
+                    return;
                 }
             }
         }
-        $this->getPullRequests($date, $page+1);
+
+        // recurse through the pages
+        $this->getPullRequests($date, $page + 1);
     }
 
     /**
@@ -137,25 +153,29 @@ class GitHub
      */
     public function buildChangeLog()
     {
-        $output = [];
-        $users  = [];
+        $valid_labels = array_keys($this->changelog);
+
         foreach ($this->pull_requests as $k => $pr) {
-            if (isset($users[$pr['user']['login']]) === false) {
-                $users[$pr['user']['login']] = 0;
+            if (isset($this->changelog_users[$pr['user']['login']]) === false) {
+                $this->changelog_users[$pr['user']['login']] = 0;
             }
             if ($pr['merged_at']) {
-                foreach ($pr['labels'] as $key => $label) {
+                $labels = array_map(function ($label) {
                     $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
-                    $name = str_replace('-', ' ', $name);
-                    if (in_array($name, $this->labels)) {
-                        $title = ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
-                        $output[$name][] = "$title ([#{$pr['number']}]({$pr['html_url']})) - [{$pr['user']['login']}]({$pr['user']['html_url']})" . PHP_EOL;
+                    return str_replace('-', ' ', $name);
+                }, $pr['labels']);
+
+                // check valid labels in order
+                foreach ($valid_labels as $valid_label) {
+                    if (in_array($valid_label, $labels) && !in_array('ignore changelog', $labels)) {
+                        $title = ucwords(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
+                        $this->changelog[$valid_label][] = "$title ([#{$pr['number']}]({$pr['html_url']})) - [{$pr['user']['login']}]({$pr['user']['html_url']})" . PHP_EOL;
+                        break; // only put in the first found label
                     }
                 }
-                $users[$pr['user']['login']] += 1;
+                $this->changelog_users[$pr['user']['login']] += 1;
             }
         }
-        $this->changelog = ['changelog' => $output, 'users' => $users];
     }
 
     /**
@@ -165,21 +185,23 @@ class GitHub
      */
     public function formatChangeLog()
     {
-        $tmp_markdown = "##$this->tag" . PHP_EOL;
+        $tmp_markdown = "## $this->tag" . PHP_EOL;
         $tmp_markdown .= '*(' . date('Y-m-d') . ')*' . PHP_EOL . PHP_EOL;
-        if (!empty($this->changelog['users'])) {
-            $tmp_markdown .= "A big thank you to the following " . count($this->changelog['users']) . " contributors this last month:" . PHP_EOL . PHP_EOL;
-            asort($this->changelog['users']);
-            foreach (array_reverse($this->changelog['users']) as $user => $count) {
+        if (!empty($this->changelog_users)) {
+            $tmp_markdown .= "A big thank you to the following " . count($this->changelog_users) . " contributors this last month:" . PHP_EOL . PHP_EOL;
+            arsort($this->changelog_users);
+            foreach ($this->changelog_users as $user => $count) {
                 $tmp_markdown .= "  - $user ($count)" . PHP_EOL;
             }
         }
 
         $tmp_markdown .= PHP_EOL;
 
-        foreach ($this->changelog['changelog'] as $section => $items) {
-            $tmp_markdown .= "#### " . ucfirst($section) . PHP_EOL;
-            $tmp_markdown .= '* ' . implode('* ', $items) . PHP_EOL;
+        foreach ($this->changelog as $section => $items) {
+            if (!empty($items)) {
+                $tmp_markdown .= "#### " . ucfirst($section) . PHP_EOL;
+                $tmp_markdown .= '* ' . implode('* ', $items) . PHP_EOL;
+            }
         }
 
         $this->markdown = $tmp_markdown;
@@ -215,6 +237,10 @@ class GitHub
         return $this->markdown;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function createRelease()
     {
         // push the changelog and version bump
@@ -239,7 +265,7 @@ class GitHub
     /**
      * Function to control the creation of creating a change log.
      * @param bool $write
-     * @throws \Exception
+     * @throws Exception
      */
     public function createChangelog($write = true)
     {
@@ -249,7 +275,7 @@ class GitHub
         }
 
         if (!isset($previous_release['published_at'])) {
-            throw new \Exception("Could not find previous release tag.");
+            throw new Exception("Could not find previous release tag.");
         }
 
         $this->getPullRequests($previous_release['published_at']);
@@ -274,11 +300,11 @@ class GitHub
      * @param string $file Path in git repo
      * @param string $contents new file contents
      * @param string $message The commit message
-     * @return \Requests_Response
+     * @return Requests_Response
      */
     private function pushFileContents($file, $contents, $message)
     {
-        $existing = \Requests::get($this->github . '/contents/' . $file, $this->getHeaders());
+        $existing = Requests::get($this->github . '/contents/' . $file, $this->getHeaders());
         $existing_sha = json_decode($existing->body)->sha;
 
         $updated = Requests::put($this->github . '/contents/' . $file, $this->getHeaders(), json_encode([

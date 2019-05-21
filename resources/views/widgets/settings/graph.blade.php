@@ -69,6 +69,14 @@
         @endif
         </select>
     </div>
+    <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_service-{{ $id }}" style="display: none;">
+        <label for="graph_service-{{ $id }}" class="control-label">@lang('Service')</label>
+        <select class="form-control" id="graph_service-{{ $id }}" name="graph_service" data-placeholder="@lang('Select a service')">
+        @if($graph_service)
+            <option value="{{ $graph_service }}">{{ $service_text }}</option>
+        @endif
+        </select>
+    </div>
     <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_bill-{{ $id }}" style="display: none;">
         <label for="graph_bill-{{ $id }}" class="control-label">@lang('Bill')</label>
         <select class="form-control" id="graph_bill-{{ $id }}" name="graph_bill" data-placeholder="@lang('Select a bill')">
@@ -111,6 +119,7 @@
             };
         }, '{{ $graph_application ?: '' }}');
         init_select2('#graph_munin-{{ $id }}', 'munin', {limit: 100}, '{{ $graph_munin ?: '' }}');
+        init_select2('#graph_service-{{ $id }}', 'service', {limit: 100}, '{{ $graph_service ?: '' }}');
         init_select2('#graph_bill-{{ $id }}', 'bill', {limit: 100}, '{{ $graph_bill ?: '' }}');
         init_select2('#graph_custom-{{ $id }}', 'graph-aggregate', {}, false);
         init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, {{ $graph_port_ids }});

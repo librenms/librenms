@@ -377,7 +377,7 @@ function getLogo($device)
  */
 function getLogoTag($device, $class = null)
 {
-    $tag = '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"';
+    $tag = '<img src="' . url(getLogo($device)) . '" title="' . getImageTitle($device) . '"';
     if (isset($class)) {
         $tag .= " class=\"$class\" ";
     }

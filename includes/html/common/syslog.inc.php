@@ -44,7 +44,7 @@ var syslog_grid = $("#syslog").bootgrid({
             from: "' . addcslashes($vars['from'], '"') . '",
         };
     },
-    url: "ajax/table/syslog"
+    url: "' . url('/ajax/table/syslog') . '"
 });
 
 </script>

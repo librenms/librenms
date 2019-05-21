@@ -10,6 +10,10 @@ foreach ($input_freq as $index => $data) {
     if (count($input_freq) > 1) {
         $descr .= " Phase $index";
     }
+    if (is_array($data['upsInputFrequency'])) {
+        $data['upsInputFrequency'] = $data['upsInputFrequency'][0];
+        $freq_oid .= ".0";
+    }
 
     discover_sensor(
         $valid['sensor'],

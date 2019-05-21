@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\BgpPeer;
+use App\Models\CefSwitching;
+use App\Models\Component;
+use App\Models\OspfInstance;
+use App\Models\Vrf;
+
 $pagetitle[] = 'Routing';
 
 if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {
@@ -8,6 +14,8 @@ if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {
     $graphs = 'nographs';
 }
 
+$user = Auth::user();
+$routing_count = \LibreNMS\Util\ObjectCache::routing();
 // $datas[] = 'overview';
 // $routing_count is populated by print-menubar.inc.php
 // $type_text['overview'] = "Overview";
@@ -22,7 +30,8 @@ print_optionbar_start();
 // if (!$vars['protocol']) { $vars['protocol'] = "overview"; }
 echo "<span style='font-weight: bold;'>Routing</span> &#187; ";
 
-unset($sep);
+$vars['protocol'] = basename($vars['protocol']);
+$sep = '';
 foreach ($routing_count as $type => $value) {
     if (!$vars['protocol']) {
         $vars['protocol'] = $type;

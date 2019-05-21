@@ -30,6 +30,7 @@ use App\Models\Port;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
+use LibreNMS\Util\ObjectCache;
 
 abstract class DeviceSummaryController extends WidgetController
 {
@@ -54,33 +55,15 @@ abstract class DeviceSummaryController extends WidgetController
     protected function getData(Request $request)
     {
         $data = $this->getSettings();
-        $user = $request->user();
 
-        $data['devices'] = [
-            'count' => Device::hasAccess($user)->count(),
-            'up' => Device::hasAccess($user)->isUp()->count(),
-            'down' => Device::hasAccess($user)->isDown()->count(),
-            'ignored' => Device::hasAccess($user)->isIgnored()->count(),
-            'disabled' => Device::hasAccess($user)->isDisabled()->count(),
-        ];
+        $data['devices'] = ObjectCache::deviceCounts(['total', 'up', 'down', 'ignored', 'disabled']);
 
-        $data['ports'] = [
-            'count' => Port::hasAccess($user)->isNotDeleted()->count(),
-            'up' => Port::hasAccess($user)->isNotDeleted()->isUp()->count(),
-            'down' => Port::hasAccess($user)->isNotDeleted()->isDown()->count(),
-            'ignored' => Port::hasAccess($user)->isNotDeleted()->isIgnored()->count(),
-            'shutdown' => Port::hasAccess($user)->isNotDeleted()->isShutdown()->count(),
-            'errored' => $data['summary_errors'] ? Port::hasAccess($user)->isNotDeleted()->hasErrors()->count() : -1,
-        ];
+        $data['ports'] = $data['summary_errors'] ?
+            ObjectCache::portCounts(['total', 'up', 'down', 'ignored', 'shutdown', 'errored']) :
+            ObjectCache::portCounts(['total', 'up', 'down', 'ignored', 'shutdown']);
 
         if ($data['show_services']) {
-            $data['services'] = [
-                'count' => Service::hasAccess($user)->count(),
-                'up' => Service::hasAccess($user)->isUp()->count(),
-                'down' => Service::hasAccess($user)->isDown()->count(),
-                'ignored' => Service::hasAccess($user)->isIgnored()->count(),
-                'disabled' => Service::hasAccess($user)->isDisabled()->count(),
-            ];
+            $data['services'] = ObjectCache::serviceCounts(['total', 'ok', 'critical', 'ignored', 'disabled']);
         }
 
         return $data;
