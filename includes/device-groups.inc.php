@@ -225,7 +225,7 @@ function GetDeviceGroups()
         return dbFetchRows('SELECT * FROM device_groups ORDER BY name');
     }
     else {
-        $user = (LegacyAuth::id());
+        $user_id = (LegacyAuth::id());
         return dbFetchRows("SELECT d.* from device_groups d join device_group_device d2 join devices_perms d1 WHERE d.id = d2.device_group_id and d2.device_id = d1.device_id and d1.user_id = {$user_id}");
     }
 }
