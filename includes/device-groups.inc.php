@@ -214,13 +214,22 @@ function GetDevicesFromGroup($group_id, $nested = false, $full = '')
 }//end GetDevicesFromGroup()
 
 /**
- * Get all Device-Groups
+ * Get all the Device groups which the decive are associated to the current user
  * @return array
  */
 function GetDeviceGroups()
 {
-    return dbFetchRows('SELECT * FROM device_groups ORDER BY name');
-}//end GetDeviceGroups()
+    $user_id = '';
+    
+    if ((LegacyAuth::user()->hasGlobalRead()) or (LegacyAuth::user()->isAdmin())) {
+        return dbFetchRows('SELECT * FROM device_groups ORDER BY name');
+    }
+    else {
+        $user = (LegacyAuth::id());
+        return dbFetchRows("SELECT d.* from device_groups d join device_group_device d2 join devices_perms d1 WHERE d.id = d2.device_group_id and d2.device_id = d1.device_id and d1.user_id = {$user_id}");
+    }
+}
+//end GetDeviceGroups()
 
 /**
  * Run the group queries again to get fresh list of groups for this device
