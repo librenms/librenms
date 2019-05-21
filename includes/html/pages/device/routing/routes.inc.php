@@ -33,4 +33,5 @@ var grid = $("#routes").bootgrid({
     },
     url: "ajax/table/routes"
 });
+
 </script>

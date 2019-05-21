@@ -52,7 +52,8 @@ class RoutesTablesController extends TableController
     protected function filterFields($request)
     {
         return [
-            'inetCidrRoute.device_id' => 'device_id',
+            'inetCidrRoute.context_name' => 'context_name',
+            'inetCidrRoute.inetCidrRouteProto' => 'proto',
             ];
     }
 

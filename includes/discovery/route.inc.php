@@ -34,6 +34,9 @@ $create_row = [];
 $update_row = [];
 $delete_row = [];
 
+//store timestamp so all update / creation will be synced on same timestamp
+$update_timestamp = dbFetchRows('select now() as now')[0]['now'];
+
 //Load current DB entries: 
 $dbRoute = dbFetchRows('select * from `inetCidrRoute` where `device_id` = ?', array($device['device_id']));
 foreach ($dbRoute as $dbRow) {
@@ -85,7 +88,7 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
         $entryClean['context_name'] = '';
         $entryClean['device_id'] = $device['device_id'];
         $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
-        $entryClean['updated_at'] = array('NOW()');
+        $entryClean['updated_at'] = $update_timestamp;
         $entryClean['inetCidrRouteNextHop_device_id'] = $device['device_id'];
         if ($entryClean['inetCidrRouteNextHop'] != '127.0.0.1' && $entryClean['inetCidrRouteNextHop'] != 'fe80::') {
             $next_device = Device::findByIp($entryClean['inetCidrRouteNextHop']);
@@ -138,7 +141,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                     $entry['context_name'] = '';
                     $entry['device_id'] = $device['device_id'];
                     $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
-                    $entry['updated_at'] = array('NOW()');
+                    $entry['updated_at'] = $update_timestamp;
                     $entry['inetCidrRouteNextHop_device_id'] = $device['device_id'];
                     if ($entry['inetCidrRouteNextHop'] != '127.0.0.1') {
                         $entry['inetCidrRouteNextHop_device_id'] = Device::findByIp($entry['inetCidrRouteNextHop'])->device_id;
@@ -206,7 +209,7 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
                     $entryClean['context_name'] = '';
                     $entryClean['device_id'] = $device['device_id'];
                     $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
-                    $entryClean['updated_at'] = array('NOW()');
+                    $entryClean['updated_at'] = $update_timestamp;
                     $entryClean['inetCidrRouteNextHop_device_id'] = $device['device_id'];
                     if ($entryClean['inetCidrRouteNextHop'] != '127.0.0.1' && $entryClean['inetCidrRouteNextHop'] != 'fe80::') {
                         $entryClean['inetCidrRouteNextHop_device_id'] = Device::findByIp($entryClean['inetCidrRouteNextHop'])->device_id;
@@ -268,7 +271,7 @@ if ($mpls_skip != 1) {
                         $entry['context_name'] = $vpnId;
                         $entry['device_id'] = $device['device_id'];
                         $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
-                        $entry['updated_at'] = array('NOW()');
+                        $entry['updated_at'] = $update_timestamp;
                         $entry['inetCidrRouteNextHop_device_id'] = $device['device_id'];
                         if ($entry['inetCidrRouteNextHop'] != '127.0.0.1') {
                             $entry['inetCidrRouteNextHop_device_id'] = Device::findByIp($entry['inetCidrRouteNextHop'])->device_id;
@@ -336,6 +339,7 @@ foreach ($update_row as $upd_entry) {
 }
 
 foreach ($create_row as $new_entry) {
+    $new_entry['created_at'] = $update_timestamp;
     dbInsert($new_entry, 'inetCidrRoute');
     echo '+';
 }
