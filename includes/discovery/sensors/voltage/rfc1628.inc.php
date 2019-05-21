@@ -104,6 +104,7 @@ foreach ($bypass_volts as $index => $data) {
     }
     if (is_array($data['upsBypassVoltage'])) {
         $data['upsBypassVoltage'] = $data['upsBypassVoltage'][0];
+        $vold_oid .= ".0";
     }
 
     discover_sensor(

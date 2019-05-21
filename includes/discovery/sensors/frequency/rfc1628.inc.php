@@ -12,6 +12,7 @@ foreach ($input_freq as $index => $data) {
     }
     if (is_array($data['upsInputFrequency'])) {
         $data['upsInputFrequency'] = $data['upsInputFrequency'][0];
+        $freq_oid .= ".0";
     }
 
     discover_sensor(
