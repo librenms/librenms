@@ -611,7 +611,7 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
         if( widget_id > 0 && widget_settings != {} ) {
             $.ajax({
                 type: 'PUT',
-                url: '<?php echo url('/ajax/form/widget-settings/'); ?>' + widget_id,
+                url: '<?php echo url('/ajax/form/widget-settings/'); ?>/' + widget_id,
                 data: {settings: widget_settings},
                 dataType: "json",
                 success: function (data) {
