@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "arubaos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "aruba.svg"
+                    "icon": "aruba.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "8.2.0.2",
                     "hardware": "Aruba7210",
                     "features": "Local Controller for 10.235.132.234",
-                    "location": "<private>",
                     "os": "arubaos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "aruba.svg"
+                    "icon": "aruba.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -180,6 +180,76 @@
                     "processor_descr": "Network Processor CPU15",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "wireless": {
+        "discovery": {
+            "wireless_sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "utilization",
+                    "sensor_index": "",
+                    "sensor_type": "arubaos-iap",
+                    "sensor_descr": "Radio ",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 0,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "power",
+                    "sensor_index": "",
+                    "sensor_type": "arubaos-iap",
+                    "sensor_descr": "Radio : Tx Power",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 0,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".\"]"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "noise-floor",
+                    "sensor_index": "",
+                    "sensor_type": "arubaos-iap",
+                    "sensor_descr": "Radio ",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": 0,
+                    "sensor_prev": null,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".\"]"
                 }
             ]
         },
