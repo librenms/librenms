@@ -1,0 +1,293 @@
+-- =================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: the huawei memory mib from huawei-device-mib
+-- Reference:
+-- Version:     V1.01
+-- History:
+--    
+-- =================================================================
+
+HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDev
+            FROM HUAWEI-MIB
+        hwFrameIndex, hwSlotIndex
+            FROM HUAWEI-DEVICE-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE            
+            FROM SNMPv2-CONF            
+        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32, Integer32
+            FROM SNMPv2-SMI
+        CounterBasedGauge64
+            FROM HCNUM-TC;
+
+    hwMemoryDev MODULE-IDENTITY
+        LAST-UPDATED "201708170000Z"
+        ORGANIZATION
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO
+            "Huawei Industrial Base
+            Bantian, Longgang
+            Shenzhen 518129
+            People's Republic of China
+            Website: http://www.huawei.com
+            Email: support@huawei.com
+            " 
+        DESCRIPTION
+            "
+            This mib module defines the memory information. NMS can query memory
+            utilization statistics from device by the mib.
+            " 
+        REVISION     "201708170000Z"
+        DESCRIPTION  "V1.01, change DESCRIPTION."
+        REVISION     "201407260000Z"
+        DESCRIPTION  "V1.00, initial version."	    
+        ::= { hwDev 5 }            
+    
+    hwMemoryDevTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMemoryDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            This table provides the information of all memory utilization statistics
+            of device. It contains the total size, the free size, the used size, and
+            so on.
+            "
+        ::= { hwMemoryDev 1 }
+    
+    hwMemoryDevEntry OBJECT-TYPE
+        SYNTAX HwMemoryDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Entries of hwMemoryDevTable.
+                            
+            The table is indexed by hwFrameIndex, hwSlotIndex and hwMemoryDevModuleIndex,
+            
+            hwFrameIndex  - the index of frame of the device. for example, hwFrameIndex
+            equals 0 in NE16.
+            hwSlotIndex   - the slot number of the device, the MAX value varies with
+            different devices.
+            hwMemoryDevModuleIndex - for the purpose of extension.In single CPU devices
+            (NE16,eg.), its value equals 0.
+            "
+        INDEX { hwFrameIndex, hwSlotIndex, hwMemoryDevModuleIndex }
+        ::= { hwMemoryDevTable 1 }
+    
+    HwMemoryDevEntry ::=
+        SEQUENCE { 
+            hwMemoryDevModuleIndex
+                Integer32,
+            hwMemoryDevSize
+                Unsigned32,
+            hwMemoryDevFree
+                Unsigned32,
+            hwMemoryDevRawSliceUsed
+                Unsigned32,
+            hwMemoryDevLargestFree
+                Unsigned32,
+            hwMemoryDevFail
+                Integer32,
+            hwMemoryDevFailNoMem
+                Integer32,
+            hwMemoryDevSize64
+                CounterBasedGauge64,
+            hwMemoryDevFree64
+                CounterBasedGauge64
+         }
+
+    hwMemoryDevModuleIndex OBJECT-TYPE
+        --SYNTAX Integer32 (1..65535)
+        -- VRPV8R1 Capability 20100828 modify value scope
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates the 32-byte memory size of managed objects, in bytes. 
+            The value is the sum of hwMemoryDevFree and hwMemoryDevRawSliceUsed. 
+            Each board has a memory, and the memory size varies with the product.
+            "
+        ::= { hwMemoryDevEntry 1 }
+    
+    hwMemoryDevSize OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The object indicates the total size of the memory in bytes,
+            which is on the managed object.
+            "
+        ::= { hwMemoryDevEntry 2 }
+    
+    hwMemoryDevFree OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The object indicates the free size of the memory in bytes.
+            "
+        ::= { hwMemoryDevEntry 3 }
+    
+    hwMemoryDevRawSliceUsed OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The object indicates the used size of the raw slice memory in bytes.
+            "
+        ::= { hwMemoryDevEntry 4 }
+    
+    hwMemoryDevLargestFree OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The object indicates the largest number of contiguous bytes
+            from the memory that are currently unused on the managed object.
+            "
+        ::= { hwMemoryDevEntry 5 }
+    
+    hwMemoryDevFail OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates the number of memory allocation failures. 
+            The default value is 0.
+            "
+        ::= { hwMemoryDevEntry 6 }
+    
+    hwMemoryDevFailNoMem OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates the number of memory allocation failures due to memory exhaustion. 
+            The default value is 0.
+            "
+        ::= { hwMemoryDevEntry 7 }
+    hwMemoryDevSize64 OBJECT-TYPE
+        SYNTAX CounterBasedGauge64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Indicates the total size of the memory module incase of excessing 4G
+            which is on the managed object, in bytes.
+            "
+        ::= { hwMemoryDevEntry 8}
+    hwMemoryDevFree64 OBJECT-TYPE
+        SYNTAX CounterBasedGauge64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates the 64-byte idle memory size, in bytes. 
+            The value is always less than hwMemoryDevSize64.
+            "
+        ::= { hwMemoryDevEntry 9 }
+    hwBufferTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwBufferEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            This table provides the inquiry of buffer utilization statistics
+            of device. The type of the buffer is classified by size: 32 bytes,
+            64 bytes,...,etc.
+            "
+        ::= { hwMemoryDev 2 }
+    
+    hwBufferEntry OBJECT-TYPE
+        SYNTAX HwBufferEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Entries of hwBufferTable.
+
+            The hwBufferTable is indexed by hwFrameIndex, hwSlotIndex,
+            hwBufferModuleIndex and hwBufferSize.
+            
+            hwFrameIndex  - the index of frame of the device. for example, hwFrameIndex
+            equals 0 in NE16.
+            hwSlotIndex   - the slot number of the device, the MAX value varies with
+            different types of devices.
+            hwBufferModuleIndex - for the purpose of extension.In single CPU devices
+            (NE16,eg.),hwBufferModuleIndex equals 0.
+            hwBufferSize  - the size in bytes of the buffer,such as 32 bytes,64 bytes,
+            ...,etc.
+            "
+        INDEX { hwFrameIndex, hwSlotIndex, hwBufferModuleIndex, hwBufferSize }
+        ::= { hwBufferTable 1 }
+    
+    HwBufferEntry ::=
+        SEQUENCE { 
+            hwBufferModuleIndex
+                Integer32,
+            hwBufferSize
+                Integer32,
+            hwBufferCurrentTotal
+                Integer32,
+            hwBufferCurrentUsed
+                Integer32
+            }
+
+    hwBufferModuleIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The object is used only for the purpose of extension,In single CPU
+            devices (NE16,eg.),hwBufferModuleIndex equals 0. 
+            "
+        ::= { hwBufferEntry 1 }
+    
+    hwBufferSize OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The object indicates the size of the buffers in bytes, such as 32 bytes,
+            64 bytes,...,etc.
+            "
+        ::= { hwBufferEntry 2 }
+    
+    hwBufferCurrentTotal OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates the total number of buffers. 
+            The value varies with the line card and buffer size. 
+            It is a part of the memory. The value ranges from 32 to 4096.
+            "
+        ::= { hwBufferEntry 3 }
+    
+    hwBufferCurrentUsed OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates the number of buffers currently occupied. 
+            The value varies with the line card and buffer size. 
+            It is a part of the memory. The value ranges from 32 to 4096, in kbits. 
+            The value is always less than hwBufferCurrentTotal.
+            "
+        ::= { hwBufferEntry 4 }
+
+END

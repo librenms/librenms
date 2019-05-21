@@ -3,13 +3,12 @@ type: network
 group: unix
 text: 'Procera Networks'
 icon: procera
+bad_if_regexp: '/^pl[0-9]+$/'
+processor_stacked: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-processor_stacked: 1
 discovery:
    - sysObjectID:
        - .1.3.6.1.4.1.15397.2
-bad_if_regexp: '/^pl[0-9]+$/'
-

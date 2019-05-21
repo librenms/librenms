@@ -1,4 +1,5 @@
 source: API/Logs.md
+path: blob/master/doc/
 
 All the `list_*logs` calls are aliased to `list_logs`.
 

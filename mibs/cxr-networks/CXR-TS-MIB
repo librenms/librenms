@@ -1,0 +1,766 @@
+--***************************************************************************
+-- CXR-TS-MIB - Version 1.14 - April 21 2004
+--***************************************************************************
+
+  CXR-TS-MIB
+  
+  DEFINITIONS ::= BEGIN
+
+
+   IMPORTS
+    IpAddress, enterprises 	FROM RFC1155-SMI
+    OBJECT-TYPE	FROM RFC-1212
+    DisplayString FROM RFC-1213
+    TRAP-TYPE FROM RFC-1215;
+
+  --*************************************************************************
+  -- Define the enterprise number as allocated by the internet authority
+  cxr OBJECT IDENTIFIER ::= { enterprises 1425 }
+
+  --*************************************************************************
+  --*************************************************************************
+  -- the overall structure of the MIB
+  --*************************************************************************
+  --*************************************************************************
+
+  ts		OBJECT IDENTIFIER ::= { cxr 1040 }
+
+
+  --*************************************************************************
+	-- First Group: system
+	
+  system      OBJECT IDENTIFIER ::= { ts  1 }
+
+  --*************************************************************************
+
+  productName     OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Product Name"
+    ::= { system 1 }
+
+  version     OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Revision"
+    ::= { system 2 }
+
+  bootp     OBJECT-TYPE
+    SYNTAX          INTEGER {
+			enable(1),
+			disable(2)
+	}
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Bootp"
+    ::= { system 3 }
+
+  mainIpAddress     OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "IP address"
+    ::= { system 4 }
+
+  ipNetmask     OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "IP Netmask"
+    ::= { system 5 }
+
+  ipGateway     OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "IP Gateway"
+    ::= { system 6 }
+
+  ethernetAddress     OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Mac Address"
+    ::= { system 7 }
+
+  ftpdService     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "FTPD Service"
+    ::= { system  8 }
+
+  httpdService     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "HTTPD Service"
+    ::= { system  9 }
+
+  telnetdService     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "TELNETD Service"
+    ::= { system  10 }
+
+  snmpdService     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "SNMPD Service"
+    ::= { system  11 }
+
+  snmpTrap	     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "SNMP Traps"
+
+
+    ::= { system  12 }
+
+  snmpTrapAddr1     OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Trap IP Address"
+    ::= { system  13 }
+
+	snmpTrapAddr2     OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Trap IP Address"
+    ::= { system  14 }
+
+  nameResolution	OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Names Resolution"
+    ::= { system  15 }
+
+  nameServer1     OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Names Server 1"
+    ::= { system  16 }
+
+	nameServer2     OBJECT-TYPE
+    SYNTAX	  IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Names Server 1"
+    ::= { system  17 }
+
+	radiusServer1     OBJECT-TYPE
+    SYNTAX	  IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Radius Server 1"
+    ::= { system  18 }
+
+  radiusSecret1     OBJECT-TYPE
+    SYNTAX      		DisplayString
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Secret for Radius Server 1"
+    ::= { system  19 }
+
+ 	radiusServer2     OBJECT-TYPE
+    SYNTAX	  IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Radius Server 2"
+    ::= { system  20 }
+
+  radiusSecret2     OBJECT-TYPE
+    SYNTAX      		DisplayString
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Secret for Radius Server 2"
+    ::= { system  21 }
+
+  siteName     			OBJECT-TYPE
+    SYNTAX      		DisplayString
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "String indetifier for TS"
+    ::= { system  22 }
+
+  resetByButton	OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Reset by button Enable ot Disable"
+    ::= { system  23 }
+
+  reset     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Reset the TS"
+    ::= { system  24 }
+
+  --*************************************************************************
+	-- Second Group: port
+	
+  portTable OBJECT-TYPE
+    			     	SYNTAX SEQUENCE OF PortEntry
+         				ACCESS not-accessible
+				        STATUS mandatory
+                DESCRIPTION
+				"A table containing all the ports"
+        ::= { ts  2 }
+
+	portEntry OBJECT-TYPE
+                SYNTAX PortEntry
+                ACCESS not-accessible
+                STATUS mandatory
+    						DESCRIPTION
+        				"Port index 1 to 11 possible"
+                INDEX { portIndex }
+        ::= { portTable 1 }
+
+	PortEntry ::= SEQUENCE {
+    portIndex	INTEGER,
+    tcpPort  INTEGER,
+    aliasIpAddress IpAddress,
+    aliasIpNetmask IpAddress,
+    timeoutRxTx  INTEGER,
+    baudRate INTEGER,
+    nbParStop  INTEGER,
+    ipServer  INTEGER,
+    remoteIpAddress  IpAddress,
+    gatewayToRemote  IpAddress,
+    remoteTcpPort  INTEGER,
+    flowControl  INTEGER,
+    mode  INTEGER,
+    rxIdle  INTEGER,
+    txIdle  INTEGER,
+    endMsg  OCTET STRING,
+    interFrame INTEGER,
+    beforeSend  INTEGER,
+    afterSend  INTEGER,
+    timeoutPAD  INTEGER,
+    terminalType INTEGER,
+    multiSession INTEGER,
+    authType  INTEGER,
+    authRad1  INTEGER,
+    authRad2  INTEGER,
+    acctRad1  INTEGER,
+    acctRad2  INTEGER,
+	formFeed  INTEGER,
+    secondIpAddress  IpAddress,
+    secondGateway  IpAddress,
+    secondTcpPort  INTEGER,
+    modbusMode INTEGER,
+    modbusType INTEGER,
+    portReset INTEGER
+  }
+
+  --*************************************************************************
+
+  --*************************************************************************
+	-- Second Group: port
+  --*************************************************************************
+
+  portIndex     OBJECT-TYPE
+    SYNTAX      INTEGER (1..11)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Port Index"
+    ::= { portEntry  1 }
+
+  tcpPort     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "TCP port"
+    ::= { portEntry	2 }
+
+  aliasIpAddress     OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Alias IP address"
+    ::= { portEntry	3 }
+
+  aliasIpNetmask     OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Alias IP netmask"
+    ::= { portEntry	4 }
+
+  timeoutRxTx     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Timeout No rx/Tx Data(min)"
+    ::= { portEntry	5 }
+
+  baudRate     OBJECT-TYPE
+    SYNTAX          INTEGER {
+	b300(1),
+	b600(2),
+	b1200(3),
+	b2400(4),
+	b4800(5),
+	b9600(6),
+	b19200(7),
+	b38400(8),
+	b57600(9),
+	b115200(10),
+	b50(11),
+	b200(12)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Baud rate"
+    ::= { portEntry	6 }
+
+  nbParStop     OBJECT-TYPE
+    SYNTAX      INTEGER {
+	p7Odd1(1),
+	p7Odd2(2),
+	p7Even1(17),
+	p7Even2(18),
+	p7None1(33),
+	p7None2(34),
+	p7High1(49),
+	p7High2(50),
+	p7Low1(65),
+	p7Low2(66),
+	p8Odd1(129),
+
+	p8Odd2(130),
+	p8Even1(145),
+	p8Even2(146),
+	p8None1(161),
+	p8None2(162),
+	p8High1(177),
+	p8High2(178),
+	p8Low1(193),
+	p8Low2(194)
+     }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Nb bits/Parity/Nb stop bits"
+    ::= { portEntry	7 }
+
+  ipServer     OBJECT-TYPE
+    SYNTAX      INTEGER {
+	active(1),
+	passive(2),
+	passiveExclusive(3)
+    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Server IP"
+    ::= { portEntry	8 }
+
+  remoteIpAddress     OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Remote IP address"
+    ::= { portEntry	9 }
+
+  gatewayToRemote    OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Gateway to remote"
+    ::= { portEntry	10 }
+
+  remoteTcpPort     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "remote TCP port"
+    ::= { portEntry	11 }
+
+  flowControl     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			noFlowControl(1),
+			xonXoff(2),
+			rtsCts(3)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Flow Control"
+    ::= { portEntry	12 }
+
+  mode     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			rfc2217(1),
+			msgFormat(2),
+			carrierBreak(3),
+			telex(4),
+			rlogin(5),
+			lpd(6),
+			telnet(7),
+			rawIp(8),
+			rtelnet(9),
+			pad(10),
+			muxv24(11),
+			modbus(12),
+			hnzs2(13),
+			hnzs5(14),
+		}
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Fonctionnement"
+    ::= { portEntry  13 }
+
+  rxIdle     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Rx Idle"
+    ::= { portEntry  14 }
+
+  txIdle     OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Tx Idle"
+    ::= { portEntry  15 }
+
+  endMsg     OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "End msg character"
+    ::= { portEntry	16 }
+
+  interFrame     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Time Inter Frame(modem mode)"
+    ::= { portEntry  17 }
+
+  beforeSend     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Time Before Send(modem mode)"
+    ::= { portEntry  18 }
+
+  afterSend     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION    "Time After Send(modem mode)"
+    ::= { portEntry  19 }
+
+  timeoutPAD     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Timeout PAD(modem PAD)"
+    ::= { portEntry  20 }
+
+
+  terminalType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			console(1),
+			linux(2),
+			aixterm(3),
+			dec-vt100(4),
+			vt100(5),
+			vt200(6),
+			vt420(7),
+			xterm(8),
+			xterms(9),
+			xtermc(10)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION    "Terminal Type"
+    ::= { portEntry  21 }
+
+  multiSession     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION    "multiSession"
+    ::= { portEntry  22 }
+
+  authType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			remote(1),
+			radius(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION    "Authentication type"
+    ::= { portEntry  23 }
+
+  authRad1     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION    "Use Server Radius 1 for auth."
+    ::= { portEntry  24 }
+
+  authRad2     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION    "Use Server Radius 2 for auth."
+    ::= { portEntry  25 }
+
+  acctRad1     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION    "Use Server Radius 1 for acct."
+    ::= { portEntry  26 }
+
+  acctRad2     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+		}
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION    "Use Server Radius 2 for acct."
+    ::= { portEntry  27 }
+
+  formFeed     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+		}
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "LPD form Feed"
+    ::= { portEntry  28 }
+
+  secondIpAddress   OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Second IP address"
+    ::= { portEntry	29 }
+
+  secondGateway	    OBJECT-TYPE
+    SYNTAX	    IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Second Gateway"
+    ::= { portEntry	30 }
+
+  secondTcpPort     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Second TCP port"
+    ::= { portEntry	31 }
+
+  modbusMode     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			rtu(1),
+			ascii(2)
+		}
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Modbus Mode"
+    ::= { portEntry	32 }
+
+  modbusType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			slave(1),
+			master(2)
+		}
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Modbus Type"
+    ::= { portEntry	33 }
+
+  portReset     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Apply changes to port"
+    ::= { portEntry  34 }
+
+--*************************************************************************
+-- Third Group: port Stats
+  portStatsTable OBJECT-TYPE
+    			     	SYNTAX SEQUENCE OF PortStatsEntry
+         				ACCESS not-accessible
+				        STATUS mandatory
+                DESCRIPTION
+				"A table containing all the statistics ports"
+        ::= { ts  3 }
+	
+	portStatsEntry OBJECT-TYPE
+                SYNTAX PortStatsEntry
+                ACCESS not-accessible
+                STATUS mandatory
+    						DESCRIPTION
+       					 "Port index 1 to 11 possible"
+                INDEX { portIndex }
+        ::= { portStatsTable 1 }
+
+	PortStatsEntry ::= SEQUENCE {
+    bytesReceiveFromV24 INTEGER,
+		bytesSendToV24      INTEGER,
+		statusDTR			      INTEGER
+  }
+	
+
+--*************************************************************************
+-- Third Group: port Stats
+--*************************************************************************
+    bytesReceiveFromV24     OBJECT-TYPE
+    SYNTAX      		INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Bytes received from V24"
+    ::= { portStatsEntry  1}
+
+    bytesSendToV24     OBJECT-TYPE
+    SYNTAX      		INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Bytes send to V24"
+    ::= { portStatsEntry  2}
+
+    statusDTR     OBJECT-TYPE
+    SYNTAX      INTEGER {
+			on(1),
+			off(2)
+    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "DTR Status"
+    ::= { portStatsEntry  3}
+
+
+
+--*************************************************************************
+-- Fourth Group: modbus Param
+  modbusTable OBJECT-TYPE
+    			     	SYNTAX SEQUENCE OF ModbusEntry
+         				ACCESS not-accessible
+				        STATUS mandatory
+                DESCRIPTION
+	"Master modbus table containing all the slave parameters table"
+        ::= { ts  4 }
+	
+	modbusEntry OBJECT-TYPE
+                SYNTAX ModbusEntry
+                ACCESS not-accessible
+                STATUS mandatory
+		DESCRIPTION
+	 "Slave index 1 to 16 possible"
+                INDEX { portIndex }
+        ::= { modbusTable 1 }
+
+	ModbusEntry ::= SEQUENCE {
+	    slaveHexaAddress INTEGER,
+	    slaveIPaddr IpAddress,
+	    slaveIPport INTEGER
+  }
+	
+
+--*************************************************************************
+-- Fourth Group: modbus
+--*************************************************************************
+    slaveHexaAddress     OBJECT-TYPE
+    SYNTAX      		INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Modbus Hexadecimal address"
+    ::= { modbusEntry  1}
+
+    slaveIPaddr     OBJECT-TYPE
+    SYNTAX      		IpAddress
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Modbus IP address"
+    ::= { modbusEntry  2}
+
+    slaveIPport     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "Modbus IP Port"
+    ::= { modbusEntry  3}
+
+
+  --*************************************************************************
+        -- TRAP : Terminal SERVER
+  --*************************************************************************
+
+ sessionStarted TRAP-TYPE
+	ENTERPRISE  cxr
+  VARIABLES   { portIndex }
+  DESCRIPTION "Session Begin"
+    	::= 1041
+
+ sessionStopped TRAP-TYPE
+	ENTERPRISE  cxr
+	VARIABLES   { portIndex }
+	DESCRIPTION "Session End"
+    	::= 1042
+
+ dtrUp TRAP-TYPE
+	ENTERPRISE  cxr
+
+	VARIABLES   { portIndex }
+	DESCRIPTION "DTR UP"
+    	::= 1043
+
+ dtrDown TRAP-TYPE
+	ENTERPRISE  cxr
+	VARIABLES   { portIndex }
+	DESCRIPTION "DTR DOWN"
+    	::= 1044
+
+
+
+END
+

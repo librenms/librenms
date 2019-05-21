@@ -30,22 +30,13 @@ push-personal pp:
 push-testing pt:
 	$(GIT) push testing
 
-update-subtrees: datetime-subtree moment-subtree font-awesome vis
+update-subtrees: datetime-subtree font-awesome 
 
 datetime-subtree:
 	$(GIT_SUBTREE) --prefix=html/js/datetime https://github.com/Eonasdan/bootstrap-datetimepicker master
 
-moment-subtree:
-	$(GIT_SUBTREE) --prefix=html/js/moment   https://github.com/moment/moment master
-
 font-awesome:
 	$(GIT_SUBTREE) --prefix=lib/Font-Awesome https://github.com/FortAwesome/Font-Awesome.git master
-
-vis:
-	$(GIT_SUBTREE) --prefix=lib/vis https://github.com/almende/vis.git master
-
-typeahead:
-	$(GIT_SUBTREE) --prefix=lib/typeahead https://github.com/corejavascript/typeahead.js.git master
 
 gridster:
 	$(GIT_SUBTREE) --prefix=lib/gridster https://github.com/dsmorse/gridster.js.git master

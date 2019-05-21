@@ -1,0 +1,350 @@
+------------------------------------------------------------------------------
+--  File         : gbnL3RipMib.mi2
+--  Description  : ADMIN  Enterprise MIB 
+--  Version      : 0.03
+--  Date         : May 03, 2002     
+--
+--  Copyright (c) 2002-2005 admin Systems, Inc.  All Rights Reserved.
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    GBNL3Rip-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter64                    FROM SNMPv2-SMI
+        
+        RowStatus,
+        DisplayString, TruthValue               FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL3                                   FROM ADMIN-MASTER-MIB 
+        
+        PortList                                FROM Q-BRIDGE-MIB;      
+        
+   gbnL3RipMib MODULE-IDENTITY
+        LAST-UPDATED    "0105030001Z"  -- May 03,2001  
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "GBN Enterprise MIB definition."
+
+        REVISION        "0105030001Z"  -- May 03,2001
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL3 4 }
+
+------------------------------------------------------------------------------
+-- Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+--
+-- "DURABLE":
+--    Objects that are saved across a system reset and/or power cycle
+--    are noted as "DURABLE" for convenience in the DESCRIPTION
+--    section of the object definition.  Code must be explicitly
+--    written to implement these DURABLE objects.
+--
+
+
+------------------------------------------------------------------------------
+--  define groups in gbnL3Rip-MIB.mi2 
+------------------------------------------------------------------------------
+    gbnL3Rip    OBJECT IDENTIFIER ::= { gbnL3RipMib 1 }     
+
+    gbnL3RipSummarry OBJECT-TYPE
+        SYNTAX INTEGER {
+                    noSummarry (0),
+                    summarry (1)
+                 }        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable/disable route summarry." 
+        DEFVAL { summarry }
+        ::= { gbnL3Rip 1 }
+
+    gbnL3RipHostRouteRx OBJECT-TYPE
+        SYNTAX INTEGER {
+                    noHostRouteRx (0),
+                    hostRouteRx (1)
+                 }        
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable/disable receive host route ." 
+        DEFVAL { hostRouteRx }
+        ::= { gbnL3Rip 2 }
+
+    gbnL3RipTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF gbnL3RipEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of RIP extern."
+       ::= {gbnL3Rip 3 }
+
+   gbnL3RipEntry OBJECT-TYPE
+       SYNTAX   gbnL3RipEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "extern config option."
+      INDEX { gbnL3RipIfConfAddress }
+      ::= { gbnL3RipTable 1 }
+
+    gbnL3RipEntry ::=
+        SEQUENCE {
+            gbnL3RipIfConfAddress
+                IpAddress,
+            gbnL3RipSplit
+                INTEGER,
+            gbnL3RipMetricIn
+                INTEGER,
+            gbnL3RipMetricOut
+                INTEGER,            
+            gbnL3RipPreIfSend
+                INTEGER,            
+            gbnL3RipPreIfReceive
+               INTEGER                  
+               
+            }
+
+    gbnL3RipIfConfAddress OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "This address is same as rip2IfExternAddress in RIP2.
+           The IP Address of this system on the indicated
+           subnet.  For unnumbered interfaces, the value 0.0.0.N,
+           where the least significant 24 bits (N) is the ifIndex
+           for the IP Interface in network byte order."
+       ::= { gbnL3RipEntry 1 }      
+
+    gbnL3RipSplit OBJECT-TYPE
+        SYNTAX   INTEGER {
+                    noSplit (0),
+                    split (1)
+                 }
+        MAX-ACCESS    read-create
+        STATUS   current
+        DESCRIPTION
+           "enable/disable split."
+       DEFVAL { split }
+       ::= { gbnL3RipEntry 2}
+
+    gbnL3RipMetricIn OBJECT-TYPE
+        SYNTAX    INTEGER ( 0..15)
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "MetricIn."
+        DEFVAL { 0 }
+       ::= { gbnL3RipEntry 3 }
+
+ gbnL3RipMetricOut OBJECT-TYPE
+        SYNTAX    INTEGER ( 0..15)
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+           "MetricOut."
+        DEFVAL { 0 }
+       ::= { gbnL3RipEntry 4}
+
+------------------------------------------------------------------------------
+--  define mib parameter for remember the pre Rip interfaces status
+------------------------------------------------------------------------------
+    gbnL3RipPreIfSend OBJECT-TYPE
+        SYNTAX   INTEGER {
+                    ripVersion1 (2),
+                    rip1Compatible (3),
+                    ripVersion2 (4),
+                    ripV1Demand (5),
+                    ripV2Demand (6)
+                 }      
+        
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+        	"store the pre rip interface send status, no including the disable."   
+        DEFVAL { rip1Compatible }
+       ::= { gbnL3RipEntry 5 }
+                                   
+                                   
+    gbnL3RipPreIfReceive OBJECT-TYPE
+        SYNTAX   INTEGER {
+                    rip1 (1),
+                    rip2 (2),
+                    rip1OrRip2 (3)
+                 }
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+        	"store the pre rip interface receive status, no including the disable."   
+        DEFVAL { rip1OrRip2 }
+       ::= { gbnL3RipEntry 6}    
+
+    gbnL3RipRedistributeTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF GbnL3RipRedistributeEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "A list of RIP redistribute infomation."
+           --RIP重发布信息列表
+       ::= {gbnL3Rip 4 }    
+
+   gbnL3RipRedistributeEntry OBJECT-TYPE
+       SYNTAX   GbnL3RipRedistributeEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "RIP redistribute information entry."
+          --RIP重发布信息条目
+      INDEX { gbnL3RipRedistributeProto }
+      ::= { gbnL3RipRedistributeTable 1 } 
+        
+    GbnL3RipRedistributeEntry ::=
+	    SEQUENCE {
+	        gbnL3RipRedistributeProto
+	            INTEGER,
+	        gbnL3RipRedistributeMetric
+	            INTEGER,
+	        gbnL3RipRedistributePrefixName
+	            OCTET STRING,
+	        gbnL3RipRedistributeRowStatus
+	        	RowStatus
+	        }
+                 
+	gbnL3RipRedistributeProto OBJECT-TYPE
+        SYNTAX   INTEGER {
+        	connected(1),
+        	static(2),
+        	ospf(3)
+        }
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+            "redistribute protocol"
+            --重发布协议号
+        ::= { gbnL3RipRedistributeEntry 1 }   
+                 
+	gbnL3RipRedistributeMetric OBJECT-TYPE
+        SYNTAX   INTEGER ( 1..16 )
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "redistribute metric"
+            --重发布度量值
+        ::= { gbnL3RipRedistributeEntry 2 }    
+                 
+	gbnL3RipRedistributePrefixName OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..31))
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "redistribute prefix-list name"
+            --重发布使用的前缀控制列表名
+        ::= { gbnL3RipRedistributeEntry 3 }          
+                 
+	gbnL3RipRedistributeRowStatus OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "row status."
+            --行状态
+            --删除重发布信息条目时，只需将行状态设置为destroy(6)即可
+        ::= { gbnL3RipRedistributeEntry 4 }   
+        
+    gbnL3RipDistributeList    OBJECT IDENTIFIER ::= { gbnL3Rip 5 }        
+
+    gbnL3RipDistributeListGateIn OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "distribute-list name of gateway ingress" 
+            --基于路由源的发布列表
+        ::= { gbnL3RipDistributeList 1 }      
+
+    gbnL3RipDistributeListAllIn OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "distribute-list name of ingress" 
+            --基于收到路由的发布列表
+        ::= { gbnL3RipDistributeList 2 }    
+
+    gbnL3RipDistributeListAllOut OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "distribute-list name of egress" 
+            --基于发出路由的发布列表
+        ::= { gbnL3RipDistributeList 3 }
+        
+        
+    gbnL3RipSummaryAddrTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF GbnL3RipSummaryAddrEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "RIP summary address table."
+           --RIP路由聚合网段表
+       ::= {gbnL3Rip 6 }    
+
+   gbnL3RipSummaryAddrEntry OBJECT-TYPE
+       SYNTAX   GbnL3RipSummaryAddrEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "RIP summary address entry."
+          --RIP路由聚合网段条目
+      INDEX { gbnL3RipSummaryNetwork, gbnL3RipSummaryMask }
+      ::= { gbnL3RipSummaryAddrTable 1 } 
+        
+    GbnL3RipSummaryAddrEntry ::=
+	    SEQUENCE {
+	        gbnL3RipSummaryNetwork
+	            IpAddress,
+	        gbnL3RipSummaryMask
+	            IpAddress,
+	        gbnL3RipSummaryAddrRowStatus
+	        	RowStatus
+	        }
+                 
+	gbnL3RipSummaryNetwork OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "summary network"
+            --聚合网段地址
+        ::= { gbnL3RipSummaryAddrEntry 1 }   
+                 
+	gbnL3RipSummaryMask OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "summary network mask"
+            --聚合网段掩码
+        ::= { gbnL3RipSummaryAddrEntry 2 }      
+                 
+	gbnL3RipSummaryAddrRowStatus OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+            "row status."
+            --行状态
+            --添加聚合网段条目时，将行状态设为active(1)、createAndGo(4)或createAndWait(5)
+            --删除聚合网段条目时，只需将行状态设置为destroy(6)即可
+        ::= { gbnL3RipSummaryAddrEntry 3 }  
+
+END
+

@@ -1,0 +1,104 @@
+MIB-4RF DEFINITIONS ::= BEGIN
+
+--
+-- File: $Id: 4RF-MIB.txt,v 1.3 2007/05/02 00:26:45 pk Exp $
+--
+-- Copyright: 2002  4RF COMMUNICATIONS LTD
+--
+-- Description:
+--   Top-level MIB sub-tree for 4RF Communications Ltd.
+--
+-- Versions:
+--
+-- Notes:
+--  None
+--
+
+IMPORTS
+
+    -- Standard imports
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+
+-- Module Identification
+fourRFRootModule MODULE-IDENTITY
+    LAST-UPDATED "200704300000Z"
+    ORGANIZATION "www.4rf.com"
+    CONTACT-INFO    
+         "postal:   4RF Communications Ltd
+                    26 Glover Street
+                    Ngauranga
+                    PO Box 13-506
+                    Wellington 6032
+                    New Zealand
+                    
+          phone:    +64 4 499 6000
+          email:    support@4rf.com"
+    DESCRIPTION "The root MIB module for 4RF Communications Ltd."
+
+	-- Revision history
+    -- (in reverse chronological order)
+
+    REVISION    "200704300000Z"
+    DESCRIPTION "Second draft"
+
+    REVISION    "200402130000Z"
+    DESCRIPTION "First draft"
+    ::= { fourRFModules 1 }
+
+
+--
+--
+-- Root of OID sub-tree for 4RF as assigned by IANA
+--
+-- This value MUST NOT BE MODIFIED
+--
+--
+
+fourRFRoot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "The root of the OID sub-tree for 4RF Communications Ltd."
+    ::= { enterprises 14817 } 
+
+    
+--
+-- Top Level OID Registrations
+--    
+
+fourRFRegistrations OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for registrations."
+    ::= { fourRFRoot 1 } 
+
+fourRFModules OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for module registrations."
+    ::= { fourRFRoot 2 } 
+
+fourRFGeneric OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for common object and event definitions."
+    ::= { fourRFRoot 3 } 
+    
+fourRFProducts OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for specific object and event definitions."
+    ::= { fourRFRoot 4 } 
+    
+fourRFCapabilities OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for agent profiles/capabilities."
+    ::= { fourRFRoot 5 } 
+    
+fourRFRequirements OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for management application requirements."
+    ::= { fourRFRoot 6 } 
+
+fourRFExperimental OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for experimental definitions."
+    ::= { fourRFRoot 7 } 
+    
+END

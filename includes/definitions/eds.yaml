@@ -1,0 +1,19 @@
+os: eds
+text: 'EDS'
+type: appliance
+icon: eds
+group: eds
+mib_dir:
+    - eds
+poller_modules:
+    bgp-peers: false
+    stp: false
+    wireless: false
+discovery_modules:
+    bgp-peers: false
+    cisco-vrf-lite: false
+    stp: false
+    wireless: false
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.31440

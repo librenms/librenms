@@ -1,0 +1,1112 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-CONTROLLER-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlOperationalState,
+    MwlAvailabilityStatus,
+    MwlAlarmState,
+    MwlControllerHwType,
+    MwlRegionSettings,
+    MwlBonding,
+    MwlEnableDisableOption,
+    MwlVpnClientProtocol,
+    MwlVpnConnectivityStatus,
+    MwlOnOffSwitch
+        FROM MERU-TC;
+
+  mwConfigController  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Controller Configuration infrastructure"
+    ::= { mwConfiguration 1 } 
+  
+    mwWncVars                                OBJECT IDENTIFIER ::= { mwConfigController 1 }
+    mwSystemFileVars                         OBJECT IDENTIFIER ::= { mwConfigController 3 }
+    mwVpnServer                              OBJECT IDENTIFIER ::= { mwConfigController 10 }
+    mwVpnClient                              OBJECT IDENTIFIER ::= { mwConfigController 11 }
+    
+  
+  mwWncVarsDescr  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Description"
+    ::= { mwWncVars    1 }
+
+  mwWncVarsLocation  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Location"
+    ::= { mwWncVars    2 }
+
+  mwWncVarsContact  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Contact"
+    ::= { mwWncVars    3 }
+
+  mwWncVarsAutoApUpgrade  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Automatic AP Upgrade"
+    ::= { mwWncVars    4 }
+
+  mwWncVarsDhcpServer  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes DHCP Server"
+    ::= { mwWncVars    5 }
+
+  mwWncVarsStatPollingPeriod  OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Statistics Polling Period (seconds)/0 disable Polling. The value must be either 0, or 5-65535"
+    ::= { mwWncVars    6 }
+
+  mwWncVarsAuditPeriod  OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Audit Polling Period (seconds)/0 disable Polling. The value must be either 0, or 5-65535"
+    ::= { mwWncVars    7 }
+
+  mwWncVarsApInitScript  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Default AP Init Script"
+    ::= { mwWncVars    8 }
+
+  mwWncVarsDhcpRelayPassThroughFlag  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes DHCP Relay Passthrough"
+    ::= { mwWncVars    9 }
+
+  mwWncVarsManagementFromWirelessClients  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Management by wireless stations"
+    ::= { mwWncVars   10 }
+
+  mwWncVarsControllerIndex  OBJECT-TYPE
+    SYNTAX Integer32(0..31)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Index. The value must be either 0, or 0-31"
+    ::= { mwWncVars   11 }
+
+  mwWncVarsFastPath  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes FastPath Mode"
+    ::= { mwWncVars   14 }
+
+  mwWncVarsBonding  OBJECT-TYPE
+    SYNTAX MwlBonding
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Bonding Mode"
+    ::= { mwWncVars   15 }
+
+  mwWncVarsNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller ID"
+    ::= { mwWncVars   18 }
+
+  mwWncVarsHostName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Host Name"
+    ::= { mwWncVars   19 }
+
+  mwWncVarsUpTime  OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Uptime"
+    ::= { mwWncVars   20 }
+
+  mwWncVarsOperationalState  OBJECT-TYPE
+    SYNTAX MwlOperationalState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Operational State"
+    ::= { mwWncVars   21 }
+
+  mwWncVarsAvailabilityStatus  OBJECT-TYPE
+    SYNTAX MwlAvailabilityStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Availability Status"
+    ::= { mwWncVars   22 }
+
+  mwWncVarsAlarmState  OBJECT-TYPE
+    SYNTAX MwlAlarmState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Alarm State"
+    ::= { mwWncVars   23 }
+
+  mwWncVarsVirtualIpAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Virtual IP Address"
+    ::= { mwWncVars   24 }
+
+  mwWncVarsVirtualNetMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Virtual Netmask"
+    ::= { mwWncVars   25 }
+
+  mwWncVarsDefaultGatewayAddr  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Default Gateway"
+    ::= { mwWncVars   26 }
+
+  mwWncVarsSoftwareVersion  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Software Version"
+    ::= { mwWncVars   27 }
+
+  mwWncVarsSerialNumber  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Network Device Id"
+    ::= { mwWncVars   28 }
+
+  mwWncVarsSystemId  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes System Id"
+    ::= { mwWncVars   29 }
+
+  mwWncVarsHardwareType  OBJECT-TYPE
+    SYNTAX MwlControllerHwType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Model"
+    ::= { mwWncVars   30 }
+
+  mwWncVarsCountry  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Country Setting"
+    ::= { mwWncVars   31 }
+
+  mwWncVarsManSerialNumber  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Manufacturing Serial #"
+    ::= { mwWncVars   32 }
+
+  mwWncVarsStationAgingOutPeriod  OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Aging Out Period(minutes). The value must be either 0, or 0-65535"
+    ::= { mwWncVars   33 }
+
+  mwWncVarsRoamingDomainState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Roaming Domain State"
+    ::= { mwWncVars   34 }
+
+  mwWncVarsL3RoutingMode  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Layer3 Routing Mode"
+    ::= { mwWncVars   37 }
+
+  mwWncVarsRegion  OBJECT-TYPE
+    SYNTAX MwlRegionSettings
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Region Setting"
+    ::= { mwWncVars   38 }
+
+  mwWncVarsRoamingTimeOutPeriod  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Roaming Time Out Period(minutes)"
+    ::= { mwWncVars   41 }
+
+  mwSystemFileVarspHostName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Host Name"
+    ::= { mwSystemFileVars    1 }
+
+  mwSystemFileVarspDnsDomainName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Domain Name"
+    ::= { mwSystemFileVars    2 }
+
+  mwUdpBcastUpstreamTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwUdpBcastUpstreamEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Upstream UDP Broadcast Port "
+    ::= { mwConfigController 4 }
+
+  mwUdpBcastUpstreamEntry  OBJECT-TYPE
+    SYNTAX MwUdpBcastUpstreamEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Upstream UDP Broadcast Port "
+    INDEX {  mwUdpBcastUpstreamTableIndex  }
+    ::= { mwUdpBcastUpstreamTable 1 }
+
+  MwUdpBcastUpstreamEntry  ::=  SEQUENCE { 
+       mwUdpBcastUpstreamTableIndex                                Integer32, 
+       mwUdpBcastUpstreamPort                                      Unsigned32,
+       mwUdpBcastUpstreamRowStatus                                 RowStatus 
+  }
+   
+   
+  mwUdpBcastUpstreamTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwUdpBcastUpstreamEntry 1 }
+
+  mwUdpBcastUpstreamPort  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes UDP Port"
+    ::= { mwUdpBcastUpstreamEntry    2 }
+
+  mwUdpBcastUpstreamRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwUdpBcastUpstreamEntry 3 }
+
+  mwUdpBcastDownstreamTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwUdpBcastDownstreamEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Downstream UDP Broadcast Port "
+    ::= { mwConfigController 5 }
+
+  mwUdpBcastDownstreamEntry  OBJECT-TYPE
+    SYNTAX MwUdpBcastDownstreamEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Downstream UDP Broadcast Port "
+    INDEX {  mwUdpBcastDownstreamTableIndex  }
+    ::= { mwUdpBcastDownstreamTable 1 }
+
+  MwUdpBcastDownstreamEntry  ::=  SEQUENCE { 
+       mwUdpBcastDownstreamTableIndex                              Integer32, 
+       mwUdpBcastDownstreamPort                                    Unsigned32,
+       mwUdpBcastDownstreamRowStatus                               RowStatus 
+  }
+   
+   
+  mwUdpBcastDownstreamTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwUdpBcastDownstreamEntry 1 }
+
+  mwUdpBcastDownstreamPort  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes UDP Port"
+    ::= { mwUdpBcastDownstreamEntry    2 }
+
+  mwUdpBcastDownstreamRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwUdpBcastDownstreamEntry 3 }
+
+  mwDnsServerTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwDnsServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server Table "
+    ::= { mwConfigController 6 }
+
+  mwDnsServerEntry  OBJECT-TYPE
+    SYNTAX MwDnsServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server Table "
+    INDEX {  mwDnsServerTableIndex  }
+    ::= { mwDnsServerTable 1 }
+
+  MwDnsServerEntry  ::=  SEQUENCE { 
+       mwDnsServerTableIndex                                       Integer32, 
+       mwDnsServer                                                 IpAddress,
+       mwDnsServerRowStatus                                        RowStatus 
+  }
+   
+   
+  mwDnsServerTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwDnsServerEntry 1 }
+
+  mwDnsServer  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server"
+    ::= { mwDnsServerEntry    2 }
+
+  mwDnsServerRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwDnsServerEntry 3 }
+
+  mwWncNetworkConfigTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwWncNetworkConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Network Configuration Parameters "
+    ::= { mwConfigController 7 }
+
+  mwWncNetworkConfigEntry  OBJECT-TYPE
+    SYNTAX MwWncNetworkConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Network Configuration Parameters "
+    INDEX {  mwWncNetworkConfigTableIndex  }
+    ::= { mwWncNetworkConfigTable 1 }
+
+  MwWncNetworkConfigEntry  ::=  SEQUENCE { 
+       mwWncNetworkConfigTableIndex                                Integer32, 
+       mwWncNetworkConfigBonding                                   MwlBonding,
+       mwWncNetworkConfigFastPath                                  MwlOnOffSwitch,
+       mwWncNetworkConfigOneGigSFP                                 MwlEnableDisableOption,
+       mwWncNetworkConfigTenGigModule                              MwlEnableDisableOption,
+       mwWncNetworkConfigRebridHandOffLogic                        MwlOnOffSwitch,
+       mwWncNetworkConfigRowStatus                                 RowStatus 
+  }
+   
+   
+  mwWncNetworkConfigTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwWncNetworkConfigEntry 1 }
+
+  mwWncNetworkConfigFastPath  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Enabling data fastpath forwarding"
+    ::= { mwWncNetworkConfigEntry    2 }
+
+  mwWncNetworkConfigBonding  OBJECT-TYPE
+    SYNTAX MwlBonding
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Bonding Mode"
+    ::= { mwWncNetworkConfigEntry    3 }
+
+  mwWncNetworkConfigTenGigModule  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Enabling 10 Gig module card"
+    ::= { mwWncNetworkConfigEntry    4 }
+
+  mwWncNetworkConfigRebridHandOffLogic  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Client Handoff Logic"
+    ::= { mwWncNetworkConfigEntry    5 }
+
+  mwWncNetworkConfigOneGigSFP  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Enabling 1 Gig SF Port Mode"
+    ::= { mwWncNetworkConfigEntry    6 }
+
+  mwWncNetworkConfigRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwWncNetworkConfigEntry 7 }
+
+  mwVirtualInterfaceProfileTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwVirtualInterfaceProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Virtual Interface "
+    ::= { mwConfigController 8 }
+
+  mwVirtualInterfaceProfileEntry  OBJECT-TYPE
+    SYNTAX MwVirtualInterfaceProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Virtual Interface "
+    INDEX {  mwVirtualInterfaceProfileTableIndex  }
+    ::= { mwVirtualInterfaceProfileTable 1 }
+
+  MwVirtualInterfaceProfileEntry  ::=  SEQUENCE { 
+       mwVirtualInterfaceProfileTableIndex                         Integer32, 
+       mwVirtualInterfaceProfileName                               DisplayString(SIZE (1..32)),
+       mwVirtualInterfaceProfileState                              MwlEnableDisableOption,
+       mwVirtualInterfaceProfileSubnetIp                           IpAddress,
+       mwVirtualInterfaceProfileGatewayIp                          IpAddress,
+       mwVirtualInterfaceProfileSubnetMask                         IpAddress,
+       mwVirtualInterfaceProfileId                                 Integer32(0..64),
+       mwVirtualInterfaceProfileRowStatus                          RowStatus 
+  }
+   
+   
+  mwVirtualInterfaceProfileTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwVirtualInterfaceProfileEntry 1 }
+
+  mwVirtualInterfaceProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Virtual Interface Profile Name"
+    ::= { mwVirtualInterfaceProfileEntry    2 }
+
+  mwVirtualInterfaceProfileId  OBJECT-TYPE
+    SYNTAX Integer32(0..64)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Id"
+    ::= { mwVirtualInterfaceProfileEntry    3 }
+
+  mwVirtualInterfaceProfileState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Enable/Disable"
+    ::= { mwVirtualInterfaceProfileEntry    4 }
+
+  mwVirtualInterfaceProfileSubnetIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Subnet IP Address"
+    ::= { mwVirtualInterfaceProfileEntry    5 }
+
+  mwVirtualInterfaceProfileSubnetMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Subnet Mask"
+    ::= { mwVirtualInterfaceProfileEntry    6 }
+
+  mwVirtualInterfaceProfileGatewayIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Gateway IP Address"
+    ::= { mwVirtualInterfaceProfileEntry    7 }
+
+  mwVirtualInterfaceProfileRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwVirtualInterfaceProfileEntry 8 }
+
+  mwDhcpServerTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwDhcpServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Internal DHCP server configuration "
+    ::= { mwConfigController 9 }
+
+  mwDhcpServerEntry  OBJECT-TYPE
+    SYNTAX MwDhcpServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Internal DHCP server configuration "
+    INDEX {  mwDhcpServerTableIndex  }
+    ::= { mwDhcpServerTable 1 }
+
+  MwDhcpServerEntry  ::=  SEQUENCE { 
+       mwDhcpServerTableIndex                                      Integer32, 
+       mwDhcpServerName                                            DisplayString(SIZE (1..32)),
+       mwDhcpServerState                                           MwlEnableDisableOption,
+       mwDhcpServerVlanName                                        DisplayString(SIZE (0..32)),
+       mwDhcpServerOption43                                        DisplayString(SIZE (0..32)),
+       mwDhcpServerLeaseTime                                       Integer32(300..65535),
+       mwDhcpServerIpPoolEnd                                       IpAddress,
+       mwDhcpServerDomainName                                      DisplayString,
+       mwDhcpServerDnsServer1                                      IpAddress,
+       mwDhcpServerDnsServer2                                      IpAddress,
+       mwDhcpServerIpPoolStart                                     IpAddress,
+       mwDhcpServerNetbiosServer1                                  IpAddress,
+       mwDhcpServerNetbiosServer2                                  IpAddress,
+       mwDhcpServerVirtualInterfaceProfileName                     DisplayString(SIZE (0..32)),
+       mwDhcpServerRowStatus                                       RowStatus 
+  }
+   
+   
+  mwDhcpServerTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwDhcpServerEntry 1 }
+
+  mwDhcpServerName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes DHCP Server Pool Name"
+    ::= { mwDhcpServerEntry    2 }
+
+  mwDhcpServerVlanName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Name"
+    ::= { mwDhcpServerEntry    3 }
+
+  mwDhcpServerVirtualInterfaceProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Virtual Interface Profile Name"
+    ::= { mwDhcpServerEntry    4 }
+
+  mwDhcpServerState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes State"
+    ::= { mwDhcpServerEntry    5 }
+
+  mwDhcpServerLeaseTime  OBJECT-TYPE
+    SYNTAX Integer32(300..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Lease Time (in Seconds)"
+    ::= { mwDhcpServerEntry    6 }
+
+  mwDhcpServerIpPoolStart  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Pool start"
+    ::= { mwDhcpServerEntry    7 }
+
+  mwDhcpServerIpPoolEnd  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Pool end"
+    ::= { mwDhcpServerEntry    8 }
+
+  mwDhcpServerDomainName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Domain Name"
+    ::= { mwDhcpServerEntry    9 }
+
+  mwDhcpServerDnsServer1  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary DNS Server"
+    ::= { mwDhcpServerEntry   10 }
+
+  mwDhcpServerDnsServer2  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Secondary DNS Server"
+    ::= { mwDhcpServerEntry   11 }
+
+  mwDhcpServerNetbiosServer1  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary Netbios Server"
+    ::= { mwDhcpServerEntry   12 }
+
+  mwDhcpServerNetbiosServer2  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Secondary Netbios Server"
+    ::= { mwDhcpServerEntry   13 }
+
+  mwDhcpServerOption43  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes DHCP Option 43"
+    ::= { mwDhcpServerEntry   14 }
+
+  mwDhcpServerRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwDhcpServerEntry 16 }
+
+  mwVpnServerState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Status"
+    ::= { mwVpnServer    2 }
+
+  mwVpnServerIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Server IP"
+    ::= { mwVpnServer    3 }
+
+  mwVpnServerHostName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..63))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Server Host Name"
+    ::= { mwVpnServer    4 }
+
+  mwVpnServerPort  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Server Port"
+    ::= { mwVpnServer    5 }
+
+  mwVpnServerIpPool  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Pool"
+    ::= { mwVpnServer    6 }
+
+  mwVpnServerSubnetMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Netmask"
+    ::= { mwVpnServer    7 }
+
+  mwVpnClientState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes State"
+    ::= { mwVpnClient    2 }
+
+  mwVpnClientVpnServerIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Server IP"
+    ::= { mwVpnClient    3 }
+
+  mwVpnClientVpnServerPort  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Server Port"
+    ::= { mwVpnClient    4 }
+
+  mwVpnClientStatus  OBJECT-TYPE
+    SYNTAX MwlVpnConnectivityStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Connectivity Status"
+    ::= { mwVpnClient    5 }
+
+  mwVpnClientProtocol  OBJECT-TYPE
+    SYNTAX MwlVpnClientProtocol
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Protocol"
+    ::= { mwVpnClient    6 }
+
+  mwUdpBcastUpstreamBridgedTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwUdpBcastUpstreamBridgedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Upstream UDP Broadcast Port Bridged "
+    ::= { mwConfigController 12 }
+
+  mwUdpBcastUpstreamBridgedEntry  OBJECT-TYPE
+    SYNTAX MwUdpBcastUpstreamBridgedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Upstream UDP Broadcast Port Bridged "
+    INDEX {  mwUdpBcastUpstreamBridgedTableIndex  }
+    ::= { mwUdpBcastUpstreamBridgedTable 1 }
+
+  MwUdpBcastUpstreamBridgedEntry  ::=  SEQUENCE { 
+       mwUdpBcastUpstreamBridgedTableIndex                         Integer32, 
+       mwUdpBcastUpstreamBridgedPort                               Unsigned32,
+       mwUdpBcastUpstreamBridgedRowStatus                          RowStatus 
+  }
+   
+   
+  mwUdpBcastUpstreamBridgedTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwUdpBcastUpstreamBridgedEntry 1 }
+
+  mwUdpBcastUpstreamBridgedPort  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes UDP Port"
+    ::= { mwUdpBcastUpstreamBridgedEntry    2 }
+
+  mwUdpBcastUpstreamBridgedRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwUdpBcastUpstreamBridgedEntry 3 }
+
+  mwUdpBcastDownstreamBridgedTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwUdpBcastDownstreamBridgedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Downstream UDP Broadcast Port Bridged "
+    ::= { mwConfigController 13 }
+
+  mwUdpBcastDownstreamBridgedEntry  OBJECT-TYPE
+    SYNTAX MwUdpBcastDownstreamBridgedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Downstream UDP Broadcast Port Bridged "
+    INDEX {  mwUdpBcastDownstreamBridgedTableIndex  }
+    ::= { mwUdpBcastDownstreamBridgedTable 1 }
+
+  MwUdpBcastDownstreamBridgedEntry  ::=  SEQUENCE { 
+       mwUdpBcastDownstreamBridgedTableIndex                       Integer32, 
+       mwUdpBcastDownstreamBridgedPort                             Unsigned32,
+       mwUdpBcastDownstreamBridgedRowStatus                        RowStatus 
+  }
+   
+   
+  mwUdpBcastDownstreamBridgedTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwUdpBcastDownstreamBridgedEntry 1 }
+
+  mwUdpBcastDownstreamBridgedPort  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes UDP Port"
+    ::= { mwUdpBcastDownstreamBridgedEntry    2 }
+
+  mwUdpBcastDownstreamBridgedRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwUdpBcastDownstreamBridgedEntry 3 }
+
+  mwWncMobilityVarsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwWncMobilityVarsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Mobility Configuration Parameters "
+    ::= { mwConfigController 14 }
+
+  mwWncMobilityVarsEntry  OBJECT-TYPE
+    SYNTAX MwWncMobilityVarsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Mobility Configuration Parameters "
+    INDEX {  mwWncMobilityVarsTableIndex  }
+    ::= { mwWncMobilityVarsTable 1 }
+
+  MwWncMobilityVarsEntry  ::=  SEQUENCE { 
+       mwWncMobilityVarsTableIndex                                 Integer32, 
+       mwWncMobilityVarsTopoUpdate                                 MwlOnOffSwitch,
+       mwWncMobilityVarsAdequateRssi                               Integer32(-75..-25),
+       mwWncMobilityVarsAssocStationMaxIdlePeriod                  Unsigned32,
+       mwWncMobilityVarsRowStatus                                  RowStatus 
+  }
+   
+   
+  mwWncMobilityVarsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwWncMobilityVarsEntry 1 }
+
+  mwWncMobilityVarsTopoUpdate  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Topology Information Update"
+    ::= { mwWncMobilityVarsEntry    3 }
+
+  mwWncMobilityVarsAssocStationMaxIdlePeriod  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated Station Max Idle Period"
+    ::= { mwWncMobilityVarsEntry    4 }
+
+  mwWncMobilityVarsAdequateRssi  OBJECT-TYPE
+    SYNTAX Integer32(-75..-25)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Adequate Signal Threshold"
+    ::= { mwWncMobilityVarsEntry    6 }
+
+  mwWncMobilityVarsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwWncMobilityVarsEntry 7 }
+
+  mwWncIpv6VarsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwWncIpv6VarsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes IPv6 Configuration Parameters "
+    ::= { mwConfigController 15 }
+
+  mwWncIpv6VarsEntry  OBJECT-TYPE
+    SYNTAX MwWncIpv6VarsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes IPv6 Configuration Parameters "
+    INDEX {  mwWncIpv6VarsTableIndex  }
+    ::= { mwWncIpv6VarsTable 1 }
+
+  MwWncIpv6VarsEntry  ::=  SEQUENCE { 
+       mwWncIpv6VarsTableIndex                                     Integer32, 
+       mwWncIpv6VarsNeighborDiscOptimization                       MwlOnOffSwitch 
+  }
+   
+   
+  mwWncIpv6VarsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwWncIpv6VarsEntry 1 }
+
+  mwWncIpv6VarsNeighborDiscOptimization  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Neighbor Discovery Optimization"
+    ::= { mwWncIpv6VarsEntry    2 }
+
+  
+END
+   

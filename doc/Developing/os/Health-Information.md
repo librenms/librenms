@@ -1,4 +1,5 @@
 source: Developing/os/Health-Information.md
+path: blob/master/doc/
 
 #### Sensors
 
@@ -9,27 +10,30 @@ Currently we have support for the following health metrics along with the values
 | Class                           | Measurement                 |
 | ------------------------------- | --------------------------- |
 | airflow                         | cfm                         |
+| ber                             | ratio                       |
 | charge                          | %                           |
+| chromatic_disperision           | ps/nm                       |
 | cooling                         | W                           |
+| count                           | #                           |
 | current                         | A                           |
 | dbm                             | dBm                         |
+| delay                           | s                           |
+| eer                             | eer                         |
 | fanspeed                        | rpm                         |
 | frequency                       | Hz                          |
 | humidity                        | %                           |
 | load                            | %                           |
 | power                           | W                           |
+| power_consumed                  | kWh                         |
+| power_factor                    | ratio                       |
 | pressure                        | kPa                         |
+| quality_factor                  | dB                          |
 | runtime                         | Min                         |
 | signal                          | dBm                         |
 | snr                             | SNR                         |
 | state                           | #                           |
 | temperature                     | C                           |
 | voltage                         | V                           |
-| delay                           | s                           |
-| quality_factor                  | dB                          |
-| chromatic_disperision           | ps/nm                       |
-| ber                             | ratio                       |
-| eer                             | eer                         |
 | waterflow                       | l/m                         |
 
 #### Simple health discovery
@@ -38,7 +42,7 @@ We have support for defining health / sensor discovery using YAML files so that 
 
 > Please note that DISPLAY-HINTS are disabled so ensure you use the correct divisor / multiplier if applicable.
 
-All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information hear is not always 
+All yaml files are located in `includes/definitions/discovery/$os.yaml`. Defining the information here is not always 
 possible and is heavily reliant on vendors being sensible with the MIBs they generate. Only snmp walks are supported 
 and you must provide a sane table that can be traversed and contains all of the data you need. We will use netbotz as 
 an example here.
@@ -57,8 +61,8 @@ modules:
                     oid: airFlowSensorTable
                     value: airFlowSensorValue
                     divisor: 10
-                    num_oid: .1.3.6.1.4.1.5528.100.4.1.5.1.2.
-                    descr: airFlowSensorLabel
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.5.1.2.{{ $index }}'
+                    descr: '{{ $airFlowSensorLabel }}'
                     index: 'airFlowSensorValue.{{ $index }}'
 ```
 
@@ -72,14 +76,15 @@ The only sensor we have defined here is airflow. The available options are as fo
 
   - `oid` (required): This is the name of the table you want to do the snmp walk on.
   - `value` (optional): This is the key within the table that contains the value. If not provided will use `oid`
-  - `num_oid` (required): This is the numerical OID that contains `value`. This should always be without the appended `index`.
+  - `num_oid` (required): This is the numerical OID that contains `value`. This should always include `{{ $index }}`.  snmptranslate -On can help figure out the number
   - `divisor` (optional): This is the divisor to use against the returned `value`.
   - `multiplier` (optional): This is the multiplier to use against the returned `value`.
-  - `low_limit` (optional): This is the critical low threshold that `value` should be (used in alerting).
-  - `low_warn_limit` (optional): This is the warning low threshold that `value` should be (used in alerting).
-  - `warn_limit` (optional): This is the warning high threshold that `value` should be (used in alerting).
-  - `high_limit` (optional): This is the critical high threshold that `value` should be (used in alerting).
-  - `descr` (required): The visible label for this sensor. It can be a key with in the table or a static string, optionally using `{{ index }}`
+  - `low_limit` (optional): This is the critical low threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
+  - `low_warn_limit` (optional): This is the warning low threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
+  - `warn_limit` (optional): This is the warning high threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
+  - `high_limit` (optional): This is the critical high threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
+  - `descr` (required): The visible label for this sensor. It can be a key with in the table or a static string, optionally using `{{ index }}`.
+  - `group` (optional): Groups sensors together under in the webui, displaying this text. Not specifying this will put the sensors in the default group.
   - `index` (optional): This is the index value we use to uniquely identify this sensor. `{{ $index }}` will be replaced by the `index` from the snmp walk.
   - `skip_values` (optional): This is an array of values we should skip over (see note below).
   - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
@@ -95,6 +100,11 @@ For `options:` you have the following available:
   - `skip_values`: This is an array of values we should skip over (see note below).
   - `skip_value_lt`: If sensor value is less than this, skip the discovery.
   - `skip_value_gt`: If sensor value is greater than this, skip the discovery.
+
+Multiple variables can be used in the sensors definition. The syntax is `{{ $variable }}`. Any oid in the current
+table can be used, as well as pre_cached data. The index ($index) and the sub_indexes
+(in case the oid is indexed multiple times) are also available: if $index="1.20", then
+$subindex0="1" and $subindex1="20".
 
 > `skip_values` can also compare items within the OID table against values. One example of this is:
 
@@ -136,6 +146,8 @@ exception of state which requires additional code.
   - $poller_type = Defaults to snmp. Things like the unix-agent can set different values but for the most part this should be left as snmp.
   - $entPhysicalIndex = Defaults to null. Sets the entPhysicalIndex to be used to look up further hardware if available.
   - $entPhysicalIndex_measured = Defaults to null. Sets the type of entPhysicalIndex used, i.e ports.
+  - $user_func = Defaults to null. You can provide a function name for the sensors value to be processed through (i.e. Convert fahrenheit to celsius use `fahrenheit_to_celsius`)
+  - $group = Defaults to null. Groups sensors together under in the webui, displaying this text.
 
 For the majority of devices, this is all that's required to add support for a sensor. Polling is done based on the data gathered using `discover_sensor()`.
 If custom polling is needed then the file format is similar to discovery: `includes/polling/sensors/$class/$os.inc.php`. Whilst it's possible to perform additional 

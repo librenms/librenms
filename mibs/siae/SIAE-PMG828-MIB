@@ -1,0 +1,591 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-PMG828-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Counter32, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+             DisplayString, RowStatus
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    pmG828 MODULE-IDENTITY
+        LAST-UPDATED "201410070000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Perforfamce Monitoring according to ITU-T G.829 for Radio Link
+             and E1 Tributaries
+             "
+        REVISION "201410070000Z"
+        DESCRIPTION
+            "Changed MAX-ACCESS caluse of some object of pmG828TpClassTable
+             from read-write to read-create
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of pmG828MibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 11 }
+
+----------------------------------------------------------------------------------
+--  object identifier inside the module
+----------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------
+--  pmG828 (PDH PERFORMANCE MONITORING G.828) GROUP
+----------------------------------------------------------------------------------
+--
+--  The following objects are used to manage the Pdh G.828 Performance Monitoring
+--  function.
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+--
+-------  The following table contains the records with  the counters used to evaluate
+-------  the Performance Monitoring  of the radio according to G.828 specification.
+-------  Begin of pmG828CounterTable
+--
+    pmG828MibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {pmG828 1}
+
+    pmG828CounterTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF    PmG828CounterRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with PmG828 records: one record for 1+0 configuration and two
+             record for 1+1 configuration."
+    ::= {pmG828 2}
+
+    pmG828CounterRecord  OBJECT-TYPE
+        SYNTAX      PmG828CounterRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "PmG828Counter record."
+        INDEX {pmG828TPointId, pmG828CounterBlockId}
+    ::= {pmG828CounterTable 1}
+
+    PmG828CounterRecord  ::=
+        SEQUENCE {
+            pmG828TPointId            Integer32,
+            pmG828CounterBlockId      Integer32,
+            pmG828CounterBlockType    INTEGER,
+            pmG828CounterBlockStatus  INTEGER,
+            pmG828CounterTimeStamp    Unsigned32,
+            pmG828BBECounter          Counter32,
+            pmG828ESCounter           Counter32,
+            pmG828SESCounter          Counter32,
+            pmG828UASCounter          Counter32,
+            pmG828SEPCounter          Counter32
+        }
+
+    pmG828TPointId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the Termination Point."
+    ::= {pmG828CounterRecord 1}
+
+    pmG828CounterBlockId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the counters block and the counter type
+             according to the following code:
+              1  Current Daily counters
+              2  Daily counters (Day before counters)
+              3  Current 15 minutes counters
+              4  15 minutes counters N. 1 (The most recent 15 minutes counters)
+                  ..............................................
+              n  15 minutes counters N. n
+              20 15 minutes counters N.16(The oldest 15 min.counters 4 hours before)."
+    ::= {pmG828CounterRecord  2}
+
+    pmG828CounterBlockType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             daily       (1),
+                             fifteenMin  (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the counter block."
+    ::= {pmG828CounterRecord 3}
+
+    pmG828CounterBlockStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             meaningless  (1),
+                             meaningfull  (2),
+                             incomplete   (3),
+                             dummy        (4),
+                             lost         (5),
+                             restarted    (6)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status of the block counter."
+    ::= {pmG828CounterRecord 4}
+
+    pmG828CounterTimeStamp  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object is the time when the performance record is closed reported
+             as the second number since 1-Gen-1970."
+    ::= {pmG828CounterRecord 5}
+
+    pmG828BBECounter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "G828 BBE counter."
+    ::= {pmG828CounterRecord 6}
+
+    pmG828ESCounter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "G828 Es counter."
+    ::= {pmG828CounterRecord 7}
+
+    pmG828SESCounter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "G828 SES counter."
+    ::= {pmG828CounterRecord 8}
+
+    pmG828UASCounter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "G828 UAS counter."
+    ::= {pmG828CounterRecord 9}
+
+    pmG828SEPCounter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "G828 SEP counter."
+    ::= {pmG828CounterRecord 10}
+
+--
+-------  End of pmG828CounterTable
+
+--
+-------  The following table contains the records used to manage the P.M. on both
+-------  radio branch and the threshold cross alarms
+-------  Begin of pmG828TpClassTable
+--
+    pmG828TpClassTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     PmG828TpClassRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with PmG828TpClass records: one record for 1+0 configuration and
+             two record for 1+1 configuration."
+    ::= {pmG828 3}
+
+    pmG828TpClassRecord  OBJECT-TYPE
+        SYNTAX      PmG828TpClassRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "PmG828TpClass record."
+        INDEX {pmG828TpClassId}
+    ::= {pmG828TpClassTable 1}
+
+    PmG828TpClassRecord  ::=
+        SEQUENCE {
+            pmG828TpClassId                Integer32,
+            pmG828TpClassStartStop         INTEGER,
+            pmG828TpClassLabel             DisplayString,
+            pmG828TpClassTimeStamp         Unsigned32,
+            pmG828TpClass15MEsAlarm        AlarmStatus,
+            pmG828TpClass15MSesAlarm       AlarmStatus,
+            pmG828TpClass15MSepAlarm       AlarmStatus,
+            pmG828TpClass24HEsAlarm        AlarmStatus,
+            pmG828TpClass24HSesAlarm       AlarmStatus,
+            pmG828TpClass24HSepAlarm       AlarmStatus,
+            pmG828TpClassUasAlarm          AlarmStatus,
+            pmG828TpClass15MEsThreshold    Integer32,
+            pmG828TpClass15MSesThreshold   Integer32,
+            pmG828TpClass15MSepThreshold   Integer32,
+            pmG828TpClass24HEsThreshold    Integer32,
+            pmG828TpClass24HSesThreshold   Integer32,
+            pmG828TpClass24HSepThreshold   Integer32,
+            pmG828TpClassRowStatus         RowStatus
+        }
+
+    pmG828TpClassId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the Termination Point."
+    ::= {pmG828TpClassRecord 1}
+
+    pmG828TpClassStartStop  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             start   (1),
+                             stop    (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to start and to stop the Perfomance Monitoring
+             counter evaluation."
+    ::= {pmG828TpClassRecord 2}
+
+    pmG828TpClassLabel  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to identify  the Tp class:
+             for example:
+             pmG828TpClassBranchId = 1 label = Radio 1
+             pmG828TpClassBranchId = 2 label = Radio 2
+             pmG828TpClassBranchId = 3 label = Radio(switched)
+             pmG828TpClassBranchId = 4 label = Trib E1 line side
+             pmG828TpClassBranchId = 5 label = Trib E1 radio side."
+    ::= {pmG828TpClassRecord 3}
+
+    pmG828TpClassTimeStamp  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            ""
+    ::= {pmG828TpClassRecord 4}
+
+    pmG828TpClass15MEsAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "15 minutes ES threshold cross alarm with associated severity."
+    ::= {pmG828TpClassRecord 5}
+
+    pmG828TpClass15MSesAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "15 minutes SES threshold cross alarm with associated severity."
+    ::= {pmG828TpClassRecord 6}
+
+    pmG828TpClass15MSepAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "15 minutes SEP threshold cross alarm with associated severity."
+    ::= {pmG828TpClassRecord 7}
+
+    pmG828TpClass24HEsAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Daily ES threshold cross alarm with associated severity."
+    ::= {pmG828TpClassRecord 8}
+
+    pmG828TpClass24HSesAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Daily SES threshold cross alarm with associated severity."
+    ::= {pmG828TpClassRecord 9}
+
+    pmG828TpClass24HSepAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Daily SEP threshold cross alarm with associated severity."
+    ::= {pmG828TpClassRecord 10}
+
+    pmG828TpClassUasAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "UAS alarm with associated severity."
+    ::= {pmG828TpClassRecord 11}
+
+    pmG828TpClass15MEsThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of ES within 15 minutes to set pmG828TpClass15MEsAlarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmG828TpClassRecord 12}
+
+    pmG828TpClass15MSesThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of SES within 15 minutes to set pmG828TpClass15MSesAlarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmG828TpClassRecord 13}
+
+    pmG828TpClass15MSepThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of SEP within 15 minutes to set pmG828TpClass15MSepAlarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmG828TpClassRecord 14}
+
+    pmG828TpClass24HEsThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of ES within one day to set pmG828TpClass24HEsAlarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmG828TpClassRecord 15}
+
+    pmG828TpClass24HSesThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of SES within one day to set pmG828TpClass24HSesAlarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmG828TpClassRecord 16}
+
+    pmG828TpClass24HSepThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of SEP within one day to set pmG828TpClass24HSepAlarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmG828TpClassRecord 17}
+
+    pmG828TpClassRowStatus   OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of pmRxPwrTpClass.
+            "
+    ::= {pmG828TpClassRecord 18}
+
+--
+-------  End of pmG828TpClassTable
+
+--
+--  MAINTENANCE TABLE
+--
+
+-------  Begin of pmG828TpMaintTable
+--
+    pmG828TpMaintTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     PmG828TpMaintRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Command for maintenance of Termination Point.
+             Objects in this table is not persistent. An Instance of this 
+             table is created on creation of pmG828TpClassTable"
+    ::= {pmG828 4}
+
+    pmG828TpMaintRecord  OBJECT-TYPE
+        SYNTAX      PmG828TpMaintRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "PmG828 Termination Point Maintenance record."
+        INDEX {pmG828TpClassId}
+    ::= {pmG828TpMaintTable 1}
+
+    PmG828TpMaintRecord  ::=
+        SEQUENCE {
+            pmG828TpMaintCounterClear      INTEGER,
+            pmG828TpMaintAlarmClear        INTEGER
+        }
+
+    pmG828TpMaintCounterClear  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive   (0),
+                             clear       (1)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear the Perfomance Monitoring counters."
+    ::= {pmG828TpMaintRecord 1}
+
+    pmG828TpMaintAlarmClear  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive   (0),
+                             clear       (1)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear the Perfomance Monitoring threshold cross alarms."
+    ::= {pmG828TpMaintRecord 2}
+--
+-------  End of pmG828TpMaintTable
+
+--
+-------  The following objects are common to all instances.
+--
+    pmG828NSesSetUAS  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Number of SES (according G.828) to set UAS."
+        DEFVAL {10}
+    ::= {pmG828 5}
+
+    pmG828NSesResetUAS  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds whitout errors (according G.828) to reset UAS."
+        DEFVAL {10}
+    ::= {pmG828 6}
+
+    pmG828TpClass15MEsAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the pmG828TpClass15MEsAlarm and
+             enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {pmG828 7}
+
+    pmG828TpClass15MSesAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the pmG828TpClass15MSesAlarm and
+             enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {pmG828 8}
+
+    pmG828TpClass24HEsAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the pmG828TpClass15MEsAlarm and
+             enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {pmG828 9}
+
+    pmG828TpClass24HSesAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the pmG828TpClass15MSesAlarm and
+             enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {pmG828 10}
+
+    pmG828TpClassUASAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the pmG828TpClassUASAlarm and
+             enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {pmG828 11}
+
+    pmG828TpClass15MSepAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the pmG828TpClass15MSepAlarm and
+             enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {pmG828 12}
+
+    pmG828TpClass24HSepAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the pmG828TpClass24HSepAlarm and
+             enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {pmG828 13}
+
+------ End group -----------------------------------------------------------------
+
+END
+
+
+
+

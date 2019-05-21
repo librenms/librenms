@@ -30,7 +30,7 @@ if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.27.')) { //ECS351
     $temp_mibs = 'ECS3510-MIB';
 };
 
-$temp_data = snmp_get_multi_oid($device, 'memoryTotal.0 memoryFreed.0', '-OUQs', $temp_mibs);
+$temp_data = snmp_get_multi_oid($device, ['memoryTotal.0', 'memoryFreed.0'], '-OUQs', $temp_mibs);
 $total = $temp_data['memoryTotal.0'];
 $avail = $temp_data['memoryFreed.0'];
 

@@ -1,8 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use LibreNMS\Config;
-use LibreNMS\Proc;
+use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -62,7 +61,7 @@ Usage:
 $os_name = false;
 if (isset($options['o'])) {
     $os_name = $options['o'];
-} elseif (isset($os_list['os'])) {
+} elseif (isset($options['os'])) {
     $os_name = $options['os'];
 }
 
@@ -95,6 +94,15 @@ if ($os_name) {
     $os_list = ModuleTestHelper::findOsWithData($modules);
 }
 
+if (isset($options['f'])) {
+    if (count($os_list) != 1) {
+        echo "Failed to create test data, -f/--file option can be used with one os/variant combination.\n";
+        echo "Multiple combinations (".count($os_list).") found.\n";
+        exit(1);
+    }
+    $output_file = $options['f'];
+}
+
 
 // Now use the saved data to update the saved database data
 $snmpsim = new Snmpsim();
@@ -104,25 +112,33 @@ $snmpsim_port = $snmpsim->getPort();
 
 if (!$snmpsim->isRunning()) {
     echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
-    exit;
+    echo "Run ./scripts/save-test-data.php --snmpsim to see the log output\n";
+    exit(1);
 }
 
 
-$no_save = isset($options['n']) || isset($options['no-save']);
-foreach ($os_list as $full_os_name => $parts) {
-    list($target_os, $target_variant) = $parts;
-    echo "OS: $target_os\n";
-    echo "Module: $modules_input\n";
-    if ($target_variant) {
-        echo "Variant: $target_variant\n";
+try {
+    $no_save = isset($options['n']) || isset($options['no-save']);
+    foreach ($os_list as $full_os_name => $parts) {
+        list($target_os, $target_variant) = $parts;
+        echo "OS: $target_os\n";
+        echo "Module: $modules_input\n";
+        if ($target_variant) {
+            echo "Variant: $target_variant\n";
+        }
+        echo PHP_EOL;
+
+        update_os_cache(true); // Force update of OS Cache
+        $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
+        if (!$no_save && !empty($output_file)) {
+            $tester->setJsonSavePath($output_file);
+        }
+        $test_data = $tester->generateTestData($snmpsim, $no_save);
+
+        if ($no_save) {
+            print_r($test_data);
+        }
     }
-    echo PHP_EOL;
-
-    $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
-
-    $test_data = $tester->generateTestData($snmpsim, $no_save);
-
-    if ($no_save) {
-        print_r($test_data);
-    }
+} catch (InvalidModuleException $e) {
+    echo $e->getMessage() . PHP_EOL;
 }

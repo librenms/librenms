@@ -396,13 +396,14 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   color: #cc0000;
 }
 
-tr.device-overview:nth-child(odd) {
-  background: #ffffff;
-}
+.device-overview>.panel-body { padding-top: 0; padding-bottom: 0; }
+.device-overview>.panel-body>.row:nth-child(odd) { background-color: #f9f9f9; }
+.device-overview>.panel-body>.row:hover { background-color: #f5f5f5; }
+.device-overview>.panel-body>.row>div { padding: 3px 5px; }
+.device-overview>.panel-body>.row>div:first-child { font-weight: 500; }
 
-tr.device-overview:nth-child(even) {
-  background: #eeeeee;
-}
+#coordinates-row { cursor: pointer; }
+#location-map { padding: 15px; height: 400px; }
 
 a.list-device, a.list-device-ignored, a.list-device-down, a.list-device-ignored-up, a.list-device-disabled {
   font-weight: bold;
@@ -1559,7 +1560,7 @@ tr.search:nth-child(odd) {
 
 .scrollable-menu {
     height: auto;
-    max-height: 200px;
+    max-height: 600px;
     overflow-x: hidden;
 }
 
@@ -1730,10 +1731,6 @@ tr.search:nth-child(odd) {
           border-top-right-radius: 4px;
 }
 
-.widget_body {
-    padding: 0.8em;
-}
-
 .mapTooltip {
     position : fixed;
     background-color : #B2B3B1;
@@ -1884,6 +1881,16 @@ label {
     color: white;
 }
 
+.blueCluster {
+    background-color: rgba(23,162,184, 0);
+    background-color: rgba(23,162,184,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: white;
+}
+
 .greenCluster {
     background-color: rgba(0,255,0, 0);
     background-color: rgba(110, 204, 57, 0.6);
@@ -1906,9 +1913,11 @@ label {
 
 .edit-widget, .close-widget { cursor: pointer; }
 .widget_body {
+    padding: 0.8em;
     overflow-y: auto;
     width: 100%;
     height: calc(100% - 38px);
+    cursor: auto;
 }
 
 .device-availability, .service-availability {
@@ -1999,7 +2008,6 @@ label {
 .widget-availability {
   float:left;
   margin:2px;
-  curosr: pointer;
 }
 
 .widget-availability-fixed {
@@ -2011,6 +2019,10 @@ label {
 .widget-availability-host {
   float:left;
   margin-bottom: 10px;
+}
+
+.widget-availability-host a:hover {
+  text-decoration: none;
 }
 
 .widget-availability-service {
@@ -2052,6 +2064,21 @@ label {
   line-height:34px;
 }
 
+.dashboard-widget-settings label {
+  line-height:34px;
+}
+
+.dashboard-graph, .dashboard-graph img {
+  height: 100%;
+  width: 100%;
+}
+
+.dashboard-image {
+  padding: 2px;
+  height: 100%;
+  width: auto;
+}
+
 .nav > li > a {
   padding-left: 10px;
   padding-right: 5px;
@@ -2071,11 +2098,7 @@ label {
 }
 
 .devices-search-header {
-    margin: 5px;
-}
-
-.devices-input-small {
-    line-height: 14px;
+    margin: 0 5px;
 }
 
 .devices-status-box-detail {
@@ -2097,9 +2120,9 @@ label {
     text-align: center;
 }
 
-.devices-headers-table-menu {
-    padding: 0;
+.devices-headers-table-menu > .actions {
     float: right;
+    margin-bottom: 5px;
 }
 
 .devices-overlib-box {
@@ -2137,7 +2160,8 @@ label {
 }
 
 .device-table-icon img {
-    width: 32px;
+  width: 32px;
+  max-height: 32px;
 }
 
 .device-icon img {
@@ -2161,6 +2185,14 @@ label {
   display: inline-block;
   width: 7px;
   min-height: 27px;
+  height: 32px;
+}
+
+.alert-status-small {
+  display: inline-block;
+  width: 7px;
+  min-height: 16px;
+  height: 20px
 }
 
 .device-services-page {
@@ -2183,4 +2215,13 @@ label {
   display: inline-block;
   margin-right: 8px;
   float: left;
+}
+
+/* Workaround for https://github.com/select2/select2/issues/291 */
+.select2-selection--multiple .select2-search--inline .select2-search__field {
+  width: auto !important;
+}
+
+.toast-top-right {
+  top: 34px;
 }

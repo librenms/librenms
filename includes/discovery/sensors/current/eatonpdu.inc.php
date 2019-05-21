@@ -10,8 +10,8 @@
  * the source code distribution for details.
  */
 
-$data = snmpwalk_cache_multi_oid($device, 'outletCurrent', array(), 'EATON-EPDU-MIB');
-$descr = snmpwalk_cache_multi_oid($device, 'outletName', array(), 'EATON-EPDU-MIB');
+$data = snmpwalk_cache_multi_oid($device, 'outletCurrent', [], 'EATON-EPDU-MIB');
+$descr = snmpwalk_cache_multi_oid($device, 'outletName', [], 'EATON-EPDU-MIB');
 if (is_array($data)) {
     $cur_oid = '.1.3.6.1.4.1.534.6.6.7.6.4.1.3.';
     foreach ($data as $index => $entry) {

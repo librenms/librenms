@@ -12,12 +12,13 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\LegacyAuth;
+
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!$_SESSION['authenticated']) {
-    echo "Unauthenticated\n";
-    exit;
+if (!LegacyAuth::check()) {
+    die('Unauthorized');
 }
 
 set_debug($_REQUEST['debug']);
@@ -32,13 +33,11 @@ if (isset($_REQUEST['sort']) && is_array($_POST['sort'])) {
     }
 }
 
-$searchPhrase = mres($_REQUEST['searchPhrase']);
-$id           = mres($_REQUEST['id']);
+$searchPhrase = $_REQUEST['searchPhrase'];
+$id           = basename($_REQUEST['id']);
 $response     = array();
 
-if (isset($id)) {
-    if (file_exists("includes/table/$id.inc.php")) {
-        header('Content-type: application/json');
-        include_once "includes/table/$id.inc.php";
-    }
+if ($id && file_exists("includes/html/table/$id.inc.php")) {
+    header('Content-type: application/json');
+    include_once "includes/html/table/$id.inc.php";
 }

@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Config;
-use LibreNMS\Device\Processor;
+use LibreNMS\Exceptions\FileNotFoundException;
+use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
@@ -36,45 +36,82 @@ class OSModulesTest extends DBTestCase
      *
      * @group os
      * @dataProvider dumpedDataProvider
-     * @param string $target_os name of the (and variant) to test
-     * @param string $filename file name of the json data
+     */
+    public function testDataIsValid($os, $variant, $modules)
+    {
+        // special case if data provider throws exception
+        if ($os === false) {
+            $this->fail($modules);
+        }
+
+        $this->assertNotEmpty($modules, "No modules to test for $os $variant");
+    }
+
+    /**
+     * Test all modules for a particular OS
+     *
+     * @group os
+     * @dataProvider dumpedDataProvider
+     * @param string $os base os
+     * @param string $variant optional variant
      * @param array $modules modules to test for this os
      */
     public function testOS($os, $variant, $modules)
     {
-        $this->requreSnmpsim();  // require snmpsim for tests
+        $this->requireSnmpsim();  // require snmpsim for tests
         global $snmpsim;
+        load_all_os(); // wiped out by application refresh
 
-        $helper = new ModuleTestHelper($modules, $os, $variant);
-        $helper->setQuiet();
-        $filename = $helper->getJsonFilepath(true);
+        try {
+            $helper = new ModuleTestHelper($modules, $os, $variant);
+            $helper->setQuiet();
 
-        $expected_data = $helper->getTestData();
-        $results = $helper->generateTestData($snmpsim, true);
+            $filename = $helper->getJsonFilepath(true);
+            $expected_data = $helper->getTestData();
+            $results = $helper->generateTestData($snmpsim, true);
+        } catch (FileNotFoundException $e) {
+            $this->fail($e->getMessage());
+            return;
+        } catch (InvalidModuleException $e) {
+            $this->fail($e->getMessage());
+            return;
+        }
 
         if (is_null($results)) {
             $this->fail("$os: Failed to collect data.");
         }
 
+        // output all discovery and poller output if debug mode is enabled for phpunit
+        $debug = in_array('--debug', $_SERVER['argv'], true);
+
         foreach ($modules as $module) {
+            $expected = $expected_data[$module]['discovery'];
+            $actual = $results[$module]['discovery'];
             $this->assertEquals(
-                $expected_data[$module]['discovery'],
-                $results[$module]['discovery'],
+                $expected,
+                $actual,
                 "OS $os: Discovered $module data does not match that found in $filename\n"
-                . $helper->getLastDiscoveryOutput()
-                . "\nOS $os: Polled $module data does not match that found in $filename"
+                . print_r(array_diff($expected, $actual), true)
+                . $helper->getDiscoveryOutput($debug ? null : $module)
+                . "\nOS $os: Discovered $module data does not match that found in $filename"
             );
 
+            if ($expected_data[$module]['poller'] == 'matches discovery') {
+                $expected = $expected_data[$module]['discovery'];
+            } else {
+                $expected = $expected_data[$module]['poller'];
+            }
+            $actual = $results[$module]['poller'];
             $this->assertEquals(
-                $expected_data[$module]['poller'] == 'matches discovery' ? $expected_data[$module]['discovery'] : $expected_data[$module]['poller'],
-                $results[$module]['poller'],
+                $expected,
+                $actual,
                 "OS $os: Polled $module data does not match that found in $filename\n"
-                . $helper->getLastPollerOutput()
+                . print_r(array_diff($expected, $actual), true)
+                . $helper->getPollerOutput($debug ? null : $module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
         }
     }
-
 
     public function dumpedDataProvider()
     {
@@ -84,6 +121,11 @@ class OSModulesTest extends DBTestCase
             $modules = explode(',', getenv('TEST_MODULES'));
         }
 
-        return ModuleTestHelper::findOsWithData($modules);
+        try {
+            return ModuleTestHelper::findOsWithData($modules);
+        } catch (InvalidModuleException $e) {
+            // special case for exception
+            return [[false, false, $e->getMessage()]];
+        }
     }
 }

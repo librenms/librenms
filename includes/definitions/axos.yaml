@@ -1,8 +1,8 @@
 os: axos
 text: Calix
 type: network
-ifname: 1
-empty_ifdescr: 1
+ifname: true
+empty_ifdescr: true
 icon: calix
 over:
     - { graph: device_bits, text: 'Device Traffic' }

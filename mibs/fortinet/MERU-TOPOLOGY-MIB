@@ -1,0 +1,928 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-TOPOLOGY-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlEncryptionAlgorithm,
+    MwlCapabilityModeBits,
+    MwlApType,
+    MwlApIfModeType,
+    MwlAssociationState,
+    MwlOnOffSwitch
+        FROM MERU-TC;
+
+  mwTopology  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Topology Configuration infrastructure"
+    ::= { mwConfiguration 13 } 
+  
+    
+  
+  mwApAssignedTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApAssignedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assigned Stations "
+    ::= { mwTopology 1 }
+
+  mwApAssignedEntry  OBJECT-TYPE
+    SYNTAX MwApAssignedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assigned Stations "
+    INDEX {  mwApAssignedTableIndex  }
+    ::= { mwApAssignedTable 1 }
+
+  MwApAssignedEntry  ::=  SEQUENCE { 
+       mwApAssignedTableIndex                                      Integer32, 
+       mwApAssignedApMac                                           MacAddress,
+       mwApAssignedEssid                                           DisplayString,
+       mwApAssigneddbState                                         MwlAssociationState,
+       mwApAssignedPrevRssi                                        Integer32,
+       mwApAssignedRxPackets                                       Unsigned32,
+       mwApAssignedTxPackets                                       Unsigned32,
+       mwApAssignedRadioType                                       MwlApIfModeType,
+       mwApAssignedAuthKeyType                                     MwlEncryptionAlgorithm,
+       mwApAssignedCurrentRssi                                     Integer32,
+       mwApAssignedVirtualPort                                     MacAddress,
+       mwApAssignedNmsApNodeId                                     Integer32,
+       mwApAssignedApDeviceType                                    MwlApType,
+       mwApAssignedLastActivity                                    TimeTicks,
+       mwApAssignedCapabilities                                    MwlCapabilityModeBits,
+       mwApAssignedNmsApNodeName                                   DisplayString 
+  }
+   
+   
+  mwApAssignedTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApAssignedEntry 1 }
+
+  mwApAssignedApMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Client MAC"
+    ::= { mwApAssignedEntry    2 }
+
+  mwApAssignedEssid  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SSID"
+    ::= { mwApAssignedEntry    3 }
+
+  mwApAssigneddbState  OBJECT-TYPE
+    SYNTAX MwlAssociationState
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Association State"
+    ::= { mwApAssignedEntry    4 }
+
+  mwApAssignedPrevRssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Previous RSSI"
+    ::= { mwApAssignedEntry    5 }
+
+  mwApAssignedRxPackets  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Packets Received"
+    ::= { mwApAssignedEntry    6 }
+
+  mwApAssignedTxPackets  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Packets Sent"
+    ::= { mwApAssignedEntry    7 }
+
+  mwApAssignedRadioType  OBJECT-TYPE
+    SYNTAX MwlApIfModeType
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Band"
+    ::= { mwApAssignedEntry    8 }
+
+  mwApAssignedAuthKeyType  OBJECT-TYPE
+    SYNTAX MwlEncryptionAlgorithm
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Key Type"
+    ::= { mwApAssignedEntry    9 }
+
+  mwApAssignedCurrentRssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current RSSI"
+    ::= { mwApAssignedEntry   10 }
+
+  mwApAssignedNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwApAssignedEntry   11 }
+
+  mwApAssignedApDeviceType  OBJECT-TYPE
+    SYNTAX MwlApType
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Type"
+    ::= { mwApAssignedEntry   12 }
+
+  mwApAssignedLastActivity  OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Last Activity"
+    ::= { mwApAssignedEntry   13 }
+
+  mwApAssignedNmsApNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwApAssignedEntry   14 }
+
+  mwApAssignedVirtualPort  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Virtual Port"
+    ::= { mwApAssignedEntry   15 }
+
+  mwApAssignedCapabilities  OBJECT-TYPE
+    SYNTAX MwlCapabilityModeBits
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Capabilities"
+    ::= { mwApAssignedEntry   16 }
+
+  mwApDiscoveredTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApDiscoveredEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Discovered APs and Stations "
+    ::= { mwTopology 2 }
+
+  mwApDiscoveredEntry  OBJECT-TYPE
+    SYNTAX MwApDiscoveredEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Discovered APs and Stations "
+    INDEX {  mwApDiscoveredTableIndex  }
+    ::= { mwApDiscoveredTable 1 }
+
+  MwApDiscoveredEntry  ::=  SEQUENCE { 
+       mwApDiscoveredTableIndex                                    Integer32, 
+       mwApDiscoveredApMac                                         MacAddress,
+       mwApDiscoveredEssid                                         DisplayString,
+       mwApDiscoveredBssid                                         MacAddress,
+       mwApDiscoveredChannel                                       Unsigned32,
+       mwApDiscoveredPrevRssi                                      Integer32,
+       mwApDiscoveredRxPackets                                     Unsigned32,
+       mwApDiscoveredRadioType                                     MwlApIfModeType,
+       mwApDiscoveredWiredRogue                                    MwlOnOffSwitch,
+       mwApDiscoveredCurrentRssi                                   Integer32,
+       mwApDiscoveredNmsApNodeId                                   Integer32,
+       mwApDiscoveredApDeviceType                                  MwlApType,
+       mwApDiscoveredLastActivity                                  TimeTicks,
+       mwApDiscoveredNmsApNodeName                                 DisplayString,
+       mwApDiscoveredConfirmedChannel                              Unsigned32 
+  }
+   
+   
+  mwApDiscoveredTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApDiscoveredEntry 1 }
+
+  mwApDiscoveredApMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwApDiscoveredEntry    2 }
+
+  mwApDiscoveredEssid  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SSID"
+    ::= { mwApDiscoveredEntry    3 }
+
+  mwApDiscoveredBssid  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes BSSID"
+    ::= { mwApDiscoveredEntry    4 }
+
+  mwApDiscoveredChannel  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Operated Channel"
+    ::= { mwApDiscoveredEntry    5 }
+
+  mwApDiscoveredPrevRssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Previous RSSI"
+    ::= { mwApDiscoveredEntry    6 }
+
+  mwApDiscoveredRxPackets  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Packets Received"
+    ::= { mwApDiscoveredEntry    7 }
+
+  mwApDiscoveredRadioType  OBJECT-TYPE
+    SYNTAX MwlApIfModeType
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Band"
+    ::= { mwApDiscoveredEntry    8 }
+
+  mwApDiscoveredWiredRogue  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue Detected on the wire"
+    ::= { mwApDiscoveredEntry    9 }
+
+  mwApDiscoveredCurrentRssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current RSSI"
+    ::= { mwApDiscoveredEntry   10 }
+
+  mwApDiscoveredNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwApDiscoveredEntry   11 }
+
+  mwApDiscoveredApDeviceType  OBJECT-TYPE
+    SYNTAX MwlApType
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Device Type"
+    ::= { mwApDiscoveredEntry   12 }
+
+  mwApDiscoveredLastActivity  OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Last activity"
+    ::= { mwApDiscoveredEntry   13 }
+
+  mwApDiscoveredNmsApNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwApDiscoveredEntry   14 }
+
+  mwApDiscoveredConfirmedChannel  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Confirmed-Channel"
+    ::= { mwApDiscoveredEntry   15 }
+
+  mwTopoApTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwTopoApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Wireless Resources "
+    ::= { mwTopology 4 }
+
+  mwTopoApEntry  OBJECT-TYPE
+    SYNTAX MwTopoApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Wireless Resources "
+    INDEX {  mwTopoApTableIndex  }
+    ::= { mwTopoApTable 1 }
+
+  MwTopoApEntry  ::=  SEQUENCE { 
+       mwTopoApTableIndex                                          Integer32, 
+       mwTopoApNodeId                                              Unsigned32,
+       mwTopoApNodeName                                            DisplayString,
+       mwTopoApAttachedCount                                       Unsigned32,
+       mwTopoApAssignedCount                                       Unsigned32,
+       mwTopoApNeighborsCount                                      Unsigned32,
+       mwTopoApResourceRequest                                     Unsigned32,
+       mwTopoApResourceAllocated                                   Unsigned32 
+  }
+   
+   
+  mwTopoApTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwTopoApEntry 1 }
+
+  mwTopoApNodeId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwTopoApEntry    2 }
+
+  mwTopoApNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwTopoApEntry    3 }
+
+  mwTopoApAttachedCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Attached Count"
+    ::= { mwTopoApEntry    4 }
+
+  mwTopoApAssignedCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assigned Count"
+    ::= { mwTopoApEntry    5 }
+
+  mwTopoApNeighborsCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Neighbor Count"
+    ::= { mwTopoApEntry    6 }
+
+  mwTopoApResourceRequest  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Resource Requested"
+    ::= { mwTopoApEntry    7 }
+
+  mwTopoApResourceAllocated  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Resource Allocated"
+    ::= { mwTopoApEntry    8 }
+
+  mwTopoApapTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwTopoApapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of AP edges "
+    ::= { mwTopology 5 }
+
+  mwTopoApapEntry  OBJECT-TYPE
+    SYNTAX MwTopoApapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of AP edges "
+    INDEX {  mwTopoApapTableIndex  }
+    ::= { mwTopoApapTable 1 }
+
+  MwTopoApapEntry  ::=  SEQUENCE { 
+       mwTopoApapTableIndex                                        Integer32, 
+       mwTopoApapHeadId                                            Unsigned32,
+       mwTopoApapTailId                                            Unsigned32,
+       mwTopoApapHeadName                                          DisplayString,
+       mwTopoApapTailName                                          DisplayString 
+  }
+   
+   
+  mwTopoApapTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwTopoApapEntry 1 }
+
+  mwTopoApapHeadId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Detecting AP ID"
+    ::= { mwTopoApapEntry    2 }
+
+  mwTopoApapTailId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Sibling AP ID"
+    ::= { mwTopoApapEntry    3 }
+
+  mwTopoApapHeadName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Detecting AP Name"
+    ::= { mwTopoApapEntry    4 }
+
+  mwTopoApapTailName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Sibling AP Name"
+    ::= { mwTopoApapEntry    5 }
+
+  mwTopoStaTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwTopoStaEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Stations Topology "
+    ::= { mwTopology 6 }
+
+  mwTopoStaEntry  OBJECT-TYPE
+    SYNTAX MwTopoStaEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Stations Topology "
+    INDEX {  mwTopoStaTableIndex  }
+    ::= { mwTopoStaTable 1 }
+
+  MwTopoStaEntry  ::=  SEQUENCE { 
+       mwTopoStaTableIndex                                         Integer32, 
+       mwTopoStaBssId                                              MacAddress,
+       mwTopoStaMssId                                              MacAddress,
+       mwTopoStaMacAddress                                         MacAddress,
+       mwTopoStaAssocState                                         MwlAssociationState,
+       mwTopoStaAssignedAp                                         Unsigned32,
+       mwTopoStaHandoffTime                                        DateAndTime,
+       mwTopoStaLastActiveTime                                     DateAndTime,
+       mwTopoStaAssignedApName                                     DisplayString 
+  }
+   
+   
+  mwTopoStaTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwTopoStaEntry 1 }
+
+  mwTopoStaBssId  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes BSSID"
+    ::= { mwTopoStaEntry    2 }
+
+  mwTopoStaMssId  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes MSSID"
+    ::= { mwTopoStaEntry    3 }
+
+  mwTopoStaMacAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwTopoStaEntry    4 }
+
+  mwTopoStaAssocState  OBJECT-TYPE
+    SYNTAX MwlAssociationState
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Association State"
+    ::= { mwTopoStaEntry    5 }
+
+  mwTopoStaAssignedAp  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assigned AP"
+    ::= { mwTopoStaEntry    6 }
+
+  mwTopoStaHandoffTime  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Last Handoff Time"
+    ::= { mwTopoStaEntry    7 }
+
+  mwTopoStaLastActiveTime  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Last Active Time"
+    ::= { mwTopoStaEntry    8 }
+
+  mwTopoStaAssignedApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assigned AP Name"
+    ::= { mwTopoStaEntry    9 }
+
+  mwTopoStaapTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwTopoStaapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station/AP Edge Records "
+    ::= { mwTopology 7 }
+
+  mwTopoStaapEntry  OBJECT-TYPE
+    SYNTAX MwTopoStaapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station/AP Edge Records "
+    INDEX {  mwTopoStaapTableIndex  }
+    ::= { mwTopoStaapTable 1 }
+
+  MwTopoStaapEntry  ::=  SEQUENCE { 
+       mwTopoStaapTableIndex                                       Integer32, 
+       mwTopoStaapRssi                                             Integer32,
+       mwTopoStaapStaId                                            MacAddress,
+       mwTopoStaapApId                                             Unsigned32,
+       mwTopoStaapApName                                           DisplayString,
+       mwTopoStaapAssigned                                         MwlOnOffSwitch 
+  }
+   
+   
+  mwTopoStaapTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwTopoStaapEntry 1 }
+
+  mwTopoStaapRssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes RSSI"
+    ::= { mwTopoStaapEntry    2 }
+
+  mwTopoStaapStaId  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station MAC Address"
+    ::= { mwTopoStaapEntry    3 }
+
+  mwTopoStaapApId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwTopoStaapEntry    4 }
+
+  mwTopoStaapApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwTopoStaapEntry    5 }
+
+  mwTopoStaapAssigned  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assigned"
+    ::= { mwTopoStaapEntry    6 }
+
+  mwApNeighborTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Neighbors List "
+    ::= { mwTopology 8 }
+
+  mwApNeighborEntry  OBJECT-TYPE
+    SYNTAX MwApNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Neighbors List "
+    INDEX {  mwApNeighborTableIndex  }
+    ::= { mwApNeighborTable 1 }
+
+  MwApNeighborEntry  ::=  SEQUENCE { 
+       mwApNeighborTableIndex                                      Integer32, 
+       mwApNeighborApMac                                           MacAddress,
+       mwApNeighborChannel                                         Unsigned32,
+       mwApNeighborNmsApNodeId                                     Integer32,
+       mwApNeighborNeighborApId                                    Integer32,
+       mwApNeighborNeighborApMac                                   MacAddress,
+       mwApNeighborNmsApInterfaceId                                Integer32,
+       mwApNeighborNeighborApCurrentRssi                           Integer32,
+       mwApNeighborNeighborApControllerIndex                       Integer32 
+  }
+   
+   
+  mwApNeighborTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApNeighborEntry 1 }
+
+  mwApNeighborNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP-ID"
+    ::= { mwApNeighborEntry    2 }
+
+  mwApNeighborNmsApInterfaceId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Id"
+    ::= { mwApNeighborEntry    3 }
+
+  mwApNeighborApMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwApNeighborEntry    4 }
+
+  mwApNeighborChannel  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel"
+    ::= { mwApNeighborEntry    5 }
+
+  mwApNeighborNeighborApId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Neighbor AP-ID"
+    ::= { mwApNeighborEntry    6 }
+
+  mwApNeighborNeighborApMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwApNeighborEntry    7 }
+
+  mwApNeighborNeighborApControllerIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes ControllerIndex"
+    ::= { mwApNeighborEntry    8 }
+
+  mwApNeighborNeighborApCurrentRssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes RSSI"
+    ::= { mwApNeighborEntry    9 }
+
+  mwApNeighborDetailsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApNeighborDetailsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Neighbors Consolidated List "
+    ::= { mwTopology 9 }
+
+  mwApNeighborDetailsEntry  OBJECT-TYPE
+    SYNTAX MwApNeighborDetailsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Neighbors Consolidated List "
+    INDEX {  mwApNeighborDetailsTableIndex  }
+    ::= { mwApNeighborDetailsTable 1 }
+
+  MwApNeighborDetailsEntry  ::=  SEQUENCE { 
+       mwApNeighborDetailsTableIndex                               Integer32, 
+       mwApNeighborDetailsChannel                                  Unsigned32,
+       mwApNeighborDetailsLocalAp                                  Integer32,
+       mwApNeighborDetailsRemoteAp                                 Integer32,
+       mwApNeighborDetailsRssiLevel1                               Integer32,
+       mwApNeighborDetailsRssiLevel2                               Integer32,
+       mwApNeighborDetailsRssiLevel3                               Integer32,
+       mwApNeighborDetailsRssiLevel4                               Integer32,
+       mwApNeighborDetailsNmsApNodeId                              Integer32,
+       mwApNeighborDetailsNmsApInterfaceId                         Integer32 
+  }
+   
+   
+  mwApNeighborDetailsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApNeighborDetailsEntry 1 }
+
+  mwApNeighborDetailsNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP-ID"
+    ::= { mwApNeighborDetailsEntry    2 }
+
+  mwApNeighborDetailsNmsApInterfaceId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Id"
+    ::= { mwApNeighborDetailsEntry    3 }
+
+  mwApNeighborDetailsChannel  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel"
+    ::= { mwApNeighborDetailsEntry    4 }
+
+  mwApNeighborDetailsLocalAp  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of Local APs"
+    ::= { mwApNeighborDetailsEntry    5 }
+
+  mwApNeighborDetailsRemoteAp  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of Remote APs"
+    ::= { mwApNeighborDetailsEntry    6 }
+
+  mwApNeighborDetailsRssiLevel1  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of APs with RSSI greater than -45"
+    ::= { mwApNeighborDetailsEntry    7 }
+
+  mwApNeighborDetailsRssiLevel2  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of APs with RSSI greater than -65"
+    ::= { mwApNeighborDetailsEntry    8 }
+
+  mwApNeighborDetailsRssiLevel3  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of APs with RSSI greater than -85"
+    ::= { mwApNeighborDetailsEntry    9 }
+
+  mwApNeighborDetailsRssiLevel4  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of APs with RSSI less than -85"
+    ::= { mwApNeighborDetailsEntry   10 }
+
+  
+END
+   

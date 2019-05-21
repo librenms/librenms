@@ -1,4 +1,5 @@
 source: Extensions/Dashboards.md
+path: blob/master/doc/
 
 # Dashboards
 Create customised dashboards in LibreNMS per user. You can share dashboards with other users. You can also make a custom dashboard and
@@ -48,7 +49,7 @@ Step 2: Then go to Settings -> WebUI settings -> Dashboard Settings and set the 
 
 Using the Notes Widget.
 ```html
-<iframe src="url/" width="1200" height="800">
+<iframe src="your_url" frameBorder="0" width="100%" height = "100%">
   <p>Your browser does not support iframes.</p>
 </iframe>
 ```
@@ -67,3 +68,13 @@ In the dashboard, you want to create an interface graph select the widget called
 * Note: you can map the port by description or the alias or by port id. You will need to know this in order to map the port to the graph. 
 
 ![port-bits-graph](/img/port-bits-port.png)
+
+### Dimension parameter replacement for Generic-image widget
+
+When using the Generic-image widget you can provide the width and height of the widget with your request.
+This will ensure that the image will fit nicely with the dimensions if the Generic-image widget.
+You can add @AUTO_HEIGHT@ and @AUTO_WIDTH@ to the Image URL as parameters.
+
+#### Examples: 
++ http://librenms.example.com/graph.php?id=333%2C444&type=multiport_bits_separate&legend=no&absolute=1&from=-14200&width=@AUTO_WIDTH@&height=@AUTO_HEIGHT@
++ http://example.com/myimage.php?size=@AUTO_WIDTH@x@AUTO_HEIGHT@

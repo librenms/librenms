@@ -1,15 +1,15 @@
 os: jetdirect
 group: printer
 text: 'HP Print server'
-ifname: 1
+ifname: true
 type: printer
 icon: hp
 over:
     - { graph: device_toner, text: Toner }
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
+    toner: true
 discovery:
     - sysDescr:
         - JETDIRECT

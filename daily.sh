@@ -126,16 +126,23 @@ set_notifiable_result() {
 #######################################
 check_php_ver() {
     local branch=$(git rev-parse --abbrev-ref HEAD)
-    local ver_res=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
-    if [[ "$branch" == "php53" ]] && [[ "$ver_res" == "0" ]]; then
+    local ver_56=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
+    local ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
+    if [[ "$branch" == "php53" ]] && [[ "$ver_56" == "0" ]]; then
         status_run "Supported PHP version, switched back to master branch." 'git checkout master'
         branch="master"
-    elif [[ "$branch" != "php53" ]] && [[ "$ver_res" == "1" ]]; then
+    elif [[ "$branch" == "php56" ]] && [[ "$ver_71" == "0" ]]; then
+        status_run "Supported PHP version, switched back to master branch." 'git checkout master'
+        branch="master"
+    elif [[ "$branch" != "php53" ]] && [[ "$ver_56" == "1" ]]; then
         status_run "Unsupported PHP version, switched to php53 branch." 'git checkout php53'
         branch="php53"
+    elif [[ "$branch" != "php56" ]] && [[ "$ver_71" == "1" ]]; then
+        status_run "Unsupported PHP version, switched to php56 branch." 'git checkout php56'
+        branch="php56"
     fi
 
-    set_notifiable_result phpver ${ver_res}
+    set_notifiable_result phpver ${branch}
 
     return ${ver_res};
 }
@@ -194,11 +201,17 @@ main () {
         update_res=0
         if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
+            local branch=$(git rev-parse --abbrev-ref HEAD)
+            if [[ "$branch" == "HEAD" ]]; then
+                # if the branch is HEAD, then we are not on a branch, checkout master
+                git checkout master
+            fi
+
             old_ver=$(git rev-parse --short HEAD)
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             update_res=$?
             new_ver=$(git rev-parse --short HEAD)
-        elif [[ "$up" == "3" ]]; then
+        else
             # Update to last Tag
             old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
             status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))' 'update'
@@ -221,6 +234,14 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;
             post-pull)
+                # Check for missing vendor dir
+                if [ ! -f vendor/autoload.php ]; then
+                    git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- vendor/
+                    git reset HEAD vendor/  # don't add vendor directory to the index
+                fi
+
+                status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
+
                 # Check if we need to revert (Must be in post pull so we can update it)
                 if [[ "$old_version" != "$new_version" ]]; then
                     check_php_ver # check php version and switch branches
@@ -241,6 +262,7 @@ main () {
                 # Cleanups
                 local options=("refresh_alert_rules"
                                "refresh_os_cache"
+                               "recalculate_device_dependencies"
                                "syslog"
                                "eventlog"
                                "authlog"
@@ -250,7 +272,9 @@ main () {
                                "purgeusers"
                                "bill_data"
                                "alert_log"
-                               "rrd_purge");
+                               "rrd_purge"
+                               "ports_fdb"
+                               "ports_purge");
                 call_daily_php "${options[@]}";
             ;;
             submodules)

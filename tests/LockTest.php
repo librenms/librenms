@@ -39,14 +39,18 @@ class LockTest extends TestCase
         unset($new_lock);
 
         FileLock::lock('tests');
+
+        $this->expectNotToPerformAssertions();
     }
 
     public function testFileLockFail()
     {
         $lock = FileLock::lock('tests');
 
-        $this->setExpectedException('LibreNMS\Exceptions\LockException');
+        $this->expectException('LibreNMS\Exceptions\LockException');
         $failed_lock = FileLock::lock('tests');
+
+        $this->expectNotToPerformAssertions();
     }
 
     public function testFileLockWait()
@@ -54,7 +58,7 @@ class LockTest extends TestCase
         $lock = FileLock::lock('tests');
 
         $start = microtime(true);
-        $this->setExpectedException('LibreNMS\Exceptions\LockException');
+        $this->expectException('LibreNMS\Exceptions\LockException');
         $wait_lock = FileLock::lock('tests', 1);
         $this->assertGreaterThan(1, microtime(true) - $start, 'Lock did not wait.');
 

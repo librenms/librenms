@@ -1,0 +1,1010 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-DHCP-MIB.mib
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+MODULE-IDENTITY,
+OBJECT-TYPE,
+IpAddress,
+Counter32,
+Unsigned32,
+Integer32
+FROM SNMPv2-SMI
+
+DisplayString,
+MacAddress,
+TruthValue,
+RowStatus
+FROM SNMPv2-TC
+
+switch
+FROM PRVT-SWITCH-MIB;
+
+prvtDHCPMib MODULE-IDENTITY
+LAST-UPDATED "200502160000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"DHCP"
+
+-- revision history
+REVISION "200502160000Z"
+DESCRIPTION
+"Fixed spelling errors and changed the contact info."
+
+REVISION "200305060000Z"
+DESCRIPTION
+"Move to SMI-V2."
+
+REVISION "200205300000Z"
+DESCRIPTION
+"Initial version. This revision enables monitoring
+of the DHCP server status only."
+::= { switch 105 }
+
+prvtDHCPObjects OBJECT IDENTIFIER ::= { prvtDHCPMib 1 }
+prvtDHCPNotifications OBJECT IDENTIFIER ::= { prvtDHCPMib 2 }
+
+dhcpPackets OBJECT IDENTIFIER ::= { prvtDHCPObjects 1 }
+dhcpRanges OBJECT IDENTIFIER ::= { prvtDHCPObjects 2 }
+dhcpSubnets OBJECT IDENTIFIER ::= { prvtDHCPObjects 3 }
+dhcpHosts OBJECT IDENTIFIER ::= { prvtDHCPObjects 4 }
+dhcpOptions OBJECT IDENTIFIER ::= { prvtDHCPObjects 5 }
+dhcpPorts OBJECT IDENTIFIER ::= { prvtDHCPObjects 6 }
+dhcpVlans OBJECT IDENTIFIER ::= { prvtDHCPObjects 7 }
+dhcpMiscSettings OBJECT IDENTIFIER ::= { prvtDHCPObjects 8 }
+dhcpRRSettings OBJECT IDENTIFIER ::= { prvtDHCPObjects 9 }
+
+dhcpStaticHosts OBJECT IDENTIFIER ::= { dhcpHosts 1 }
+dhcpDynamicHosts OBJECT IDENTIFIER ::= { dhcpHosts 2 }
+
+dhcpStatusTotalNoOfDiscovers OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable indicates the number of
+discovery messages received"
+::= { dhcpPackets 1 }
+
+dhcpStatusTotalNoOfRequests OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable indicates the number of
+requests received"
+::= { dhcpPackets 2 }
+
+dhcpStatusTotalNoOfReleases OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable indicates the number of
+releases received"
+::= { dhcpPackets 3 }
+
+dhcpStatusTotalNoOfOffers OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable indicates the number of
+offers sent"
+::= { dhcpPackets 4 }
+
+dhcpStatusTotalNoOfAcks OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable indicates the number of
+ACKs received"
+::= { dhcpPackets 5 }
+
+dhcpStatusTotalNoOfNacks OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable indicates the number of
+NACKs received"
+::= { dhcpPackets 6 }
+
+dhcpStatusTotalNoOfDeclines OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable indicates the number of
+declines"
+::= { dhcpPackets 7 }
+
+-- Range usage table
+
+dhcpRangeTable OBJECT-TYPE
+SYNTAX SEQUENCE OF DhcpRangeEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of ranges maintained by the server"
+::= { dhcpRanges 1 }
+
+dhcpRangeEntry OBJECT-TYPE
+SYNTAX DhcpRangeEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This is the row corresponding to a range"
+INDEX {dhcpRangeStartIp}
+::= { dhcpRangeTable 1 }
+
+DhcpRangeEntry ::= SEQUENCE {
+dhcpRangeStartIp IpAddress,
+dhcpRangeStopIp IpAddress,
+dhcpRangeNoAddInUse Counter32,
+dhcpRangeNoAddFree Counter32,
+dhcpRangeCircuitID DisplayString,
+dhcpRangeCircuitIDType INTEGER,
+dhcpRangeRangeName DisplayString,
+dhcpRangeSubnetIp IpAddress,
+dhcpRangeSubnetName DisplayString,
+dhcpRangeRowStatus RowStatus
+}
+
+dhcpRangeStartIp OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the range start address "
+::= { dhcpRangeEntry 1 }
+
+dhcpRangeStopIp OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the range stop address "
+::= { dhcpRangeEntry 2 }
+
+dhcpRangeNoAddInUse OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the number of addresses in use"
+::= { dhcpRangeEntry 3 }
+
+dhcpRangeNoAddFree OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the number of free addresses"
+::= { dhcpRangeEntry 4 }
+
+dhcpRangeCircuitID OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is circuit-ID of that range "
+::= { dhcpRangeEntry 5 }
+
+dhcpRangeCircuitIDType OBJECT-TYPE
+SYNTAX INTEGER {
+string(1),
+hex(2)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is circuit-ID type of that range "
+::= { dhcpRangeEntry 6 }
+
+dhcpRangeRangeName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the range name "
+::= { dhcpRangeEntry 7 }
+
+dhcpRangeSubnetIp OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the range start address "
+::= { dhcpRangeEntry 8 }
+
+dhcpRangeSubnetName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Subnet name, related to the range"
+::= { dhcpRangeEntry 9 }
+
+dhcpRangeRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Indicates the status of the row. Setting of this field to active enables range
+creation"
+::= { dhcpRangeEntry 10 }
+
+-- Subnets table
+
+dhcpSubnetTable OBJECT-TYPE
+SYNTAX SEQUENCE OF DhcpSubnetEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of subnets maintained by the server"
+::= { dhcpSubnets 1 }
+
+dhcpSubnetEntry OBJECT-TYPE
+SYNTAX DhcpSubnetEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This is the row corresponding to a single subnet"
+INDEX {dhcpSubnetIp}
+::= { dhcpSubnetTable 1 }
+
+DhcpSubnetEntry ::= SEQUENCE {
+dhcpSubnetIp IpAddress,
+dhcpSubnetMask IpAddress,
+dhcpSubnetName DisplayString,
+dhcpSubnetNoAddInUse Counter32,
+dhcpSubnetNoAddFree Counter32,
+dhcpSubnetRowStatus RowStatus
+}
+
+dhcpSubnetIp OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the subnet IP address "
+::= { dhcpSubnetEntry 1 }
+
+dhcpSubnetMask OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the subnet netmask "
+::= { dhcpSubnetEntry 2 }
+
+dhcpSubnetName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the subnet name"
+::= { dhcpSubnetEntry 3 }
+
+dhcpSubnetNoAddInUse OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the number of addresses in use"
+::= { dhcpSubnetEntry 4 }
+
+dhcpSubnetNoAddFree OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the number of addresses that are free "
+::= { dhcpSubnetEntry 5 }
+
+dhcpSubnetRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Indicates the status of the row. Setting of this field to active enables
+subnet creation"
+::= { dhcpSubnetEntry 6 }
+
+-- Static Hosts table
+
+dhcpStaticHostsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF DhcpStaticHostsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of hosts with fixed IP addresses maintained by the server"
+::= { dhcpStaticHosts 1 }
+
+dhcpStaticHostsEntry OBJECT-TYPE
+SYNTAX DhcpStaticHostsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This is the row, corresponding to a subnet"
+INDEX {dhcpStaticHostIPAddress}
+::= { dhcpStaticHostsTable 1 }
+
+DhcpStaticHostsEntry ::= SEQUENCE {
+dhcpStaticHostIPAddress IpAddress,
+dhcpStaticHostName DisplayString,
+dhcpStaticHostConnected TruthValue,
+dhcpStaticHostMACAddr MacAddress,
+dhcpStaticHostFilename DisplayString,
+dhcpStaticHostBootpIP IpAddress,
+dhcpStaticHostServer DisplayString,
+dhcpStatisHostSnoofPort Counter32,
+dhcpStaticHostRowStatus RowStatus
+}
+
+dhcpStaticHostIPAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the fixed IP address, reserved for this host"
+::= { dhcpStaticHostsEntry 1 }
+
+dhcpStaticHostName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the host name"
+::= { dhcpStaticHostsEntry 2 }
+
+dhcpStaticHostConnected OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the currently connected status of the host.
+The value TRUE means that this host has requested this IP address"
+::= { dhcpStaticHostsEntry 3 }
+
+dhcpStaticHostMACAddr OBJECT-TYPE
+SYNTAX MacAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the specified host MAC address "
+::= { dhcpStaticHostsEntry 4 }
+
+dhcpStaticHostFilename OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the host file name"
+::= { dhcpStaticHostsEntry 5 }
+
+dhcpStaticHostBootpIP OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the bootstrap server IP address for the current host"
+::= { dhcpStaticHostsEntry 6 }
+
+dhcpStaticHostServer OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is boot server name"
+::= { dhcpStaticHostsEntry 7 }
+
+dhcpStatisHostSnoofPort OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the coresponding Snoof port if defined"
+::= { dhcpStaticHostsEntry 8 }
+
+dhcpStaticHostRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Indicates the status of the row. Setting this field to active
+enables static host creation"
+::= { dhcpStaticHostsEntry 9 }
+
+-- Lease states table
+
+dhcpLeaseStateTable OBJECT-TYPE
+SYNTAX SEQUENCE OF DhcpLeaseStateEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of lease states"
+::= { dhcpDynamicHosts 1 }
+
+dhcpLeaseStateEntry OBJECT-TYPE
+SYNTAX DhcpLeaseStateEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This is the row corresponding to a single lease"
+INDEX {dhcpLeaseIp}
+::= { dhcpLeaseStateTable 1 }
+
+DhcpLeaseStateEntry ::= SEQUENCE {
+dhcpLeaseIp IpAddress,
+dhcpLeaseName DisplayString,
+dhcpLeaseETime DisplayString,
+dhcpLeaseMac MacAddress,
+dhcpLeaseSnoofPort Counter32
+}
+
+dhcpLeaseIp OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the lease IP address "
+::= { dhcpLeaseStateEntry 1 }
+
+dhcpLeaseName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the lease name"
+::= { dhcpLeaseStateEntry 2 }
+
+dhcpLeaseETime OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Lease expiration time"
+::= { dhcpLeaseStateEntry 3 }
+
+dhcpLeaseMac OBJECT-TYPE
+SYNTAX MacAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the lease MAC address "
+::= { dhcpLeaseStateEntry 4 }
+
+dhcpLeaseSnoofPort OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the corresponding Snoof port, if defined"
+::= { dhcpLeaseStateEntry 5 }
+
+-- Options table
+
+dhcpOptionsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF DhcpOptionsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of options set on the server"
+::= { dhcpOptions 1 }
+
+dhcpOptionsEntry OBJECT-TYPE
+SYNTAX DhcpOptionsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This is the row corresponding to a set of options"
+INDEX {dhcpOptionsSubnetIp}
+::= { dhcpOptionsTable 1 }
+
+DhcpOptionsEntry ::= SEQUENCE {
+dhcpOptionsSubnetIp DisplayString,
+dhcpOptionsMaxLTime Counter32,
+dhcpOptionsDfltLTime Counter32,
+dhcpOptionsRouter IpAddress,
+dhcpOptionsBrcstAddr IpAddress,
+dhcpOptionsSubnetMask IpAddress,
+dhcpOptionsDomainName DisplayString,
+dhcpOptionsMeritDump DisplayString,
+dhcpOptionsRootPath DisplayString,
+dhcpOptionsBootStSrv IpAddress,
+dhcpOptionsBootFileName DisplayString,
+--
+dhcpOptionsDNSServer1 IpAddress,
+dhcpOptionsDNSServer2 IpAddress,
+dhcpOptionsDNSServer3 IpAddress,
+dhcpOptionsDNSServer4 IpAddress,
+dhcpOptionsDNSServer5 IpAddress,
+--
+dhcpOptionsLogServer1 IpAddress,
+dhcpOptionsLogServer2 IpAddress,
+dhcpOptionsLogServer3 IpAddress,
+dhcpOptionsLogServer4 IpAddress,
+dhcpOptionsLogServer5 IpAddress,
+--
+dhcpOptionsWinsServer1 IpAddress,
+dhcpOptionsWinsServer2 IpAddress,
+dhcpOptionsWinsServer3 IpAddress,
+dhcpOptionsWinsServer4 IpAddress,
+dhcpOptionsWinsServer5 IpAddress
+}
+
+dhcpOptionsSubnetIp OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the subnet IP address "
+::= { dhcpOptionsEntry 1 }
+
+dhcpOptionsMaxLTime OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the max-lease-time option "
+::= { dhcpOptionsEntry 2 }
+
+dhcpOptionsDfltLTime OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the default-lease-time option "
+::= { dhcpOptionsEntry 3 }
+
+dhcpOptionsRouter OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the router option "
+::= { dhcpOptionsEntry 4 }
+
+dhcpOptionsBrcstAddr OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the network broadcast address option "
+::= { dhcpOptionsEntry 5 }
+
+dhcpOptionsSubnetMask OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the network subnet mask option "
+::= { dhcpOptionsEntry 6 }
+
+dhcpOptionsDomainName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the domain-name option "
+::= { dhcpOptionsEntry 7 }
+
+dhcpOptionsMeritDump OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the merit-dump option "
+::= { dhcpOptionsEntry 8 }
+
+dhcpOptionsRootPath OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the root-path option "
+::= { dhcpOptionsEntry 9 }
+
+dhcpOptionsBootStSrv OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the bootstrap server IP address "
+::= { dhcpOptionsEntry 10 }
+
+dhcpOptionsBootFileName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the bootstrap filename option "
+::= { dhcpOptionsEntry 11 }
+
+dhcpOptionsDNSServer1 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the first DNS server option "
+::= { dhcpOptionsEntry 12 }
+
+dhcpOptionsDNSServer2 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the second DNS server option "
+::= { dhcpOptionsEntry 13 }
+
+dhcpOptionsDNSServer3 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the third DNS server option "
+::= { dhcpOptionsEntry 14 }
+
+dhcpOptionsDNSServer4 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the fourth DNS server option "
+::= { dhcpOptionsEntry 15 }
+
+dhcpOptionsDNSServer5 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the fifth DNS server option "
+::= { dhcpOptionsEntry 16 }
+
+dhcpOptionsLogServer1 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the first log-server option "
+::= { dhcpOptionsEntry 17 }
+
+dhcpOptionsLogServer2 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the second log-server option "
+::= { dhcpOptionsEntry 18 }
+
+dhcpOptionsLogServer3 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the third log-server option "
+::= { dhcpOptionsEntry 19 }
+
+dhcpOptionsLogServer4 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the fourth log-server option "
+::= { dhcpOptionsEntry 20 }
+
+dhcpOptionsLogServer5 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the fifth log-server option "
+::= { dhcpOptionsEntry 21 }
+
+dhcpOptionsWinsServer1 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the first WINS server option "
+::= { dhcpOptionsEntry 22 }
+
+dhcpOptionsWinsServer2 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the second WINS server option "
+::= { dhcpOptionsEntry 23 }
+
+dhcpOptionsWinsServer3 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the third WINS server option "
+::= { dhcpOptionsEntry 24 }
+
+dhcpOptionsWinsServer4 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the fourth WINS server option "
+::= { dhcpOptionsEntry 25 }
+
+dhcpOptionsWinsServer5 OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the fifth WINS server option "
+::= { dhcpOptionsEntry 26 }
+
+-- Misc DHCP server settings
+
+dhcpDBExpire OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Expire time for internal DHCP database "
+::= { dhcpMiscSettings 1 }
+
+dhcpTFTPServer OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"IP address of TFTP server to store the DHCP database remotely "
+::= { dhcpMiscSettings 2 }
+
+dhcpFTPServer OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"IP address of FTP server to store the DHCP database remotely "
+::= { dhcpMiscSettings 3 }
+
+dhcpFTPServerUser OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Username for remote FTP server "
+::= { dhcpMiscSettings 4 }
+
+dhcpFTPServerPass OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Password for remote FTP server "
+::= { dhcpMiscSettings 5 }
+
+dhcpRemoteDBDelay OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Delay between consecutive database transfers to remote server "
+::= { dhcpMiscSettings 6 }
+
+dhcpRemoteDBFilename OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"IP Leases remote database filename"
+::= { dhcpMiscSettings 7 }
+
+dhcpUnknownCircuitIDPolicy OBJECT-TYPE
+SYNTAX INTEGER {
+permit(1),
+deny(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Unknown circuit-ID policy "
+::= { dhcpMiscSettings 8 }
+
+dhcpEnableServer OBJECT-TYPE
+SYNTAX INTEGER {
+enabled(1),
+disabled(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enable/disable DHCP server operation "
+::= { dhcpMiscSettings 9 }
+
+-- Port settings table
+
+dhcpPortTable OBJECT-TYPE
+SYNTAX SEQUENCE OF DhcpPortEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of DHCP settings related to ports "
+::= { dhcpPorts 1 }
+
+dhcpPortEntry OBJECT-TYPE
+SYNTAX DhcpPortEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"These are the physical port settings."
+INDEX {dhcpPort}
+::= { dhcpPortTable 1 }
+
+DhcpPortEntry ::= SEQUENCE {
+dhcpPort Integer32,
+dhcpMaxPortIP Counter32,
+dhcpPortSnoof TruthValue,
+dhcpPortServiceEnable TruthValue
+}
+
+dhcpPort OBJECT-TYPE
+SYNTAX Integer32(0..2147483647)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the port number."
+::= { dhcpPortEntry 1 }
+
+dhcpMaxPortIP OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is the maximum IP addresses to be given via the current port."
+::= { dhcpPortEntry 2 }
+
+dhcpPortSnoof OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is a check for enabling/disabling Snoof on the current port."
+::= { dhcpPortEntry 3 }
+
+dhcpPortServiceEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is a check for enabling/disabling DHCP service on the current port."
+::= { dhcpPortEntry 4 }
+
+-- Vlan settings table
+
+dhcpVlanTable OBJECT-TYPE
+SYNTAX SEQUENCE OF DhcpVlanEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of DHCP VLAN settings."
+::= { dhcpVlans 1 }
+
+dhcpVlanEntry OBJECT-TYPE
+SYNTAX DhcpVlanEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This is the row corresponding to a single VLAN setting."
+INDEX {dhcpVlanID}
+::= { dhcpVlanTable 1 }
+
+DhcpVlanEntry ::= SEQUENCE {
+dhcpVlanID Unsigned32,
+dhcpVlanEnable TruthValue
+}
+
+dhcpVlanID OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the VLAN ID."
+::= { dhcpVlanEntry 1 }
+
+dhcpVlanEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is enable/disable DHCP service status per VLAN."
+::= { dhcpVlanEntry 2 }
+
+-- RR settings table
+
+dhcpRRTable OBJECT-TYPE
+SYNTAX SEQUENCE OF DhcpRREntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of DHCP round-robin settings."
+::= { dhcpRRSettings 1 }
+
+dhcpRREntry OBJECT-TYPE
+SYNTAX DhcpRREntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This is the row corresponding to single VLAN setting."
+INDEX {dhcpRRif}
+::= { dhcpRRTable 1 }
+
+DhcpRREntry ::= SEQUENCE {
+dhcpRRif DisplayString,
+dhcpRREnable TruthValue
+}
+
+dhcpRRif OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the IP interface name."
+::= { dhcpRREntry 1 }
+
+dhcpRREnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is enable/disable DHCP round-robin feature per interface."
+::= { dhcpRREntry 2 }
+
+END

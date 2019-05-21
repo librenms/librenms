@@ -15,31 +15,14 @@
  * the source code distribution for details.
  */
 
-$productmib = trim($device['sysObjectID'], '" ');
+$ruckus_data = snmp_get_multi_oid($device, ['.1.3.6.1.4.1.25053.1.2.1.1.1.1.18.0', '.1.3.6.1.4.1.25053.1.2.1.1.1.1.15.0', '.1.3.6.1.4.1.25053.1.2.1.1.1.1.12.0', '.1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0', '.1.3.6.1.4.1.25053.1.2.1.1.1.1.20.0', '.1.3.6.1.4.1.25053.1.2.1.1.1.15.15.0']);
 
-$ruckusmodels    = array(
-    "$productmib.5.0",
-    '.1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0',
-    '.1.3.6.1.4.1.25053.1.1.2.1.1.1.1.0',
-    '.1.3.6.1.2.1.1.1.0',
-);
-$ruckusversions  = array(
-    "$productmib.8.0",
-    '.1.3.6.1.4.1.25053.1.1.3.1.1.1.1.1.3.1',
-);
-$ruckusserials   = array(
-    "$productmib.7.0",
-    '.1.3.6.1.4.1.25053.1.1.2.1.1.1.2.0',
-);
-$ruckuscountries = array(
-    "$productmib.9.0",
-    '.1.3.6.1.4.1.25053.1.2.1.1.1.1.20',
-);
+$version      = $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.18.0'];
+$serial       = $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.15.0'];
+$features     = "Licenses: " . $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.15.15.0'] . "/" . $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.12.0'];
+$hardware     = $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0'];
+$ruckuscountry = $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.20.0'];
 
-$hardware      = first_oid_match($device, $ruckusmodels);
-$version       = first_oid_match($device, $ruckusversions);
-$serial        = first_oid_match($device, $ruckusserials);
-$ruckuscountry = first_oid_match($device, $ruckuscountries);
 if (isset($ruckuscountry) && $ruckuscountry != '') {
     $version .= " ($ruckuscountry)";
 }

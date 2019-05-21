@@ -92,7 +92,7 @@ class RrdtoolTest extends TestCase
         $config['rrdcached'] = '';
         $config['rrdtool_version'] = '1.4';
 
-        $this->setExpectedException('LibreNMS\Exceptions\FileExistsException');
+        $this->expectException('LibreNMS\Exceptions\FileExistsException');
         // use this file, since it is guaranteed to exist
         rrdtool_build_command('create', __FILE__, 'o');
     }

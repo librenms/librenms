@@ -1,0 +1,646 @@
+-- Adonis MIB file
+
+ADONIS-DNS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, Integer32, Counter64, Gauge32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+
+        	FROM SNMPv2-SMI
+    
+    OBJECT-GROUP
+    		FROM SNMPv2-CONF
+        
+	appliances
+        	FROM BLUECATNETWORKS-MIB;
+
+-- Adonis Server
+
+adonis MODULE-IDENTITY
+	LAST-UPDATED "200810010000Z"
+	ORGANIZATION "BlueCat Networks Inc."
+	CONTACT-INFO
+		"Adonis Technical Support
+		 BlueCat Networks Inc.
+		 
+		 Tel: +1 866 491 2228 (toll free)
+		      +1 416 646 8400 (international) 
+		 Email: support@bluecatnetworks.com"
+	DESCRIPTION "MIB for the Adonis DNS Server"
+	
+	::= { appliances 101 }
+
+adonisObjects OBJECT IDENTIFIER ::= { adonis 1 }
+
+	dns OBJECT IDENTIFIER ::= { adonisObjects 1 }
+		dnsDaemon OBJECT IDENTIFIER ::= { dns 1 }
+		dnsStats OBJECT IDENTIFIER ::= { dns 2 }
+
+	-- reserve adonis 2 for future DHCP service
+	dhcp OBJECT IDENTIFIER ::= { adonisObjects 2 }
+		dhcpDaemon OBJECT IDENTIFIER ::= { dhcp 1 }
+		dhcpStats OBJECT IDENTIFIER ::= { dhcp 2 }
+		dhcpConfig OBJECT IDENTIFIER ::= { dhcp 3 }
+
+	ha OBJECT IDENTIFIER ::= { adonisObjects 3 }
+		haService OBJECT IDENTIFIER ::= { ha 1 }
+
+	commandServer OBJECT IDENTIFIER ::= { adonisObjects 4 }
+		commandServerDaemon OBJECT IDENTIFIER ::= { commandServer 1 }
+
+	lcd OBJECT IDENTIFIER ::= { adonisObjects 5 }
+		lcdDaemon OBJECT IDENTIFIER ::= { lcd 1 }
+
+	tftp OBJECT IDENTIFIER ::= { adonisObjects 6 }
+		tftpDaemon OBJECT IDENTIFIER ::= { tftp 1 }
+		
+	system OBJECT IDENTIFIER ::= { adonisObjects 7 }
+		systemDaemon OBJECT IDENTIFIER ::= { system 1 }
+
+adonisTraps OBJECT IDENTIFIER ::= { adonis 2 }
+
+	trapDNS OBJECT IDENTIFIER ::= { adonisTraps 1 }
+	trapHA OBJECT IDENTIFIER ::= { adonisTraps 2 }
+	trapCommandServer OBJECT IDENTIFIER ::= { adonisTraps 3 }
+	trapDHCP OBJECT IDENTIFIER ::= { adonisTraps 4 }
+	trapReplication OBJECT IDENTIFIER ::= { adonisTraps 5 }
+	trapTFTP OBJECT IDENTIFIER ::= { adonisTraps 6 }
+	trapSystem OBJECT IDENTIFIER ::= { adonisTraps 7 }
+
+-- Name Server Daemon
+
+dnsDaemonRunning OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current running state of the DNS daemon.
+				 0 - Not Running
+				 1 - Running"
+	
+	::= { dnsDaemon 1 }
+
+dnsDaemonNumberOfZones OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of zones loaded"
+
+	::= { dnsDaemon 2 }
+
+dnsDaemonDebugLevel OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current debug level"
+
+	::= { dnsDaemon 3 }
+
+dnsDaemonZoneTransfersInProgress OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of zone transfers currently in progress"
+
+	::= { dnsDaemon 4 }
+
+dnsDaemonZoneTransfersDeferred OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of zone transfers currently deferred"
+
+	::= { dnsDaemon 5 }
+
+dnsDaemonSOAQueriesInProgress OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of SOA queries in progress"
+
+	::= { dnsDaemon 6 }
+	
+dnsDaemonQueryLoggingState OBJECT-TYPE
+	SYNTAX INTEGER (0..1)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current running state of query logging.
+				 0 - Not logging
+				 1 - Logging"
+	
+	::= { dnsDaemon 7 }
+
+dnsDaemonZoneTransferFailure OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The last zone transfer failure desciption which includes the time, the zone name, the master address and the explaination"
+
+	::= { dnsDaemon 8 }
+
+
+-- DNS Statistics
+
+dnsStatsSuccess OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of successful queries made to the server since dns daemon was started"
+	
+	::= { dnsStats 1 }
+
+dnsStatsReferral OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of queries that resulted in referal responses since dns daemon was started" 
+	
+	::= { dnsStats 2 }
+
+dnsStatsNXRRSet OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of queries that resulted in non-existent record set since dns daemon was started"
+	
+	::= { dnsStats 3 }
+
+dnsStatsNXDomain OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of queries that resulted in non-existent domain responses since dns daemon was started"
+	
+	::= { dnsStats 4 }
+	
+dnsStatsRecursion OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of queries that required the server to perform recursive lookups since dns daemon was started"
+	
+	::= { dnsStats 5 }
+
+dnsStatsFailure OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of failed queries that did not result in non-existent domain or record set since dns daemon was started"
+	
+	::= { dnsStats 6 }
+
+-- DHCP server daemon
+
+dhcpDaemonRunning OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current running state of the DHCP daemon.
+				 0 - Not Running
+				 1 - Running"
+	
+	::= { dhcpDaemon 1 }
+
+dhcpDaemonSubnetAlert OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The IP address which has to be alerted for."
+	
+	::= { dhcpDaemon 2 }
+
+dhcpDaemonLeaseStatsSuccess OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The number of successful DHCP leases issued per second"
+
+	::= { dhcpDaemon 3 }
+	
+dhcpFailOverState OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current state of the DHCP failover.
+				 1  - startup
+				 2  - normal
+				 3  - communications interrupted
+				 4  - partner down
+				 5  - potential conflict
+				 6  - recover
+				 7  - paused
+				 8  - shutdown
+				 9  - recover done
+				 254 - recover wait"
+	
+	::= { dhcpDaemon 4 }	
+
+-- DHCP server statistics
+
+dhcpLeaseTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DhcpLeaseEntry
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current lease table"
+
+	::= { dhcpStats 1 }
+
+dhcpLeaseEntry OBJECT-TYPE
+	SYNTAX DhcpLeaseEntry
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Information about a particular DHCP lease"
+	INDEX { dhcpIP }
+
+	::= { dhcpLeaseTable 1 }
+
+DhcpLeaseEntry ::= SEQUENCE {
+	dhcpIP IpAddress,
+	dhcpLeaseStartTime Unsigned32,
+	dhcpLeaseEndTime Unsigned32,
+	dhcpLeaseTimeStamp Unsigned32,
+	dhcpLeaseBindState INTEGER,
+	dhcpLeaseHardwareAddress OCTET STRING,
+	dhcpLeaseHostname OCTET STRING 
+}
+	
+dhcpIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "IP address of the lease"
+
+	::= { dhcpLeaseEntry 1 }
+
+dhcpLeaseStartTime OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Start time of the lease"
+
+	::= { dhcpLeaseEntry 2 }
+
+dhcpLeaseEndTime OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "End time of the lease"
+
+	::= { dhcpLeaseEntry 3 }
+
+dhcpLeaseTimeStamp OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Timestamp of the lease"
+
+	::= { dhcpLeaseEntry 4 }
+
+dhcpLeaseBindState OBJECT-TYPE
+	SYNTAX INTEGER { free (0),
+			 active (1),
+			 fixed (2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The state of this lease"
+
+	::= { dhcpLeaseEntry 5 }
+
+dhcpLeaseHardwareAddress OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The hardware address (MAC address) of this lease"
+
+	::= { dhcpLeaseEntry 6 }
+
+dhcpLeaseHostname OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The client hostname of this lease"
+
+	::= { dhcpLeaseEntry 7 }
+
+dhcpSubnetTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DhcpSubnetEntry
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current subnet table"
+
+	::= { dhcpStats 2 }
+
+dhcpSubnetEntry OBJECT-TYPE
+	SYNTAX DhcpSubnetEntry
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Information about a particular DHCP subnet"
+	INDEX { dhcpSubnetIP }
+
+	::= { dhcpSubnetTable 1 }
+
+DhcpSubnetEntry ::= SEQUENCE {
+	dhcpSubnetIP IpAddress,
+	dhcpSubnetMask IpAddress,
+	dhcpSubnetSize Unsigned32,
+	dhcpSubnetUsed Unsigned32,
+	dhcpSubnetAlert Unsigned32
+}
+	
+dhcpSubnetIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "IP address of the subnet"
+
+	::= { dhcpSubnetEntry 1 }
+
+dhcpSubnetMask OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "IP mask of the subnet"
+
+	::= { dhcpSubnetEntry 2 }
+
+dhcpSubnetSize OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "size of the subnet"
+
+	::= { dhcpSubnetEntry 3 }
+
+dhcpSubnetUsed OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "the number of used IPs in the subnet"
+
+	::= { dhcpSubnetEntry 4 }
+
+dhcpSubnetAlert OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "alert level in the subnet"
+
+	::= { dhcpSubnetEntry 5 }
+
+dhcpPoolTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DhcpPoolEntry
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current pool table"
+
+	::= { dhcpStats 3 }
+
+dhcpPoolEntry OBJECT-TYPE
+	SYNTAX DhcpPoolEntry
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Information about a particular DHCP pool"
+	INDEX { dhcpPoolStartIP }
+
+	::= { dhcpPoolTable 1 }
+
+DhcpPoolEntry ::= SEQUENCE {
+	dhcpPoolSubnetIP IpAddress,
+	dhcpPoolStartIP IpAddress,
+	dhcpPoolEndIP IpAddress,
+	dhcpPoolSize Unsigned32,
+	dhcpPoolUsed Unsigned32,
+	dhcpPoolAlert Unsigned32
+}
+	
+dhcpPoolSubnetIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "subnet IP address of the pool"
+
+	::= { dhcpPoolEntry 1 }
+
+dhcpPoolStartIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "start IP address of the pool"
+
+	::= { dhcpPoolEntry 2 }
+
+dhcpPoolEndIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "end IP address of the pool"
+
+	::= { dhcpPoolEntry 3 }
+
+dhcpPoolSize OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "the size of the pool"
+
+	::= { dhcpPoolEntry 4 }
+
+dhcpPoolUsed OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "the number of used IPs in the pool"
+
+	::= { dhcpPoolEntry 5 }
+
+dhcpPoolAlert OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "the alert level of the pool"
+
+	::= { dhcpPoolEntry 6 }
+
+-- DHCP server configuration
+
+dhcpFixedIPTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DhcpFixedIPEntry
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current DHCP subnet tables in configuration"
+
+	::= { dhcpConfig 1 }
+
+dhcpFixedIPEntry OBJECT-TYPE
+	SYNTAX DhcpFixedIPEntry
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Information about a particular DHCP subnet"
+	INDEX { dhcpFixedIP }
+
+	::= { dhcpFixedIPTable 1 }
+
+DhcpFixedIPEntry ::= SEQUENCE {
+	dhcpFixedIP IpAddress
+	}
+
+dhcpFixedIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "One of the current fixed IP addresses in the DHCP configuration"
+
+	::= { dhcpFixedIPEntry 1 }
+	
+-- HA Services
+
+haServiceRunning OBJECT-TYPE
+	SYNTAX Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current running state of high availability.
+				 0 - Not running
+				 1 - Running"
+
+	::= { haService 1 }
+
+haServiceNodeType OBJECT-TYPE
+	SYNTAX Integer32 (0..2)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Type of high availability node
+				 0 - HA not running
+				 1 - Active Node
+				 2 - Passive Node"
+
+	::= { haService 2 }
+
+haReplicationBinding OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Binding for replicationFailure trap"
+
+        ::= { haService 3 }
+	
+-- Command Server
+
+commandServerDaemonRunning OBJECT-TYPE
+	SYNTAX Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current running state of the command server daemon.
+				 0 - Not running
+				 1 - Running"
+
+	::= { commandServerDaemon 1 }
+
+-- System 
+
+systemState OBJECT-TYPE
+	SYNTAX Integer32 (0..2) 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current state of system.
+				 0  - shutdown
+				 1  - restart
+				 2  - startup"
+	
+	::= { systemDaemon 1 }	
+	
+-- TFTP
+
+tftpDaemonRunning OBJECT-TYPE
+	SYNTAX Integer32 (0..2)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current running state of the TFTP daemon.
+				 0 - Not running
+				 1 - Running
+				 2 - Restarting"
+
+	::= { tftpDaemon 1 }
+
+licenseValid OBJECT-TYPE
+	SYNTAX Integer32 (0..1)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current virtual machine license status.
+				 0 - Not valid 
+				 1 - Valid"
+
+	::= { lcdDaemon 1 }
+
+licenseExpiry OBJECT-TYPE
+	SYNTAX Gauge32 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Expiry time of the license in seconds since the UNIX Epoch"
+
+	::= { lcdDaemon 2 }
+
+
+--============ TRAPS ===========================
+
+-- DNS Traps
+
+trapDNSDaemon  NOTIFICATION-TYPE
+	OBJECTS { dnsDaemonRunning, dnsDaemonZoneTransferFailure }
+	STATUS current
+	DESCRIPTION "DNS daemon has stopped running or a zone transfer failed"
+
+	::= { trapDNS 1 }
+
+-- DHCP Traps
+
+trapDHCPDaemon  NOTIFICATION-TYPE
+	OBJECTS { dhcpDaemonRunning, dhcpDaemonSubnetAlert, dhcpFailOverState }
+	STATUS current
+	DESCRIPTION "DHCP daemon has stopped running or
+		the number of assigned IPS in one of the subnets has reached 
+		to the alert level or DHCP failover state changes"
+
+	::= { trapDHCP 1 }
+
+-- HA Traps
+
+trapHAServiceFailOver NOTIFICATION-TYPE
+	OBJECTS { haServiceNodeType }
+	STATUS current
+	DESCRIPTION "High availibility service failed over"
+	::= { trapHA 1 }
+
+-- Command Server Traps
+
+trapCommandServerDaemon  NOTIFICATION-TYPE
+	OBJECTS { commandServerDaemonRunning }
+	STATUS current
+	DESCRIPTION "Command server daemon has stopped running"
+
+	::= { trapCommandServer 1 }
+
+-- System Traps
+	
+trapSystemDaemon  NOTIFICATION-TYPE
+	OBJECTS { systemState }
+	STATUS current
+	DESCRIPTION "System has stopped running"
+
+	::= { trapSystem 1 }
+
+-- Replication Traps
+
+trapReplicationFailure  NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION "Replication has failed"
+
+   ::= { trapReplication 1 }
+
+-- TFTP Traps
+
+trapTFTPDaemon  NOTIFICATION-TYPE
+	OBJECTS { tftpDaemonRunning }
+	STATUS current
+	DESCRIPTION "TFTP daemon has stopped running"
+
+	::= { trapTFTP 1 }
+
+END

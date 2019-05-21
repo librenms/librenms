@@ -1,35 +1,13 @@
 <?php
 
+use LibreNMS\Config;
+use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\OS;
+
 $valid['sensor'] = array();
 
-// Pre-cache data for later use
-$pre_cache = array();
-$pre_cache_file = 'includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php';
-if (is_file($pre_cache_file)) {
-    echo "Pre-cache {$device['os']}: ";
-    include $pre_cache_file;
-    echo PHP_EOL;
-    d_echo($pre_cache);
-}
-
-// TODO change to exclude os with pre-cache php file, but just exclude them by hand for now (like avtech)
-if (isset($device['dynamic_discovery']['modules']['sensors']) && $device['os'] != 'avtech') {
-    foreach ($device['dynamic_discovery']['modules']['sensors'] as $key => $data_array) {
-        foreach ($data_array['data'] as $data) {
-            foreach ((array)$data['oid'] as $oid) {
-                if (!isset($pre_cache[$oid])) {
-                    if (isset($data['snmp_flags'])) {
-                        $snmp_flag = $data['snmp_flags'];
-                    } else {
-                        $snmp_flag = '-OeQUs';
-                    }
-                    $snmp_flag .= ' -Ih';
-                    $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $device['dynamic_discovery']['mib'], null, $snmp_flag);
-                }
-            }
-        }
-    }
-}
+/** @var OS $os */
+$pre_cache = $os->preCache();
 
 // Run custom sensors
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
@@ -56,6 +34,14 @@ if (strstr($device['hardware'], 'ProLiant')) {
     include 'includes/discovery/sensors/state/hp.inc.php';
 }
 
+if ($device['os'] == 'gw-eydfa') {
+    include 'includes/discovery/sensors/gw-eydfa.inc.php';
+}
+
+if ($device['os_group'] == 'printer') {
+    include 'includes/discovery/sensors/state/printer.inc.php';
+}
+
 $run_sensors = array(
     'airflow',
     'current',
@@ -66,9 +52,12 @@ $run_sensors = array(
     'humidity',
     'load',
     'power',
+    'power_consumed',
+    'power_factor',
     'runtime',
     'signal',
     'state',
+    'count',
     'temperature',
     'voltage',
     'snr',
@@ -81,6 +70,10 @@ $run_sensors = array(
     'eer',
     'waterflow',
 );
+
+// filter submodules
+$run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));
+
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(
     $pre_cache,

@@ -1,12 +1,20 @@
 mib: STEELHEAD-MIB:RBT-MIB
 modules:
+    processors:
+          data:
+              -
+                  oid: cpuUtil1
+                  num_oid: '.1.3.6.1.4.1.17163.1.1.5.1.4.{{ $index }}'
+                  precision: 1
+                  type: riverbed-cpu
+
     sensors:
         temperature:
             data:
                 -
                     oid: systemTemperature
                     value: systemTemperature
-                    num_oid: .1.3.6.1.4.1.17163.1.1.2.9.
+                    num_oid: '.1.3.6.1.4.1.17163.1.1.2.9.{{ $index }}'
                     snmp_flags: '-OQUs'
                     index: 0
                     descr: 'System Temperature'
@@ -16,7 +24,7 @@ modules:
                 -
                     oid: systemHealth
                     value: systemHealth
-                    num_oid: .1.3.6.1.4.1.17163.1.1.2.7.
+                    num_oid: '.1.3.6.1.4.1.17163.1.1.2.7.{{ $index }}'
                     descr: 'System Health'
                     index: 0
                     state_name: systemHealth
@@ -28,7 +36,7 @@ modules:
                 -
                     oid: optServiceStatus
                     value: optServiceStatus
-                    num_oid: .1.3.6.1.4.1.17163.1.1.2.8.
+                    num_oid: '.1.3.6.1.4.1.17163.1.1.2.8.{{ $index }}'
                     descr: 'Optimization Service Status'
                     index: 0
                     state_name: optServiceStatus

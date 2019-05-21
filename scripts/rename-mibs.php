@@ -30,22 +30,28 @@ if (empty($argv)) {
     echo "You must specify one or more files or folders containing files to rename.\n";
 }
 
+$renamed_count = 0;
+
 foreach ($argv as $item) {
     if (is_dir($item)) {
         foreach (scandir($item) as $file) {
-            rename_mib_file($file);
+            if ($file != '.' && $file != '..') {
+                $renamed_count += (int)rename_mib_file($item . $file);
+            }
         }
     } else {
-        rename_mib_file($item);
+        $renamed_count += (int)rename_mib_file($item);
     }
 }
+
+echo "Renamed $renamed_count files.\n";
 
 
 function rename_mib_file($file)
 {
     if (!is_file($file)) {
         echo "Not a file: $file\n";
-        return;
+        return false;
     }
 
     $mib_name = extract_mib_name($file);
@@ -53,8 +59,9 @@ function rename_mib_file($file)
     if ($mib_name != $filename) {
         $new_file = dirname($file) . '/' . $mib_name;
         echo "$file -> $new_file\n";
-        rename($file, $new_file);
+        return rename($file, $new_file);
     }
+    return false; // name already correct
 }
 
 function extract_mib_name($file)

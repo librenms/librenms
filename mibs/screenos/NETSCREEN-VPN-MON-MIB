@@ -1,0 +1,537 @@
+-- This module defines enterprise MIBs for VPN tunnel monitoring
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VPN-MON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Counter32, Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE,
+    TimeTicks
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenVpnMonMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor VPN
+         tunnels"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "no comment"
+    REVISION      "200008270000Z" -- August 27, 2000
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVpnMibModule 1 }
+
+NsVpnMonEntry ::= SEQUENCE
+{
+    nsVpnMonIndex                Integer32,
+    nsVpnMonInPlyId              Integer32,
+    nsVpnMonOutPlyId             Integer32,
+    nsVpnMonVpnName              DisplayString,
+    nsVpnMonVsysName             DisplayString,
+    nsVpnMonTunnelType           INTEGER,
+    nsVpnMonEspEncAlg            INTEGER,
+    nsVpnMonEspAuthAlg           INTEGER,
+    nsVpnMonAhAlg                INTEGER,
+    nsVpnMonKeyType              INTEGER,
+    nsVpnMonP1Auth               INTEGER,
+    nsVpnMonVpnType              INTEGER,
+    nsVpnMonRmtGwIp              IpAddress,
+    nsVpnMonRmtGwId              DisplayString,
+    nsVpnMonMyGwIp               IpAddress,
+    nsVpnMonMyGwId               DisplayString,
+    nsVpnMonOutSpi               Integer32,
+    nsVpnMonInSpi                Integer32,
+    nsVpnMonMonState             INTEGER,
+    nsVpnMonTunnelState          INTEGER,
+    nsVpnMonP1State              INTEGER,
+    nsVpnMonP1LifeTime           Integer32,
+    nsVpnMonP2State              INTEGER,
+    nsVpnMonP2LifeTime           Integer32,
+    nsVpnMonP2LifeBytes          Integer32,
+    nsVpnMonDelayAvg             Integer32,
+    nsVpnMonDelayLast            Integer32,
+    nsVpnMonAvail                Integer32,
+    nsVpnMonSaId                 Integer32,
+    nsVpnMonGroupId              Integer32,
+    nsVpnMonUsrId                Integer32,
+    nsVpnMonStartSessRequestTime TimeTicks,
+    nsVpnMonStartSessEstTime     TimeTicks,
+    nsVpnMonEndSessTime          TimeTicks,
+    nsVpnMonBytesIn              Counter32,
+    nsVpnMonBytesOut             Counter32,
+    nsVpnMonPacketsIn            Counter32,
+    nsVpnMonPacketsOut           Counter32,
+    nsVpnMonIfIndex              Integer32,
+    nsVpnMonUpdateTime           TimeTicks,
+    nsVpnMonDN                   DisplayString,
+    nsVpnMonIfInfo               Integer32
+}
+
+netscreenVpnMon OBJECT IDENTIFIER ::= { netscreenVpn 1 }
+
+nsVpnMonTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnMonEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of active VPN tunnel entries."
+    ::= { netscreenVpnMon 1 }
+
+nsVpnMonEntry OBJECT-TYPE
+    SYNTAX        NsVpnMonEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A VPN tunnel entry containing attributes for both IKE Phase 1
+         and Phase 2 as well as associated policy"
+    INDEX
+        { nsVpnMonIndex }
+    ::= { nsVpnMonTable 1 }
+
+nsVpnMonIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each active VPN tunnel.  Its value ranges
+         between 1 and 65535 and may not be contiguous.  Due to the
+         dynamic nature of active VPN tunnels, the index  has no other
+         meaning but a pure index"
+    ::= { nsVpnMonEntry 1 }
+
+nsVpnMonInPlyId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The incoming policy ID for which this tunnel is created for.
+         -1 means no policy associates with this SA."
+    ::= { nsVpnMonEntry 2 }
+
+nsVpnMonOutPlyId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The outgoing policy ID for which this tunnel is created for.
+         -1 means no policy associates with this SA."
+    ::= { nsVpnMonEntry 3 }
+
+nsVpnMonVpnName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual string contains information about the VPN entity
+         from which this tunnel was derived."
+    ::= { nsVpnMonEntry 4 }
+
+nsVpnMonVsysName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual string contains the Virtual system to which this
+         tunnel belongs."
+    ::= { nsVpnMonEntry 5 }
+
+nsVpnMonTunnelType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        reserved(0),
+        proto-isakmp(1),
+        proto-ipsec-ah(2),
+        proto-ipsec-esp(3),
+        proto-ipcomp(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Protocol type used for the tunnel"
+    ::= { nsVpnMonEntry 6 }
+
+nsVpnMonEspEncAlg OBJECT-TYPE
+    SYNTAX        INTEGER {
+        reserved(0),
+        esp-des-iv64(1),
+        esp-des(2),
+        esp-3des(3),
+        esp-rc5(4),
+        esp-idea(5),
+        esp-cast(6),
+        esp-blowfish(7),
+        esp-3idea(8),
+        esp-des-iv32(9),
+        esp-rc4(10),
+        esp-null(11),
+        esp-aes(12),
+		esp-aes192(20),
+		esp-aes256(21)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "a value which identifies a particular algorithm to be used to
+         provide secrecy protection for ESP."
+    ::= { nsVpnMonEntry 7 }
+
+nsVpnMonEspAuthAlg OBJECT-TYPE
+    SYNTAX        INTEGER {
+        reserved(0),
+        hmac-md5(1),
+        hmac-sha(2),
+        des-mac(3),
+        ipdk(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The ESP Authentication Algorithm used in the IPsec."
+    ::= { nsVpnMonEntry 8 }
+
+nsVpnMonAhAlg OBJECT-TYPE
+    SYNTAX        INTEGER {
+        reserved(0),
+        ah-md5(2),
+        ah-sha(3),
+        ah-des(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "a value which identifies a particular algorithm to be used to
+         provide integrity protection for AH."
+    ::= { nsVpnMonEntry 9 }
+
+nsVpnMonKeyType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        manual(0),
+        auto-ike(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "a value which identifies a key exchange protocol to be used
+         for the negotiation"
+    ::= { nsVpnMonEntry 10 }
+
+nsVpnMonP1Auth OBJECT-TYPE
+    SYNTAX        INTEGER {
+        unused(0),
+        preshared-key(1),
+        dss-Signature(2),
+        rsa-Signature(3),
+        rsa-Encryption1(4),
+        rsa-Encryption2(5)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "a value which identifies Phase 1 authentication method"
+    ::= { nsVpnMonEntry 11 }
+
+nsVpnMonVpnType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        reserved(0),
+        dialup(1),
+        site-to-site(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The type of this VPN tunnel, either a dialup or site-to-site"
+    ::= { nsVpnMonEntry 12 }
+
+nsVpnMonRmtGwIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The peer Gateway's IP address"
+    ::= { nsVpnMonEntry 13 }
+
+nsVpnMonRmtGwId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The peer Gateway's ID"
+    ::= { nsVpnMonEntry 14 }
+
+nsVpnMonMyGwIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The local Gateway's IP address"
+    ::= { nsVpnMonEntry 15 }
+
+nsVpnMonMyGwId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The local Gateway's ID"
+    ::= { nsVpnMonEntry 16 }
+
+nsVpnMonOutSpi OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The SPI for outgoing packets"
+    ::= { nsVpnMonEntry 17 }
+
+nsVpnMonInSpi OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The SPI for incoming packets"
+    ::= { nsVpnMonEntry 18 }
+
+nsVpnMonMonState OBJECT-TYPE
+    SYNTAX        INTEGER {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The monitoring status, if it is on, an icmp ping will be sent
+         over the tunnel periodically to test the connectivity and
+         latency"
+    ::= { nsVpnMonEntry 19 }
+
+nsVpnMonTunnelState OBJECT-TYPE
+    SYNTAX        INTEGER {
+        down(0),
+        up(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current tunnel status determined by the icmp ping  if The
+         monitoring status is on."
+    ::= { nsVpnMonEntry 20 }
+
+nsVpnMonP1State OBJECT-TYPE
+    SYNTAX        INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The IKE's Phase 1 status"
+    ::= { nsVpnMonEntry 21 }
+
+nsVpnMonP1LifeTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "an active Phase 1 sa's time left before re-key. -1 means
+         unlimited lifetime."
+    ::= { nsVpnMonEntry 22 }
+
+nsVpnMonP2State OBJECT-TYPE
+    SYNTAX        INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The IKE's Phase 2 status"
+    ::= { nsVpnMonEntry 23 }
+
+nsVpnMonP2LifeTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "an active Phase 2 sa's time left before re-key. -1 means
+         unlimited life time."
+    ::= { nsVpnMonEntry 24 }
+
+nsVpnMonP2LifeBytes OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "an active Phase 2 sa's bytes left before re-key. -1 means
+         unlimited life bytes."
+    ::= { nsVpnMonEntry 25 }
+
+nsVpnMonDelayAvg OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "a kind of rolling average of latency, in milliseconds. -1 has
+         no meaning here, which means nsVpnMonDelayAvg  has not been
+         calculated yet."
+    ::= { nsVpnMonEntry 26 }
+
+nsVpnMonDelayLast OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "latency in last sample, in milliseconds.
+         -1 means either vpn tunnel is inactive or vpn tunnel monitor is
+         not turned on."
+    ::= { nsVpnMonEntry 27 }
+
+nsVpnMonAvail OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "percentage over 30 samples"
+    ::= { nsVpnMonEntry 28 }
+
+nsVpnMonSaId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SA identifier, also used as table index"
+    ::= { nsVpnMonEntry 29 }
+
+nsVpnMonGroupId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Group Identifier"
+    ::= { nsVpnMonEntry 30 }
+
+nsVpnMonUsrId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "User Identifier"
+    ::= { nsVpnMonEntry 31 }
+
+nsVpnMonStartSessRequestTime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Start Session request timestamp"
+    ::= { nsVpnMonEntry 32 }
+
+nsVpnMonStartSessEstTime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Start Session establish timestamp"
+    ::= { nsVpnMonEntry 33 }
+
+nsVpnMonEndSessTime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "End Session timestamp [when session terminates]"
+    ::= { nsVpnMonEntry 34 }
+
+nsVpnMonBytesIn OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Incoming bytes through this sa."
+    ::= { nsVpnMonEntry 35 }
+
+nsVpnMonBytesOut OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Outgoing bytes through this sa."
+    ::= { nsVpnMonEntry 36 }
+
+nsVpnMonPacketsIn OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Incoming packets through this sa."
+    ::= { nsVpnMonEntry 37 }
+
+nsVpnMonPacketsOut OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Outgoing packets through this sa."
+    ::= { nsVpnMonEntry 38 }
+
+nsVpnMonIfIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "interface index."
+    ::= { nsVpnMonEntry 39 }
+
+nsVpnMonUpdateTime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Timestamp [Whenever any member of the row gets updated, the
+         timestamp is updated]"
+    ::= { nsVpnMonEntry 40 }
+
+nsVpnMonDN OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "DN name"
+    ::= { nsVpnMonEntry 41 }
+
+nsVpnMonIfInfo OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Internal id assigned to this interface. Stays persistent across resets."
+    ::= { nsVpnMonEntry 42 }
+
+END
+
+

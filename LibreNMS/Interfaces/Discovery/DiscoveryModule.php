@@ -29,5 +29,5 @@ use LibreNMS\OS;
 
 interface DiscoveryModule
 {
-    public static function discover(OS $os);
+    public static function runDiscovery(OS $os);
 }

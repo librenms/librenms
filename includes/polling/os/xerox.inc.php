@@ -19,3 +19,4 @@ if ($hardware == '') {
 }
 
 $version = trim(snmp_get($device, '1.3.6.1.4.1.236.11.5.1.1.1.2.0', '-OQv', '', ''), '" ');
+$serial = trim(snmp_get($device, '1.3.6.1.2.1.43.5.1.1.17.1', '-OQv', '', ''), '" ');

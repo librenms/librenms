@@ -7,10 +7,11 @@
  *
  */
 
-$init_modules = array();
+use LibreNMS\Config;
+
+$init_modules = ['nodb'];
 require __DIR__ . '/includes/init.php';
 
 if (isCli()) {
-    global $config;
-    echo json_encode($config);
+    echo Config::json_encode();
 }

@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$data = snmp_get_multi_oid($device, 'midSerialNumber.1 midFirmwareVersion.1 midModelNumber.1 midDeviceName.1', '-OQs', 'PM8ECCMIB');
+$data = snmp_get_multi_oid($device, ['midSerialNumber.1', 'midFirmwareVersion.1', 'midModelNumber.1', 'midDeviceName.1'], '-OQs', 'PM8ECCMIB');
 $serial = trim($data['midSerialNumber.1'], '"');
 $version = trim($data['midFirmwareVersion.1'], '"');
 $hardware = trim($data['midDeviceName.1'], '"');

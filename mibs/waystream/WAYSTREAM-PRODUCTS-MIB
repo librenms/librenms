@@ -1,0 +1,230 @@
+WAYSTREAM-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+--
+-- Waystream Product Object identifier Assignments
+--
+-- Copyright (c) 2017 Waystream AB, All rights reserved
+--
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+        wsProduct,
+        wsModules
+        FROM WAYSTREAM-SMI;
+
+--
+-- Waystream products 
+--
+wsProductsMIB MODULE-IDENTITY
+    LAST-UPDATED "201702101100Z"	-- February 10, 2017
+    ORGANIZATION "Waystream AB"
+    CONTACT-INFO
+        "Waystream AB
+         Customer Service
+
+         Mail : Farogatan 33
+                SE-164 51 Kista
+                Sweden
+
+         Tel  : +46 8 5626 9450
+
+         E-mail: info@waystream.com
+         Web   : http://www.waystream.com"
+    DESCRIPTION
+        "The Waystream management information base describing product
+         families and the products within those families"
+
+    REVISION "201702101100Z"	-- February 10, 2017
+    DESCRIPTION
+        "Company name change:
+	 In October 2015 PacketFront Network Products was renamed Waystream.
+	 In this update all PacketFront were changed to Waystream and all
+	 pf* to ws*."
+    REVISION "201504081452Z"
+    DESCRIPTION
+	"Added MS4k and MPC480 products (and removed some legacy)"
+    REVISION "201209241435Z"
+    DESCRIPTION
+	"Added Hybrid (HRG) products"
+    REVISION "201202021530Z"
+    DESCRIPTION
+	"Corrected the model names for ASR6000"
+    REVISION "201112051100Z"
+    DESCRIPTION
+	"Added ASR6000 products"
+    REVISION "201106101356Z"	-- June 10, 2011
+    DESCRIPTION
+	"Removed unreleased products, added drg886, drg281, drg286 and drg287"
+    REVISION "201101121310Z"	-- January 12, 2011
+    DESCRIPTION
+	"Added se1 and se2 under asr product group and removed se product group,
+	 updated company name"
+    REVISION "201005171410Z"
+    DESCRIPTION
+	"Added metrostar (MS) product group, updated DRG group"
+    REVISION "200904141229Z"
+    DESCRIPTION
+	"Added service engine (SE) product group"
+    REVISION "200903231053Z"
+    DESCRIPTION
+	"Updated telephone information in contact-info"
+    REVISION "200705141238Z"
+    DESCRIPTION
+	"Generation from PACKETFRONT-MIB"
+    REVISION "200601251330Z"
+    DESCRIPTION
+        "Updated to reflect PacketFronts new corporate address"
+    REVISION "200410201434Z"
+    DESCRIPTION
+        "Added the ASR10K platorm"
+    REVISION "200311040001Z"
+    DESCRIPTION
+        "Added the IPD1116C platform"
+
+    ::= { wsModules 2 }
+
+--
+-- Product groups
+--
+asr	OBJECT-IDENTITY	
+	STATUS current
+	DESCRIPTION
+		"The Access Switching Router (ASR) and Service Engine (SE) product group"
+	::= { wsProduct 1 }
+
+ipd	OBJECT-IDENTITY	
+	STATUS current
+	DESCRIPTION
+		"The IP DSLAM (IPD) product group"
+	::= { wsProduct 2 }
+
+legacy1	OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"Previously used for DRG products"
+	::= { wsProduct 3 }
+
+ms	OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The MetroStar (MS) product group"
+	::= { wsProduct 5 }
+
+legacy2	OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"Previously used for HRG producs"
+	::= { wsProduct 6 }
+
+mpc	OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The MPC edge router platform (MPC) product group"
+	::= { wsProduct 7 }
+
+
+-- ASR4000 products
+
+asr4108C	OBJECT IDENTIFIER ::= { asr  1 }
+asr4116C	OBJECT IDENTIFIER ::= { asr  2 }
+asr4124C	OBJECT IDENTIFIER ::= { asr  3 }
+asr4208FM	OBJECT IDENTIFIER ::= { asr  4 }
+asr4216FM	OBJECT IDENTIFIER ::= { asr  5 }
+asr4224FM	OBJECT IDENTIFIER ::= { asr  6 }
+asr4308FV	OBJECT IDENTIFIER ::= { asr  7 }
+asr4316FV	OBJECT IDENTIFIER ::= { asr  8 }
+asr4324FV	OBJECT IDENTIFIER ::= { asr  9 }
+asr4408SFV	OBJECT IDENTIFIER ::= { asr 10 }
+asr4416SFV	OBJECT IDENTIFIER ::= { asr 11 }
+asr4424SFV	OBJECT IDENTIFIER ::= { asr 12 }
+asr4508SFM	OBJECT IDENTIFIER ::= { asr 13 }
+asr4516SFM	OBJECT IDENTIFIER ::= { asr 14 }
+asr4524SFM	OBJECT IDENTIFIER ::= { asr 15 }
+asr4608SFS	OBJECT IDENTIFIER ::= { asr 16 }
+asr4616SFS	OBJECT IDENTIFIER ::= { asr 17 }
+asr4624SFS	OBJECT IDENTIFIER ::= { asr 18 }
+asr3108VDSL	OBJECT IDENTIFIER ::= { asr 19 }
+asr3116VDSL	OBJECT IDENTIFIER ::= { asr 20 }
+asr3124VDSL	OBJECT IDENTIFIER ::= { asr 21 }
+asr3208VDSL	OBJECT IDENTIFIER ::= { asr 22 }
+asr3216VDSL	OBJECT IDENTIFIER ::= { asr 23 }
+asr3224VDSL	OBJECT IDENTIFIER ::= { asr 24 }
+asr3308VDSL	OBJECT IDENTIFIER ::= { asr 25 }
+asr3316VDSL	OBJECT IDENTIFIER ::= { asr 26 }
+asr3324VDSL	OBJECT IDENTIFIER ::= { asr 27 }
+asr4708SFL	OBJECT IDENTIFIER ::= { asr 28 }
+asr4716SFL	OBJECT IDENTIFIER ::= { asr 29 }
+asr4724SFL	OBJECT IDENTIFIER ::= { asr 30 }
+asr4108Cco	OBJECT IDENTIFIER ::= { asr 31 }
+asr4116Cco	OBJECT IDENTIFIER ::= { asr 32 }
+asr4124Cco	OBJECT IDENTIFIER ::= { asr 33 }
+asr4208FMco	OBJECT IDENTIFIER ::= { asr 34 }
+asr4216FMco	OBJECT IDENTIFIER ::= { asr 35 }
+asr4224FMco	OBJECT IDENTIFIER ::= { asr 36 }
+asr4308FVco	OBJECT IDENTIFIER ::= { asr 37 }
+asr4316FVco	OBJECT IDENTIFIER ::= { asr 38 }
+asr4324FVco	OBJECT IDENTIFIER ::= { asr 39 }
+asr4508SFMco	OBJECT IDENTIFIER ::= { asr 40 }
+asr4516SFMco	OBJECT IDENTIFIER ::= { asr 41 }
+asr4524SFMco	OBJECT IDENTIFIER ::= { asr 42 }
+asr4608SFSco	OBJECT IDENTIFIER ::= { asr 43 }
+asr4616SFSco	OBJECT IDENTIFIER ::= { asr 44 }
+asr4624SFSco	OBJECT IDENTIFIER ::= { asr 45 }
+asr4708SFLco	OBJECT IDENTIFIER ::= { asr 46 }
+asr4716SFLco	OBJECT IDENTIFIER ::= { asr 47 }
+asr4724SFLco	OBJECT IDENTIFIER ::= { asr 48 }
+
+-- ASR 10k products
+asr10132co	OBJECT IDENTIFIER ::= { asr 49 }
+
+-- ASR 5k products
+asr5124Cacco	OBJECT IDENTIFIER ::= { asr 50 }
+asr5124Cdcco	OBJECT IDENTIFIER ::= { asr 51 }
+asr5224FMacco	OBJECT IDENTIFIER ::= { asr 52 }
+asr5224FMdcco	OBJECT IDENTIFIER ::= { asr 53 }
+asr5624FSacco	OBJECT IDENTIFIER ::= { asr 54 }
+asr5624FSdcco	OBJECT IDENTIFIER ::= { asr 55 }
+asr5724FLacco	OBJECT IDENTIFIER ::= { asr 56 }
+asr5724FLdcco	OBJECT IDENTIFIER ::= { asr 57 }
+
+-- SE products
+se1		OBJECT IDENTIFIER ::= { asr 58 }
+se2		OBJECT IDENTIFIER ::= { asr 59 }
+
+-- ASR 6k products
+asr6026ac	OBJECT IDENTIFIER ::= { asr 60 }	-- 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office AC
+asr6026dc	OBJECT IDENTIFIER ::= { asr 61 }	-- 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office DC
+asr6126ac	OBJECT IDENTIFIER ::= { asr 62 }	-- 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office AC
+asr6126dc	OBJECT IDENTIFIER ::= { asr 63 }	-- 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office DC
+
+-- IPD products
+ipd1116C	OBJECT IDENTIFIER ::= { ipd 1 }
+
+-- MetroStar products
+ms3028ac	OBJECT IDENTIFIER ::= { ms  3 }
+ms3028dc	OBJECT IDENTIFIER ::= { ms  4 }
+ms3128ac	OBJECT IDENTIFIER ::= { ms  5 }
+ms3128dc	OBJECT IDENTIFIER ::= { ms  6 }
+
+ms4026ac	OBJECT IDENTIFIER ::= { ms  64 }
+ms4026dc	OBJECT IDENTIFIER ::= { ms  65 }
+ms4126ac	OBJECT IDENTIFIER ::= { ms  66 }
+ms4126dc	OBJECT IDENTIFIER ::= { ms  67 }
+
+-- MPC products
+mpc480se4818	OBJECT IDENTIFIER ::= { mpc  68 }
+mpc480se4818t	OBJECT IDENTIFIER ::= { mpc  69 }
+mpc480re4818	OBJECT IDENTIFIER ::= { mpc  70 }
+mpc480re4818t	OBJECT IDENTIFIER ::= { mpc  71 }
+mpc480me4818	OBJECT IDENTIFIER ::= { mpc  72 }
+mpc480me4818t	OBJECT IDENTIFIER ::= { mpc  73 }
+reserved1	OBJECT IDENTIFIER ::= { mpc  74 }
+reserved2	OBJECT IDENTIFIER ::= { mpc  75 }
+reserved3	OBJECT IDENTIFIER ::= { mpc  76 }
+reserved4	OBJECT IDENTIFIER ::= { mpc  77 }
+
+
+END
+

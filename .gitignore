@@ -9,9 +9,12 @@
 !/.github/
 !/.codeclimate.yml
 !/.mention-bot
+!/.env.example
 
 # Others #
 ##########
+__pycache__
+*.pyc
 *.swp
 Thumbs.db
 config.php
@@ -25,7 +28,12 @@ nbproject
 patches
 !/lib/yaml
 /vendor
+/node_modules
+npm-debug.log
+yarn-error.log
 composer.phar
+_ide_helper.php
+_ide_helper_models.php
 
 # Docs #
 ########

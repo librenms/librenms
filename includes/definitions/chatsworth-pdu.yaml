@@ -2,7 +2,7 @@ os: chatsworth-pdu
 text: 'Chatsworth PDU'
 type: power
 icon: chatsworth
-nobulk: 1
+nobulk: true
 discovery:
     - sysObjectID:
         - .0.10.43.6.1.4.1

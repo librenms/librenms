@@ -1,0 +1,2514 @@
+-- ============================================================================
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The mib is used for configuring the information of the SAC.
+-- Reference: 
+-- Version: V1.01
+-- ============================================================================
+-- Module definition
+
+	HUAWEI-WLAN-SAC-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			hwWlan
+				FROM HUAWEI-WLAN-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+				FROM SNMPv2-CONF
+			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
+			MODULE-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+			MacAddress, RowStatus, DateAndTime
+				FROM SNMPv2-TC;
+		--1.3.6.1.4.1.2011.6.139.20
+		hwWlanSac MODULE-IDENTITY
+			LAST-UPDATED "201506190900Z"		-- June 19, 2015 at 09:00 GMT
+			ORGANIZATION
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO
+			 "Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+				  "
+                        DESCRIPTION 
+				"The MIB module defines the information of the SAC."
+	                REVISION "201506190900Z"		-- June 19, 2015 at 09:00 GMT
+			DESCRIPTION
+				"V1.01, Inital version."
+	                REVISION "201502120900Z"		-- February 12, 2015 at 09:00 GMT
+			DESCRIPTION
+				"V1.00, Inital version."
+			::= { hwWlan 20 }
+
+--
+--Node definitions
+--
+
+		--1.3.6.1.4.1.2011.6.139.20.1
+		hwSacObjects OBJECT IDENTIFIER ::= { hwWlanSac 1 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.1
+		hwSACEnableConfig OBJECT IDENTIFIER ::= { hwSacObjects 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.1.1
+		hwSACEnableOper OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACEnableConfig 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.1.2
+		hwSACEnableRuleLibName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACEnableConfig 2 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.2
+		hwSACProtocolGroupTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACProtocolGroupEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 2 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.2.1
+		hwSACProtocolGroupEntry OBJECT-TYPE
+			SYNTAX HwSACProtocolGroupEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwSACProtocolGroupName }
+			::= { hwSACProtocolGroupTable 1 }
+
+
+		HwSACProtocolGroupEntry ::=
+			SEQUENCE {				
+				hwSACProtocolGroupName
+					OCTET STRING,
+				hwSACProtocolGroupRowstatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.2.1.1
+		hwSACProtocolGroupName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..35))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACProtocolGroupEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.2.1.2
+		hwSACProtocolGroupRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACProtocolGroupEntry 2 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.3
+		hwSACProGroupProTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACProGroupProEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 3 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.3.1
+		hwSACProGroupProEntry OBJECT-TYPE
+			SYNTAX HwSACProGroupProEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwSACProtocolGroupName, hwSACProtocolName }
+			::= { hwSACProGroupProTable 1 }
+
+
+		HwSACProGroupProEntry ::=
+			SEQUENCE {				
+				hwSACProtocolName
+					OCTET STRING,
+				hwSACProGroupProRowstatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.3.1.1
+		hwSACProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACProGroupProEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.3.1.2
+		hwSACProGroupProRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACProGroupProEntry 2 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.4
+		hwSACVapStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACVapStatEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 4 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.4.1
+		hwSACVapStatEntry OBJECT-TYPE
+			SYNTAX HwSACVapStatEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwSACVapStatApName, hwSACVapStatRadioId, hwSACVapStatSsid, hwSACVapStatProtocolIndex, hwSACVapStatType }
+			::= { hwSACVapStatTable 1 }
+
+
+		HwSACVapStatEntry ::=
+			SEQUENCE {				
+				hwSACVapStatApName
+					OCTET STRING,
+				hwSACVapStatRadioId
+					Integer32,
+				hwSACVapStatSsid
+					OCTET STRING,
+				hwSACVapStatProtocolIndex
+					Integer32,
+				hwSACVapStatType
+					INTEGER,
+				hwSACVapStatProtocolName
+					OCTET STRING,
+				hwSACVapStatProtocolPktUpNum
+					Counter64,
+				hwSACVapStatProtocolByteUpNum
+					Counter64,
+				hwSACVapStatProtocolPktDnNum
+					Counter64,
+				hwSACVapStatProtocolByteDnNum
+					Counter64,
+				hwSACVapStatClear
+					Integer32,
+				hwSACVapStatRowstatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.1
+		hwSACVapStatApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.2
+		hwSACVapStatRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.3
+		hwSACVapStatSsid OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.4
+		hwSACVapStatProtocolIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.5
+		hwSACVapStatType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				total(1),
+				period(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.6
+		hwSACVapStatProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.7
+		hwSACVapStatProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.8
+		hwSACVapStatProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.9
+		hwSACVapStatProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.10
+		hwSACVapStatProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.11
+		hwSACVapStatClear OBJECT-TYPE
+			SYNTAX Integer32 (1)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.4.1.12
+		hwSACVapStatRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapStatEntry 12 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.5
+		hwSACUserStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACUserStatEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 5 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.5.1
+		hwSACUserStatEntry OBJECT-TYPE
+			SYNTAX HwSACUserStatEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwSACUserStatUserMac, hwSACUserStatProtocolIndex, hwSACUserStatType }
+			::= { hwSACUserStatTable 1 }
+
+
+		HwSACUserStatEntry ::=
+			SEQUENCE {				
+				hwSACUserStatUserMac
+					MacAddress,
+				hwSACUserStatProtocolIndex
+					Integer32,
+				hwSACUserStatType
+					INTEGER,
+				hwSACUserStatProtocolName
+					OCTET STRING,
+				hwSACUserStatProtocolPktUpNum
+					Counter64,
+				hwSACUserStatProtocolByteUpNum
+					Counter64,
+				hwSACUserStatProtocolPktDnNum
+					Counter64,
+				hwSACUserStatProtocolByteDnNum
+					Counter64,
+				hwSACUserStatClear
+					Integer32,
+				hwSACUserStatRowstatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.1
+		hwSACUserStatUserMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.2
+		hwSACUserStatProtocolIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.3
+		hwSACUserStatType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				total(1),
+				period(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.4
+		hwSACUserStatProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.5
+		hwSACUserStatProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.6
+		hwSACUserStatProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.7
+		hwSACUserStatProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.8
+		hwSACUserStatProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.9
+		hwSACUserStatClear OBJECT-TYPE
+			SYNTAX Integer32 (1)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.5.1.10
+		hwSACUserStatRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserStatEntry 10 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.6
+		hwSACAppListTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACAppListEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 6 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.6.1
+		hwSACAppListEntry OBJECT-TYPE
+			SYNTAX HwSACAppListEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwSACAppListAppIndex }
+			::= { hwSACAppListTable 1 }
+
+
+		HwSACAppListEntry ::=
+			SEQUENCE {				
+				hwSACAppListAppIndex
+					Integer32,
+				hwSACAppListAppID
+					Integer32,
+				hwSACAppListAppName
+					OCTET STRING,
+				hwSACAppListRowstatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.6.1.1
+		hwSACAppListAppIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACAppListEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.6.1.2
+		hwSACAppListAppID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACAppListEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.6.1.3
+		hwSACAppListAppName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACAppListEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.6.1.4
+		hwSACAppListRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACAppListEntry 4 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.7
+		hwSACInfo OBJECT IDENTIFIER ::= { hwSacObjects 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.7.1
+		hwSACInfoSACEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACInfo 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.7.2
+		hwSACInfoSignatureState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACInfo 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.7.3
+		hwSACInfoSignatureName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..128))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACInfo 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.7.4
+		hwSACInfoSignatureVersion OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..64))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACInfo 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.7.5
+		hwSACInfoSignatureDate OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..64))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACInfo 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.7.6
+		hwSACInfoAppNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACInfo 6 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.8
+		hwSACVapTop10StatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACVapTop10StatEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 8 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.8.1
+		hwSACVapTop10StatEntry OBJECT-TYPE
+			SYNTAX HwSACVapTop10StatEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwSACVapTop10StatApName, hwSACVapTop10StatRadioId, hwSACVapTop10StatSsid, hwSACVapTop10StatType }
+			::= { hwSACVapTop10StatTable 1 }
+
+
+		HwSACVapTop10StatEntry ::=
+			SEQUENCE {				
+				hwSACVapTop10StatApName
+					OCTET STRING,
+				hwSACVapTop10StatRadioId
+					Integer32,
+				hwSACVapTop10StatSsid
+					OCTET STRING,
+				hwSACVapTop10StatType
+					INTEGER,
+				hwSACVapStatTotalPktUpNum
+					Counter64,
+				hwSACVapStatTotalByteUpNum
+					Counter64,
+				hwSACVapStatTotalPktDnNum
+					Counter64,
+				hwSACVapStatTotalByteDnNum
+					Counter64,
+				hwSACVapStat1stProtocolName
+					OCTET STRING,
+				hwSACVapStat1stProtocolPktUpNum
+					Counter64,
+				hwSACVapStat1stProtocolByteUpNum
+					Counter64,
+				hwSACVapStat1stProtocolPktDnNum
+					Counter64,
+				hwSACVapStat1stProtocolByteDnNum
+					Counter64,
+				hwSACVapStat2ndProtocolName
+					OCTET STRING,
+				hwSACVapStat2ndProtocolPktUpNum
+					Counter64,
+				hwSACVapStat2ndProtocolByteUpNum
+					Counter64,
+				hwSACVapStat2ndProtocolPktDnNum
+					Counter64,
+				hwSACVapStat2ndProtocolByteDnNum
+					Counter64,
+				hwSACVapStat3rdProtocolName
+					OCTET STRING,
+				hwSACVapStat3rdProtocolPktUpNum
+					Counter64,
+				hwSACVapStat3rdProtocolByteUpNum
+					Counter64,
+				hwSACVapStat3rdProtocolPktDnNum
+					Counter64,
+				hwSACVapStat3rdProtocolByteDnNum
+					Counter64,
+				hwSACVapStat4thProtocolName
+					OCTET STRING,
+				hwSACVapStat4thProtocolPktUpNum
+					Counter64,
+				hwSACVapStat4thProtocolByteUpNum
+					Counter64,
+				hwSACVapStat4thProtocolPktDnNum
+					Counter64,
+				hwSACVapStat4thProtocolByteDnNum
+					Counter64,
+				hwSACVapStat5thProtocolName
+					OCTET STRING,
+				hwSACVapStat5thProtocolPktUpNum
+					Counter64,
+				hwSACVapStat5thProtocolByteUpNum
+					Counter64,
+				hwSACVapStat5thProtocolPktDnNum
+					Counter64,
+				hwSACVapStat5thProtocolByteDnNum
+					Counter64,
+				hwSACVapStat6thProtocolName
+					OCTET STRING,
+				hwSACVapStat6thProtocolPktUpNum
+					Counter64,
+				hwSACVapStat6thProtocolByteUpNum
+					Counter64,
+				hwSACVapStat6thProtocolPktDnNum
+					Counter64,
+				hwSACVapStat6thProtocolByteDnNum
+					Counter64,
+				hwSACVapStat7thProtocolName
+					OCTET STRING,
+				hwSACVapStat7thProtocolPktUpNum
+					Counter64,
+				hwSACVapStat7thProtocolByteUpNum
+					Counter64,
+				hwSACVapStat7thProtocolPktDnNum
+					Counter64,
+				hwSACVapStat7thProtocolByteDnNum
+					Counter64,
+				hwSACVapStat8thProtocolName
+					OCTET STRING,
+				hwSACVapStat8thProtocolPktUpNum
+					Counter64,
+				hwSACVapStat8thProtocolByteUpNum
+					Counter64,
+				hwSACVapStat8thProtocolPktDnNum
+					Counter64,
+				hwSACVapStat8thProtocolByteDnNum
+					Counter64,
+				hwSACVapStat9thProtocolName
+					OCTET STRING,
+				hwSACVapStat9thProtocolPktUpNum
+					Counter64,
+				hwSACVapStat9thProtocolByteUpNum
+					Counter64,
+				hwSACVapStat9thProtocolPktDnNum
+					Counter64,
+				hwSACVapStat9thProtocolByteDnNum
+					Counter64,
+				hwSACVapStat10thProtocolName
+					OCTET STRING,
+				hwSACVapStat10thProtocolPktUpNum
+					Counter64,
+				hwSACVapStat10thProtocolByteUpNum
+					Counter64,
+				hwSACVapStat10thProtocolPktDnNum
+					Counter64,
+				hwSACVapStat10thProtocolByteDnNum
+					Counter64,
+				hwSACVapTop10StatClear
+					Integer32,
+				hwSACVapTop10StatRowstatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.1
+		hwSACVapTop10StatApName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..32))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.2
+		hwSACVapTop10StatRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.3
+		hwSACVapTop10StatSsid OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.4
+		hwSACVapTop10StatType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				total(1),
+				period(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.5
+		hwSACVapStatTotalPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.6
+		hwSACVapStatTotalByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.7
+		hwSACVapStatTotalPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.8
+		hwSACVapStatTotalByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.9
+		hwSACVapStat1stProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.10
+		hwSACVapStat1stProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.11
+		hwSACVapStat1stProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.12
+		hwSACVapStat1stProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 12 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.13
+		hwSACVapStat1stProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 13 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.14
+		hwSACVapStat2ndProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 14 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.15
+		hwSACVapStat2ndProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 15 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.16
+		hwSACVapStat2ndProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 16 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.17
+		hwSACVapStat2ndProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 17 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.18
+		hwSACVapStat2ndProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 18 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.19
+		hwSACVapStat3rdProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 19 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.20
+		hwSACVapStat3rdProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 20 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.21
+		hwSACVapStat3rdProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 21 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.22
+		hwSACVapStat3rdProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 22 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.23
+		hwSACVapStat3rdProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 23 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.24
+		hwSACVapStat4thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 24 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.25
+		hwSACVapStat4thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 25 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.26
+		hwSACVapStat4thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 26 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.27
+		hwSACVapStat4thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 27 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.28
+		hwSACVapStat4thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 28 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.29
+		hwSACVapStat5thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 29 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.30
+		hwSACVapStat5thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 30 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.31
+		hwSACVapStat5thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 31 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.32
+		hwSACVapStat5thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 32 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.33
+		hwSACVapStat5thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 33 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.34
+		hwSACVapStat6thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 34 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.35
+		hwSACVapStat6thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 35 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.36
+		hwSACVapStat6thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 36 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.37
+		hwSACVapStat6thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 37 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.38
+		hwSACVapStat6thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 38 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.39
+		hwSACVapStat7thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 39 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.40
+		hwSACVapStat7thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 40 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.41
+		hwSACVapStat7thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 41 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.42
+		hwSACVapStat7thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 42 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.43
+		hwSACVapStat7thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 43 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.44
+		hwSACVapStat8thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 44 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.45
+		hwSACVapStat8thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 45 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.46
+		hwSACVapStat8thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 46 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.47
+		hwSACVapStat8thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 47 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.48
+		hwSACVapStat8thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 48 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.49
+		hwSACVapStat9thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 49 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.50
+		hwSACVapStat9thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 50 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.51
+		hwSACVapStat9thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 51 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.52
+		hwSACVapStat9thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 52 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.53
+		hwSACVapStat9thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 53 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.54
+		hwSACVapStat10thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 54 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.55
+		hwSACVapStat10thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 55 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.56
+		hwSACVapStat10thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 56 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.57
+		hwSACVapStat10thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 57 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.58
+		hwSACVapStat10thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 58 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.59
+		hwSACVapTop10StatClear OBJECT-TYPE
+			SYNTAX Integer32 (1)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 59 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.8.1.60
+		hwSACVapTop10StatRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACVapTop10StatEntry 60 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.9
+		hwSACUserTop10StatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSACUserTop10StatEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 9 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.9.1
+		hwSACUserTop10StatEntry OBJECT-TYPE
+			SYNTAX HwSACUserTop10StatEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwSACUserTop10StatUserMac, hwSACUserTop10StatType }
+			::= { hwSACUserTop10StatTable 1 }
+
+
+		HwSACUserTop10StatEntry ::=
+			SEQUENCE {				
+				hwSACUserTop10StatUserMac
+					MacAddress,
+				hwSACUserTop10StatType
+					INTEGER,
+				hwSACUserStatTotalPktUpNum
+					Counter64,
+				hwSACUserStatTotalByteUpNum
+					Counter64,
+				hwSACUserStatTotalPktDnNum
+					Counter64,
+				hwSACUserStatTotalByteDnNum
+					Counter64,
+				hwSACUserStat1stProtocolName
+					OCTET STRING,
+				hwSACUserStat1stProtocolPktUpNum
+					Counter64,
+				hwSACUserStat1stProtocolByteUpNum
+					Counter64,
+				hwSACUserStat1stProtocolPktDnNum
+					Counter64,
+				hwSACUserStat1stProtocolByteDnNum
+					Counter64,
+				hwSACUserStat2ndProtocolName
+					OCTET STRING,
+				hwSACUserStat2ndProtocolPktUpNum
+					Counter64,
+				hwSACUserStat2ndProtocolByteUpNum
+					Counter64,
+				hwSACUserStat2ndProtocolPktDnNum
+					Counter64,
+				hwSACUserStat2ndProtocolByteDnNum
+					Counter64,
+				hwSACUserStat3rdProtocolName
+					OCTET STRING,
+				hwSACUserStat3rdProtocolPktUpNum
+					Counter64,
+				hwSACUserStat3rdProtocolByteUpNum
+					Counter64,
+				hwSACUserStat3rdProtocolPktDnNum
+					Counter64,
+				hwSACUserStat3rdProtocolByteDnNum
+					Counter64,
+				hwSACUserStat4thProtocolName
+					OCTET STRING,
+				hwSACUserStat4thProtocolPktUpNum
+					Counter64,
+				hwSACUserStat4thProtocolByteUpNum
+					Counter64,
+				hwSACUserStat4thProtocolPktDnNum
+					Counter64,
+				hwSACUserStat4thProtocolByteDnNum
+					Counter64,
+				hwSACUserStat5thProtocolName
+					OCTET STRING,
+				hwSACUserStat5thProtocolPktUpNum
+					Counter64,
+				hwSACUserStat5thProtocolByteUpNum
+					Counter64,
+				hwSACUserStat5thProtocolPktDnNum
+					Counter64,
+				hwSACUserStat5thProtocolByteDnNum
+					Counter64,
+				hwSACUserStat6thProtocolName
+					OCTET STRING,
+				hwSACUserStat6thProtocolPktUpNum
+					Counter64,
+				hwSACUserStat6thProtocolByteUpNum
+					Counter64,
+				hwSACUserStat6thProtocolPktDnNum
+					Counter64,
+				hwSACUserStat6thProtocolByteDnNum
+					Counter64,
+				hwSACUserStat7thProtocolName
+					OCTET STRING,
+				hwSACUserStat7thProtocolPktUpNum
+					Counter64,
+				hwSACUserStat7thProtocolByteUpNum
+					Counter64,
+				hwSACUserStat7thProtocolPktDnNum
+					Counter64,
+				hwSACUserStat7thProtocolByteDnNum
+					Counter64,
+				hwSACUserStat8thProtocolName
+					OCTET STRING,
+				hwSACUserStat8thProtocolPktUpNum
+					Counter64,
+				hwSACUserStat8thProtocolByteUpNum
+					Counter64,
+				hwSACUserStat8thProtocolPktDnNum
+					Counter64,
+				hwSACUserStat8thProtocolByteDnNum
+					Counter64,
+				hwSACUserStat9thProtocolName
+					OCTET STRING,
+				hwSACUserStat9thProtocolPktUpNum
+					Counter64,
+				hwSACUserStat9thProtocolByteUpNum
+					Counter64,
+				hwSACUserStat9thProtocolPktDnNum
+					Counter64,
+				hwSACUserStat9thProtocolByteDnNum
+					Counter64,
+				hwSACUserStat10thProtocolName
+					OCTET STRING,
+				hwSACUserStat10thProtocolPktUpNum
+					Counter64,
+				hwSACUserStat10thProtocolByteUpNum
+					Counter64,
+				hwSACUserStat10thProtocolPktDnNum
+					Counter64,
+				hwSACUserStat10thProtocolByteDnNum
+					Counter64,
+				hwSACUserTop10StatClear
+					Integer32,
+				hwSACUserTop10StatRowstatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.1
+		hwSACUserTop10StatUserMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.2
+		hwSACUserTop10StatType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				total(1),
+				period(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.3
+		hwSACUserStatTotalPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.4
+		hwSACUserStatTotalByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.5
+		hwSACUserStatTotalPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.6
+		hwSACUserStatTotalByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.7
+		hwSACUserStat1stProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.8
+		hwSACUserStat1stProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.9
+		hwSACUserStat1stProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.10
+		hwSACUserStat1stProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.11
+		hwSACUserStat1stProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.12
+		hwSACUserStat2ndProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 12 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.13
+		hwSACUserStat2ndProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 13 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.14
+		hwSACUserStat2ndProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 14 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.15
+		hwSACUserStat2ndProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 15 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.16
+		hwSACUserStat2ndProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 16 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.17
+		hwSACUserStat3rdProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 17 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.18
+		hwSACUserStat3rdProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 18 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.19
+		hwSACUserStat3rdProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 19 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.20
+		hwSACUserStat3rdProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 20 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.21
+		hwSACUserStat3rdProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 21 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.22
+		hwSACUserStat4thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 22 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.23
+		hwSACUserStat4thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 23 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.24
+		hwSACUserStat4thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 24 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.25
+		hwSACUserStat4thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 25 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.26
+		hwSACUserStat4thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 26 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.27
+		hwSACUserStat5thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 27 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.28
+		hwSACUserStat5thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 28 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.29
+		hwSACUserStat5thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 29 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.30
+		hwSACUserStat5thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 30 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.31
+		hwSACUserStat5thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 31 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.32
+		hwSACUserStat6thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 32 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.33
+		hwSACUserStat6thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 33 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.34
+		hwSACUserStat6thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 34 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.35
+		hwSACUserStat6thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 35 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.36
+		hwSACUserStat6thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 36 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.37
+		hwSACUserStat7thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 37 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.38
+		hwSACUserStat7thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 38 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.39
+		hwSACUserStat7thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 39 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.40
+		hwSACUserStat7thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 40 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.41
+		hwSACUserStat7thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 41 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.42
+		hwSACUserStat8thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 42 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.43
+		hwSACUserStat8thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 43 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.44
+		hwSACUserStat8thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 44 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.45
+		hwSACUserStat8thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 45 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.46
+		hwSACUserStat8thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 46 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.47
+		hwSACUserStat9thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 47 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.48
+		hwSACUserStat9thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 48 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.49
+		hwSACUserStat9thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 49 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.50
+		hwSACUserStat9thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 50 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.51
+		hwSACUserStat9thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 51 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.52
+		hwSACUserStat10thProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 52 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.53
+		hwSACUserStat10thProtocolPktUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 53 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.54
+		hwSACUserStat10thProtocolByteUpNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 54 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.55
+		hwSACUserStat10thProtocolPktDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 55 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.56
+		hwSACUserStat10thProtocolByteDnNum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 56 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.57
+		hwSACUserTop10StatClear OBJECT-TYPE
+			SYNTAX Integer32 (1)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 57 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.9.1.58
+		hwSACUserTop10StatRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSACUserTop10StatEntry 58 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.10
+		hwMediaAwareConfig OBJECT IDENTIFIER ::= { hwSacObjects 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.10.1
+		hwWlanVoiceAware OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwMediaAwareConfig 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.10.2
+		hwWlanVideoAware OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwMediaAwareConfig 2 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.11
+		hwVoiceAwareProtocolTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwVoiceAwareProtocolEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 11 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.11.1
+		hwVoiceAwareProtocolEntry OBJECT-TYPE
+			SYNTAX HwVoiceAwareProtocolEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwVoiceAwareProtocolName }
+			::= { hwVoiceAwareProtocolTable 1 }
+
+
+		HwVoiceAwareProtocolEntry ::=
+			SEQUENCE {				
+				hwVoiceAwareProtocolName
+					OCTET STRING,
+				hwVoiceAwarePortocolEnable
+					INTEGER,
+				hwVoiceAwarePortocolRowStatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.11.1.1
+		hwVoiceAwareProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..255))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwVoiceAwareProtocolEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.11.1.2
+		hwVoiceAwarePortocolEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwVoiceAwareProtocolEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.11.1.3
+		hwVoiceAwarePortocolRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwVoiceAwareProtocolEntry 3 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.12
+		hwVideoAwareProtocolTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwVideoAwareProtocolEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 12 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.12.1
+		hwVideoAwareProtocolEntry OBJECT-TYPE
+			SYNTAX HwVideoAwareProtocolEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwVideoAwareProtocolName }
+			::= { hwVideoAwareProtocolTable 1 }
+
+
+		HwVideoAwareProtocolEntry ::=
+			SEQUENCE {				
+				hwVideoAwareProtocolName
+					OCTET STRING,
+				hwVideoAwarePortocolEnable
+					INTEGER,
+				hwVideoAwarePortocolRowStatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.12.1.1
+		hwVideoAwareProtocolName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..255))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwVideoAwareProtocolEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.12.1.2
+		hwVideoAwarePortocolEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwVideoAwareProtocolEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.12.1.3
+		hwVideoAwarePortocolRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwVideoAwareProtocolEntry 3 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.13
+		hwLyncRecordTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwLyncRecordEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSacObjects 13 }
+
+		--1.3.6.1.4.1.2011.6.139.20.1.13.1
+		hwLyncRecordEntry OBJECT-TYPE
+			SYNTAX HwLyncRecordEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			INDEX { hwLyncRecordID }
+			::= { hwLyncRecordTable 1 }
+
+
+		HwLyncRecordEntry ::=
+			SEQUENCE {				
+				hwLyncRecordID
+					Unsigned32,
+				hwLyncRecordSrcApName
+					OCTET STRING,
+				hwLyncRecordSrcMAC
+					MacAddress,
+				hwLyncRecordSrcIP
+					IpAddress,
+				hwLyncRecordSrcPort
+					Unsigned32,
+				hwLyncRecordDstApName
+					OCTET STRING,
+				hwLyncRecordDstMAC
+					MacAddress,
+				hwLyncRecordDstIP
+					IpAddress,
+				hwLyncRecordDstPort
+					Unsigned32,
+				hwLyncRecordCallID
+					OCTET STRING,
+				hwLyncRecordStartTime
+					OCTET STRING,
+				hwLyncRecordEndTime
+					OCTET STRING,
+				hwLyncRecordProtocol
+					Unsigned32,
+				hwLyncRecordPacketUtilization
+					Unsigned32,
+				hwLyncRecordJitterInterArrival
+					Unsigned32,
+				hwLyncRecordJitterInterArrivalMax
+					Unsigned32,
+				hwLyncRecordRoundTrip
+					Unsigned32,
+				hwLyncRecordRoundTripMax
+					Unsigned32,
+				hwLyncRecordHealerPacketDropRatio
+					OCTET STRING,
+				hwLyncRecordDegradationAvg
+					OCTET STRING,
+				hwLyncRecordRatioConcealedSamplesAvg
+					OCTET STRING,
+				hwLyncRecordBurstGapDuration
+					Unsigned32,
+				hwLyncRecordDegradationMax
+					OCTET STRING,
+				hwLyncRecordRecvListenMOSMin
+					OCTET STRING,
+				hwLyncRecordRecvListenMOS
+					OCTET STRING,
+				hwLyncRecordOverallMinNetworkMOS
+					OCTET STRING,
+				hwLyncRecordOverallAvgNetworkMOS
+					OCTET STRING,
+				hwLyncRecordAppliedBandwidthLimit
+					Unsigned32,
+				hwLyncRecordRowstatus
+					RowStatus 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.1
+		hwLyncRecordID OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.2
+		hwLyncRecordSrcApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.3
+		hwLyncRecordSrcMAC OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.4
+		hwLyncRecordSrcIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.5
+		hwLyncRecordSrcPort OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.6
+		hwLyncRecordDstApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.7
+		hwLyncRecordDstMAC OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.8
+		hwLyncRecordDstIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.9
+		hwLyncRecordDstPort OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.10
+		hwLyncRecordCallID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.11
+		hwLyncRecordStartTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.12
+		hwLyncRecordEndTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 12 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.13
+		hwLyncRecordProtocol OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 13 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.14
+		hwLyncRecordPacketUtilization OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 14 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.15
+		hwLyncRecordJitterInterArrival OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 15 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.16
+		hwLyncRecordJitterInterArrivalMax OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 16 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.17
+		hwLyncRecordRoundTrip OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 17 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.18
+		hwLyncRecordRoundTripMax OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 18 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.19
+		hwLyncRecordHealerPacketDropRatio OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 19 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.20
+		hwLyncRecordDegradationAvg OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 20 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.21
+		hwLyncRecordRatioConcealedSamplesAvg OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 21 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.22
+		hwLyncRecordBurstGapDuration OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 22 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.23
+		hwLyncRecordDegradationMax OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 23 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.24
+		hwLyncRecordRecvListenMOSMin OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 24 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.25
+		hwLyncRecordRecvListenMOS OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 25 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.26
+		hwLyncRecordOverallMinNetworkMOS OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 26 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.27
+		hwLyncRecordOverallAvgNetworkMOS OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 27 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.28
+		hwLyncRecordAppliedBandwidthLimit OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 28 }
+
+		 --1.3.6.1.4.1.2011.6.139.20.1.13.1.29
+		hwLyncRecordRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwLyncRecordEntry 29 }
+
+		--1.3.6.1.4.1.2011.6.139.20.2
+		hwWlanSacConformance OBJECT IDENTIFIER ::= { hwWlanSac 2 }
+
+		--1.3.6.1.4.1.2011.6.139.20.2.1
+		hwWlanSacCompliances OBJECT IDENTIFIER ::= { hwWlanSacConformance 1 }
+
+		--1.3.6.1.4.1.2011.6.139.20.2.1.1
+		hwWlanSacCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE
+					MANDATORY-GROUPS { hwWlanSACGroup }
+			::= { hwWlanSacCompliances 1 }
+
+		--1.3.6.1.4.1.2011.6.139.20.2.2
+		hwWlanSacObjectGroups OBJECT IDENTIFIER ::= { hwWlanSacConformance 2 }
+
+		--1.3.6.1.4.1.2011.6.139.20.2.2.1
+		hwWlanSACGroup OBJECT-GROUP
+			OBJECTS { hwSACEnableOper, hwSACEnableRuleLibName, hwSACProtocolGroupRowstatus, hwSACProGroupProRowstatus, 
+			hwSACVapStatProtocolName, hwSACVapStatProtocolPktUpNum, hwSACVapStatProtocolByteUpNum, hwSACVapStatProtocolPktDnNum, 
+			hwSACVapStatProtocolByteDnNum, hwSACVapStatClear, hwSACVapStatRowstatus, 
+			hwSACUserStatProtocolName, hwSACUserStatProtocolPktUpNum, hwSACUserStatProtocolByteUpNum, hwSACUserStatProtocolPktDnNum, 
+			hwSACUserStatProtocolByteDnNum, hwSACUserStatClear, hwSACUserStatRowstatus, hwSACAppListAppID, 
+			hwSACAppListAppName, hwSACAppListRowstatus, hwSACInfoSACEnable, hwSACInfoSignatureState, hwSACInfoSignatureName, 
+			hwSACInfoSignatureVersion, hwSACInfoSignatureDate, hwSACInfoAppNum, 
+			hwSACVapStatTotalPktUpNum, hwSACVapStatTotalByteUpNum, hwSACVapStatTotalPktDnNum, 
+			hwSACVapStatTotalByteDnNum, hwSACVapStat1stProtocolName, hwSACVapStat1stProtocolPktUpNum, hwSACVapStat1stProtocolByteUpNum, hwSACVapStat1stProtocolPktDnNum, 
+			hwSACVapStat1stProtocolByteDnNum, hwSACVapStat2ndProtocolName, hwSACVapStat2ndProtocolPktUpNum, hwSACVapStat2ndProtocolByteUpNum, hwSACVapStat2ndProtocolPktDnNum, 
+			hwSACVapStat2ndProtocolByteDnNum, hwSACVapStat3rdProtocolName, hwSACVapStat3rdProtocolPktUpNum, hwSACVapStat3rdProtocolByteUpNum, hwSACVapStat3rdProtocolPktDnNum, 
+			hwSACVapStat3rdProtocolByteDnNum, hwSACVapStat4thProtocolName, hwSACVapStat4thProtocolPktUpNum, hwSACVapStat4thProtocolByteUpNum, hwSACVapStat4thProtocolPktDnNum, 
+			hwSACVapStat4thProtocolByteDnNum, hwSACVapStat5thProtocolName, hwSACVapStat5thProtocolPktUpNum, hwSACVapStat5thProtocolByteUpNum, hwSACVapStat5thProtocolPktDnNum, 
+			hwSACVapStat5thProtocolByteDnNum, hwSACVapStat6thProtocolName, hwSACVapStat6thProtocolPktUpNum, hwSACVapStat6thProtocolByteUpNum, hwSACVapStat6thProtocolPktDnNum, 
+			hwSACVapStat6thProtocolByteDnNum, hwSACVapStat7thProtocolName, hwSACVapStat7thProtocolPktUpNum, hwSACVapStat7thProtocolByteUpNum, hwSACVapStat7thProtocolPktDnNum, 
+			hwSACVapStat7thProtocolByteDnNum, hwSACVapStat8thProtocolName, hwSACVapStat8thProtocolPktUpNum, hwSACVapStat8thProtocolByteUpNum, hwSACVapStat8thProtocolPktDnNum, 
+			hwSACVapStat8thProtocolByteDnNum, hwSACVapStat9thProtocolName, hwSACVapStat9thProtocolPktUpNum, hwSACVapStat9thProtocolByteUpNum, hwSACVapStat9thProtocolPktDnNum, 
+			hwSACVapStat9thProtocolByteDnNum, hwSACVapStat10thProtocolName, hwSACVapStat10thProtocolPktUpNum, hwSACVapStat10thProtocolByteUpNum, hwSACVapStat10thProtocolPktDnNum, 
+			hwSACVapStat10thProtocolByteDnNum, hwSACVapTop10StatClear, hwSACVapTop10StatRowstatus, 
+			hwSACUserStatTotalPktUpNum, hwSACUserStatTotalByteUpNum, hwSACUserStatTotalPktDnNum, hwSACUserStatTotalByteDnNum, hwSACUserStat1stProtocolName, 
+			hwSACUserStat1stProtocolPktUpNum, hwSACUserStat1stProtocolByteUpNum, hwSACUserStat1stProtocolPktDnNum, hwSACUserStat1stProtocolByteDnNum, hwSACUserStat2ndProtocolName, 
+			hwSACUserStat2ndProtocolPktUpNum, hwSACUserStat2ndProtocolByteUpNum, hwSACUserStat2ndProtocolPktDnNum, hwSACUserStat2ndProtocolByteDnNum, hwSACUserStat3rdProtocolName, 
+			hwSACUserStat3rdProtocolPktUpNum, hwSACUserStat3rdProtocolByteUpNum, hwSACUserStat3rdProtocolPktDnNum, hwSACUserStat3rdProtocolByteDnNum, hwSACUserStat4thProtocolName, 
+			hwSACUserStat4thProtocolPktUpNum, hwSACUserStat4thProtocolByteUpNum, hwSACUserStat4thProtocolPktDnNum, hwSACUserStat4thProtocolByteDnNum, hwSACUserStat5thProtocolName, 
+			hwSACUserStat5thProtocolPktUpNum, hwSACUserStat5thProtocolByteUpNum, hwSACUserStat5thProtocolPktDnNum, hwSACUserStat5thProtocolByteDnNum, hwSACUserStat6thProtocolName, 
+			hwSACUserStat6thProtocolPktUpNum, hwSACUserStat6thProtocolByteUpNum, hwSACUserStat6thProtocolPktDnNum, hwSACUserStat6thProtocolByteDnNum, hwSACUserStat7thProtocolName, 
+			hwSACUserStat7thProtocolPktUpNum, hwSACUserStat7thProtocolByteUpNum, hwSACUserStat7thProtocolPktDnNum, hwSACUserStat7thProtocolByteDnNum, hwSACUserStat8thProtocolName, 
+			hwSACUserStat8thProtocolPktUpNum, hwSACUserStat8thProtocolByteUpNum, hwSACUserStat8thProtocolPktDnNum, hwSACUserStat8thProtocolByteDnNum, hwSACUserStat9thProtocolName, 
+			hwSACUserStat9thProtocolPktUpNum, hwSACUserStat9thProtocolByteUpNum, hwSACUserStat9thProtocolPktDnNum, hwSACUserStat9thProtocolByteDnNum, hwSACUserStat10thProtocolName, 
+			hwSACUserStat10thProtocolPktUpNum, hwSACUserStat10thProtocolByteUpNum, hwSACUserStat10thProtocolPktDnNum, hwSACUserStat10thProtocolByteDnNum, hwSACUserTop10StatClear, 
+			hwSACUserTop10StatRowstatus, hwWlanVoiceAware, hwWlanVideoAware, hwVoiceAwarePortocolEnable, 
+			hwVoiceAwarePortocolRowStatus, hwVideoAwarePortocolEnable, hwVideoAwarePortocolRowStatus, 
+			hwLyncRecordSrcApName, hwLyncRecordSrcMAC, hwLyncRecordSrcIP, hwLyncRecordSrcPort, hwLyncRecordDstApName, 
+			hwLyncRecordDstMAC, hwLyncRecordDstIP, hwLyncRecordDstPort, hwLyncRecordCallID, hwLyncRecordStartTime, 
+			hwLyncRecordEndTime, hwLyncRecordProtocol, hwLyncRecordPacketUtilization, hwLyncRecordJitterInterArrival, hwLyncRecordJitterInterArrivalMax, 
+			hwLyncRecordRoundTrip, hwLyncRecordRoundTripMax, hwLyncRecordHealerPacketDropRatio, hwLyncRecordDegradationAvg, hwLyncRecordRatioConcealedSamplesAvg, 
+			hwLyncRecordBurstGapDuration, hwLyncRecordDegradationMax, hwLyncRecordRecvListenMOSMin, hwLyncRecordRecvListenMOS, hwLyncRecordOverallMinNetworkMOS, 
+			hwLyncRecordOverallAvgNetworkMOS, hwLyncRecordAppliedBandwidthLimit, hwLyncRecordRowstatus }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanSacObjectGroups 1 }
+
+
+	END
+--
+-- HUAWEI-WLAN-SAC-MIB.mib
+--

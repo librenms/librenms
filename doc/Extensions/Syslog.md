@@ -1,7 +1,9 @@
 source: Extensions/Syslog.md
+path: blob/master/doc/
 # Setting up syslog support
 
 This document will explain how to send syslog data to LibreNMS.
+Please also refer to the file Graylog.md for an alternate way of integrating syslog with LibreNMS.
 
 ### Syslog server installation
 
@@ -163,6 +165,7 @@ See here for more Clean Up Options [Link](https://docs.librenms.org/#Support/Con
 ### Client configuration
 
 Below are sample configurations for a variety of clients. You should understand the config before using it as you may want to make some slight changes.
+Further configuration hints may be found in the file Graylog.md.
 
 Replace librenms.ip with IP or hostname of your LibreNMS install.
 
@@ -199,6 +202,29 @@ logging librenms.ip
 ```config
 logging server librenms.ip 5 use-vrf default facility local6
 ```
+
+#### Juniper Junos
+```config
+set system syslog host librenms.ip authorization any
+set system syslog host librenms.ip daemon any
+set system syslog host librenms.ip kernel any
+set system syslog host librenms.ip user any
+set system syslog host librenms.ip change-log any
+set system syslog host librenms.ip source-address <management ip>
+set system syslog host librenms.ip exclude-hostname
+set system syslog time-format
+```
+
+#### Allied Telesis Alliedware Plus
+```config
+log date-format iso // Required so syslog-ng/LibreNMS can correctly interpret the log message formatting.
+log host x.x.x.x
+log host x.x.x.x level <errors> // Required. A log-level must be specified for syslog messages to send. 
+log host x.x.x.x level notices program imish // Useful for seeing all commands executed by users.
+log host x.x.x.x level notices program imi // Required for Oxidized Syslog hook log message.  
+log host source <eth0>
+```
+
 
 If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web UI.
 
@@ -245,4 +271,36 @@ $config['os']['nxos']['syslog_hook'][] = Array('regex' => '/%VSHD-5-VSHD_SYSLOG_
 #### Cisco IOSXR
 ```ssh
 $config['os']['iosxr']['syslog_hook'][] = Array('regex' => '/%GBL-CONFIG-6-DB_COMMIT/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+
+#### Juniper Junos
+```ssh
+$config['os']['junos']['syslog_hook'][] = Array('regex' => '/UI_COMMIT:/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+#### Juniper ScreenOS
+```ssh
+$config['os']['screenos']['syslog_hook'][] = Array('regex' => '/System configuration saved/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+
+#### Allied Telesis Alliedware Plus
+**Note:** At least software version 5.4.8-2.1 is required. `log host x.x.x.x level notices program imi` may also be required depending on configuration. This is to ensure the syslog hook log message gets sent to the syslog server. 
+
+```ssh
+$config['os']['awplus']['syslog_hook'][] = Array('regex' => '/IMI.+.Startup-config saved on/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+
+### Configuration Options
+
+#### Matching syslogs to hosts with different names
+
+In some cases, you may get logs that aren't being associated with the device in LibreNMS. For example, in LibreNMS the device is known as "ne-core-01", and that's how DNS resolves. However, the received syslogs are for "loopback.core-nw". 
+
+To fix this issue, you can configure LibreNMS to translate the incoming syslog hostname into another hostname, so that the logs get associated with the correct device.
+
+Example:
+```ssh
+$config['syslog_xlate'] = array(
+        'loopback0.core7k1.noc.net' => 'n7k1-core7k1',
+        'loopback0.core7k2.noc.net' => 'n7k2-core7k2'
+);
 ```

@@ -1,9 +1,9 @@
 os: uniping
-text: 'UniPing'
+text: UniPing
 type: environmental
 icon: netping
 group: netping
-nobulk: 1
+nobulk: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

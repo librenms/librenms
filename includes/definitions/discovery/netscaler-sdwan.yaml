@@ -1,0 +1,26 @@
+mib: CITRIX-NetScaler-SD-WAN-MIB
+modules:
+    sensors:
+          state:
+              data:
+                  -
+                      oid: sdWANStatsApplianceHAState
+                      num_oid: '.1.3.6.1.4.1.3845.31.4.2.2.12.1.9'
+                      index: 'sdWANStatsApplianceHAState'
+                      descr: HA State
+                      state_name: sdWANStatsApplianceHAState
+                      states:
+                          - { value: 0, generic: 3, graph: 1, descr: undefined }
+                          - { value: 1, generic: 0, graph: 1, descr: notConfigured }
+                          - { value: 2, generic: 0, graph: 1, descr: active }
+                          - { value: 3, generic: 0, graph: 1, descr: standby }
+                  -
+                      oid: sdWANStatsApplianceState
+                      num_oid: '.1.3.6.1.4.1.3845.31.4.2.2.12.1.8'
+                      index: 'sdWANStatsApplianceState'
+                      descr: State
+                      state_name: sdWANStatsApplianceState
+                      states:
+                          - { value: 0, generic: 3, graph: 1, descr: undefined }
+                          - { value: 1, generic: 1, graph: 1, descr: disabled }
+                          - { value: 2, generic: 0, graph: 1, descr: enabled }

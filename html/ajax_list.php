@@ -13,21 +13,26 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\LegacyAuth;
+
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!$_SESSION['authenticated']) {
-    echo "Unauthenticated\n";
-    exit;
+if (!LegacyAuth::check()) {
+    die('Unauthorized');
 }
 
 set_debug($_REQUEST['debug']);
 
-$id = mres($_REQUEST['id']);
+$type = basename($_REQUEST['type']);
 
-if (isset($id)) {
-    if (file_exists("includes/list/$id.inc.php")) {
-        header('Content-type: application/json');
-        include_once "includes/list/$id.inc.php";
-    }
+if ($type && file_exists("includes/html/list/$type.inc.php")) {
+    header('Content-type: application/json');
+
+    list($results, $more) = include "includes/html/list/$type.inc.php";
+
+    die(json_encode([
+        'results' => $results,
+        'pagination' => ['more' => $more]
+    ]));
 }

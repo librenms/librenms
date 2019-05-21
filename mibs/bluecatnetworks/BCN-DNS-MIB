@@ -1,0 +1,307 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BCN-DNS-MIB.mib:  BlueCat Networks DNS services
+--
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BCN-DNS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    OBJECT-TYPE, Gauge32, Integer32, Counter64
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    BcnAlarmSeverity
+        FROM BCN-TC-MIB
+    bcnServices
+        FROM BCN-SMI-MIB;
+
+bcnDnsMIB MODULE-IDENTITY
+    LAST-UPDATED	"201011301200Z"
+    ORGANIZATION	"BlueCat Networks"
+    CONTACT-INFO
+        "BlueCat Networks. Customer Care.
+
+        North America
+        Call: +1.866.491.2228
+        Europe
+        Call: +44.8081.011.306
+        Other
+        Call: +1.416.646.8433
+        
+        Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "This module provides status as well as statistical information
+        about the DNS service."
+    REVISION "201011301200Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcnDns 1 }
+
+bcnDns OBJECT IDENTIFIER  ::= { bcnServices 2 }
+
+-- Organization
+
+bcnDnsObjects OBJECT IDENTIFIER 
+    ::= { bcnDns 2 }
+
+bcnDnsNotification OBJECT IDENTIFIER 
+    ::= { bcnDns 3 }
+
+bcnDnsConformance OBJECT IDENTIFIER 
+    ::= { bcnDns 4 }
+
+
+-- Data objects
+
+bcnDnsServiceStatus OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "General state of the DNS Service."
+    ::= { bcnDnsObjects 1 }
+
+bcnDnsSerOperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+      running(1),
+      notRunning(2),
+      starting(3),
+      stopping(4),
+      fault(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational state of the Service. The possible states are:
+        running(1)    The service is running normally.
+        notRunning(2) The service is stopped either intentionally (i.e.:
+                      the service is not supposed to run on this node) or
+                      unintentionally (a problem has occurred).
+        starting(3)   The service is in the process of starting, either
+                      for the first time of after an event occurred.
+        stopping(4)   The service is in the process of stopping. Stopping
+                      a service might be necessary after a configuration
+                      change.
+        fault(5)      An error has been detected and the state is undefined.
+        "
+    ::= { bcnDnsServiceStatus 1 }
+
+bcnDnsSerNumberOfZones OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of zones loaded."
+    ::= { bcnDnsServiceStatus 2 }
+
+bcnDnsSerTransfersRunning OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of zone transfers currently in progress." 
+    ::= { bcnDnsServiceStatus 3 }
+
+bcnDnsSerTransfersDeferred OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of zone transfers currently deferred." 
+    ::= { bcnDnsServiceStatus 4 }
+
+bcnDnsSerSOAQueriesInProgress OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of SOA queries in progress." 
+    ::= { bcnDnsServiceStatus 5 }
+
+bcnDnsSerQueryLogging OBJECT-TYPE
+    SYNTAX          INTEGER {
+      on (1),
+      off (2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "State of query logging. The possible values are on(1) or off(2)." 
+    ::= { bcnDnsServiceStatus 6 }
+
+bcnDnsSerDebugLevel OBJECT-TYPE
+    SYNTAX          Integer32 (0..99)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Debug log level. The possible values range from 0 to 99.
+        Where 0 indicates no logging and 99 is the maximum level of logging."
+    ::= { bcnDnsServiceStatus 7 }
+
+
+bcnDnsServiceStatistics OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "DNS statistics objects container"
+    ::= { bcnDnsObjects 2 }
+
+bcnDnsStatServer OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "DNS server statistics objects container"
+    ::= { bcnDnsServiceStatistics 1 }
+
+bcnDnsStatSrvQrySuccess OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Queries resulted in a successful answer."
+    ::= { bcnDnsStatServer 1 }
+
+bcnDnsStatSrvQryReferral OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Queries resulted in referral answer."
+    ::= { bcnDnsStatServer 2 }
+
+bcnDnsStatSrvQryNXRRSet OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Queries resulted in non-existent record responses with no data."
+    ::= { bcnDnsStatServer 3 }
+
+bcnDnsStatSrvQryNXDomain OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Queries resulted in non-existent domain responses with no data."
+    ::= { bcnDnsStatServer 4 }
+
+bcnDnsStatSrvQryRecursion OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Queries which caused the server to perform recursion lookups in
+        order to find the final answer."
+    ::= { bcnDnsStatServer 5 }
+
+bcnDnsStatSrvQryFailure OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of failed queries that did not result in non-existent
+        domain or record."
+    ::= { bcnDnsStatServer 6 }
+
+-- Notification definitions
+
+bcnDnsNotificationEvents OBJECT IDENTIFIER 
+    ::= { bcnDnsNotification 0 }
+
+bcnDnsNotificationData OBJECT IDENTIFIER 
+    ::= { bcnDnsNotification 1 }
+
+-- Notification data
+
+bcnDnsAlarmSeverity OBJECT-TYPE
+    SYNTAX          BcnAlarmSeverity
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Severity classification for the alarm."
+    ::= { bcnDnsNotificationData 1 }
+
+bcnDnsAlarmInfo OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Descriptive information about the alarm event."
+    ::= { bcnDnsNotificationData 2 }
+
+-- Notification events
+
+bcnDnsAlarmNotif NOTIFICATION-TYPE
+    OBJECTS {   
+                bcnDnsSerOperState,
+                bcnDnsAlarmSeverity,
+                bcnDnsAlarmInfo
+            }
+    STATUS          current
+    DESCRIPTION
+        "A bcnDnsAlarmNotif signifies that the DNS service has transitioned
+        state or a particular event has been detected on the service."
+   ::= { bcnDnsNotificationEvents 1 }
+
+-- Conformance
+
+bcnDnsServiceCompliances OBJECT IDENTIFIER 
+    ::= { bcnDnsConformance 1 }
+
+bcnDnsServiceGroups OBJECT IDENTIFIER 
+    ::= { bcnDnsConformance 2 }
+
+
+bcnDnsServiceStatusGroup OBJECT-GROUP
+    OBJECTS { bcnDnsSerOperState, bcnDnsSerNumberOfZones,
+      bcnDnsSerTransfersRunning, bcnDnsSerTransfersDeferred, 
+      bcnDnsSerSOAQueriesInProgress, bcnDnsSerQueryLogging,
+      bcnDnsSerDebugLevel 
+    }
+    STATUS current
+    DESCRIPTION "Status conformance."
+    ::= { bcnDnsServiceGroups 1 }
+
+bcnDnsServerStatisticsGroup OBJECT-GROUP
+    OBJECTS { bcnDnsStatSrvQrySuccess, bcnDnsStatSrvQryReferral,
+      bcnDnsStatSrvQryNXRRSet, bcnDnsStatSrvQryNXDomain,
+      bcnDnsStatSrvQryRecursion, bcnDnsStatSrvQryFailure
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnDnsServiceGroups 2 }
+
+bcnDnsNotificationEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { bcnDnsAlarmNotif
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnDnsServiceGroups 3 }
+
+bcnDnsNotificationDataGroup OBJECT-GROUP
+    OBJECTS { bcnDnsAlarmSeverity, bcnDnsAlarmInfo
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnDnsServiceGroups 4 }
+
+
+bcnDnsStatusCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Basic conformance"
+    MODULE -- This module
+    MANDATORY-GROUPS {
+        bcnDnsServiceStatusGroup, bcnDnsServerStatisticsGroup,
+        bcnDnsNotificationEventGroup, bcnDnsNotificationDataGroup }
+-- GROUP CCC
+    ::= {bcnDnsServiceCompliances 1 }
+
+
+
+
+END

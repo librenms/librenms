@@ -1,0 +1,128 @@
+-- =================================================================
+-- Copyright (C) 2009 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI SYS CLOCK MIB
+-- Reference:   huawei enterprise mib
+-- Version:     V1.0
+-- History:
+--             initial version 2009-07-25
+-- =================================================================
+
+    HUAWEI-SYS-CLOCK-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            TimeTicks, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            TimeStamp, TruthValue, RowStatus, TEXTUAL-CONVENTION, DateAndTime            
+                FROM SNMPv2-TC;
+
+    
+        hwSysClockMIB MODULE-IDENTITY 
+            LAST-UPDATED "200907250000Z"        -- July 25, 2009 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "HUAWEI-SYS-CLOCK-MIB is used to configure and query time information, 
+                 such as the system time, time zone, and daylight saving time.
+                 Root object: iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).
+                 huawei(2011).huaweiMgmt(5).hwDatacomm(25).hwSysClockMIB(205) "
+            REVISION "200907250000Z"        -- July 25, 2009 at 00:00 GMT
+            DESCRIPTION
+                "The initial revision of this MIB module ."
+            ::= { hwDatacomm 205 }
+        
+                
+--
+-- Node definitions
+--
+    
+--  Huawei SYS Clock set mib object
+
+        huaweiClockObjects OBJECT IDENTIFIER ::= { hwSysClockMIB 1 }
+
+        hwLocalClock OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "This object is used to set and query the local time that is in the format of 
+         'YYYY-MM-DD,HH:MM:SS'. "
+        ::= { huaweiClockObjects 1 }
+
+        hwUTCClock OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "This object is used to configure and query the system UTC time that is in the 
+         format of 'YYYY-MM-DD,HH:MM:SS'. "
+        ::= { huaweiClockObjects 2 }
+
+--  -------------------------------------------------------------
+-- HUAWEI-SYS-CLOCK-MIB MIB - Notification Information
+-- -------------------------------------------------------------             
+       
+        huaweiClockNotifications OBJECT IDENTIFIER ::= { hwSysClockMIB 2 }        
+
+        hwClockChanged NOTIFICATION-TYPE
+            OBJECTS { hwUTCClock }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the alarm reported when the system time changes. 
+                 In addition, the new system time is recorded."
+            ::= { huaweiClockNotifications 1 }
+          
+--  -------------------------------------------------------------
+-- HUAWEI-SYS-CLOCK-MIB MIB - Conformance Information
+-- -------------------------------------------------------------     
+   
+        huaweiClockMIBConformance OBJECT IDENTIFIER ::= { hwSysClockMIB 3 }
+        
+        hwClockMIBCompliances OBJECT IDENTIFIER ::= { huaweiClockMIBConformance 1 }
+        
+        hwClockMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                " 
+                The compliance statement for 
+                entities that support the huawei Clock MIB.
+                "
+            MODULE -- this module
+                MANDATORY-GROUPS { hwClockSetGroup, hwClockNotificationGroup }
+            ::= { hwClockMIBCompliances 1 }
+        
+        huaweiClockMIBGroups OBJECT IDENTIFIER ::= { huaweiClockMIBConformance 2 }
+        
+        hwClockSetGroup OBJECT-GROUP
+            OBJECTS { hwLocalClock, hwUTCClock }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects on Clock setting level information.
+                "
+            ::= { huaweiClockMIBGroups 1 }
+        
+        hwClockNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwClockChanged }
+            STATUS current
+            DESCRIPTION 
+                "The collection of notifications in the module"
+            ::= { huaweiClockMIBGroups 2 }
+                
+    
+    END
+
+--
+-- HUAWEI-SYS-CLOCK-MIB.mib
+--

@@ -1,0 +1,444 @@
+-- These MIBs were created on 1/7/2003
+-- This module defines enterprise MIBs for NS OSPF TRAP
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-OSPF-TRAP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress
+                FROM SNMPv2-SMI
+            MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+            netscreenTrapDesc, netscreenTrapType
+                FROM NETSCREEN-TRAP-MIB
+            nsOspfRouterId, nsOspfIfIpAddress, nsOspfAddressLessIf, nsOspfIfState,
+            nsOspfVirtIfAreaId, nsOspfVirtIfNeighbor, nsOspfVirtIfState,
+            nsOspfNbrIpAddr, nsOspfNbrAddressLessIndex, nsOspfNbrRtrId,
+            nsOspfNbrState, nsOspfVirtNbrArea, nsOspfVirtNbrRtrId, nsOspfVirtNbrState,
+            nsOspfLsdbType, nsOspfLsdbLsid, nsOspfLsdbRouterId, nsOspfLsdbAreaId,
+            nsOspfExtLsdbLimit, nsOspf
+                FROM NETSCREEN-OSPF-MIB;
+
+    nsOspfTrap MODULE-IDENTITY
+       LAST-UPDATED  "200405032022Z" -- May 03, 2004
+       ORGANIZATION
+           "Juniper Networks, Inc."
+       CONTACT-INFO
+           "Customer Support
+
+            1194 North Mathilda Avenue 
+            Sunnyvale, California 94089-1206
+            USA
+   
+            Tel: 1-800-638-8296
+            E-mail: customerservice@juniper.net
+            HTTP://www.juniper.net"
+       DESCRIPTION
+          "The MIB module to describe traps for  the  OSPF
+          Version 2 Protocol."
+      ::= { nsOspf 16 }
+
+-- Trap Support Objects
+
+--         The following are support objects for the OSPF traps.
+
+nsOspfTrapControl OBJECT IDENTIFIER ::= { nsOspfTrap 1 }
+nsOspfTraps OBJECT IDENTIFIER ::= { nsOspfTrap 2 }
+
+    nsOspfSetTrap OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE(4))
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "A four-octet string serving as a bit  map  for
+           the trap events defined by the OSPF traps. This
+           object is used to enable and  disable  specific
+           OSPF   traps   where  a  1  in  the  bit  field
+           represents enabled.  The right-most bit  (least
+           significant) represents trap 0."
+       ::= { nsOspfTrapControl 1 }
+
+    nsOspfConfigErrorType OBJECT-TYPE
+        SYNTAX   INTEGER   {
+                    badVersion (1),
+                    areaMismatch (2),
+                    unknownNbmaNbr (3), -- Router is Dr eligible
+                    unknownVirtualNbr (4),
+                    authTypeMismatch(5),
+                    authFailure (6),
+                    netMaskMismatch (7),
+                    helloIntervalMismatch (8),
+                    deadIntervalMismatch (9),
+                    optionMismatch (10) }
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "Potential types  of  configuration  conflicts.
+           Used  by the nsOspfConfigError and nsOspfConfigVir-
+           tError traps."
+   ::= { nsOspfTrapControl 2 }
+
+    nsOspfPacketType OBJECT-TYPE
+        SYNTAX   INTEGER   {
+                    hello (1),
+                    dbDescript (2),
+                    lsReq (3),
+                    lsUpdate (4),
+                    lsAck (5) }
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+
+           "OSPF packet types."
+   ::= { nsOspfTrapControl 3 }
+
+    nsOspfPacketSrc OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The IP address of an inbound packet that  can-
+           not be identified by a neighbor instance."
+       ::= { nsOspfTrapControl 4 }
+
+-- Traps
+
+    nsOspfIfStateChange NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfIfIpAddress,
+                    nsOspfAddressLessIf,
+                    nsOspfIfState,   -- The new state
+			        nsOspfIfVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfIfStateChange trap signifies that there
+           has been a change in the state of a non-virtual
+           OSPF interface. This trap should  be  generated
+           when  the interface state regresses (e.g., goes
+           from Dr to Down) or progresses  to  a  terminal
+           state  (i.e.,  Point-to-Point, DR Other, Dr, or
+           Backup)."
+   ::= { nsOspfTraps 16 }
+
+    nsOspfVirtIfStateChange NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfVirtIfAreaId,
+                    nsOspfVirtIfNeighbor,
+                    nsOspfVirtIfState,  -- The new state
+					nsOspfVirtIfVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfIfStateChange trap signifies that there
+           has  been a change in the state of an OSPF vir-
+           tual interface.
+
+           This trap should be generated when  the  inter-
+           face  state  regresses  (e.g., goes from Point-
+           to-Point to Down) or progresses to  a  terminal
+           state (i.e., Point-to-Point)."
+   ::= { nsOspfTraps 1 }
+
+    nsOspfNbrStateChange NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfNbrIpAddr,
+                    nsOspfNbrAddressLessIndex,
+                    nsOspfNbrRtrId,
+                    nsOspfNbrState,  -- The new state
+					nsOspfNbrVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An  nsOspfNbrStateChange  trap  signifies   that
+           there  has been a change in the state of a non-
+           virtual OSPF neighbor.   This  trap  should  be
+           generated  when  the  neighbor  state regresses
+           (e.g., goes from Attempt or Full  to  1-Way  or
+           Down)  or progresses to a terminal state (e.g.,
+           2-Way or Full).  When an  neighbor  transitions
+           from  or  to Full on non-broadcast multi-access
+           and broadcast networks, the trap should be gen-
+           erated  by the designated router.  A designated
+           router transitioning to Down will be  noted  by
+           nsOspfIfStateChange."
+   ::= { nsOspfTraps 2 }
+
+    nsOspfVirtNbrStateChange NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfVirtNbrArea,
+                    nsOspfVirtNbrRtrId,
+                    nsOspfVirtNbrState,  -- The new state
+					nsOspfVirtNbrVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfIfStateChange trap signifies that there
+           has  been a change in the state of an OSPF vir-
+           tual neighbor.  This trap should  be  generated
+           when  the  neighbor state regresses (e.g., goes
+           from Attempt or  Full  to  1-Way  or  Down)  or
+           progresses to a terminal state (e.g., Full)."
+   ::= { nsOspfTraps 3 }
+
+    nsOspfIfConfigError NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfIfIpAddress,
+                    nsOspfAddressLessIf,
+                    nsOspfPacketSrc,  -- The source IP address
+                    nsOspfConfigErrorType, -- Type of error
+                    nsOspfPacketType,
+					nsOspfIfVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfIfConfigError  trap  signifies  that  a
+           packet  has  been received on a non-virtual in-
+           terface  from  a  router  whose   configuration
+           parameters  conflict  with this router's confi-
+           guration parameters.  Note that the  event  op-
+           tionMismatch  should  cause  a  trap only if it
+           prevents an adjacency from forming."
+                  ::= { nsOspfTraps 4 }
+
+    nsOspfVirtIfConfigError NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfVirtIfAreaId,
+                    nsOspfVirtIfNeighbor,
+                    nsOspfConfigErrorType, -- Type of error
+                    nsOspfPacketType,
+					nsOspfVirtIfVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfConfigError trap signifies that a pack-
+           et  has  been  received  on a virtual interface
+           from a router  whose  configuration  parameters
+           conflict   with   this  router's  configuration
+           parameters.  Note that the event optionMismatch
+           should  cause a trap only if it prevents an ad-
+           jacency from forming."
+   ::= { nsOspfTraps 5 }
+
+    nsOspfIfAuthFailure NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfIfIpAddress,
+                    nsOspfAddressLessIf,
+                    nsOspfPacketSrc,  -- The source IP address
+                    nsOspfConfigErrorType, -- authTypeMismatch or
+
+                                         -- authFailure
+                    nsOspfPacketType,
+					nsOspfIfVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfIfAuthFailure  trap  signifies  that  a
+           packet  has  been received on a non-virtual in-
+           terface from a router whose authentication  key
+           or  authentication  type  conflicts  with  this
+           router's authentication key  or  authentication
+           type."
+   ::= { nsOspfTraps 6 }
+
+    nsOspfVirtIfAuthFailure NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfVirtIfAreaId,
+                    nsOspfVirtIfNeighbor,
+                    nsOspfConfigErrorType, -- authTypeMismatch or
+                                         -- authFailure
+                    nsOspfPacketType,
+					nsOspfVirtIfVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfVirtIfAuthFailure trap signifies that a
+           packet has been received on a virtual interface
+           from a router whose authentication key  or  au-
+           thentication  type conflicts with this router's
+           authentication key or authentication type."
+   ::= { nsOspfTraps 7 }
+
+    nsOspfIfRxBadPacket NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfIfIpAddress,
+                    nsOspfAddressLessIf,
+                    nsOspfPacketSrc,  -- The source IP address
+                    nsOspfPacketType,
+					nsOspfIfVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfIfRxBadPacket trap  signifies  that  an
+           OSPF  packet has been received on a non-virtual
+           interface that cannot be parsed."
+   ::= { nsOspfTraps 8 }
+
+    nsOspfVirtIfRxBadPacket NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfVirtIfAreaId,
+                    nsOspfVirtIfNeighbor,
+                    nsOspfPacketType,
+					nsOspfVirtIfVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfRxBadPacket trap signifies that an OSPF
+           packet has been received on a virtual interface
+           that cannot be parsed."
+   ::= { nsOspfTraps 9 }
+
+    nsOspfTxRetransmit NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfIfIpAddress,
+                    nsOspfAddressLessIf,
+                    nsOspfNbrRtrId, -- Destination
+                    nsOspfPacketType,
+                    nsOspfLsdbType,
+                    nsOspfLsdbLsid,
+                    nsOspfLsdbRouterId,
+					nsOspfLsdbVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfTxRetransmit  trap  signifies  than  an
+           OSPF  packet  has  been retransmitted on a non-
+           virtual interface.  All packets that may be re-
+           transmitted  are associated with an LSDB entry.
+           The LS type, LS ID, and Router ID are  used  to
+           identify the LSDB entry."
+   ::= { nsOspfTraps 10 }
+
+    nsOspfVirtIfTxRetransmit NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfVirtIfAreaId,
+                    nsOspfVirtIfNeighbor,
+                    nsOspfPacketType,
+                    nsOspfLsdbType,
+                    nsOspfLsdbLsid,
+                    nsOspfLsdbRouterId,
+					nsOspfLsdbVRID
+                  }
+        STATUS             current
+
+        DESCRIPTION
+           "An nsOspfTxRetransmit  trap  signifies  than  an
+           OSPF packet has been retransmitted on a virtual
+           interface.  All packets that may be retransmit-
+           ted  are  associated with an LSDB entry. The LS
+           type, LS ID, and Router ID are used to identify
+           the LSDB entry."
+   ::= { nsOspfTraps 11 }
+
+    nsOspfOriginateLsa NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
+                    nsOspfLsdbType,
+                    nsOspfLsdbLsid,
+                    nsOspfLsdbRouterId,
+					nsOspfLsdbVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfOriginateLsa trap signifies that a  new
+           LSA  has  been originated by this router.  This
+           trap should not be invoked for simple refreshes
+           of  LSAs  (which happesn every 30 minutes), but
+           instead will only be invoked  when  an  LSA  is
+           (re)originated due to a topology change.  Addi-
+           tionally, this trap does not include LSAs  that
+           are  being  flushed  because  they have reached
+           MaxAge."
+   ::= { nsOspfTraps 12 }
+
+    nsOspfMaxAgeLsa NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
+                    nsOspfLsdbType,
+                    nsOspfLsdbLsid,
+                    nsOspfLsdbRouterId,
+					nsOspfLsdbVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfMaxAgeLsa trap signifies  that  one  of
+           the LSA in the router's link-state database has
+           aged to MaxAge."
+   ::= { nsOspfTraps 13 }
+
+    nsOspfLsdbOverflow NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfExtLsdbLimit,
+					nsOspfLsdbVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfLsdbOverflow trap  signifies  that  the
+           number of LSAs in the router's link-state data-
+           base has exceeded nsOspfExtLsdbLimit."
+   ::= { nsOspfTraps 14 }
+
+    nsOspfLsdbApproachingOverflow NOTIFICATION-TYPE
+        OBJECTS {
+                    netscreenTrapType,
+                    netscreenTrapDesc,
+                    nsOspfRouterId, -- The originator of the trap
+                    nsOspfExtLsdbLimit,
+					nsOspfLsdbVRID
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An nsOspfLsdbApproachingOverflow trap  signifies
+           that  the  number of LSAs in the router's link-
+           state database has exceeded ninety  percent  of
+           nsOspfExtLsdbLimit."
+   ::= { nsOspfTraps 15 }
+
+END

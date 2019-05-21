@@ -1,0 +1,1961 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Private MIB
+-- Reference:
+-- Version: V2.03
+-- History: V1.0 
+--   <author>, <date>, <contents>
+--  qiyanqing, 2007-05-14, publish
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types be imported
+-- 
+-- ==================================================================
+
+    HUAWEI-TUNNEL-TE-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB    
+            InterfaceIndex            
+                FROM IF-MIB            
+            MplsIndexType            
+                FROM MPLS-LSR-STD-MIB            
+            MplsTunnelIndex, MplsTunnelInstanceIndex, MplsExtendedTunnelId            
+                FROM MPLS-TC-STD-MIB            
+            SnmpAdminString            
+                FROM SNMP-FRAMEWORK-MIB            
+            OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, Counter32, Counter64, BITS, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI
+            TruthValue, TimeStamp, RowStatus            
+                FROM SNMPv2-TC;
+    
+        hwTunnelTeMib MODULE-IDENTITY 
+      	    LAST-UPDATED "201708171607Z"        -- August 17, 2017 at 16:07 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "This MIB contains private managed object  
+                definitions for the binding information."   		         
+
+           --  Revision history
+            REVISION   "201708171607Z"
+            DESCRIPTION "V2.03, modify description."
+
+            REVISION   "201708022038Z"
+            DESCRIPTION "V2.01, modify list head."
+			
+            REVISION   "201308281726Z"
+            DESCRIPTION "V2.01, modify comment."
+
+            REVISION "200606301554Z"        -- June 30, 2006 at 15:54 GMT
+            DESCRIPTION
+                "Initial version 2006/06/10,MPLS LSPM MIB GROUP."
+            ::= { hwDatacomm 151 }
+        
+    
+    
+--
+-- Node definitions
+--
+    
+
+        hwTunnelTeMibObject OBJECT IDENTIFIER ::= { hwTunnelTeMib 1 }
+        
+            
+  
+     hwTunnelDiffServTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTunnelDiffServEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes the different service mode of tunnel."
+        ::= { hwTunnelTeMibObject  1}   
+        
+
+
+     hwTunnelDiffServEntry OBJECT-TYPE
+        SYNTAX HwTunnelDiffServEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "Interface different service mode attribute configuration."
+        INDEX   { hwTunnelDiffServIndex } 
+        ::= {hwTunnelDiffServTable 1}
+
+     HwTunnelDiffServEntry    ::=
+        SEQUENCE {
+            hwTunnelDiffServIndex
+                     InterfaceIndex,
+            hwTunnelDiffServMode
+                     INTEGER,
+            hwTunnelDiffServServiceClass
+                     INTEGER,
+            hwTunnelDiffServColor
+                     INTEGER,  
+            hwTunnelTeFlowQueue
+                     OCTET STRING
+                 }    
+                 
+
+      hwTunnelDiffServIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Uniquely identifies a set of tunnel instances
+                between a pair of ingress and egress LSRs.
+                Managers should obtain new values for row
+                creation in this table by reading mplsTunnelIndexNext. 
+                When the MPLS signalling protocol is rsvp(2),this value 
+                should be equal to the value signalled in the Tunnel ID 
+                of the session object. When the MPLS signalling protocol 
+                is crldp(3) this value should be equal to the value 
+                signalled in the LSP ID. Reference to MPLS-TE-STD-MIB."
+            ::= { hwTunnelDiffServEntry 1 } 
+            
+      hwTunnelDiffServMode OBJECT-TYPE
+         SYNTAX  INTEGER
+        {
+                pipe(1),
+                uniform(2)
+        }
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                "Different service mode of TE interface, default is uniform."
+        ::= { hwTunnelDiffServEntry 2 } 
+        
+      hwTunnelDiffServServiceClass OBJECT-TYPE
+         SYNTAX INTEGER {
+                            be(1),
+                            af1(2),
+                            af2(3),
+                            af3(4),
+                            af4(5),
+                            ef(6),
+                            cs6(7),
+                            cs7(8),
+                            invalidClass(255)
+                        }
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                "PHB in the ingress PE, the value must be 
+                 be,af1,af2,af3,af4,ef,cs6,cs7.The default class is invalidClass(255)."
+        ::= { hwTunnelDiffServEntry 3 }    
+        
+  
+      hwTunnelDiffServColor OBJECT-TYPE
+         SYNTAX    INTEGER
+            {
+                green(1),
+                yellow(2), 
+                red(3),
+                invalidColor(255)
+            }
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                "Remarked color of packet in the ingress 
+                 PE, the value must be green,yellow,red.The default color is invalidColor(255)."
+        ::= { hwTunnelDiffServEntry 4 }   
+        
+     hwTunnelTeFlowQueue OBJECT-TYPE
+         SYNTAX OCTET STRING (SIZE (0..31))
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                "Name of flow-queue template."
+        ::= { hwTunnelDiffServEntry 5 }
+       
+     hwTunnelTeVsiTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTunnelTeVsiEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION 
+            "The table describes the VPN binding of Tunnel."
+        ::= { hwTunnelTeMibObject  2 }   
+        
+
+     hwTunnelTeVsiEntry OBJECT-TYPE
+        SYNTAX HwTunnelTeVsiEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION 
+            "The L2VPN VSI binding configuration of tunnel interface."
+        INDEX   { hwTunnelTeVsiIndex,hwTunnelTeVsiName } 
+        ::= {hwTunnelTeVsiTable 1}
+
+     HwTunnelTeVsiEntry    ::=
+        SEQUENCE {
+            hwTunnelTeVsiIndex
+                     InterfaceIndex,
+            hwTunnelTeVsiName
+                     OCTET STRING,
+            hwTunnelTeVsiCir 
+                     Integer32,
+            hwTunnelTeVsiPir
+                     Integer32,
+            hwTunnelTeVsiFlowQueue
+                     OCTET STRING
+                 }    
+                 
+      hwTunnelTeVsiIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS obsolete
+            DESCRIPTION
+                "Uniquely identifies a set of tunnel instances
+                between a pair of ingress and egress LSRs.
+                Managers should obtain new values for row
+                creation in this table by reading mplsTunnelIndexNext. 
+                When the MPLS signalling protocol is rsvp(2),this value 
+                should be equal to the value signalled in the tunnel ID 
+                of the session object. When the MPLS signalling protocol 
+                is crldp(3) this value should be equal to the value 
+                signalled in the LSP ID. Reference to MPLS-TE-STD-MIB."
+            ::= { hwTunnelTeVsiEntry 1 } 
+            
+      hwTunnelTeVsiName OBJECT-TYPE
+         SYNTAX OCTET STRING (SIZE (0..47)) 
+         MAX-ACCESS  not-accessible
+         STATUS obsolete
+         DESCRIPTION
+                "The name of VSI that the TE interface bind."
+        ::= { hwTunnelTeVsiEntry 2 }    
+        
+  
+      hwTunnelTeVsiCir OBJECT-TYPE
+         SYNTAX Integer32 (100..10000000)
+         MAX-ACCESS  read-only
+         STATUS  obsolete
+         DESCRIPTION
+                "The Committed Information Rate of the VSI."
+        ::= { hwTunnelTeVsiEntry 3}
+        
+  
+      hwTunnelTeVsiPir OBJECT-TYPE
+         SYNTAX Integer32 (100..10000000)
+         MAX-ACCESS  read-only
+         STATUS  obsolete
+         DESCRIPTION
+                "The Peak Information Rate of the VSI."
+        ::= { hwTunnelTeVsiEntry 4 }
+        
+  
+      hwTunnelTeVsiFlowQueue OBJECT-TYPE
+         SYNTAX OCTET STRING (SIZE (0..31))
+         MAX-ACCESS  read-only
+         STATUS  obsolete
+         DESCRIPTION
+                "Name of flow-queue template."
+        ::= { hwTunnelTeVsiEntry 5 }
+    
+     
+     hwTunnelTeVllTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTunnelTeVllEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION 
+            "The table describes the VLL binding of tunnel."
+        ::= { hwTunnelTeMibObject  3 }   
+        
+
+     hwTunnelTeVllEntry OBJECT-TYPE
+        SYNTAX HwTunnelTeVllEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION 
+            "The VLL binding configuration of tunnel interface."
+        INDEX   { hwTunnelTeVllIndex,hwTunnelTeVllInterfaceName } 
+        ::= {hwTunnelTeVllTable 1}
+
+     HwTunnelTeVllEntry    ::=
+        SEQUENCE { 
+                 hwTunnelTeVllIndex
+                     InterfaceIndex,    
+                 hwTunnelTeVllInterfaceName  
+                     OCTET STRING,
+               hwTunnelTeVllCir 
+                     Integer32,
+            hwTunnelTeVllPir
+                     Integer32,
+           hwTunnelTeVllFlowQueue
+                     OCTET STRING
+                 }    
+                 
+      hwTunnelTeVllIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS obsolete
+            DESCRIPTION
+                "Uniquely identifies a set of tunnel instances
+                between a pair of ingress and egress LSRs.
+                Managers should obtain new values for row
+                creation in this table by reading mplsTunnelIndexNext. 
+                When the MPLS signalling protocol is rsvp(2),this value 
+                should be equal to the value signalled in the tunnel ID 
+                of the session object. When the MPLS signalling protocol 
+                is crldp(3) this value should be equal to the value 
+                signalled in the LSP ID. Reference to MPLS-TE-STD-MIB."
+            ::= { hwTunnelTeVllEntry 1 }   
+            
+       hwTunnelTeVllInterfaceName OBJECT-TYPE
+         SYNTAX OCTET STRING (SIZE (0..47)) 
+         MAX-ACCESS  not-accessible
+         STATUS  obsolete
+         DESCRIPTION
+                "The interface name of VLL binding."
+        ::= { hwTunnelTeVllEntry 2 }           
+        
+                   
+      hwTunnelTeVllCir OBJECT-TYPE
+         SYNTAX Integer32 (100..10000000)
+         MAX-ACCESS  read-only
+         STATUS  obsolete
+         DESCRIPTION
+                "The Committed Information Rate of the VLL."
+        ::= { hwTunnelTeVllEntry 3}
+        
+  
+      hwTunnelTeVllPir OBJECT-TYPE
+         SYNTAX Integer32 (100..10000000)
+         MAX-ACCESS  read-only
+         STATUS  obsolete
+         DESCRIPTION
+                "The Peak Information Rate of the VLL."
+        ::= { hwTunnelTeVllEntry 4 }
+        
+  
+      hwTunnelTeVllFlowQueue OBJECT-TYPE
+         SYNTAX OCTET STRING (SIZE (0..31))
+         MAX-ACCESS  read-only
+         STATUS  obsolete
+         DESCRIPTION
+                "Name of flow-queue template."
+        ::= { hwTunnelTeVllEntry 5 }
+        
+     hwTunnelTeL3vpnTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTunnelTeL3vpnEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION 
+            "The table describes the L3VPN binding of tunnel."
+        ::= { hwTunnelTeMibObject  4 }   
+        
+
+     hwTunnelTeL3vpnEntry OBJECT-TYPE
+        SYNTAX HwTunnelTeL3vpnEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION 
+            "The L3VPN binding configuration of tunnel interface."
+        INDEX   { hwTunnelTeL3vpnIndex,hwTunnelTeL3vpnName } 
+        ::= {hwTunnelTeL3vpnTable 1}
+
+     HwTunnelTeL3vpnEntry    ::=
+        SEQUENCE {
+            hwTunnelTeL3vpnIndex
+                     InterfaceIndex,
+            hwTunnelTeL3vpnName
+                     OCTET STRING,
+            hwTunnelTeL3vpnCir 
+                     Integer32,
+            hwTunnelTeL3vpnPir
+                     Integer32,
+            hwTunnelTeL3vpnFlowQueue
+                     OCTET STRING
+                 }    
+                 
+      hwTunnelTeL3vpnIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS obsolete
+            DESCRIPTION
+                "Uniquely identifies a set of tunnel instances
+                between a pair of ingress and egress LSRs.
+                Managers should obtain new values for row
+                creation in this table by reading mplsTunnelIndexNext. 
+                When the MPLS signalling protocol is rsvp(2),this value 
+                should be equal to the value signalled in the tunnel ID 
+                of the session object. When the MPLS signalling protocol 
+                is crldp(3) this value should be equal to the value 
+                signalled in the LSP ID. Reference to MPLS-TE-STD-MIB."
+            ::= { hwTunnelTeL3vpnEntry 1 } 
+            
+  
+      hwTunnelTeL3vpnName OBJECT-TYPE
+         SYNTAX OCTET STRING (SIZE (0..47))
+         MAX-ACCESS  not-accessible
+         STATUS  obsolete
+         DESCRIPTION
+                "The name of VPN instance that the TE interface bind."
+        ::= { hwTunnelTeL3vpnEntry 2 }
+        
+  
+      hwTunnelTeL3vpnCir OBJECT-TYPE
+         SYNTAX Integer32 (100..10000000)
+         MAX-ACCESS  read-only
+         STATUS  obsolete
+         DESCRIPTION
+                "The Committed Information Rate of the L3VPN."
+        ::= { hwTunnelTeL3vpnEntry 3}
+        
+  
+      hwTunnelTeL3vpnPir OBJECT-TYPE
+         SYNTAX Integer32 (100..10000000)
+         MAX-ACCESS  read-only
+         STATUS  obsolete
+         DESCRIPTION
+                "The Peak Information Rate of the L3VPN."
+        ::= { hwTunnelTeL3vpnEntry 4 }
+        
+  
+      hwTunnelTeL3vpnFlowQueue OBJECT-TYPE
+         SYNTAX OCTET STRING (SIZE (0..31))
+         MAX-ACCESS  read-only
+         STATUS  obsolete
+         DESCRIPTION
+                "Name of flow-queue template."
+        ::= { hwTunnelTeL3vpnEntry 5 }
+ 
+      hwTunnelTeStatisticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTunnelTeStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes the up/down state transition counts of the TE tunnel interface. 
+              It also describes timestamps when an interface is hot swapped and a primary/backup tunnel switchover is performed."
+        ::= { hwTunnelTeMibObject  5 }   
+
+      hwTunnelTeStatisticsEntry OBJECT-TYPE
+        SYNTAX HwTunnelTeStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The up/down state transition counts of TE tunnel interface.
+             The index of the table is hwTunnelTeStatisticsIfIndex."
+        INDEX   { hwTunnelTeStatisticsIfIndex} 
+        ::= {hwTunnelTeStatisticsTable 1}
+
+      HwTunnelTeStatisticsEntry    ::=
+         SEQUENCE { 
+                hwTunnelTeStatisticsIfIndex      InterfaceIndex,    
+                    hwTunnelTeUpDownStatistics       Unsigned32,
+                    hwTunnTeCounterDiscontinuityTime TimeStamp
+                  }    
+                 
+      hwTunnelTeStatisticsIfIndex OBJECT-TYPE
+         SYNTAX InterfaceIndex
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+                "This object identifies the index of a TE tunnel. 
+                 The value is an unsigned 32-bit integer."
+          ::= { hwTunnelTeStatisticsEntry 1 }   
+            
+       hwTunnelTeUpDownStatistics OBJECT-TYPE
+          SYNTAX Unsigned32 
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+               "Describes the up/down transition counts of the TE tunnel interface."
+          ::= { hwTunnelTeStatisticsEntry 2 }  
+          
+        hwTunnTeCounterDiscontinuityTime OBJECT-TYPE
+          SYNTAX TimeStamp 
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+               "The value of sysUpTime on the most recent occasion at which this interface's up/down transition  counters suffered a discontinuity."
+          ::= { hwTunnelTeStatisticsEntry 3 }          
+               
+ 
+               
+               
+               
+          
+      hwCtTemplateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCtTemplateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes the CT template configuration on the device."
+        ::= { hwTunnelTeMibObject  6 }   
+
+      hwCtTemplateEntry OBJECT-TYPE
+        SYNTAX HwCtTemplateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The CT template configuration on the device.
+             The index of the table is hwCtTemplateIndex."
+        INDEX   { hwCtTemplateIndex } 
+        ::= {hwCtTemplateTable 1}
+
+      HwCtTemplateEntry    ::=
+         SEQUENCE { 
+                    hwCtTemplateIndex                Integer32,  
+                    hwCtTemplateName                 OCTET STRING,  
+                    hwCtTemplateCt0                  Unsigned32,
+                    hwCtTemplateCt1                  Unsigned32,
+                    hwCtTemplateCt2                  Unsigned32,
+                    hwCtTemplateCt3                  Unsigned32,
+                    hwCtTemplateCt4                  Unsigned32,
+                    hwCtTemplateCt5                  Unsigned32,                    
+                    hwCtTemplateCt6                  Unsigned32,  
+                    hwCtTemplateCt7                  Unsigned32,
+                    hwCtTemplateCommit               INTEGER, 
+                    hwCtTemplateRowStatus            RowStatus
+                    }    
+                    
+        hwCtTemplateIndex OBJECT-TYPE
+         SYNTAX Integer32 (1..4096)
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+                "It uniquely identifies a set of CT templates.
+                Managers should obtain new values for row
+                creation in this table by reading hwCtTemplateIndex."
+          ::= { hwCtTemplateEntry 1 } 
+          
+         hwCtTemplateName OBJECT-TYPE
+             SYNTAX OCTET STRING (SIZE (1..19))
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The CT template name."
+             ::= { hwCtTemplateEntry 2 } 
+          
+         hwCtTemplateCt0 OBJECT-TYPE
+             SYNTAX Unsigned32
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The CT0 bandwidth of the CT template."
+             ::= { hwCtTemplateEntry 3 }    
+             
+         hwCtTemplateCt1 OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The CT1 bandwidth of the CT template."
+             ::= { hwCtTemplateEntry 4 }    
+             
+         hwCtTemplateCt2 OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The CT2 bandwidth of the CT template."
+             ::= { hwCtTemplateEntry 5 }    
+             
+         hwCtTemplateCt3 OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The CT3 bandwidth of the CT template."
+             ::= { hwCtTemplateEntry 6 }    
+             
+         hwCtTemplateCt4 OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The CT4 bandwidth of the CT template."
+             ::= { hwCtTemplateEntry 7 }    
+             
+         hwCtTemplateCt5 OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The CT5 bandwidth of the CT template."
+             ::= { hwCtTemplateEntry 8 }    
+             
+         hwCtTemplateCt6 OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The CT6 bandwidth of the CT template."
+             ::= { hwCtTemplateEntry 9 }    
+             
+         hwCtTemplateCt7 OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The CT7 bandwidth of the CT template."
+             ::= { hwCtTemplateEntry 10 }    
+             
+          hwCtTemplateCommit OBJECT-TYPE
+             SYNTAX  INTEGER{ 
+                             notCommit(1),
+                             commit(2)
+                             }
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                "The commit flag of the CT template,1 indicates commit,0 indicates not commit."
+             ::= { hwCtTemplateEntry 11 }  
+               
+         hwCtTemplateRowStatus OBJECT-TYPE
+            SYNTAX      RowStatus
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+               "This object is used to create and delete rows in the CT template."
+            ::= { hwCtTemplateEntry 12 }
+
+          
+      --      
+                 
+               
+          
+      hwCtConfigTunnelCtTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCtConfigTunnelCtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes the CT configuration in the TE tunnel interface."
+        ::= { hwTunnelTeMibObject  7 }   
+
+      hwCtConfigTunnelCtEntry OBJECT-TYPE
+        SYNTAX HwCtConfigTunnelCtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes the CT configuration in the TE tunnel interface.
+             The index of the table is hwCtConfigTunnelCtIfIndex."
+        INDEX   { hwCtConfigTunnelCtIfIndex} 
+        ::= {hwCtConfigTunnelCtTable 1}
+
+      HwCtConfigTunnelCtEntry    ::=
+         SEQUENCE { 
+                        hwCtConfigTunnelCtIfIndex                InterfaceIndex,  
+                        hwCtConfigTunnelName                     OCTET STRING,
+                        hwCtConfigTunnelCommit                   INTEGER, 
+                        hwCtConfigTemplateName                   OCTET STRING,  
+                        hwCtConfigTunnelCt0Band                  Unsigned32,
+                            hwCtConfigTunnelCt1Band                  Unsigned32,
+                            hwCtConfigTunnelCt2Band                  Unsigned32,
+                            hwCtConfigTunnelCt3Band                  Unsigned32,
+                            hwCtConfigTunnelCt4Band                  Unsigned32,
+                            hwCtConfigTunnelCt5Band                  Unsigned32,                    
+                            hwCtConfigTunnelCt6Band                  Unsigned32,  
+                            hwCtConfigTunnelCt7Band                  Unsigned32
+                    }    
+                    
+        hwCtConfigTunnelCtIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Uniquely identifies a set of tunnels
+                between a pair of ingress and egress LSRs.
+                Managers should obtain new values for row
+                creation in this table by reading mplsTunnelIndexNext. 
+                When the MPLS signalling protocol is rsvp(2),this value 
+                should be equal to the value signalled in the tunnel ID 
+                of the session object. When the MPLS signalling protocol 
+                is crldp(3) this value should be equal to the value 
+                signalled in the LSP ID. Reference to MPLS-TE-STD-MIB."
+            ::= { hwCtConfigTunnelCtEntry 1 } 
+            
+         hwCtConfigTunnelName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..64)) 
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                "The name of the TE tunnel interface."
+                 ::= { hwCtConfigTunnelCtEntry 2 }    
+                 
+         hwCtConfigTunnelCommit OBJECT-TYPE
+             SYNTAX  INTEGER{ 
+                            notCommit(1),
+                            commit(2)
+                            }
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The commit flag of the TE tunnel interface,1 indicates commit,0 indicates not commit."
+                ::= { hwCtConfigTunnelCtEntry 3 }  
+    
+                                
+         hwCtConfigTemplateName OBJECT-TYPE
+             SYNTAX OCTET STRING (SIZE (1..19))
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT template name."
+                ::= { hwCtConfigTunnelCtEntry 4 }     
+             
+              
+         hwCtConfigTunnelCt0Band OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT0 bandwidth value of the TE tunnel interface."
+             ::= { hwCtConfigTunnelCtEntry 5 }    
+             
+         hwCtConfigTunnelCt1Band OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT1 bandwidth value of the TE tunnel interface."
+             ::= { hwCtConfigTunnelCtEntry 6 }    
+             
+         hwCtConfigTunnelCt2Band OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT2 bandwidth value of the TE tunnel interface."
+             ::= { hwCtConfigTunnelCtEntry 7 }    
+             
+         hwCtConfigTunnelCt3Band OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT3 bandwidth value of the TE tunnel interface."
+             ::= { hwCtConfigTunnelCtEntry 8 }    
+             
+         hwCtConfigTunnelCt4Band OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT4 bandwidth value of the TE tunnel interface."
+             ::= { hwCtConfigTunnelCtEntry 9 }    
+             
+         hwCtConfigTunnelCt5Band OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT5 bandwidth value of the TE tunnel interface."
+             ::= { hwCtConfigTunnelCtEntry 10 }    
+             
+         hwCtConfigTunnelCt6Band OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT6 bandwidth value of the TE tunnel interface."
+             ::= { hwCtConfigTunnelCtEntry 11 }    
+             
+         hwCtConfigTunnelCt7Band OBJECT-TYPE
+             SYNTAX Unsigned32 (0..32000000)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT7 bandwidth value of the TE tunnel interface."
+             ::= { hwCtConfigTunnelCtEntry 12 }    
+                                                 
+      
+      
+      --      
+                 
+          
+     hwCtStatisticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCtStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes flow statistics of the TE tunnel interface VPN configuration."
+        ::= { hwTunnelTeMibObject  8 }   
+
+      hwCtStatisticsEntry OBJECT-TYPE
+        SYNTAX HwCtStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes the statistics in the TE tunnel interface with CT configuration.
+             The index of the table is hwCtStatisticsIfIndex."
+        INDEX   { hwCtStatisticsIfIndex } 
+        ::= {hwCtStatisticsTable 1}
+  
+      HwCtStatisticsEntry    ::=
+         SEQUENCE { 
+                    hwCtStatisticsIfIndex                 InterfaceIndex,
+                        hwCtStatisticsTunnelName              OCTET STRING,    
+                        hwCtStatisticsCt0OutByteRate          Counter64,                   
+                        hwCtStatisticsCt0OutPktRate           Counter64,  
+                    hwCtStatisticsCt0OutPkt               Counter64, 
+                    hwCtStatisticsCt0OutPktByte           Counter64,   
+                    hwCtStatisticsCt0OutErrorPkt          Counter64,    
+                    hwCtStatisticsCt1OutByteRate          Counter64,
+                    hwCtStatisticsCt1OutPktRate           Counter64, 
+                    hwCtStatisticsCt1OutPkt               Counter64, 
+                    hwCtStatisticsCt1OutPktByte           Counter64,   
+                    hwCtStatisticsCt1OutErrorPkt          Counter64, 
+                    hwCtStatisticsCt2OutByteRate          Counter64,
+                    hwCtStatisticsCt2OutPktRate           Counter64, 
+                    hwCtStatisticsCt2OutPkt               Counter64, 
+                    hwCtStatisticsCt2OutPktByte           Counter64,   
+                    hwCtStatisticsCt2OutErrorPkt          Counter64, 
+                    hwCtStatisticsCt3OutByteRate          Counter64,
+                        hwCtStatisticsCt3OutPktRate           Counter64,                      
+                    hwCtStatisticsCt3OutPkt               Counter64, 
+                    hwCtStatisticsCt3OutPktByte           Counter64,   
+                    hwCtStatisticsCt3OutErrorPkt          Counter64, 
+                    hwCtStatisticsCt4OutByteRate          Counter64,
+                         hwCtStatisticsCt4OutPktRate           Counter64,                     
+                    hwCtStatisticsCt4OutPkt               Counter64, 
+                    hwCtStatisticsCt4OutPktByte           Counter64,   
+                    hwCtStatisticsCt4OutErrorPkt          Counter64, 
+                    hwCtStatisticsCt5OutByteRate          Counter64,
+                        hwCtStatisticsCt5OutPktRate           Counter64,                      
+                    hwCtStatisticsCt5OutPkt               Counter64, 
+                    hwCtStatisticsCt5OutPktByte           Counter64,   
+                    hwCtStatisticsCt5OutErrorPkt          Counter64,  
+                    hwCtStatisticsCt6OutByteRate          Counter64,
+                        hwCtStatisticsCt6OutPktRate           Counter64,                      
+                    hwCtStatisticsCt6OutPkt               Counter64, 
+                    hwCtStatisticsCt6OutPktByte           Counter64,   
+                    hwCtStatisticsCt6OutErrorPkt          Counter64, 
+                    hwCtStatisticsCt7OutByteRate          Counter64,
+                        hwCtStatisticsCt7OutPktRate           Counter64,                      
+                    hwCtStatisticsCt7OutPkt               Counter64, 
+                    hwCtStatisticsCt7OutPktByte           Counter64,   
+                    hwCtStatisticsCt7OutErrorPkt          Counter64
+                    }    
+                    
+        hwCtStatisticsIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Uniquely identifies a set of tunnels
+                between a pair of ingress and egress LSRs.
+                Managers should obtain new values for row
+                creation in this table by reading mplsTunnelIndexNext. 
+                When the MPLS signalling protocol is rsvp(2),this value 
+                should be equal to the value signalled in the tunnel ID 
+                of the session object. When the MPLS signalling protocol 
+                is crldp(3) this value should be equal to the value 
+                signalled in the LSP ID. Reference to MPLS-TE-STD-MIB."
+            ::= { hwCtStatisticsEntry 1 } 
+            
+         hwCtStatisticsTunnelName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..64)) 
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                "The name of the TE tunnel interface."
+                 ::= { hwCtStatisticsEntry 2 }  
+
+         hwCtStatisticsCt0OutByteRate OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in bytes/sec out from the CT0 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 3 }    
+                
+                
+                
+         hwCtStatisticsCt0OutPktRate      OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in packets/sec out from the CT0 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 4 }    
+             
+         hwCtStatisticsCt0OutPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packets from the CT0 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 5 }  
+                  
+         hwCtStatisticsCt0OutPktByte OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out bytes from the CT0 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 6 }   
+      
+         hwCtStatisticsCt0OutErrorPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the error packets from the CT0 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 7 }   
+
+         hwCtStatisticsCt1OutByteRate OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in bytes/sec out from CT1 the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 8 }                  
+                
+         hwCtStatisticsCt1OutPktRate      OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in packets/sec out from the CT0 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 9 }    
+                   
+                  
+             
+         hwCtStatisticsCt1OutPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packets from the CT1 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 10 }    
+         hwCtStatisticsCt1OutPktByte OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packet bytes from the CT1 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 11 }   
+      
+         hwCtStatisticsCt1OutErrorPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the error packets from the CT1 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 12 }   
+      
+ 
+         hwCtStatisticsCt2OutByteRate OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in bytes/sec out from the CT2 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 13 }    
+                 
+         hwCtStatisticsCt2OutPktRate      OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in packets/sec out from the CT2 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 14 }    
+   
+ 
+             
+         hwCtStatisticsCt2OutPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packets from the CT2 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 15 }    
+         hwCtStatisticsCt2OutPktByte OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packet bytes from the CT2 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 16 }   
+      
+         hwCtStatisticsCt2OutErrorPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the error packets from the CT2 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 17 }   
+      
+
+         hwCtStatisticsCt3OutByteRate OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT3 out in bytes/sec out of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 18 }    
+                
+         hwCtStatisticsCt3OutPktRate      OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in packets/sec out from the CT0 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 19 }    
+                   
+                
+                
+             
+         hwCtStatisticsCt3OutPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packets from the CT3 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 20 }    
+         hwCtStatisticsCt3OutPktByte OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packet bytes from the CT3 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 21 }   
+      
+         hwCtStatisticsCt3OutErrorPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the error packets from the CT0 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 22 }   
+      
+ 
+         hwCtStatisticsCt4OutByteRate OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT4 out in bytes/sec out of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 23 }  
+                
+                 
+         hwCtStatisticsCt4OutPktRate      OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in packets/sec out from the CT4 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 24 }    
+                    
+             
+         hwCtStatisticsCt4OutPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packets from the CT4 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 25 } 
+                   
+         hwCtStatisticsCt4OutPktByte OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packet bytes from the CT4 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 26 }   
+      
+         hwCtStatisticsCt4OutErrorPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the error packets from the CT4 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 27 }   
+      
+ 
+         hwCtStatisticsCt5OutByteRate OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT5 out in bytes/sec out of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 28 }  
+                
+                
+         hwCtStatisticsCt5OutPktRate      OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in packets/sec out from the CT5 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 29 }    
+                     
+             
+         hwCtStatisticsCt5OutPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packets from the CT5 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 30 }    
+         hwCtStatisticsCt5OutPktByte OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packet bytes from the CT5 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 31 }   
+      
+         hwCtStatisticsCt5OutErrorPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the error packets from the CT5 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 32 }   
+      
+
+         hwCtStatisticsCt6OutByteRate OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT6 out in bytes/sec out of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 33 } 
+                
+                 
+         hwCtStatisticsCt6OutPktRate      OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in packets/sec out from the CT6 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 34 }    
+                     
+             
+         hwCtStatisticsCt6OutPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packets from the CT6 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 35 }    
+         hwCtStatisticsCt6OutPktByte OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packet bytes from the CT6 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 36 }   
+      
+         hwCtStatisticsCt6OutErrorPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the error packets from the CT6 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 37 }   
+      
+
+         hwCtStatisticsCt7OutByteRate OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The CT7 out in bytes/sec out of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 38 }    
+
+                
+         hwCtStatisticsCt7OutPktRate      OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the rate in packets/sec out from the CT7 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 39 }    
+   
+             
+         hwCtStatisticsCt7OutPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packets from the CT7 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 40 }    
+         hwCtStatisticsCt7OutPktByte OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the out packet bytes from the CT7 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 41 }   
+      
+         hwCtStatisticsCt7OutErrorPkt OBJECT-TYPE
+             SYNTAX Counter64
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "It counts the error packets from the CT7 of the TE tunnel interface with VPN configuration."
+                ::= { hwCtStatisticsEntry 42 }   
+      
+      
+                      
+             
+
+-- Node definitions
+--
+    
+
+        
+        hwCtFlowTemplateTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCtFlowTemplateEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes max 8 of the CT-FLOW-Mapping template configuration on the device.
+            "
+        ::= { hwTunnelTeMibObject  9}    
+       
+           hwCtFlowTemplateEntry  OBJECT-TYPE
+        SYNTAX  HwCtFlowTemplateEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes the CT-FLOW-Mapping template configuration on the device.
+            "
+        INDEX   { hwCtFlowTemplateID } 
+        ::= { hwCtFlowTemplateTable  1} 
+        
+        HwCtFlowTemplateEntry  ::=
+        SEQUENCE 
+        {
+            hwCtFlowTemplateID Integer32,
+            
+            hwCtFlowTemplateName  OCTET STRING, 
+                                    
+            hwCt0Cos INTEGER,
+           
+            hwCt0Scheduler  INTEGER,
+            
+            hwCt0Valid INTEGER , 
+                                    
+            hwCt1Cos INTEGER,
+           
+            hwCt1Scheduler  INTEGER,
+            
+            hwCt1Valid INTEGER ,
+                        
+            hwCt2Cos INTEGER,
+           
+            hwCt2Scheduler  INTEGER,
+            
+            hwCt2Valid INTEGER ,
+                        
+            hwCt3Cos INTEGER,
+           
+            hwCt3Scheduler  INTEGER,
+            
+            hwCt3Valid INTEGER ,
+                         
+            hwCt4Cos INTEGER,
+           
+            hwCt4Scheduler  INTEGER,
+            
+            hwCt4Valid INTEGER ,
+                        
+            hwCt5Cos INTEGER,
+           
+            hwCt5Scheduler  INTEGER,
+            
+            hwCt5Valid INTEGER ,
+                        
+            hwCt6Cos INTEGER,
+           
+            hwCt6Scheduler  INTEGER,
+            
+            hwCt6Valid INTEGER ,
+                        
+            hwCt7Cos INTEGER,
+           
+            hwCt7Scheduler  INTEGER,
+            
+            hwCt7Valid INTEGER ,
+            
+            hwCtFlowTemplateCommit INTEGER,
+            
+            hwCtFlowTemplateRowStatus RowStatus        
+ 
+        } 
+         
+        hwCtFlowTemplateID  OBJECT-TYPE
+        SYNTAX Integer32 (1..8)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The index of CT-FLOW templat."
+        ::= {hwCtFlowTemplateEntry 1}
+        
+        hwCtFlowTemplateName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..60))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The name of CT-FLOW template."
+        ::= { hwCtFlowTemplateEntry 11 } 
+        
+        hwCt0Cos  OBJECT-TYPE
+        SYNTAX INTEGER {
+                            be(1),
+                            af1(2),
+                            af2(3),
+                            af3(4),
+                            af4(5),
+                            ef(6),
+                            cs6(7),
+                            cs7(8)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "The Value of class of service must be in 'be,af1,af2,af3,af4,ef,cs6,cs7'."
+        ::= { hwCtFlowTemplateEntry 12 }
+        
+        hwCt0Scheduler  OBJECT-TYPE
+         SYNTAX INTEGER {
+                            pq(1),
+                            wfq(2),
+                            lpq(3)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "Scheduler name."
+        ::= { hwCtFlowTemplateEntry 13 }
+   
+        hwCt0Valid OBJECT-TYPE
+        SYNTAX INTEGER {
+                            valid(1),
+                            invalid(2)
+                        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat row."
+        ::= { hwCtFlowTemplateEntry 14 }                            
+        hwCt1Cos  OBJECT-TYPE
+        SYNTAX INTEGER {
+                            be(1),
+                            af1(2),
+                            af2(3),
+                            af3(4),
+                            af4(5),
+                            ef(6),
+                            cs6(7),
+                            cs7(8)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "The Value of class of service must be in 'be,af1,af2,af3,af4,ef,cs6,cs7'."
+        ::= { hwCtFlowTemplateEntry 15 }
+        
+        hwCt1Scheduler  OBJECT-TYPE
+         SYNTAX INTEGER {
+                            pq(1),
+                            wfq(2),
+                            lpq(3)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "Scheduler name."
+        ::= { hwCtFlowTemplateEntry 16 }
+   
+        hwCt1Valid OBJECT-TYPE
+        SYNTAX INTEGER {
+                            valid(1),
+                            invalid(2)
+                        }
+
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat row."
+        ::= { hwCtFlowTemplateEntry 17 }                            
+        hwCt2Cos  OBJECT-TYPE
+        SYNTAX INTEGER {
+                            be(1),
+                            af1(2),
+                            af2(3),
+                            af3(4),
+                            af4(5),
+                            ef(6),
+                            cs6(7),
+                            cs7(8)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "The Value of class of service must be in 'be,af1,af2,af3,af4,ef,cs6,cs7'."
+        ::= { hwCtFlowTemplateEntry 18 }
+        
+        hwCt2Scheduler  OBJECT-TYPE
+         SYNTAX INTEGER {
+                            pq(1),
+                            wfq(2),
+                            lpq(3)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "Scheduler name."
+        ::= { hwCtFlowTemplateEntry 19 }
+   
+        hwCt2Valid OBJECT-TYPE
+         SYNTAX INTEGER {
+                            valid(1),
+                            invalid(2)
+                        }
+
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat row."
+        ::= { hwCtFlowTemplateEntry 20 }                            
+        hwCt3Cos  OBJECT-TYPE
+        SYNTAX INTEGER {
+                            be(1),
+                            af1(2),
+                            af2(3),
+                            af3(4),
+                            af4(5),
+                            ef(6),
+                            cs6(7),
+                            cs7(8)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "The Value of class of service must be in 'be,af1,af2,af3,af4,ef,cs6,cs7'."
+        ::= { hwCtFlowTemplateEntry 21 }
+        
+        hwCt3Scheduler  OBJECT-TYPE
+         SYNTAX INTEGER {
+                            pq(1),
+                            wfq(2),
+                            lpq(3)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "Scheduler name."
+        ::= { hwCtFlowTemplateEntry 22 }
+   
+        hwCt3Valid OBJECT-TYPE
+         SYNTAX INTEGER {
+                            valid(1),
+                            invalid(2)
+                        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat row."
+        ::= { hwCtFlowTemplateEntry 23 }                            
+        hwCt4Cos  OBJECT-TYPE
+        SYNTAX INTEGER {
+                            be(1),
+                            af1(2),
+                            af2(3),
+                            af3(4),
+                            af4(5),
+                            ef(6),
+                            cs6(7),
+                            cs7(8)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "The Value of class of service must be in 'be,af1,af2,af3,af4,ef,cs6,cs7'."
+        ::= { hwCtFlowTemplateEntry 24 }
+        
+        hwCt4Scheduler  OBJECT-TYPE
+         SYNTAX INTEGER {
+                            pq(1),
+                            wfq(2),
+                            lpq(3)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "Scheduler name."
+        ::= { hwCtFlowTemplateEntry 25 }
+   
+        hwCt4Valid OBJECT-TYPE
+        SYNTAX INTEGER {
+                            valid(1),
+                            invalid(2)
+                        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat row."
+        ::= { hwCtFlowTemplateEntry 26 }                            
+        hwCt5Cos  OBJECT-TYPE
+        SYNTAX INTEGER {
+                            be(1),
+                            af1(2),
+                            af2(3),
+                            af3(4),
+                            af4(5),
+                            ef(6),
+                            cs6(7),
+                            cs7(8)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "The Value of class of service must be in 'be,af1,af2,af3,af4,ef,cs6,cs7'."
+        ::= { hwCtFlowTemplateEntry 27 }
+        
+        hwCt5Scheduler  OBJECT-TYPE
+         SYNTAX INTEGER {
+                            pq(1),
+                            wfq(2),
+                            lpq(3)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "Scheduler name."
+        ::= { hwCtFlowTemplateEntry 28 }
+   
+        hwCt5Valid OBJECT-TYPE
+        SYNTAX INTEGER {
+                            valid(1),
+                            invalid(2)
+                        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat row."
+        ::= { hwCtFlowTemplateEntry 29 }                            
+        hwCt6Cos  OBJECT-TYPE
+        SYNTAX INTEGER {
+                            be(1),
+                            af1(2),
+                            af2(3),
+                            af3(4),
+                            af4(5),
+                            ef(6),
+                            cs6(7),
+                            cs7(8)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "The Value of class of service must be in 'be,af1,af2,af3,af4,ef,cs6,cs7'."
+        ::= { hwCtFlowTemplateEntry 30 }
+        
+        hwCt6Scheduler  OBJECT-TYPE
+         SYNTAX INTEGER {
+                            pq(1),
+                            wfq(2),
+                            lpq(3)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "Scheduler name."
+        ::= { hwCtFlowTemplateEntry 31 }
+   
+        hwCt6Valid OBJECT-TYPE
+        SYNTAX INTEGER {
+                            valid(1),
+                            invalid(2)
+                        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat row."
+        ::= { hwCtFlowTemplateEntry 32 }                            
+        hwCt7Cos  OBJECT-TYPE
+        SYNTAX INTEGER {
+                            be(1),
+                            af1(2),
+                            af2(3),
+                            af3(4),
+                            af4(5),
+                            ef(6),
+                            cs6(7),
+                            cs7(8)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "The Value of class of service must be in 'be,af1,af2,af3,af4,ef,cs6,cs7'."
+        ::= { hwCtFlowTemplateEntry 33 }
+        
+        hwCt7Scheduler  OBJECT-TYPE
+         SYNTAX INTEGER {
+                            pq(1),
+                            wfq(2),
+                            lpq(3)
+                        }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "Scheduler name."
+        ::= { hwCtFlowTemplateEntry 34 }
+   
+        hwCt7Valid OBJECT-TYPE
+        SYNTAX INTEGER {
+                            valid(1),
+                            invalid(2)
+                       }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat row."
+        ::= { hwCtFlowTemplateEntry 35 }                            
+        
+        hwCtFlowTemplateCommit OBJECT-TYPE
+        SYNTAX INTEGER {
+                            commit(1),
+                            nocommit(2)
+                       }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat commit."
+        ::= { hwCtFlowTemplateEntry 36 }                            
+
+        hwCtFlowTemplateRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The state of CT-FLOW templat."
+        ::= { hwCtFlowTemplateEntry 51 }     
+             
+         
+
+        hwDsteInterfaceCfgTable  OBJECT-TYPE 
+        SYNTAX SEQUENCE OF  HwDsteInterfaceCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The DS-TE configuration at interface."
+        ::= { hwTunnelTeMibObject  10}
+        
+        hwDsteInterfaceCfgEntry  OBJECT-TYPE
+        SYNTAX  HwDsteInterfaceCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The DS-TE configuration at interface."
+        INDEX   { hwDsteIfIndex } 
+        ::= { hwDsteInterfaceCfgTable  1}      
+
+        HwDsteInterfaceCfgEntry ::=  
+        SEQUENCE
+        {
+            hwDsteIfIndex InterfaceIndex ,
+                       
+            hwAppliedCtFlowTemplateName  OCTET STRING,
+            
+            hwCtBandWidthShareCfg INTEGER
+        }
+         
+        hwDsteIfIndex  OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "A unique value, greater than zero, for eachinterface.  
+            It is recommended that values are assigned contiguously starting from 1.
+            The value for each interface sub-layer must remain constant at least from one re-initialization of the entity's network management system to the next re-initialization."
+        ::= {hwDsteInterfaceCfgEntry 1}
+
+        hwAppliedCtFlowTemplateName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..60))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The name of CT-FLOW template."
+        ::= { hwDsteInterfaceCfgEntry 11 } 
+        
+        hwCtBandWidthShareCfg  OBJECT-TYPE
+        SYNTAX INTEGER {
+                            share(1),
+                            unshare(2)
+                       }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION
+                "The Value of Ct BandWidth configuration for DS-TE.
+                 That must be in 'Share,UnShare'."
+        ::= { hwDsteInterfaceCfgEntry 12 }
+      
+        hwTunnelTeConformance OBJECT IDENTIFIER ::= { hwTunnelTeMib 3 }
+        
+        hwTunnelTeGroups OBJECT IDENTIFIER ::= { hwTunnelTeConformance 3 }
+        
+        hwTunnelTeCompliances OBJECT IDENTIFIER ::= {hwTunnelTeConformance 1}
+        
+            
+        hwTunnelDiffServGroup OBJECT-GROUP
+            OBJECTS { hwTunnelDiffServMode, hwTunnelDiffServServiceClass,hwTunnelDiffServColor,hwTunnelTeFlowQueue}
+            STATUS current
+            DESCRIPTION 
+                "Describes the different service mode of tunnel."
+            ::= { hwTunnelTeGroups 1 }
+            
+        hwTunnelTeVsiGroup OBJECT-GROUP
+            OBJECTS { hwTunnelTeVsiCir, hwTunnelTeVsiPir,hwTunnelTeVsiFlowQueue}
+            STATUS current
+            DESCRIPTION 
+                "Describes the VSI binding of tunnel."
+            ::= { hwTunnelTeGroups 2 }  
+            
+        hwTunnelTeVllGroup OBJECT-GROUP
+            OBJECTS { hwTunnelTeVllCir, hwTunnelTeVllPir,hwTunnelTeVllFlowQueue}
+            STATUS current
+            DESCRIPTION 
+                "Describes the VLL binding of tunnel."
+            ::= { hwTunnelTeGroups 3 }
+            
+        hwTunnelTeL3vpnGroup OBJECT-GROUP
+            OBJECTS { hwTunnelTeL3vpnCir, hwTunnelTeL3vpnPir,hwTunnelTeL3vpnFlowQueue}
+            STATUS current
+            DESCRIPTION 
+                "Describes the L3VPN binding of tunnel."
+            ::= { hwTunnelTeGroups 4 }   
+        hwTunnelTeStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwTunnelTeUpDownStatistics,hwTunnTeCounterDiscontinuityTime}
+            STATUS current
+            DESCRIPTION 
+                "Describes the up/down count of the TE tunnel."
+            ::= { hwTunnelTeGroups 5 }
+            
+       hwCtTemplateGroup OBJECT-GROUP
+            OBJECTS { hwCtTemplateName ,
+                      hwCtTemplateCt0 ,
+                      hwCtTemplateCt1 , 
+                      hwCtTemplateCt2 ,
+                      hwCtTemplateCt3 ,
+                      hwCtTemplateCt4 ,
+                      hwCtTemplateCt5 ,
+                      hwCtTemplateCt6 ,
+                      hwCtTemplateCt7,
+                      hwCtTemplateCommit,
+                      hwCtTemplateRowStatus
+                      }
+            STATUS current
+            DESCRIPTION 
+                "Describes CT template."
+            ::= { hwTunnelTeGroups 6 } 
+             
+       hwCtConfigCtGroup OBJECT-GROUP
+            OBJECTS {
+                        hwCtConfigTunnelName ,
+                        hwCtConfigTunnelCommit ,
+                        hwCtConfigTemplateName ,                       
+                        hwCtConfigTunnelCt0Band  ,
+                        hwCtConfigTunnelCt1Band  ,
+                        hwCtConfigTunnelCt2Band  ,
+                        hwCtConfigTunnelCt3Band  ,
+                        hwCtConfigTunnelCt4Band  ,
+                        hwCtConfigTunnelCt5Band  ,
+                        hwCtConfigTunnelCt6Band  ,
+                        hwCtConfigTunnelCt7Band}
+            STATUS current
+            DESCRIPTION 
+                "Describes the CT configuration of the TE tunnel interface."
+            ::= { hwTunnelTeGroups 7 } 
+        
+       hwCtStatisticsGroup OBJECT-GROUP
+            OBJECTS {
+                        hwCtStatisticsTunnelName ,
+                        hwCtStatisticsCt0OutByteRate ,
+                        hwCtStatisticsCt0OutPktRate           ,  
+                    hwCtStatisticsCt0OutPkt               ,  
+                    hwCtStatisticsCt0OutPktByte           ,   
+                    hwCtStatisticsCt0OutErrorPkt          ,    
+                    hwCtStatisticsCt1OutByteRate          ,  
+                    hwCtStatisticsCt1OutPktRate           ,  
+                    hwCtStatisticsCt1OutPkt               ,  
+                    hwCtStatisticsCt1OutPktByte           ,   
+                    hwCtStatisticsCt1OutErrorPkt          ,  
+                    hwCtStatisticsCt2OutByteRate          ,  
+                    hwCtStatisticsCt2OutPktRate           ,  
+                    hwCtStatisticsCt2OutPkt               ,  
+                    hwCtStatisticsCt2OutPktByte           ,   
+                    hwCtStatisticsCt2OutErrorPkt          ,  
+                    hwCtStatisticsCt3OutByteRate          ,  
+                        hwCtStatisticsCt3OutPktRate           ,                      
+                    hwCtStatisticsCt3OutPkt               ,  
+                    hwCtStatisticsCt3OutPktByte           ,   
+                    hwCtStatisticsCt3OutErrorPkt          ,  
+                    hwCtStatisticsCt4OutByteRate          ,  
+                         hwCtStatisticsCt4OutPktRate           ,                     
+                    hwCtStatisticsCt4OutPkt               ,  
+                    hwCtStatisticsCt4OutPktByte           ,   
+                    hwCtStatisticsCt4OutErrorPkt          ,  
+                    hwCtStatisticsCt5OutByteRate          ,  
+                        hwCtStatisticsCt5OutPktRate           ,                      
+                    hwCtStatisticsCt5OutPkt               ,  
+                    hwCtStatisticsCt5OutPktByte           ,   
+                    hwCtStatisticsCt5OutErrorPkt          ,  
+                    hwCtStatisticsCt6OutByteRate          ,  
+                        hwCtStatisticsCt6OutPktRate           ,                      
+                    hwCtStatisticsCt6OutPkt               ,  
+                    hwCtStatisticsCt6OutPktByte           ,   
+                    hwCtStatisticsCt6OutErrorPkt          ,  
+                    hwCtStatisticsCt7OutByteRate          ,  
+                        hwCtStatisticsCt7OutPktRate           ,                      
+                    hwCtStatisticsCt7OutPkt               ,  
+                    hwCtStatisticsCt7OutPktByte           ,   
+                    hwCtStatisticsCt7OutErrorPkt  
+                    }
+                    
+            STATUS current
+            DESCRIPTION 
+                "Describes the CT  of the TE tunnel interface."
+            ::= { hwTunnelTeGroups 8 }     
+             
+            hwCtFlowTemplateGroup OBJECT-GROUP
+            OBJECTS {     
+                        --hwCtFlowTemplateID ,
+                        hwCtFlowTemplateName   , 
+                        hwCt0Cos ,
+                        hwCt0Scheduler  ,
+                        hwCt0Valid  , 
+                        hwCt1Cos ,
+                        hwCt1Scheduler  ,
+                        hwCt1Valid  ,
+                        hwCt2Cos ,
+                        hwCt2Scheduler  ,
+                        hwCt2Valid  ,
+                        hwCt3Cos ,
+                        hwCt3Scheduler  ,
+                        hwCt3Valid  ,
+                        hwCt4Cos ,
+                        hwCt4Scheduler  ,
+                        hwCt4Valid  ,
+                        hwCt5Cos ,
+                        hwCt5Scheduler  ,
+                        hwCt5Valid  ,
+                        hwCt6Cos ,
+                        hwCt6Scheduler  ,
+                        hwCt6Valid  ,
+                        hwCt7Cos ,
+                        hwCt7Scheduler  ,
+                        hwCt7Valid  ,
+                        hwCtFlowTemplateCommit ,
+                        hwCtFlowTemplateRowStatus       
+                    }
+            STATUS current
+            DESCRIPTION 
+                "The table describes the CT-FLOW-Mapping template configuration on the device."
+            ::= { hwTunnelTeGroups 10 }     
+            
+            hwDsteInterfaceCfgGroup OBJECT-GROUP
+            OBJECTS {     
+                       --hwDsteIfIndex  ,
+                       hwAppliedCtFlowTemplateName   ,
+                       hwCtBandWidthShareCfg 
+                    }
+            STATUS current
+            DESCRIPTION 
+                "The table describes the CT-FLOW-Mapping template configuration on the device."
+            ::= { hwTunnelTeGroups 11 }     
+  
+        
+            
+         hwTunnelDsTeTrap OBJECT IDENTIFIER ::= { hwTunnelTeMib 2 }                    
+    
+        
+        hwMplsFqShortage NOTIFICATION-TYPE
+            OBJECTS { hwCtConfigTunnelName }
+            STATUS obsolete
+            DESCRIPTION 
+                "This notification is generated when FQ (flow-queue) template resources are shortage."
+            ::= { hwTunnelDsTeTrap 1 }  
+            
+        hwMplsSqShortage NOTIFICATION-TYPE
+            OBJECTS { hwCtConfigTunnelName }
+            STATUS obsolete
+            DESCRIPTION 
+                "This notification is generated when SQ (subscriber-queue) resources are shortage."
+            ::= { hwTunnelDsTeTrap 2 }  
+            
+        hwMplsSqBandwidthExceed NOTIFICATION-TYPE
+            OBJECTS { hwCtConfigTunnelName }
+            STATUS obsolete
+            DESCRIPTION 
+                "This notification is generated when the total bandwidth of SQ (subscriber-queue) exceeds 10G bit/s in one LPU."
+            ::= { hwTunnelDsTeTrap 3 }
+
+        hwMplsHsbFqShortage NOTIFICATION-TYPE
+            OBJECTS { hwCtConfigTunnelName }
+            STATUS obsolete
+            DESCRIPTION 
+                "This notification is generated when FQ (flow-queue) template resources in HSB are shortage."
+            ::= { hwTunnelDsTeTrap 4 }  
+            
+        hwMplsHsbSqShortage NOTIFICATION-TYPE
+            OBJECTS { hwCtConfigTunnelName }
+            STATUS obsolete
+            DESCRIPTION 
+                "This notification is generated when SQ (subscriber-queue) resources in HSB are shortage."
+            ::= { hwTunnelDsTeTrap 5 }  
+            
+        hwMplsHsbSqBandwidthExceed NOTIFICATION-TYPE
+            OBJECTS { hwCtConfigTunnelName }
+            STATUS obsolete
+            DESCRIPTION 
+                "This notification is generated when the total bandwidth of SQ (subscriber-queue) in HSB exceeds 10G bit/s in one LPU."
+            ::= { hwTunnelDsTeTrap 6 }
+
+        hwTunnelTeTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsHsbSqBandwidthExceed, hwMplsHsbSqShortage, hwMplsHsbFqShortage, hwMplsSqBandwidthExceed, hwMplsSqShortage, hwMplsFqShortage }
+            STATUS  current
+            DESCRIPTION
+                "The HUAWEI Tunnel Te trap info."
+            ::= { hwTunnelTeGroups 9 }
+
+
+
+               
+    
+-- compliance statements
+         
+         hwTunnelTeCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for HUAWEI-TUNNEL-TE-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwTunnelDiffServGroup,
+                hwTunnelTeVsiGroup,
+                hwTunnelTeVllGroup,
+                hwTunnelTeL3vpnGroup,
+                hwTunnelTeStatisticsGroup,
+                hwCtTemplateGroup,
+                hwCtConfigCtGroup,
+                hwCtStatisticsGroup,
+                hwTunnelTeTrapGroup,
+                hwCtFlowTemplateGroup,
+                hwDsteInterfaceCfgGroup}
+            ::= { hwTunnelTeCompliances 1 }   
+
+                    
+    
+    END
+
+--
+-- HUAWEI-TUNNEL-TE-MIB.mib
+--

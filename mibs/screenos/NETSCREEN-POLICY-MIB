@@ -1,0 +1,583 @@
+-- This module defines enterprise MIBs for Policy Monitoring
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-POLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenPolicy
+        FROM NETSCREEN-SMI
+    Counter32, Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenPolicyMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines NetScreen private MIBs for Policy
+         Monitoring"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200308130000Z" -- August 13, 2003
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105140000Z" -- May 14, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenPolicy 0 }
+
+NsPlyEntry ::= SEQUENCE
+{
+    nsPlyId                 Integer32,
+    nsPlyVsys               Integer32,
+    nsPlySrcZone            DisplayString,
+    nsPlyDstZone            DisplayString,
+    nsPlySrcAddr            DisplayString,
+    nsPlyDstAddr            DisplayString,
+    nsPlyService            INTEGER,
+    nsPlyAction             INTEGER,
+    nsPlyNat                INTEGER,
+    nsPlyFixPort            INTEGER,
+    nsPlyDipId              Integer32,
+    nsPlyVpnTunnel          DisplayString,
+    nsPlyL2tpTunnel         DisplayString,
+    nsPlyAuth               INTEGER,
+    nsPlyLogEnable          INTEGER,
+    nsPlyCountEnable        INTEGER,
+    nsPlyAlarmBPS           Integer32,
+    nsPlyAlarmBPM           Integer32,
+    nsPlySchedule           DisplayString,
+    nsPlyTrafficShapeEnable INTEGER,
+    nsPlyTrafficPriority    INTEGER,
+    nsPlyDSEnable           INTEGER,
+    nsPlyActiveStatus       INTEGER,
+    nsPlyName               DisplayString,
+    nsPlyServiceName        DisplayString
+}
+
+NsPlyMonEntry ::= SEQUENCE
+{
+    nsPlyMonId            Integer32,
+    nsPlyMonVsys          Integer32,
+    nsPlyMonPackPerSec    Integer32,
+    nsPlyMonPackPerMin    Integer32,
+    nsPlyMonTotalPacket   Counter32,
+    nsPlyMonBytePerSec    Integer32,
+    nsPlyMonBytePerMin    Integer32,
+    nsPlyMonTotalByte     Counter32,
+    nsPlyMonSessionPerSec Integer32,
+    nsPlyMonSessionPerMin Integer32,
+    nsPlyMonTotalSession  Counter32
+}
+
+nsPlyTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsPlyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A firewall provides a network boundary with a single point of
+         entry and exit-a choke point.You can screen and direct all that
+         traffic through the implementation of a set of access policies.
+         Access policies allow you to permit, deny, encrypt,
+         authenticate, prioritize, schedule, and monitor the traffic
+         attemption to cross your firewall. This table collects all the
+         policy configuration information existing in NetScreen
+         Device."
+    ::= { netscreenPolicy 1 }
+
+-- applicable only to release before 6.3
+--nsPlyEntry OBJECT-TYPE
+--    SYNTAX        NsPlyEntry
+--    MAX-ACCESS    not-accessible
+--    STATUS        current
+--    DESCRIPTION
+--        "Each entry in the nsPlyTable holds a set of configuration
+--         parameters associatied with an instance of policy."
+--    INDEX
+--        { nsPlyId, nsPlyVsys }
+--    ::= { nsPlyTable 1 }
+
+-- applicable since 6.3 release, for pr439626
+nsPlyEntry OBJECT-TYPE
+    SYNTAX        NsPlyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsPlyTable holds a set of configuration
+         parameters associatied with an instance of policy."
+    INDEX
+        { nsPlyVsys, nsPlyId }
+    ::= { nsPlyTable 1 }
+
+
+
+nsPlyId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Each policy is identified by a unique policy ID."
+    ::= { nsPlyEntry 1 }
+
+nsPlyVsys OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Vitural system's name this polic entry belongs to."
+    ::= { nsPlyEntry 2 }
+
+nsPlySrcZone OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Traffic through a firewall means that traffic flows from one
+         security zone to another. This object describes the source zone
+         name traffic flow passes."
+    ::= { nsPlyEntry 3 }
+
+nsPlyDstZone OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Traffic through a firewall means that traffic flows from one
+         security zone to another. This object describes the destination
+         zone name traffic flow passes."
+    ::= { nsPlyEntry 4 }
+
+nsPlySrcAddr OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Addresses are objects that identify network devices such as
+         hosts  and networks by their location in relation to the
+         firwall on which security zone.To create an access policy for
+         specific addresses, you must first create entries for the
+         relevant hosts and networks in the  address book.Source IP
+         address indicates the address in source zone, 0.0.0.0 means any
+         address."
+    ::= { nsPlyEntry 5 }
+
+nsPlyDstAddr OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Addresses are objects that identify network devices such as
+         hosts  and networks by their location in relation to the
+         firwall-on which security zone.To create an access policy for
+         specific addresses, you must first create entries for the
+         relevant hosts and networks in the  address book.Source IP
+         address indicates the address in destination  zone, 0.0.0.0
+         means any address."
+    ::= { nsPlyEntry 6 }
+
+nsPlyService OBJECT-TYPE
+    SYNTAX        INTEGER {
+        any(0),
+        aol(1),
+        bgp(2),
+        dpcp-relay(3),
+        dns(4),
+        finger(5),
+        ftp(6),
+        ftp-get(7),
+        ftp-put(8),
+        gopher(9),
+        h323(10),
+        http(11),
+        https(12),
+        icmp-info(13),
+        icmp-timestamp(14),
+        ike(15),
+        imap(16),
+        internet-locator-service(17),
+        irc(18),
+        l2tp(19),
+        ldap(20),
+        mail(21),
+        netmeeting(22),
+        nfs(23),
+        nntp(24),
+        ns-global(25),
+        ns-global-pro(26),
+        ntp(27),
+        ospf(28),
+        pc-anywhere(29),
+        ping(30),
+        pop3(31),
+        pptp(32),
+        real-media(33),
+        rip(34),
+        rlogin(35),
+        snmp(36),
+        ssh(37),
+        syslog(38),
+        talk(39),
+        tcp-any(40),
+        telnet(41),
+        tftp(42),
+        traceroute(43),
+        udp-any(44),
+        uucp(45),
+        vdo-live(46),
+        wais(47),
+        winframe(48),
+        x-windows(49),
+        other(50)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Sevices are objects that identify application protocols using
+         layer 4 information such as standard and accepted TCP and UDP
+         port numbers for application services like  Telnet, FTP, SMTP
+         and HTTP. This object indicates all the traffic service type
+         this  policy allows. 'Any' means all this policy allows all
+         service go through. 'Other' could be a configured service or
+         not in the list. See nsPlyServiceName for service  name."
+    ::= { nsPlyEntry 7 }
+
+nsPlyAction OBJECT-TYPE
+    SYNTAX        INTEGER {
+        deny(0),
+        permit(1),
+        tunnel(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Actions objects that describe what the firewall does to the
+         traffic it receives. Permit allows the packet to pass the
+         firewall. Deny blocks the packet from traversing the firewall.
+         Tunnel encapsulates outgoing IP packets and decapsulates
+         incoming IP packets."
+    ::= { nsPlyEntry 8 }
+
+nsPlyNat OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "You can apply NAT at the interface level or at the policy
+         level. With policy-based NAT, you can translate the source
+         address on either incoming or outging network and  VPN traffic.
+         This object indicates if this is a policy-based NAT."
+    ::= { nsPlyEntry 9 }
+
+nsPlyFixPort OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "When in policy-based NAT, the new secure address can come from
+         either a Dynamic IP  or from a Mapped IP. This object indicates
+         if poliy-based NAT uses fix port when working on NAT mode."
+    ::= { nsPlyEntry 10 }
+
+nsPlyDipId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object indicates the Dynamic ID chosen for NAT policy."
+    ::= { nsPlyEntry 11 }
+
+nsPlyVpnTunnel OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VPN tunnel this access policy applies to."
+    ::= { nsPlyEntry 12 }
+
+nsPlyL2tpTunnel OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "L2TP tunnel this access policy applies to."
+    ::= { nsPlyEntry 13 }
+
+nsPlyAuth OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object indicates the selecting this option requires the
+         user at the source address to authenticate his/her identiry by
+         supplying a user name and password before traffic is allowed to
+         graverw the  firewall or enter the VPN tunnel."
+    ::= { nsPlyEntry 14 }
+
+nsPlyLogEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "When you enable logging in an access policy, the NetScreen
+         device logs  all connections to which that paticular access
+         policy applies."
+    ::= { nsPlyEntry 15 }
+
+nsPlyCountEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "When you enable counting in an access plicy, the NetScreen
+         device counts the total number of bytes of traffic to which
+         this access policy applies and records the informaiton in
+         historical graphs."
+    ::= { nsPlyEntry 16 }
+
+nsPlyAlarmBPS OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "User can set a threshold that triggers an alarm when the
+         traffic permitted by the access policy exceeds a specified
+         number of bytes per second."
+    ::= { nsPlyEntry 17 }
+
+nsPlyAlarmBPM OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "User can set a threshold that triggers an alarm when the
+         traffic permitted by the access policy exceeds a specified
+         number of bytes per Minute."
+    ::= { nsPlyEntry 18 }
+
+nsPlySchedule OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "By associating a schedule to an access policy, you can
+         determine when the access policy is in effect."
+    ::= { nsPlyEntry 19 }
+
+nsPlyTrafficShapeEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "User can set parameters for the control and shaping of traffic
+         for each  access policy."
+    ::= { nsPlyEntry 20 }
+
+nsPlyTrafficPriority OBJECT-TYPE
+    SYNTAX        INTEGER {
+        high(0),
+        priority2nd(1),
+        priority3rd(2),
+        priority4th(3),
+        priority5th(4),
+        priority6th(5),
+        priority7th(6),
+        priorityLow(7)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Traffic priority for this policy."
+    ::= { nsPlyEntry 21 }
+
+nsPlyDSEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Differentiated Services is a system for tagging traffic at a
+         position within a hierarchy of priority."
+    ::= { nsPlyEntry 22 }
+
+nsPlyActiveStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        inactive(0),
+        inuse(1),
+        hidden(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Show the status of one policy entry."
+    ::= { nsPlyEntry 23 }
+
+nsPlyName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "policy name (optional)"
+    ::= { nsPlyEntry 24 }
+    
+nsPlyServiceName OBJECT-TYPE
+    SYNTAX        DisplayString 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Sevices name that identify application protocols using
+         layer 4 information such as standard and accepted TCP and UDP
+         port numbers for application services like  Telnet, FTP, SMTP
+         and HTTP. This object indicates all the traffic service type
+         this  policy allows. 'Any' means all this policy allows all
+         service go through."
+    ::= { nsPlyEntry 25 }
+
+nsPlyMonTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsPlyMonEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "traffic information for the policy-based traffic."
+    ::= { netscreenPolicy 2 }
+
+nsPlyMonEntry OBJECT-TYPE
+    SYNTAX        NsPlyMonEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry holds a set of traffic counters of a specific
+         policy."
+    INDEX
+        { nsPlyMonId, nsPlyMonVsys }
+    ::= { nsPlyMonTable 1 }
+
+nsPlyMonId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Policy Id, also used as index in this table"
+    ::= { nsPlyMonEntry 1 }
+
+nsPlyMonVsys OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys this policy belongs to"
+    ::= { nsPlyMonEntry 2 }
+
+nsPlyMonPackPerSec OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Packets go through this policy per second"
+    ::= { nsPlyMonEntry 3 }
+
+nsPlyMonPackPerMin OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Packets go through this policy per minute"
+    ::= { nsPlyMonEntry 4 }
+
+nsPlyMonTotalPacket OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "total packets go through this policy"
+    ::= { nsPlyMonEntry 5 }
+
+nsPlyMonBytePerSec OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes go through this policy per second"
+    ::= { nsPlyMonEntry 6 }
+
+nsPlyMonBytePerMin OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes go through this policy per minute"
+    ::= { nsPlyMonEntry 7 }
+
+nsPlyMonTotalByte OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total bytes go through this policy"
+    ::= { nsPlyMonEntry 8 }
+
+nsPlyMonSessionPerSec OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Sessions go through this policy per second"
+    ::= { nsPlyMonEntry 9 }
+
+nsPlyMonSessionPerMin OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Sessions go through this policy per minute"
+    ::= { nsPlyMonEntry 10 }
+
+nsPlyMonTotalSession OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total Sessions go through this policy"
+    ::= { nsPlyMonEntry 11 }
+
+END
+
+

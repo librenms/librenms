@@ -37,60 +37,92 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Pushover implements Transport
+class Pushover extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        foreach ($opts as $api) {
-            $data          = array();
-            $data['token'] = $api['appkey'];
-            $data['user']  = $api['userkey'];
-            switch ($obj['severity']) {
-                case "critical":
-                    $severity         = "Critical";
-                    $data['priority'] = 1;
-                    if (!empty($api['sound_critical'])) {
-                        $data['sound'] = $api['sound_critical'];
-                    }
-                    break;
-                case "warning":
-                    $severity         = "Warning";
-                    $data['priority'] = 0;
-                    if (!empty($api['sound_warning'])) {
-                        $data['sound'] = $api['sound_warning'];
-                    }
-                    break;
-            }
-            switch ($obj['state']) {
-                case 0:
-                    $title_text = "OK";
-                    if (!empty($api['sound_ok'])) {
-                        $data['sound'] = $api['sound_ok'];
-                    }
-                    break;
-                case 1:
-                    $title_text = $severity;
-                    break;
-                case 2:
-                    $title_text = "Acknowledged";
-                    break;
-            }
-            $data['title'] = $title_text . " - " . $obj['hostname'] . " - " . $obj['name'];
-            $data['message'] = $obj['msg'];
-            $curl            = curl_init();
-            set_curl_proxy($curl);
-            curl_setopt($curl, CURLOPT_URL, 'https://api.pushover.net/1/messages.json');
-            curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-            $ret  = curl_exec($curl);
-            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($code != 200) {
-                var_dump("Pushover returned error"); //FIXME: proper debugging
-                return 'HTTP Status code ' . $code;
-            }
+        $pushover_opts = $this->config;
+        $pushover_opts['options'] = $this->parseUserOptions($this->config['options']);
+
+        return $this->contactPushover($obj, $pushover_opts);
+    }
+
+    public function contactPushover($obj, $api)
+    {
+        $data          = array();
+        $data['token'] = $api['appkey'];
+        $data['user']  = $api['userkey'];
+        switch ($obj['severity']) {
+            case "critical":
+                $data['priority'] = 1;
+                if (!empty($api['options']['sound_critical'])) {
+                    $data['sound'] = $api['options']['sound_critical'];
+                }
+                break;
+            case "warning":
+                $data['priority'] = 1;
+                if (!empty($api['options']['sound_warning'])) {
+                    $data['sound'] = $api['options']['sound_warning'];
+                }
+                break;
+        }
+        switch ($obj['state']) {
+            case 0:
+                $data['priority'] = 0;
+                if (!empty($api['options']['sound_ok'])) {
+                    $data['sound'] = $api['options']['sound_ok'];
+                }
+                break;
+        }
+        $data['title']   = $obj['title'];
+        $data['message'] = $obj['msg'];
+        if ($api['options']) {
+            $data = array_merge($data, $api['options']);
+        }
+        $curl            = curl_init();
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_URL, 'https://api.pushover.net/1/messages.json');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        $ret  = curl_exec($curl);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code != 200) {
+            var_dump("Pushover returned error"); //FIXME: proper debugging
+            return 'HTTP Status code ' . $code;
         }
         return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Api Key',
+                    'name'  => 'appkey',
+                    'descr' => 'Api Key',
+                    'type'  => 'text',
+                ],
+                [
+                    'title' => 'User Key',
+                    'name'  => 'userkey',
+                    'descr' => 'User Key',
+                    'type'  => 'text',
+                ],
+                [
+                    'title' => 'Pushover Options',
+                    'name'  => 'options',
+                    'descr' => 'Pushover options',
+                    'type'  => 'textarea',
+                ],
+            ],
+            'validation' => [
+                'appkey' => 'required',
+                'userkey' => 'required',
+            ]
+        ];
     }
 }

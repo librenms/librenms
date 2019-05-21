@@ -1,0 +1,3032 @@
+-- =====================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: Huawei Stack MIB
+-- Reference:   HUAWEI Stack MIB
+-- Version:  V1.60
+-- History:
+-- Friday, May 06, 2011 at 15:29:31
+--
+-- =====================================================================
+HUAWEI-STACK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        entPhysicalIndex , entPhysicalName           
+            FROM ENTITY-MIB 
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        Integer32, Counter64, IpAddress, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        EnabledStatus
+            FROM P-BRIDGE-MIB
+        TruthValue, MacAddress, RowStatus
+            FROM SNMPv2-TC
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    huaweiStackMIB MODULE-IDENTITY
+                  LAST-UPDATED "201705081100Z"           
+                  ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+                  CONTACT-INFO  
+           "Huawei Industrial Base
+            Bantian, Longgang
+            Shenzhen 518129
+            People's Republic of China
+            Website: http://www.huawei.com
+            Email: support@huawei.com
+           "           
+        DESCRIPTION 
+        " "	
+        REVISION "201705081100Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+	
+        REVISION "201704271500Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201612141511Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201609221511Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+		
+        REVISION "201608111511Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+	
+        REVISION "201607271511Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201603171120Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+        
+        REVISION "201603021120Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201602291120Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201602051547Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201601201606Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201512221459Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201510260925Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201508070925Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201506240925Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201504150925Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201503060925Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201502150925Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+ 
+        REVISION "201502101425Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201412171425Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201410251425Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201410211521Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201409181650Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201409011434Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201408192109Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201408041711Z"   
+        DESCRIPTION "Updated to include support for STACK"  
+
+        REVISION "201407111558Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201406211513Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201406181348Z"   
+        DESCRIPTION "Updated to include support for STACK"  
+
+        REVISION "201406131617Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+       REVISION "201406091043Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201404140000Z"   
+        DESCRIPTION "Add hwStackSysOid"
+
+        REVISION "201403181730Z"   
+        DESCRIPTION "Updated to include support for MPUA"
+     
+        REVISION "201403041510Z"   
+        DESCRIPTION "Updated to include support for MPUA"
+
+        REVISION "201402241831Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201402221024Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        REVISION "201402190000Z"   
+        DESCRIPTION "Add hwAddingPhyPortToFabricPortTable and hwFabricPortTable"
+
+        REVISION "201401261044Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201401141459Z"   
+        DESCRIPTION "Updated to include support for STACK"    
+
+        REVISION "201401131554Z"   
+        DESCRIPTION "Updated to include support for STACK"    
+
+        REVISION "201312310845Z"   
+        DESCRIPTION "Updated to include support for STACK"    
+
+        REVISION "201312240922Z"   
+        DESCRIPTION "Updated to include support for STACK"   
+
+        REVISION "201312101122Z"   
+        DESCRIPTION "Updated to include support for SRUA/SRUB"
+
+        REVISION "201312061300Z"   
+        DESCRIPTION "Updated to include support for MPUA"
+
+        REVISION "201311081536Z"   
+        DESCRIPTION "Updated to include support for STACK"  
+
+        REVISION "201311061938Z"   
+        DESCRIPTION "Updated to include support for STACK"  
+
+        REVISION "201311051537Z"   
+        DESCRIPTION "Updated to include support for STACK"
+
+        REVISION "201310110931Z"   
+        DESCRIPTION "Updated to include support for MPUA"
+
+        REVISION "201304201703Z"   
+        DESCRIPTION "Updated to include support for STACK"
+
+        REVISION "201303281435Z"   
+        DESCRIPTION "Updated to include support for STACK"
+
+        REVISION "201208300936Z"   
+        DESCRIPTION "Updated to include support for SRUC"
+
+
+
+            ::= { hwDatacomm 183 }
+
+--
+-- Node definitions
+--
+
+        hwStackObject OBJECT IDENTIFIER ::= { huaweiStackMIB 1 }
+
+        hwStackRun OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The state of stack function on the device. The value enabled(1) 
+                  indicates this device's stack function is enabled. The value disabled(2)
+                  indicates this device's stack function is disabled."
+            ::= { hwStackObject 1 }
+
+
+        hwStackTopoType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ring(1),
+                link(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The topology of stack. "
+            ::= { hwStackObject 2 }
+
+
+
+        hwStackMacAddressSwitchTime OBJECT-TYPE
+            SYNTAX Integer32 (0..60 | 255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Stack system's MAC address switch time. "
+            ::= { hwStackObject 3 }
+
+        hwStackSystemMac OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The stack system's MAC address, it always be the master 
+                  device's MAC address. "
+            ::= { hwStackObject 4 }
+
+        hwStackIsStackDevice OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value true(1) indicates that the device's stack 
+                function is enable and it is in a stack system. When 
+                false(2), the stack function is not enable or it is 
+                not in a stack system. "
+            ::= { hwStackObject 5 }
+            
+            
+        hwStackReservedVlanId OBJECT-TYPE
+            SYNTAX Integer32 (1..4094)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Stack reserved-vlanId. "
+            ::= { hwStackObject 6 }       
+            
+        hwStackClearUnsupportCfg OBJECT-TYPE
+            SYNTAX Integer32 (1)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Clear the config which is not support stack. "
+            ::= { hwStackObject 7 }
+
+        hwStackLinkAlarmThreshold OBJECT-TYPE
+            SYNTAX Integer32 (1..32)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The alarm threshold of stack link. "
+            ::= { hwStackObject 8 }
+
+        hwStackMemberThreshold OBJECT-TYPE
+            SYNTAX Integer32 (1..256)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Maximum number of stack members."   
+            ::= { hwStackObject 9 }
+
+        hwStackMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                 card(1),
+                 serviceport(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The mode of stack."   
+            ::= { hwStackObject 10 }
+
+         hwStackMemberSpec OBJECT-TYPE
+            SYNTAX  Integer32   (1..16)
+            MAX-ACCESS accessible-for-notify
+            STATUS  current
+            DESCRIPTION
+                    "Upper limit of the stack members."
+            ::= { hwStackObject 11 }           
+
+        hwStackMacAddressAlarmTime OBJECT-TYPE
+            SYNTAX Integer32 (0..60 | 255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Stack system's MAC address inconsistence-alarm time. "
+            ::= { hwStackObject 12 }     
+
+        hwLeafMaxNumber OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum number of leaf switches on the LPU."   
+            ::= { hwStackObject 13 }
+
+        hwFabricCurrentForwardModel OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                distributed(1),
+                centralized(2),
+                hybrid(3),
+                unknown(255)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current forwarding model type of svf system"
+            ::= { hwStackObject 14 }
+
+        hwFabricConfigForwardModel OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                distributed(1),
+                centralized(2),
+                hybrid(3),
+                unknown(255)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The config forwarding model type of svf system"
+            ::= { hwStackObject 15 }
+
+        hwLeafSingleHomedAlarmEnable OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                enabled(1),
+                disabled(2),
+                unknown(255)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The single-homed alarm of leaf switches is enable or disable."
+            ::= { hwStackObject 16 }
+      
+        hwFabricExcludeLeafType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                default(0),
+                ce5810ei(1),
+                unknown(255)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The spine exclude leaf type."
+            ::= { hwStackObject 17 }
+        
+
+        hwStackUpgradeRollbackTimer OBJECT-TYPE
+            SYNTAX Integer32 (60..240)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The fast upgrade rollback timer."
+            ::= { hwStackObject 18 }
+
+--
+--  TABLE: hwStackMemberInfoTable definition
+--
+        hwStackMemberInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwStackMemberInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of stack member switches. "
+            ::= { hwStackObject 20 }
+
+
+        hwStackMemberInfoEntry OBJECT-TYPE
+            SYNTAX HwStackMemberInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provide information of stack member."
+            INDEX { hwMemberCurrentStackId }
+            ::= { hwStackMemberInfoTable 1 }
+
+
+        HwStackMemberInfoEntry ::=
+            SEQUENCE{
+                hwMemberCurrentStackId
+                    Integer32,
+                hwMemberStackPriority
+                    Integer32,
+                hwMemberStackRole
+                    INTEGER,
+                hwMemberStackMacAddress
+                    OCTET STRING,
+                hwMemberStackDeviceType
+                    OCTET STRING,
+                hwMemberConfigStackId
+                    Integer32,
+                hwMemberStackObjectId
+                    OBJECT IDENTIFIER                                        
+             }
+            
+        hwMemberCurrentStackId OBJECT-TYPE
+            SYNTAX Integer32 (0..16)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Current stack ID. "
+            ::= { hwStackMemberInfoEntry 1 }
+
+
+        hwMemberStackPriority  OBJECT-TYPE
+            SYNTAX Integer32 (-1..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Stack member's priority. "
+            ::= { hwStackMemberInfoEntry 2 }
+
+
+        hwMemberStackRole OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               master(1),
+               standby(2),
+               slave(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The role of stack device in stack system. "
+            ::= { hwStackMemberInfoEntry 3 }
+
+
+        hwMemberStackMacAddress OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "MAC address of the stack device. "
+            ::= { hwStackMemberInfoEntry 4 }
+
+
+        hwMemberStackDeviceType OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Device type of the stack device. "
+            ::= { hwStackMemberInfoEntry 5 }
+
+        hwMemberConfigStackId OBJECT-TYPE
+            SYNTAX Integer32   (0..16)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set stack device stack ID. "
+            ::= { hwStackMemberInfoEntry 6 }
+
+        hwMemberStackObjectId OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    "The vendor's authoritative identification of the
+                    network management subsystem contained in the
+                    entity.  This value is allocated within the SMI
+                    enterprises subtree (1.3.6.1.4.1) and provides an
+                    easy and unambiguous means for determining `what
+                    kind of box' is being managed.  For example, if
+                    vendor `Flintstones, Inc.' was assigned the
+                    subtree 1.3.6.1.4.1.4242, it could assign the
+                    identifier 1.3.6.1.4.1.4242.1.1 to its `Fred
+                    Router'."
+            ::= { hwStackMemberInfoEntry 7 }
+
+--
+--  TABLE: hwStackMemberInformationTable definition           
+--
+        hwStackMemberInformationTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwStackMemberInformationEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of stack member switches. "
+            ::= { hwStackObject 25}
+
+
+        hwStackMemberInformationEntry OBJECT-TYPE
+            SYNTAX HwStackMemberInformationEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provide information of stack member."
+            INDEX { hwStackIdIndex}
+            ::= { hwStackMemberInformationTable 1 }
+
+
+        HwStackMemberInformationEntry::=
+            SEQUENCE{
+                hwStackIdIndex                      
+                    Integer32,
+                hwStackPriority               
+                    Integer32,
+                hwStackRole                  
+                    INTEGER,
+                hwStackMacAddress            
+                    MacAddress,
+                hwStackDeviceType              
+                    OCTET STRING, 
+                hwStackId                
+                    Integer32,
+                hwStackConfigId               
+                    Integer32,
+                hwStackSysOid 
+                    OCTET STRING,
+                hwStackDescription 
+                    OCTET STRING,
+                hwStackCurrentUplinkPort 
+                    INTEGER,
+                hwStackConfigUplinkPort 
+                    INTEGER,
+                hwStackCurrentSwitchMode
+                    INTEGER,
+                hwStackConfigSwitchMode 
+                    INTEGER
+             }            
+        hwStackIdIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..254)          
+            MAX-ACCESS not-accessible     
+            STATUS current
+            DESCRIPTION
+                "Stack ID Index. "
+            ::= { hwStackMemberInformationEntry 1 }
+
+
+        hwStackPriority OBJECT-TYPE
+            SYNTAX Integer32 (-1..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Stack member's priority. -1 indicates an invalid value."
+            ::= { hwStackMemberInformationEntry 2 }
+
+
+        hwStackRole OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               master(1),
+               standby(2),
+               slave(3),
+               leaf(4),
+               spine(5)                        
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The role of stack device in stack system. "
+            ::= { hwStackMemberInformationEntry 3 }
+
+
+        hwStackMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "MAC address of the stack device. "
+            ::= { hwStackMemberInformationEntry 4 }
+
+
+        hwStackDeviceType OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Device type of the stack device. "
+            ::= { hwStackMemberInformationEntry 5 }
+
+        hwStackId OBJECT-TYPE
+            SYNTAX  Integer32   (0..254)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    "Current stack ID."
+            ::= { hwStackMemberInformationEntry 6 }
+
+        hwStackConfigId OBJECT-TYPE
+            SYNTAX Integer32   (-1..254)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set stack device stack ID. -1 indicates an invalid value."
+            ::= { hwStackMemberInformationEntry 7 }
+
+        hwStackSysOid OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sysoid of the stack device. "
+            ::= { hwStackMemberInformationEntry 8 }
+
+       hwStackDescription OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..81))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Description of the stack device."
+            ::= { hwStackMemberInformationEntry 9 }
+
+
+       hwStackCurrentUplinkPort OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               autoNegotiation(1),
+               port8x10ge(2),
+               port4x40ge(3),
+               port4x10ge(4),
+               port2x40ge(5),
+               port6x40ge(6),   
+               unknown(255)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current leaf Fabric-Port type of the stack device. "
+            ::= { hwStackMemberInformationEntry 10 }	
+
+         hwStackConfigUplinkPort OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                 autoNegotiation(1),
+                 port8x10ge(2),
+                 port4x40ge(3),
+                 port4x10ge(4),
+                 port2x40ge(5),
+                 port6x40ge(6),
+                 unknown(255)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The config leaf Fabric-Port type of the stack device."
+            ::= { hwStackMemberInformationEntry 11 }
+
+         hwStackCurrentSwitchMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                 autoNegotiation(1), 
+                 leaf(2),
+                 stack(3),
+                 unknown(255)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current switch mode type of the stack device."
+            ::= { hwStackMemberInformationEntry 12 }
+
+
+         hwStackConfigSwitchMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                  autoNegotiation(1), 
+                  leaf(2),
+                  stack(3),
+                  unknown(255)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The config switch mode type of the stack device."
+            ::= { hwStackMemberInformationEntry 13 }	
+
+
+
+--
+--  TABLE: hwFabricPhyLinkTable definition           
+--
+        hwFabricPhyLinkTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwFabricPhyLinkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of fabric physical link information. "
+            ::= { hwStackObject 28}
+
+
+        hwFabricPhyLinkEntry OBJECT-TYPE
+            SYNTAX HwFabricPhyLinkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provide information of fabric physical link ."
+            INDEX { hwSpinePortIndex }
+            ::= { hwFabricPhyLinkTable 1 }
+
+
+        HwFabricPhyLinkEntry::=
+            SEQUENCE{
+                hwSpinePortIndex
+                    Integer32,
+                hwSpineStackId
+                    Integer32,
+                hwSpinePortName
+                    OCTET STRING, 
+                hwSpinePortStatus
+                    INTEGER,
+                hwLeafPortIndex
+                    Integer32,
+                hwLeafStackId
+                    Integer32,
+                hwLeafPortName
+                    OCTET STRING, 
+                hwLeafPortStatus
+                     INTEGER
+             }
+            
+        hwSpinePortIndex OBJECT-TYPE
+            SYNTAX Integer32           
+            MAX-ACCESS not-accessible        
+            STATUS current
+            DESCRIPTION
+                "Spine port physical index. "
+            ::= { hwFabricPhyLinkEntry 1 }
+
+        hwSpineStackId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Spine stack device's ID."
+            ::= { hwFabricPhyLinkEntry 2 }
+
+        hwSpinePortName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..128))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Spine stack port name. "
+            ::= { hwFabricPhyLinkEntry 3 }
+
+        hwSpinePortStatus OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               up(1),
+               down(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Protocol status of the spine member port. "
+            ::= { hwFabricPhyLinkEntry 4 }
+
+        hwLeafPortIndex OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-only       
+            STATUS current
+            DESCRIPTION
+                "Leaf port physical index, and -1 indicates an invalid value. "
+            ::= { hwFabricPhyLinkEntry 5 }
+
+        hwLeafStackId OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 101..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Leaf device's ID, and -1 indicates an invalid value."
+            ::= { hwFabricPhyLinkEntry 6 }
+
+        hwLeafPortName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..128))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Leaf port name, and null indicates an invalid value."
+            ::= { hwFabricPhyLinkEntry 7 }
+
+        hwLeafPortStatus OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               up(1),
+               down(2),
+               null(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Protocol status of the leaf member port, and null indicates an invalid value."
+            ::= { hwFabricPhyLinkEntry 8}
+
+--
+--  TABLE: hwStackPortTable definition
+--
+        hwStackPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwStackPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of stack port. "
+            ::= { hwStackObject 21 }
+
+
+        hwStackPortEntry OBJECT-TYPE
+            SYNTAX HwStackPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provide information of the stack port. "
+            INDEX { hwStackPortStackId ,hwStackPortId }
+            ::= { hwStackPortTable 1 }
+
+
+        HwStackPortEntry ::=
+            SEQUENCE {  
+                hwStackPortStackId
+                    Integer32,
+                hwStackPortId
+                    Integer32,
+                hwStackPortName
+                    OCTET STRING,
+                hwStackNeighborInfo
+                    OCTET STRING,
+                hwStackPortStatus 
+                    INTEGER
+             }
+
+        hwStackPortStackId OBJECT-TYPE
+            SYNTAX Integer32 (0..16)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Stack device's ID. "
+            ::= { hwStackPortEntry 1 }
+
+
+        hwStackPortId  OBJECT-TYPE
+            SYNTAX Integer32 (0..1)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Stack port ID. "
+            ::= { hwStackPortEntry 2 }
+
+
+        hwStackPortName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..128))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack port name. "
+            ::= { hwStackPortEntry 3 }
+
+
+        hwStackNeighborInfo OBJECT-TYPE  
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack neighbor ID. "
+            ::= { hwStackPortEntry 4 }
+
+
+        hwStackPortStatus  OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               up(1),
+               down(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the stack port. "
+            ::= { hwStackPortEntry 5 }
+
+--
+-- Trap :hwStackEventsV2 definition
+--
+        hwStackEventsV2 OBJECT IDENTIFIER ::= { hwStackObject 22 }
+
+        hwStackLinkUp  NOTIFICATION-TYPE
+            OBJECTS {hwStackPortStackId,hwStackPortId,hwStackPortStatus}
+            STATUS current
+            DESCRIPTION
+                "When the stack link turn to up status,
+                send a SNMP trap to network manager."
+            ::= { hwStackEventsV2 1 }
+
+        hwStackLinkDown  NOTIFICATION-TYPE
+            OBJECTS {hwStackPortStackId,hwStackPortId,hwStackPortStatus}
+            STATUS current
+            DESCRIPTION
+                "When the stack link turn to down status,
+                send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  2 }
+
+        hwStackStandbyChange NOTIFICATION-TYPE
+            OBJECTS { hwMemberCurrentStackId }
+            STATUS current
+            DESCRIPTION
+                "When the stack standby device change,
+                send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  3 }
+
+
+        hwStackSwitchOver NOTIFICATION-TYPE
+            OBJECTS { hwMemberCurrentStackId }
+            STATUS current
+            DESCRIPTION
+                "When the stack main device change,
+                send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  4 }
+
+
+        hwStackSystemRestart NOTIFICATION-TYPE
+            OBJECTS { hwMemberCurrentStackId }
+            STATUS current
+            DESCRIPTION
+                "When the stack system restart,
+                send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  5 }
+
+        hwStackStackMemberAdd NOTIFICATION-TYPE
+            OBJECTS { hwMemberCurrentStackId }
+            STATUS current
+            DESCRIPTION
+                " When a stack member join in,
+                send a SNMP trap to network manager. "
+            ::= { hwStackEventsV2  6 }
+
+        hwStackStackMemberLeave NOTIFICATION-TYPE
+            OBJECTS { hwMemberCurrentStackId }
+            STATUS current
+            DESCRIPTION
+                " When a stack member leave,
+                send a SNMP trap to the network manager."
+            ::= { hwStackEventsV2  7 }
+
+        hwStackStackMacChange NOTIFICATION-TYPE
+            OBJECTS { hwMemberStackMacAddress }
+            STATUS current
+            DESCRIPTION
+                " When the main stack device change, the stack system's
+                MAC address should change also. And we can set the MAC 
+                address change time. When the MAC address change,send 
+                a SNMP trap to network manager."
+            ::= { hwStackEventsV2  8 }
+            
+        hwStackLogicStackPortLinkErr NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName,hwStackPeerIfName }
+            STATUS current
+            DESCRIPTION
+                " When the stack port connect error,send 
+                a SNMP trap to network manager."
+            ::= { hwStackEventsV2  9 }
+
+        hwStackPhyStackPortLinkErr NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName,hwStackPeerIfName }
+            STATUS current
+            DESCRIPTION
+                " When the stack port connect error,send 
+                a SNMP trap to network manager."
+            ::= { hwStackEventsV2  10 }
+            
+        hwPhyStackPortIsDown NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName }
+            STATUS current
+            DESCRIPTION
+                " When the stack port link state is down,send 
+                a SNMP trap to network manager."
+            ::= { hwStackEventsV2  11 }      
+
+        hwPhyStackPortIsUp NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName }
+            STATUS current
+            DESCRIPTION
+                " When the stack port link state is up,send 
+                a SNMP trap to network manager."
+            ::= { hwStackEventsV2  12 }    
+
+       hwStackLogicStackPortLinkErrResume NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName,hwStackPeerIfName }
+            STATUS current
+            DESCRIPTION
+                " When the wrong link in stack port resumed,send 
+                a SNMP trap to network manager."
+            ::= { hwStackEventsV2  13 }
+            
+        hwStackPortConfigureFailed NOTIFICATION-TYPE
+            OBJECTS { hwConfigureFailedStackId }
+            STATUS current
+            DESCRIPTION
+                " When failed to configure the stack port,send 
+                a SNMP trap to network manager."
+            ::= { hwStackEventsV2  14 }      
+
+        hwStackLinkLimitAlarm NOTIFICATION-TYPE 
+            OBJECTS { hwStackLocalIfName, hwStackCurrentLinkNum, hwStackLinkAlarmThreshold }     
+            STATUS current     
+            DESCRIPTION     
+                " When the number of STACK links has reached alarm threshold,send      
+                a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  15 }           
+      
+        hwStackLinkLimitAlarmResume NOTIFICATION-TYPE     
+            OBJECTS { hwStackLocalIfName, hwStackCurrentLinkNum, hwStackLinkAlarmThreshold }     
+            STATUS current     
+            DESCRIPTION     
+                " When the number of STACK links is equal or more than alarm threshold,
+                send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  16 }            
+
+         hwStackConfigConflict NOTIFICATION-TYPE     
+            OBJECTS { hwMemberCurrentStackId,hwStackCfgConflictStackId }     
+            STATUS current     
+            DESCRIPTION     
+                " When the stack configuration conflicts, send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  17 }  
+
+         hwStackFabricPortLinkErr NOTIFICATION-TYPE     
+            OBJECTS { hwStackFabricPort,hwStackFabricMemberPort}     
+            STATUS current     
+            DESCRIPTION     
+                " When the interface Fabric-Port link is invalidly, send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  18 }
+
+         hwStackFabricPortLinkErrResume NOTIFICATION-TYPE     
+            OBJECTS { hwStackFabricPort,hwStackFabricMemberPort }     
+            STATUS current     
+            DESCRIPTION     
+                " When the interface Fabric-Port link is resumed, send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  19 } 
+
+         hwStackLeafSingleHomedAlarm NOTIFICATION-TYPE     
+            OBJECTS { hwStackMemberId,hwStackLeafMemberId }     
+            STATUS current     
+            DESCRIPTION     
+                " When the leaf switch is only linked to one spine switch, send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  20 } 
+
+         hwStackLeafSingleHomedAlarmResume NOTIFICATION-TYPE     
+            OBJECTS { hwStackMemberId,hwStackLeafMemberId }     
+            STATUS current     
+            DESCRIPTION     
+                " When the single-homed leaf switch leaves the stack system or turns to the dual-homed mode, send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  21 } 
+
+         hwStackMemberLimit NOTIFICATION-TYPE     
+            OBJECTS { hwStackMemberThreshold }     
+            STATUS current     
+            DESCRIPTION     
+                " When the number of stack members has reached the upper limit and new members failed to join, send a SNMP trap to network manager." 
+            ::= { hwStackEventsV2  22 } 
+
+        hwStackMemberAdd NOTIFICATION-TYPE
+            OBJECTS { hwStackId }
+            STATUS current
+            DESCRIPTION
+                " When a stack member join in,
+                send a SNMP trap to network manager. "
+            ::= { hwStackEventsV2  23 }
+
+        hwStackMemberLeave NOTIFICATION-TYPE
+            OBJECTS { hwStackId }
+            STATUS current
+            DESCRIPTION
+                " When a stack member leave,
+                send a SNMP trap to the network manager."
+            ::= { hwStackEventsV2  24 }
+
+        hwStackConfigDifferent NOTIFICATION-TYPE
+            OBJECTS { hwStackId, hwStackReason }
+            STATUS current
+            DESCRIPTION
+                " When the stack configuration of the current startup is different from that of next startup, 
+                send a SNMP trap to the network manager."
+            ::= { hwStackEventsV2  25 }
+
+       hwStackLeafConfigConflict NOTIFICATION-TYPE
+            OBJECTS { hwStackLeafPort }
+            STATUS current
+            DESCRIPTION
+                " When configuration exists on the uplink port of the leaf switch, and this port cannot be used as the fabric port, send a SNMP trap to the network manager."
+            ::= { hwStackEventsV2  26 }
+
+       hwStackChipSingleHomedAlarm NOTIFICATION-TYPE     
+            OBJECTS { hwStackLeafMemberId }     
+            STATUS current     
+            DESCRIPTION     
+                " In the dual-homing network, when two ports of any chip on the dual-chip leaf switch are connected to a spine switch, send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  27 } 
+
+       hwStackChipSingleHomedAlarmResume NOTIFICATION-TYPE     
+            OBJECTS { hwStackLeafMemberId }     
+            STATUS current     
+            DESCRIPTION     
+                " In the dual-homing network, when two ports of any chip on the dual-chip leaf switch are not connected to a spine switch, send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  28 } 
+
+        hwStackLeafMemberAdd NOTIFICATION-TYPE
+            OBJECTS { hwStackId }
+            STATUS current
+            DESCRIPTION
+                " When a leaf member join in,
+                send a SNMP trap to network manager. "
+            ::= { hwStackEventsV2  29 }
+
+        hwFabricLinkLimitAlarm NOTIFICATION-TYPE
+            OBJECTS { hwStackFabricPort, hwFabricCurrentLinkNum, hwFabricConfiguredLinkNum }     
+            STATUS current     
+            DESCRIPTION     
+                " When the number of fabric links has reached alarm threshold,send      
+                a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  30 }           
+      
+        hwFabricLinkLimitAlarmResume NOTIFICATION-TYPE     
+            OBJECTS { hwStackFabricPort, hwFabricCurrentLinkNum, hwFabricConfiguredLinkNum }     
+            STATUS current     
+            DESCRIPTION     
+                " When the number of fabric links is equal or more than alarm threshold,
+                send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  31 }   
+
+        hwStackMemberExceedSpec NOTIFICATION-TYPE
+            OBJECTS { hwStackMemberSpec }
+            STATUS current
+            DESCRIPTION
+                " The number of stack members exceeds the upper limit. "
+            ::= { hwStackEventsV2  32 } 
+
+        hwStackMacInconsistence NOTIFICATION-TYPE
+            OBJECTS { hwStackSystemMac }
+            STATUS current
+            DESCRIPTION
+                "When the stack system's MAC address is not the manufacture MAC address of any member device,
+                send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  33 } 
+
+        hwStackMacInconsistenceResume NOTIFICATION-TYPE
+            OBJECTS { hwStackSystemMac}
+            STATUS current
+            DESCRIPTION
+                "When the stack system's MAC address is the manufacture MAC address of a member device,
+                send a SNMP trap to network manager."     
+            ::= { hwStackEventsV2  34 } 
+
+        hwFabricLinkProtocolAlarm NOTIFICATION-TYPE
+            OBJECTS {hwStackFabricPort}
+            STATUS current
+            DESCRIPTION     
+                "When the fabric link protocol state of the fabric port is down, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2 35 }
+
+        hwFabricLinkProtocolAlarmResume NOTIFICATION-TYPE
+            OBJECTS {hwStackFabricPort}
+            STATUS current
+            DESCRIPTION
+                "When the fabric link protocol state of the fabric port is up or the fabric port does not exist, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2  36 }
+
+        hwFabricMemberPortProtocolAlarm NOTIFICATION-TYPE
+            OBJECTS {hwStackFabricMemberPort}
+            STATUS current
+            DESCRIPTION
+                "When the fabric link protocol state of the member port is down, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2 37 }
+
+        hwFabricMemberPortProtocolAlarmResume NOTIFICATION-TYPE
+            OBJECTS {hwStackFabricMemberPort}
+            STATUS current
+            DESCRIPTION
+                "When the fabric link protocol state of the member port is up or the fabric member port does not exist, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2  38 }
+
+        hwLeafMaxNumberExceededAlarm  NOTIFICATION-TYPE
+            OBJECTS {entPhysicalName, hwLeafMaxNumber}
+            STATUS current
+            DESCRIPTION
+                "When the number of leaf switches connected to the LPU exceeds the maximum,
+                send a SNMP trap to network manager."
+            ::= { hwStackEventsV2 39 }
+
+        hwLeafMaxNumberExceededAlarmResume  NOTIFICATION-TYPE
+            OBJECTS {entPhysicalName, hwLeafMaxNumber}
+            STATUS current
+            DESCRIPTION
+                "When the number of leaf switches connected to the LPU is recovered to be within the maximum,
+                send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  40 }
+
+        hwPhyStackPortErrorDown  NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION
+                "When the runts-error-down occured, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  41 }
+    
+        hwPhyStackPortErrorDownRecover  NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName, hwStackErrorDownRecoverReason}
+            STATUS current
+            DESCRIPTION
+                "When the runts-error-down recovered, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  42 }
+
+        hwSvfFabricPortConfigurationNotActiveAlarm  NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION
+                "When the port on the board is configured as fabric member port, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2 43 }
+
+        hwSvfFabricPortConfigurationNotActiveAlarmResume  NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION
+                "When the port on the board is cancel configured as fabric member port or the board is offline, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2  44 }
+
+        hwStackMemberPortSpeedDifferentAlarm  NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION
+                "When the rates of member ports in a stack port are different, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2 45 }
+
+        hwStackMemberPortSpeedDifferentAlarmResume  NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION
+                "When the rates of member ports in a stack port are same, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2  46 }
+
+        hwStackMemberPortProtocolAlarm NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION
+                "When the physical status of the stack member port is up, but the protocol status is down, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2 47 }
+
+        hwStackMemberPortProtocolAlarmResume NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION
+                "When the physical status and protocol status of the stack member port is up or down at the same time, or the stack member port is deleted, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2  48 }
+            
+        hwPhyStackVlanConflict NOTIFICATION-TYPE
+            OBJECTS { hwStackVlanConflictDescription, hwStackVlanID }
+            STATUS current
+            DESCRIPTION 
+                "When the stack VLAN conflict, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  49 }
+             
+        hwStackLinkTopoAlarm NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "When the TOR stack system consisting of more than two devices is a link stack, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  51 }
+            
+        hwStackLinkTopoAlarmResume NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "When the TOR stack system consisting of more than two devices is a ring stack, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  52 }
+
+        hwStackMemberPortTypeDifferentAlarm NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION
+                "When the interface type of member ports in a stack port are different, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2  53 }
+            
+        hwStackMemberPortTypeDifferentAlarmResume NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName }
+            STATUS current
+            DESCRIPTION
+                "When the interface type of member ports in a stack port are same, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2  54 }
+           
+        hwStackLinkTopoSinglePortAlarm NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName }
+            STATUS current
+            DESCRIPTION
+                "When the stack port has only one available physical forwarding link in the link-topo stack system, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  55 }
+            
+        hwStackLinkTopoSinglePortAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION
+                "When the stack port has not only one available physical forwarding link in the link-topo stack system, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  56 }
+        hwStackSipPortSingleLinkAlarm NOTIFICATION-TYPE
+            OBJECTS { hwStackMemberId }
+            STATUS current
+            DESCRIPTION
+                "When the out-of-band CSS has only one available sip-port link, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  57 }
+            
+        hwStackSipPortSingleLinkAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwStackMemberId }
+            STATUS current
+            DESCRIPTION
+                "When the out-of-band CSS has not only one available sip-port link,send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  58 }
+			
+	    hwStackPortErrorDown NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName, hwStackPortErrorDownType }
+            STATUS current
+            DESCRIPTION
+            "When the crc or link-flap error-down occured,send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  59 }
+			
+		hwStackPortErrorDownRecovery NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName, hwStackPortErrorDownType }
+            STATUS current
+            DESCRIPTION
+            "When the crc or link-flap error-down recovered,send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  60 }
+			
+		hwStackSetUpFailure NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalSlotID, hwStackPeerSlotID, hwStackSetUpFailureDescription }
+            STATUS current
+            DESCRIPTION
+            "When failed to set up a stack,send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  61 }
+
+        hwStackMemberPortLoopAlarm NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName }
+            STATUS current
+            DESCRIPTION
+            "When a loop occurre in stack member port, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  62 }
+			
+        hwStackMemberPortLoopAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName }
+            STATUS current
+            DESCRIPTION
+            "When the loop recover in stack member port, send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  63 }
+	    
+	hwStackAutoConfigFailed NOTIFICATION-TYPE
+            OBJECTS { hwStackAutoConfigFailedSlotID, hwStackAutoConfigFailedIfName, hwStackAutoConfigFailedReason }
+            STATUS current
+            DESCRIPTION
+            "When failed auto change to stack port,send a SNMP trap to network manager."
+            ::= { hwStackEventsV2  64 }	    
+	
+--
+--  TABLE: hwStackUpgradeTable definition
+--
+        hwStackUpgradeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwStackUpgradeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of flash copy operation entries. Each
+                entry represents a flash copy operation (to flash)
+                that has been initiated."
+            ::= { hwStackObject 30 }
+
+        hwStackUpgradeEntry OBJECT-TYPE
+            SYNTAX HwStackUpgradeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A flash copy operation entry. Each entry consists 
+                of a command, a source, and optional parameters such
+                as protocol to be used, a destination, a server address,
+                etc. 
+                
+                A management station wishing to create an entry should
+                first generate a pseudo-random serial number to be used
+                as the index to this sparse table.  The station should
+                then create the associated instance of the row status
+                object. It must also, either in the same or in successive 
+                PDUs, create the associated instance of the command and
+                parameter objects. It should also modify the default values 
+                for any of the parameter objects if the defaults are not 
+                appropriate.
+                
+                Once the appropriate instances of all the command
+                objects have been created, either by an explicit SNMP
+                set request or by default, the row status should be set
+                to active to initiate the operation. Note that this entire
+                procedure may be initiated via a single set request which
+                specifies a row status of createAndGo as well as specifies
+                valid values for the non-defaulted parameter objects.
+                
+                Once an operation has been activated, it cannot be stopped. 
+                
+                Once the operation completes, the management station should
+                retrieve the value of the status object, and delete the entry. 
+                In order to prevent old entries from clogging the table, 
+                entries will be aged out, but an entry will never be deleted 
+                within 2 hours of completing."
+            INDEX { hwStackUpgradeIndex }
+            ::= { hwStackUpgradeTable 1 }
+
+        HwStackUpgradeEntry ::=
+            SEQUENCE {
+                hwStackUpgradeIndex
+                    Integer32,
+                hwStackUpgradeGrpType
+                    INTEGER,
+                hwStackUpgradeGrpValue
+                    OCTET STRING,
+                hwStackUpgradeFileType
+                    INTEGER,
+                hwStackUpgradeFileInfo
+                    OCTET STRING,
+                hwStackUpgradeFtpIp
+                    IpAddress,
+                hwStackUpgradeFtpUserName
+                    OCTET STRING,
+                hwStackUpgradeFtpPassword
+                    OCTET STRING,
+                hwStackUpgradeServerPort
+                    Integer32,
+                hwStackUpgradeFileSize
+                    Integer32,
+                hwStackUpgradeTransmitProtocol
+                    INTEGER,
+                hwStackUpgradeRowStatus
+                    RowStatus
+            }
+
+        hwStackUpgradeIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Specifies the index of an entry. It is a 
+                random value when creating an entry."
+            ::= { hwStackUpgradeEntry 1 }
+
+        hwStackUpgradeGrpType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                allMembers(1),
+                memberIdList(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of stack grouping member switches." 
+            DEFVAL { allMembers }
+            ::= { hwStackUpgradeEntry 2 }
+
+        hwStackUpgradeGrpValue OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..18))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Details about stack grouping member switches for memberIdList. 
+                Optional, This object will be ignored for allMembers ."
+            ::= { hwStackUpgradeEntry 3 }
+
+        hwStackUpgradeFileType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                startupFile(1),
+                patchFile(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of the file to be upgraded."
+            ::= { hwStackUpgradeEntry 4 }
+
+        hwStackUpgradeFileInfo OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Path and type of the file to be upgraded."
+            ::= { hwStackUpgradeEntry 5 }
+
+        hwStackUpgradeFtpIp OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The address of remote host acting as server for any operation.
+                The default value of which is 255.255.255.255."   
+            DEFVAL { 'FFFFFFFF'h }
+            ::= { hwStackUpgradeEntry 6 }
+
+        hwStackUpgradeFtpUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "When use FTP to transfer files, the user name must be 
+                specified by this node."
+            ::= { hwStackUpgradeEntry 7 }
+
+        hwStackUpgradeFtpPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Remote user password for copy via FTP protocol. "
+            ::= { hwStackUpgradeEntry 8 }
+
+        hwStackUpgradeServerPort OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                This object specifies the SFTP server port that is used for file transfer 
+                only SFTP is valid. The default SFTP server port is 22 if no port is specified.  
+                If the value of protocol is not SFTP, this object is ignored by the 
+                implementation."
+            ::= { hwStackUpgradeEntry 9 }
+
+        hwStackUpgradeFileSize OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object specifies the reserved space (in BYTE) guaranteed by a host.
+                The value 0 indicates that no space need be reserved. This object is optional 
+                in the Set operation of file upload. The default value is 0. This object is unavailable
+                in the Set operation of file download. "
+            ::= { hwStackUpgradeEntry 10 }
+
+        hwStackUpgradeTransmitProtocol OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ftp(1),
+                sftp(2),
+                tftp(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the protocol used to transfer file.
+                The default value of it is FTP."
+            DEFVAL { ftp }
+            ::= { hwStackUpgradeEntry 11 }
+
+        hwStackUpgradeRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this table entry.  Only used createAndGo and destroy."
+            ::= { hwStackUpgradeEntry 51 }
+
+--
+--  TABLE: hwStackMemberPortEnableTable definition
+--
+        hwStackMemberPortEnableTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwStackMemberPortEnableEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of stack physical port. "
+            ::= { hwStackObject 23 }
+
+        hwStackMemberPortEnableEntry OBJECT-TYPE
+            SYNTAX HwStackMemberPortEnableEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provide information of the physical port. "
+            INDEX { entPhysicalIndex }
+            ::= { hwStackMemberPortEnableTable 1 }
+
+        HwStackMemberPortEnableEntry ::=
+            SEQUENCE {  
+                hwEnableStackMode
+                    INTEGER
+             }
+
+        hwEnableStackMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               yes(1),
+               no(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If enable stack mode. "
+            DEFVAL { no }
+            ::= { hwStackMemberPortEnableEntry 1 }
+            
+
+--
+--  TABLE: hwAddingPhyPortToStackPortTable definition
+--
+        hwAddingPhyPortToStackPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAddingPhyPortToStackPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of a stack port's member port. "
+            ::= { hwStackObject 24 }
+
+
+        hwAddingPhyPortToStackPortEntry OBJECT-TYPE
+            SYNTAX HwAddingPhyPortToStackPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provide information of a stack port's member port. "
+            INDEX { hwEnabledStackModePhyPortIndex }
+            ::= { hwAddingPhyPortToStackPortTable 1 }
+
+
+        HwAddingPhyPortToStackPortEntry ::=
+            SEQUENCE {  
+                hwEnabledStackModePhyPortIndex
+                     Integer32,
+                hwStackPortID
+                     INTEGER           
+             }
+
+        hwEnabledStackModePhyPortIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Enabled stack mode's physical name "
+            ::= { hwAddingPhyPortToStackPortEntry 1 }
+            
+        hwStackPortID OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               port1(1),
+               port2(2),
+               unjoinable(3)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "adding to which stack port
+                 1: added to stack port 1
+                 2: added to stack port 2
+                 3: did not add to any stack port "
+            ::= { hwAddingPhyPortToStackPortEntry 2 }
+
+--
+--  TABLE: hwAddingPhyPortToFabricPortTable definition
+--
+        hwAddingPhyPortToFabricPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAddingPhyPortToFabricPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of a fabric port's member port. "
+            ::= { hwStackObject 26 }
+
+
+        hwAddingPhyPortToFabricPortEntry OBJECT-TYPE
+            SYNTAX HwAddingPhyPortToFabricPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provide information of a fabric port's member port. "
+            INDEX { hwEnabledStackModePortIndex }
+            ::= { hwAddingPhyPortToFabricPortTable 1 }
+
+
+        HwAddingPhyPortToFabricPortEntry ::=
+            SEQUENCE {  
+                hwEnabledStackModePortIndex
+                     Integer32,
+                hwFabricPortID
+                     Integer32           
+             }
+
+        hwEnabledStackModePortIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Enabled stack mode's physical Index "
+            ::= { hwAddingPhyPortToFabricPortEntry 1 }
+            
+        hwFabricPortID OBJECT-TYPE
+            SYNTAX Integer32 (0..32)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "adding to which fabric port
+                 0: did not add to any fabric port
+                 1: added to fabric port 1"
+            ::= { hwAddingPhyPortToFabricPortEntry 2 }
+
+--
+--  TABLE: hwFabricPortTable definition
+--
+        hwFabricPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwFabricPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of fabric port. "
+            ::= { hwStackObject 27 }
+
+
+        hwFabricPortEntry OBJECT-TYPE
+            SYNTAX HwFabricPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provide information of the fabric port. "
+            INDEX { hwFabricPortIndex }
+            ::= { hwFabricPortTable 1 }
+
+
+        HwFabricPortEntry ::=
+            SEQUENCE {  
+                hwFabricPortIndex
+                    Integer32,
+                hwFabricMemberID
+                    Integer32,
+                hwFabricLoadBalance
+                    INTEGER,
+                hwFabricProtocolState 
+                    INTEGER,
+                hwFabricConfiguredLinkNum
+                    Integer32 
+             }
+
+        hwFabricPortIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Index of the fabric port. "
+            ::= { hwFabricPortEntry 1 }
+
+
+        hwFabricMemberID  OBJECT-TYPE
+            SYNTAX Integer32 (0 | 101..254)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Member device's ID of the fabric port. "
+            ::= { hwFabricPortEntry 2 }
+
+
+        hwFabricLoadBalance OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               sourceMac(1),
+               destinationMac(2),
+               sourceAndDestinationMac(3),
+               sourceIp(4),
+               destinationIp(5),
+               sourceAndDestinationIp(6),
+               enhanced(7)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The loadBalance of the fabric port:
+                sourceMac(1):According to source MAC hash arithmetic.
+                destinationMac(2):According to destination MAC hash arithmetic
+                sourceAndDestinationMac(3):According to source/destination MAC hash arithmetic.
+                sourceIp(4):According to source IP hash arithmetic.
+                destinationIp(5):According to destination IP hash arithmetic.
+                sourceAndDestinationIp(6):According to source/destination IP hash arithmetic.
+                enhanced(7):According to enhanced hash arithmetic."
+            ::= { hwFabricPortEntry 3 }
+
+
+        hwFabricProtocolState  OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+               down(0),
+               up(1)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The protocol state of the fabric port. "
+            ::= { hwFabricPortEntry 4 }
+
+        hwFabricConfiguredLinkNum OBJECT-TYPE
+            SYNTAX Integer32 (1..8)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The configured alarm threshold of minimum fabric link number. "
+            ::= { hwFabricPortEntry 5}
+
+
+
+--
+--  TABLE: hwStackUpgradeResultTable definition
+--
+        hwStackUpgradeResultTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwStackUpgradeResultEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Results of upgrade commands returned from stack member switches."
+            ::= { hwStackObject 31 }
+
+        hwStackUpgradeResultEntry OBJECT-TYPE
+            SYNTAX HwStackUpgradeResultEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the result of stack switchs upgrade entry. "
+            INDEX { hwStackUpgradeResultIndex, hwStackUpgradeResultMemberId }
+            ::= { hwStackUpgradeResultTable 1 }
+
+        HwStackUpgradeResultEntry ::=
+            SEQUENCE {
+                hwStackUpgradeResultIndex
+                    Integer32,
+                hwStackUpgradeResultMemberId
+                    Integer32,
+                hwStackUpgradeResult
+                    INTEGER,
+                hwStackUpgradeResultInProcess
+                    Integer32,
+                hwStackUpgradeResultFailReason
+                    INTEGER
+                }
+
+        hwStackUpgradeResultIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Specifies the index of an entry. It is a 
+                random value when creating an entry."
+            ::= { hwStackUpgradeResultEntry 1 }
+
+        hwStackUpgradeResultMemberId OBJECT-TYPE
+            SYNTAX Integer32 (0..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Identifier of the stack member switch."
+            ::= { hwStackUpgradeResultEntry 2 }
+
+        hwStackUpgradeResult OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                success(1),
+                failure(2),
+                running(3),
+                timeout(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Results of upgrade commands returned from stack member switches."
+            ::= { hwStackUpgradeResultEntry 3 }
+
+        hwStackUpgradeResultInProcess OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The upgrade is in process."
+            ::= { hwStackUpgradeResultEntry 4 }
+
+        hwStackUpgradeResultFailReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                opUpgradeSuccess(1),
+                opMasterDiskNoSpace(2),
+                opNonmasterDiskNoSpace(3),
+                opInvalidFileInfo(4),
+                opInvalidFileType(5),
+                opInvalidServerAddress(6),
+                opInvalidUserOrPassword(7),
+                opDeviceBusy(8),
+                opFileTransferError(9),
+                opFileChecksumError(10),
+                opNoMemory(11),
+                opVersionFileNotMatch(12),
+                opUpgradeDeviceAbsent(13),
+                opUnknownFailure(14),
+                opUpgradeInvalidValue(15)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of  operation. Only upgrade failure valid.
+                The status of the specified  operation can be one of the follows.
+                opUpgradeSuccess(1): upgrade success.
+                opMasterDiskNoSpace(2): flash of master device is no enough space.
+                opNonmasterDiskNoSpace(3): flash of non-master device is no enough space.
+                opInvalidFileInfo(4) :invalid source file name or path is specified.
+                opInvalidFileType(5) :invalid file type.
+                opInvalidServerAddress(6) :invalid server address is specified.
+                opInvalidUserOrPassword(7):invalid server user or password.
+                opDeviceBusy(8) :the device is in use and locked by another process
+                opFileTransferError(9) :file transfer was unsuccessfull.
+                opFileChecksumError(10) :file checksum in Flash si invalid.
+                opNoMemory(11) :system is running in low on memory. 
+                opVersionFileNotMatch(12) : the version file does not match the device type.
+                opUpgradeDeviceAbsent(13) : device absent.
+                opUnknownFailure(14) :failure which is unknown.
+                opUpgradeInvalidValue(15):invalid value.
+                "
+            ::= { hwStackUpgradeResultEntry 5 }
+
+        hwStackTrapObject OBJECT IDENTIFIER ::= { hwStackObject 32 }
+
+        hwStackLocalIfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Interface name."
+            ::= { hwStackTrapObject 1 }
+
+        hwStackPeerIfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The peer interface name."
+            ::= { hwStackTrapObject 2 }
+
+    hwStackConnectErrReason OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Connection error reason."
+            ::= { hwStackTrapObject 3 }
+            
+    hwConfigureFailedStackId OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Slot id."
+            ::= { hwStackTrapObject 4 }            
+            
+     hwCssTrapErrorPortId OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Error PortId."
+            ::= { hwStackTrapObject 5 } 
+ 
+      hwStackConnectMethod OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "SRUC Vs08 Connect Suggest."
+            ::= { hwStackTrapObject 6 }
+
+      hwStackCfgConflictStackId OBJECT-TYPE
+            SYNTAX Integer32 (0..16)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Stack ID of the device whose stack configuration conflicts with that of the device sending alarms."
+            ::= { hwStackTrapObject 7 }
+
+      hwStackFabricPort OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " Fabric port interface name."
+            ::= { hwStackTrapObject 8 }
+
+      hwStackFabricMemberPort OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The fabric local interface name."
+            ::= { hwStackTrapObject 9 }
+          
+      hwStackMemberId OBJECT-TYPE
+            SYNTAX Integer32 (0..254)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The stack member ID."
+            ::= { hwStackTrapObject 10 }
+
+      hwStackLeafMemberId OBJECT-TYPE
+            SYNTAX Integer32 (101..254)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The leaf switch member ID."
+            ::= { hwStackTrapObject 11 }
+
+      hwStackReason OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "  The reason for different stack configurations."
+            ::= { hwStackTrapObject 12 }
+
+      hwStackLeafPort OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The leaf switch interface name."
+            ::= { hwStackTrapObject 13 }
+
+      hwStackCurrentLinkNum OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The current number of member port in Stack-Port, which protocol state is up."
+            ::= { hwStackTrapObject 14}
+
+      hwFabricCurrentLinkNum OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The current number of member port in Fabric-Port, which protocol state is up."
+            ::= { hwStackTrapObject 15 }
+
+      hwStackErrorDownRecoverReason OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " Error-down reason."
+            ::= { hwStackTrapObject 16 } 
+            
+     hwStackVlanConflictDescription OBJECT-TYPE
+				 SYNTAX OCTET STRING
+			   MAX-ACCESS accessible-for-notify
+			   STATUS current
+			   DESCRIPTION
+						"The description of stack VLAN conflict."
+			   ::= { hwStackTrapObject 17 }
+			   
+	hwStackVlanID OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS accessible-for-notify
+				STATUS current
+				DESCRIPTION
+						"The stack VLAN ID."
+		  	::= { hwStackTrapObject 18 }
+			
+	 hwStackPortErrorDownType OBJECT-TYPE
+			   SYNTAX OCTET STRING
+			   MAX-ACCESS accessible-for-notify
+			   STATUS current
+			   DESCRIPTION
+			   "The description of stack port error-down type."
+			   ::= { hwStackTrapObject 19 }
+    
+	hwStackSetUpFailureDescription OBJECT-TYPE
+			   SYNTAX OCTET STRING
+			   MAX-ACCESS accessible-for-notify
+			   STATUS current
+			   DESCRIPTION
+			   "To set up a stack the reason of failure."
+			   ::= { hwStackTrapObject 20 }
+	
+	hwStackLocalSlotID OBJECT-TYPE
+            SYNTAX Integer32 (0..254)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            " The stack member ID."
+			::= { hwStackTrapObject 21 }
+		
+	hwStackPeerSlotID OBJECT-TYPE
+            SYNTAX Integer32 (0..254)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            " The stack peer member ID."
+		    ::= { hwStackTrapObject 22 }   
+		    
+	hwStackAutoConfigFailedSlotID OBJECT-TYPE
+            SYNTAX Integer32 (0..254)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            " The stack member ID."
+			::= { hwStackTrapObject 23 }
+		    
+	hwStackAutoConfigFailedIfName OBJECT-TYPE
+			   SYNTAX OCTET STRING
+			   MAX-ACCESS accessible-for-notify
+			   STATUS current
+			   DESCRIPTION
+			   "The interface name."
+			   ::= { hwStackTrapObject 24 }
+
+	hwStackAutoConfigFailedReason OBJECT-TYPE
+			   SYNTAX OCTET STRING
+			   MAX-ACCESS accessible-for-notify
+			   STATUS current
+			   DESCRIPTION
+			   "Auto configration failed reason."
+			   ::= { hwStackTrapObject 25 }
+		    
+		    
+			     	           
+    hwCssObject OBJECT IDENTIFIER ::= { huaweiStackMIB 3 }
+    
+    hwCssGlobalObject OBJECT IDENTIFIER ::= { hwCssObject 1 }
+
+        
+    hwCssEnable OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "CSS enable status."
+        ::= { hwCssGlobalObject 1 }
+
+    
+    hwCssMemberInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCssMemberInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of CSS member information."
+        ::= { hwCssObject 2 }
+
+    
+    hwCssMemberInfoEntry OBJECT-TYPE
+        SYNTAX HwCssMemberInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of CSS member information table."
+        INDEX { hwCssMemberFrameId }
+        ::= { hwCssMemberInfoTable 1 }
+
+    
+    HwCssMemberInfoEntry ::=
+        SEQUENCE { 
+            hwCssMemberFrameId
+                Integer32,
+            hwCssMemberConfigFrameId
+                Integer32,
+            hwCssMemberPriority
+                Integer32,
+            hwCssMemberConfigPriority
+                Integer32,
+            hwCssMemberMasterForce
+                INTEGER,
+            hwCssMemberConfigMasterForce
+                INTEGER,
+            hwCssMemberConfigEnable
+                INTEGER,
+            hwCssMemberRole
+                INTEGER
+         }
+
+    hwCssMemberFrameId OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Frame id for CSS member."
+        ::= { hwCssMemberInfoEntry 1 }
+
+    
+    hwCssMemberConfigFrameId OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Configured frame id for CSS member."
+        ::= { hwCssMemberInfoEntry 2 }
+
+    
+    hwCssMemberPriority OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Priority for CSS member."
+        ::= { hwCssMemberInfoEntry 3 }
+
+    
+    hwCssMemberConfigPriority OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Configured priority for CSS member."
+        ::= { hwCssMemberInfoEntry 4 }
+
+    
+    hwCssMemberMasterForce OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2),
+            unknown(255)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Force master status for CSS member."
+        ::= { hwCssMemberInfoEntry 5 }
+
+    
+    hwCssMemberConfigMasterForce OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2),
+            unknown(255)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Configured force master status CSS member."
+        ::= { hwCssMemberInfoEntry 6 }
+
+    
+    hwCssMemberConfigEnable OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2),
+            unknown(255)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Configured enable status for CSS member."
+        ::= { hwCssMemberInfoEntry 7 }
+
+    
+    hwCssMemberRole OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            master(1),
+            standby(2),
+            slave(3),
+            single(4),
+            unknown(10)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "CSS member's role define."
+        ::= { hwCssMemberInfoEntry 8 }
+
+    
+    hwCssTrap OBJECT IDENTIFIER ::= { hwCssObject 3 }
+
+    
+    hwCssTrapObjects OBJECT IDENTIFIER ::= { hwCssTrap 1 }
+
+    
+    hwCssTrapFrameId1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "CSS trap message frame id parameter."
+        ::= { hwCssTrapObjects 1 }
+
+    
+    hwCssTrapSlotId1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "CSS trap message slot id parameter."
+        ::= { hwCssTrapObjects 2 }
+
+    
+    hwCssTrapPortId1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "CSS trap message port id parameter."
+        ::= { hwCssTrapObjects 3 }
+
+    
+    hwCssTrapFrameId2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "CSS trap message frame id parameter."
+        ::= { hwCssTrapObjects 4 }
+
+    
+    hwCssTrapSlotId2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "CSS trap message slot id parameter."
+        ::= { hwCssTrapObjects 5 }
+
+    
+    hwCssTrapPortId2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "CSS trap message port id parameter."
+        ::= { hwCssTrapObjects 6 }
+
+    
+    hwCssTrapFrameId3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "CSS trap message frame id parameter."
+        ::= { hwCssTrapObjects 7 }
+
+    
+    hwCssTrapSlotId3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "CSS trap message slot id parameter."
+        ::= { hwCssTrapObjects 8 }
+
+    
+    hwCssTrapPortId3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "CSS trap message port id parameter."
+        ::= { hwCssTrapObjects 9 }
+        
+   hwCssTrapConfigureFailedSlotId OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "CSS configure failed trap message slot id parameter."
+            ::= { hwCssTrapObjects 10 }
+
+
+    hwCssTraps OBJECT IDENTIFIER ::= { hwCssTrap 2 }
+
+    
+    hwCssLinkDown NOTIFICATION-TYPE
+        OBJECTS { hwCssTrapFrameId1, hwCssTrapSlotId1, hwCssTrapPortId1 }
+        STATUS current
+        DESCRIPTION 
+            "CSS link down trap message."
+        ::= { hwCssTraps 1 }
+
+    
+    hwCssLinkUp NOTIFICATION-TYPE
+        OBJECTS { hwCssTrapFrameId1, hwCssTrapSlotId1, hwCssTrapPortId1 }
+        STATUS current
+        DESCRIPTION 
+            "CSS link up trap message."
+        ::= { hwCssTraps 2 }
+
+    
+    hwCssSwitchOver NOTIFICATION-TYPE
+        OBJECTS { hwCssTrapFrameId1 }
+        STATUS current
+        DESCRIPTION 
+            "CSS switch over trap message."
+        ::= { hwCssTraps 3 }
+
+    
+    hwCssConnectError NOTIFICATION-TYPE
+        OBJECTS { hwCssTrapFrameId1, hwCssTrapSlotId1, hwCssTrapPortId1, hwCssTrapFrameId2, hwCssTrapSlotId2, 
+            hwCssTrapPortId2, hwCssTrapFrameId3, hwCssTrapSlotId3, hwCssTrapPortId3 }
+        STATUS current
+        DESCRIPTION 
+            "CSS connect error trap message."
+        ::= { hwCssTraps 4 }
+
+    
+    hwCssSplit NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "CSS split trap message."
+        ::= { hwCssTraps 5 }
+
+    
+    hwCssEstablish NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "CSS establish trap message."
+        ::= { hwCssTraps 6 }
+
+    
+    hwCssFastUpgradeFail NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "CSS fast upgrade fail."
+        ::= { hwCssTraps 7 }
+
+
+    hwCssPhyCsuConnectError NOTIFICATION-TYPE
+        OBJECTS {hwStackLocalIfName, hwStackPeerIfName, hwStackConnectErrReason }
+        STATUS current
+        DESCRIPTION 
+            "CSS connect error trap message."
+        ::= { hwCssTraps 8 }
+
+    hwCssLpuInvalidLicense NOTIFICATION-TYPE        
+        STATUS current
+        DESCRIPTION 
+            "The license of controlling Lpu-based CSS function is invalid."
+        ::= { hwCssTraps 9 }
+    
+    hwCssPortConfigureFailed NOTIFICATION-TYPE    
+        OBJECTS {hwCssTrapConfigureFailedSlotId }    
+        STATUS current
+        DESCRIPTION 
+            "CSS port configure failed trap message."
+        ::= { hwCssTraps 10 }
+
+    hwCssPortUpDownAlarm NOTIFICATION-TYPE    
+        OBJECTS {hwCssTrapErrorPortId }    
+        STATUS current
+        DESCRIPTION 
+            "CSS port link flapping repeatedly message."
+        ::= { hwCssTraps 11 }
+        
+   hwCssPortCrcErrorAlarm NOTIFICATION-TYPE    
+        OBJECTS {hwCssTrapErrorPortId }    
+        STATUS current
+        DESCRIPTION 
+            "CSS port continuously receives CRC error packets message."
+        ::= { hwCssTraps 12 }                
+                   
+   hwCssPortErrorDown NOTIFICATION-TYPE    
+        OBJECTS {hwCssTrapErrorPortId }    
+        STATUS current
+        DESCRIPTION 
+            "CSS port turn into error-down state message."
+        ::= { hwCssTraps 13 }       
+        
+     
+   hwCssPortErrorDownRecover NOTIFICATION-TYPE    
+        OBJECTS {hwCssTrapErrorPortId }    
+        STATUS current
+        DESCRIPTION 
+            "CSS port recovered from error-down state message."
+        ::= { hwCssTraps 14 }     
+
+    hwCssPhyVs08ConnectError NOTIFICATION-TYPE
+        OBJECTS {hwStackLocalIfName, hwStackPeerIfName, hwStackConnectMethod}
+        STATUS current
+        DESCRIPTION 
+            "CSS connect error trap message."
+        ::= { hwCssTraps 15 }
+
+    hwCssStandbyError NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "The CSS enters the standby-no-MPU state trap message."
+         ::= { hwCssTraps 16 }
+    
+     hwCssStandbyErrorRestore NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "The CSS is recovered from the standby-no-MPU state trap message."
+         ::= { hwCssTraps 17 }
+
+    hwCssPortStateError NOTIFICATION-TYPE
+        OBJECTS {hwCssTrapErrorPortId}
+        STATUS current
+        DESCRIPTION 
+            "CSS port error trap message."
+        ::= { hwCssTraps 18 }
+
+    hwCssPhyCardConnectError NOTIFICATION-TYPE
+        OBJECTS {hwStackLocalIfName, hwStackPeerIfName, hwStackConnectErrReason}
+        STATUS current
+        DESCRIPTION 
+            "CSS connect error trap message."
+        ::= { hwCssTraps 19 }
+
+hwCssPortInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCssPortInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of CSS port information."
+        ::= { hwCssObject 4 }
+
+    hwCssPortInfoEntry OBJECT-TYPE
+        SYNTAX HwCssPortInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of CSS port information table."
+        INDEX { hwCssPortFrameId, hwCssPortSlotId, hwCssPortCardId, hwCssPortPortId, hwCssPortName }
+        ::= { hwCssPortInfoTable 1 }
+
+    HwCssPortInfoEntry ::=
+        SEQUENCE { 
+            hwCssPortFrameId
+                Integer32, 
+            hwCssPortSlotId
+                Integer32, 
+            hwCssPortCardId
+                Integer32,
+            hwCssPortPortId
+                Integer32,
+            hwCssPortName
+                OCTET STRING,
+            hwCssPortSpeed
+                OCTET STRING, 
+            hwCssPortOperStatus
+                INTEGER, 
+            hwCssPortAdminStatus
+                INTEGER,
+            hwCssPortInOctets
+                Counter64,  
+            hwCssPortInUcastPkts
+                Counter64, 
+            hwCssPortInMcastPkts
+                Counter64, 
+            hwCssPortInBcastPkts
+                Counter64, 
+            hwCssPortInDiscards
+                Counter64, 
+            hwCssPortInErrors
+                Counter64, 
+            hwCssPortInCRCErrors
+                Counter64, 
+            hwCssPortOutOctets
+                Counter64, 
+            hwCssPortOutUcastPkts
+                Counter64, 
+            hwCssPortOutMcastPkts
+                Counter64, 
+            hwCssPortOutBcastPkts
+                Counter64, 
+            hwCssPortOutDiscards
+                Counter64, 
+            hwCssPortOutErrors
+                Counter64 
+       }
+
+    hwCssPortFrameId OBJECT-TYPE
+        SYNTAX Integer32 (1..8)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Frame id of CSS port."
+        ::= { hwCssPortInfoEntry 1 }
+
+    hwCssPortSlotId OBJECT-TYPE
+        SYNTAX Integer32 (1..18)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Slot id of CSS port."
+        ::= { hwCssPortInfoEntry 2 }
+
+    hwCssPortCardId OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Card id of CSS port."
+        ::= { hwCssPortInfoEntry 3 }
+
+    hwCssPortPortId OBJECT-TYPE
+        SYNTAX Integer32 (0..8)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Port id of CSS port."
+        ::= { hwCssPortInfoEntry 4 }
+
+    hwCssPortName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port name of CSS port."
+        ::= { hwCssPortInfoEntry 5 }
+
+    hwCssPortSpeed OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Speed of CSS port."
+        ::= { hwCssPortInfoEntry 6 }
+        
+    hwCssPortOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+               {
+               down(0),
+               up(1)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Oper status of CSS port."
+        ::= { hwCssPortInfoEntry 7 }        
+        
+    hwCssPortAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+               {
+               undoshutdown(0),
+               shutdown(1)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Admin status of CSS port."
+        ::= { hwCssPortInfoEntry 8 }                
+        
+    hwCssPortInOctets OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of octets received on the interface."
+        ::= { hwCssPortInfoEntry 9 }
+
+    hwCssPortInUcastPkts OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of unicast packets received on the interface."
+        ::= { hwCssPortInfoEntry 10 }
+
+    hwCssPortInMcastPkts OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of multicast packets received on the interface."
+        ::= { hwCssPortInfoEntry 11 }
+
+    hwCssPortInBcastPkts OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of broadcast packets received on the interface."
+        ::= { hwCssPortInfoEntry 12 }
+
+    hwCssPortInDiscards OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of inbound packets which were discarded."
+        ::= { hwCssPortInfoEntry 13 }
+
+    hwCssPortInErrors OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of inbound packets which were error."
+        ::= { hwCssPortInfoEntry 14 }
+
+    hwCssPortInCRCErrors OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of inbound packets which were CRC error."
+        ::= { hwCssPortInfoEntry 15 }
+
+    hwCssPortOutOctets OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of octets sent on the interface."
+        ::= { hwCssPortInfoEntry 16 }
+
+    hwCssPortOutUcastPkts OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of unicast packets sent from the interface."
+        ::= { hwCssPortInfoEntry 17 }
+
+    hwCssPortOutMcastPkts OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of multicast packets sent from the interface."
+        ::= { hwCssPortInfoEntry 18 }
+
+    hwCssPortOutBcastPkts OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of broadcast packets sent from the interface."
+        ::= { hwCssPortInfoEntry 19 }
+
+    hwCssPortOutDiscards OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of outbound packets which were discarded."
+        ::= { hwCssPortInfoEntry 20 }
+        
+    hwCssPortOutErrors OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of outbound packets which were error."
+        ::= { hwCssPortInfoEntry 21 }        
+
+    hwCssLinkInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCssLinkInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of CSS link information."
+        ::= { hwCssObject 5 }
+
+    hwCssLinkInfoEntry OBJECT-TYPE
+        SYNTAX HwCssLinkInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of CSS link information table."
+        INDEX { hwCssLinkLocFrameId, hwCssLinkLocSlotId, hwCssLinkLocCardId, hwCssLinkLocPortId }
+        ::= { hwCssLinkInfoTable 1 }
+
+    HwCssLinkInfoEntry ::=
+        SEQUENCE { 
+            hwCssLinkLocFrameId
+                Integer32, 
+            hwCssLinkLocSlotId
+                Integer32, 
+            hwCssLinkLocCardId
+                Integer32,
+            hwCssLinkLocPortId
+                Integer32,
+            hwCssLinkLocPortName
+                OCTET STRING,
+            hwCssLinkRemFrameId
+                Integer32, 
+            hwCssLinkRemSlotId
+                Integer32, 
+            hwCssLinkRemCardId
+                Integer32,
+            hwCssLinkRemPortId
+                Integer32,  
+            hwCssLinkRemPortName
+                OCTET STRING,
+            hwCssLinkSpeed
+                OCTET STRING
+       }
+
+    hwCssLinkLocFrameId OBJECT-TYPE
+        SYNTAX Integer32 (1..8)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Local frame id of CSS link."
+        ::= { hwCssLinkInfoEntry 1 }  
+  
+    hwCssLinkLocSlotId OBJECT-TYPE
+       SYNTAX Integer32 (1..18)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Local slot id of CSS link."
+       ::= { hwCssLinkInfoEntry 2 }  
+ 
+    hwCssLinkLocCardId OBJECT-TYPE
+       SYNTAX Integer32 (0..1)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Local card id of CSS link."
+       ::= { hwCssLinkInfoEntry 3 }   
+       
+    hwCssLinkLocPortId OBJECT-TYPE
+       SYNTAX Integer32 (1..8)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Local port id of CSS link."
+       ::= { hwCssLinkInfoEntry 4 }   
+       
+    hwCssLinkLocPortName OBJECT-TYPE
+       SYNTAX OCTET STRING
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Local port name of CSS link."
+       ::= { hwCssLinkInfoEntry 5 }   
+       
+    hwCssLinkRemFrameId OBJECT-TYPE
+       SYNTAX Integer32 (1..8)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Remote frame id of CSS link."
+       ::= { hwCssLinkInfoEntry 6 }   
+       
+     hwCssLinkRemSlotId OBJECT-TYPE
+       SYNTAX Integer32 (1..18)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Remote slot id of CSS link."
+       ::= { hwCssLinkInfoEntry 7 }   
+       
+     hwCssLinkRemCardId OBJECT-TYPE
+       SYNTAX Integer32 (0..1)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Remote card id of CSS link."
+       ::= { hwCssLinkInfoEntry 8 }   
+      
+     hwCssLinkRemPortId OBJECT-TYPE
+       SYNTAX Integer32 (1..8)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Remote port id of CSS link."
+       ::= { hwCssLinkInfoEntry 9 }   
+
+     hwCssLinkRemPortName OBJECT-TYPE
+       SYNTAX OCTET STRING
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Remote port name of CSS link."
+       ::= { hwCssLinkInfoEntry 10 }   
+              
+     hwCssLinkSpeed OBJECT-TYPE
+       SYNTAX OCTET STRING
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Speed of CSS link."
+       ::= { hwCssLinkInfoEntry 11 }   
+--
+-- Node compliance check
+--
+    hwStackConformance OBJECT IDENTIFIER ::= { huaweiStackMIB 100 }
+    hwStackCompliances OBJECT IDENTIFIER ::= { hwStackConformance 1 }
+    hwStackCompliance MODULE-COMPLIANCE
+       STATUS      current
+       DESCRIPTION
+        "The compliance statement for systems supporting this module."
+    
+       MODULE
+       MANDATORY-GROUPS
+           {
+               hwStackObjectGroup, hwStackNotificationGroup, hwStackTrapGroup
+           }  
+                                       
+    ::= { hwStackCompliances 1 }  		
+
+		hwStackGroups OBJECT IDENTIFIER ::= { hwStackCompliances 2 }
+
+    hwStackObjectGroup OBJECT-GROUP
+        OBJECTS {
+                  hwStackRun, hwStackTopoType, hwStackMacAddressSwitchTime, 
+                  hwStackSystemMac, hwStackIsStackDevice,hwStackReservedVlanId,
+                  hwStackClearUnsupportCfg,hwStackLinkAlarmThreshold, hwStackMemberThreshold,
+                  hwStackMode, hwStackMemberSpec,
+                  hwLeafMaxNumber, hwFabricCurrentForwardModel, hwFabricConfigForwardModel,hwLeafSingleHomedAlarmEnable,
+                  hwFabricExcludeLeafType, hwStackUpgradeRollbackTimer, hwMemberCurrentStackId, hwMemberStackPriority, 
+                  hwMemberStackRole, hwMemberStackMacAddress,hwMemberStackDeviceType,
+                  hwMemberConfigStackId, hwMemberStackObjectId, 
+                  hwStackPriority, hwStackRole, hwStackMacAddress, hwStackDeviceType, 
+                  hwStackId, hwStackConfigId, hwStackSysOid, hwStackDescription, hwStackCurrentUplinkPort, hwStackConfigUplinkPort,
+                  hwStackCurrentSwitchMode, hwStackConfigSwitchMode, hwEnabledStackModePortIndex, hwFabricPortID,
+                  hwFabricPortIndex, hwFabricMemberID, hwFabricLoadBalance, hwFabricProtocolState, hwFabricConfiguredLinkNum ,
+                  hwSpineStackId, hwSpinePortName, hwSpinePortStatus, 
+                  hwLeafPortIndex, hwLeafStackId,  hwLeafPortName, hwLeafPortStatus,
+                  hwStackPortStackId, hwStackPortId , hwStackPortName,hwStackNeighborInfo, 
+                  hwStackPortStatus, hwStackUpgradeGrpType, hwStackUpgradeGrpValue, 
+                  hwStackUpgradeFileType, hwStackUpgradeFileInfo, hwStackUpgradeFtpIp, 
+                  hwStackUpgradeFtpUserName, hwStackUpgradeFtpPassword, hwStackUpgradeServerPort, 
+                  hwStackUpgradeFileSize, hwStackUpgradeTransmitProtocol,hwStackUpgradeRowStatus, 
+                  hwStackUpgradeResultMemberId, hwStackUpgradeResult, hwStackUpgradeResultInProcess, 
+                  hwStackUpgradeResultFailReason,hwStackMacAddressAlarmTime
+                 }
+        STATUS current                                            
+        DESCRIPTION
+            " Enter the description of the created OBJECT-GROUP."
+        ::= { hwStackGroups 1 }
+
+    hwStackNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+                        hwStackLinkUp , hwStackLinkDown ,hwStackStandbyChange, 
+                        hwStackSwitchOver, hwStackSystemRestart, hwStackStackMemberAdd, 
+                        hwStackStackMemberLeave, hwStackStackMacChange, hwStackLogicStackPortLinkErr, 
+                        hwStackPhyStackPortLinkErr, hwPhyStackPortIsDown, hwPhyStackPortIsUp,
+                        hwStackLogicStackPortLinkErrResume, hwStackPortConfigureFailed,
+                        hwStackLinkLimitAlarm ,hwStackLinkLimitAlarmResume, hwStackConfigConflict,
+                        hwStackFabricPortLinkErr, hwStackFabricPortLinkErrResume, 
+                        hwStackLeafSingleHomedAlarm, hwStackLeafSingleHomedAlarmResume, hwStackMemberLimit,
+                        hwStackMemberAdd, hwStackMemberLeave, hwStackConfigDifferent, hwStackLeafConfigConflict,
+                        hwStackChipSingleHomedAlarm, hwStackChipSingleHomedAlarmResume, hwStackLeafMemberAdd,
+                        hwFabricLinkLimitAlarm, hwFabricLinkLimitAlarmResume,hwStackMemberExceedSpec ,hwStackMacInconsistence,hwStackMacInconsistenceResume,
+                        hwFabricLinkProtocolAlarm, hwFabricLinkProtocolAlarmResume, hwFabricMemberPortProtocolAlarm, hwFabricMemberPortProtocolAlarmResume, hwLeafMaxNumberExceededAlarm, hwLeafMaxNumberExceededAlarmResume,
+                        hwPhyStackPortErrorDown, hwPhyStackPortErrorDownRecover, hwSvfFabricPortConfigurationNotActiveAlarm, hwSvfFabricPortConfigurationNotActiveAlarmResume,
+                        hwStackMemberPortSpeedDifferentAlarm, hwStackMemberPortSpeedDifferentAlarmResume,hwStackMemberPortProtocolAlarm,hwStackMemberPortProtocolAlarmResume,hwPhyStackVlanConflict,
+                        hwStackLinkTopoAlarm,hwStackLinkTopoAlarmResume,hwStackMemberPortTypeDifferentAlarm,hwStackMemberPortTypeDifferentAlarmResume,
+                        hwStackLinkTopoSinglePortAlarm,hwStackLinkTopoSinglePortAlarmResume, hwStackSipPortSingleLinkAlarm, hwStackSipPortSingleLinkAlarmResume, hwStackPortErrorDown, 
+						hwStackPortErrorDownRecovery, hwStackSetUpFailure,hwStackMemberPortLoopAlarm,hwStackMemberPortLoopAlarmResume,hwStackAutoConfigFailed
+                        }
+        STATUS current
+        DESCRIPTION
+            "Enter the description of the created NOTIFICATION-GROUP."
+        ::= { hwStackGroups 2 }        
+
+    hwStackTrapGroup OBJECT-GROUP
+        OBJECTS {
+                 hwStackLocalIfName, hwStackPeerIfName, hwStackVlanID, hwStackVlanConflictDescription,hwConfigureFailedStackId,
+                 hwStackConnectErrReason, hwCssTrapErrorPortId, hwStackConnectMethod,
+                 hwStackCfgConflictStackId, hwStackFabricPort, hwStackFabricMemberPort,
+                 hwStackMemberId, hwStackLeafMemberId, hwStackReason, hwStackLeafPort,
+                 hwStackCurrentLinkNum, hwFabricCurrentLinkNum, hwStackErrorDownRecoverReason, hwStackPortErrorDownType, 
+				 hwStackSetUpFailureDescription, hwStackLocalSlotID, hwStackPeerSlotID,hwStackAutoConfigFailedSlotID,hwStackAutoConfigFailedIfName,hwStackAutoConfigFailedReason
+                 }
+        STATUS current
+        DESCRIPTION
+            "Enter the description of the created OBJECT-GROUP."
+        ::= { hwStackGroups 3 }                             
+
+
+    hwCssConformance OBJECT IDENTIFIER ::= { huaweiStackMIB 101 }
+    hwCssCompliances OBJECT IDENTIFIER ::= { hwCssConformance 1 }
+    hwCssCompliance MODULE-COMPLIANCE
+       STATUS      current
+       DESCRIPTION
+        "The compliance statement for systems supporting this module."
+    
+       MODULE
+       MANDATORY-GROUPS
+           {
+               hwCssObjectGroup, hwCssTrapObjectGroup, hwCssNotificationGroup
+           }  
+                                       
+    ::= { hwCssCompliances 1 }
+    
+    hwCssGroups OBJECT IDENTIFIER ::= { hwCssCompliances 2 }
+
+    
+    hwCssObjectGroup OBJECT-GROUP
+        OBJECTS { hwCssMemberFrameId, hwCssMemberConfigFrameId, hwCssMemberPriority, hwCssMemberConfigPriority, hwCssMemberMasterForce, 
+            hwCssMemberConfigMasterForce, hwCssMemberConfigEnable, hwCssMemberRole, hwCssEnable }
+        STATUS current
+        DESCRIPTION 
+            "CSS mib group: object."
+        ::= { hwCssGroups 1 }
+
+    
+    hwCssTrapObjectGroup OBJECT-GROUP
+        OBJECTS { hwCssTrapFrameId2, hwCssTrapSlotId2, hwCssTrapPortId2, hwCssTrapFrameId3, hwCssTrapSlotId3, 
+            hwCssTrapPortId3, hwCssTrapFrameId1, hwCssTrapSlotId1, hwCssTrapPortId1,hwCssTrapConfigureFailedSlotId }
+        STATUS current
+        DESCRIPTION 
+            "CSS mib group: trap."
+        ::= { hwCssGroups 2 }
+
+    
+    hwCssNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwCssLinkDown, hwCssLinkUp, hwCssSwitchOver, hwCssConnectError, hwCssSplit, 
+                        hwCssEstablish, hwCssFastUpgradeFail, hwCssPhyCsuConnectError, 
+                        hwCssLpuInvalidLicense, hwCssPortConfigureFailed, hwCssPortUpDownAlarm, hwCssPortCrcErrorAlarm,
+                        hwCssPortErrorDown, hwCssPortErrorDownRecover, hwCssPhyVs08ConnectError, hwCssStandbyError, 
+                        hwCssStandbyErrorRestore, hwCssPortStateError, hwCssPhyCardConnectError}
+        STATUS current
+        DESCRIPTION 
+            "CSS mib group: notification."
+        ::= { hwCssGroups 3 }
+
+END
+
+--
+-- HUAWEI-STACK-MIB.mib
+--

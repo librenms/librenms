@@ -1,0 +1,53 @@
+mib: ZYXEL-ES-COMMON:ZYXEL-HW-MONITOR-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: ZYXEL-GS2200-24-MIB::sysMgmtCPUUsage
+                  value: sysMgmtCPUUsage
+                  snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
+                  num_oid: '.1.3.6.1.4.1.890.1.5.8.55.12.7.{{ $index }}'
+              -
+                  oid: sysMgmtCPU5SecUsage
+                  num_oid: '.1.3.6.1.4.1.890.1.15.3.2.7.{{ $index }}'
+    sensors:
+        fanspeed:
+            options:
+                skip_values_lt: 0
+            data:
+                -
+                    oid: zyxelHwMonitorFanRpmTable
+                    value: zyHwMonitorFanRpmCurrentValue
+                    num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.1.1.3.{{ $index }}'
+                    descr: zyHwMonitorFanRpmDescription
+                    index: 'zyHwMonitorFanRpmCurrentValue.{{ $index }}'
+                    high_limit: zyHwMonitorFanRpmMaxValue
+                    low_limit: zyHwMonitorFanRpmMinValue
+                    low_warn_limit: zyHwMonitorFanRpmLowThreshold
+        temperature:
+            options:
+                skip_values_lt: 0
+            data:
+                -
+                    oid: zyxelHwMonitorTemperatureTable
+                    value: zyHwMonitorTemperatureCurrentValue
+                    num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.2.1.3.{{ $index }}'
+                    descr: zyHwMonitorTemperatureDescription
+                    index: 'zyHwMonitorTemperatureCurrentValue.{{ $index }}'
+                    high_limit: zyHwMonitorTemperatureMaxValue
+                    low_limit: zyHwMonitorTemperatureMinValue
+                    warn_limit: zyHwMonitorTemperatureHighThreshold
+        voltage:
+            options:
+                skip_values_lt: 0
+                divisor: 1000
+            data:
+                -
+                    oid: zyxelHwMonitorVoltageTable
+                    value: zyHwMonitorVoltageCurrentValue
+                    num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.3.1.3.{{ $index }}'
+                    descr: zyHwMonitorVoltageDescription
+                    index: 'zyHwMonitorVoltageCurrentValue.{{ $index }}'
+                    high_limit: zyHwMonitorVoltageMaxValue
+                    low_limit: zyHwMonitorVoltageMinValue
+                    low_warn_limit: zyHwMonitorVoltageLowThreshold

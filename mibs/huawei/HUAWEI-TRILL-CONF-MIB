@@ -1,0 +1,356 @@
+--  ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI-TRILL-CONF-MIB provides information about TRILL
+-- Reference:
+-- Version: V1.04
+-- History:
+-- <author>,   <date>,  <contents>
+--  HUAWEI   2009-08-03  TRILL private MIB
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types are imported
+-- 
+-- ==================================================================
+
+	HUAWEI-TRILL-CONF-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			SystemID			
+				FROM HUAWEI-ISIS-CONF-MIB			
+			hwDatacomm			
+				FROM HUAWEI-MIB	
+			ifEntry, ifIndex
+ 				FROM RFC1213-MIB			
+			ifName			
+				FROM IF-MIB			
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP			
+				FROM SNMPv2-CONF			
+			experimental, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE 		
+				FROM SNMPv2-SMI
+			LinkStatePDUID 
+				FROM ISIS-MIB;
+	
+	
+--  1.3.6.1.4.1.2011.5.25.331
+-- June 06, 2014 at 15:40 GMT
+		hwTrill MODULE-IDENTITY 
+			LAST-UPDATED "201708171637Z"		--August 17, 2017 at 21:50 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+				"Huawei Industrial Base
+				Bantian, Longgang
+				 Shenzhen 518129
+				 People's Republic of China
+				 Website: http://www.huawei.com
+				 Email: support@huawei.com
+				"
+			DESCRIPTION 
+				"
+				The HUAWEI PRIVATE MIB contains objects belonging to processes of the TRILL protocol existing on the system. 
+				It defines the model used to represent data that exists elsewhere in the system and on peripheral devices. 
+				There are no constraints on this MIB."
+			REVISION "201708171637Z"		--August 17, 2017 at 21:50 GMT
+			DESCRIPTION
+				"revision 1.0.4"
+
+			REVISION "201606131637Z"		-- June 13, 2016 at 16:37 GMT
+			DESCRIPTION
+				"revision 1.0.3"
+
+
+			REVISION "201505071524Z"		-- May 7, 2015 at 15:24 GMT
+			DESCRIPTION
+				"revision 1.0.2"
+
+			REVISION "201504271524Z"		-- April 27, 2015 at 15:24 GMT
+			DESCRIPTION
+				"revision 1.0.1,modify description of hwTrillAuthenticationFailure and hwTrillAuthenticationTypeFailure at 2015-04-27"
+
+			REVISION "201406121655Z"		-- June 12, 2014 at 16:55 GMT
+			DESCRIPTION
+				"revision 1.0.0"
+			::= { hwDatacomm 331 }		
+		
+--
+-- Node definitions
+--
+	
+--  Node definitions
+-- 
+-- 1.3.6.1.4.1.2011.5.25.331.1
+		-- 1.3.6.1.4.1.2011.5.25.331.1
+		hwTrillConf OBJECT IDENTIFIER ::= { hwTrill 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1
+		hwTrillMibObjects OBJECT IDENTIFIER ::= { hwTrillConf 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.1
+		hwTrillBaseTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwTrillBaseEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes TRILL instance information."
+			::= { hwTrillMibObjects 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.1.1
+		hwTrillBaseEntry OBJECT-TYPE
+			SYNTAX HwTrillBaseEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwTrillInstanceID }
+			::= { hwTrillBaseTable 1 }
+		
+		HwTrillBaseEntry ::=
+			SEQUENCE { 
+				hwTrillInstanceID
+					Unsigned32,
+				hwTrillSysID
+					SystemID,
+				hwTrillRemainingLifetime
+					Unsigned32,
+				hwTrillPduLspId
+					LinkStatePDUID
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.1.1.1
+		hwTrillInstanceID OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Trill instance id."
+			::= { hwTrillBaseEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.1.1.2
+		hwTrillSysID OBJECT-TYPE
+			SYNTAX SystemID
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Trill system id."
+			::= { hwTrillBaseEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.1.1.3
+		hwTrillRemainingLifetime OBJECT-TYPE
+			SYNTAX Unsigned32
+			UNITS "seconds"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Trill remaining-lifetime of LSP."
+			DEFVAL { 1200 }
+			::= { hwTrillBaseEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.1.1.4
+		hwTrillPduLspId OBJECT-TYPE
+			SYNTAX LinkStatePDUID
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Trill LSP id."
+			::= { hwTrillBaseEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.2
+		hwTrillNicknameTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwTrillNicknameEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes nickname information about an TRILL network."
+			::= { hwTrillMibObjects 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.2.1
+		hwTrillNicknameEntry OBJECT-TYPE
+			SYNTAX HwTrillNicknameEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwTrillInstanceID, hwTrillNickname }
+			::= { hwTrillNicknameTable 1 }
+		
+		HwTrillNicknameEntry ::=
+			SEQUENCE { 
+				hwTrillNickname
+					Unsigned32,
+				hwTrillPriority
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.2.1.2
+		hwTrillNickname OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Trill nickname."
+			::= { hwTrillNicknameEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.2.1.3
+		hwTrillPriority OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Trill priority."
+			::= { hwTrillNicknameEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.3
+		hwTrillAuthenticationTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwTrillAuthenticationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information on TRILL ports' authentification modes."
+			::= { hwTrillMibObjects 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.3.1
+		hwTrillAuthenticationEntry OBJECT-TYPE
+			SYNTAX HwTrillAuthenticationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex }
+			::= { hwTrillAuthenticationTable 1 }
+		
+		HwTrillAuthenticationEntry ::=
+			SEQUENCE { 
+				hwTrillSysInstance
+					Unsigned32,
+				hwTrillCircIfIndex
+					Integer32,
+				hwTrillPduFragment
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.3.1.1
+		hwTrillSysInstance OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Trill instance id."
+			::= { hwTrillAuthenticationEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.3.1.2
+		hwTrillCircIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Trill circuit interface index."
+			::= { hwTrillAuthenticationEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.1.3.1.3
+		hwTrillPduFragment OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"64-byte PDU fragment."
+			::= { hwTrillAuthenticationEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.2
+		hwTrillConfGroups OBJECT IDENTIFIER ::= { hwTrillConf 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.2.1
+		hwTrillBaseEntryGroup OBJECT-GROUP
+			OBJECTS { hwTrillSysID, hwTrillInstanceID }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwTrillConfGroups 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.2.2
+		hwTrillNicknameGroup OBJECT-GROUP
+			OBJECTS { hwTrillNickname, hwTrillPriority }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwTrillConfGroups 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.2.3
+		hwTrillTrapsGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwTrillNicknameConflict, hwTrillNicknameConflictClear, hwTrillAuthenticationFailure, hwTrillAuthenticationTypeFailure }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwTrillConfGroups 3 }
+		
+                -- 1.3.6.1.4.1.2011.5.25.331.1.2.4
+		hwTrillAuthenticationGroup OBJECT-GROUP
+			OBJECTS { hwTrillSysInstance, hwTrillCircIfIndex, hwTrillPduFragment }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwTrillConfGroups 4 }
+		-- 1.3.6.1.4.1.2011.5.25.331.1.3
+		hwTrillTraps OBJECT IDENTIFIER ::= { hwTrillConf 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.3.1
+		hwTrillNicknameConflict NOTIFICATION-TYPE
+			OBJECTS { hwTrillSysID, hwTrillPriority }
+			STATUS current
+			DESCRIPTION 
+				"The local nickname conflicted with another nickname."
+			::= { hwTrillTraps 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.3.2
+		hwTrillNicknameConflictClear NOTIFICATION-TYPE
+			OBJECTS { hwTrillSysID, hwTrillPriority }
+			STATUS current
+			DESCRIPTION 
+				"The local nickname conflict was cleared."
+			::= { hwTrillTraps 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.3.3
+		hwTrillAuthenticationFailure NOTIFICATION-TYPE
+			OBJECTS { hwTrillSysInstance, hwTrillCircIfIndex, hwTrillPduFragment, ifName }
+			STATUS current
+			DESCRIPTION 
+				"The alarm is generated if the device receives a PDU carrying an authentication password that is different from the local one. The PDU fragment is displayed in the alarm, helping network administrators locate the device that sent the PDU."
+			::= { hwTrillTraps 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.3.4
+		hwTrillAuthenticationTypeFailure NOTIFICATION-TYPE
+			OBJECTS { hwTrillSysInstance, hwTrillCircIfIndex, hwTrillPduFragment, ifName }
+			STATUS current
+			DESCRIPTION 
+				"The alarm is generated if the device receives a PDU carrying an authentication mode that is different from the local one. The PDU fragment is displayed in the alarm, helping network administrators locate the device that sent the PDU."
+			::= { hwTrillTraps 4 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.3.5
+		hwTrillLspRemainingLifetimeRefresh NOTIFICATION-TYPE
+			OBJECTS { hwTrillInstanceID, ifIndex, ifName, hwTrillSysID, hwTrillPduLspId, 
+				hwTrillRemainingLifetime }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the Remaining Lifetime of a received LSP is less than 60s."
+			::= { hwTrillTraps 5 }
+
+		-- 1.3.6.1.4.1.2011.5.25.331.1.5
+		hwTrillCompliances OBJECT IDENTIFIER ::= { hwTrillConf 5 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.331.1.5.1
+		hwTrillModuleFullCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE -- this module
+				MANDATORY-GROUPS { hwTrillTrapsGroup, hwTrillBaseEntryGroup, hwTrillNicknameGroup }
+			::= { hwTrillCompliances 1 }
+		
+	
+	END
+
+--
+-- HUAWEI-TRILL-CONF-MIB.mib
+--

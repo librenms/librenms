@@ -1,0 +1,1410 @@
+  NSCRTV-ROOT DEFINITIONS ::= BEGIN
+
+IMPORTS
+     enterprises, OBJECT-TYPE, IpAddress
+          FROM RFC1155-SMI
+		DisplayString, NetworkAddress FROM SNMPv2-TC
+		Counter FROM RFC1155-SMI
+;
+nscrtvRoot  OBJECT IDENTIFIER ::= { enterprises 17409 }
+
+-- DESCRIPTION
+--     "NscrtvRoot definition of the National Radio and Television Standardization Technical Committee
+--       MIB root node"
+
+nscrtvHFCemsTree  OBJECT IDENTIFIER  ::= { nscrtvRoot 1 }
+
+-- DESCRIPTION
+--     "NscrtvHFCemsTree definition HFC network equipment management system MIB root node,"
+--     "All HFC network equipment management system should be in the MIB definition of nodes."
+
+propertyIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 1}
+
+--     DESCRIPTION
+--     "Attribute (Property) MIB branch nodes logo."
+--     "See Appendix C."
+
+alarmsIdent   OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 2}
+
+--     DESCRIPTION
+--     "Alarm (Alarms) MIB branch nodes logo."
+--     "See Appendix D."
+
+commonIdent   OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 3}
+
+--     DESCRIPTION
+--     "Utility (Common) MIB branch nodes logo."
+--     "See Appendix E"
+
+
+oaIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 11}
+
+--     DESCRIPTION
+--     "Optical Amplifiers (Optical Amplifier) MIB branch node identifier."
+--     "See Appendix M"
+
+--********************************************************************************************
+--
+--**********************************************************************************************
+analogPropertyTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF AnalogPropertyEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Attribute Table simulation parameters"
+	::= { propertyIdent 1 }
+
+analogPropertyEntry  OBJECT-TYPE
+	SYNTAX 	AnalogPropertyEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+	    "Attribute Table simulation parameters head.
+	OID purpose as a table index,Its coding method is'lengthï¿½ï¿½OID'ï¿½ï¿½OID former two members'1.3'According to '1'and'3'respectively coding,Instead of ordinary OID encoding (0x2B)."
+	INDEX	{ analogParameterOID }
+	::= { analogPropertyTable 1 }
+
+AnalogPropertyEntry ::= SEQUENCE {
+	analogParameterOID
+		OBJECT IDENTIFIER,
+	alarmEnable
+		OCTET STRING,
+	analogAlarmState
+		INTEGER,
+	analogAlarmHIHI
+		INTEGER,
+	analogAlarmHI
+		INTEGER,
+	analogAlarmLO
+		INTEGER,
+	analogAlarmLOLO
+		INTEGER,
+	analogAlarmDeadband
+		INTEGER
+}
+
+analogParameterOID  OBJECT-TYPE
+	SYNTAX 	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"index"
+	::= { analogPropertyEntry 1 }
+
+alarmEnable  OBJECT-TYPE
+	SYNTAX 	OCTET STRING (SIZE(1))
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Alarm enable control byte, the corresponding position for the'1 'that allow alarm,'0' a ban warning
+                    Bit 0: Alarm enable low
+                    Bit 1: Alarm enable low
+                    Bit 2: Alarm enable high
+                    Bit 3: Alarm enable high
+                 Bit 4 ~ 7 reservations should be 0
+             This object should be stored in nonvolatile memory."
+
+	::= { analogPropertyEntry 2 }
+
+analogAlarmState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		aasNominal (1),
+		aasHIHI (2),
+		aasHI (3),
+		aasLO (4),
+		aasLOLO (5)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The parameters of the current state of alarm."
+	::= { analogPropertyEntry 3 }
+
+analogAlarmHIHI  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Alarm HIHI high threshold value. This object should be stored in non-volatile memory."
+	::= { analogPropertyEntry 4 }
+
+analogAlarmHI  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"HI high alarm threshold value. This object should be stored in non-volatile memory."
+	::= { analogPropertyEntry 5 }
+
+analogAlarmLO  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"LO low alarm threshold value. This object should be stored in non-volatile memory."
+	::= { analogPropertyEntry 6 }
+
+analogAlarmLOLO  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Alarm LOLO very low threshold value. This object should be stored in non-volatile memory."
+	::= { analogPropertyEntry 7 }
+
+analogAlarmDeadband  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+	"Dead-alarm threshold value. After the warning, parameter values should be restored to the alarm threshold and alarm threshold and the difference between the absolute value greater than the value of dead zone, the alarm can be removed.
+        This object should be stored in nonvolatile memory."
+	::= { analogPropertyEntry 8 }
+
+
+discretePropertyTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF DiscretePropertyEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Discrete Attribute Table."
+	::= { propertyIdent 2 }
+
+discretePropertyEntry  OBJECT-TYPE
+	SYNTAX 	DiscretePropertyEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Attribute Table discrete head. OID coding methods with simulation attribute table"
+	INDEX	{ discreteParameterOID, discreteAlarmValue }
+	::= { discretePropertyTable 1 }
+
+DiscretePropertyEntry ::= SEQUENCE {
+	discreteParameterOID
+		OBJECT IDENTIFIER,
+	discreteAlarmValue
+		INTEGER,
+	discreteAlarmEnable
+		INTEGER,
+	discreteAlarmState
+		INTEGER
+}
+
+discreteParameterOID  OBJECT-TYPE
+	SYNTAX 	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Attribute Table discrete index 1: Parameters OID."
+	::= { discretePropertyEntry 1 }
+
+discreteAlarmValue  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Attribute Table discrete index 2: parameter values.
+               When the equipment value of this parameter values, and so will be dealt with a warning."
+	::= { discretePropertyEntry 2 }
+
+
+discreteAlarmEnable  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		disable (1),
+		enableMajor (2),
+		enableMinor (3)
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"When the alarm so that it can open the (2 or 3), this parameter allows for alarm processing.
+               If the alarm so that it can shut down (1), alarm processing will be carried out.
+               This object default values for the disable (1).
+               This object should be stored in non-volatile memory."
+	::= { discretePropertyEntry 3 }
+
+discreteAlarmState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		dasNominal(1),
+		dasDiscreteMajor(6),
+		dasDiscreteMinor(7)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The parameters of the current state of alarm."
+	::= { discretePropertyEntry 4 }
+
+
+
+currentAlarmTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CurrentAlarmEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The current warning Table."
+	::= { propertyIdent 3 }
+
+currentAlarmEntry  OBJECT-TYPE
+	SYNTAX 	CurrentAlarmEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The current warning Table Head.
+               OID coding methods with simulation attribute table."
+	INDEX	{ currentAlarmOID }
+	::= { currentAlarmTable 1 }
+
+CurrentAlarmEntry ::= SEQUENCE {
+	currentAlarmOID
+		OBJECT IDENTIFIER,
+	currentAlarmState
+		INTEGER,
+	currentAlarmValue
+		INTEGER
+
+}
+
+currentAlarmOID  OBJECT-TYPE
+	SYNTAX 	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"NE, currently in a state of alarm parameters OID Index, and attribute the alarm in the table corresponding parameters OID."
+	::= { currentAlarmEntry 1 }
+
+currentAlarmState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		caasHIHI (2),
+		caasHI (3),
+		caasLO (4),
+		caasLOLO (5),
+		caasDiscreteMajor (6),
+		caasDiscreteMinor (7)
+
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Warning parameters of the current state of alarm."
+	::= { currentAlarmEntry 2 }
+
+currentAlarmValue  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Alarm parameter's value."
+	::= { currentAlarmEntry 3 }
+
+--************************************************************************************************
+--
+--************************************************************************************************
+ alarmLogNumberOfEntries OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+"Alarm record number of records in the table."
+          ::= { alarmsIdent 1 }
+
+     alarmLogLastIndex OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+              "Recently a warning the index of the records."
+          ::= { alarmsIdent 2 }
+
+     alarmLogTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF AlarmLogEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+              "Alarm record form, at least support 16 record. Each table in the registration of a new record, the management agent (transponder) managers should send traps news."
+          ::= { alarmsIdent 3 }
+
+     alarmLogEntry OBJECT-TYPE
+          SYNTAX AlarmLogEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+              "Alarm Sheet Head."
+          INDEX { alarmLogIndex }
+          ::= { alarmLogTable 1 }
+
+     AlarmLogEntry ::=
+          SEQUENCE
+          {
+               alarmLogIndex
+                    INTEGER,
+               alarmLogInformation
+                    OCTET STRING
+          }
+
+     alarmLogIndex OBJECT-TYPE
+          SYNTAX INTEGER (1..32767)
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+   "The only logo Alarm Index recorded a record in the table, the index value increased from 1 start of each new record, plus 1 until 32,767,
+    a record index of the re-starts at 1. Acting under the management of storage capacity can be the first choice to delete those records,
+    the specific details in this not to achieve provisions."
+          ::= { alarmLogEntry 1 }
+
+     alarmLogInformation OBJECT-TYPE
+          SYNTAX OCTET STRING ( SIZE ( 17..255 ) )
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+               "Alarm record information, multi-byte strings, defined as follows:
+                Byte 1 ~ 4: Alarm in time (POSIX format, the previous maximum byte)
+                Byte 5: Alarm types (enumeration, definitions see behind)
+                Byte 6: Alarm value after commonNeStatus
+                Byte 7 ~ m: Alarm parameters object identifier (Basic Encoding Rules (ASN.1))
+                Byte n ~ z: Alarm parameter values (Basic Encoding Rules (ASN.1))
+
+               Alarm enumerated types:
+               1 NOMINAL
+               2 HIHI
+               3 HI
+               4 LO
+               5 LOLO
+               6 Discrete Major
+               7 Discrete Minor "
+          ::= { alarmLogEntry 2 }
+
+     alarmText OBJECT-TYPE
+          SYNTAX DisplayString
+          ACCESS not-accessible
+          STATUS optional
+          DESCRIPTION
+"This trap targets for the needs of information contained in a text field transponder information is achievable.
+The field contains the text of the object depends on the definition of alarm parameters, it is uncertain,
+This object can not access provisions."
+
+          ::= { alarmsIdent 4 }
+
+hfcAlarmEvent TRAP-TYPE
+     ENTERPRISE nscrtvHFCemsTree
+     VARIABLES { commonPhysAddress, commonNELogicalID, alarmLogInformation, alarmText }
+     DESCRIPTION
+	"When detected in the event of alarm information sent this trap, whether bundled alarmText variable parameter under warning object to determine.
+        Some of the parameters only need to bind the alarm first three variables."
+     ::= 1
+
+--***********************************************************************************************
+--
+--**********************************************************************************************
+-- *
+-- *  Common MIB
+-- *
+commonAdminGroup	OBJECT IDENTIFIER ::= { commonIdent 1 }
+commonAdminUseRf	OBJECT IDENTIFIER ::= { commonIdent 2 }
+commonAdminUseEthernet	OBJECT IDENTIFIER ::= { commonIdent 3 }
+
+commonMACGroup		OBJECT IDENTIFIER ::= { commonAdminUseRf 1 }
+commonRfGroup		OBJECT IDENTIFIER ::= { commonAdminUseRf 2 }
+
+commonMacAddress	OBJECT IDENTIFIER ::= { commonMACGroup 1 }
+commonBackoffParams	OBJECT IDENTIFIER ::= { commonMACGroup 2 }
+commonMacStats		OBJECT IDENTIFIER ::= { commonMACGroup 3 }
+
+commonAgentGroup	OBJECT IDENTIFIER ::= { commonAdminUseEthernet 1 }
+commonDeviceGroup	OBJECT IDENTIFIER ::= { commonAdminUseEthernet 2 }
+
+-- *************
+-- *
+-- *************
+
+commonNELogicalID  OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(0..40))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+	"The logic of the designated NE identifier (LogicID), the values and attributes of other unrelated NE.
+        This target value should be stored in non-volatile memory."
+     ::= { commonAdminGroup 1 }
+
+commonNEVendor  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+	"NE equipment manufacturers."
+     ::= { commonAdminGroup 2 }
+
+commonNEModelNumber  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"NE equipment models."
+     ::= { commonAdminGroup 3 }
+
+commonNESerialNumber  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+	"NE equipment serial numbers."
+     ::= { commonAdminGroup 4 }
+
+commonNEVendorInfo  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+	"NE equipment suppliers other special designated information."
+     ::= { commonAdminGroup 5 }
+
+commonNEStatus  OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(1))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+	"With 7.5.4 STATRESP PDU parameters in the corresponding Status
+           Bit 0: CHNLRQST
+           Bit 1: CNTNRM
+           Bit 2: CNTCUR
+           Bit 3: MAJOR ALARMS
+           Bit 4: MINOR ALARMS
+           Bit 5: RSVD1
+           Bit 6: RSVD2
+		   Bit 7: RSVD3"
+     ::= { commonAdminGroup 6 }
+
+commonReset  OBJECT-TYPE
+     SYNTAX INTEGER { reset (1) }
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+     	"Write'1 'will be reset NE equipment, the value will be included in other non-functional. Reading this object return value'1 ', had no effect on equipment."
+     ::= { commonAdminGroup 7 }
+
+commonAlarmDetectionControl OBJECT-TYPE
+     SYNTAX INTEGER {
+        detectionDisabled (1),
+        detectionEnabled (2),
+        detectionEnabledAndRegenerate (3)
+     }
+ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object used to control the Alarm Detection NE."
+     ::= { commonAdminGroup 8 }
+
+commonNetworkAddress  OBJECT-TYPE
+     SYNTAX NetworkAddress
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+	"NE network IP address, NE produce Trap should include this address. This value should be stored in nonvolatile memory. This value can be registered through the MAC order or through local vendors to set up Interface."
+     ::= { commonAdminGroup 9 }
+
+
+commonCheckCode  OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"This target for the detection transponder code configuration of the report. The calculation includes detection code transponder (including management equipment) and the physical configuration parameters stored in non-volatile memory of all the parameters. The detection algorithm calculated by the vendor code provisions.
+The object should be kept in the value of non-volatile memory, the response thinks highly activated, will be recalculated and re-testing code and the value prior to the commencement of comparison to determine whether or should haveÒ»ï¿½ï¿½hfcColdStart hfcWarmStart traps.
+When write this object (SetRequest), the detection code will be recalculated and fill the SetRequest in response to the GetResponse. At this time, will not produce or hfcWarmStart traps hfcColdStart."
+     ::= { commonAdminGroup 10 }
+
+commonTrapCommunityString  OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(0..64))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"Definition of Community Trap string. The default value is' public '.
+The value of this object should be stored in non-volatile memory."
+     ::= { commonAdminGroup 11 }
+
+commonTamperStatus  OBJECT-TYPE
+     SYNTAX INTEGER { intact (1), compromised (2) }
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+"The safety report NE switching equipment (such as whether to open up the lid) state that this object is called discrete attributes of a corresponding entry in the table. Intact that normal, expressed alarm compromised."
+     ::= { commonAdminGroup 12 }
+
+commonInternalTemperature  OBJECT-TYPE
+     SYNTAX INTEGER (-128..127)
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+"NE equipment Room (machine) temperature, units degrees Celsius. This request object attribute in a corresponding entry in the table."
+     ::= { commonAdminGroup 13 }
+
+commonTime  OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION
+	"NE of the POSIX said that the current time (since at 0:00 on January 1, 1970 since the seconds)."
+     ::= { commonAdminGroup 14 }
+
+commonVarBindings  OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"This object can be said to receive SNMP information NE variables bundled the largest number of tables. Value: 0 indicated no restrictions on the maximum number bundled."
+     ::= { commonAdminGroup 15 }
+
+commonResetCause  OBJECT-TYPE
+     SYNTAX INTEGER {
+          other (1),
+          powerup (2),
+          command (3),
+          watchdog (4),
+          craft (5)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"NE said the reasons for the recent reduction."
+     ::= { commonAdminGroup 16 }
+
+commonCraftStatus  OBJECT-TYPE
+     SYNTAX INTEGER {
+          disconnected (1),
+          connected (2)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"NE local object that this interface (such as RS232 or RS485 interface) state. NE does not necessarily have to support the local interface.
+ NE local interface without affecting the state of its MAC interface functions; If we do not support the local interface, and its value is disconnected."
+     ::= { commonAdminGroup 17 }
+
+commonDeviceOID OBJECT-TYPE
+     SYNTAX OBJECT IDENTIFIER
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+"This OID object as a pointer, the equipment was used at MIB (such as Node, two-way amplifier, etc)."
+     ::= { commonAdminGroup 18 }
+
+commonDeviceId OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(32))
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+"The contents of this object by the designated by the equipment vendors, manufacturers and products it contains special ASCII text messages."
+     ::= { commonAdminGroup 19 }
+commondownload  OBJECT-TYPE
+     SYNTAX INTEGER { reset (1) }
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+     	""
+     ::= { commonAdminGroup 20 }
+-- ******************
+-- *  MAC
+-- *******************
+
+
+-- ****************
+-- *
+-- ****************
+
+commonPhysAddress  OBJECT-TYPE
+     SYNTAX OCTET STRING
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"NE MAC (physical) address."
+     ::= { commonMacAddress 1 }
+
+commonMaxMulticastAddresses  OBJECT-TYPE
+     SYNTAX INTEGER (4..255)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"NE equipment to support the greatest number of multicast addresses."
+     ::= { commonMacAddress 2 }
+
+commonMulticastAddressTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF CommonMulticastAddressEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+"Multicast addresses Table, the value of this object should be stored in nonvolatile memory."
+     ::= { commonMacAddress 3 }
+
+commonMulticastAddressEntry  OBJECT-TYPE
+     SYNTAX CommonMulticastAddressEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+"Multicast addresses Table Head."
+     INDEX { commonMulticastAddressIndex }
+     ::= { commonMulticastAddressTable 1 }
+
+CommonMulticastAddressEntry ::=
+     SEQUENCE
+     {
+          commonMulticastAddressIndex
+               INTEGER,
+          commonMulticastAddressNumber
+               OCTET STRING
+     }
+
+commonMulticastAddressIndex  OBJECT-TYPE
+     SYNTAX INTEGER (1..255)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"Multicast addresses Index."
+     ::= { commonMulticastAddressEntry 1 }
+
+commonMulticastAddressNumber  OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(6))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"Multicast addresses,I/Gbit"
+     ::= { commonMulticastAddressEntry 2 }
+
+-- ************************
+-- *   backoff
+-- ************************
+
+commonBackoffPeriod  OBJECT-TYPE
+     SYNTAX INTEGER (0..16383)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"Backoff algorithm benchmark time (ms), initialize the default value of 6 ms.
+The value of this object should be stored in non-volatile memory."
+     ::= { commonBackoffParams 1 }
+
+commonACKTimeoutWindow  OBJECT-TYPE
+     SYNTAX INTEGER (0..255)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"NE awaiting HE overtime to send ACK response time (ms), initialize the default value is 19 ms.
+ The value of this object should be stored in non-volatile memory."
+     ::= { commonBackoffParams 2 }
+
+commonMaximumMACLayerRetries  OBJECT-TYPE
+     SYNTAX INTEGER (0..255)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"NE data packets sent the greatest number of re-examination. Initialize the default value is 16.
+The value of this object should be stored in non-volatile memory."
+     ::= { commonBackoffParams 3 }
+
+commonMaxPayloadSize  OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"From top to bottom line channel packet supported by the largest payload (payload) the length of."
+     ::= { commonBackoffParams 4 }
+
+commonBackoffMinimumExponent  OBJECT-TYPE
+     SYNTAX INTEGER (0..15)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"The standards body of the MAC layer specification definition of the smallest backoff algorithm index value, default values for 6.
+This value may not exceed commonBackoffMaximumValue value.
+The value of this object should be stored in non-volatile memory."
+     ::= { commonBackoffParams 5 }
+
+commonBackoffMaximumExponent  OBJECT-TYPE
+     SYNTAX INTEGER (0..15)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"The body of the MAC layer standard definition of backoff algorithm for standardizing the largest index value, the default value is 15.
+ This value shall be not less than commonBackoffMinimum value.
+ The value of this object should be stored in non-volatile memory."
+     ::= { commonBackoffParams 6 }
+
+-- ******************
+-- *   MAC
+-- ******************
+
+commonForwardPathLOSEvents  OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION
+"LOS downlink channel in the number of reset to 0."
+     ::= { commonMacStats 1 }
+
+commonForwardPathFramingErrors  OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION
+"Downlink Channel frames wrong number reset to 0."
+     ::= { commonMacStats 2 }
+
+commonForwardPathCRCErrors  OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION
+"CRC errors down the number of reset to 0."
+     ::= { commonMacStats 3 }
+
+commonInvalidMacCmds  OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION
+"Invalid MAC layer order wrong number reset to 0."
+     ::= { commonMacStats 4 }
+
+commonBackwardPathCollisionTimes OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION
+"Uplink Packet collision frequency, reset to 0."
+     ::= { commonMacStats 5 }
+
+-- *************
+-- *
+-- *************
+
+commonReturnPathFrequency  OBJECT-TYPE
+     SYNTAX INTEGER (0..1000000000)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"Channel uplink frequency units Hz.
+The value of this object should be stored in non-volatile memory."
+     ::= { commonRfGroup 1 }
+
+commonForwardPathFrequency  OBJECT-TYPE
+     SYNTAX INTEGER (0..1000000000)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"Downlink frequency channel, flat Hz.
+The value of this object should be stored in non-volatile memory."
+     ::= { commonRfGroup 2 }
+
+commonProvisionedReturnPowerLevel  OBJECT-TYPE
+     SYNTAX INTEGER (0..127)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"Upstream channel power levels and units for dBuV.
+ When the internal use of this value will be rounded to the nearest support value. Reading return to this subject when the actual value rather than rounding value.
+ The value of this object should be stored in non-volatile memory."
+     ::= { commonRfGroup 3 }
+
+commonForwardPathReceiveLevel  OBJECT-TYPE
+     SYNTAX INTEGER (0..127)
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+"Downlink Channel receive power levels, units dBuV."
+     ::= { commonRfGroup 4 }
+
+commonMaxReturnPower  OBJECT-TYPE
+     SYNTAX INTEGER (0..127)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"The largest upstream channel power levels and units for dBuV.
+ The value of this object should be stored in non-volatile memory."
+     ::= { commonRfGroup 5 }
+
+-- ************
+-- *
+-- ************
+
+commonAgentBootWay  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		bootDefault (1),
+		bootBOOTP (2),
+		bootTFTP (3)
+	}
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION
+		"Starting Method Acting"
+	::= { commonAgentGroup 1 }
+
+commonAgentReset  OBJECT-TYPE
+	SYNTAX     INTEGER { reset(1) }
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION
+	"Acting Restart, write'1 'will enable agents to restart, the value will be included in other non-functional. Reading this object return value'1 ', the agent had no effect on."
+	::= { commonAgentGroup 2 }
+
+commonAgentMaxTraps  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION
+		"Acting detected alarm when sent to the management of the largest number of TRAP, 0 that manufacturers use the default default values."
+	::= { commonAgentGroup 3 }
+
+commonAgentTrapMinInterval  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION
+		"Acting TRAP send the minimum spacing units for s."
+	::= { commonAgentGroup 4 }
+
+commonAgentTrapMaxInterval  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION
+		"Acting TRAP send the largest spacing units for s."
+	::= { commonAgentGroup 5 }
+
+commonTrapAck  OBJECT-TYPE
+     SYNTAX OCTET STRING ( SIZE ( 17..255 ) )
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION
+     	"The variables used to notify Snmp agents, it issued the warning Trap has received information management console, do not have to re-hair. The content of the variables in alarmLogInformation MIB and the same warning. Agents received after the adoption of alarmLogInformation management can clearly know the host response is a warning which Trap information, thereby stop the alarm information re the Trap."
+     ::= { commonAgentGroup 6 }
+
+commonAgentTrapTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CommonAgentTrapEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION
+		"Acting Information Table TRAP."
+	::= { commonAgentGroup 7 }
+
+commonAgentTrapEntry  OBJECT-TYPE
+	SYNTAX 	CommonAgentTrapEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION
+		"Acting Head TRAP Information Table."
+	INDEX { commonAgentTrapIndex }
+	::= { commonAgentTrapTable 1 }
+
+CommonAgentTrapEntry ::= SEQUENCE {
+	commonAgentTrapIndex
+		INTEGER,
+	commonAgentTrapIP
+		IpAddress,
+	commonAgentTrapCommunity
+		DisplayString,
+	commonAgentTrapStatus
+		INTEGER
+}
+
+commonAgentTrapIndex  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION
+		"TRAP Table Index."
+	::= { commonAgentTrapEntry 1 }
+
+commonAgentTrapIP  OBJECT-TYPE
+	SYNTAX     IpAddress
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION
+		"When the purpose of the TRAP host's IP address."
+	::= { commonAgentTrapEntry 2 }
+
+commonAgentTrapCommunity  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..64))
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION
+		"Send the Community string TRAP."
+	::= { commonAgentTrapEntry 3 }
+
+commonAgentTrapStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		commonAgentTrapEnable (1),
+		commonAgentTrapDisable (2)
+	}
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION
+		"It said the opening of the TRAP."
+	::= { commonAgentTrapEntry 4 }
+
+-- ***************
+-- *
+-- ***************
+
+commonDeviceNum  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION
+		"The agent said that the current management is the number of devices."
+	::= { commonDeviceGroup 1 }
+
+commonDeviceInfoTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CommonDeviceInfoEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION
+		"Acting is currently public information management equipment List."
+	::= { commonDeviceGroup 2 }
+
+commonDeviceInfoEntry  OBJECT-TYPE
+	SYNTAX 	CommonDeviceInfoEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION
+		"Acting is currently public information management equipment list Table Head."
+	INDEX { commonDeviceSlot }
+	::= { commonDeviceInfoTable 1 }
+
+CommonDeviceInfoEntry ::= SEQUENCE {
+	commonDeviceSlot
+		INTEGER,
+	commonDevicesID
+		OCTET STRING,
+	commonDeviceVendor
+		DisplayString,
+	commonDeviceModelNumber
+		DisplayString,
+	commonDeviceSerialNumber
+		DisplayString,
+	commonDeviceVendorInfo
+		DisplayString,
+	commonDeviceStatus
+		OCTET STRING,
+	commonDeviceReset
+		INTEGER,
+	commonDeviceAlarmDetectionControl
+		INTEGER,
+	commonDeviceMACAddress
+		NetworkAddress,
+	commonDeviceTamperStatus
+		INTEGER,
+	commonDeviceInternalTemperature
+		INTEGER,
+	commonDeviceResetCause
+		INTEGER,
+	commonDeviceCraftStatus
+		INTEGER,
+	commonDevicesOID
+		OBJECT IDENTIFIER,
+	commonDeviceAcct
+		Counter,
+	commonDeviceName
+		DisplayString,
+	commonDeviceMFD
+		DisplayString,
+	commonDeviceFW
+		DisplayString
+}
+
+commonDeviceSlot  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS  read-only
+	STATUS 	mandatory
+	DESCRIPTION
+		"Acting is currently under the management of the equipment list of public information table Index."
+	::= { commonDeviceInfoEntry 1 }
+
+commonDevicesID  OBJECT-TYPE
+	SYNTAX 	OCTET STRING (SIZE(0..40))
+	ACCESS  read-only
+	STATUS 	mandatory
+	DESCRIPTION
+		"Designated equipment manufacturers logo."
+	::= { commonDeviceInfoEntry 2 }
+
+commonDeviceVendor  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"Equipment manufacturers."
+	::= { commonDeviceInfoEntry 3 }
+
+commonDeviceModelNumber  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+	     "Equipment Model."
+
+	::= { commonDeviceInfoEntry 4 }
+
+commonDeviceSerialNumber  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+	     "The string of equipment."
+	::= { commonDeviceInfoEntry 5 }
+
+commonDeviceVendorInfo  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+	    "Equipment suppliers of other special designated information."
+	::= { commonDeviceInfoEntry 6 }
+
+commonDeviceStatus  OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(1))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"The state equipment
+           Bit 0: RSVD0
+           Bit 1: RSVD1
+           Bit 2: RSVD2
+           Bit 3: MAJOR ALARMS
+           Bit 4: MINOR ALARMS
+           Bit 5: RSVD5
+           Bit 6: RSVD6
+		   Bit 7: RSVD7"
+	::= { commonDeviceInfoEntry 7 }
+
+commonDeviceReset  OBJECT-TYPE
+     SYNTAX INTEGER { reset (1) }
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"Write'1 'will be reset equipment, other values will be written into the non-functional. Reading this object return value'1 ', had no effect on equipment."
+	::= { commonDeviceInfoEntry 8 }
+
+commonDeviceAlarmDetectionControl OBJECT-TYPE
+     SYNTAX INTEGER {
+        detectionDisabled (1),
+        detectionEnabled (2),
+        detectionEnabledAndRegenerate (3)
+     }
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+"This object used to control equipment Alarm Detection."
+	::= { commonDeviceInfoEntry 9 }
+
+commonDeviceMACAddress  OBJECT-TYPE
+	SYNTAX 	NetworkAddress
+	ACCESS  read-only
+	STATUS 	mandatory
+	DESCRIPTION
+"Equipment MAC address."
+	::= { commonDeviceInfoEntry 10 }
+
+commonDeviceTamperStatus OBJECT-TYPE
+     SYNTAX INTEGER { intact (1), compromised (2) }
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+"Report of the safety switch equipment (such as whether to open up the lid) state that this object is called discrete attributes of a corresponding entry in the table. Intact that normal, expressed alarm compromised."
+	::= { commonDeviceInfoEntry 11 }
+
+commonDeviceInternalTemperature OBJECT-TYPE
+     SYNTAX INTEGER (-128..127)
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+"Equipment Room (machine) temperature, units degrees Celsius. This request object attribute in a corresponding entry in the table."
+	::= { commonDeviceInfoEntry 12 }
+
+commonDeviceResetCause OBJECT-TYPE
+     SYNTAX INTEGER {
+          other (1),
+          powerup (2),
+          command (3),
+          watchdog (4),
+          craft (5)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"Equipment that the reasons for the recent reduction."
+	::= { commonDeviceInfoEntry 13 }
+
+commonDeviceCraftStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+          disconnected (1),
+          connected (2)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"This object interface that local equipment (such as RS232 or RS485 interface) state."
+	::= { commonDeviceInfoEntry 14 }
+
+commonDevicesOID OBJECT-TYPE
+     SYNTAX  OBJECT IDENTIFIER
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+"Goals identifier string, point to a concrete realization of the equipment."
+	::= { commonDeviceInfoEntry 15 }
+
+commonDeviceAcct OBJECT-TYPE
+     SYNTAX  Counter
+     ACCESS  read-only
+     STATUS  optional
+     DESCRIPTION
+"Equipment that the accumulated work time, units of s."
+	::= { commonDeviceInfoEntry 16 }
+
+commonDeviceName OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"Equipment Name."
+	::= { commonDeviceInfoEntry 17 }
+
+commonDeviceMFD OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(10))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"Date of production equipment."
+	::= { commonDeviceInfoEntry 18 }
+
+commonDeviceFW OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"Firmware information equipment."
+	::= { commonDeviceInfoEntry 19 }
+
+
+
+
+hfcColdStart  TRAP-TYPE
+     ENTERPRISE nscrtvHFCemsTree
+     VARIABLES { commonPhysAddress, commonNELogicalID}
+     DESCRIPTION
+"HfcColdStart traps that are sent to re-initialization protocol entities, and entities agent configuration or agreement may have changed. This trap only after the success of transponder sent registration."
+     ::= 0
+
+hfcWarmStart  TRAP-TYPE
+     ENTERPRISE nscrtvHFCemsTree
+     VARIABLES {  commonPhysAddress, commonNELogicalID }
+     DESCRIPTION
+"HfcWarmStart traps that are sent to re-initialization protocol entities, and entities agent configuration or agreement has not changed. This trap only after the completion of transponder sent registration."
+
+     ::= 2
+
+
+
+--*********************************************************************************************
+--
+--*********************************************************************************************
+oaVendorOID OBJECT-TYPE
+     SYNTAX OBJECT IDENTIFIER
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+        "This object provides manufacturers of optical amplifier MIB expansion. Without the expansion, this should be targeting at the optical amplifier nodes oaIdent."
+     ::= { oaIdent 1 }
+oaOutputOpticalPower OBJECT-TYPE
+     SYNTAX INTEGER ( 0..65535 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+          "The output optical power units to 0.1 dBm, the object attributes required to register an entry MIB."
+     ::= { oaIdent 2 }
+
+oaInputOpticalPower OBJECT-TYPE
+     SYNTAX INTEGER ( -128..127 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+          "Input optical power units to 0.1 dBm, the object attributes required to register an entry MIB."
+     ::= { oaIdent 3 }
+
+    -- ****************
+    -- *
+    -- ****************
+oaPumpTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF OaPumpEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+          "EDFA laser pump Information Table."
+     ::= { oaIdent 4 }
+
+oaPumpEntry OBJECT-TYPE
+     SYNTAX OaPumpEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+          "Each laser-pumped optical amplifier Information Table Head."
+     INDEX { oaPumpIndex }
+     ::= { oaPumpTable 1 }
+
+OaPumpEntry ::=
+     SEQUENCE
+     {
+          oaPumpIndex
+               INTEGER,
+          oaPumpBIAS
+               INTEGER,
+          oaPumpTEC
+               INTEGER,
+          oaPumpTemp
+               INTEGER
+     }
+
+oaPumpIndex OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+          "Laser-pumped optical amplifier index value."
+     ::= { oaPumpEntry 1 }
+
+oaPumpBIAS OBJECT-TYPE
+     SYNTAX INTEGER ( 0..65535 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+          "The pump laser bias current, flat mA, this attribute MIB objects require an entry in the register."
+     ::= { oaPumpEntry 2 }
+
+oaPumpTEC OBJECT-TYPE
+     SYNTAX INTEGER ( -32768..32767 )
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+          "Current laser pump refrigeration unit is 0.01 A, this attribute MIB objects require an entry in the register."
+     ::= { oaPumpEntry 3 }
+
+oaPumpTemp OBJECT-TYPE
+     SYNTAX INTEGER ( 0..32768 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+          "Laser pump temperature, units of 0.10 C, this attribute MIB objects require an entry in the register."
+     ::= { oaPumpEntry 4 }
+
+
+-- *****************
+-- *
+-- *****************
+
+oaNumberDCPowerSupply OBJECT-TYPE
+     SYNTAX INTEGER ( 0..16 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+	     "The number of internal DC power supply, 0 expressed transponder does not support this function."
+     ::= { oaIdent 5 }
+
+oaDCPowerSupplyMode OBJECT-TYPE
+     SYNTAX INTEGER { loadsharing(1), switchedRedundant(2), aloneSupply(3)}
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+"Power supply mode: load sharing, standby switching or an independent power supply."
+     ::= { oaIdent 6 }
+
+oaDCPowerTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF OaDCPowerEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+ 	     "DC Power Information Table."
+     ::= { oaIdent 7 }
+
+oaDCPowerEntry OBJECT-TYPE
+     SYNTAX OaDCPowerEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+	     "DC Power Information Table Head."
+     INDEX { oaDCPowerIndex }
+     ::= { oaDCPowerTable 1 }
+
+OaDCPowerEntry ::=SEQUENCE
+     {
+          oaDCPowerIndex
+               INTEGER,
+          oaDCPowerVoltage
+               INTEGER,
+          oaDCPowerCurrent
+               INTEGER,
+          oaDCPowerName
+               DisplayString
+     }
+
+oaDCPowerIndex OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "DC Power Index."
+     ::= { oaDCPowerEntry 1 }
+
+oaDCPowerVoltage OBJECT-TYPE
+     SYNTAX INTEGER ( -32768..32767 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+ 	     "Supply voltage, the unit is 0.1 V. This attribute MIB objects require an entry in the register."
+     ::= { oaDCPowerEntry 2 }
+
+oaDCPowerCurrent OBJECT-TYPE
+     SYNTAX INTEGER ( 0..65535 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+ 	       "Electricity power supply unit is 0.01 A. This attribute MIB objects require an entry in the register."
+     ::= { oaDCPowerEntry 3 }
+
+oaDCPowerName OBJECT-TYPE
+     SYNTAX DisplayString
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+"Indicate the name of the power supply, for example: 24 V DC power supply.
+This field value by the user, should at least be marked with a number of power supply voltage and distinguish between each other.
+When the object of this table have a warning, that this object should be put into the name of alarmText hfcAlarmEvent traps in the target."
+     ::= { oaDCPowerEntry 4 }
+oaOutputOpticalPowerSet OBJECT-TYPE
+     SYNTAX INTEGER ( 0..65535 )
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+          "The output optical power control ,units to 0.1 dBm"
+     ::= { oaIdent 11 }
+oaGainSet OBJECT-TYPE
+     SYNTAX INTEGER ( 0..65535 )
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+          "units to 0.1 dB"
+     ::= { oaIdent 12 }
+powerSupplyStatusA    OBJECT-TYPE
+    SYNTAX            INTEGER { undefined(0),nominal(1),failure(2),notInstalled(3) }
+    UNITS             "no units"
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "Returns the operating status of power supply A."
+    ::= { oaIdent 32 }
+
+powerSupplyStatusB    OBJECT-TYPE
+    SYNTAX            INTEGER { undefined(0),nominal(1),failure(2),notInstalled(3) }
+    UNITS             "no units"
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "Returns the operating status of power supply B."
+    ::= { oaIdent 33 }
+END

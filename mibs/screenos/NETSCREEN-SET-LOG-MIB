@@ -1,0 +1,197 @@
+-- This module defines enterprise MIBs for syslog setting
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-LOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetLogMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor 
+         syslog setting"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 8 }
+
+nsSetLog OBJECT IDENTIFIER ::= { netscreenSetting 8 }
+
+nsSetLogEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Syslog messages"
+    ::= { nsSetLog 1 }
+
+nsSetLogVPNEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure syslog message traffic using VPN encryption"
+    ::= { nsSetLog 2 }
+
+nsSetLogTraffic OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Including traffic log when recording administration log"
+    ::= { nsSetLog 3 }
+
+nsSetLogHostName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "syslog server name or ip address"
+    ::= { nsSetLog 4 }
+
+nsSetLogPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "syslog server port number"
+    ::= { nsSetLog 5 }
+
+nsSetLogSecFacility OBJECT-TYPE
+    SYNTAX        INTEGER {
+        local0(16),
+        local1(17),
+        local2(18),
+        local3(19),
+        local4(20),
+        local5(21),
+        local6(22),
+        local7(23),
+        auth-sec(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Security Facility of syslog server"
+    ::= { nsSetLog 6 }
+
+nsSetLogFacility OBJECT-TYPE
+    SYNTAX        INTEGER {
+        local0(16),
+        local1(17),
+        local2(18),
+        local3(19),
+        local4(20),
+        lcoal5(21),
+        local6(22),
+        loca7(23),
+        auth-sec(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Facility of syslog server"
+    ::= { nsSetLog 7 }
+
+nsSetLogLevel OBJECT-TYPE
+    SYNTAX        INTEGER {
+        emergency(0),
+        aleart(1),
+        critical(2),
+        error(3),
+        warning(4),
+        notice(5),
+        info(6),
+        debug(7)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Only log messages with a priority level of
+         EMERGENCY/ALERT/CRITICAL/ERROR/WARNING/NOTICE/INFO/DEBUG or
+         higher"
+    ::= { nsSetLog 8 }
+
+nsSetLogWebTrendsEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable WebTrends Firewall syslog report."
+    ::= { nsSetLog 9 }
+
+nsSetLogWebTrendsVPNEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure WebTrends message via VPN encryption"
+    ::= { nsSetLog 10 }
+
+nsSetLogWebTrendsHostName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "WebTrends Host Name"
+    ::= { nsSetLog 11 }
+
+nsSetLogWebTrendsPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "WebTrends Host Port"
+    ::= { nsSetLog 12 }
+
+END
+
+

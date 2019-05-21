@@ -24,7 +24,7 @@
  */
 
 if ($device['os'] === 'oceanstor') {
-    $oceanstor_tmp = snmp_get_multi_oid($device, 'usedCapacity.0 totalCapacity.0', '-OUQs', 'ISM-STORAGE-SVC-MIB');
+    $oceanstor_tmp = snmp_get_multi_oid($device, ['usedCapacity.0', 'totalCapacity.0'], '-OUQs', 'ISM-STORAGE-SVC-MIB');
 
     $fstype = "dsk";
     $descr  = "File System";

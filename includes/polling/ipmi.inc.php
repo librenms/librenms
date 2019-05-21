@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
 $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_type='ipmi'", array($device['device_id']));
@@ -14,14 +15,16 @@ if (is_array($ipmi_rows)) {
 
         echo 'Fetching IPMI sensor data...';
 
+        $cmd = [Config::get('ipmitool', 'ipmitool')];
         if ($config['own_hostname'] != $device['hostname'] || $ipmi['host'] != 'localhost') {
-            $remote = " -H " . $ipmi['host'] . " -U '" . $ipmi['user'] . "' -P '" . $ipmi['password'] . "' -L USER";
+            array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
         }
 
         // Check to see if we know which IPMI interface to use
         // so we dont use wrong arguments for ipmitool
         if ($ipmi['type'] != '') {
-            $results = external_exec($config['ipmitool'] . ' -I ' . $ipmi['type'] . ' -c ' . $remote . ' sdr 2>/dev/null');
+            array_push($cmd, '-I', $ipmi['type'], '-c', 'sdr');
+            $results = external_exec($cmd);
             d_echo($results);
             echo " done.\n";
         } else {

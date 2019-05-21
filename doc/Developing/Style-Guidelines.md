@@ -1,4 +1,5 @@
 source: Developing/Style-Guidelines.md
+path: blob/master/doc/
 # Style guidelines
 
 This document is here to help style standards for contributions towards LibreNMS. These aren't strict rules but it is in

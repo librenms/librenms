@@ -1,4 +1,5 @@
 source: General/Releases.md
+path: blob/master/doc/
 
 #### Introduction
 We try to ensure that breaking changes aren't introduced by utilising various automated 

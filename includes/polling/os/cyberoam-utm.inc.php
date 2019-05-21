@@ -23,9 +23,11 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$cyberoam_data = snmp_get_multi_oid($device, 'applianceModel.0 cyberoamVersion.0', '-OQUs', 'CYBEROAM-MIB');
-$hardware = $cyberoam_data['.1.3.6.1.4.1.21067.2.1.1.2.0'];
-$version  = $cyberoam_data['.1.3.6.1.4.1.21067.2.1.1.3.0'];
+$cyberoam_data = snmp_get_multi_oid($device, ['applianceModel.0', 'cyberoamVersion.0', 'applianceKey.0'], '-OQUs', 'CYBEROAM-MIB');
+
+$hardware = $cyberoam_data['applianceModel.0'];
+$version  = $cyberoam_data['cyberoamVersion.0'];
+$serial   = $cyberoam_data['applianceKey.0'];
 
 unset(
     $cyberoam_data

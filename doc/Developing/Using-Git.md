@@ -1,4 +1,5 @@
 source: Developing/Using-Git.md
+path: blob/master/doc/
 Git can have a bit of a steep learning curve, stick with it as it is worth learning the [basics][1][2] at least.
 
 If you want to help develop LibreNMS and haven't really used Git before then this quick primer will help you get started.

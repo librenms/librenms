@@ -7,7 +7,7 @@ $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name])) {
     $rawdata = $agent_data['app'][$name];
 } else {
-    $options = '-O qv';
+    $options = '-Oqv';
     $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.117.110.98.111.117.110.100';
     $rawdata  = snmp_get($device, $oid, $options);
 }
@@ -77,6 +77,23 @@ $fields = array (
 $metrics['cache'] = $fields;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+#Unbound Operations - Total opcodes and three valuable return codes
+$rrd_name =  array('app', $name,'operations',$app_id);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('opcodeQuery', 'DERIVE', 0, 125000000000)
+    ->addDataset('rcodeNOERROR', 'DERIVE', 0, 125000000000)
+    ->addDataset('rcodeNXDOMAIN', 'DERIVE', 0, 125000000000)
+    ->addDataset('rcodeNodata', 'DERIVE', 0, 125000000000);
+$fields = array (
+    'opcodeQuery' => $unbound['num.query.opcode.QUERY'],
+    'rcodeNOERROR' => $unbound['num.answer.rcode.NOERROR'],
+    'rcodeNXDOMAIN' => $unbound['num.answer.rcode.NXDOMAIN'],
+    'rcodeNodata' => $unbound['num.answer.rcode.nodata']
+    );
+$metrics['operations'] = $fields;
+$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+data_update($device, 'app', $tags, $fields);
+ 
 update_application($app, $rawdata, $metrics);
 
 unset($lines, $unbound, $rrd_name, $rrd_def, $fields, $tags);

@@ -1,0 +1,224 @@
+-----------------------------------------------------------------------------
+--  File         : gbnL3Ospf-Mib.mi2
+--  Description  : ADMIN  Enterprise MIB 
+--  Version      : 0.03
+--  Date         : May 03, 2002     
+--
+--  Copyright (c) 2002-2005 admin Systems, Inc.  All Rights Reserved.
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    GBNL3Ospf-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter64                    FROM SNMPv2-SMI
+        
+        DisplayString, TruthValue,MacAddress,RowStatus    FROM SNMPv2-TC  
+              
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL3                                   FROM ADMIN-MASTER-MIB
+        
+        mib-2                                   FROM RFC1213-MIB;
+    
+        
+    gbnL3OspfMib MODULE-IDENTITY
+        LAST-UPDATED    "0308180001Z"  -- Autumn 18,2003  
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "GBN Enterprise MIB definition."
+
+        REVISION        "0308180001Z"  -- Autumn 18,2003
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL3 3 }
+
+Metric ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The OSPF Internal Metric."
+    SYNTAX      Integer32 (0..'FFFFFF'h)
+
+   gbnL3OspfGroup               OBJECT IDENTIFIER ::= { gbnL3OspfMib 1 }   
+    
+   
+    ospfRedistriDefaultMetric OBJECT-TYPE
+        SYNTAX   Metric
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "其他路由协议的路由引入到OSPF的默认花费值."
+       REFERENCE
+          "OSPF Version 2, C.1 Global parameters" 
+       DEFVAL { 1 }         
+      ::= { gbnL3OspfGroup 1 }      
+      
+    ospfRedistriDefaultType OBJECT-TYPE
+       SYNTAX   INTEGER    {
+                    type1 (1),
+                    type2 (2)
+                  }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "其他路由协议的路由引入到OSPF的默认类型.第一类或第二类。"
+       REFERENCE
+          "OSPF Version 2, C.1 Global parameters"  
+       DEFVAL { type2 }         
+      ::= { gbnL3OspfGroup 2 }
+
+    ospfRedistriDefaultTag OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "此项暂时不用." 
+       DEFVAL { 1 }        
+      ::= { gbnL3OspfGroup 3 }
+
+
+   ospfRedistriDefaultInterval OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "OSPF引入外部路由的默认引入间隔，以秒（S）为单位."
+       REFERENCE
+          "OSPF Version 2, C.1 Global parameters" 
+       DEFVAL { 1 }          
+      ::= { gbnL3OspfGroup 4 }    
+      
+    ospfRedistriDefaultLimit OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "OSPF每次引入外部路由的最大数目."
+       REFERENCE
+          "OSPF Version 2, C.1 Global parameters"
+       DEFVAL { 1000 }
+      ::= { gbnL3OspfGroup 5 }
+
+    ospfMibBinding OBJECT-TYPE
+        SYNTAX   Integer32(0..10)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Bind OSPF MIBs to OSPF process. OSPF MIBs access the binging process only."
+       DEFVAL { 0 }
+      ::= { gbnL3OspfGroup 6 }
+      
+      
+--  OSPF redistribute Variables
+
+--      These parameters apply globally to the Router's
+--      OSPF Process when OSPF redistribute routes of other protocal.  
+
+    ospfRedistributeTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF OspfRedistributeEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing the configured  parame-
+           ters  of redistribute."
+       ::= { gbnL3OspfMib 2 }
+
+    ospfRedistributeEntry OBJECT-TYPE
+        SYNTAX   OspfRedistributeEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing the configured  parame-
+           ters  of redistribute."
+       INDEX { ospfRedistributeProtocal }
+       ::= { ospfRedistributeTable 1 }
+
+    OspfRedistributeEntry ::=
+	    SEQUENCE {
+	        ospfRedistributeProtocal
+	            Integer32,
+	        ospfRedistributeMetric
+	            Metric,
+	        ospfRedistributeType
+	            INTEGER,
+	        ospfRedistributeTag
+	            Integer32,
+	        ospfRedistributeStatus
+	            RowStatus, 
+	        ospfRedistributeAlways
+	            TruthValue
+	              }
+
+    ospfRedistributeProtocal OBJECT-TYPE
+       SYNTAX   Integer32
+         MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "OSPF引入的外部路由协议."
+       REFERENCE
+          "OSPF Version 2, C.1 Global parameters"
+      ::= { ospfRedistributeEntry 1 }
+
+    ospfRedistributeMetric OBJECT-TYPE
+        SYNTAX   Metric
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "定义其他路由协议的路由引入到OSPF时路由的基准花费，
+           如:引入RIP路由协议的路由，配置RIP的metric为100，
+           此条路由在RIP中的跳数为10，则引入OSPF后此条路由的
+           实际花费为110."
+       ::= { ospfRedistributeEntry 2 }
+
+    ospfRedistributeType OBJECT-TYPE
+      SYNTAX   INTEGER    {
+                    type1 (1),
+                    type2 (2)
+                  }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "OSPF将所引入的自治系统外部路由分成两类：type1和type2，
+           第一类是指引入的是IGP路由（例如RIP，IGRP，STATIC）， 由
+           于这类路由的可信程度高一些，所以计算出的外部路由的花费
+           与自治系统内部的路由花费的数量级是相同的，即到第一类外部
+           路由的花费值 = 本路由器到相应的ASBR的花费值+ASBR到该路由
+           目的地址的花费值。对于第二类外部路由是指引入的是BGP路由，
+           由于这类路由的可信度比较低，所以OSPF协议认为从ASBR到自治
+           系统之外的花费远远大于在自治系统之内到达ASBR的花费。所以
+           计算路由花费时将主要考虑前者，即到第二类外部路由的花费值 
+           = ASBR到该路由目的地址的花费值。如果该值相等，再考虑本路
+           由器到相应的ASBR的花费值。如果加上前面所述的两种路由类型."
+       ::= { ospfRedistributeEntry 3 }
+
+    ospfRedistributeTag OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-write
+        STATUS   current 
+        DESCRIPTION
+        "tag"
+        ::= { ospfRedistributeEntry 4 }
+        
+    ospfRedistributeStatus OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS   read-write
+        STATUS   current 
+        DESCRIPTION
+        "This object indicates the status of this entry."
+        ::= { ospfRedistributeEntry 5 }  
+        
+     ospfRedistributeAlways OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current 
+        DESCRIPTION
+        "always 这个关键字使得就算本机没有配置缺省路由也要产生一个描
+        述缺省路由的ase lsa 发布出去若未指定该关键字本机必须要配置缺
+        省路由才可以引入产生缺省路由的ase lsa，这个参数只有在引入默认
+        路由时才用."
+        ::= { ospfRedistributeEntry 6 } 
+
+END

@@ -25,7 +25,8 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Exceptions\AuthenticationException;
 
 // Note that as this test set depends on mres(), it is a DBTestCase even though the database is unused
 class AuthHTTPTest extends DBTestCase
@@ -36,9 +37,8 @@ class AuthHTTPTest extends DBTestCase
         global $config;
         $config['auth_mechanism'] = 'http-auth';
 
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
-        $this->assertFalse($a->reauthenticate(null, null));
         $this->assertTrue($a->canUpdatePasswords() === 0);
         $this->assertTrue($a->changePassword(null, null) === 0);
         $this->assertTrue($a->canManageUsers() === 1);
@@ -49,7 +49,7 @@ class AuthHTTPTest extends DBTestCase
     public function testOldBehaviourAgainstCurrent()
     {
         global $config;
-        
+
         $old_username = null;
         $new_username = null;
 
@@ -57,7 +57,7 @@ class AuthHTTPTest extends DBTestCase
         $users = array('steve',  '   steve', 'steve   ', '   steve   ', '    steve   ', '', 'CAT');
         $vars = array('REMOTE_USER', 'PHP_AUTH_USER');
 
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         foreach ($vars as $v) {
             foreach ($users as $u) {

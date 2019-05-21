@@ -4,8 +4,9 @@
 -- =============================
 -- 9/5/13       1.01
 --
+-- Renamed from ICT-MIB to ICT-DISTRIBUTION-PANEL-MIB
 
-ICT-MIB DEFINITIONS ::= BEGIN
+ICT-DISTRIBUTION-PANEL-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 	enterprises, IpAddress	FROM RFC1155-SMI

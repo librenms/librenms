@@ -154,13 +154,18 @@ class Component
 
         // Populate our reserved fields into the Array, these cant be used as user attributes.
         foreach ($COMPONENTS as $COMPONENT) {
+            $component_device_id = (int)$COMPONENT['device_id'];
             foreach ($this->reserved as $k => $v) {
-                $RESULT[$COMPONENT['device_id']][$COMPONENT['id']][$k] = $COMPONENT[$k];
+                $RESULT[$component_device_id][$COMPONENT['id']][$k] = $COMPONENT[$k];
             }
 
             // Sort each component array so the attributes are in order.
-            ksort($RESULT[$RESULT[$COMPONENT['device_id']][$COMPONENT['id']]]);
-            ksort($RESULT[$RESULT[$COMPONENT['device_id']]]);
+            if (is_array($RESULT[$RESULT[$component_device_id][$COMPONENT['id']]])) {
+                ksort($RESULT[$RESULT[$component_device_id][$COMPONENT['id']]]);
+            }
+            if (is_array($RESULT[$RESULT[$component_device_id]])) {
+                ksort($RESULT[$RESULT[$component_device_id]]);
+            }
         }
 
         // limit    array(start,count)
@@ -294,7 +299,7 @@ class Component
 
         $OLD = $this->getComponents($device_id);
         // Loop over each component.
-        foreach ($ARRAY as $COMPONENT => $AVP) {
+        foreach ((array)$ARRAY as $COMPONENT => $AVP) {
             // Make sure the component already exists.
             if (!isset($OLD[$device_id][$COMPONENT])) {
                 // Error. Component doesn't exist in the database.

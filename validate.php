@@ -14,9 +14,12 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
 chdir(__DIR__); // cwd to the directory containing this script
+
+ini_set('display_errors', 1);
 
 require_once 'includes/common.php';
 require_once 'includes/functions.php';
@@ -39,6 +42,7 @@ if (isset($options['h'])) {
           Default groups:
           - configuration: checks various config settings are correct
           - database: checks the database for errors
+          - dependencies: checks that all required libraries are installed and up-to-date
           - disk: checks for disk space and other disk related issues
           - php: check that various PHP modules and functions exist
           - poller: check that the poller and discovery are running properly
@@ -61,6 +65,10 @@ register_shutdown_function(function () {
     global $precheck_complete;
 
     if (!$precheck_complete) {
+        // use this in case composer autoloader isn't available
+        spl_autoload_register(function ($class) {
+            include str_replace('\\', '/', $class) . '.php';
+        });
         print_header(version_info());
     }
 });
@@ -91,56 +99,51 @@ if (str_contains(`tail config.php`, '?>')) {
 
 // Composer checks
 if (!file_exists('vendor/autoload.php')) {
-    print_fail('Composer has not been run, dependencies are missing', 'composer install --no-dev');
-    $pre_checks_failed = true;
+    print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
+    exit;
 }
 
-if (!str_contains(shell_exec('php scripts/composer_wrapper.php --version'), 'Composer version')) {
-    print_fail("No composer available, please install composer", "https://getcomposer.org/");
-    $pre_checks_failed = true;
-}
+// init autoloading
+require_once 'vendor/autoload.php';
+
 
 $dep_check = shell_exec('php scripts/composer_wrapper.php install --no-dev --dry-run');
 preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
 if (!empty($dep_missing[0])) {
-    print_fail("Missing dependencies!", "composer install --no-dev");
+    print_fail("Missing dependencies!", "./scripts/composer_wrapper.php install --no-dev");
     $pre_checks_failed = true;
     print_list($dep_missing[1], "\t %s\n");
 }
 preg_match_all('/Updating ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_outdated);
 if (!empty($dep_outdated[0])) {
-    print_fail("Outdated dependencies", "composer install --no-dev");
+    print_fail("Outdated dependencies", "./scripts/composer_wrapper.php install --no-dev");
     print_list($dep_outdated[1], "\t %s\n");
+}
+
+$validator = new Validator();
+$validator->validate(array('dependencies'));
+if ($validator->getGroupStatus('dependencies') == ValidationResult::FAILURE) {
+    $pre_checks_failed = true;
 }
 
 if ($pre_checks_failed) {
     exit;
 }
 
-$init_modules = array('nodb');
+$init_modules = [];
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
 if (!file_exists(Config::get('install_dir').'/config.php')) {
-    $suggested = realpath(__DIR__ . '/../..');
+    $suggested = realpath(__DIR__);
     print_fail('$config[\'install_dir\'] is not set correctly.', "It should probably be set to: $suggested");
     exit;
 }
 
-$validator = new Validator();
-
-
-// Connect to MySQL
-try {
-    dbConnect();
-
-    // pull in the database config settings
-    mergedb();
-    require 'includes/process_config.inc.php';
-
+if (\LibreNMS\DB\Eloquent::isConnected()) {
     $validator->ok('Database connection successful', null, 'database');
-} catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
-    $validator->fail('Error connecting to your database. '.$e->getMessage(), null, 'database');
+} else {
+    $validator->fail('Error connecting to your database.', null, 'database');
 }
 
 $precheck_complete = true; // disable shutdown function
@@ -161,7 +164,7 @@ $validator->validate($modules, isset($options['s'])||!empty($modules));
 function print_header($versions)
 {
     $output = ob_get_clean();
-    ob_end_clean();
+    @ob_end_clean();
 
     echo <<< EOF
 ====================================

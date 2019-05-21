@@ -25,16 +25,35 @@
 
 namespace LibreNMS\Tests;
 
-abstract class TestCase extends \PHPUnit_Framework_TestCase
+use LibreNMS\Util\Snmpsim;
+
+abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
-    protected $snmpsimIp = '127.1.6.2';
-    protected $snmpsimPort = 1161;
+    use SnmpsimHelpers;
+
+    /** @var Snmpsim snmpsim instance */
+    protected $snmpsim = null;
+
+    public function __construct($name = null, $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+        // grab global $snmpsim from bootstrap and make it accessible
+        global $snmpsim;
+        $this->snmpsim = $snmpsim;
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+        set_debug(false); // prevent warnings from stopping execution for legacy code
+    }
 
     public function dbSetUp()
     {
         if (getenv('DBTEST')) {
-            dbConnect();
-            dbBeginTransaction();
+            \LibreNMS\DB\Eloquent::boot();
+            \LibreNMS\DB\Eloquent::setStrictMode();
+            \LibreNMS\DB\Eloquent::DB()->beginTransaction();
         } else {
             $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
         }
@@ -43,14 +62,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     public function dbTearDown()
     {
         if (getenv('DBTEST')) {
-            dbRollbackTransaction();
-        }
-    }
-
-    public function requreSnmpsim()
-    {
-        if (!getenv('SNMPSIM')) {
-            $this->markTestSkipped('Snmpsim required for this test.  Set SNMPSIM=1 to enable.');
+            \LibreNMS\DB\Eloquent::DB()->rollBack();
         }
     }
 }

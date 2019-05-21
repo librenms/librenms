@@ -13,4 +13,4 @@
  */
 
 echo 'Caching Brocade IronWare Optics';
-$pre_cache['ironware_optic_oids'] = snmpwalk_cache_multi_oid($device, 'snIfOpticalMonitoringInfoTable', array(), 'FOUNDRY-SN-SWITCH-GROUP-MIB');
+$pre_cache['ironware_optic_oids'] = snmpwalk_cache_multi_oid($device, 'snIfOpticalMonitoringInfoTable', [], 'FOUNDRY-SN-SWITCH-GROUP-MIB');

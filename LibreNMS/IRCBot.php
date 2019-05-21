@@ -20,8 +20,8 @@
 
 namespace LibreNMS;
 
-use LibreNMS\Authentication\Auth;
-use LibreNMS\Exceptions\DatabaseConnectException;
+use LibreNMS\DB\Eloquent;
+use LibreNMS\Authentication\LegacyAuth;
 
 class IRCBot
 {
@@ -68,11 +68,8 @@ class IRCBot
 
     public function __construct()
     {
-        global $config, $database_link;
+        global $config;
         $this->log('Setting up IRC-Bot..');
-        if (is_resource($database_link)) {
-            $this->sql = $database_link;
-        }
 
         $this->config = $config;
         $this->debug  = $this->config['irc_debug'];
@@ -259,11 +256,13 @@ class IRCBot
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
                     $this->ircRaw('PRIVMSG '.$chan.' :'.$severity.trim($alert['title']));
-                    foreach (explode("\n", $alert['msg']) as $line) {
-                        // We don't need to repeat the title
-                        $line = strip_tags($line);
-                        if (trim($line) != trim($alert['title'])) {
-                            $this->ircRaw('PRIVMSG '.$chan.' :'.$line);
+                    if (!$this->config['irc_alert_short']) { // Only send the title if set to short
+                        foreach (explode("\n", $alert['msg']) as $line) {
+                            // We don't need to repeat the title
+                            $line = strip_tags($line);
+                            if (trim($line) != trim($alert['title'])) {
+                                $this->ircRaw('PRIVMSG '.$chan.' :'.$line);
+                            }
                         }
                     }
                 }
@@ -271,11 +270,13 @@ class IRCBot
                 foreach ($this->authd as $nick => $data) {
                     if ($data['expire'] >= time()) {
                         $this->ircRaw('PRIVMSG '.$nick.' :'.$severity.trim($alert['title']));
-                        foreach (explode("\n", $alert['msg']) as $line) {
-                            // We don't need to repeat the title
-                            $line = strip_tags($line);
-                            if (trim($line) != trim($alert['title'])) {
-                                $this->ircRaw('PRIVMSG '.$nick.' :'.$line);
+                        if (!$this->config['irc_alert_short']) { // Only send the title if set to short
+                            foreach (explode("\n", $alert['msg']) as $line) {
+                                // We don't need to repeat the title
+                                $line = strip_tags($line);
+                                if (trim($line) != trim($alert['title'])) {
+                                    $this->ircRaw('PRIVMSG '.$nick.' :'.$line);
+                                }
                             }
                         }
                     }
@@ -503,17 +504,10 @@ class IRCBot
 
     private function chkdb()
     {
-        if (!is_resource($this->sql)) {
+        if (!Eloquent::isConnected()) {
             try {
-                $this->sql = dbConnect(
-                    $this->config['db_host'],
-                    $this->config['db_user'],
-                    $this->config['db_pass'],
-                    $this->config['db_name'],
-                    $this->config['db_port'],
-                    $this->config['db_socket']
-                );
-            } catch (DatabaseConnectException $e) {
+                Eloquent::boot();
+            } catch (\PDOException $e) {
                 $this->log('Cannot connect to MySQL: ' . $e->getMessage());
                 return die();
             }
@@ -545,11 +539,11 @@ class IRCBot
             foreach ($hosts as $host) {
                 $host = preg_replace("/\*/", ".*", $host);
                 if (preg_match("/$host/", $this->getUserHost($this->data))) {
-                    $user_id = Auth::get()->getUserid(mres($nms_user));
-                    $user = Auth::get()->getUser($user_id);
+                    $user_id = LegacyAuth::get()->getUserid(mres($nms_user));
+                    $user = LegacyAuth::get()->getUser($user_id);
                     $this->user['name'] = $user['username'];
                     $this->user['id']   = $user_id;
-                    $this->user['level'] = Auth::get()->getUserlevel($user['username']);
+                    $this->user['level'] = LegacyAuth::get()->getUserlevel($user['username']);
                     $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
                     if ($this->user['level'] < 5) {
                         foreach (dbFetchRows('SELECT device_id FROM devices_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
@@ -584,8 +578,8 @@ class IRCBot
         if (strlen($params[0]) == 64) {
             if ($this->tokens[$this->getUser($this->data)] == $params[0]) {
                 $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
-                $tmp_user = Auth::get()->getUser($this->user['id']);
-                $tmp = Auth::get()->getUserlevel($tmp_user['username']);
+                $tmp_user = LegacyAuth::get()->getUser($this->user['id']);
+                $tmp = LegacyAuth::get()->getUserlevel($tmp_user['username']);
                 $this->user['level'] = $tmp;
                 if ($this->user['level'] < 5) {
                     foreach (dbFetchRows('SELECT device_id FROM devices_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
@@ -602,8 +596,8 @@ class IRCBot
                 return $this->respond('Nope.');
             }
         } else {
-            $user_id = Auth::get()->getUserid(mres($params[0]));
-            $user = Auth::get()->getUser($user_id);
+            $user_id = LegacyAuth::get()->getUserid(mres($params[0]));
+            $user = LegacyAuth::get()->getUser($user_id);
             if ($user['email'] && $user['username'] == $params[0]) {
                 $token = hash('gost', openssl_random_pseudo_bytes(1024));
                 $this->tokens[$this->getUser($this->data)] = $token;
@@ -684,7 +678,7 @@ class IRCBot
         $schema_version = $versions['db_schema'];
         $version        = substr($versions['local_sha'], 0, 7);
 
-        $msg = $this->config['project_name_version'].', Version: '.$version.', DB schema: #'.$schema_version.', PHP: '.PHP_VERSION;
+        $msg = $this->config['project_name_version'].', Version: '.$version.', DB schema: '.$schema_version.', PHP: '.PHP_VERSION;
         return $this->respond($msg);
     }//end _version()
 
@@ -697,13 +691,13 @@ class IRCBot
         }
 
         if ($this->user['level'] < 5) {
-            $tmp = dbFetchRows('SELECT `event_id`,`host`,`datetime`,`message`,`type` FROM `eventlog` WHERE `host` IN ('.implode(',', $this->user['devices']).') ORDER BY `event_id` DESC LIMIT '.mres($num));
+            $tmp = dbFetchRows('SELECT `event_id`,`device_id`,`datetime`,`message`,`type` FROM `eventlog` WHERE `device_id` IN ('.implode(',', $this->user['devices']).') ORDER BY `event_id` DESC LIMIT '. (int)$num);
         } else {
-            $tmp = dbFetchRows('SELECT `event_id`,`host`,`datetime`,`message`,`type` FROM `eventlog` ORDER BY `event_id` DESC LIMIT '.mres($num));
+            $tmp = dbFetchRows('SELECT `event_id`,`device_id`,`datetime`,`message`,`type` FROM `eventlog` ORDER BY `event_id` DESC LIMIT '.(int)$num);
         }
 
         foreach ($tmp as $device) {
-            $hostid = dbFetchRow('SELECT `hostname` FROM `devices` WHERE `device_id` = '.$device['host']);
+            $hostid = dbFetchRow('SELECT `hostname` FROM `devices` WHERE `device_id` = '.$device['device_id']);
             $this->respond($device['event_id'].' '.$hostid['hostname'].' '.$device['datetime'].' '.$device['message'].' '.$device['type']);
         }
 

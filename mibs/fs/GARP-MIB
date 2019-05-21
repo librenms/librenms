@@ -1,0 +1,2886 @@
+GARP-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- Internal GARP MIB
+-- -------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    TimeInterval, RowStatus, TruthValue, DisplayString, 
+	TEXTUAL-CONVENTION, MacAddress
+        FROM SNMPv2-TC
+    gbnL2
+        FROM ADMIN-MASTER-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+garpMib MODULE-IDENTITY
+    LAST-UPDATED "9907060000Z"
+    ORGANIZATION "admin Systems, Inc."
+    CONTACT-INFO
+        "admin Systems"
+    DESCRIPTION
+        "GARP Module Management"
+
+-- revision history
+
+    REVISION     "9907060000Z"
+    DESCRIPTION
+         "Initial version"
+
+    ::= { gbnL2 2 }
+
+garpMIBObjects OBJECT IDENTIFIER ::= { garpMib 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER {
+	enabled(1), disabled(2) }
+
+TimeFilter ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "To be used for the index to a table.  Allows an application
+        to download only those rows changed since a particular time.
+        A row is considered changed if the value of any object in the
+        row changes or if the row is created or deleted.
+
+        When sysUpTime is equal to zero, this table shall be empty.
+
+        One entry exists for each past value of sysUpTime, except that
+        the whole table is purged should sysUpTime wrap.
+
+        As this basic row is updated new conceptual rows are created
+        (which still share the now updated object values with all
+        other instances).  The number of instances which are created
+        is determined by the value of sysUpTime at which the basic row
+        was last updated.  One instance will exist for each value of
+        sysUpTime at the last update time for the row.  A new
+        timeMark instance is created for each new sysUpTime value.
+        Each new conceptual row will be associated with the timeMark
+        instance which was created at the value of sysUpTime with
+        which the conceptual row is to be associated.
+
+        By definition all conceptual rows were updated at or after
+        time zero and so at least one conceptual row (associated with
+        timeMark.0) must exist for each underlying (basic) row.
+
+        See the appendix for further discussion of this variable.
+
+        Consider the following fooTable:
+
+        fooTable ...
+        INDEX { fooTimeMark, fooIndex }
+
+        FooEntry {
+           fooTimeMark  TimeFilter
+           fooIndex     INTEGER,
+           fooCounts    Counter
+        }
+
+        Should there be two basic rows in this table (fooIndex == 1,
+        fooIndex == 2) and row 1 was updated most recently at time 6,
+        while row 2 was updated most recently at time 8, and both rows
+        had been updated on several earlier occasions such that the
+        current values were 5 and 9 respectively then the following
+        fooCounts instances would exist.
+
+        fooCounts.0.1  5
+        fooCounts.0.2  9
+        fooCounts.1.1  5
+        fooCounts.1.2  9
+        fooCounts.2.1  5
+        fooCounts.2.2  9
+        fooCounts.3.1  5
+        fooCounts.3.2  9
+        fooCounts.4.1  5
+        fooCounts.4.2  9
+        fooCounts.5.1  5
+        fooCounts.5.2  9
+        fooCounts.6.1  5
+        fooCounts.6.2  9
+        fooCounts.7.2  9    -- note that row 1 doesn't exist for
+        fooCounts.8.2  9    -- times 7 and 8"
+    SYNTAX    TimeTicks
+
+PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+VlanIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value used to index per-VLAN tables: values of 0 and
+        4095 are not permitted; if the value is between 1 and
+        4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
+        global scope within a given bridged domain (see VlanId
+        textual convention).  If the value is greater than 4095
+        then it represents a VLAN with scope local to the
+        particular agent, i.e. one without a global VLAN-ID
+        assigned to it. Such VLANs are outside the scope of
+        IEEE 802.1Q but it is convenient to be able to manage them
+        in the same way using this MIB."
+    SYNTAX      Unsigned32
+
+VlanId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A 12-bit VLAN ID used in the VLAN Tag header."
+    SYNTAX      INTEGER (1..4094)
+
+-- -------------------------------------------------------------
+-- groups in the GARP MIB
+-- -------------------------------------------------------------
+
+gDot1qBase       OBJECT IDENTIFIER ::= { garpMIBObjects 1 }
+gDot1qTp         OBJECT IDENTIFIER ::= { garpMIBObjects 2 }
+gDot1qStatic     OBJECT IDENTIFIER ::= { garpMIBObjects 3 }
+gDot1qVlan       OBJECT IDENTIFIER ::= { garpMIBObjects 4 }
+gDot1dGarp		 OBJECT IDENTIFIER ::= { garpMIBObjects 5 }
+gDot1dGmrp		 OBJECT IDENTIFIER ::= { garpMIBObjects 6 }
+gDot1dExtBase    OBJECT IDENTIFIER ::= { garpMIBObjects 7 }
+gDot1qExtend     OBJECT IDENTIFIER ::= { garpMIBObjects 8 }
+
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- gDot1qBase group
+-- -------------------------------------------------------------
+
+gDot1qVlanVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    version1(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version number of IEEE 802.1Q that this device
+        supports."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.1.1"
+    DEFVAL      { 1 }
+    ::= { gDot1qBase 1 }
+
+gDot1qMaxVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum IEEE 802.1Q VLAN ID that this device
+        supports."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 9.3.2.3"
+    ::= { gDot1qBase 2 }
+
+gDot1qMaxSupportedVlans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of IEEE 802.1Q VLANs that this
+        device supports."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.1.1"
+    ::= { gDot1qBase 3 }
+
+gDot1qNumVlans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of IEEE 802.1Q VLANs that are
+        configured in this device."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.1.1"
+    ::= { gDot1qBase 4 }
+
+gDot1qGvrpStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus{ enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { enabled }
+		The administrative status requested by management for
+        GVRP.  The value enabled(1) indicates that GVRP should
+        be enabled on this device, on all ports for which it has
+        not been specifically disabled.  When disabled(2), GVRP
+        is disabled on all ports and all GVRP packets will be
+        forwarded transparently.  This object affects all GVRP
+        Applicant and Registrar state machines.  A transition
+        from disabled(2) to enabled(1) will cause a reset of all
+        GVRP state machines on all ports."
+    DEFVAL      { disabled }
+    ::= { gDot1qBase 5 }
+
+gDot1qVlanIndexMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qVlanIndexMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table gives the mapping of linear indices to 
+         VLAN Indices.  It is necessary because CCDGEN doesn't
+         support nonlinear indices."
+    REFERENCE
+        "No reference"
+    ::= { gDot1qBase 6 }
+
+gDot1qVlanIndexMappingEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qVlanIndexMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry maps a linear index to a VLAN index."
+    INDEX   { gDot1qVlanSlotIndex }
+    ::= { gDot1qVlanIndexMappingTable 1 }
+
+GarpDot1qVlanIndexMappingEntry ::=
+    SEQUENCE {
+        gDot1qVlanSlotIndex
+            INTEGER,
+        gDot1qVlanSlotActualIndex
+            VlanIndex
+    }
+
+gDot1qVlanSlotIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The durable slot index for this VLAN"
+    ::= { gDot1qVlanIndexMappingEntry 1 }
+
+gDot1qVlanSlotActualIndex OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+         The actual VLAN index for this durable VLAN slot"
+    ::= { gDot1qVlanIndexMappingEntry 2 }
+
+-- -------------------------------------------------------------
+-- the gDot1qTp group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- the current Filtering Database Table
+-- -------------------------------------------------------------
+
+gDot1qFdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains configuration and control
+        information for each Filtering Database currently
+        operating on this device.  Entries in this table appear
+        automatically when VLANs are assigned FDB IDs in the
+        gDot1qVlanCurrentTable."
+    ::= { gDot1qTp 1 }
+
+gDot1qFdbEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a specific Filtering Database."
+    INDEX   { gDot1qFdbId }
+    ::= { gDot1qFdbTable 1 }
+
+GarpDot1qFdbEntry ::=
+    SEQUENCE {
+        gDot1qFdbId
+            Unsigned32,
+        gDot1qFdbDynamicCount
+            Counter32
+    }
+
+gDot1qFdbId OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The identity of this Filtering Database."
+    ::= { gDot1qFdbEntry 1 }
+
+gDot1qFdbDynamicCount OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The current number of dynamic entries in this
+        Filtering Database."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.1.1.3"
+    ::= { gDot1qFdbEntry 2 }
+
+-- -------------------------------------------------------------
+-- Multiple Forwarding Databases for 802.1Q Transparent devices
+-- This table is an alternative to the dot1dTpFdbTable,
+-- previously defined for 802.1D devices which only support a
+-- single Forwarding Database.
+-- -------------------------------------------------------------
+
+gDot1qTpFdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qTpFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information about unicast entries
+        for which the device has forwarding and/or filtering
+        information.  This information is used by the
+        transparent bridging function in determining how to
+        propagate a received frame."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.7"
+    ::= { gDot1qTp 2 }
+
+gDot1qTpFdbEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qTpFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a specific unicast MAC address for
+        which the device has some forwarding and/or filtering
+        information."
+    INDEX   { gDot1qFdbId, gDot1qTpFdbAddress }
+    ::= { gDot1qTpFdbTable 1 }
+
+GarpDot1qTpFdbEntry ::=
+    SEQUENCE {
+        gDot1qTpFdbAddress
+            MacAddress,
+        gDot1qTpFdbPort
+            INTEGER,
+        gDot1qTpFdbStatus
+            INTEGER
+    }
+
+gDot1qTpFdbAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unicast MAC address for which the device has
+        forwarding and/or filtering information."
+    ::= { gDot1qTpFdbEntry 1 }
+
+gDot1qTpFdbPort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Either the value '0', or the port number of the port on
+        which a frame having a source address equal to the value
+        of the corresponding instance of gDot1qTpFdbAddress has
+        been seen.  A value of '0' indicates that the port
+        number has not been learned but that the device does
+        have some forwarding/filtering information about this
+        address (e.g. in the gDot1qStaticUnicastTable).
+        Implementors are encouraged to assign the port value to
+        this object whenever it is learned even for addresses
+        for which the corresponding value of gDot1qTpFdbStatus is
+        not learned(3)."
+    ::= { gDot1qTpFdbEntry 2 }
+
+gDot1qTpFdbStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    invalid(2),
+                    learned(3),
+                    self(4),
+                    mgmt(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of this entry.  The meanings of the values
+        are:
+            other(1) - none of the following.  This may include
+                the case where some other MIB object (not the
+                corresponding instance of gDot1qTpFdbPort, nor an
+                entry in the gDot1qStaticUnicastTable) is being
+                used to determine if and how frames addressed to
+                the value of the corresponding instance of
+                gDot1qTpFdbAddress are being forwarded.
+            invalid(2) - this entry is no longer valid (e.g., it
+                was learned but has since aged out), but has not
+                yet been flushed from the table.
+            learned(3) - the value of the corresponding instance
+                of gDot1qTpFdbPort was learned and is being used.
+            self(4) - the value of the corresponding instance of
+                gDot1qTpFdbAddress represents one of the device's
+                addresses.  The corresponding instance of
+                gDot1qTpFdbPort indicates which of the device's
+                ports has this address.
+            mgmt(5) - the value of the corresponding instance of
+                gDot1qTpFdbAddress is also the value of an
+                existing instance of gDot1qStaticAddress."
+    ::= { gDot1qTpFdbEntry 3 }
+-- -------------------------------------------------------------
+-- Dynamic Group Registration Table
+-- -------------------------------------------------------------
+
+gDot1qTpGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qTpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing filtering information for VLANs
+        configured into the bridge by (local or network)
+        management, or learnt dynamically, specifying the set of
+        ports to which frames received on a VLAN for this FDB
+        and containing a specific Group destination address are
+        allowed to be forwarded."
+    ::= { gDot1qTp 3 }
+
+gDot1qTpGroupEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qTpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Filtering information configured into the bridge by
+        management, or learnt dynamically, specifying the set of
+        ports to which frames received on a VLAN and containing
+        a specific Group destination address, are allowed to be
+        forwarded.  The subset of these ports learnt dynamically
+        is also provided."
+    INDEX   { gDot1qVlanIndex, gDot1qTpGroupAddress }
+    ::= { gDot1qTpGroupTable 1 }
+
+GarpDot1qTpGroupEntry ::=
+    SEQUENCE {
+        gDot1qTpGroupAddress
+            MacAddress,
+        gDot1qTpGroupEgressPorts
+            PortList,
+        gDot1qTpGroupLearnt
+            PortList
+    }
+
+gDot1qTpGroupAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The destination Group MAC address in a frame to which
+        this entry's filtering information applies."
+    ::= { gDot1qTpGroupEntry 1 }
+
+gDot1qTpGroupEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports, in this VLAN, to which
+        frames destined for this Group MAC address are currently
+        being explicitly forwarded.  This does not include ports
+        for which this address is only implicitly forwarded, in
+        the gDot1qForwardAllPorts list."
+    ::= { gDot1qTpGroupEntry 2 }
+
+gDot1qTpGroupLearnt OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subset of ports in gDot1qTpGroupEgressPorts which
+        were learnt by GMRP or some other dynamic mechanism, in
+        this Filtering database."
+    ::= { gDot1qTpGroupEntry 3 }
+
+-- -------------------------------------------------------------
+-- Service Requirements Group
+-- -------------------------------------------------------------
+
+gDot1qForwardAllTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qForwardAllEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing forwarding information for each
+        VLAN, specifying the set of ports to which forwarding of
+        all multicasts applies, configured statically by
+        management or dynamically by GMRP.  An entry appears in
+        this table for all VLANs that are currently
+        instantiated."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.2, 12.7.7"
+    ::= { gDot1qTp 4 }
+gDot1qForwardAllEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qForwardAllEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Forwarding information for a VLAN, specifying the set
+        of ports to which all multicasts should be forwarded,
+        configured statically by management or dynamically by
+        GMRP."
+--
+-- This table is actually indexed by VLAN ID, however for the purposes
+-- of default value table generation, we introduce a phony index of 
+-- the dimension of the VLAN slot table.
+--
+--    INDEX   { gDot1qVlanIndex }
+--
+    INDEX   { gDot1qVlanSlotIndex }	-- Don't use this index at runtime
+    ::= { gDot1qForwardAllTable 1 }
+
+GarpDot1qForwardAllEntry ::=
+    SEQUENCE {
+        gDot1qForwardAllPorts
+            PortList,
+		gDot1qForwardAllVlanIndex
+			VlanIndex,
+        gDot1qForwardAllStaticPorts
+            PortList,
+        gDot1qForwardAllForbiddenPorts
+            PortList
+    }
+
+gDot1qForwardAllPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports in this VLAN to which all
+        multicast group-addressed frames are to be forwarded.
+        This includes ports for which this need has been
+        determined dynamically by GMRP, or configured statically
+        by management."
+    ::= { gDot1qForwardAllEntry 1 }
+
+gDot1qForwardAllVlanIndex OBJECT-TYPE
+	SYNTAX		VlanIndex
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"DURABLE: { 0:all }
+		This is here only to allow the VLAN index to be saved along
+		with the corresponding forward all table entry."
+	::= { gDot1qForwardAllEntry 2 }
+
+gDot1qForwardAllStaticPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+		The set of ports configured by management in this VLAN
+        to which all multicast group-addressed frames are to be
+        forwarded.  Ports entered in this list will also appear
+        in the complete set shown by gDot1qForwardAllPorts.  This
+        value will be restored after the device is reset.  This
+        only applies to ports that are members of the VLAN,
+        defined by gDot1qVlanCurrentEgressPorts.  A port may not
+        be added in this set if it is already a member of the
+        set of ports in gDot1qForwardAllForbiddenPorts.  The
+        default value is a string of ones of appropriate length,
+        to indicate standard non-EFS behaviour, i.e.  forward
+        all multicasts to all ports."
+    ::= { gDot1qForwardAllEntry 3 }
+
+gDot1qForwardAllForbiddenPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+		The set of ports configured by management in this VLAN
+        for which the Service Requirement attribute Forward All
+        Multicast Groups may not be dynamically registered by
+        GMRP.  This value will be restored after the device is
+        reset.  A port may not be added in this set if it is
+        already a member of the set of ports in
+        gDot1qForwardAllStaticPorts.  The default value is a
+        string of zeros of appropriate length."
+    ::= { gDot1qForwardAllEntry 4 }
+
+gDot1qForwardUnregisteredTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qForwardUnregisteredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing forwarding information for each
+        VLAN, specifying the set of ports to which forwarding of
+        multicast group-addressed frames for which there is no
+        more specific forwarding information applies.  This is
+        configured statically by management and determined
+        dynamically by GMRP.  An entry appears in this table for
+        all VLANs that are currently instantiated."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.2, 12.7.7"
+    ::= { gDot1qTp 5 }
+
+gDot1qForwardUnregisteredEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qForwardUnregisteredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Forwarding information for a VLAN, specifying the set
+        of ports to which all multicasts for which there is no
+        more specific forwarding information shall be forwarded.
+        This is configured statically by management or
+        dynamically by GMRP."
+--
+-- This table is actually indexed by VLAN ID, however for the purposes
+-- of default value table generation, we introduce a phony index of 
+-- the dimension of the VLAN slot table.
+--
+--    INDEX   { gDot1qVlanIndex }
+--
+    INDEX   { gDot1qVlanSlotIndex }	-- Don't use this index at runtime
+    ::= { gDot1qForwardUnregisteredTable 1 }
+
+GarpDot1qForwardUnregisteredEntry ::=
+    SEQUENCE {
+        gDot1qForwardUnregisteredPorts
+            PortList,
+		gDot1qForwardUnregisteredVlanIndex
+			VlanIndex,
+        gDot1qForwardUnregisteredStaticPorts
+            PortList,
+        gDot1qForwardUnregisteredForbiddenPorts
+            PortList
+    }
+
+gDot1qForwardUnregisteredPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports in this VLAN to which
+        multicast group-addressed frames for which there is no
+        more specific forwarding information will be forwarded.
+        This includes ports for which this need has been
+        determined dynamically by GMRP, or configured statically
+        by management."
+    ::= { gDot1qForwardUnregisteredEntry 1 }
+
+gDot1qForwardUnregisteredVlanIndex OBJECT-TYPE
+	SYNTAX		VlanIndex
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"DURABLE: { 0:all }
+		This is here only to allow the VLAN index to be saved along
+		with the corresponding forward unregistered table entry."
+	::= { gDot1qForwardUnregisteredEntry 2 }
+
+gDot1qForwardUnregisteredStaticPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all } 
+		The set of ports configured by management, in this
+        VLAN, to which multicast group-addressed frames for
+        which there is no more specific forwarding information
+        are to be forwarded.  Ports entered in this list will
+        also appear in the complete set shown by
+        gDot1qForwardUnregisteredPorts.  This value will be
+        restored after the device is reset.  A port may not be
+        added in this set if it is already a member of the set
+        of ports in gDot1qForwardUnregisteredForbiddenPorts.  The
+        default value is a string of zeros of appropriate
+        length, although this has no effect with the default
+        value of gDot1qForwardAllStaticPorts."
+    ::= { gDot1qForwardUnregisteredEntry 3 }
+
+gDot1qForwardUnregisteredForbiddenPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all } 
+		The set of ports configured by management in this VLAN
+        for which the Service Requirement attribute Forward
+        Unregistered Multicast Groups may not be dynamically
+        registered by GMRP.  This value will be restored after
+        the device is reset.  A port may not be added in this
+        set if it is already a member of the set of ports in
+        gDot1qForwardUnregisteredStaticPorts.  The default value
+        is a string of zeros of appropriate length."
+    ::= { gDot1qForwardUnregisteredEntry 4 }
+
+-- -------------------------------------------------------------
+-- The Static (Destination-Address Filtering) Database
+-- -------------------------------------------------------------
+
+gDot1qStaticUnicastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qStaticUnicastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing filtering information for Unicast
+        MAC addresses for each Filtering Database, configured
+        into the device by (local or network) management
+        specifying the set of ports to which frames received
+        from specific ports and containing specific unicast
+        destination addresses are allowed to be forwarded.  A
+        value of zero in this table as the port number from
+        which frames with a specific destination address are
+        received, is used to specify all ports for which there
+        is no specific entry in this table for that particular
+        destination address.  Entries are valid for unicast
+        addresses only."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.7,
+        ISO/IEC 15802-3 Section 7.9.1"
+    ::= { gDot1qStatic 1 }
+
+gDot1qStaticUnicastEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qStaticUnicastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Filtering information configured into the device by
+        (local or network) management specifying the set of
+        ports to which frames received from a specific port and
+        containing a specific unicast destination address are
+        allowed to be forwarded."
+    INDEX   {
+        gDot1qFdbId,
+        gDot1qStaticUnicastAddress,
+        gDot1qStaticUnicastReceivePort
+    }
+    ::= { gDot1qStaticUnicastTable 1 }
+
+GarpDot1qStaticUnicastEntry ::=
+    SEQUENCE {
+        gDot1qStaticUnicastAddress
+            MacAddress,
+        gDot1qStaticUnicastReceivePort
+            INTEGER,
+        gDot1qStaticUnicastAllowedToGoTo
+            PortList,
+        gDot1qStaticUnicastStatus
+            INTEGER
+    }
+
+gDot1qStaticUnicastAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address in a frame to which this
+        entry's filtering information applies.  This object must
+        take the value of a unicast address."
+    ::= { gDot1qStaticUnicastEntry 1 }
+
+gDot1qStaticUnicastReceivePort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Either the value '0', or the port number of the port
+        from which a frame must be received in order for this
+        entry's filtering information to apply.  A value of zero
+        indicates that this entry applies on all ports of the
+        device for which there is no other applicable entry."
+    ::= { gDot1qStaticUnicastEntry 2 }
+
+gDot1qStaticUnicastAllowedToGoTo OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The set of ports for which a frame with a specific
+        unicast address will be flooded in the event that it
+        has not been learned.  It also specifies the set of
+        ports a specific unicast address may be dynamically
+        learnt on.  The gDot1qTpFdbTable will have an equivalent
+        entry with a gDot1qTpFdbPort value of '0' until this
+        address has been learnt, when it will be updated with
+        the port the address has been seen on.  This only
+        applies to ports that are members of the VLAN, defined
+        by gDot1qVlanCurrentEgressPorts.  The default value of
+        this object is a string of ones of appropriate length."
+    REFERENCE
+        "IEEE 802.1Q/D11 Table 8-5, ISO/IEC 15802-3 Table 7-5"
+    ::= { gDot1qStaticUnicastEntry 3 }
+
+gDot1qStaticUnicastStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    invalid(2),
+                    permanent(3),
+                    deleteOnReset(4),
+                    deleteOnTimeout(5)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry.
+            other(1) - this entry is currently in use but
+                the conditions under which it will remain
+                so differ from the following values.
+            invalid(2) - writing this value to the object
+                removes the corresponding entry.
+            permanent(3) - this entry is currently in use
+                and will remain so after the next reset of
+                the bridge.
+            deleteOnReset(4) - this entry is currently in
+                use and will remain so until the next
+                reset of the bridge.
+            deleteOnTimeout(5) - this entry is currently in
+                use and will remain so until it is aged out."
+    DEFVAL      { permanent }
+    ::= { gDot1qStaticUnicastEntry 4 }
+
+gDot1qStaticMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qStaticMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing filtering information for Multicast
+        and Broadcast MAC addresses for each VLAN, configured
+        into the device by (local or network) management
+        specifying the set of ports to which frames received
+        from specific ports and containing specific Multicast
+        and Broadcast destination addresses are allowed to be
+        forwarded.  A value of zero in this table as the port
+        number from which frames with a specific destination
+        address are received, is used to specify all ports for
+        which there is no specific entry in this table for that
+        particular destination address.  Entries are valid for
+        Multicast and Broadcast addresses only."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.7,
+        ISO/IEC 15802-3 Section 7.9.1"
+    ::= { gDot1qStatic 2 }
+
+gDot1qStaticMulticastEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qStaticMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Filtering information configured into the device by
+        (local or network) management specifying the set of
+        ports to which frames received from this specific port
+        for this VLAN and containing this Multicast or Broadcast
+        destination address are allowed to be forwarded."
+    INDEX   {
+        gDot1qVlanIndex,
+        gDot1qStaticMulticastAddress,
+        gDot1qStaticMulticastReceivePort
+    }
+    ::= { gDot1qStaticMulticastTable 1 }
+
+GarpDot1qStaticMulticastEntry ::=
+    SEQUENCE {
+		gDot1qStaticMulticastVlanIndex
+			VlanIndex,
+        gDot1qStaticMulticastAddress
+            MacAddress,
+        gDot1qStaticMulticastReceivePort
+            INTEGER,
+        gDot1qStaticMulticastStaticEgressPorts
+            PortList,
+        gDot1qStaticMulticastForbiddenEgressPorts
+            PortList,
+        gDot1qStaticMulticastStatus
+            INTEGER,
+        gDot1qGmrpLearningPermit
+            INTEGER
+    }
+
+gDot1qStaticMulticastVlanIndex OBJECT-TYPE
+	SYNTAX		VlanIndex
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"DURABLE: { 0:all }
+		This is here to allow the VLAN Index to be saved along with
+		the corresponding multicast table entry."
+	::= { gDot1qStaticMulticastEntry 1 }
+	
+gDot1qStaticMulticastAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all}
+		The destination MAC address in a frame to which this
+        entry's filtering information applies.  This object must
+        take the value of a Multicast or Broadcast address."
+    ::= { gDot1qStaticMulticastEntry 2 }
+
+gDot1qStaticMulticastReceivePort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+		Either the value '0', or the port number of the port
+        from which a frame must be received in order for this
+        entry's filtering information to apply.  A value of zero
+        indicates that this entry applies on all ports of the
+        device for which there is no other applicable entry."
+    ::= { gDot1qStaticMulticastEntry 3 }
+
+gDot1qStaticMulticastStaticEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+		The set of ports to which frames received from a
+        specific port and destined for a specific Multicast or
+        Broadcast MAC address must be forwarded, regardless of
+        any dynamic information e.g. from GMRP.  A port may not
+        be added in this set if it is already a member of the
+        set of ports in gDot1qStaticMulticastForbiddenEgressPorts.
+        The default value of this object is a string of ones of
+        appropriate length."
+    ::= { gDot1qStaticMulticastEntry 4 }
+
+gDot1qStaticMulticastForbiddenEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+		The set of ports to which frames received from a
+        specific port and destined for a specific Multicast or
+        Broadcast MAC address must not be forwarded, regardless
+        of any dynamic information e.g. from GMRP.  A port may
+        not be added in this set if it is already a member of the
+        set of ports in gDot1qStaticMulticastStaticEgressPorts.
+        The default value of this object is a string of zeros of
+        appropriate length."
+    ::= { gDot1qStaticMulticastEntry 5 }
+
+gDot1qStaticMulticastStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    invalid(2),
+                    permanent(3),
+                    deleteOnReset(4),
+                    deleteOnTimeout(5)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+		This object indicates the status of this entry.
+            other(1) - this entry is currently in use but
+                the conditions under which it will remain
+                so differ from the following values.
+            invalid(2) - writing this value to the object
+                removes the corresponding entry.
+            permanent(3) - this entry is currently in use
+                and will remain so after the next reset of
+                the bridge.
+            deleteOnReset(4) - this entry is currently in
+                use and will remain so until the next
+                reset of the bridge.
+            deleteOnTimeout(5) - this entry is currently in
+                use and will remain so until it is aged out."
+    DEFVAL      { permanent }
+    ::= { gDot1qStaticMulticastEntry 6 }
+
+gDot1qGmrpLearningPermit OBJECT-TYPE
+    SYNTAX      INTEGER {
+            gmrpLearningEnable(1),
+            gmrpLearningDisable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to add a mcast to garp so that other devices can learn it."
+    ::= { gDot1qStaticMulticastEntry 7 }
+
+-- -------------------------------------------------------------
+-- The Current VLAN Database
+-- -------------------------------------------------------------
+
+gDot1qVlanNumDeletes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times a VLAN entry has been deleted from
+        the gDot1qVlanCurrentTable (for any reason).  If an entry
+        is deleted, then inserted, and then deleted, this
+        counter will be incremented by 2."
+    ::= { gDot1qVlan 1 }
+
+gDot1qVlanCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qVlanCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing current configuration information
+        for each VLAN currently configured into the device by
+        (local or network) management, or dynamically created
+        as a result of GVRP requests received."
+    ::= { gDot1qVlan 2 }
+
+gDot1qVlanCurrentEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qVlanCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information for a VLAN configured into the device by
+        (local or network) management, or dynamically created
+        as a result of GVRP requests received."
+    INDEX   { gDot1qVlanTimeMark, gDot1qVlanIndex }
+    ::= { gDot1qVlanCurrentTable 1 }
+
+GarpDot1qVlanCurrentEntry ::=
+    SEQUENCE {
+        gDot1qVlanTimeMark
+            TimeFilter,
+        gDot1qVlanIndex
+            VlanIndex,
+        gDot1qVlanFdbId
+            Unsigned32,
+        gDot1qVlanCurrentEgressPorts
+            PortList,
+        gDot1qVlanCurrentUntaggedPorts
+            PortList,
+        gDot1qVlanStatus
+            INTEGER,
+        gDot1qVlanCreationTime
+            TimeTicks
+    }
+
+gDot1qVlanTimeMark OBJECT-TYPE
+    SYNTAX      TimeFilter
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A TimeFilter for this entry.  See the TimeFilter
+        textual convention to see how this works."
+    ::= { gDot1qVlanCurrentEntry 1 }
+
+gDot1qVlanIndex OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN-ID or other identifier refering to this VLAN."
+    ::= { gDot1qVlanCurrentEntry 2 }
+
+gDot1qVlanFdbId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Filtering Database used by this VLAN.  This is one
+        of the gDot1qFdbId values in the gDot1qFdbTable.  This
+        value is allocated automatically by the device whenever
+        the VLAN is created: either dynamically by GVRP, or by
+        management, in gDot1qVlanStaticTable.  Allocation of this
+        value follows the learning constraints defined for this
+        VLAN in gDot1qLearningConstraintsTable."
+    ::= { gDot1qVlanCurrentEntry 3 }
+
+gDot1qVlanCurrentEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports which are transmitting traffic for
+        this VLAN as either tagged or untagged frames."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.2.1"
+    ::= { gDot1qVlanCurrentEntry 4 }
+
+gDot1qVlanCurrentUntaggedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports which are transmitting traffic for
+        this VLAN as untagged frames."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.2.1"
+    ::= { gDot1qVlanCurrentEntry 5 }
+
+gDot1qVlanStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    permanent(2),
+                    dynamicGvrp(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry.
+            other(1) - this entry is currently in use but the
+                conditions under which it will remain so differ
+                from the following values.
+            permanent(2) - this entry, corresponding to an entry
+                in gDot1qVlanStaticTable, is currently in use and
+                will remain so after the next reset of the
+                device.  The port lists for this entry include
+                ports from the equivalent gDot1qVlanStaticTable
+                entry and ports learnt dynamically.
+            dynamicGvrp(3) - this entry is currently in use
+                and will remain so until removed by GVRP.  There
+                is no static entry for this VLAN and it will be
+                removed when the last port leaves the VLAN."
+    ::= { gDot1qVlanCurrentEntry 6 }
+
+gDot1qVlanCreationTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when this VLAN was created."
+    ::= { gDot1qVlanCurrentEntry 7 }
+
+-- -------------------------------------------------------------
+-- The Static VLAN Database
+-- -------------------------------------------------------------
+
+gDot1qVlanStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qVlanStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static configuration information for
+        each VLAN configured into the device by (local or
+        network) management.  All entries are permanent and will
+        be restored after the device is reset."
+    ::= { gDot1qVlan 3 }
+
+gDot1qVlanStaticEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qVlanStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Static information for a VLAN configured into the
+        device by (local or network) management."
+--
+-- This table is actually indexed by VLAN ID, however for the purposes
+-- of default value table generation, we introduce a phony index of 
+-- the dimension of the VLAN slot table.
+--
+--    INDEX   { gDot1qVlanIndex }
+--
+    INDEX   { gDot1qVlanSlotIndex }	-- Don't use this index at runtime
+    ::= { gDot1qVlanStaticTable 1 }
+
+GarpDot1qVlanStaticEntry ::=
+    SEQUENCE {
+        gDot1qVlanStaticName
+			DisplayString,
+--            SnmpAdminString,
+        gDot1qVlanStaticEgressPorts
+            PortList,
+        gDot1qVlanForbiddenEgressPorts
+            PortList,
+        gDot1qVlanStaticUntaggedPorts
+            PortList,
+        gDot1qVlanStaticRowStatus
+            RowStatus,
+        gDot1qGvrpLearningPermit
+                INTEGER,  
+        gDot1qVlanSpanningTreeGroup
+                INTEGER
+                
+    }
+
+gDot1qVlanStaticName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+--    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 'Default' }
+		An administratively assigned string, which may be used
+        to identify the VLAN."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.2.1"
+    ::= { gDot1qVlanStaticEntry 1 }
+
+gDot1qVlanStaticEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+		The set of ports which are permanently assigned to the
+        egress list for this VLAN by management.  Changes to a
+        bit in this object affect the per-port per-VLAN
+        Registrar control for Registration Fixed for the
+        relevant GVRP state machine on each port.  A port may
+        not be added in this set if it is already a member of
+        the set of ports in gDot1qVlanForbiddenEgressPorts.  The
+        default value of this object is a string of zeros of
+        appropriate length, indicating not fixed."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.7.3, 11.2.3.2.3"
+    ::= { gDot1qVlanStaticEntry 2 }
+
+gDot1qVlanForbiddenEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+		The set of ports which are prohibited by management
+        from being included in the egress list for this VLAN.
+        Changes to this object that cause a port to be included
+        or excluded affect the per-port per-VLAN Registrar
+        control for Registration Forbidden for the relevant GVRP
+        state machine on each port.  A port may not be added in
+        this set if it is already a member of the set of ports
+        in gDot1qVlanStaticEgressPorts.  The default value of
+        this object is a string of zeros of appropriate length,
+        excluding all ports from the forbidden set."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.7.7.3, 11.2.3.2.3"
+    ::= { gDot1qVlanStaticEntry 3 }
+
+gDot1qVlanStaticUntaggedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 0:all }
+		The set of ports which should transmit egress packets
+        for this VLAN as untagged.  The default value of this
+        object for the default VLAN (gDot1qVlanIndex = 1) is a string
+        of appropriate length including all ports.  There is no
+        specified default for other VLANs.  If a device agent cannot
+        support the set of ports being set then it will reject the
+        set operation with an error. An example might be if a
+        manager attempts to set more than one VLAN to be untagged
+        on egress where the device does not support this IEEE 802.1Q
+        option."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.2.1"
+    ::= { gDot1qVlanStaticEntry 4 }
+
+gDot1qVlanStaticRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { gDot1qVlanStaticEntry 5 }
+
+gDot1qGvrpLearningPermit OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	gvrpLearningEnable(1),
+    	gvrpLearningDisable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to add a vlan to garp so that other devices can learn it."
+        --将一个vlan加入到garp中以允许其他交换机学习该vlan
+    ::= { gDot1qVlanStaticEntry 6 }
+    
+gDot1qVlanSpanningTreeGroup OBJECT-TYPE
+    	SYNTAX      INTEGER (0..15)
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+    	    "This object is used to Get/Set current vlan's spanning-tree group num"
+    	    --用于获取/设置vlan的生成树组
+    ::= { gDot1qVlanStaticEntry 7 }
+    	
+gDot1qNextFreeLocalVlanIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0|4096..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The next available value for gDot1qVlanIndex of a local
+        VLAN entry in gDot1qVlanStaticTable.  This will report
+        values >=4096 if a new Local VLAN may be created or else
+        the value 0 if this is not possible.
+
+        A row creation operation in this table for an entry with a local
+        VlanIndex value may fail if the current value of this object
+        is not used as the index. Even if the value read is used,
+        there is no guarantee that it will still be the valid index
+        when the create operation is attempted - another manager may
+        have already got in during the intervening time interval.
+        In this case, gDot1qNextFreeLocalVlanIndex should be re-read
+        and the creation re-tried with the new value.
+
+        This value will automatically change when the current value is
+        used to create a new row."
+    ::= { gDot1qVlan 4 }
+
+-- -------------------------------------------------------------
+-- The VLAN Port Configuration Table
+-- -------------------------------------------------------------
+
+gDot1qPortVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qPortVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per port control and status
+        information for VLAN configuration in the device."
+    ::= { gDot1qVlan 5 }
+
+gDot1qPortVlanEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qPortVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling VLAN configuration for a port
+        on the device.  This is indexed by dot1dBasePort."
+	INDEX   { gDot1dPortGmrp }
+    ::= { gDot1qPortVlanTable 1 }
+
+GarpDot1qPortVlanEntry ::=
+    SEQUENCE {
+        gDot1qPvid
+            VlanIndex,
+        gDot1qPortAcceptableFrameTypes
+            INTEGER,
+        gDot1qPortIngressFiltering
+            TruthValue,
+        gDot1qPortGvrpStatus
+            EnabledStatus,
+        gDot1qPortGvrpFailedRegistrations
+            Counter32,
+        gDot1qPortGvrpLastPduOrigin
+            MacAddress
+    }
+
+gDot1qPvid OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 1:all }
+		The PVID, the VLAN ID assigned to untagged frames or
+        Prority-Tagged frames received on this port."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.1.1"
+    DEFVAL      { 1 }
+    ::= { gDot1qPortVlanEntry 1 }
+
+gDot1qPortAcceptableFrameTypes OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    admitAll(1),
+                    admitOnlyVlanTagged(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 1:all }
+		When this is admitOnlyVlanTagged(2) the device will
+        discard untagged frames or Prority-Tagged frames
+        received on this port.  When admitAll(1), untagged
+        frames or Prority-Tagged frames received on this port
+        will be accepted and assigned to the PVID for this port.
+
+        This control does not affect VLAN independent BPDU
+        frames, such as GVRP and STP.  It does affect VLAN
+        dependent BPDU frames, such as GMRP."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.1.3"
+    DEFVAL      { admitAll }
+    ::= { gDot1qPortVlanEntry 2 }
+
+gDot1qPortIngressFiltering OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: {1:all}
+		When this is true(1) the device will discard incoming
+        frames for VLANs which do not include this Port in its
+        Member set.  When false(2), the port will accept all
+        incoming frames.
+
+        This control does not affect VLAN independent BPDU
+        frames, such as GVRP and STP.  It does affect VLAN
+        dependent BPDU frames, such as GMRP."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.1.4"
+    DEFVAL      { false }
+    ::= { gDot1qPortVlanEntry 3 }
+
+gDot1qPortGvrpStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: {enabled:all}
+		The state of GVRP operation on this port.  The value
+        enabled(1) indicates that GVRP is enabled on this port,
+        as long as gDot1qGvrpStatus is also enabled for this
+        device.  When disabled(2) but gDot1qGvrpStatus is still
+        enabled for the device, GVRP is disabled on this port:
+        any GVRP packets received will be silently discarded and
+        no GVRP registrations will be propagated from other
+        ports.  This object affects all GVRP Applicant and
+        Registrar state machines on this port.  A transition
+        from disabled(2) to enabled(1) will cause a reset of all
+        GVRP state machines on this port."
+    DEFVAL      { disabled }
+    ::= { gDot1qPortVlanEntry 4 }
+
+gDot1qPortGvrpFailedRegistrations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of failed GVRP registrations, for any
+        reason, on this port."
+    ::= { gDot1qPortVlanEntry 5 }
+
+gDot1qPortGvrpLastPduOrigin OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Source MAC Address of the last GVRP message
+        received on this port."
+    ::= { gDot1qPortVlanEntry 6 }
+
+-- -------------------------------------------------------------
+-- The GARP Port Table
+-- -------------------------------------------------------------
+
+gDot1dPortGarpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1dPortGarpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of GARP control information about every bridge
+        port.  This is indexed by gDot1qBasePort."
+    ::= { gDot1dGarp 1 }
+
+gDot1dPortGarpEntry OBJECT-TYPE
+    SYNTAX      GarpDot1dPortGarpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "GARP control information for a bridge port."
+	INDEX   { gDot1dPortGmrp }
+    ::= { gDot1dPortGarpTable 1 }
+
+GarpDot1dPortGarpEntry ::=
+    SEQUENCE {
+		gDot1dPortEnable
+			INTEGER,
+        gDot1dPortGarpJoinTime
+            TimeInterval,
+        gDot1dPortGarpLeaveTime
+            TimeInterval,
+        gDot1dPortGarpLeaveAllTime
+            TimeInterval
+    }
+
+gDot1dPortEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+              enabled(1),
+              disabled(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+          "The enabled/disabled status of the port for all
+			GARP protocol instances.  This should be set
+			according to the current link state of the port"
+    REFERENCE
+           "IEEE 802.1D-1990: Section 4.5.5.2"
+    ::= { gDot1dPortGarpEntry 1 }
+
+gDot1dPortGarpJoinTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 20:all }
+		The GARP Join time, in centiseconds."
+    DEFVAL      { 20 }
+    ::= { gDot1dPortGarpEntry 2 }
+
+gDot1dPortGarpLeaveTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 60:all }
+		The GARP Leave time, in centiseconds."
+    DEFVAL      { 60 }
+    ::= { gDot1dPortGarpEntry 3 }
+
+gDot1dPortGarpLeaveAllTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { 1000:all }
+		The GARP LeaveAll time, in centiseconds."
+    DEFVAL      { 1000 }
+    ::= { gDot1dPortGarpEntry 4 }
+
+gDot1dGmrpStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { enabled }
+		 The administrative status requested by management for
+        GMRP.  The value enabled(1) indicates that GMRP should
+        be enabled on this device, in all VLANs, on all ports
+        for which it has not been specifically disabled.  When
+        disabled(2), GMRP is disabled, in all VLANs, on all
+        ports and all GMRP packets will be forwarded
+        transparently.  This object affects both Applicant and
+        Registrar state machines.  A transition from disabled(2)
+        to enabled(1) will cause a reset of all GMRP state
+        machines on all ports."
+    DEFVAL      { disabled }
+    ::= { gDot1dExtBase 1 }
+
+-- -------------------------------------------------------------
+-- The GMRP Port Configuration and Status Table
+-- -------------------------------------------------------------
+
+gDot1dPortGmrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1dPortGmrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of GMRP control and status information about
+        every bridge port.  Augments the gDot1qBasePortTable."
+    ::= { gDot1dGmrp 1 }
+
+gDot1dPortGmrpEntry OBJECT-TYPE
+    SYNTAX      GarpDot1dPortGmrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "GMRP control and status information for a bridge port."
+	INDEX   { gDot1dPortGmrp }
+    ::= { gDot1dPortGmrpTable 1 }
+
+GarpDot1dPortGmrpEntry ::=
+    SEQUENCE {
+		gDot1dPortGmrp
+			INTEGER,
+        gDot1dPortGmrpStatus
+            EnabledStatus,
+        gDot1dPortGmrpFailedRegistrations
+            Counter32,
+        gDot1dPortGmrpLastPduOrigin
+            MacAddress
+    }
+
+gDot1dPortGmrp OBJECT-TYPE
+	SYNTAX		INTEGER (1..128)
+	MAX-ACCESS	read-only
+	STATUS		current
+    DESCRIPTION
+        "The port number of the port for which this entry
+         contains GMRP management information."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.8.2.1.2"
+    ::= { gDot1dPortGmrpEntry 1 }
+
+gDot1dPortGmrpStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DURABLE: { enabled:all }
+		The administrative state of GMRP operation on this port. The
+        value enabled(1) indicates that GMRP is enabled on this port
+        in all VLANs as long as garpGmrpStatus is also enabled(1).
+        A value of disabled(2) indicates that GMRP is disabled on this
+        port in all VLANs: any GMRP packets received will
+        be silently discarded and no GMRP registrations will be
+        propagated from other ports. Setting this to a value of
+        enabled(1) will be stored by the agent but will only take effect
+        on the GMRP protocol operation if garpGmrpStatus also
+        indicates the value enabled(1).  This object affects all
+        GMRP Applicant and Registrar state machines on this
+        port.  A transition from disabled(2) to enabled(1) will
+        cause a reset of all GMRP state machines on this port."
+    DEFVAL      { disabled }
+    ::= { gDot1dPortGmrpEntry 2 }
+
+gDot1dPortGmrpFailedRegistrations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of failed GMRP registrations, for any
+        reason, in all VLANs, on this port."
+    ::= { gDot1dPortGmrpEntry 3 }
+
+gDot1dPortGmrpLastPduOrigin OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Source MAC Address of the last GMRP message
+        received on this port."
+    ::= { gDot1dPortGmrpEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- The VLAN Learning Constraints Table
+-- -------------------------------------------------------------
+
+gDot1qLearningConstraintsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qLearningConstraintsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing learning constraints for sets of
+        Shared and Independendent VLANs."
+    REFERENCE
+        "IEEE 802.1Q/D11 Section 12.10.3.1"
+    ::= { gDot1qVlan 6 }
+
+gDot1qLearningConstraintsEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qLearningConstraintsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A learning constraint defined for a VLAN."
+    INDEX   { gDot1qConstraintVlan, gDot1qConstraintSet }
+    ::= { gDot1qLearningConstraintsTable 1 }
+
+GarpDot1qLearningConstraintsEntry ::=
+    SEQUENCE {
+        gDot1qConstraintVlan
+            VlanIndex,
+        gDot1qConstraintSet
+            INTEGER,
+        gDot1qConstraintType
+            INTEGER,
+        gDot1qConstraintStatus
+            RowStatus
+    }
+
+gDot1qConstraintVlan OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the row in gDot1qVlanCurrentTable for the
+        VLAN constrained by this entry."
+    ::= { gDot1qLearningConstraintsEntry 1 }
+
+gDot1qConstraintSet OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identity of the constraint set to which
+        gDot1qConstraintVlan belongs.  These values may be chosen
+        by the management station."
+    ::= { gDot1qLearningConstraintsEntry 2 }
+
+gDot1qConstraintType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    independent(1),
+                    shared(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of constraint this entry defines.
+            independent(1) - the VLAN, gDot1qConstraintVlan,
+                uses an independent filtering database from all
+                other VLANs in the same set, defined by
+                gDot1qConstraintSet.
+            shared(2) - the VLAN, gDot1qConstraintVlan, shares
+                the same filtering database as all other VLANs
+                in the same set, defined by gDot1qConstraintSet."
+    ::= { gDot1qLearningConstraintsEntry 3 }
+
+gDot1qConstraintStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this entry."
+    ::= { gDot1qLearningConstraintsEntry 4 }
+
+gDot1qConstraintSetDefault OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The identity of the constraint set to which a VLAN
+        belongs, if there is not an explicit entry for that VLAN
+        in gDot1qLearningConstraintsTable."
+    ::= { gDot1qVlan 7 }
+
+gDot1qConstraintTypeDefault OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    independent(1),
+                    shared(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The type of constraint set to which a VLAN belongs, if
+        there is not an explicit entry for that VLAN in
+        gDot1qLearningConstraintsTable.  The types are as defined
+        for gDot1qConstraintType."
+    ::= { gDot1qVlan 8 }
+	       
+-- -------------------------------------------------------------
+-- GARP MIB - Conformance Information
+-- -------------------------------------------------------------
+
+garpMIBConformance OBJECT IDENTIFIER ::= { garpMib 2 }
+garpMIBGroups OBJECT IDENTIFIER ::= { garpMIBConformance 1 }
+garpMIBCompliances OBJECT IDENTIFIER
+    ::= { garpMIBConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+garpMIBBaseGroup OBJECT-GROUP
+    OBJECTS {
+        gDot1qVlanVersionNumber,
+        gDot1qMaxVlanId,
+        gDot1qMaxSupportedVlans,
+        gDot1qNumVlans,
+        gDot1qGvrpStatus,
+        gDot1qFdbDynamicCount,
+        gDot1qTpFdbPort,
+        gDot1qTpFdbStatus,
+        gDot1qTpGroupEgressPorts,
+        gDot1qTpGroupLearnt,
+        gDot1qForwardAllPorts,
+        gDot1qForwardAllStaticPorts,
+        gDot1qForwardAllForbiddenPorts,
+        gDot1qForwardUnregisteredPorts,
+        gDot1qForwardUnregisteredStaticPorts,
+        gDot1qForwardUnregisteredForbiddenPorts,
+        gDot1qStaticUnicastAllowedToGoTo,
+        gDot1qStaticUnicastStatus,
+        gDot1qStaticMulticastStaticEgressPorts,
+        gDot1qStaticMulticastForbiddenEgressPorts,
+        gDot1qStaticMulticastStatus,
+        gDot1qVlanNumDeletes,
+        gDot1qVlanFdbId,
+        gDot1qVlanCurrentEgressPorts,
+        gDot1qVlanCurrentUntaggedPorts,
+        gDot1qVlanStatus,
+        gDot1qVlanCreationTime,
+        gDot1qVlanStaticName,
+        gDot1qVlanStaticEgressPorts,
+        gDot1qVlanForbiddenEgressPorts,
+        gDot1qVlanStaticUntaggedPorts,
+        gDot1qVlanStaticRowStatus,
+        gDot1qNextFreeLocalVlanIndex,
+        gDot1qPvid,
+        gDot1qPortAcceptableFrameTypes,
+        gDot1qPortIngressFiltering,
+        gDot1qPortGvrpStatus,
+        gDot1qPortGvrpFailedRegistrations,
+        gDot1qPortGvrpLastPduOrigin,
+		gDot1dPortGarpJoinTime,
+		gDot1dPortGarpLeaveTime,
+		gDot1dPortGarpLeaveAllTime,
+		gDot1dPortGmrpStatus,
+		gDot1dPortGmrpFailedRegistrations,
+		gDot1dPortGmrpLastPduOrigin,
+		gDot1dGmrpStatus, 
+        gDot1qConstraintType,
+        gDot1qConstraintStatus,
+        gDot1qConstraintSetDefault,
+        gDot1qConstraintTypeDefault
+    }
+    STATUS      current
+    DESCRIPTION
+        "GARP module groups."
+    ::= { garpMIBGroups 1 }
+    
+-- -------------------------------------------------------------
+-- the gDot1qExtend group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- the double tagging table
+-- -------------------------------------------------------------
+gDot1qDoubleTagging OBJECT-TYPE
+    SYNTAX      INTEGER{
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The global QinQ status"
+        --全局QinQ的状态
+    ::= { gDot1qExtend 1 }
+        
+gDot1qTpid OBJECT-TYPE
+    SYNTAX      INTEGER(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The tag protocol id of service provider, this value is used to
+         determine if a incoming packets is tagged and used when insert a
+         new tag"
+       --用于配置服务提供者的vlan协议号,用于判断端口是否为tagged或者是
+       --为报文插入一个新的tag头时使用
+    ::= { gDot1qExtend 2 }
+    
+gDot1qDoubleTaggingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qDoubleTaggingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to config the double tagging function."
+        --该表用于配置双tag头相关的功能.
+    ::= { gDot1qExtend 3 }
+
+gDot1qDoubleTaggingEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qDoubleTaggingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about double tagging table entry."
+        --双tag表项
+    INDEX   { gDot1qDoubleTaggingPort }
+    ::= { gDot1qDoubleTaggingTable 1 }
+
+GarpDot1qDoubleTaggingEntry ::=
+    SEQUENCE {
+        gDot1qDoubleTaggingPort
+            INTEGER,
+        gDot1qDoubleTaggingMode
+            INTEGER,
+        gDot1qPortInnerTpid
+            INTEGER,
+        gDot1qPortOuterTpid
+            INTEGER
+    }
+
+gDot1qDoubleTaggingPort OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The index of double tagging entry."
+        --双tag表的索引
+    ::= { gDot1qDoubleTaggingEntry 1 }
+
+gDot1qDoubleTaggingMode OBJECT-TYPE
+    SYNTAX       INTEGER{
+        dtagModeNone(0),
+        dtagModeInternal(1),
+        dtagModeExternal(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Port's 8021q-in-8021q mode:
+        dtagModeNone means QinQ is disabled;
+        dtagModeInternal means incoming pkt's will be inserted a tag
+        if it has no tag or its' tag-id doesn't match that of the port.
+        dtagModeExternal means incoming pkt's tag is always be ignored
+        and a new tag is inserted."
+       --配置端口的QinQ模式，dtagModeNone为关闭端口的QinQ，dtagModeInternal只有
+       --vlan协议号与端口的配置不同时才在报文中插入新的tag头，dtagModeExternal意
+       --味着端口总是忽略报文的tag属性而为报文新添一个tag头
+    ::= { gDot1qDoubleTaggingEntry 2 }
+    
+gDot1qPortInnerTpid OBJECT-TYPE
+    SYNTAX      INTEGER(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Used to change the original tag's(i.e.customer tag) tpid of packet when dtag enabled."
+       --双tag使能时,用于配置报文原始tag头的tpid
+    ::= { gDot1qDoubleTaggingEntry 3 }
+
+gDot1qPortOuterTpid OBJECT-TYPE
+    SYNTAX      INTEGER(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Used to change the new tag's(i.e.service-provider tag) tpid of packet when dtag enabled."
+       --双tag使能时,用于配置报文新tag头的tpid
+    ::= { gDot1qDoubleTaggingEntry 4 }
+
+gDot1qInnerTpid OBJECT-TYPE
+    SYNTAX      INTEGER(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used to change the original tag's(i.e.customer tag) tpid of packet when dtag enabled."
+       --双tag使能时,用于配置报文原始tag头的tpid
+    ::= { gDot1qExtend 4 }
+-- -------------------------------------------------------------
+-- the current VLAN MAC Table
+-- -------------------------------------------------------------
+gDot1qVlanMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qVlanMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to assign a VLAN ID for a packet based on
+         the source MAC Address. If an entry is found, then the VLAN 
+         ID, PRIORITY of vlan mac table will be used for the packet."
+        --该表用于基于报文的源MAC地址为报文添加一个tag头，如果找到匹配的表
+        --项，那么VLAN MAC表的vlan id以及优先级就会被添加到报文上.
+    ::= { gDot1qExtend 5 }
+
+gDot1qVlanMacEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qVlanMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a vlan mac table entry."
+        --vlan mac表项的信息
+    INDEX   { gDot1qVlanMacAddress }
+    ::= { gDot1qVlanMacTable 1 }
+
+GarpDot1qVlanMacEntry ::=
+    SEQUENCE {
+        gDot1qVlanMacAddress
+            MacAddress,
+        gDot1qVlanMacNewVlanId
+            INTEGER,
+        gDot1qVlanMacNewPriority
+            INTEGER,
+        gDot1qVlanMacStatus
+            INTEGER
+    }
+
+gDot1qVlanMacAddress OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The index of vlan mac table entry."
+        --vlan mac表的索引
+    ::= { gDot1qVlanMacEntry 1 }
+
+gDot1qVlanMacNewVlanId OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Vlan id to be assigned to the packet."
+	--将要为报文添加的vlan id
+    ::= { gDot1qVlanMacEntry 2 }
+    
+gDot1qVlanMacNewPriority OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Priority to be assigned to the packet."
+        --将要为报文添加的优先级
+    ::= { gDot1qVlanMacEntry 3 }
+    
+gDot1qVlanMacStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+        active(1),
+    	createAndGo(2),
+    	destroy(3)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "table entry status."
+        --表项的状态
+    ::= { gDot1qVlanMacEntry 4 }
+-- -------------------------------------------------------------
+-- the current VLAN SUBNET Table
+-- -------------------------------------------------------------
+gDot1qVlanSubnetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qVlanSubnetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to assign a VLAN ID for a packet based on
+         the source IP Address."
+        --该表用于基于报文的源ip为报文添加tag头
+    ::= { gDot1qExtend 6 }
+
+gDot1qVlanSubnetEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qVlanSubnetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a vlan subnet table entry."
+        --vlan subnet表的表项信息
+    INDEX   { gDot1qVlanSubnetIpAddress, gDot1qVlanSubnetIpMask }
+    ::= { gDot1qVlanSubnetTable 1 }
+
+GarpDot1qVlanSubnetEntry ::=
+    SEQUENCE {
+        gDot1qVlanSubnetIpAddress
+            IpAddress,
+        gDot1qVlanSubnetIpMask
+            IpAddress,
+        gDot1qVlanSubnetNewVlanId
+            INTEGER,
+        gDot1qVlanSubnetNewPriority
+            INTEGER,
+        gDot1qVlanSubnetStatus
+            INTEGER
+    }
+
+gDot1qVlanSubnetIpAddress OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The first index of vlan subnet table entry."
+        --vlan subnet 表的第一个索引
+    ::= { gDot1qVlanSubnetEntry 1 }
+
+gDot1qVlanSubnetIpMask OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The second index of vlan subnet table entry."
+        --vlan subnet 表的第二个索引
+    ::= { gDot1qVlanSubnetEntry 2 }
+    
+gDot1qVlanSubnetNewVlanId OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Vlan id to be assigned to the packet."
+        --将要为报文添加的vlan id
+    ::= { gDot1qVlanSubnetEntry 3 }
+    
+gDot1qVlanSubnetNewPriority OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Priority to be assigned to the packet."
+	--将要添加给报文的优先级值
+    ::= { gDot1qVlanSubnetEntry 4 }
+
+gDot1qVlanSubnetStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+        active(1),
+    	createAndGo(2),
+    	destroy(3)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "table entry status."
+        --表项的状态
+    ::= { gDot1qVlanSubnetEntry 5 }
+-- -------------------------------------------------------------
+-- the current VLAN PROTOCOL Table
+-- -------------------------------------------------------------
+gDot1qVlanProtoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qVlanProtoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to assign a VLAN for a packet based 
+         on the protocol(FrameType,EtherType)and the ingress port."
+        --该表用于基于报文的协议字段为报文添加新的tag头
+    ::= { gDot1qExtend 7 }
+
+gDot1qVlanProtoEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qVlanProtoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a vlan protocol table entry."
+        --基于协议的vlan表的表项
+    INDEX   { gDot1qVlanProtoFrameType, gDot1qVlanProtoEthertype, gDot1qVlanProtoPortId }
+    ::= { gDot1qVlanProtoTable 1 }
+
+GarpDot1qVlanProtoEntry ::=
+    SEQUENCE {
+        gDot1qVlanProtoFrameType
+            INTEGER,
+        gDot1qVlanProtoEthertype
+            INTEGER,
+        gDot1qVlanProtoPortId
+            INTEGER,
+        gDot1qVlanProtoNewVlanId
+            INTEGER,
+        gDot1qVlanProtoStatus
+            INTEGER
+    }
+
+gDot1qVlanProtoFrameType OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Frame type：the first index of vlan protocol entry."
+        --Frame type：基于协议的vlan表的第一个索引.
+    ::= { gDot1qVlanProtoEntry 1 }
+
+gDot1qVlanProtoEthertype OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Ether type：the second index of vlan protocol entry."
+        --Ether type：基于协议的vlan表的第二个索引.
+    ::= { gDot1qVlanProtoEntry 2 }
+    
+gDot1qVlanProtoPortId OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Ingress, wthe third index of vlan protocol entry."
+        --报文的入端口,基于协议的vlan表的第三个索引
+    ::= { gDot1qVlanProtoEntry 3 }
+    
+gDot1qVlanProtoNewVlanId OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Vlan id to be assigned to packet."
+        --将要赋予报文的vlan id
+    ::= { gDot1qVlanProtoEntry 4 }
+
+gDot1qVlanProtoStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+        active(1),
+    	createAndGo(2),
+    	destroy(3)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "table entry status."
+        --表项的状态
+    ::= { gDot1qVlanProtoEntry 5 }  
+-- -------------------------------------------------------------
+-- the current VLAN TRANSLATION Table
+-- -------------------------------------------------------------
+gDot1qVlanTranslationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qVlanTransEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to to translate the VLAN ID of an incoming
+         tagged packet to another VLAN ID based on the ingress port and
+         incoming packet VLAN ID."
+        --该表用于基于报文的vlan号和入端口转换报文的vlan id
+    ::= { gDot1qExtend 8 }
+
+gDot1qVlanTransEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qVlanTransEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a vlan translation table entry."
+        --vlan转换表的表项信息
+    INDEX   { gDot1qVlanTransVlanId, gDot1qVlanTransPortId }
+    ::= { gDot1qVlanTranslationTable 1 }
+
+GarpDot1qVlanTransEntry ::=
+    SEQUENCE {
+        gDot1qVlanTransVlanId
+            INTEGER,
+        gDot1qVlanTransPortId
+            INTEGER,
+        gDot1qVlanTransNewVlanId
+            INTEGER,
+        gDot1qVlanTransNewPriority
+            INTEGER,
+        gDot1qVlanTransStatus
+            INTEGER
+    }
+
+gDot1qVlanTransVlanId OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The first index of vlan translation table entry."
+        --vlan转换表项的第一个索引
+    ::= { gDot1qVlanTransEntry 1 }
+
+gDot1qVlanTransPortId OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The second index of vlan translation table entry."
+        --vlan转换表项的第二个索引
+    ::= { gDot1qVlanTransEntry 2 }
+    
+gDot1qVlanTransNewVlanId OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The new vlan id to be assigned to the packet who match
+        a vlan translation table entry."
+        --转换后的报文的新的vlan id值
+    ::= { gDot1qVlanTransEntry 3 }
+    
+gDot1qVlanTransNewPriority OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The priority field of vlan translation table."
+        --VLAN转换表中的报文优先级字段
+    ::= { gDot1qVlanTransEntry 4 }
+   
+gDot1qVlanTransStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+        active(1),
+    	createAndGo(2),
+    	destroy(3)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "table entry status."
+        --表项的状态
+    ::= { gDot1qVlanTransEntry 5 } 
+-- -------------------------------------------------------------
+-- gDot1qExtend other
+-- -------------------------------------------------------------
+gDot1qVlanSubnetPrecede OBJECT-TYPE
+    SYNTAX       INTEGER{
+         true(1),
+         false(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Used to config whether the IP-Subnet Based VLAN has a higher
+         precedence than the MAC Based VLAN."
+        --用于配置是否基于ip的vlan比基于MAC的vlan具有更高的优先级
+    ::= { gDot1qExtend 9 }
+    
+gDot1qVlanTransEnable OBJECT-TYPE
+    SYNTAX       INTEGER{
+        true(1),
+        false(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Used to config current vlan-translation's status."
+        --vlan转换的使能开关
+    ::= { gDot1qExtend 10 }
+
+-- -------------------------------------------------------------
+-- The Stack VLAN Database
+-- -------------------------------------------------------------
+gDot1qStackVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qStackVlanEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      current 
+    DESCRIPTION
+         "A table containing stack vlan configuration information for 
+         each stack vlan configured into the device by management."
+         --该表用于显示和配置Stack VLAN相关的信息.
+    ::={ gDot1qExtend 11 }
+
+ gDot1qStackVlanEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qStackVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling stack VLAN configuration for a port
+        on the device.  This is indexed by port and end vlan id."
+        --Stack VLAN表项,以端口号和结束VLAN ID为索引.
+	INDEX   { gDot1qStackVlanPort, gDot1qEndStackVlan }
+    ::= { gDot1qStackVlanTable 1 }
+
+ GarpDot1qStackVlanEntry ::=
+    SEQUENCE {
+        gDot1qStackVlanPort
+	      INTEGER,
+        gDot1qStartStackVlan
+	      INTEGER,
+        gDot1qEndStackVlan
+              INTEGER,
+        gDot1qTargetStackVlan
+              INTEGER,
+        gDot1qStackVlanRowStatus 
+              RowStatus
+        }
+
+ gDot1qStackVlanPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The index of stack vlan."
+          --Stack VLAN的索引.
+    ::={ gDot1qStackVlanEntry 1 }
+    
+ gDot1qStartStackVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The start vlan of the serial vlans we want to insert a new vlan tag."
+          --Stack VLAN范围的起始VLAN ID.
+    ::={ gDot1qStackVlanEntry 2 }
+    
+ gDot1qEndStackVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The end vlan of the serial vlans we want to insert a new vlan tag."
+          --Stack VLAN范围的结束VLAN ID.
+    ::={ gDot1qStackVlanEntry 3 } 
+
+ gDot1qTargetStackVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The target vlan of the serial vlans we want to insert."
+          --要插入的目标VLAN ID.
+    ::={ gDot1qStackVlanEntry 4 } 
+
+ gDot1qStackVlanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "Describe the oprations for the entry:4-create 6-delete"
+           --设置Stack VLAN:4-添加 6-删除.
+    ::= { gDot1qStackVlanEntry 5 }
+
+-- -------------------------------------------------------------
+-- The  VLAN Passthrough Database
+-- -------------------------------------------------------------
+gDot1qVlanPassthroughTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qVlanPassthroughEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      current 
+    DESCRIPTION
+         "A table containing  vlan passthrough configuration information for 
+         each  vlan passthrough configured into the device by management."
+         --该表用于显示和配置VLAN透传相关的信息.
+    ::={ gDot1qExtend 12 }
+
+ gDot1qVlanPassthroughEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qVlanPassthroughEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling VLAN passthrough configuration for a port
+        on the device.  This is indexed by port and end vlan id."
+        --VLAN透传表项,以端口号和结束VLAN ID为索引.
+	INDEX   { gDot1qPassthroughPort, gDot1qEndPassthroughVlan }
+    ::= { gDot1qVlanPassthroughTable 1 }
+ 
+GarpDot1qVlanPassthroughEntry ::=
+    SEQUENCE {
+        gDot1qPassthroughPort
+	      INTEGER,
+        gDot1qStartPassthroughVlan
+	      INTEGER,
+        gDot1qEndPassthroughVlan
+              INTEGER,
+        gDot1qPassthroughRowStatus 
+              RowStatus
+        }
+
+ gDot1qPassthroughPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The index of passthrough entry."
+          --VLAN透传的索引
+    ::={ gDot1qVlanPassthroughEntry 1 }
+    
+ gDot1qStartPassthroughVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The start vlan of the serial vlans we want to passthrough."
+          --配置VLAN透传范围的起始VLAN
+    ::={ gDot1qVlanPassthroughEntry 2 }
+    
+ gDot1qEndPassthroughVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The end vlan of the serial vlans we want to passthrough. "
+          --配置VLAN透传范围的结束VLAN
+    ::={ gDot1qVlanPassthroughEntry 3 } 
+
+ gDot1qPassthroughRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "Describe the oprations for the entry:4-create 6-delete."
+           --设置VLAN透传:4-添加 6-删除.
+    ::= { gDot1qVlanPassthroughEntry 4 }
+    
+-- -------------------------------------------------------------
+-- The  VLAN SWAP Database
+-- -------------------------------------------------------------
+ gDot1qVlanSwapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GarpDot1qVlanSwapEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      current 
+    DESCRIPTION
+         "A table containing  vlan swap configuration information for 
+         each  vlan swap configured into the device by management."
+         --该表用于显示和配置VLAN交换相关的信息.
+    ::={ gDot1qExtend 13 }
+
+ gDot1qVlanSwapEntry OBJECT-TYPE
+    SYNTAX      GarpDot1qVlanSwapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information controlling VLAN swap configuration for a port
+        on the device.  This is indexed by port and end vlan id."
+        --VLAN交换表项,以端口号和结束VLAN ID为索引.
+	INDEX   { gDot1qVlanSwapPort, gDot1qEndSwapVlan }
+    ::= { gDot1qVlanSwapTable 1 }
+ 
+ GarpDot1qVlanSwapEntry ::=
+    SEQUENCE {
+        gDot1qVlanSwapPort
+            INTEGER,
+        gDot1qStartSwapVlan
+            INTEGER,
+        gDot1qEndSwapVlan
+            INTEGER,
+        gDot1qTargetSwapVlan
+            INTEGER,
+        gDot1qVlanSwapRowStatus 
+            RowStatus
+        }
+
+ gDot1qVlanSwapPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The index of vlan swap entry."
+          --VLAN交换的索引
+    ::={ gDot1qVlanSwapEntry 1 }
+    
+ gDot1qStartSwapVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The start vlan of the serial vlans we want to swap."
+          --配置VLAN交换范围的起始VLAN
+    ::={ gDot1qVlanSwapEntry 2 }
+    
+ gDot1qEndSwapVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The end vlan of the serial vlans we want to swap. "
+          --配置VLAN交换范围的结束VLAN
+    ::={ gDot1qVlanSwapEntry 3 }
+
+ gDot1qTargetSwapVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The target vlan of the serial vlans we want to swap."
+          --要交换的目标VLAN ID.
+    ::={ gDot1qVlanSwapEntry 4 }
+    
+ gDot1qVlanSwapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "Describe the oprations for the entry:4-create 6-delete."
+           --设置VLAN交换:4-添加 6-删除.
+    ::= { gDot1qVlanSwapEntry 5 }
+
+---在marvell芯片中使用
+gDot1qProtocolVlan     OBJECT IDENTIFIER ::= { gDot1qExtend 14 }
+
+gDot1qProtocolVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GDot1qProtocolVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to classify a packet based on the protocol(FrameType,EtherType).only for marvell chip"
+        --该表用于基于报文的协议字段为报文进行分类，在marvell芯片中使用
+    ::= { gDot1qProtocolVlan 1 }
+
+gDot1qProtocolVlanEntry OBJECT-TYPE
+    SYNTAX      GDot1qProtocolVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a vlan protocol table entry."
+        --基于协议的vlan表的表项
+    INDEX   { protocolVlanTableIndex }
+    ::= { gDot1qProtocolVlanTable 1 }
+
+GDot1qProtocolVlanEntry ::=
+    SEQUENCE {
+        protocolVlanTableIndex
+            INTEGER,
+        protocolVlanTableEthertype
+            INTEGER,
+        protocolVlanTableProtocol
+            INTEGER,
+        protocolVlanTableStatus
+            RowStatus
+    }
+
+protocolVlanTableIndex OBJECT-TYPE
+    SYNTAX       INTEGER(0..11)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "index of vlan protocol entry."
+        --基于协议的vlan表的索引.
+    ::= { gDot1qProtocolVlanEntry 1 }
+
+protocolVlanTableEthertype OBJECT-TYPE
+    SYNTAX       INTEGER(0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "ether type of packet."
+        --报文的以太网类型.
+    ::= { gDot1qProtocolVlanEntry 2 }
+    
+protocolVlanTableProtocol OBJECT-TYPE
+    SYNTAX       INTEGER{
+       ethernetv2(1),
+    	non-snap-llc(2),
+    	ethernetv2-non-snap-llc(3),
+    	snap-llc(4),
+    	ethernetv2-snap-llc(5),
+    	non-snap-llc-snap-llc(6),
+    	ethernetv2-non-snap-llc-snap-llc(7)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "protocol of packet.bit 0 is ethernetv2, bit 1 is non-snap-llc, bit 2 is snap-llc."
+        --报文的协议类型，位0表示ethernetv2，位1表示non-snap-llc，位2表示snap-llc
+    ::= { gDot1qProtocolVlanEntry 3 }
+    
+protocolVlanTableStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "table entry status."
+        --表项的状态
+    ::= { gDot1qProtocolVlanEntry 4 }  
+
+gDot1qProtocolVlanActionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GDot1qProtocolVlanActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to assign a VLAN for a packet based 
+         on the protocol(FrameType,EtherType)and the ingress port.only for marvell chip"
+        --该表用于基于报文的协议字段为报文添加新的tag头，在marvell芯片中使用
+    ::= { gDot1qProtocolVlan 2 }
+
+gDot1qProtocolVlanActionEntry OBJECT-TYPE
+    SYNTAX      GDot1qProtocolVlanActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a vlan protocol aciton table entry."
+        --基于协议的vlan动作表的表项
+    INDEX   { protocolVlanAcitonTablePort,  protocolVlanTableIndex}
+    ::= { gDot1qProtocolVlanActionTable 1 }
+
+GDot1qProtocolVlanActionEntry ::=
+    SEQUENCE {
+        protocolVlanAcitonTablePort
+            INTEGER,
+        protocolVlanActionTableNewVlan
+            VlanId,
+        protocolVlanActionTableStatus
+            RowStatus
+    }
+
+protocolVlanAcitonTablePort OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "port index."
+        --端口索引
+    ::= { gDot1qProtocolVlanActionEntry 1 }
+
+protocolVlanActionTableNewVlan OBJECT-TYPE
+    SYNTAX       VlanId
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "new vlan id of packet."
+        --报文新的VLAN号.
+    ::= { gDot1qProtocolVlanActionEntry 2 }
+        
+protocolVlanActionTableStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "table entry status."
+        --表项的状态
+    ::= { gDot1qProtocolVlanActionEntry 3 }  
+
+gDot1qProtocolVlanAdminTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GDot1qProtocolVlanAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to enable assign a VLAN for a packet based 
+         on the protocol(FrameType,EtherType)and the ingress port.only for marvell chip"
+        --该表用于使能基于报文的协议字段为报文添加新的tag头，在marvell芯片中使用
+    ::= { gDot1qProtocolVlan 3 }
+
+gDot1qProtocolVlanAdminEntry OBJECT-TYPE
+    SYNTAX      GDot1qProtocolVlanAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a vlan protocol admin table entry."
+        --使能基于协议的vlan表的表项
+    INDEX   { protocolVlanAdminTablePort }
+    ::= { gDot1qProtocolVlanAdminTable 1 }
+
+GDot1qProtocolVlanAdminEntry ::=
+    SEQUENCE {
+        protocolVlanAdminTablePort
+            INTEGER,
+        protocolVlanAdminTableEnable
+            TruthValue,
+    }
+
+protocolVlanAdminTablePort OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "port index."
+        --端口索引
+    ::= { gDot1qProtocolVlanAdminEntry 1 }
+
+protocolVlanAdminTableEnable OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "enable protocol-based vlan function of a port."
+        --使能端口的基于协议的VLAN功能.
+    ::= { gDot1qProtocolVlanAdminEntry 2 }
+
+
+gDot1qTranslateVlan     OBJECT IDENTIFIER ::= { gDot1qExtend 15 }
+
+gDot1qTranslateVlanIngressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GDot1qTranslateVlanIngressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to classify a packet based on the protocol(FrameType,EtherType).only for marvell chip"
+        --替换vlan全局表项
+    ::= { gDot1qTranslateVlan 1 }   
+    
+    
+gDot1qTranslateVlanIngressEntry OBJECT-TYPE
+    SYNTAX      GDot1qTranslateVlanIngressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "entry of ingress vlan translate."
+        --入口vlan替换表项
+    INDEX   { translateVlanIngressTableIndex }
+    ::= { gDot1qTranslateVlanIngressTable 1 }  
+    
+GDot1qTranslateVlanIngressEntry ::=
+    SEQUENCE {
+        translateVlanIngressTableIndex
+            INTEGER,
+	translateIngressTargetVlanID
+            INTEGER,
+    }
+    
+translateVlanIngressTableIndex OBJECT-TYPE
+    SYNTAX       INTEGER(1..4094)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "index of ingress vlan."
+        --入口VLAN 索引.
+    ::= { gDot1qTranslateVlanIngressEntry 1 }
+    
+translateIngressTargetVlanID OBJECT-TYPE
+    SYNTAX       INTEGER(0..4094)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Target vlan ID.        
+        0 means not set"
+        --目标vlan ID. 0:表示没有设置,不能将目标vlan与原vlan设置相同
+    ::= { gDot1qTranslateVlanIngressEntry 2 }
+
+gDot1qTranslateVlanEgressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GDot1qTranslateVlanEgressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is used to classify a packet based on the protocol(FrameType,EtherType).only for marvell chip"
+        --替换vlan全局表项
+    ::= { gDot1qTranslateVlan 2 } 
+    
+gDot1qTranslateVlanEgressEntry OBJECT-TYPE
+    SYNTAX      GDot1qTranslateVlanEgressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "entry of Egress vlan translate."
+        --出口vlan替换表项
+    INDEX   { translateVlanEgressTableIndex }
+    ::= { gDot1qTranslateVlanEgressTable 1 }
+    
+GDot1qTranslateVlanEgressEntry ::=
+    SEQUENCE {
+        translateVlanEgressTableIndex
+            INTEGER,
+		translateEgressTargetVlanID
+            INTEGER,
+    }
+translateVlanEgressTableIndex OBJECT-TYPE
+    SYNTAX       INTEGER(1..4094)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "index of Egress vlan."
+        --出口VLAN 索引.
+    ::= { gDot1qTranslateVlanEgressEntry 1 }
+    
+translateEgressTargetVlanID OBJECT-TYPE
+    SYNTAX       INTEGER(0..4094)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Target vlan ID.
+        0 means not set"
+        --目标vlan ID. 0:表示没有设置,不能将目标vlan与原vlan设置相同
+    ::= { gDot1qTranslateVlanEgressEntry 2 }
+         
+         
+         
+gDot1qTranslateVlanPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GDot1qTranslateVlanPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "translate vlan port list"
+        --替换vlan端口开启列表
+    ::= { gDot1qTranslateVlan 3 }
+    
+gDot1qTranslateVlanPortEntry OBJECT-TYPE
+    SYNTAX      GDot1qTranslateVlanPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "port entry of  vlan translate."
+        --vlan替换端口使能表项
+    INDEX   { translateVlanTablePort }
+    ::= { gDot1qTranslateVlanPortTable 1 }
+    
+GDot1qTranslateVlanPortEntry ::=
+    SEQUENCE {
+        translateVlanTablePort
+            INTEGER,
+		translateTargetVlanIngressTableEnable
+            TruthValue,
+		translateTargetVlanEgressTableEnable
+            TruthValue            
+    }    
+translateVlanTablePort OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "port index."
+        --端口索引
+    ::= { gDot1qTranslateVlanPortEntry 1 }
+    
+translateTargetVlanIngressTableEnable OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "enable ingress Translate vlan function of a port.1:enable;2:disable"
+        --使能入端口的VLAN替换功能 1表示使能，2表示禁止.
+    ::= { gDot1qTranslateVlanPortEntry 2 }   
+    
+ translateTargetVlanEgressTableEnable OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "enable Egress Translate vlan function of a port.1:enable;2:disable"
+        --使能出端口的VLAN替换功能 1表示使能，2表示禁止.
+    ::= { gDot1qTranslateVlanPortEntry 3 }           
+
+            
+-- -------------------------------------------------------------
+-- GARP MIB - compliance statements
+-- -------------------------------------------------------------
+
+garpMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for the GARP module."
+
+    MODULE
+        MANDATORY-GROUPS {
+            garpMIBBaseGroup
+        }
+       ::= { garpMIBCompliances 1 }
+
+END

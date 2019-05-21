@@ -1,0 +1,119 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : adminMasterMib.mi2
+--  Description  : Sample ADMIN Master OID Definition MIB 
+--  Version      : 0.6 
+--  Date         : August 29, 2000     
+--
+--  Copyright (c) 2000 admin Systems, Inc.  All Rights Reserved.
+--
+--  Reproduction of this document is authorized on condition that this
+--  copyright notice is included.  This sample ADMIN Master Enterprise MIB
+--  embodies proprietary intellectual property of admin Systems (ADMIN). 
+--  ADMIN retains all title and ownership in the specification, including any
+--  revisions.
+--
+--  It is the intent of ADMIN to encourage the widespread use of this
+--  specification in connection with the management of ADMIN-based products.  
+--  ADMIN grants vendors, end-users, and other interested parties a
+--  non-exclusive license to use this specification in connection with the
+--  management of ADMIN products.
+--
+--  This specification is supplied "AS IS", and ADMIN makes no warranty,
+--  either express or implied, as to the use, operations, condition,
+--  or performance of this specification.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--  Sample ADMIN Master Enterprise MIB
+--
+--  NOTES:
+--   1. This is a SMIv2 MIB - all definitions are automatically 'exported'.
+--
+--   2. This MIB:
+--        - defines the 'ADMIN Product' OIDs (used as IMPORTS)
+--        - defines the 'ADMIN Major Category' OIDs (used as IMPORTS)
+--        - defines the 'ADMIN Internal MIB Module' OIDs (used as IMPORTS)
+--        - defines/documents the 'ADMIN Generic' MIB OIDs
+--        - documents the 'ADMIN OEM swAPI' MIB OIDs
+--        - documents the 'ADMIN OEM Product' MIB OIDs
+--
+--   3. Note that the 'defined/documents' items provide a common place to
+--      define or document the required OIDs.  SMIv1 MIBs can be defined
+--      here and then imported into the corresponding MIB.  The SMIv2 
+--      'MODULE-IDENTITY' macro does not allow the second OID parameter to
+--      be imported from an external MIB file.  The authors of these
+--      'documented' MIBs must verify, by procedure, that the values used
+--      match the values in this document.
+--
+--   4. Note that some MIB compilers do not accept two sets of comments on the
+--      same line.  Consequently, for commented out document items, do not
+--      use a second comment on the same line.
+--
+--   5. Note that the admin enterprise ID (13464) is used in the sample
+--      MIBs.  The customer "must" replace the admin enterprise ID with
+--      the registered enterprise identifier for the specific company or
+--      product.  The customer must also replace the ADMIN information
+--      located in the 'MODULE-IDENTITY' in each sample MIB.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+ADMIN-MASTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises              FROM SNMPv2-SMI;
+
+    admin MODULE-IDENTITY
+        LAST-UPDATED    "0008290000Z"  -- August 29, 2000
+        ORGANIZATION    "Admin Systems, Inc."
+        CONTACT-INFO    "Admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "ADMIN Master MIB OID defines and documentation."
+
+        REVISION        "0008290000Z"  -- August 29, 2000
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { enterprises 13464 }
+    
+-- ADMIN Products
+dataCom           OBJECT IDENTIFIER ::= {admin 1} 
+transmission      OBJECT IDENTIFIER ::= {admin 2} 
+wireCom            OBJECT IDENTIFIER ::= {admin 3} 
+
+
+-- DataCom Products
+vdsl			OBJECT IDENTIFIER ::= {dataCom 1}
+gbn             OBJECT IDENTIFIER ::= {dataCom 2 } 
+switch			OBJECT IDENTIFIER ::= {dataCom 3}
+adsl			OBJECT IDENTIFIER ::= {dataCom 5}
+bas			OBJECT IDENTIFIER ::= {dataCom 6}
+voip			OBJECT IDENTIFIER ::= {dataCom 7}
+mnt			OBJECT IDENTIFIER ::= {dataCom 10}
+
+--VDSL Products
+S5330-28TX   OBJECT IDENTIFIER ::= {vdsl 1}   
+
+-- ADMIN Major MIB Categories
+    gbnPlatform     OBJECT IDENTIFIER ::= { gbn 1 }     
+    gbnDevice       OBJECT IDENTIFIER ::= { gbn 2 }     
+    gbnService      OBJECT IDENTIFIER ::= { gbn 3 }     
+    gbnL2           OBJECT IDENTIFIER ::= { gbn 4 }     
+    gbnL3           OBJECT IDENTIFIER ::= { gbn 5 } 
+    gbnLS           OBJECT IDENTIFIER ::= { gbn 6 } 
+
+    gbnServiceAAA      OBJECT IDENTIFIER ::= { gbnService 1 } 
+    rmonMib            OBJECT IDENTIFIER ::= { gbnService 2}--gbnServiceRMON
+    gbnServiceMACNotification            OBJECT IDENTIFIER ::= { gbnService 3}
+    
+-- Switch Products
+S5330          OBJECT IDENTIFIER ::= { mnt 10 }
+-- S5330
+S5330-28TX           OBJECT IDENTIFIER ::= {S5330  24 }
+--
+-- END of ADMIN-MASTER-MIB
+--
+
+END

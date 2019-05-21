@@ -1,0 +1,388 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-TOP10-STATISTICS-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwStatistics
+        FROM MERU-SMI
+    ;
+
+  mwTop10Statistics  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Top 10 Statistics infrastructure"
+    ::= { mwStatistics 2 } 
+  
+    
+  
+  mwTop10ApStationProblemTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwTop10ApStationProblemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Top 10 station problem statistics "
+    ::= { mwTop10Statistics 1 }
+
+  mwTop10ApStationProblemEntry  OBJECT-TYPE
+    SYNTAX MwTop10ApStationProblemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Top 10 station problem statistics "
+    INDEX {  mwTop10ApStationProblemTableIndex  }
+    ::= { mwTop10ApStationProblemTable 1 }
+
+  MwTop10ApStationProblemEntry  ::=  SEQUENCE { 
+       mwTop10ApStationProblemTableIndex                           Integer32, 
+       mwTop10ApStationProblemApName                               DisplayString,
+       mwTop10ApStationProblemIfIndex                              Integer32,
+       mwTop10ApStationProblemWepErrors                            Unsigned32,
+       mwTop10ApStationProblemNmsApNodeId                          Integer32,
+       mwTop10ApStationProblemStationIPAddress                     Ipv6Address,
+       mwTop10ApStationProblemStationMacAddress                    MacAddress,
+       mwTop10ApStationProblemStationIPv4Address                   IpAddress 
+  }
+   
+   
+  mwTop10ApStationProblemTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwTop10ApStationProblemEntry 1 }
+
+  mwTop10ApStationProblemApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwTop10ApStationProblemEntry    2 }
+
+  mwTop10ApStationProblemIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwTop10ApStationProblemEntry    3 }
+
+  mwTop10ApStationProblemWepErrors  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes WEP error count from reset"
+    ::= { mwTop10ApStationProblemEntry    4 }
+
+  mwTop10ApStationProblemNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwTop10ApStationProblemEntry    5 }
+
+  mwTop10ApStationProblemStationIPAddress  OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station IP Address"
+    ::= { mwTop10ApStationProblemEntry    6 }
+
+  mwTop10ApStationProblemStationMacAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station MAC Address"
+    ::= { mwTop10ApStationProblemEntry    7 }
+
+  mwTop10ApStationProblemStationIPv4Address  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station IP Address"
+    ::= { mwTop10ApStationProblemEntry    9 }
+
+  mwTop10ApStationRxtxTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwTop10ApStationRxtxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Top 10 station talker statistics request "
+    ::= { mwTop10Statistics 2 }
+
+  mwTop10ApStationRxtxEntry  OBJECT-TYPE
+    SYNTAX MwTop10ApStationRxtxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Top 10 station talker statistics request "
+    INDEX {  mwTop10ApStationRxtxTableIndex  }
+    ::= { mwTop10ApStationRxtxTable 1 }
+
+  MwTop10ApStationRxtxEntry  ::=  SEQUENCE { 
+       mwTop10ApStationRxtxTableIndex                              Integer32, 
+       mwTop10ApStationRxtxApName                                  DisplayString,
+       mwTop10ApStationRxtxIfIndex                                 Integer32,
+       mwTop10ApStationRxtxNmsApNodeId                             Integer32,
+       mwTop10ApStationRxtxRxPacketCount                           Unsigned32,
+       mwTop10ApStationRxtxTxPacketCount                           Unsigned32,
+       mwTop10ApStationRxtxStationIPAddress                        Ipv6Address,
+       mwTop10ApStationRxtxStationMacAddress                       MacAddress,
+       mwTop10ApStationRxtxStationIPv4Address                      IpAddress 
+  }
+   
+   
+  mwTop10ApStationRxtxTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwTop10ApStationRxtxEntry 1 }
+
+  mwTop10ApStationRxtxApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwTop10ApStationRxtxEntry    2 }
+
+  mwTop10ApStationRxtxIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwTop10ApStationRxtxEntry    3 }
+
+  mwTop10ApStationRxtxNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwTop10ApStationRxtxEntry    4 }
+
+  mwTop10ApStationRxtxRxPacketCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx packet count from reset"
+    ::= { mwTop10ApStationRxtxEntry    5 }
+
+  mwTop10ApStationRxtxTxPacketCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx packet count from reset"
+    ::= { mwTop10ApStationRxtxEntry    6 }
+
+  mwTop10ApStationRxtxStationIPAddress  OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station IP Address"
+    ::= { mwTop10ApStationRxtxEntry    7 }
+
+  mwTop10ApStationRxtxStationMacAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station MAC Address"
+    ::= { mwTop10ApStationRxtxEntry    8 }
+
+  mwTop10ApStationRxtxStationIPv4Address  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station IP Address"
+    ::= { mwTop10ApStationRxtxEntry    9 }
+
+  mwTop10ApProblemTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwTop10ApProblemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Top 10 problem AP statistics "
+    ::= { mwTop10Statistics 3 }
+
+  mwTop10ApProblemEntry  OBJECT-TYPE
+    SYNTAX MwTop10ApProblemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Top 10 problem AP statistics "
+    INDEX {  mwTop10ApProblemTableIndex  }
+    ::= { mwTop10ApProblemTable 1 }
+
+  MwTop10ApProblemEntry  ::=  SEQUENCE { 
+       mwTop10ApProblemTableIndex                                  Integer32, 
+       mwTop10ApProblemApName                                      DisplayString,
+       mwTop10ApProblemTxLoss                                      Unsigned32,
+       mwTop10ApProblemIfIndex                                     Integer32,
+       mwTop10ApProblemNmsApNodeId                                 Integer32 
+  }
+   
+   
+  mwTop10ApProblemTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwTop10ApProblemEntry 1 }
+
+  mwTop10ApProblemApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwTop10ApProblemEntry    2 }
+
+  mwTop10ApProblemTxLoss  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Loss Percentage"
+    ::= { mwTop10ApProblemEntry    3 }
+
+  mwTop10ApProblemIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwTop10ApProblemEntry    4 }
+
+  mwTop10ApProblemNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwTop10ApProblemEntry    5 }
+
+  mwTop10ApRxtxTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwTop10ApRxtxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Top 10 talker AP statistics "
+    ::= { mwTop10Statistics 4 }
+
+  mwTop10ApRxtxEntry  OBJECT-TYPE
+    SYNTAX MwTop10ApRxtxEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Top 10 talker AP statistics "
+    INDEX {  mwTop10ApRxtxTableIndex  }
+    ::= { mwTop10ApRxtxTable 1 }
+
+  MwTop10ApRxtxEntry  ::=  SEQUENCE { 
+       mwTop10ApRxtxTableIndex                                     Integer32, 
+       mwTop10ApRxtxApName                                         DisplayString,
+       mwTop10ApRxtxIfIndex                                        Integer32,
+       mwTop10ApRxtxNmsApNodeId                                    Integer32,
+       mwTop10ApRxtxTxFrameCount                                   Unsigned32,
+       mwTop10ApRxtxRxUnicastFrameCount                            Unsigned32 
+  }
+   
+   
+  mwTop10ApRxtxTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwTop10ApRxtxEntry 1 }
+
+  mwTop10ApRxtxApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwTop10ApRxtxEntry    2 }
+
+  mwTop10ApRxtxIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwTop10ApRxtxEntry    3 }
+
+  mwTop10ApRxtxNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwTop10ApRxtxEntry    4 }
+
+  mwTop10ApRxtxTxFrameCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx frame count from reset"
+    ::= { mwTop10ApRxtxEntry    5 }
+
+  mwTop10ApRxtxRxUnicastFrameCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx frame count from reset"
+    ::= { mwTop10ApRxtxEntry    6 }
+
+  
+END
+   

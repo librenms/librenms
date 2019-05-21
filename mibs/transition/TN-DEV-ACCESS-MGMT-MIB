@@ -1,0 +1,291 @@
+-- *****************************************************************
+-- TN-ACCESS-MGMT-MIB
+--
+-- Copyright (c) 2012, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+TN-ACCESS-MGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    Unsigned32  FROM SNMPv2-SMI
+    RowStatus  FROM SNMPv2-TC
+    entPhysicalIndex  FROM ENTITY-MIB
+    InetAddressType, InetAddress  FROM INET-ADDRESS-MIB
+    tnDevMgmt FROM TN-MGMT-MIB;
+
+tnDevAccessMgmt        OBJECT IDENTIFIER ::= { tnDevMgmt 36 }
+
+--
+-- MIB variables
+--
+
+--
+-- tnAccessMgmtCfgTable
+--
+tnAccessMgmtCfgTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnAccessMgmtCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "This table contains a mapping for access management configuraition."
+    ::= { tnDevAccessMgmt 1 }
+
+tnAccessMgmtCfgEntry OBJECT-TYPE
+    SYNTAX        TnAccessMgmtCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "The entry contains variables that are intended to configurate Access Management."
+    INDEX { entPhysicalIndex }
+    ::= { tnAccessMgmtCfgTable 1 }
+
+TnAccessMgmtCfgEntry ::= SEQUENCE {
+    tnAccessMgmtMode    INTEGER,
+    tnAccessMgmtClearOpCommand      INTEGER
+    }
+
+tnAccessMgmtMode  OBJECT-TYPE
+    SYNTAX       INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates the access management mode operation. Possible modes are:
+
+                Enabled: Enable access management mode operation.
+                Disabled: Disable access management mode operation."
+    ::= { tnAccessMgmtCfgEntry 1 }
+
+tnAccessMgmtClearOpCommand   OBJECT-TYPE
+    SYNTAX       INTEGER { none(1), clear(2) }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION  "
+            none      perform nothing.
+
+            clear     perform the operating of clear the Access Management Statistics."
+    ::= { tnAccessMgmtCfgEntry 2 }
+
+--
+-- tnAccessMgmtTable
+--
+tnAccessMgmtTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnAccessMgmtEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "This table contains a mapping for access management."
+    ::= { tnDevAccessMgmt 2 }
+
+tnAccessMgmtEntry OBJECT-TYPE
+    SYNTAX        TnAccessMgmtEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "The entry contains detailed information used to implement access controls."
+
+    INDEX { tnAccessMgmtId }
+    ::= { tnAccessMgmtTable 1 }
+
+TnAccessMgmtEntry ::= SEQUENCE {
+    tnAccessMgmtId                   Unsigned32,
+    tnAccessMgmtAddressType          InetAddressType,
+    tnAccessMgmtStartIPAddress       InetAddress,
+    tnAccessMgmtEndIPAddress         InetAddress,
+    tnAccessMgmtServiceType          BITS,
+    tnAccessMgmtRowStatus            RowStatus
+    }
+
+tnAccessMgmtId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates the access id in the entry."
+    ::= { tnAccessMgmtEntry 1 }
+
+tnAccessMgmtAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates the type of target device IP address."
+    ::= { tnAccessMgmtEntry 2 }
+
+tnAccessMgmtStartIPAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates the start IP address for the access management entry."
+    ::= { tnAccessMgmtEntry 3 }
+
+tnAccessMgmtEndIPAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates the end IP address for the access management entry."
+    ::= { tnAccessMgmtEntry 4 }
+
+tnAccessMgmtServiceType OBJECT-TYPE
+    SYNTAX BITS {
+           Telnet(0),
+           Web(1),
+           Snmp(2),
+           }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "- Telnet(0)
+        Indicates that the host can access the switch from TELNET/SSH interface
+        if the host IP address matches the IP address range provided in the entry.
+
+        - Web(1)
+        Indicates that the host can access the switch from HTTP/HTTPS interface
+        if the host IP address matches the IP address range provided in the entry.
+
+        - Snmp(2)
+        Indicates that the host can access the switch from SNMP interface
+        if the host IP address matches the IP address range provided in the entry.
+        "
+    ::= { tnAccessMgmtEntry 5 }
+
+tnAccessMgmtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of the entry, and is used to create
+        and delete entries in this table."
+    ::= { tnAccessMgmtEntry 6 }
+
+--
+-- tnAccessMgmtStatsTable
+--
+tnAccessMgmtStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnAccessMgmtStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "This table contains a mapping for access management statistics."
+    ::= { tnDevAccessMgmt 3 }
+
+tnAccessMgmtStatsEntry OBJECT-TYPE
+    SYNTAX        TnAccessMgmtStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "The entry contains the details of Access Management Statistics."
+    INDEX { entPhysicalIndex }
+    ::= { tnAccessMgmtStatsTable 1 }
+
+TnAccessMgmtStatsEntry ::= SEQUENCE {
+    tnAccessMgmtHttpReceivedCount             Unsigned32,
+    tnAccessMgmtHttpDiscardedCount            Unsigned32,
+    tnAccessMgmtHttpsReceivedCount            Unsigned32,
+    tnAccessMgmtHttpsDiscardedCount           Unsigned32,
+    tnAccessMgmtSnmpReceivedCount             Unsigned32,
+    tnAccessMgmtSnmpDiscardedCount            Unsigned32,
+    tnAccessMgmtTelnetReceivedCount           Unsigned32,
+    tnAccessMgmtTelnetDiscardedCount          Unsigned32,
+    tnAccessMgmtSshReceivedCount              Unsigned32,
+    tnAccessMgmtSshDiscardedCount             Unsigned32
+    }
+
+tnAccessMgmtHttpReceivedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of received packets from the interface(http)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 1 }
+
+tnAccessMgmtHttpDiscardedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of discarded packets from the interface(http)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 2 }
+
+tnAccessMgmtHttpsReceivedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of received packets from the interface(https)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 3 }
+
+tnAccessMgmtHttpsDiscardedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of discarded packets from the interface(https)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 4 }
+
+tnAccessMgmtSnmpReceivedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of received packets from the interface(snmp)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 5 }
+
+tnAccessMgmtSnmpDiscardedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of discarded packets from the interface(snmp)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 6 }
+
+tnAccessMgmtTelnetReceivedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of received packets from the interface(telnet)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 7 }
+
+tnAccessMgmtTelnetDiscardedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of discarded packets from the interface(telnet)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 8 }
+
+tnAccessMgmtSshReceivedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of received packets from the interface(ssh)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 9 }
+
+tnAccessMgmtSshDiscardedCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Number of discarded packets from the interface(ssh)
+        when access management mode is enabled."
+    ::= { tnAccessMgmtStatsEntry 10 }
+
+--
+-- Notifications
+--
+
+END

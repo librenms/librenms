@@ -1,4 +1,5 @@
 source: Extensions/RRDTune.md
+path: blob/master/doc/
 # RRDTune?
 
 When we create rrd files for ports, we currently do so with a max value of 12500000000 (100G). Because of this if a device sends us bad data back then it can appear as though

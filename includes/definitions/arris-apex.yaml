@@ -1,0 +1,11 @@
+os: arris-apex
+text: 'Arris Apex'
+type: network
+icon: arris
+mib_dir:
+    - arris
+over:
+    - { graph: '', text: '' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1166.1.31

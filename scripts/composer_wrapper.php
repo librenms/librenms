@@ -27,49 +27,106 @@
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-// Set up proxy if needed
-$proxy = getenv("HTTP_PROXY") ?: getenv("http_proxy");
-if (!$proxy && $proxy = rtrim(shell_exec('git config --global --get http.proxy'))) {
-    // Use git http.proxy if available
+if (!is_writable(getenv('HOME'))) {
+    // set COMPOSER_HOME in case HOME isn't set or writable
+    putenv("COMPOSER_HOME=$install_dir/.composer");
+}
+
+$use_https = true;
+// Set up proxy if needed, check git config for proxies too
+if ($proxy = getenv("HTTPS_PROXY") ?: getenv("https_proxy")) {
+    $use_https = true;
+} elseif ($proxy = getenv("HTTP_PROXY") ?: getenv("http_proxy")) {
+    $use_https = false;
+} elseif ($proxy = trim(shell_exec('git config --global --get https.proxy'))) {
+    putenv("HTTPS_PROXY=$proxy");
+    $use_https = true;
+} elseif ($proxy = trim(shell_exec('git config --global --get http.proxy'))) {
     putenv("HTTP_PROXY=$proxy");
+    $use_https = false;
 }
 
 $exec = false;
 
-$path_exec = shell_exec("which composer 2> /dev/null");
-if (!empty($path_exec)) {
-    $exec = trim($path_exec);
-} elseif (is_file($install_dir . '/composer.phar')) {
+$extra_args = '';
+if (php_sapi_name() == 'cli' && isset($_SERVER['TERM'])) {
+    // running interactively, set output to ansi
+    $extra_args .= ' --ansi';
+}
+
+if (is_file($install_dir . '/composer.phar')) {
     $exec = 'php ' . $install_dir . '/composer.phar';
+
+    // self-update
+    passthru("$exec self-update -q" . $extra_args);
 } else {
-    if ($proxy) {
-        $stream_default_opts = array(
-            'http' => array(
-                'proxy' => str_replace('http://', 'tcp://', $proxy),
-                'request_fulluri' => true,
-            )
-        );
+    $sig_url = ($use_https ? 'https' : 'http') . '://composer.github.io/installer.sig';
 
-        stream_context_set_default($stream_default_opts);
-    }
+    // Download installer signature from github
+    $good_sha = trim(curl_fetch($sig_url, $proxy, $use_https));
 
-    // Download composer.phar (code from the composer web site)
-    $good_sha = trim(@file_get_contents('http://composer.github.io/installer.sig'));
-
-    // Download composer.phar (code from the composer web site)
-    @copy('http://getcomposer.org/installer', 'composer-setup.php');
-    if (!empty($good_sha) && @hash_file('SHA384', 'composer-setup.php') === $good_sha) {
-        // Installer verified
-        shell_exec('php composer-setup.php');
-        $exec = 'php ' . $install_dir . '/composer.phar';
+    if (empty($good_sha)) {
+        echo "Error: Failed to download installer signature from $sig_url\n";
     } else {
-        echo "Corrupted download.\n";
+        // Download composer.phar (code from the composer web site)
+        $dest = 'composer-setup.php';
+        $installer_url = ($use_https ? 'https' : 'http') . '://getcomposer.org/installer';
+        curl_fetch($installer_url, $proxy, $use_https, $dest);
+
+        if (!is_file($dest)) {
+            echo "Error: Failed to download $installer_url\n";
+        } elseif (@hash_file('SHA384', $dest) === $good_sha) {
+            // Installer verified
+            shell_exec("php $dest");
+            $exec = "php $install_dir/composer.phar";
+        } else {
+            echo "Error: Corrupted download, signature doesn't match for $installer_url\n";
+        }
+        @unlink($dest);
     }
-    @unlink('composer-setup.php');
+}
+
+// if nothing else, use system supplied composer
+if (!$exec) {
+    $path_exec = trim(shell_exec("which composer 2> /dev/null"));
+    if ($path_exec) {
+        $exec = $path_exec;
+    }
 }
 
 if ($exec) {
-    passthru("$exec " . implode(' ', array_splice($argv, 1)) . ' 2>&1');
+    passthru("$exec " . implode(' ', array_splice($argv, 1)) . "$extra_args 2>&1");
 } else {
     echo "Composer not available, please manually install composer.\n";
+}
+
+
+function curl_fetch($url, $proxy, $use_https, $output = false)
+{
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+    if ($output) {
+        $fp = fopen($output, 'w+');
+        curl_setopt($curl, CURLOPT_FILE, $fp);
+    }
+
+    if ($proxy) {
+        curl_setopt($curl, CURLOPT_PROXY, rtrim(str_replace(['http://', 'https://'], '', $proxy), '/'));
+        if ($use_https) {
+            curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+        }
+    }
+
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 300);
+    $ret = @curl_exec($curl);
+
+    curl_close($curl);
+    if (isset($fp)) {
+        fclose($fp);
+    }
+
+    return $ret;
 }

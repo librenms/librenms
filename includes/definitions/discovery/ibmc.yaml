@@ -1,0 +1,115 @@
+mib: HUAWEI-SERVER-IBMC-MIB
+modules:
+    sensors:
+        fanspeed:
+            options:
+                skip_values_lt: 0
+            data:
+                -
+                    oid: fanDescriptionEntry
+                    value: fanSpeed
+                    num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.8.50.1.2.{{ $index }}'
+                    descr: 'fanDevicename'
+                    index: 'fanSpeed.{{ $index }}'
+        power:
+            options:
+                skip_values_lt: 0
+            data:
+                -
+                    oid: powerSupplyDescriptionEntry
+                    value: powerSupplyInputPower
+                    num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.6.50.1.8.{{ $index }}'
+                    descr: 'Power Supply {{ $index }} Input'
+                    index: 'powerSupplyIndex.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: TemperatureDescriptionEntry
+                    value: temperatureReading
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.26.50.1.3.{{ $index }}'
+                    descr: 'temperatureObject'
+                    index: 'temperatureIndex.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: cpuDescriptionEntry
+                    value: cpuStatus
+                    num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.15.50.1.6.{{ $index }}'
+                    descr: 'Processor {{ $cpuFamily }} @{{ $cpuClockRate }} #{{ $cpuIndex }}'
+                    index: 'cpuStatus.{{ $index }}'
+                    state_name: cpuStatus
+                    group: 'CPU'
+                    states:
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: minor, graph: 0, value: 2, generic: 1 }
+                        - { descr: major, graph: 0, value: 3, generic: 2 }
+                        - { descr: critical, graph: 0, value: 4, generic: 2 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
+                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                -
+                    oid: hardDiskDescriptionEntry
+                    value: hardDiskStatus
+                    num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.18.50.1.3.{{ $index }}'
+                    descr: 'Drive Bay {{ $index }} {{ $hardDiskDevicename }}'
+                    index: 'hardDiskStatus.{{ $index }}'
+                    state_name: hardDiskStatus
+                    group: 'Drive Bays'
+                    states:
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: minor, graph: 0, value: 2, generic: 1 }
+                        - { descr: major, graph: 0, value: 3, generic: 2 }
+                        - { descr: critical, graph: 0, value: 4, generic: 2 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
+                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                -
+                    oid: fanDescriptionEntry
+                    value: fanStatus
+                    num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.8.50.1.4.{{ $index }}'
+                    descr: 'fanDevicename'
+                    index: 'fanSpeed.{{ $index }}'
+                    state_name: fanStatus
+                    group: 'Fans'
+                    states:
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: minor, graph: 0, value: 2, generic: 1 }
+                        - { descr: major, graph: 0, value: 3, generic: 2 }
+                        - { descr: critical, graph: 0, value: 4, generic: 2 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
+                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                -
+                    oid: memoryEntireStatus
+                    value: memoryEntireStatus
+                    num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.16.1.{{ $index }}'
+                    descr: 'Memory Status'
+                    index: 'memoryEntireStatus.{{ $index }}'
+                    state_name: memoryEntireStatus
+                    group: 'RAM'
+                    states:
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: minor, graph: 0, value: 2, generic: 1 }
+                        - { descr: major, graph: 0, value: 3, generic: 2 }
+                        - { descr: critical, graph: 0, value: 4, generic: 2 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
+                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                -
+                    oid: memoryDescriptionEntry
+                    value: memoryStatus
+                    num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.16.50.1.6.{{ $index }}'
+                    descr: '{{ $memoryLogic }} {{ $memoryManufacturer }} {{ $memorySize }} {{ $memoryClockRate }}'
+                    index: 'memoryStatus.{{ $index }}'
+                    state_name: memoryStatus
+                    group: 'RAM'
+                    states:
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: minor, graph: 0, value: 2, generic: 1 }
+                        - { descr: major, graph: 0, value: 3, generic: 2 }
+                        - { descr: critical, graph: 0, value: 4, generic: 2 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
+                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                    skip_values:
+                        -
+                            oid: memoryStatus
+                            op: '='
+                            value: 5
+

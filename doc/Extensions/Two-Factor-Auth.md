@@ -1,4 +1,5 @@
 source: Extensions/Two-Factor-Auth.md
+path: blob/master/doc/
 
 # About
 

@@ -1,0 +1,238 @@
+    GBNL3DhcpRelay-MIB  DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter32,
+        TimeTicks, IpAddress                    FROM SNMPv2-SMI
+        DisplayString, TruthValue, 
+        RowStatus, MacAddress                   FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL3                                   FROM ADMIN-MASTER-MIB;       
+        
+    gbnL3DhcpRelay  MODULE-IDENTITY
+        LAST-UPDATED    "0105030000Z"  -- May 03,2001  
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "GBN Enterprise MIB definition."
+
+        REVISION        "0105030000Z"  -- May 03,2001
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL3 5 }
+
+------------------------------------------------------------------------------
+-- Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+
+
+    dhcpRelayEnableStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+             enable(1),
+             disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { gbnL3DhcpRelay 1 }
+        
+     dhcpRelayDebugStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+             enable(1),
+             disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            ""
+        ::= { gbnL3DhcpRelay 2 }
+        
+    dhcpRelayGroupTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpRelayGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { gbnL3DhcpRelay 3 }
+
+    dhcpRelayGroupEntry  OBJECT-TYPE
+        SYNTAX DhcpRelayGroupEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch interface control and status information."
+        INDEX { dhcpRelaySvrGroupNo }
+        ::= { dhcpRelayGroupTable 1 }
+
+    DhcpRelayGroupEntry ::= SEQUENCE {
+        dhcpRelaySvrGroupNo         Integer32,
+        dhcpRelayServerIp           IpAddress
+      }                   
+          
+    dhcpRelaySvrGroupNo    OBJECT-TYPE
+        SYNTAX Integer32(1..256) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Group number"
+        ::= { dhcpRelayGroupEntry 1 }  
+        
+    
+    dhcpRelayServerIp    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "Dhcp Server IP Address of the group"
+        ::= { dhcpRelayGroupEntry 2 }  
+    
+
+    dhcpRelayIfaceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpRelayIfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { gbnL3DhcpRelay 4 }
+
+    dhcpRelayIfaceEntry  OBJECT-TYPE
+        SYNTAX DhcpRelayIfaceEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch interface control and status information."
+        INDEX { dhcpRelaySvrVlanIfaceNo, dhcpRelayVlanIfaceGroupNo }
+        ::= { dhcpRelayIfaceTable 1 }
+
+    DhcpRelayIfaceEntry ::= SEQUENCE {
+        dhcpRelaySvrVlanIfaceNo     Integer32(1..256),        
+        dhcpRelayVlanIfaceGroupNo   Integer32(1..8),
+        dhcpRelayVlanIfaceServerNo  Integer32(1..256)
+      }                   
+          
+    dhcpRelaySvrVlanIfaceNo  OBJECT-TYPE
+        SYNTAX Integer32(1..256) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "interface number"
+        ::= { dhcpRelayIfaceEntry 1 }      
+    
+    dhcpRelayVlanIfaceGroupNo  OBJECT-TYPE
+        SYNTAX Integer32(1..8) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Group number of interface"
+        ::= { dhcpRelayIfaceEntry 2 }  
+             
+    dhcpRelayVlanIfaceServerNo  OBJECT-TYPE
+        SYNTAX Integer32(1..256) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Dhcp server number"
+        ::= { dhcpRelayIfaceEntry 3 }  
+       
+     dhcpRelayHideServerIp OBJECT-TYPE
+        SYNTAX INTEGER {
+             enable(1),
+             disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { gbnL3DhcpRelay 5 }
+        
+    dhcpRelayMaxHops OBJECT-TYPE
+        SYNTAX Integer32(1..16) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp relay max hops"
+        ::= { gbnL3DhcpRelay 6 }
+        
+    dhcpRelayClientTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpRelayClientEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table for client information on dhcp server. Only Get operation
+             can execute on the table, not support Get-Next or Walk operation."
+        ::= { gbnL3DhcpRelay 7 }
+
+    dhcpRelayClientEntry  OBJECT-TYPE
+        SYNTAX DhcpRelayClientEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for client information on dhcp server."
+        INDEX { dhcpRelayUserMac }
+        ::= { dhcpRelayClientTable 1 }
+        
+    DhcpRelayClientEntry ::= SEQUENCE {
+        dhcpRelayUserMac     MacAddress,        
+        dhcpRelayVlanId      Integer32,
+        dhcpRelayIpAddress   IpAddress,
+        dhcpRelayHostName    DisplayString
+      }
+        
+    dhcpRelayUserMac  OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "mac address of user"
+        ::= { dhcpRelayClientEntry 1 }
+    
+    dhcpRelayVlanId  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "vlan id of user"
+        ::= { dhcpRelayClientEntry 2 }
+             
+    dhcpRelayIpAddress  OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "ip address of user"
+        ::= { dhcpRelayClientEntry 3 }
+        
+    dhcpRelayHostName  OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "host name of user"
+        ::= { dhcpRelayClientEntry 4 }
+        
+    dhcpRelaySvrTraps OBJECT IDENTIFIER ::= { gbnL3DhcpRelay 8 }
+    
+    dhcpRelaySvrTrapEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable traps on dhcp server"
+        ::= { dhcpRelaySvrTraps 1 }
+        
+    dhcpRelaySvrClientTrap NOTIFICATION-TYPE
+        OBJECTS {
+        dhcpRelayUserMac,
+        dhcpRelayVlanId,
+        dhcpRelayIpAddress
+      }
+        STATUS current
+        DESCRIPTION
+        "A trap is sent to the management entity with the OID of the ip
+         address that has been allocated to client by the dhcp server."
+       ::= { dhcpRelaySvrTraps 2 }
+    
+END

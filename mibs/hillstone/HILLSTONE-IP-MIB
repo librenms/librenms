@@ -1,0 +1,45 @@
+-- **********************************************************************
+-- HILLSTONE-IP-MIB   
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V3    
+-- Description:	 Hillstone Networks IP MIB Object Identifier Assignments
+-- **********************************************************************
+--
+
+HILLSTONE-IP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneIp
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212;	
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstoneIpObjects OBJECT IDENTIFIER ::= { hillstoneIp 1 }
+
+hillstoneIpAddressFamily OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+	ipv4(1),
+	ipv6(2),
+	other(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The address family of this interface."
+    ::= { hillstoneIpObjects 1 } 
+
+END

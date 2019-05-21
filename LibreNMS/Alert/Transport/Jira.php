@@ -23,11 +23,23 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Jira implements Transport
+class Jira extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['username'] = $this->config['jira-username'];
+            $opts['password'] = $this->config['jira-password'];
+            $opts['prjkey'] = $this->config['jira-key'];
+            $opts['issuetype'] = $this->config['jira-type'];
+            $opts['url'] = $this->config['jira-url'];
+        }
+        return $this->contactJira($obj, $opts);
+    }
+
+    public function contactJira($obj, $opts)
     {
         // Don't create tickets for resolutions
         if ($obj['severity'] == 'recovery' && $obj['msg'] != 'This is a test alert') {
@@ -74,5 +86,50 @@ class Jira implements Transport
             d_echo("Jira connection error: " . serialize($ret));
             return false;
         }
+    }
+    
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'URL',
+                    'name' => 'jira-url',
+                    'descr' => 'Jira URL',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Project Key',
+                    'name' => 'jira-key',
+                    'descr' => 'Jira Project Key',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Issue Type',
+                    'name' => 'jira-type',
+                    'descr' => 'Jira Issue Type',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Jira Username',
+                    'name' => 'jira-username',
+                    'descr' => 'Jira Username',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Jira Password',
+                    'name' => 'jira-password',
+                    'descr' => 'Jira Password',
+                    'type' => 'text'
+                ],
+            ],
+            'validation' => [
+                'jira-key' => 'required|string',
+                'jira-url' => 'required|string',
+                'jira-type' => 'required|string',
+                'jira-username' => 'required|string',
+                'jira-password' => 'required|string',
+            ]
+        ];
     }
 }

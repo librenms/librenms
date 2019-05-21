@@ -1,7 +1,8 @@
 os: nos
 text: 'Brocade NOS'
 type: network
-ifname: 1
+ifname: true
+group: brocade
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

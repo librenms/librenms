@@ -1,4 +1,5 @@
 source: Extensions/metrics/OpenTSDB.md
+path: blob/master/doc/
 # Enabling support for OpenTSDB.
 
 This module sends all metrics to OpenTSDB server. You need something like Grafana for graphing.

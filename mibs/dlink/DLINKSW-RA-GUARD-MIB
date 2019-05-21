@@ -1,0 +1,355 @@
+-- *****************************************************************
+-- DLINKSW-RA-GUARD-MIB: RA Guard MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-RA-GUARD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Unsigned32,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    TruthValue,
+    RowStatus,
+    DisplayString
+        FROM SNMPv2-TC
+
+    ifIndex
+        FROM IF-MIB
+
+    dlinkIndustrialCommon
+        FROM DLINK-ID-REC-MIB;
+
+dlinkSwRaGuardMIB MODULE-IDENTITY
+    LAST-UPDATED "201307180000Z"
+    ORGANIZATION "D-Link Corp."
+    CONTACT-INFO
+        "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+        "
+    DESCRIPTION
+        "This MIB module defines objects for RA Guard."
+    REVISION    "201307180000Z"
+    DESCRIPTION
+         "This is the first version of the MIB file.
+         "
+    ::= { dlinkIndustrialCommon 141 }
+
+--
+-- Textual Conventions
+--
+
+
+-- -----------------------------------------------------------------------------
+    dRaGuardNotifications    OBJECT IDENTIFIER ::= { dlinkSwRaGuardMIB 0 }
+    dRaGuardObjects          OBJECT IDENTIFIER ::= { dlinkSwRaGuardMIB 1 }
+    dRaGuardConformance      OBJECT IDENTIFIER ::= { dlinkSwRaGuardMIB 2 }
+
+    dRaGuardPolicy       OBJECT IDENTIFIER ::= { dRaGuardObjects 1 }
+    dRaGuardInterface    OBJECT IDENTIFIER ::= { dRaGuardObjects 2 }
+
+-- -----------------------------------------------------------------------------
+    dRaGuardPolicyNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in RA Guard policy
+             table."
+        ::= { dRaGuardPolicy 1 }
+
+    dRaGuardPolicyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DRaGuardPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains information about RA Guard policies."
+        ::= { dRaGuardPolicy 2 }
+
+    dRaGuardPolicyEntry OBJECT-TYPE
+        SYNTAX          DRaGuardPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defined in dRaGuardPolicyTable. An entry is 
+            created/removed when a RA Guard policy is created/deleted."
+        INDEX { dRaGuardPolicyName }
+        ::= { dRaGuardPolicyTable 1 }
+
+    DRaGuardPolicyEntry ::= SEQUENCE {
+        dRaGuardPolicyName          DisplayString,
+        dRaGuardPolicyDeviceRole	INTEGER,
+        dRaGuardPolicyRowStatus     RowStatus
+    }
+
+    dRaGuardPolicyName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the RA Guard policy."
+        ::= { dRaGuardPolicyEntry 1 }
+
+    dRaGuardPolicyDeviceRole OBJECT-TYPE
+        SYNTAX      INTEGER {
+            host(1),
+            router(2)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Indicates the role of the attached device.
+             host: all the inbound router advertisement 
+                   and redirect messages are blocked.
+             router: all messages (router solicitation [RS], 
+                   router advertisement [RA], or redirect) 
+                   are allowed on this port.
+            "
+        DEFVAL { host }
+        ::= { dRaGuardPolicyEntry 2 }
+        
+     dRaGuardPolicyRowStatus  OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object allows the dynamic creation and deletion of a RA Guard
+            policy.
+            "
+        ::= { dRaGuardPolicyEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dRaGuardMatchAclTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DRaGuardMatchAclEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "The table contains a list of IPv6 access list associations for
+            RA Guard policies. 
+            The IPv6 access list is used to filter the RA messages based on 
+            sender IPv6 address.
+            "
+        ::= { dRaGuardPolicy 3 }
+
+    dRaGuardMatchAclEntry OBJECT-TYPE
+        SYNTAX          DRaGuardMatchAclEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined in dRaGuardMatchAclTable. 
+            The first instance identifier index value identifies the 
+            dRaGuardPolicyEntry that an IPv6 access list (dRaGuardMatchAclEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dRaGuardPolicyEntry is deleted."
+        INDEX { 
+            dRaGuardPolicyName 
+        }
+        ::= { dRaGuardMatchAclTable 1 }
+
+    DRaGuardMatchAclEntry ::= SEQUENCE {
+        dRaGuardMatchAccessListName        DisplayString,
+        dRaGuardMatchAclRowStatus          RowStatus
+        }
+
+    dRaGuardMatchAccessListName  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the associated IPv6 access list
+            in a RA Guard policy.
+            The IPv6 access list is used to filter RA messages based on sender
+            IPv6 address when the corresponding dRaGuardPolicyDeviceRole is
+            'router'. 
+            If the IPv6 access list is not configured, all RA messages are
+            bypassed."
+        ::= { dRaGuardMatchAclEntry 1 }
+
+    dRaGuardMatchAclRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dRaGuardMatchAclEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dRaGuardIfConfigTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DRaGuardIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to configure the RA Guard
+            state at every interface capable of this feature.
+            "
+        ::= { dRaGuardInterface 1 }
+
+    dRaGuardIfConfigEntry OBJECT-TYPE
+        SYNTAX          DRaGuardIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the configuration to enable or
+            disable RA Guard on an interface.
+            "
+        INDEX { ifIndex }
+        ::= { dRaGuardIfConfigTable 1 }
+
+    DRaGuardIfConfigEntry ::= SEQUENCE {
+        dRaGuardIfEnabled       TruthValue
+    }
+
+    dRaGuardIfEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables RA Guard on the interface, if set this 
+            object to 'true'. 
+            Setting this object to 'false' disables the RA Guard on the
+            interface.
+            "
+        ::= { dRaGuardIfConfigEntry 1 }
+
+-- -----------------------------------------------------------------------------
+    dRaGuardIfAttachTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DRaGuardIfAttachEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to attach a RA Guard policy on
+            a physical port or port-channel interface.       
+            "
+    ::= { dRaGuardInterface 2 }
+
+    dRaGuardIfAttachEntry OBJECT-TYPE
+        SYNTAX       DRaGuardIfAttachEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "A row instance contains the configuration to attach a RA Guard
+            policy on a physical port or port-channel interface.   
+            "
+        INDEX { ifIndex }
+        ::= { dRaGuardIfAttachTable 1 }
+
+    DRaGuardIfAttachEntry ::= SEQUENCE {
+        dRaGuardIfAttachPolicy       DisplayString,
+        dRaGuardIfAttachRowStatus    RowStatus
+    }
+
+    dRaGuardIfAttachPolicy OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the attached RA Guard
+            policy.
+            "
+        ::= { dRaGuardIfAttachEntry 1 }
+
+    dRaGuardIfAttachRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."
+        ::= { dRaGuardIfAttachEntry 99 }
+
+-- Conformance
+
+    dRaGuardMIBCompliances    OBJECT IDENTIFIER ::= { dRaGuardConformance 1 }
+
+    dRaGuardMIBGroups    OBJECT IDENTIFIER ::= { dRaGuardConformance 2 }
+
+    dRaGuardMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "The compliance statement for DLINKSW-RA-GUARD-MIB"
+        MODULE
+        MANDATORY-GROUPS {
+            dRaGuardIfConfigGroup
+        }
+
+        GROUP dRaGuardPolicyGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            configuration of RA Guard policy."
+
+        GROUP dRaGuardIfAttachGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            interface-specific configuration of attaching RA Guard policy."
+
+        GROUP dRaGuardMatchAclGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            filtering IPv6 RA message by IPv6 access list."
+        ::= { dRaGuardMIBCompliances 1 }
+
+-- Units of Conformance
+
+    dRaGuardIfConfigGroup OBJECT-GROUP
+        OBJECTS {
+            dRaGuardIfEnabled
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects which are used to configure as
+            well as show information regarding the RA Guard feature
+            per interface."
+        ::= { dRaGuardMIBGroups 1 }
+
+    dRaGuardPolicyGroup OBJECT-GROUP
+        OBJECTS {
+            dRaGuardPolicyNumber,
+            dRaGuardPolicyDeviceRole,
+            dRaGuardPolicyRowStatus 
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects which are used to configure as
+            well as show information regarding the RA Guard policy."
+        ::= { dRaGuardMIBGroups 2 }
+
+    dRaGuardMatchAclGroup OBJECT-GROUP
+        OBJECTS {
+            dRaGuardMatchAccessListName,
+            dRaGuardMatchAclRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects which are used to configure as
+            well as show information regarding the IPv6 access list
+            in RA Guard policy."
+        ::= { dRaGuardMIBGroups 3 }
+
+    dRaGuardIfAttachGroup OBJECT-GROUP
+        OBJECTS {
+            dRaGuardIfAttachPolicy,
+            dRaGuardIfAttachRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of object which are used to configure as
+            well as show information regarding the attaching policy 
+            per interface."
+    ::= { dRaGuardMIBGroups 4 }
+
+END
+
+

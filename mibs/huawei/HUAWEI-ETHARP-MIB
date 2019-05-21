@@ -1,0 +1,2268 @@
+-- =================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: Huawei Ethernet ARP MIB
+-- Reference: HUAWEI Enterprise MIB
+-- Version: V3.11
+-- History:
+-- Version:     V3.02
+-- History:
+--              chenzhiwei, 2009-08-07, add nodes for arp anti-attack.
+-- =================================================================
+
+    HUAWEI-ETHARP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS        
+            hwDatacomm
+                FROM HUAWEI-MIB
+
+            OBJECT-TYPE, MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter32, Integer32, Unsigned32, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            PhysAddress, MacAddress,                      
+            DisplayString,
+            RowStatus            
+                FROM SNMPv2-TC   
+            NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
+             FROM SNMPv2-CONF
+            InterfaceIndex
+                FROM  IF-MIB 
+            InetAddressIPv4
+                FROM INET-ADDRESS-MIB 
+            PhysicalIndex, entPhysicalIndex, entPhysicalName
+                FROM ENTITY-MIB
+            EnabledStatus        
+                FROM P-BRIDGE-MIB;
+            
+        hwEthernetARPMIB MODULE-IDENTITY 
+            LAST-UPDATED "201707270000Z"  
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+ 
+            DESCRIPTION 
+                "This MIB describes objects used for managing Ethernet ARP,
+                 including  ARP Speed-limit,ARP Limit etc. "
+
+        REVISION "201707270000Z"
+            DESCRIPTION
+              "MODIFY  hwFwdArpAlarmResume"
+
+                 REVISION "201705191520Z"
+            DESCRIPTION
+              "MODIFY  hwEthernetARPLimitExceed"
+  
+
+        REVISION "201705181520Z"
+            DESCRIPTION
+              "MODIFY  hwEthernetARPLimitExceed"
+
+
+          REVISION "201705081520Z"
+            DESCRIPTION
+              "MODIFY  hwEthernetARPLimitExceed,hwEthernetARPLimitExceedResume"
+
+            REVISION "201607011000Z"
+            DESCRIPTION
+                "Add hwArpNumberStatisticsTable at 2016-07-01."
+
+            REVISION "201512102057Z"
+            DESCRIPTION
+                "Delete default value of hwArpEntryExpireFakeTime and hwArpEntryExpireDetectMode at 2015-12-10."
+
+            REVISION "201512101044Z"
+            DESCRIPTION 
+                "Add ARP host conflict  at 2015-12-10 "
+       	    
+
+          REVISION "201404231044Z"
+            DESCRIPTION
+                "Add ARP remote backup fail trap at 2014-04-23."
+            REVISION "201309070000Z"        
+            DESCRIPTION
+                "Fix the errors checked by a tool."
+            REVISION "200606100000Z"        -- February 12, 2003 at 00:00 GMT
+            DESCRIPTION
+                "The initial revision of this MIB module."
+
+          --add by chenlong 00230926
+          REVISION "201611172050Z"
+            DESCRIPTION
+                "ADD  hwEthernetARPGateWayDuplicateAlarm, hwEthernetARPGateWayDuplicateAlarmResume"
+         
+          --add by liupeng  00349956
+          REVISION "201611181626Z"
+            DESCRIPTION
+                "ADD  hwFwdArpAlarmOccur, hwFwdArpAlarmResume"
+         
+          REVISION "201611211648Z"
+            DESCRIPTION
+                "MODIFY  hwEthernetARPGateWayDuplicateAlarm, hwEthernetARPGateWayDuplicateAlarmResume"
+
+          REVISION "201611301919Z"
+            DESCRIPTION
+              "MODIFY  hwEthernetARPGateWayDuplicateAlarmResume"
+
+            ::= { hwDatacomm 123 }
+            
+hwEthernetARPObjects OBJECT IDENTIFIER ::= { hwEthernetARPMIB 1 } 
+
+
+-- =================================================================
+-- 1st The Node of  Anti-AttackLog
+-- =================================================================
+
+            hwEthernetARPAntiAttackLog OBJECT-TYPE
+            SYNTAX Integer32(0..1200)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "To prevent log and trap from being attacked, the function is not enabled by default."
+            ::= { hwEthernetARPObjects 1 }
+
+-- =================================================================
+-- 2nd The Node of LearningStrict
+-- =================================================================
+            hwEthernetARPLearningStrict OBJECT-TYPE
+            SYNTAX INTEGER {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates the ARP strict learning. In this way, routers can learn ARP entries only from
+                the arp reply in response to the arp requrest send by the router."
+            ::= { hwEthernetARPObjects 2 }
+
+-- =================================================================
+-- 3rd The Table of ARP Speed Limit 
+-- =================================================================
+            
+            hwEthernetARPSpeedLimitTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEthernetARPSpeedLimitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table contains the configuration information of Ethernet ARP Speed limit slot. 
+                The information includes type, speedvalue, sourceip and destip."
+            ::= { hwEthernetARPObjects 3 }  
+            
+            hwEthernetARPSpeedLimitEntry  OBJECT-TYPE
+               SYNTAX HwEthernetARPSpeedLimitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table contains the configuration information of Ethernet ARP Speed limit slot. 
+                The information includes type, speedvalue, sourceip and destip."
+            INDEX {hwEthernetARPLimitSlot,hwEthernetARPLimitType,hwEthernetARPLimitIPType}
+            ::= { hwEthernetARPSpeedLimitTable 1 }                                                
+                                            
+            HwEthernetARPSpeedLimitEntry ::=
+            SEQUENCE { 
+                hwEthernetARPLimitSlot     Integer32 ,
+                hwEthernetARPLimitType   INTEGER  ,
+                hwEthernetARPLimitIPType INTEGER  ,
+                hwEthernetARPLimitSpeedValue Unsigned32
+             }
+      
+      
+              hwEthernetARPLimitSlot  OBJECT-TYPE
+               SYNTAX Integer32(0..128)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The slot of ARP Speed Limit."
+            ::= { hwEthernetARPSpeedLimitEntry 1 } 
+            
+            
+            hwEthernetARPLimitType  OBJECT-TYPE
+               SYNTAX INTEGER{
+                       arp(1),
+                    arpmiss(2)
+                    }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Type of ARP Speed Limit."
+            ::= { hwEthernetARPSpeedLimitEntry 2 }   
+                    
+            hwEthernetARPLimitIPType  OBJECT-TYPE
+               SYNTAX INTEGER{
+                       sourceip(4),
+                    destinationip(8)
+                    }
+               MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "ARP speed limit is performed on a source or a destination IP address."
+            ::= { hwEthernetARPSpeedLimitEntry 3 }  
+            
+            hwEthernetARPLimitSpeedValue  OBJECT-TYPE
+               SYNTAX Unsigned32(0..65536)
+               MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Speed Value of ARP Speed Limit."
+            ::= { hwEthernetARPSpeedLimitEntry 4 }  
+            
+            
+-- =================================================================
+-- 5th The Table of ARP Speed Limit 
+-- =================================================================
+            hwEthernetARPSpeedLimitIfIndex  OBJECT-TYPE
+                           SYNTAX InterfaceIndex
+                           MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "Indicates an interface enabled with ARP-MISS 
+                            or an interface receiving the ARP packets."
+                        ::= { hwEthernetARPObjects 4 }     
+-- =================================================================
+-- 5th The Table of ARP Speed Limit 
+-- =================================================================
+            hwEthernetARPSpeedLimitConfigured  OBJECT-TYPE
+                           SYNTAX Counter32
+                           MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "The Configured Speed Limit Value of ARP Speed Limit."
+                        ::= { hwEthernetARPObjects 5 }   
+
+-- =================================================================
+-- 5th The Table of ARP Speed Limit 
+-- =================================================================
+            hwEthernetARPSpeedLimitCurrent  OBJECT-TYPE
+                           SYNTAX Counter32
+                           MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "The Current Speed Limit Value of ARP Speed Limit."
+                        ::= { hwEthernetARPObjects 6 }                                               
+                        
+-- =================================================================
+-- 5th The Table of ARP Speed Limit 
+-- =================================================================
+            hwEthernetARPSpeedLimitType  OBJECT-TYPE
+                           SYNTAX DisplayString
+                           MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "The Type of ARP Speed Limit."
+                        ::= { hwEthernetARPObjects 7 }  
+                        
+ -- =================================================================
+-- 6th The Table of ARP Speed Limit 
+-- =================================================================
+
+            hwEthernetARPSpeedLimitSrcIPAddr  OBJECT-TYPE
+                           SYNTAX IpAddress
+                           MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "The Source IP address of ARP Speed Limit."
+                        ::= { hwEthernetARPObjects 8 }
+
+ -- =================================================================
+-- 6th The Table of ARP Speed Limit 
+-- =================================================================
+
+            hwEthernetARPSpeedLimitDstIPAddr  OBJECT-TYPE
+                           SYNTAX IpAddress
+                           MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "The Destination IP address of ARP Speed Limit."
+                        ::= { hwEthernetARPObjects 9 }
+                        
+-- =================================================================
+-- 7th The Table of ARP Speed Limit 
+-- =================================================================
+
+
+            hwEthernetARPSpeedLimitVPNinstance  OBJECT-TYPE
+                           SYNTAX DisplayString
+                           MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "The VPN-instance name of ARP Speed Limit."
+                        ::= { hwEthernetARPObjects 10 }
+
+--
+-- ARP LIMIT DEFINATION
+--    display  arp statics   begin
+            hwEthernetARPStaticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEthernetARPStaticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table contains the statistics about Ethernet ARP. 
+                The statistics include number of received ARP packets, 
+                number of received ARP-MISS packets, number of learned ARP packets, 
+                number of discarded ARP packets caused by the ARP limit, 
+                the number of discarded ARP-MISS packets caused by the limit 
+                and the number of discarded ARP and ARP-MISS packets caused by other reasons."
+            ::= { hwEthernetARPObjects 11 }
+              
+            hwEthernetARPStaticsEntry  OBJECT-TYPE
+               SYNTAX HwEthernetARPStaticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table contains the statistics about Ethernet ARP. 
+                The statistics include number of received ARP packets, 
+                number of received ARP-MISS packets, number of learned ARP packets, 
+                number of discarded ARP packets caused by the ARP limit, 
+                the number of discarded ARP-MISS packets caused by the limit 
+                and the number of discarded ARP and ARP-MISS packets caused by other reasons."
+            INDEX {hwEthernetARPStaticsSlot}
+            ::= { hwEthernetARPStaticsTable 1 }
+                
+            HwEthernetARPStaticsEntry ::=
+            SEQUENCE { 
+                hwEthernetARPStaticsSlot     Integer32 ,
+                hwEthernetARPStaticsLearnTotal   Counter32  ,
+                hwEthernetARPDropForLimit Counter32  ,
+                hwEthernetARPDropForARPSuppress Counter32  , 
+                hwEthernetARPDropForARPMissSuppress Counter32,                
+                hwEthernetARPDropForOther    Counter32 ,
+                hwEthernetARPMissDropForOther    Counter32 ,
+                hwEthernetARPRcvNum        Counter32 ,
+                hwEthernetARPMissRcvNum        Counter32 ,
+                hwEthernetARPStaticsOperation INTEGER ,
+                hwEthernetARPDropForARPProxySuppress  Counter32 
+            
+             }    
+             
+            hwEthernetARPStaticsSlot  OBJECT-TYPE
+               SYNTAX Integer32(0..128 | 65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The slot about which the ARP statistics are displayed."
+            ::= { hwEthernetARPStaticsEntry 1 }  
+            
+            hwEthernetARPStaticsLearnTotal  OBJECT-TYPE
+               SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the learned ARP packets."
+            ::= { hwEthernetARPStaticsEntry 2 } 
+            
+            hwEthernetARPDropForLimit  OBJECT-TYPE
+               SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discarded packets caused by limit."
+            ::= { hwEthernetARPStaticsEntry 3 } 
+            
+            hwEthernetARPDropForARPSuppress  OBJECT-TYPE
+               SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discarded packets caused by the ARP suppress."
+            ::= { hwEthernetARPStaticsEntry 4 }     
+            
+            hwEthernetARPDropForARPMissSuppress  OBJECT-TYPE
+               SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discarded packets caused by the ARP-MISS suppress."
+            ::= { hwEthernetARPStaticsEntry 5 }           
+            
+            hwEthernetARPDropForOther  OBJECT-TYPE
+               SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discarded ARP packets caused by other reasons."
+            ::= { hwEthernetARPStaticsEntry 6 } 
+                
+            hwEthernetARPMissDropForOther  OBJECT-TYPE
+               SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discarded ARP-MISS caused by other reasons."
+            ::= { hwEthernetARPStaticsEntry 7 } 
+                
+                
+            hwEthernetARPRcvNum  OBJECT-TYPE
+               SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of received ARP packets."
+            ::= { hwEthernetARPStaticsEntry 8 } 
+            
+            hwEthernetARPMissRcvNum  OBJECT-TYPE
+               SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of received ARP-MISS."
+            ::= { hwEthernetARPStaticsEntry 9 }
+                
+            hwEthernetARPStaticsOperation OBJECT-TYPE
+            SYNTAX INTEGER {
+                reset(1),
+                unused(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "resets the statistics about Ethernet ARP."
+            ::= { hwEthernetARPStaticsEntry 10 }
+            
+            hwEthernetARPDropForARPProxySuppress   OBJECT-TYPE
+               SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of discarded packets caused by the ARP-PROXY suppress."
+            ::= { hwEthernetARPStaticsEntry 11 } 
+
+--    display  arp statics   end
+--    disp arp and statics with interface and vlanid  begin  
+            hwEthARPShowWithInterAndVidTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEthARPShowWithInterAndVidEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Display the ARP table based on interface number or interface number and VLAN ID."
+            ::= { hwEthernetARPObjects 12 }
+              
+            hwEthARPShowWithInterAndVidEntry  OBJECT-TYPE
+               SYNTAX HwEthARPShowWithInterAndVidEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Display the ARP table based on interface number or interface number and VLAN ID."
+            INDEX {hwEthARPShowIfindex,hwEthARPShowVid,hwEthARPIpAddr}
+            ::= { hwEthARPShowWithInterAndVidTable 1 }
+                
+            HwEthARPShowWithInterAndVidEntry ::=
+            SEQUENCE {    
+                hwEthARPShowIfindex     InterfaceIndex ,
+                hwEthARPShowVid   Integer32 , 
+                hwEthARPIpAddr IpAddress  ,
+                hwEthARPMacAddr PhysAddress   
+                    }    
+             
+            hwEthARPShowIfindex  OBJECT-TYPE
+               SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The interface learns ARP packets."
+            ::= { hwEthARPShowWithInterAndVidEntry 1 }  
+
+            hwEthARPShowVid  OBJECT-TYPE
+               SYNTAX Integer32(0..4094)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The VLAN receives the APR packets."
+            ::= { hwEthARPShowWithInterAndVidEntry 2 } 
+             
+            hwEthARPIpAddr  OBJECT-TYPE
+               SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ip of ARP ."
+            ::= { hwEthARPShowWithInterAndVidEntry 3 }
+            
+            hwEthARPMacAddr  OBJECT-TYPE
+               SYNTAX PhysAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The MAC of ARP ."
+            ::= { hwEthARPShowWithInterAndVidEntry 4 }
+
+--    disp arp and statics with interface and vlanid  end 
+--    arp limit config definition     begin              
+
+
+            hwEthARPLimitTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEthARPLimitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Configure the ARP limit based on interfaces or VLANs."
+            ::= { hwEthernetARPObjects 13 }
+              
+            hwEthARPLimitEntry  OBJECT-TYPE
+               SYNTAX HwEthARPLimitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Configure the ARP limit based on interfaces or VLANs."
+            INDEX {hwEthARPLimitCfgIfindex,hwEthARPVLANFirst,hwEthARPVLANLast}
+            ::= { hwEthARPLimitTable 1 }
+                
+            HwEthARPLimitEntry ::=
+            SEQUENCE {    
+                hwEthARPLimitCfgIfindex     InterfaceIndex ,
+                hwEthARPVLANFirst  Integer32 ,
+                hwEthARPVLANLast  Integer32 ,
+                hwEthARPLimitNum   Integer32 ,
+                hwEthARPLimitRowStatus   RowStatus                         
+                    }    
+             
+            hwEthARPLimitCfgIfindex  OBJECT-TYPE
+               SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The interface on which the limit is configured."
+            ::= { hwEthARPLimitEntry 1 } 
+
+            
+            hwEthARPVLANFirst  OBJECT-TYPE
+               SYNTAX Integer32(0..4094)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The VLAN to which Layer 2 interfaces belong."
+            ::= { hwEthARPLimitEntry 2 }
+
+            hwEthARPVLANLast  OBJECT-TYPE
+               SYNTAX Integer32(0..4094)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The VLAN to which Layer 2 interfaces belong."
+            ::= { hwEthARPLimitEntry 3 }
+            
+            hwEthARPLimitNum  OBJECT-TYPE
+               SYNTAX Integer32(1..2147483647)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of the ARP limit."
+            ::= { hwEthARPLimitEntry 4 } 
+
+               hwEthARPLimitRowStatus  OBJECT-TYPE
+               SYNTAX  RowStatus
+               MAX-ACCESS read-create
+               STATUS current
+               DESCRIPTION 
+                   "The running status of the ARP limit table."
+               ::= { hwEthARPLimitEntry 5 }
+
+            hwEthernetARPLearningStrictInterfaceTable   OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEthernetARPLearningStrictInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Configure the ARP Learning Strict based on interfaces."
+            ::= { hwEthernetARPObjects 14 }
+              
+            hwEthernetARPLearningStrictInterfaceEntry  OBJECT-TYPE
+               SYNTAX HwEthernetARPLearningStrictInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Configure the ARP Learning Strict based on interfaces."
+            INDEX {hwEthernetARPLearningStrictIfindex}
+            ::= { hwEthernetARPLearningStrictInterfaceTable 1 }
+                
+            HwEthernetARPLearningStrictInterfaceEntry ::=
+            SEQUENCE {    
+                    hwEthernetARPLearningStrictIfindex     InterfaceIndex ,
+                       hwEthernetARPLearningStrictState   INTEGER ,
+                    hwEthernetARPLearningStrictRowStatus   RowStatus                         
+                    }    
+             
+            hwEthernetARPLearningStrictIfindex  OBJECT-TYPE
+               SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The interface on which the ARP Learning Strict be configured."
+            ::= { hwEthernetARPLearningStrictInterfaceEntry 1 }        
+    
+            hwEthernetARPLearningStrictState  OBJECT-TYPE
+               SYNTAX INTEGER
+               {
+                   forceEnable(1),
+                   forceDisable(2)
+               }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The ARP Learning Strict State be configured."
+            ::= { hwEthernetARPLearningStrictInterfaceEntry 2 } 
+
+               hwEthernetARPLearningStrictRowStatus  OBJECT-TYPE
+               SYNTAX  RowStatus
+               MAX-ACCESS read-create
+               STATUS current
+               DESCRIPTION 
+                   "The running status of the ARP Learning Strict table."
+               ::= { hwEthernetARPLearningStrictInterfaceEntry 3 }    
+                           
+--        
+--     arp process-interface-status     begin 
+        hwArpLinkInterfaceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwArpLinkInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Config ARP link interface:
+                hwArpLinkIfIndex: interface index
+                hwArpLinkPeerIp: peer ip
+                hwArpLinkDetectTime: detection time between two ARP packects
+                hwArpLinkDetectTimes: detection times of ARP packects
+                hwArpLinkDetectMode: detection mode
+                hwArpLinkStatus: interface status
+                hwArpLinkRowStatus: the row status of this row."                 
+            ::= { hwEthernetARPObjects 15 } 
+             
+            
+        hwArpLinkInterfaceEntry OBJECT-TYPE  
+            SYNTAX HwArpLinkInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Config ARP link interface:
+                hwArpLinkIfIndex: interface index
+                hwArpLinkPeerIp: peer ip
+                hwArpLinkDetectTime: detection time between two ARP packects
+                hwArpLinkDetectTimes: detection times of ARP packects
+                hwArpLinkDetectMode: detection mode
+                hwArpLinkStatus: interface status
+                hwArpLinkRowStatus: the row status of this row."
+            INDEX { hwArpLinkIfIndex }
+            ::= { hwArpLinkInterfaceTable 1 }
+      
+        HwArpLinkInterfaceEntry ::=              
+            SEQUENCE {
+                hwArpLinkIfIndex
+                    Integer32,
+                hwArpLinkPeerIp
+                    InetAddressIPv4,
+                hwArpLinkDetectTime
+                    Integer32,
+                hwArpLinkDetectTimes
+                    Integer32,
+                hwArpLinkDetectMode
+                    INTEGER,
+                hwArpLinkStatus
+                    INTEGER,    
+                hwArpLinkRowStatus
+                    RowStatus   
+            }               
+              
+        hwArpLinkIfIndex OBJECT-TYPE
+            SYNTAX Integer32(1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of interface which is configed to be linked by ARP, 
+                the zero value is invalid."
+            ::= { hwArpLinkInterfaceEntry 1 }           
+        
+        hwArpLinkPeerIp OBJECT-TYPE
+            SYNTAX   InetAddressIPv4
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The IP address which ARP detecting packet will send to. When 
+                creating a new record or modifying the peer ip address, a check for 
+                this ip will be generated. If it is invalid, that operation will 
+                be not applicable."
+            ::= { hwArpLinkInterfaceEntry 11 } 
+        
+        hwArpLinkDetectTime OBJECT-TYPE
+            SYNTAX   Integer32(200..10000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The interval time for two ARP packets are sent to detect the
+                peer's interface status, this time unit is millisecond. The valid 
+                range is from 200 to 10000, and the default value is 1000."
+            DEFVAL { 1000 }
+            ::= { hwArpLinkInterfaceEntry 12 }
+            
+        hwArpLinkDetectTimes OBJECT-TYPE
+            SYNTAX   Integer32(1..10)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "After the max detecting times for ARP packet is sent to, and there is not 
+                any response, the sender can judge the peer interface is down. Then, setting 
+                the status of current interface down. The valid range is from 1 to 10,  
+                and the default value is 3."
+            DEFVAL { 3 }
+            ::= { hwArpLinkInterfaceEntry 13 }
+    
+        hwArpLinkDetectMode OBJECT-TYPE
+            SYNTAX   INTEGER
+            {
+                loose(1),
+                strict(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The detecting mode for ARP linking interface. If the mode is loose and its 
+                status is down, current interface just wait to receive the ARP packet, when 
+                received peer's arp packet, current interface status is up. If mode is 
+                strict, current interface sends ARP detecting packet to peer actively, and 
+                shutdown itself, if these is no response from peer after the retry times. 
+                If status of current interface is up, it will send ARP packet to detect the
+                status of peer actively, whenever the mode is loose or strict."
+            DEFVAL { strict }
+            ::= { hwArpLinkInterfaceEntry 14 } 
+            
+        hwArpLinkStatus OBJECT-TYPE
+            SYNTAX   INTEGER
+            {
+                up(1),
+                down(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of interface linked by ARP. This value can not be set anytime."  
+            DEFVAL { down }
+            ::= { hwArpLinkInterfaceEntry 15 }
+        
+        hwArpLinkRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status of ARP link table. The detail can be found from the rowstatus definition."
+            ::= { hwArpLinkInterfaceEntry 51}
+
+-- =================================================================
+-- The Table of ARP Entry Expire control table (use detect mode now) 
+-- =================================================================  
+        hwArpEntryExpireControlTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwArpEntryExpireControlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the parameters of ARP aging detection, 
+                such as ARP detection mode, start time, detection times. At present, 
+                only the ARP detection mode and ARP fake-entry expire time can be configured.
+                hwArpEntryExpireIfIndex: indicates the interface index.
+                hwArpEntryExpireDetectMode: indicates the unicast or broadcast ARP aging detection mode.
+                hwArpEntryExpireFakeTime: indicates the expire time of ARP fake entry."                 
+            ::= { hwEthernetARPObjects 16 } 
+             
+            
+        hwArpEntryExpireControlEntry OBJECT-TYPE  
+            SYNTAX HwArpEntryExpireControlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the parameters of ARP aging detection, 
+                such as ARP detection mode, start time, detection times. At present, 
+                only the ARP detection mode and ARP fake-entry expire time can be configured.
+                hwArpEntryExpireIfIndex: indicates the interface index.
+                hwArpEntryExpireDetectMode: indicates the unicast or broadcast ARP aging detection mode.
+                hwArpEntryExpireFakeTime: indicates the expire time of ARP fake entry."                 
+            INDEX { hwArpEntryExpireIfIndex }
+            ::= { hwArpEntryExpireControlTable 1 }
+      
+        HwArpEntryExpireControlEntry ::=              
+            SEQUENCE {
+                hwArpEntryExpireIfIndex
+                    InterfaceIndex,
+                hwArpEntryExpireDetectMode
+                    INTEGER,
+                hwArpEntryExpireFakeTime
+                    Integer32  
+            } 
+        hwArpEntryExpireIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the index of an interface on which ARP aging detection 
+                parameters are set. The value 0 is invalid."
+            ::= { hwArpEntryExpireControlEntry 1 } 
+            
+        hwArpEntryExpireDetectMode OBJECT-TYPE
+            SYNTAX   INTEGER
+            {
+                broadcast(1),
+                unicast(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the ARP aging detection mode. In unicast ARP detection mode, 
+                unicast ARP detection packets are sent before ARP ages. In broadcast ARP detection mode, 
+                broadcast ARP detection packets are sent before ARP ages."
+              ::= { hwArpEntryExpireControlEntry 2 }    
+            
+        hwArpEntryExpireFakeTime OBJECT-TYPE
+            SYNTAX   Integer32(1..36000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the expire time of ARP fake entry. The valid range is from 1 to 36000."
+            ::= { hwArpEntryExpireControlEntry 3 }
+                           
+        --  End of hwArpEntryExpireControlTable
+        
+-- =================================================================
+-- The Table of ARP Dynamic Entry table
+-- =================================================================         
+        hwArpDynTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwArpDynEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the items of ARP table, 
+                such as IP address of ARP items, VPN instance name of ARP items, 
+                MAC address of ARP items, VLAN information of ARP items, expire time of ARP items. 
+                hwArpDynEntryIfIndex: indicates the interface index.
+                hwArpDynEntryIpAdd: indicates the IP address.
+                hwArpDynEntryVrf: indicates the VPN instance name.
+                hwArpDynEntryMacAdd: indicates the MAC address.
+                hwArpDynEntryVlanId: indicates the VLAN of ARP item.
+                hwArpDynEntryCeVlanId: indicates the CE VLAN of ARP item.
+                hwArpDynEntryOutIfIndex: indicates the forwarding interface.
+                hwArpDynEntryExpireTime: indicates the expire time of ARP item."                 
+            ::= { hwEthernetARPObjects 17 } 
+             
+            
+        hwArpDynEntry OBJECT-TYPE  
+            SYNTAX HwArpDynEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the items of dynamic ARP table, 
+                such as IP address of ARP items, VPN instance name of ARP items, 
+                MAC address of ARP items, VLAN information of ARP items, expire time of ARP items. 
+                hwArpDynEntryIfIndex: indicates the interface index.
+                hwArpDynEntryIpAdd: indicates the IP address.
+                hwArpDynEntryVrf: indicates the VPN instance name.
+                hwArpDynEntryMacAdd: indicates the MAC address.
+                hwArpDynEntryVlanId: indicates the VLAN of ARP item.
+                hwArpDynEntryCeVlanId: indicates the CE VLAN of ARP item.
+                hwArpDynEntryOutIfIndex: indicates the forwarding interface.
+                hwArpDynEntryExpireTime: indicates the expire time of ARP item."
+            INDEX { hwArpDynIfIndex, hwArpDynIpAdd, hwArpDynVrf }
+            ::= { hwArpDynTable 1 }
+      
+        HwArpDynEntry ::=              
+            SEQUENCE {
+                hwArpDynIfIndex
+                    Integer32,
+                hwArpDynIpAdd
+                    InetAddressIPv4,
+                hwArpDynVrf
+                    OCTET STRING,
+                hwArpDynMacAdd
+                    PhysAddress,
+                hwArpDynVlanId
+                    Integer32,
+                hwArpDynCeVlanId
+                    Integer32,
+                hwArpDynOutIfIndex
+                    InterfaceIndex,
+                hwArpDynExpireTime
+                    Integer32
+            }
+        hwArpDynIfIndex OBJECT-TYPE
+            SYNTAX Integer32(1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The logic forwarding interface. The value 0 is invalid."
+            ::= { hwArpDynEntry 1 }
+            
+        hwArpDynIpAdd OBJECT-TYPE
+            SYNTAX InetAddressIPv4
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of an ARP items. The value 0 is invalid."
+            ::= { hwArpDynEntry 2 }
+            
+        hwArpDynVrf OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPN name of an ARP items."
+            ::= { hwArpDynEntry 3 } 
+            
+        hwArpDynMacAdd OBJECT-TYPE
+            SYNTAX PhysAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MAC address of an ARP items."
+            ::= { hwArpDynEntry 11 }  
+            
+        hwArpDynVlanId OBJECT-TYPE
+            SYNTAX Integer32(0..4096)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VLAN of an ARP items."
+            ::= { hwArpDynEntry 12 }  
+            
+        hwArpDynCeVlanId OBJECT-TYPE
+            SYNTAX Integer32(0..4096)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the CE VLAN of an ARP items."
+            ::= { hwArpDynEntry 13 }  
+            
+        hwArpDynOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The physical forwarding interface."
+            ::= { hwArpDynEntry 14 }
+             
+        hwArpDynExpireTime OBJECT-TYPE
+            SYNTAX Integer32(0..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the expire time of an ARP items."
+            ::= { hwArpDynEntry 15 }                  
+        --  End of hwArpDynEntryTable
+        
+-- =================================================================
+-- The Table of ARP Static Entry table
+-- =================================================================         
+        hwArpCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwArpCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the items of static ARP table, 
+                such as IP address of ARP items, VPN instance name of ARP items, 
+                MAC address of ARP items, VLAN information of ARP items.  
+                hwArpDynEntryIpAdd: indicates the IP address.
+                hwArpDynEntryVrf: indicates the VPN instance name.
+                hwArpDynEntryMacAdd: indicates the MAC address.
+                hwArpDynEntryVlanId: indicates the VLAN of ARP item.
+                hwArpDynEntryCeVlanId: indicates the CE VLAN of ARP item.
+                hwArpDynEntryOutIfIndex: indicates the forwarding interface."               
+            ::= { hwEthernetARPObjects 18 } 
+             
+            
+        hwArpCfgEntry OBJECT-TYPE  
+            SYNTAX HwArpCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the items of static ARP table, 
+                such as IP address of ARP items, VPN instance name of ARP items, 
+                MAC address of ARP items, VLAN information of ARP items.  
+                hwArpDynEntryIpAdd: indicates the IP address.
+                hwArpDynEntryVrf: indicates the VPN instance name.
+                hwArpDynEntryMacAdd: indicates the MAC address.
+                hwArpDynEntryVlanId: indicates the VLAN of ARP item.
+                hwArpDynEntryCeVlanId: indicates the CE VLAN of ARP item.
+                hwArpDynEntryOutIfIndex: indicates the forwarding interface." 
+            INDEX { hwArpCfgIpAdd, hwArpCfgVrf }
+            ::= { hwArpCfgTable 1 }
+      
+        HwArpCfgEntry ::=              
+            SEQUENCE {
+                hwArpCfgIpAdd
+                    InetAddressIPv4,
+                hwArpCfgMacAdd
+                    MacAddress,
+                hwArpCfgVrf
+                    OCTET STRING,                
+                hwArpCfgVlanId
+                    Integer32,
+                hwArpCfgCeVlanId
+                    Integer32,
+                hwArpCfgOutIfIndex
+                    Integer32,
+                hwArpCfgRowstatus
+                    RowStatus
+            }
+            
+        hwArpCfgIpAdd OBJECT-TYPE
+            SYNTAX InetAddressIPv4
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of an ARP items. The value 0 is invalid."
+            ::= { hwArpCfgEntry 1 } 
+            
+        hwArpCfgMacAdd OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MAC address of an ARP items."
+            ::= { hwArpCfgEntry 2 }
+            
+        hwArpCfgVrf OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPN name of an ARP items."
+            ::= { hwArpCfgEntry 3 }
+            
+        hwArpCfgVlanId OBJECT-TYPE
+            SYNTAX Integer32 (0..4096)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VLAN of an ARP items."
+            ::= { hwArpCfgEntry 11 } 
+            
+        hwArpCfgCeVlanId OBJECT-TYPE
+            SYNTAX Integer32 (0..4096)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the CE VLAN of an ARP items."
+            ::= { hwArpCfgEntry 12 }   
+            
+        hwArpCfgOutIfIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The physical forwarding interface."
+            ::= { hwArpCfgEntry 13 }
+             
+        hwArpCfgRowstatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the row status of an static ARP item."
+            ::= { hwArpCfgEntry 51 }                  
+        --  End of hwArpCfgTable
+
+  
+
+            hwEthernetARPAntiAttackStatus  OBJECT-TYPE
+                         SYNTAX INTEGER               
+                         {
+                            disable(0),
+                            fixMac(1),
+                            fixAll(2),
+                            sendAck(3)
+                         }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "This object indicates the status of the ARP anti-attack."
+                        DEFVAL { disable }
+                        ::= { hwEthernetARPObjects 19 }
+ 
+
+            hwEthernetARPAntiGateWayConflict  OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "This object indicates the status of the ARP anti-gateway-conflict."
+                        ::= { hwEthernetARPObjects 20 }
+ 
+
+            hwEthernetARPLogAndTrapTimer  OBJECT-TYPE
+                        SYNTAX Integer32(0..1200)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "This object indicates the interval of log and trap. The default value is 0, which means no log and trap."
+                        ::= { hwEthernetARPObjects 21 }
+                         
+
+        hwEthernetARPAntiAttackObjects OBJECT IDENTIFIER ::= { hwEthernetARPObjects 22 } 
+          
+            hwEthernetARPAntiAttackIpAddress  OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "This object indicates the IP address which is attacked."
+                        ::= { hwEthernetARPAntiAttackObjects 1 }    
+            hwEthernetARPAntiAttackMacAddress  OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "This object indicates the MAC address which is attacked."
+                        ::= { hwEthernetARPAntiAttackObjects 2 }    
+            hwEthernetARPAntiAttackVlanId  OBJECT-TYPE
+                        SYNTAX  Integer32(1..4094)      
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "This object indicates the VLAN ID which is attacked."
+                        ::= { hwEthernetARPAntiAttackObjects 3 }    
+            hwEthernetARPAntiAttackIfName  OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                            "This object indicates the interface name which is attacked."
+                        ::= { hwEthernetARPAntiAttackObjects 4 }    
+
+        hwArpEntryGatewayConflictTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwArpEntryGatewayConflictEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the information about the source of the attack. 
+                It contains IP address, MAC, VLAN ID and interface."   
+            ::= { hwEthernetARPObjects 23 } 
+        
+        hwArpEntryGatewayConflictEntry OBJECT-TYPE  
+            SYNTAX HwArpEntryGatewayConflictEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the information about the source of the attack. 
+                It contains IP address, MAC, VLAN ID and interface."
+            INDEX { hwEthernetARPAntiGatewayConflictIndex }
+            ::= { hwArpEntryGatewayConflictTable 1 }
+    
+        HwArpEntryGatewayConflictEntry ::=              
+            SEQUENCE {
+                hwEthernetARPAntiGatewayConflictIndex
+                    Integer32,
+                hwEthernetARPAntiGatewayConflictIpAddress
+                    IpAddress,
+                hwEthernetARPAntiGatewayConflictMacAddress
+                    OCTET STRING,
+                hwEthernetARPAntiGatewayConflictVlanId
+                    Integer32, 
+                hwEthernetARPAntiGatewayConflictIfName
+                    OCTET STRING
+            }    
+            
+        hwEthernetARPAntiGatewayConflictIndex OBJECT-TYPE
+            SYNTAX Integer32(1..100)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the gateway conflict entries."
+            ::= { hwArpEntryGatewayConflictEntry 1 }   
+                    
+        hwEthernetARPAntiGatewayConflictIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address is attacked."
+            ::= { hwArpEntryGatewayConflictEntry 2 } 
+     
+        hwEthernetARPAntiGatewayConflictMacAddress OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MAC of the attack-source."
+            ::= { hwArpEntryGatewayConflictEntry 3 } 
+
+        hwEthernetARPAntiGatewayConflictVlanId OBJECT-TYPE
+            SYNTAX Integer32(1..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VLAN ID of the attack-source."
+            ::= { hwArpEntryGatewayConflictEntry 4 } 
+
+        hwEthernetARPAntiGatewayConflictIfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface of the attack-source."
+            ::= { hwArpEntryGatewayConflictEntry 5 }       
+    
+    hwArpSecValidateTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwArpSecValidateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table contains the arp validation information on the interface."   
+            ::= { hwEthernetARPObjects 24 } 
+        
+        hwArpSecValidateEntry OBJECT-TYPE  
+            SYNTAX HwArpSecValidateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry contains the arp validation information on the interface."
+            INDEX { hwArpSecValidateIfIndex }
+            ::= { hwArpSecValidateTable 1 }
+    
+        HwArpSecValidateEntry ::=              
+            SEQUENCE {
+                hwArpSecValidateIfIndex
+                    InterfaceIndex,
+                hwArpSecValidateSmac
+                    EnabledStatus, 
+                hwArpSecValidateDmac
+                    EnabledStatus, 
+                hwArpSecValidateRowStatus
+                    RowStatus
+                }    
+            
+        hwArpSecValidateIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the arp validation entries."
+            ::= { hwArpSecValidateEntry 1 }   
+                    
+        hwArpSecValidateSmac OBJECT-TYPE
+            SYNTAX     EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "indicates check the source-mac of arp packet head and the ethernet packet head."
+            DEFVAL { disabled } 
+            ::= { hwArpSecValidateEntry 2 }    
+                         
+        hwArpSecValidateDmac OBJECT-TYPE
+            SYNTAX     EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "indicates check the destination-mac of arp packet head and the ethernet packet head."
+            DEFVAL { disabled } 
+            ::= { hwArpSecValidateEntry 3 }
+             
+        hwArpSecValidateRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object specifies the status of the arp validation table."
+            ::= { hwArpSecValidateEntry 51 }
+ 
+  -- BEGIN: ARP GRATIUITOUS SEND ENABLE 
+    
+    hwARPGratuitousSendTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwARPGratuitousSendEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table contains the arp validation information on the interface."   
+            ::= { hwEthernetARPObjects 25 } 
+        
+        hwARPGratuitousSendEntry OBJECT-TYPE  
+            SYNTAX HwARPGratuitousSendEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry contains the gratuitous arp send information on the vlanif interface."
+            INDEX { hwARPGratuitousSendIfIndex }
+            ::= { hwARPGratuitousSendTable 1 }
+    
+        HwARPGratuitousSendEntry ::=              
+            SEQUENCE {
+                hwARPGratuitousSendIfIndex
+                    InterfaceIndex,      
+                hwARPGratuitousSendEnable
+                    EnabledStatus, 
+                hwARPArpGratuitousSendInterval
+                    Integer32
+                  }    
+       
+        hwARPGratuitousSendIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ifindex of the ARP gratuitous send configed."
+            ::= { hwARPGratuitousSendEntry 1 }     
+       
+        hwARPGratuitousSendEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the status of the gratuitous-arp send."
+            DEFVAL { disabled }          
+            ::= { hwARPGratuitousSendEntry 2 }   
+                    
+        hwARPArpGratuitousSendInterval OBJECT-TYPE
+            SYNTAX     Integer32 (1..86400)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interval of the gratuitous-arp send.
+                The value ranges from 1 to 86400, in second, with default value 90."
+            DEFVAL { 90 } 
+            ::= { hwARPGratuitousSendEntry 3 }    
+                         
+     
+     
+  
+  -- END : ARP GRATIUITOUS SEND ENABLE 
+ 
+    hwEthernetARPThresholdObjects OBJECT IDENTIFIER ::= { hwEthernetARPObjects 26 }    
+            
+        hwEthernetARPThresholdValue  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the threshold of the alarm generated."
+            ::= { hwEthernetARPThresholdObjects 1 }    
+            
+        hwEthernetARPThresholdDynamicNumber  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of dynamic ARP entries."
+            ::= { hwEthernetARPThresholdObjects 2 } 
+            
+        hwEthernetARPThresholdStaticNumber  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of static ARP entries."
+            ::= { hwEthernetARPThresholdObjects 3 }         
+
+-- =================================================================
+-- 27th The Node of ConflictDetect
+-- =================================================================
+    hwEthernetARPConflictDetect OBJECT-TYPE
+            SYNTAX INTEGER {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates the ARP conflict detect. In this way, router can detect ARP entries conflict."
+            ::= { hwEthernetARPObjects 27 }
+
+            
+-- =================================================================
+-- 28th The Node of IP Conflict
+-- =================================================================            
+    hwETHARPIPConflictObjects OBJECT IDENTIFIER ::= { hwEthernetARPObjects 28 }    
+            
+        hwEthernetARPIPConflictIPAddress  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the conflict IP address."
+            ::= { hwETHARPIPConflictObjects 1 }   
+            
+        hwEthernetARPIPConflictLocalInterfaceName  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface before conflict."
+            ::= { hwETHARPIPConflictObjects 2 } 
+            
+        hwEthernetARPIPConflictLocalMAC  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MAC before conflict."
+            ::= { hwETHARPIPConflictObjects 3} 
+
+        hwEthernetARPIPConflictLocalVLAN  OBJECT-TYPE
+            SYNTAX Integer32(0..4094)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VLAN before conflict."
+            ::= { hwETHARPIPConflictObjects 4}
+            
+        hwEthernetARPIPConflictLocalCEVLAN  OBJECT-TYPE
+            SYNTAX Integer32(0..4094)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the CE VLAN before conflict."
+            ::= { hwETHARPIPConflictObjects 5}    
+                        
+        hwEthernetARPIPConflictReceiveInterfaceName  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the conflict interface."
+            ::= { hwETHARPIPConflictObjects 6 } 
+            
+        hwEthernetARPIPConflictReceiveMAC  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the conflict MAC of the received packet."
+            ::= { hwETHARPIPConflictObjects 7 } 
+            
+        hwEthernetARPIPConflictReceiveVLAN  OBJECT-TYPE
+            SYNTAX Integer32(0..4094)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VLAN of the received packet."
+            ::= { hwETHARPIPConflictObjects 8}  
+            
+        hwEthernetARPIPConflictReceiveCEVLAN  OBJECT-TYPE
+            SYNTAX Integer32(0..4094)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the CE VLAN of the received packet."
+            ::= { hwETHARPIPConflictObjects 9}               
+            
+        hwEthernetARPIPConflictType  OBJECT-TYPE
+            SYNTAX OCTET STRING                
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the conflict type."
+            ::= { hwETHARPIPConflictObjects 10 }        
+        
+        hwEthernetARPReceiveDstIPAddr  OBJECT-TYPE
+            SYNTAX IpAddress                
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the destination IP address of the received packet."
+            ::= { hwETHARPIPConflictObjects 11 }
+        
+        hwEthernetARPReceiveDstMAC  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the destination MAC of the received packet."
+            ::= { hwETHARPIPConflictObjects 12 }   
+
+-- =================================================================
+-- 29th The Node of ConflictDetect
+-- =================================================================
+        hwEthernetARPLearnStopTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEthernetARPLearnStopEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the parameters of ARP learning disable threshold.
+                hwEthernetARPLearnStopSlot: indicates the slot.
+                hwEthernetARPLearnStopThreshold: indicates the threshold usage of memory for learning ARP."                 
+            ::= { hwEthernetARPObjects 29 } 
+             
+            
+        hwEthernetARPLearnStopEntry OBJECT-TYPE  
+            SYNTAX HwEthernetARPLearnStopEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of the object identifies the parameters of of ARP learning disable threshold.
+                hwEthernetARPLearnStopSlot: indicates the slot of the alarm generated.
+                hwEthernetARPLearnStopThreshold: indicates the threshold usage of memory for learning ARP."                 
+            INDEX { hwEthernetARPLearnStopSlot }
+            ::= { hwEthernetARPLearnStopTable 1 }
+      
+        HwEthernetARPLearnStopEntry ::=              
+            SEQUENCE {
+                hwEthernetARPLearnStopSlot
+                    Integer32(0..128),
+                hwEthernetARPLearnStopThreshold
+                    Counter32
+            } 
+        hwEthernetARPLearnStopSlot OBJECT-TYPE
+            SYNTAX Integer32(0..128)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the the slot of the alarm generated."
+            ::= { hwEthernetARPLearnStopEntry 1 } 
+            
+        hwEthernetARPLearnStopThreshold OBJECT-TYPE
+            SYNTAX   Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the threshold usage of memory for learning ARP."
+            ::= { hwEthernetARPLearnStopEntry 2 }                                                     
+
+-- =================================================================
+-- 30th The Node of ARP Statistics
+-- =================================================================                
+        hwArpStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwArpStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table contains the arp information of the interfaces."   
+            ::= { hwEthernetARPObjects 30 } 
+        
+        hwArpStatisticsEntry OBJECT-TYPE  
+            SYNTAX HwArpStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry contains the arp information of the interfaces."
+            INDEX { hwArpStatisticsSlot, hwArpStatisticsType}
+            ::= { hwArpStatisticsTable 1 }
+    
+        HwArpStatisticsEntry ::=
+            SEQUENCE {
+                hwArpStatisticsSlot  
+                	Integer32,
+                hwArpStatisticsType  
+                	INTEGER, 
+                hwArpStatisticsLearnedCount  
+                	Counter32, 
+                hwArpStatisticsAvailableCount  
+                	Counter32
+                }       
+
+        hwArpStatisticsSlot  OBJECT-TYPE
+            SYNTAX Integer32(0..128)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The slot of ARP Statics Verbose."
+            ::= { hwArpStatisticsEntry 1 }  
+            
+        hwArpStatisticsType  OBJECT-TYPE
+           SYNTAX INTEGER{
+                          phy(1),
+                          ve(2),
+                          ethTrunk(3),
+                          vlanif(4),
+                          phyQinq(5),
+                          ethTrunkQinq(6),
+                          veQinq(7)
+                    }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Type of Interface Learn ARP."
+            ::= { hwArpStatisticsEntry 2 }
+            
+        hwArpStatisticsLearnedCount  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of ARP entries learned by this type of interfaces."
+            ::= { hwArpStatisticsEntry 3} 
+
+        hwArpStatisticsAvailableCount  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The avaiable number of ARP entries of this type of interfaces."
+            ::= { hwArpStatisticsEntry 4}
+
+
+
+-- =================================================================
+-- 31th The Node of Remote Backup ARP entry fail
+-- =================================================================           
+    hwEthernetARPRemoteBackupFailObjects OBJECT IDENTIFIER ::= { hwEthernetARPObjects 31 }    
+            
+        hwEthernetARPRemoteBackupFailMainIfName  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the interface name with the remote ARP entry backup failure."
+            ::= { hwEthernetARPRemoteBackupFailObjects 1 }   
+            
+-- =================================================================
+-- 32th The Node of Host IP Conflict
+-- =================================================================            
+        hwEthernetARPHostInfoTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwEthernetARPHostInfoEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The table contains the information of local host and remote host. 
+                         The information includes host IP, host MAC, gateway VtepIP, gateway VNIID."
+                ::= { hwEthernetARPObjects 32 }
+        
+        hwEthernetARPHostInfoEntry OBJECT-TYPE
+                SYNTAX HwEthernetARPHostInfoEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the host information table."
+                INDEX { hwEthernetARPHostIPAddress,hwEthernetARPGatewayVNIID }
+                ::= { hwEthernetARPHostInfoTable 1 }
+        
+        HwEthernetARPHostInfoEntry ::=
+                SEQUENCE { 
+                        hwEthernetARPHostIPAddress
+                                IpAddress,
+                        hwEthernetARPGatewayVNIID
+                                Unsigned32,  
+                        hwEthernetARPHostMAC
+                                MacAddress,
+                        hwEthernetARPGatewayVtepIP
+                                IpAddress                  
+                 }   
+            
+        hwEthernetARPHostIPAddress  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the host IP address."
+            ::= { hwEthernetARPHostInfoEntry 1 }   
+
+        hwEthernetARPGatewayVNIID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VNI ID of gateway."
+            ::= { hwEthernetARPHostInfoEntry 2 }
+
+        hwEthernetARPHostMAC  OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the host MAC."
+            ::= { hwEthernetARPHostInfoEntry 3 } 
+
+        hwEthernetARPGatewayVtepIP  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VTEP IP of gateway."
+            ::= { hwEthernetARPHostInfoEntry 4 }   
+
+-- =================================================================
+-- 33th The Node of number of ARP entries of the slot
+-- =================================================================
+        hwArpNumberStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwArpNumberStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table contains the number of ARP entries of the slot."   
+            ::= { hwEthernetARPObjects 33 } 
+        
+        hwArpNumberStatisticsEntry OBJECT-TYPE  
+            SYNTAX HwArpNumberStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry contains the number of ARP entries of the slot."
+            INDEX { hwArpNumberStatisticsSlot }
+            ::= { hwArpNumberStatisticsTable 1 }
+    
+        HwArpNumberStatisticsEntry ::=
+            SEQUENCE {
+                hwArpNumberStatisticsSlot  
+                	Integer32,
+                hwArpNumberStatic
+                	Counter32, 
+                hwArpNumberDynamic
+                	Counter32
+                }       
+
+        hwArpNumberStatisticsSlot  OBJECT-TYPE
+            SYNTAX Integer32(0..128)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The slot of ARP entries."
+            ::= { hwArpNumberStatisticsEntry 1 }  
+
+        hwArpNumberStatic  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of static ARP entries of slot."
+            ::= { hwArpNumberStatisticsEntry 2 } 
+
+        hwArpNumberDynamic  OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of dynamic ARP entries of slot."
+            ::= { hwArpNumberStatisticsEntry 3 }
+
+-- =================================================================
+-- 34th The Node of ARP gateway duplicate
+-- =================================================================            
+        hwEthernetARPGateWayDuplicateInfoTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwEthernetARPGateWayDuplicateInfoEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The table contains the information of ARP packet with a duplicate IP address from the interface. 
+                         The information includes gateway ifname, gateway IP."
+                ::= { hwEthernetARPObjects 34 }
+        
+        hwEthernetARPGateWayDuplicateInfoEntry OBJECT-TYPE
+                SYNTAX HwEthernetARPGateWayDuplicateInfoEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of the ARP packet with a duplicate IP address information table."
+                INDEX { hwEthernetARPGateWayIfName,hwEthernetARPGateWayPortName,hwEthernetARPGateWayIP }
+                ::= { hwEthernetARPGateWayDuplicateInfoTable 1 }
+        
+        HwEthernetARPGateWayDuplicateInfoEntry ::=
+                SEQUENCE {
+                        hwEthernetARPGateWayIfName
+                                OCTET STRING,
+                        hwEthernetARPGateWayPortName
+                                OCTET STRING,
+                        hwEthernetARPGateWayIP
+                                IpAddress                  
+                 }   
+            
+        hwEthernetARPGateWayIfName  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IfName of gateway."
+            ::= { hwEthernetARPGateWayDuplicateInfoEntry 1 }   
+        
+        hwEthernetARPGateWayPortName  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PortName of gateway."
+            ::= { hwEthernetARPGateWayDuplicateInfoEntry 2 }
+            
+        hwEthernetARPGateWayIP  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP of gateway."
+            ::= { hwEthernetARPGateWayDuplicateInfoEntry 3 }
+-- =================================================================
+-- 35th Arp Miss exist on the interface XXX on the slot XX (alarm)
+-- =================================================================
+         hwFwdArpSlotName OBJECT-TYPE
+             SYNTAX OCTET STRING(SIZE (1..31))
+             MAX-ACCESS read-write
+             STATUS current
+             DESCRIPTION
+                   "Indicates the slot of the interface."
+                   ::= { hwEthernetARPObjects 35 }
+
+           hwFwdArpPortName OBJECT-TYPE
+                SYNTAX  OCTET STRING(SIZE (0..80)) 
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                 "Indicates the interface name."
+                   ::= { hwEthernetARPObjects 36}
+			
+-- =================================================================
+-- 37th The Node of ARP limit exceed
+-- =================================================================            
+        hwEthernetARPLimitExceedInfoTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwEthernetARPLimitExceedInfoEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The table contains the information of learnt ARP packet. 
+                         The information includes interface of arp packet, the learnt number of arp packet, the limitnumber of arp packet, the recover reason of arp limit."
+                ::= { hwEthernetARPObjects 37 }
+        
+        hwEthernetARPLimitExceedInfoEntry OBJECT-TYPE
+                SYNTAX HwEthernetARPLimitExceedInfoEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This object indicates Entries of the learnt ARP packet."
+                INDEX { hwEthernetARPLimitExceedInterface,hwEthernetARPLimitExceedLimitNumber,hwEthernetARPLimitExceedLearnedNumber,hwEthernetARPLimitExceedRecoverReason }
+                ::= { hwEthernetARPLimitExceedInfoTable 1 }
+        
+        HwEthernetARPLimitExceedInfoEntry::=
+                SEQUENCE {
+                        hwEthernetARPLimitExceedInterface
+                                OCTET STRING,
+                        hwEthernetARPLimitExceedLimitNumber
+                                Integer32,
+                        hwEthernetARPLimitExceedLearnedNumber
+                                Integer32,
+                        hwEthernetARPLimitExceedRecoverReason 
+                                OCTET STRING
+                 }   
+            
+        hwEthernetARPLimitExceedInterface  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates  interface of arp limt entries."
+            ::= { hwEthernetARPLimitExceedInfoEntry 1 }   
+        
+        hwEthernetARPLimitExceedLimitNumber  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates  number of limit arp entries."
+            ::= { hwEthernetARPLimitExceedInfoEntry 2 }
+            
+        hwEthernetARPLimitExceedLearnedNumber  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates  number of learnt arp entries."
+            ::= { hwEthernetARPLimitExceedInfoEntry 3 }
+
+        hwEthernetARPLimitExceedRecoverReason  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This recover reason of the alarm arp limt entries."
+            ::= { hwEthernetARPLimitExceedInfoEntry 4 }   
+
+
+--  Notifications(trap) Definitions
+--       
+    hwEthernetARPNotifications OBJECT IDENTIFIER ::= { hwEthernetARPMIB 2 }
+     
+    hwEthernetARPSpeedLimitAlarm NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPSpeedLimitIfIndex,hwEthernetARPSpeedLimitConfigured,hwEthernetARPSpeedLimitCurrent,hwEthernetARPSpeedLimitType,hwEthernetARPSpeedLimitSrcIPAddr,hwEthernetARPSpeedLimitDstIPAddr,hwEthernetARPSpeedLimitVPNinstance} 
+            STATUS current   
+            DESCRIPTION 
+                "Trap information about ARP speed limit: interface index, current configured limit number, current received number, limit type (ARP, ARP-MISS), source IP address, destination IP address, VPN instance."
+            ::= { hwEthernetARPNotifications 1 }  
+    
+    hwEthernetARPAntiAttackAlarm NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPAntiAttackIpAddress,hwEthernetARPAntiAttackMacAddress,hwEthernetARPAntiAttackVlanId,hwEthernetARPAntiAttackIfName} 
+            STATUS current     
+            DESCRIPTION 
+                "Trap information about ARP anti-attack: IP address, MAC, VLAN id, interface index."
+            ::= { hwEthernetARPNotifications 2 }    
+               
+    hwEthernetARPAntiGatewayConflictAlarm NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPAntiGatewayConflictIpAddress,hwEthernetARPAntiGatewayConflictMacAddress,hwEthernetARPAntiGatewayConflictVlanId,hwEthernetARPAntiGatewayConflictIfName} 
+            STATUS current     
+            DESCRIPTION 
+                "Trap information about ARP anti-attack: IP address, MAC, VLAN ID, interface index."
+            ::= { hwEthernetARPNotifications 3 }
+
+    hwEthernetARPThresholdExceedAlarm NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName,hwEthernetARPThresholdValue,hwEthernetARPThresholdDynamicNumber,hwEthernetARPThresholdStaticNumber } 
+            STATUS current     
+            DESCRIPTION 
+                "Trap information about ARP exceed threshold: slot, threshold, number of dynamic ARP, number of static ARP."
+            ::= { hwEthernetARPNotifications 4 } 
+            
+    hwEthernetARPThresholdResumeAlarm NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName,hwEthernetARPThresholdValue,hwEthernetARPThresholdDynamicNumber,hwEthernetARPThresholdStaticNumber } 
+            STATUS current     
+            DESCRIPTION 
+                "Trap information about ARP resume threshold: slot, threshold, number of dynamic ARP, number of static ARP."
+            ::= { hwEthernetARPNotifications 5 }             
+            
+    hwEthernetARPIPConflictEvent NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPIPConflictIPAddress,hwEthernetARPIPConflictLocalInterfaceName,hwEthernetARPIPConflictLocalMAC,hwEthernetARPIPConflictLocalVLAN,hwEthernetARPIPConflictLocalCEVLAN,hwEthernetARPIPConflictReceiveInterfaceName,hwEthernetARPIPConflictReceiveMAC,hwEthernetARPIPConflictReceiveVLAN,hwEthernetARPIPConflictReceiveCEVLAN,hwEthernetARPIPConflictType } 
+            STATUS current     
+            DESCRIPTION 
+                "Trap information about ARP IP conflict."
+            ::= { hwEthernetARPNotifications 6 }                        
+    
+    hwEthernetARPMACIPConflict NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPIPConflictLocalInterfaceName,hwEthernetARPIPConflictReceiveMAC,hwEthernetARPIPConflictIPAddress,hwEthernetARPReceiveDstMAC,hwEthernetARPReceiveDstIPAddr,hwEthernetARPIPConflictReceiveVLAN,hwEthernetARPIPConflictReceiveCEVLAN,hwEthernetARPIPConflictReceiveInterfaceName} 
+            STATUS current   
+            DESCRIPTION 
+                "Trap information about MAC and IP address conflict: conflict interface name, conflict MAC address, conflict IP address, and the received packet's destination MAC address, destination IP address, vlan, ce-vlan, receive interface."
+            ::= { hwEthernetARPNotifications 7 }  
+    
+    hwEthernetARPMACIPConflictResolved NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPIPConflictLocalInterfaceName,hwEthernetARPIPConflictReceiveMAC,hwEthernetARPIPConflictIPAddress} 
+            STATUS current   
+            DESCRIPTION 
+                "Trap information about MAC and IP address conflict resolved: conflict interface name, conflict MAC address, conflict IP address."
+            ::= { hwEthernetARPNotifications 8 }
+
+    hwEthernetARPLearnStopAlarm NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPLearnStopSlot,hwEthernetARPLearnStopThreshold } 
+            STATUS current     
+            DESCRIPTION 
+                "Trap information about ARP learning disable: memory usage threshold."
+            ::= { hwEthernetARPNotifications 9 } 
+            
+    hwEthernetARPLearnResumeAlarm NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPLearnStopSlot,hwEthernetARPLearnStopThreshold } 
+            STATUS current     
+            DESCRIPTION 
+                "Trap information about ARP learning enable: memory usage threshold."
+            ::= { hwEthernetARPNotifications 10 }
+    
+    hwEthernetARPRemoteBackupFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPRemoteBackupFailMainIfName } 
+            STATUS current     
+            DESCRIPTION 
+                "Trap information about the remote ARP entry backup failure."
+            ::= { hwEthernetARPNotifications 11 } 
+            
+    hwEthernetARPRemoteBackupFailResumeAlarm NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPRemoteBackupFailMainIfName } 
+            STATUS current     
+            DESCRIPTION 
+                "Trap clearing information when the backup device detects that ARP entries are successfully backed up within a period."
+            ::= { hwEthernetARPNotifications 12 }   
+      
+    hwEthernetARPHostIPConflict NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP,hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP} 
+            STATUS current   
+            DESCRIPTION 
+                "Trap information about host IP address conflict: local host MAC address, local gateway VTEP IP address, remote host MAC address, remote gateway VTEP IP address."
+            ::= { hwEthernetARPNotifications 13 }  
+			
+    hwEthernetARPHostIPConflictResume NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP,hwEthernetARPHostMAC,hwEthernetARPGatewayVtepIP} 
+            STATUS current   
+            DESCRIPTION 
+                "Trap information about host IP address conflict resolved: local host MAC address, local gateway VTEP IP address, remote host MAC address, remote gateway VTEP IP address."
+            ::= { hwEthernetARPNotifications 14 }
+            
+    --begin add by chenlong 230926, arp anti-attack gateway-duplicate Alarm
+    hwEthernetARPGateWayDuplicateAlarm NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPGateWayIfName,hwEthernetARPGateWayPortName,hwEthernetARPGateWayIP} 
+            STATUS current   
+            DESCRIPTION 
+                "Trap information about ARP gateway duplicate: Received an ARP packet with a duplicate IP address from the interface."
+            ::= { hwEthernetARPNotifications 15 }
+            
+    hwEthernetARPGateWayDuplicateAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPGateWayIfName,hwEthernetARPGateWayPortName,hwEthernetARPGateWayIP} 
+            STATUS current   
+            DESCRIPTION 
+                "Trap information about ARP gateway duplicate resolved: Received an ARP packet with a duplicate IP address from the interface."
+            ::= { hwEthernetARPNotifications 16 }
+    --end add by chenlong 230926, arp anti-attack gateway-duplicate Alarm
+    
+	hwFwdArpAlarmOccur NOTIFICATION-TYPE
+			OBJECTS { hwFwdArpSlotName , hwFwdArpPortName}
+			STATUS current
+			DESCRIPTION 
+				"Arp MISS alarm occur."
+			::= { hwEthernetARPNotifications 17 }
+			
+	hwFwdArpAlarmResume NOTIFICATION-TYPE
+			OBJECTS { hwFwdArpSlotName , hwFwdArpPortName}
+			STATUS current
+			DESCRIPTION 
+				"Arp MISS alarm resume."
+			::= { hwEthernetARPNotifications 18 }
+
+    --begin add by z00360178, arp limit threshold
+    hwEthernetARPLimitExceed NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPLimitExceedInterface,hwEthernetARPLimitExceedLimitNumber,hwEthernetARPLimitExceedLearnedNumber} 
+            STATUS current   
+            DESCRIPTION 
+                "Enter the threhold about ARP limit number, the alarm is appear."
+            ::= { hwEthernetARPNotifications 19 }
+            
+    hwEthernetARPLimitExceedResume NOTIFICATION-TYPE
+            OBJECTS { hwEthernetARPLimitExceedInterface,hwEthernetARPLimitExceedLimitNumber,hwEthernetARPLimitExceedLearnedNumber,hwEthernetARPLimitExceedRecoverReason }
+            STATUS current   
+            DESCRIPTION 
+                "Not enter the threhold about ARP limit number, then resume the alarm ."
+            ::= { hwEthernetARPNotifications 20 }
+    --end add by z00360178, arp limit threshold
+	
+--
+-- Conformance information
+--
+
+          hwEthernetARPConformance OBJECT IDENTIFIER ::= { hwEthernetARPMIB 3 }
+        
+          hwEthernetARPGroups OBJECT IDENTIFIER ::= { hwEthernetARPConformance 1 }
+          
+          hwEthernetARPCompliances OBJECT IDENTIFIER ::= { hwEthernetARPConformance 2 }
+
+	      hwFwdArpTrapCompliances OBJECT IDENTIFIER ::= { hwEthernetARPConformance 3 }
+		  
+    hwEthernetARPStaticsGroup OBJECT-GROUP
+    OBJECTS {
+                --hwEthernetARPStaticsSlot    , 
+                hwEthernetARPStaticsLearnTotal   ,
+                hwEthernetARPDropForLimit ,
+                hwEthernetARPDropForARPSuppress ,
+                hwEthernetARPDropForARPMissSuppress ,                
+                hwEthernetARPDropForOther    ,
+                hwEthernetARPMissDropForOther    ,
+                hwEthernetARPRcvNum ,
+                hwEthernetARPMissRcvNum,
+                hwEthernetARPStaticsOperation ,
+                hwEthernetARPDropForARPProxySuppress 
+    }
+    STATUS      current
+    DESCRIPTION
+        "A table contains the statistics about Ethernet ARP. 
+    The statistics include number of received ARP packets, 
+    number of received ARP-MISS packets, number of learned ARP packets, 
+    number of discarded ARP packets caused by the ARP limit, 
+    the number of discarded ARP-MISS packets caused by the limit 
+    and the number of discarded ARP and ARP-MISS packets caused by other reasons."
+    ::= { hwEthernetARPGroups 1 }
+                                       
+     hwEthernetARPSpeedLimitGroup  OBJECT-GROUP  
+     OBJECTS {
+                hwEthernetARPLimitSpeedValue 
+     }
+     STATUS      current
+     DESCRIPTION
+        "A Group table ,which contains the configuration information of Ethernet ARP Speed limit slot. 
+                The information includes type, speedvalue, sourceip and destip."                
+    ::= { hwEthernetARPGroups 2 }     
+          
+          
+     hwEthARPShowWithInterAndVidGroup  OBJECT-GROUP  
+     OBJECTS {
+                hwEthARPMacAddr 
+     }
+     STATUS      current
+     DESCRIPTION
+        "Display the ARP table based on interface number or interface number and VLAN ID."
+    ::= { hwEthernetARPGroups 3 }    
+    
+     hwEthARPLimitGroup  OBJECT-GROUP  
+     OBJECTS {
+                hwEthARPLimitNum,
+                hwEthARPLimitRowStatus   
+                --hwEthARPLimitVidFirst  ,
+                --hwEthARPLimitVidLast  
+     }
+     STATUS      current
+     DESCRIPTION
+        "config the arp limit on the interface with vlanid,limit num."
+    ::= { hwEthernetARPGroups 4 }   
+        
+     --hwEthARPLimitGroup  OBJECT-GROUP  
+    -- OBJECTS {
+                --hwEthARPLimitShowNum   , 
+                --hwEthARPLimitShowVid   ,
+            --    hwEthARPLimitShowIfindex
+    -- }
+     --STATUS      current
+    -- DESCRIPTION
+     --   "Display the limit based on interface number and VLAN ID."
+    --::= { hwEthernetARPGroups 5 }  
+   
+   
+    hwEthernetARPBaseGroup OBJECT-GROUP
+    OBJECTS {
+        hwEthernetARPAntiAttackLog,
+        hwEthernetARPLearningStrict,
+        hwEthernetARPSpeedLimitIfIndex,
+        hwEthernetARPSpeedLimitConfigured,
+        hwEthernetARPSpeedLimitCurrent,
+        hwEthernetARPSpeedLimitType,
+        hwEthernetARPSpeedLimitSrcIPAddr,
+        hwEthernetARPSpeedLimitDstIPAddr,
+        hwEthernetARPSpeedLimitVPNinstance,
+        hwArpSecValidateSmac,
+        hwArpSecValidateDmac,
+        hwArpSecValidateRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing configuration or display."
+    ::= { hwEthernetARPGroups 5 }      
+    
+    
+    hwEthernetARPNotificationsGroup NOTIFICATION-GROUP   
+        NOTIFICATIONS{ hwEthernetARPSpeedLimitAlarm, hwEthernetARPAntiAttackAlarm, hwEthernetARPAntiGatewayConflictAlarm, hwEthernetARPThresholdExceedAlarm, hwEthernetARPThresholdResumeAlarm, hwEthernetARPIPConflictEvent, hwEthernetARPMACIPConflict, hwEthernetARPMACIPConflictResolved, hwEthernetARPLearnStopAlarm, hwEthernetARPLearnResumeAlarm, hwEthernetARPRemoteBackupFailAlarm, hwEthernetARPRemoteBackupFailResumeAlarm, hwEthernetARPHostIPConflict, hwEthernetARPHostIPConflictResume, hwEthernetARPGateWayDuplicateAlarm, hwEthernetARPGateWayDuplicateAlarmResume, hwEthernetARPLimitExceed, hwEthernetARPLimitExceedResume}
+        STATUS current
+        DESCRIPTION
+                 "notification Group."   
+     ::= { hwEthernetARPGroups 6 }
+ 
+                                 
+    hwEthernetARPLearningStrictInterfaceGroup OBJECT-GROUP   
+        OBJECTS{                     
+               hwEthernetARPLearningStrictState,
+            hwEthernetARPLearningStrictRowStatus  
+        }
+        STATUS current
+        DESCRIPTION
+        "ARP Learning Strict Interface Group."   
+     ::= { hwEthernetARPGroups 7 }
+
+    hwArpLinkInferaceGroup OBJECT-GROUP
+    OBJECTS { 
+        hwArpLinkPeerIp, 
+        hwArpLinkDetectTime, 
+        hwArpLinkDetectTimes, 
+        hwArpLinkDetectMode, 
+        hwArpLinkStatus,
+        hwArpLinkRowStatus 
+    }
+    STATUS current
+    DESCRIPTION 
+        "A collection of objects providing configuration of ARP linking interface."
+    ::= { hwEthernetARPGroups 8 }
+
+    hwArpEntryExpireControlGroup OBJECT-GROUP
+    OBJECTS { 
+        hwArpEntryExpireDetectMode,
+        hwArpEntryExpireFakeTime 
+    }
+    STATUS current
+    DESCRIPTION 
+        "A collection of objects providing configuration of ARP Expire Parameter."        
+    ::= { hwEthernetARPGroups 9 }
+
+    hwArpAntiAttackGroup OBJECT-GROUP
+    OBJECTS {    
+         hwEthernetARPAntiAttackStatus, hwEthernetARPAntiGateWayConflict, hwEthernetARPLogAndTrapTimer, 
+         hwEthernetARPAntiAttackIpAddress, 
+         hwEthernetARPAntiAttackMacAddress, hwEthernetARPAntiAttackVlanId, hwEthernetARPAntiAttackIfName, 
+         hwEthernetARPAntiGatewayConflictIpAddress, hwEthernetARPAntiGatewayConflictMacAddress, 
+         hwEthernetARPAntiGatewayConflictVlanId, hwEthernetARPAntiGatewayConflictIfName,
+         hwArpDynMacAdd, hwArpDynVlanId, hwArpDynCeVlanId, hwArpDynOutIfIndex,
+         hwArpDynExpireTime, hwArpCfgVlanId, hwArpCfgCeVlanId, hwArpCfgOutIfIndex,
+         hwArpCfgRowstatus  }
+    STATUS current
+    DESCRIPTION 
+        "A collection of objects providing lockuping ARP anti attack."
+    ::= { hwEthernetARPGroups 10 }
+
+    hwEthernetARPThresholdGroup OBJECT-GROUP
+    OBJECTS {
+        hwEthernetARPThresholdValue,
+        hwEthernetARPThresholdDynamicNumber,
+        hwEthernetARPThresholdStaticNumber
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for ARP threshold alarm."
+    ::= { hwEthernetARPGroups 11 }
+
+    
+    hwETHARPIPConflictGroup OBJECT-GROUP
+    OBJECTS {
+        hwEthernetARPIPConflictIPAddress,
+        hwEthernetARPIPConflictLocalInterfaceName,
+        hwEthernetARPIPConflictLocalMAC,
+        hwEthernetARPIPConflictLocalVLAN,
+        hwEthernetARPIPConflictLocalCEVLAN,
+        hwEthernetARPIPConflictReceiveInterfaceName,
+        hwEthernetARPIPConflictReceiveMAC,
+        hwEthernetARPIPConflictReceiveVLAN,
+        hwEthernetARPIPConflictReceiveCEVLAN,
+        hwEthernetARPIPConflictType,
+        hwEthernetARPReceiveDstIPAddr,
+        hwEthernetARPReceiveDstMAC,
+        hwEthernetARPConflictDetect
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for ARP conflict trap."
+    ::= { hwEthernetARPGroups 12 }
+
+hwEthernetARPLearnStopGroup OBJECT-GROUP
+    OBJECTS {
+    	hwEthernetARPLearnStopSlot,
+        hwEthernetARPLearnStopThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for ARP learning alarm."
+    ::= { hwEthernetARPGroups 13 }
+
+hwArpStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+            hwArpStatisticsLearnedCount,
+        hwArpStatisticsAvailableCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for ARP statistics table."
+    ::= { hwEthernetARPGroups 14 } 
+    
+hwEthernetARPRemoteBackupFaidGroup OBJECT-GROUP
+    OBJECTS {
+    	hwEthernetARPRemoteBackupFailMainIfName
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for the remote ARP entry backup failure alarm."
+    ::= { hwEthernetARPGroups 15 }
+
+hwFwdArpObjectGroup OBJECT-GROUP
+	OBJECTS { hwFwdArpSlotName , hwFwdArpPortName}
+	STATUS current
+	DESCRIPTION 
+		"Group for base trap objects."
+	::= { hwEthernetARPGroups 16 }
+		
+hwFwdArpTrapGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { hwFwdArpAlarmOccur, hwFwdArpAlarmResume }
+	STATUS current
+	DESCRIPTION 
+		"Group for all base traps."
+	::= { hwEthernetARPGroups 17 }
+
+    
+hwEthernetARPCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for arp Speedlimit and  arp limit."
+    MODULE
+        MANDATORY-GROUPS {
+            hwEthernetARPBaseGroup,
+            hwEthernetARPLearningStrictInterfaceGroup,
+            hwArpEntryExpireControlGroup,
+            hwArpAntiAttackGroup
+        }  
+      
+   ::= { hwEthernetARPCompliances 1 }    
+
+hwFwdArpTrapCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION 
+		"Compliance statement for agents that provide full support for hwBaseTrapMIB."
+	MODULE -- this module
+		MANDATORY-GROUPS { hwFwdArpObjectGroup }
+		::= { hwFwdArpTrapCompliances 1 } 
+   
+-- units of conformance
+     
+END

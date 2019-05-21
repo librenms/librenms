@@ -16,9 +16,13 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Git;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Laravel;
 
 function generate_priority_label($priority)
 {
@@ -72,19 +76,49 @@ function graylog_severity_label($severity)
     return '<span class="alert-status '.$barColor .'" style="margin-right:8px;float:left;"></span>';
 }
 
+/**
+ * Execute and snmp command, filter debug output unless -v is specified
+ *
+ * @param array $command
+ * @return null|string
+ */
 function external_exec($command)
 {
-    global $debug,$vdebug;
+    global $debug, $vdebug;
+
+    $proc = new \Symfony\Component\Process\Process($command);
+    $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
     if ($debug && !$vdebug) {
-        $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
-        $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
+        $patterns = [
+            '/-c\' \'[\S]+\'/',
+            '/-u\' \'[\S]+\'/',
+            '/-U\' \'[\S]+\'/',
+            '/-A\' \'[\S]+\'/',
+            '/-X\' \'[\S]+\'/',
+            '/-P\' \'[\S]+\'/',
+            '/-H\' \'[\S]+\'/',
+            '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
+        ];
+        $replacements = [
+            '-c\' \'COMMUNITY\'',
+            '-u\' \'USER\'',
+            '-U\' \'USER\'',
+            '-A\' \'PASSWORD\'',
+            '-X\' \'PASSWORD\'',
+            '-P\' \'PASSWORD\'',
+            '-H\' \'HOSTNAME\'',
+            '\1:HOSTNAME:\3',
+        ];
+
+        $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
-        c_echo('SNMP[%c'.$command."%n]\n");
+        c_echo('SNMP[%c'.$proc->getCommandLine()."%n]\n");
     }
 
-    $output = shell_exec($command);
+    $proc->run();
+    $output = $proc->getOutput();
 
     if ($debug && !$vdebug) {
         $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
@@ -93,6 +127,7 @@ function external_exec($command)
     } elseif ($vdebug) {
         d_echo($output . PHP_EOL);
     }
+    d_echo($proc->getErrorOutput());
 
     return $output;
 }
@@ -156,17 +191,6 @@ function delete_port($int_id)
     dbDelete('ports_stack', "`port_id_low` = ? OR `port_id_high` = ?", array($int_id, $int_id));
 
     unlink(get_port_rrdfile_path($interface['hostname'], $interface['port_id']));
-}
-
-function sgn($int)
-{
-    if ($int < 0) {
-        return -1;
-    } elseif ($int == 0) {
-        return 0;
-    } else {
-        return 1;
-    }
 }
 
 function get_sensor_rrd($device, $sensor)
@@ -323,17 +347,8 @@ function get_device_id_by_app_id($app_id)
 
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
-    $ifclass = "interface-upup";
-    if ($ifAdminStatus == "down") {
-        $ifclass = "interface-admindown";
-    }
-    if ($ifAdminStatus == "up" && $ifOperStatus== "down") {
-        $ifclass = "interface-updown";
-    }
-    if ($ifAdminStatus == "up" && $ifOperStatus== "up") {
-        $ifclass = "interface-upup";
-    }
-    return $ifclass;
+    // fake a port model
+    return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
 }
 
 function device_by_name($name, $refresh = 0)
@@ -359,7 +374,7 @@ function device_by_id_cache($device_id, $refresh = false)
     if (!$refresh && isset($cache['devices']['id'][$device_id]) && is_array($cache['devices']['id'][$device_id])) {
         $device = $cache['devices']['id'][$device_id];
     } else {
-        $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        $device = dbFetchRow("SELECT `devices`.*, `location`, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.location_id=`locations`.`id` WHERE `device_id` = ?", [$device_id]);
         $device['attribs'] = get_dev_attribs($device['device_id']);
         load_os($device);
 
@@ -397,6 +412,7 @@ function truncate($substring, $max = 50, $rep = '...')
 
 function mres($string)
 {
+    return $string; // FIXME bleh
     // short function wrapper because the real one is stupidly long and ugly. aesthetics.
     global $database_link;
     return mysqli_real_escape_string($database_link, $string);
@@ -603,7 +619,7 @@ function format_si($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-        return number_format(round($value, $round), $sf, '.', '').$ext;
+    return (number_format(round($value, $round), $sf, '.', '')+0)." ".$ext;
 }
 
 function format_bi($value, $round = '2', $sf = '3')
@@ -622,8 +638,7 @@ function format_bi($value, $round = '2', $sf = '3')
     if ($neg) {
         $value = $value * -1;
     }
-
-    return number_format(round($value, $round), $sf, '.', '').$ext;
+    return (number_format(round($value, $round), $sf, '.', '')+0)." ".$ext;
 }
 
 function format_number($value, $base = '1000', $round = 2, $sf = 3)
@@ -637,40 +652,29 @@ function format_number($value, $base = '1000', $round = 2, $sf = 3)
 
 function is_valid_hostname($hostname)
 {
-    // The Internet standards (Request for Comments) for protocols mandate that
-    // component hostname labels may contain only the ASCII letters 'a' through 'z'
-    // (in a case-insensitive manner), the digits '0' through '9', and the hyphen
-    // ('-'). The original specification of hostnames in RFC 952, mandated that
-    // labels could not start with a digit or with a hyphen, and must not end with
-    // a hyphen. However, a subsequent specification (RFC 1123) permitted hostname
-    // labels to start with digits. No other symbols, punctuation characters, or
-    // white space are permitted. While a hostname may not contain other characters,
-    // such as the underscore character (_), other DNS names may contain the underscore
-    // maximum length is 253 characters, maximum segment size is 63
-
-    return (
-        preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*\.?$/i", $hostname) //valid chars check
-        && preg_match("/^.{1,253}$/", $hostname) //overall length check
-        && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname)
-    );
+    return \LibreNMS\Util\Validate::hostname($hostname);
 }
 
 /*
  * convenience function - please use this instead of 'if ($debug) { echo ...; }'
  */
-function d_echo($text, $no_debug_text = null)
-{
-    global $debug, $php_debug;
-    if ($debug) {
-        if (isset($php_debug)) {
-            $php_debug[] = $text;
-        } else {
+if (!function_exists('d_echo')) {
+    //TODO remove this after installs have updated, leaving it for for transition
+    function d_echo($text, $no_debug_text = null)
+    {
+        global $debug;
+
+        if (Laravel::isBooted()) {
+            \Log::debug(is_string($text) ? rtrim($text) : $text);
+        } elseif ($debug) {
             print_r($text);
         }
-    } elseif ($no_debug_text) {
-        echo "$no_debug_text";
+
+        if (!$debug && $no_debug_text) {
+            echo "$no_debug_text";
+        }
     }
-} // d_echo
+}
 
 /**
  * Output using console color if possible
@@ -720,9 +724,7 @@ function c_echo($string, $enabled = true)
  */
 function is_mib_graph($type, $subtype)
 {
-    global $config;
-    return isset($config['graph_types'][$type][$subtype]['section']) &&
-        $config['graph_types'][$type][$subtype]['section'] == 'mib';
+    return \LibreNMS\Util\Graph::isMibGraph($type, $subtype);
 } // is_mib_graph
 
 
@@ -758,10 +760,11 @@ function get_graph_subtypes($type, $device = null)
 {
     global $config;
 
+    $type = basename($type);
     $types = array();
 
     // find the subtypes defined in files
-    if ($handle = opendir($config['install_dir'] . "/html/includes/graphs/$type/")) {
+    if ($handle = opendir($config['install_dir'] . "/includes/html/graphs/$type/")) {
         while (false !== ($file = readdir($handle))) {
             if ($file != "." && $file != ".." && $file != "auth.inc.php" && strstr($file, ".inc.php")) {
                 $types[] = str_replace(".inc.php", "", $file);
@@ -1018,11 +1021,10 @@ function object_is_cached($section, $obj)
  * attributes
  * @param array $attribs Device attributes
  * @return bool
-**/
+ **/
 function can_ping_device($attribs)
 {
-    global $config;
-    if ($config['icmp_check'] === true && $attribs['override_icmp_disable'] != "true") {
+    if (Config::get('icmp_check') && !(isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] == "true")) {
         return true;
     } else {
         return false;
@@ -1096,7 +1098,7 @@ Set <code>$config[\'poller_modules\'][\'mib\'] = 1;</code> in <code>config.php</
  * Constructs the path to an RRD for the Ceph application
  * @param string $gtype The type of rrd we're looking for
  * @return string
-**/
+ **/
 function ceph_rrd($gtype)
 {
     global $device;
@@ -1114,14 +1116,16 @@ function ceph_rrd($gtype)
 /**
  * Parse location field for coordinates
  * @param string location The location field to look for coords in.
- * @return array Containing the lat and lng coords
-**/
+ * @return array|bool Containing the lat and lng coords
+ **/
 function parse_location($location)
 {
-    preg_match('/(\[)(-?[0-9\. ]+),[ ]*(-?[0-9\. ]+)(\])/', $location, $tmp_loc);
-    if (is_numeric($tmp_loc[2]) && is_numeric($tmp_loc[3])) {
-        return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
+    preg_match('/\[(-?[0-9. ]+), *(-?[0-9. ]+)\]/', $location, $tmp_loc);
+    if (is_numeric($tmp_loc[1]) && is_numeric($tmp_loc[2])) {
+        return ['lat' => $tmp_loc[1], 'lng' => $tmp_loc[2]];
     }
+
+    return false;
 }//end parse_location()
 
 /**
@@ -1132,8 +1136,11 @@ function parse_location($location)
 function version_info($remote = false)
 {
     global $config;
-    $output = array();
-    if (check_git_exists() === true) {
+    $version = \LibreNMS\Util\Version::get();
+    $output = [
+        'local_ver' => $version->local(),
+    ];
+    if (Git::repoPresent() && Git::binaryExists()) {
         if ($remote === true && $config['update_channel'] == 'master') {
             $api = curl_init();
             set_curl_proxy($api);
@@ -1146,12 +1153,11 @@ function version_info($remote = false)
             $output['github'] = json_decode(curl_exec($api), true);
         }
         list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
-        $output['local_ver']    = rtrim(`git describe --tags`);
         $output['local_sha']    = $local_sha;
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    $output['db_schema']   = dbIsConnected() ? get_db_schema() : '?';
+    $output['db_schema']   = vsprintf('%s (%s)', $version->database());
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
@@ -1165,10 +1171,10 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
-* Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
-* @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
-* @return string Empty if not valid.
-*/
+ * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
+ * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
+ * @return string Empty if not valid.
+ */
 // Fuction is from http://uk3.php.net/manual/en/function.inet-ntop.php
 function inet6_ntop($ip)
 {
@@ -1181,23 +1187,30 @@ function inet6_ntop($ip)
 
 /**
  * If hostname is an ip, use return sysName
- * @param array $device
+ * @param array $device (uses hostname and sysName fields)
  * @param string $hostname
  * @return string
-**/
-function format_hostname($device, $hostname = '')
+ */
+function format_hostname($device, $hostname = null)
 {
-    global $config;
     if (empty($hostname)) {
         $hostname = $device['hostname'];
     }
-    if ($config['force_ip_to_sysname'] === true && !empty($device['sysName'])) {
-        if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-            $hostname = $device['sysName'];
+
+    if (Config::get('force_hostname_to_sysname') && !empty($device['sysName'])) {
+        if (is_valid_hostname($hostname) && !IP::isValid($hostname)) {
+            return $device['sysName'];
         }
     }
+
+    if (Config::get('force_ip_to_sysname') && !empty($device['sysName'])) {
+        if (IP::isValid($hostname)) {
+            return $device['sysName'];
+        }
+    }
+
     return $hostname;
-}//end format_hostname
+}
 
 /**
  * Return valid port association modes
@@ -1205,17 +1218,12 @@ function format_hostname($device, $hostname = '')
  */
 function get_port_assoc_modes()
 {
-    return dbFetchColumn("SELECT `name` FROM `port_association_mode` ORDER BY pom_id");
-}
-
-/**
- * Validate port_association_mode
- * @param string $port_assoc_mode
- * @return bool
- */
-function is_valid_port_assoc_mode($port_assoc_mode)
-{
-    return in_array($port_assoc_mode, get_port_assoc_modes());
+    return [
+        1 => 'ifIndex',
+        2 => 'ifName',
+        3 => 'ifDescr',
+        4 => 'ifAlias',
+    ];
 }
 
 /**
@@ -1225,7 +1233,9 @@ function is_valid_port_assoc_mode($port_assoc_mode)
  */
 function get_port_assoc_mode_id($port_assoc_mode)
 {
-    return (int)dbFetchCell("SELECT `pom_id` FROM `port_association_mode` WHERE name = ?", array ($port_assoc_mode));
+    $modes = array_flip(get_port_assoc_modes());
+
+    return isset($modes[$port_assoc_mode]) ? $modes[$port_assoc_mode] : false;
 }
 
 /**
@@ -1235,7 +1245,9 @@ function get_port_assoc_mode_id($port_assoc_mode)
  */
 function get_port_assoc_mode_name($port_assoc_mode_id)
 {
-    return dbFetchCell("SELECT `name` FROM `port_association_mode` WHERE pom_id = ?", array ($port_assoc_mode_id));
+    $modes = get_port_assoc_modes();
+
+    return isset($modes[$port_assoc_mode_id]) ? $modes[$port_assoc_mode_id] : false;
 }
 
 /**
@@ -1340,11 +1352,16 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
                     'sensors_to_state_indexes.sensor_id',
                     "sensors.$target",
                 ));
-            } elseif ($table == 'application_metrics' && $target = 'device_id') {
+            } elseif ($table == 'application_metrics' && $target == 'device_id') {
                 return array_merge($last, array(
                     'application_metrics.app_id',
                     "applications.$target",
                 ));
+            } elseif ($table == 'locations' && $target == 'device_id') {
+                return array_merge($last, [
+                    'locations.id',
+                    'devices.device_id.location_id'
+                ]);
             }
 
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', array($table));
@@ -1459,29 +1476,6 @@ if (!function_exists('starts_with')) {
     }
 }
 
-function get_auth_ad_user_filter($username)
-{
-    global $config;
-
-    // don't return disabled users
-    $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
-    if ($config['auth_ad_user_filter']) {
-        $user_filter .= $config['auth_ad_user_filter'];
-    }
-    $user_filter .= ')';
-    return $user_filter;
-}
-
-function get_auth_ad_group_filter($groupname)
-{
-    global $config;
-    $group_filter = "(samaccountname=$groupname)";
-    if ($config['auth_ad_group_filter']) {
-        $group_filter = "(&{$config['auth_ad_group_filter']}$group_filter)";
-    }
-    return $group_filter;
-}
-
 /**
  * Print a list of items up to a max amount
  * If over that number, a line will print the total items
@@ -1527,28 +1521,9 @@ function clean($value, $strip_tags = true)
  * @param array $purifier_config (key, value pair)
  * @return string
  */
-function display($value, $purifier_config = array())
+function display($value, $purifier_config = [])
 {
-    /** @var HTMLPurifier $purifier */
-    global $config, $purifier;
-
-    // If $purifier_config is non-empty then we don't want
-    // to convert html tags and allow these to be controlled
-    // by purifier instead.
-    if (empty($purifier_config)) {
-        $value = htmlentities($value);
-    }
-    if (!isset($purifier)) {
-        // initialize HTML Purifier here since this is the only user
-        $p_config = HTMLPurifier_Config::createDefault();
-        $p_config->set('Cache.SerializerPath', $config['temp_dir']);
-        foreach ($purifier_config as $k => $v) {
-            $p_config->set($k, $v);
-        }
-        $purifier = new HTMLPurifier($p_config);
-    }
-
-    return $purifier->purify(stripslashes($value));
+    return Html::display($value, $purifier_config);
 }
 
 /**
@@ -1562,22 +1537,24 @@ function load_os(&$device)
     global $config;
 
     if (!isset($device['os'])) {
-        d_echo('No OS to load');
+        d_echo("No OS to load\n");
         return;
     }
 
-    $tmp_os = Symfony\Component\Yaml\Yaml::parse(
-        file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
-    );
+    if (!isset($config['os'][$device['os']]['definition_loaded'])) {
+        $tmp_os = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
+        );
 
-    if (isset($config['os'][$device['os']])) {
-        $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
-    } else {
-        $config['os'][$device['os']] = $tmp_os;
+        if (isset($config['os'][$device['os']])) {
+            $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
+        } else {
+            $config['os'][$device['os']] = $tmp_os;
+        }
     }
 
     // Set type to a predefined type for the OS if it's not already set
-    if ($device['attribs']['override_device_type'] != 1 && $config['os'][$device['os']]['type'] != $device['type']) {
+    if ((!isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && $config['os'][$device['os']]['type'] != $device['type']) {
         log_event('Device type changed ' . $device['type'] . ' => ' . $config['os'][$device['os']]['type'], $device, 'system', 3);
         $device['type'] = $config['os'][$device['os']]['type'];
         dbUpdate(array('type' => $device['type']), 'devices', 'device_id=?', array($device['device_id']));
@@ -1589,6 +1566,8 @@ function load_os(&$device)
     } else {
         unset($device['os_group']);
     }
+
+    $config['os'][$device['os']]['definition_loaded'] = true;
 }
 
 /**
@@ -1624,12 +1603,14 @@ function load_all_os($existing = false, $cached = true)
         }
 
         foreach ($os_list as $file) {
-            $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+            if (is_readable($file)) {
+                $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
 
-            if (isset($config['os'][$tmp['os']])) {
-                $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
-            } else {
-                $config['os'][$tmp['os']] = $tmp;
+                if (isset($config['os'][$tmp['os']])) {
+                    $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
+                } else {
+                    $config['os'][$tmp['os']] = $tmp;
+                }
             }
         }
     }
@@ -1681,10 +1662,16 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
     return sprintf('%.02f', $value);
 }
 
+/**
+ * Converts uW to dBm
+ * $value must be positive
+ *
+ */
 function uw_to_dbm($value)
 {
     return 10 * log10($value / 1000);
 }
+
 /**
  * @param $value
  * @param null $default
@@ -1693,11 +1680,11 @@ function uw_to_dbm($value)
  */
 function set_null($value, $default = null, $min = null)
 {
-    if (is_nan($value)) {
+    if (!is_numeric($value)) {
+        return $default;
+    } elseif (is_nan($value)) {
         return $default;
     } elseif (is_infinite($value)) {
-        return $default;
-    } elseif (!is_numeric($value)) {
         return $default;
     } elseif (isset($min) && $value < $min) {
         return $default;
@@ -1711,24 +1698,13 @@ function set_null($value, $default = null, $min = null)
  */
 function set_numeric($value, $default = 0)
 {
-    if (is_nan($value) ||
-        is_infinite($value) ||
-        !isset($value) ||
-        !is_numeric($value)
+    if (!is_numeric($value) ||
+        is_nan($value) ||
+        is_infinite($value)
     ) {
         $value = $default;
     }
     return $value;
-}
-
-function check_git_exists()
-{
-    exec('git > /dev/null 2>&1', $response, $exit_code);
-    if ($exit_code === 1) {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 function get_vm_parent_id($device)
@@ -1760,7 +1736,7 @@ function get_user_pref($name, $default = null, $user_id = null)
     }
 
     if (is_null($user_id)) {
-        $user_id = $_SESSION['user_id'];
+        $user_id = LegacyAuth::id();
     }
 
     $pref = dbFetchCell(
@@ -1789,7 +1765,7 @@ function set_user_pref($name, $value, $user_id = null)
 {
     global $user_prefs;
     if (is_null($user_id)) {
-        $user_id = $_SESSION['user_id'];
+        $user_id = LegacyAuth::id();
     }
 
     $pref = array(
@@ -1856,4 +1832,22 @@ function check_file_permissions($file, $mask)
 function array_by_column($array, $column)
 {
     return array_combine(array_column($array, $column), $array);
+}
+
+/**
+ * Get all consecutive pairs of values in an array.
+ * [1,2,3,4] -> [[1,2],[2,3],[3,4]]
+ *
+ * @param array $array
+ * @return array
+ */
+function array_pairs($array)
+{
+    $pairs = [];
+
+    for ($i = 1; $i < count($array); $i++) {
+        $pairs[] = [$array[$i -1], $array[$i]];
+    }
+
+    return $pairs;
 }

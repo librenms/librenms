@@ -1,0 +1,169 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename:   PRVT-UPS-MIB.mib
+-- ** Project:    T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose:    Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications.  All rights reserved.
+--                             WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information.  This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM.  Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+--
+PRVT-UPS-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,NOTIFICATION-TYPE
+                                            FROM SNMPv2-SMI
+        NOTIFICATION-GROUP                  	       FROM SNMPv2-CONF
+
+
+    switch   
+	                                     FROM PRVT-SWITCH-MIB;  
+	                                     
+
+    prvtUPSMib MODULE-IDENTITY
+        LAST-UPDATED "200801010000Z"
+        ORGANIZATION "BATM Advanced Communication"
+        CONTACT-INFO       
+        
+        "BATM/Telco Systems Support team
+				Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"        
+         
+        DESCRIPTION
+        "MIB module for monitoring the UPS connected to switch or ipSwitch"
+
+        -- revision history     
+        REVISION     "200801010000Z"
+     	 DESCRIPTION
+		"Removed redefined OIDs in private vendor extension definitions."  
+         REVISION     "200502160000Z"
+     	 DESCRIPTION
+			"Fixed spelling errors and changed the contact info." 
+
+		REVISION     "200305080000Z"
+		DESCRIPTION
+							"Move to SMI-V2."
+
+        REVISION     "200201280000Z"
+        DESCRIPTION
+                "Initial version."
+        ::= { switch 103 }
+
+
+    -- -----------------------------------------------------------------------------
+    -- UPS parameters
+    -- -----------------------------------------------------------------------------
+    prvtUPSNotifications  OBJECT IDENTIFIER ::= { prvtUPSMib 0 }
+    upsStatus 	OBJECT IDENTIFIER ::= { prvtUPSMib 1 }
+    prvtUPSConformance    OBJECT IDENTIFIER ::= { prvtUPSMib 2 }
+    
+    upsConnectedStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                       connected(1),
+                       disconnected(2)
+                       }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+            "This object indicates, if a UPS is connected to the device."
+		::= { upsStatus 1 }
+
+    upsLinePowerStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                       unknown(1),
+                       fromExternalConnection(2),
+                       fromInternalBattery(3)
+                       }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+            "This object indicates the external AD power line status: 
+             the UPS is supplying the power from the internal battery
+             or from an external AC power connection."
+		::= { upsStatus 2 }
+
+    upsBatteryStorageStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                       unknown(1),
+                       moreThan30Minutes(2),
+                       lessThan30Minutes(3)
+                       }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+            "This object shows the estimated time left until the UPS battery 
+             will discharge to the level at which the UPS must shutdown."
+		::= { upsStatus 3 }
+
+    upsInternalStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                       unknown(1),
+                       ok(2),
+                       failure(3)
+                       }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+            "This object shows if the UPS has some kind of an internal 
+             failure."
+		::= { upsStatus 4 }
+     
+     -- Traps for use by prvtUPSMib
+
+     upsStatusChange NOTIFICATION-TYPE
+         OBJECTS { upsConnectedStatus,upsLinePowerStatus,
+                     upsBatteryStorageStatus,upsInternalStatus}
+	 STATUS current
+         DESCRIPTION
+                 "The upsStatusChange trap indicates that the sending 
+                  agent monitor detected a change in the status of the external 
+                  UPS, connected to the device."
+         ::= {prvtUPSNotifications 1}
+
+-- *******************************************************************
+--  Conformance Information
+-- *******************************************************************
+
+    prvtUPSMIBGroups       OBJECT IDENTIFIER ::= { prvtUPSConformance 2 }
+
+
+    prvtUPSNotificationGroup NOTIFICATION-GROUP
+    	NOTIFICATIONS {
+    		upsStatusChange
+    	}
+	STATUS current
+     	DESCRIPTION
+        	"Private Notification Group."
+     ::= { prvtUPSMIBGroups 3 }
+
+END

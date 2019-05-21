@@ -1,7 +1,8 @@
 source: Installation/Installation-CentOS-7-Nginx.md
+path: blob/master/doc/
 > NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is 5.6.4**
+**Please note the minimum supported PHP version is 7.1.3**
 
 ## Install Required Packages ##
 
@@ -9,17 +10,17 @@ source: Installation/Installation-CentOS-7-Nginx.md
 
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-    yum install cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php71w php71w-cli php71w-common php71w-curl php71w-fpm php71w-gd php71w-mcrypt php71w-mysql php71w-process php71w-snmp php71w-xml php71w-zip python-memcached rrdtool
+    yum install composer cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php72w php72w-cli php72w-common php72w-curl php72w-fpm php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
 
 #### Add librenms user
 
     useradd librenms -d /opt/librenms -M -r
     usermod -a -G librenms nginx
 
-#### Install LibreNMS
+#### Download LibreNMS
 
     cd /opt
-    git clone https://github.com/librenms/librenms.git librenms
+    composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
 
 ## DB Server ##
 
@@ -39,13 +40,10 @@ exit
 
     vi /etc/my.cnf
 
-> NOTE: Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
-
 Within the `[mysqld]` section please add:
 
 ```bash
 innodb_file_per_table=1
-sql-mode=""
 lower_case_table_names=0
 ```
     systemctl enable mariadb
@@ -70,7 +68,7 @@ user = nginx
 group = apache   ; keep group as apache
 
 ;listen = 127.0.0.1:9000
-listen = /var/run/php-fpm/php7.1-fpm.sock
+listen = /var/run/php-fpm/php7.2-fpm.sock
 
 listen.owner = nginx
 listen.group = nginx
@@ -105,7 +103,7 @@ server {
  location ~ \.php {
   include fastcgi.conf;
   fastcgi_split_path_info ^(.+\.php)(/.+)$;
-  fastcgi_pass unix:/var/run/php-fpm/php7.1-fpm.sock;
+  fastcgi_pass unix:/var/run/php-fpm/php7.2-fpm.sock;
  }
  location ~ /\.ht {
   deny all;
@@ -133,11 +131,17 @@ Install the policy tool for SELinux:
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
     restorecon -RFvv /opt/librenms/rrd/
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/storage(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/storage(/.*)?'
+    restorecon -RFvv /opt/librenms/storage/
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+    restorecon -RFvv /opt/librenms/bootstrap/cache/
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_execmem 1
 
 ##### Allow fping
-Create the file http_fping.tt with the following contents:
+Create the file http_fping.tt with the following contents. You can create this file anywhere, as it is a throw-away file. The last step in this install procedure will install the module in the proper location.
 ```
 module http_fping 1.0;
 
@@ -165,7 +169,7 @@ Then run these commands
     firewall-cmd --zone public --add-service https
     firewall-cmd --permanent --zone public --add-service https
 
-#### Configure snmpd
+### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
 
@@ -182,6 +186,8 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 
     cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 
+> NOTE: Keep in mind  that cron, by default, only uses a very limited set of environment variables. You may need to configure proxy variables for the cron invocation. Alternatively adding the proxy settings in config.php is possible too. The config.php file will be created in the upcoming steps. Review the following URL after you finished librenms install steps: https://docs.librenms.org/Support/Configuration/#proxy-support
+
 #### Copy logrotate config
 
 LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
@@ -191,14 +197,19 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 ### Set permissions
 
     chown -R librenms:librenms /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs
+    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    chgrp apache /var/lib/php/session/
 
 ## Web installer ##
 
 Now head to the web installer and follow the on-screen instructions.
 
     http://librenms.example.com/install.php
+    
+The web installer might prompt you to create a `config.php` file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
+
+    chown librenms:librenms /opt/librenms/config.php
 
 ### Final steps
 

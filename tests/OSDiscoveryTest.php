@@ -26,7 +26,6 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
-use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 class OSDiscoveryTest extends TestCase
 {
@@ -69,7 +68,7 @@ class OSDiscoveryTest extends TestCase
         });
 
         if (empty($files)) {
-            throw new PHPUnitException("No snmprec files found for $os_name!");
+            $this->fail("No snmprec files found for $os_name!");
         }
 
         foreach ($files as $file) {
@@ -101,8 +100,9 @@ class OSDiscoveryTest extends TestCase
     private function checkOS($expected_os, $filename = null)
     {
         $community = $filename ?: $expected_os;
-        global $debug;
+        global $debug, $vdebug;
         $debug = true;
+        $vdebug = true;
         ob_start();
         $os = getHostOS($this->genDevice($community));
         $output = ob_get_contents();
@@ -119,18 +119,18 @@ class OSDiscoveryTest extends TestCase
      */
     private function genDevice($community)
     {
-        return array(
+        return [
             'device_id' => 1,
-            'hostname' => $this->snmpsimIp,
+            'hostname' => $this->snmpsim->getIP(),
             'snmpver' => 'v2c',
-            'port' => $this->snmpsimPort,
+            'port' => $this->snmpsim->getPort(),
             'timeout' => 3,
             'retries' => 0,
             'snmp_max_repeaters' => 10,
             'community' => $community,
             'os' => 'generic',
             'os_group' => '',
-        );
+        ];
     }
 
     /**
@@ -144,6 +144,7 @@ class OSDiscoveryTest extends TestCase
         $config_os = array_keys(Config::get('os'));
         if (count($config_os) < count(glob(Config::get('install_dir').'/includes/definitions/*.yaml'))) {
             load_all_os();
+            $config_os = array_keys(Config::get('os'));
         }
 
         $excluded_os = array(

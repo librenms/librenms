@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS 
+ * LibreNMS
  *
  * Copyright (c) 2015 Vitali Kari <vitali.kari@gmail.com>
  *
@@ -29,7 +29,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
     // some vendors like PBN dont follow the 802.1D implementation and use seconds in SNMP
     if ($device['os'] == 'pbn') {
         preg_match('/^.* Build (?<build>\d+)/', $device['version'], $version);
-        if ($version[build] <= 16607) { // Buggy version :-(
+        if ($version['build'] <= 16607) { // Buggy version :-(
             $tm = '1';
         }
     }
@@ -56,7 +56,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
 
     // read the 802.1D bridge address and set as MAC in database
     $mac_raw = snmp_get($device, 'dot1dBaseBridgeAddress.0', '-Oqv', 'RSTP-MIB');
-    
+
     // read Time as timetics (in hundredths of a seconds) since last topology change and convert to seconds
     $time_since_change = snmp_get($device, 'dot1dStpTimeSinceTopologyChange.0', '-Ovt', 'RSTP-MIB');
     if ($time_since_change > '100') {
@@ -100,7 +100,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
         log_event('STP added, bridge address: ' . $stp['bridgeAddress'], $device, 'stp', 3);
         echo '+';
     }
-    
+
     if ($stp_db['bridgeAddress'] && !$stp['bridgeAddress']) {
         dbDelete('stp', 'device_id = ?', array($device['device_id']));
         log_event('STP removed', $device, 'stp', 4);
@@ -119,17 +119,17 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
                 'designatedPort'        => $stp_raw[$port]['dot1dStpPortDesignatedPort'],
                 'forwardTransitions'    => $stp_raw[$port]['dot1dStpPortForwardTransitions']
             );
-            
+
             // set device binding
             $stp_port['device_id'] = $device['device_id'];
-            
+
             // set port binding
             $stp_port['port_id'] = dbFetchCell('SELECT port_id FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $stp_raw[$port]['dot1dStpPort']));
-            
+
             $dr = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedRoot']));
             $dr = substr($dr, -12); //remove first two octets
             $stp_port['designatedRoot'] = $dr;
-            
+
             $db = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedBridge']));
             $db = substr($db, -12); //remove first two octets
             $stp_port['designatedBridge'] = $db;
@@ -149,7 +149,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
                 $dp = substr($stp_raw[$port]['dot1dStpPortDesignatedPort'], -2); //discard the first octet (priority part)
                 $stp_port['designatedPort'] = hexdec($dp);
             }
-            
+
             d_echo($stp_port);
 
             // Write to db

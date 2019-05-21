@@ -1,4 +1,5 @@
 source: API/Routing.md
+path: blob/master/doc/
 
 ### `list_bgp`
 

@@ -1,0 +1,968 @@
+PEGASUS-SDH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  Integer32,
+  OBJECT-TYPE,
+  MODULE-IDENTITY         FROM SNMPv2-SMI
+  TEXTUAL-CONVENTION,
+  DisplayString,
+  TruthValue              FROM SNMPv2-TC
+  InterfaceIndex,
+  InterfaceIndexOrZero,
+  ifIndex                 FROM IF-MIB
+  pegasusMibModule,
+  OperStateEnum,
+  AvailabilityStatusElem, 
+  CommStateEnum           FROM PEGASUS-MIB;
+
+pegasusSdhMibModule  MODULE-IDENTITY
+  LAST-UPDATED "200403180000Z"  -- 18 March, 2004
+  ORGANIZATION "Schmid Telecom, Zurich"
+  CONTACT-INFO
+    "Schmid Telecom AG
+     Binzstrasse 35, CH-8048 Zurich
+     Switzerland
+
+     Email: xdslsupport@schmid-telecom.ch"
+  DESCRIPTION
+    "This MIB applies to the PEGASUS SDSL product manufactured by Schmid
+    Telecom Zurich. The MIB is modelled after the PEM management model, so
+    object hierarchy and individual variables agree with the PEM client. This 
+    MIB represents an extension to the DS1-MIB and the SONET-MIB. These three
+    MIB files are used to manage the PEGASUS STM-1 card.
+
+    The PEGASUS-SDH-MIB contains five tables:
+    - stm1CardTable         one entry for each STM-1 card configured.
+    - stm1CardClockTable    one entry for each STM-1 card configured.
+    - ethernetIfTable       one entry for each Ethernet interface of a 
+                              configured STM-1 card.
+    - vcTable               one entry for each Virtual Container (VC-3/4/12).
+    - tugConfigTable        one entry for each Tributary Unit Group (TUG-3).
+
+    Note
+    - The tables that represent extensions to the DS1-/SINET-MIB use the 
+      ifIndex from IF-MIB (ifTable)."
+
+  REVISION "200403180000Z"  -- 18 March, 2004
+  DESCRIPTION
+    "Improved Alarm signalisation. A new variable stm1CardAlarmStatus shows 
+    the alarms that are active on the STM-1 card. Active Ethernet alarms are 
+    shown by ethernetIfAlarmStatus. The following values for vcAlarmStatus 
+    are can not occur (not used):
+        - vcgTxAddTimeout     - vcgDnuOk
+        - vcgTxAdd            - vcgRxAdd
+        - vcgTxRemove         - vcgRxRemove
+        - vcgTxDnu            - vcgRxFail"
+  REVISION "200401070000Z"  -- 7 January, 2004
+  DESCRIPTION
+    "Actually, only GFP is supported as Ethernet Encapsulation. Therefore 
+    the variable etherIfEncapsulation is now read-only."
+  REVISION "200311170000Z"  -- 17 November, 2003
+  DESCRIPTION
+    "Initial Revision."
+  ::= { pegasusMibModule 8 }
+
+
+-- *******************************************************************
+-- stm1 card group
+--
+-- This group contains four tables:
+-- - stm1CardTable
+-- - ethernetIfTable
+-- - vcConfigTable
+-- - tugConfigTable
+-- *******************************************************************
+-- STM1 Card Enumerations and Subranges
+
+ClockSourceEnum ::= INTEGER {
+    rxLineClock(1),
+    referenceClock(2),
+    freeRun(3)
+  }
+
+ClockSyncStateEnum ::= INTEGER {
+    syncOk(1),
+    syncNotOk(2)  
+  }
+
+ClockModeEnum ::= INTEGER {
+    enabled(1),
+    disabled(2)
+  }
+
+ClockPriorityEnum ::= INTEGER {
+    primary(1),
+    secondary(2)
+  }
+
+ClockQualityEnum ::= INTEGER {
+    prc(1),
+    ssu-a(2),
+    ssu-b(3),
+    sec(4),
+    dnu(5),
+    auto(6),
+    unknown(7)
+  }
+
+ClockStateEnum ::= INTEGER {
+    invalid(1),
+    valid(2)
+  }
+
+MultiplexingModeEnum ::= INTEGER {
+    au3(1),
+    au4(2)
+  }
+
+VirtualContainerTypeEnum ::= INTEGER {
+    vc4(1),
+    vc3(2),
+    vc12(3)
+  }
+
+LaserOperationModeEnum ::= INTEGER {
+    off(1),
+    als(2)
+  }
+
+LaserStateEnum ::= INTEGER {
+    on(1),
+    shutdown(2),
+    restart(3)
+  }
+
+SdhInterfaceEnum ::= INTEGER {
+    optical(1),
+    e1(2)
+  }
+
+PRBSPatternEnum ::= INTEGER {
+    pattern2exp15(1),    -- 2^15-1 = 32767
+    pattern2exp20(2)     -- 2^20-1 = 1048575
+  }
+
+TraceSizeEnum ::= INTEGER {
+    size1byte(1),
+    size16byte(2)
+  }
+
+SignalLabel ::= TEXTUAL-CONVENTION
+  DISPLAY-HINT  "x"
+  STATUS        current
+  DESCRIPTION
+      "Representation of a VC Signal Label. The meaning of the SignalLabel
+      depends on the type of vitual container. 
+      VC-12s use the following values:
+      001b    Unequipped
+      001b    Equipped (non specific)
+      010b    Asynchronous
+      011b    Bit Synchronous
+      100b    Byte Synchronous
+      101b    Reserved for future use
+      110b    Test signal (O.181)
+      111b    VC-AIS
+
+      VC-4 and VC-3 use these values:
+      00h     Unequipped or supervisory-unequipped
+      01h     Equipped - non-specific
+      02h     TUG Structure
+      03h     Locked TU-n
+      04h     Asynch. mapping of 34'386/44'736 kbit/s into Container-3
+      12h     Asynch. mapping of 139'264 kbit/s into Container-4
+      13h     ATM Mapping
+      14h     MAN DQDB (IEEE 802.6 mapping
+      15h     FDDI (ISO 9314) mapping
+      16h     Mapping of HDLC/PPP framed signal
+      17h     Mapping of SDL with SDH self synch. Scrambler
+      18h     Mapping of HDLC/LAP-S framed signals
+      19h     Mapping of SDL with set-reset scrambler
+      1Ah     Mapping of 10 Gbit/s Ethernet frames (IEEE 802.3)
+      CFh     Obsolete mapping of HDLC/PPP framed signal
+      E1h-FCh Reserved for national use
+      FEh     Test signal, O.181 specific mapping
+      FFh     VC-AIS"
+  SYNTAX        INTEGER(0..7|18..26|207|225..252|254..255)
+
+ConcatenationTypeEnum ::= INTEGER {
+    lcas(1),
+    nonLCAS(2)
+  }
+
+EthernetIfEncapsulationEnum ::= INTEGER {
+    disabled(1),    -- not supported feature
+    gfp(2),
+    lapf(3),        -- not supported feature
+    laps(4),        -- not supported feature
+    ppp(5)          -- not supported feature
+  }
+
+OrderLevelEnum ::= INTEGER {
+    highOrder(1),
+    lowOrder(2)
+  }
+
+STM1SlotNumber ::= INTEGER(2)
+TUGIndex ::= INTEGER(1..3)
+TUGIndexOrZero ::= INTEGER(0..3)
+
+-- STM-1 Card: STM-1 Card Table
+
+stm1CardTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF Stm1CardEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "A table containing stm1 card specific information."
+  ::= { pegasusSdhMibModule 1 }
+
+stm1CardEntry OBJECT-TYPE
+  SYNTAX      Stm1CardEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for stm1 card table."
+  INDEX   { stm1CardSlotNumber }
+  ::= { stm1CardTable 1 }
+
+Stm1CardEntry ::= SEQUENCE {
+    stm1CardSlotNumber              STM1SlotNumber,
+    -- identification
+    stm1CardName                    DisplayString,
+    stm1CardHardwareVersion         DisplayString,
+    stm1CardFirmwareVersion         DisplayString,
+    stm1CardManufacturer            DisplayString,
+    stm1CardSerialNumber            DisplayString,
+    -- configuration
+    stm1CardMultiplexingMode        MultiplexingModeEnum,
+    stm1CardJ0TraceMonitoring       OperStateEnum,
+    stm1CardJ1TraceMonitoring       OperStateEnum,
+    stm1CardJ2TraceMonitoring       OperStateEnum,
+    stm1CardJ0PathTraceSize         TraceSizeEnum,
+    stm1CardJ0PathTraceSend         DisplayString,          -- same as sonetMediumCircuitIdentifier
+    stm1CardJ0PathTraceExpected     DisplayString,    
+    stm1CardJ0PathTraceReceive      DisplayString,
+    stm1CardLaserOperationMode      LaserOperationModeEnum,
+    stm1CardLaserState              LaserStateEnum,
+    -- supervision
+    stm1CardOperState               OperStateEnum,
+    stm1CardAvailabilityState       AvailabilityStatusElem,
+    stm1CardMgmtCommState           CommStateEnum,
+    -- maintenance
+    stm1CardPRBSGeneratorSink       SdhInterfaceEnum,
+    stm1CardPRBSAnalyzerSource      SdhInterfaceEnum,
+    stm1CardPRBSPattern             PRBSPatternEnum,
+    -- additional card alarm status
+    stm1CardAlarmStatus             Integer32
+  }
+
+stm1CardSlotNumber OBJECT-TYPE
+  SYNTAX      STM1SlotNumber
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Slot number for stm1 card."
+  ::= { stm1CardEntry 1 }
+
+stm1CardName OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Name of the PEGASUS device."
+  ::= { stm1CardEntry 2 }
+
+stm1CardHardwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Hardware version of the STM-1 card. This is also called CHM-number
+          (it always starts with the letters 'CHM'). The number '404' after
+          'CHM' identifies the card as a STM-1 card."
+  ::= { stm1CardEntry 3 }
+
+stm1CardFirmwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Version number and build date of the firmware running on the line 
+          card. The format is 'major.minor YYYYMMDD hh:mm'."
+  ::= { stm1CardEntry 4 }
+
+stm1CardManufacturer OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Manufacturer of the STM-1 card."
+  ::= { stm1CardEntry 5 }
+
+stm1CardSerialNumber OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Serial number of the line card. Also called HM-number, as it always 
+          starts with 'HM'. Example: HMVSS014810294."
+  ::= { stm1CardEntry 6 }
+
+stm1CardMultiplexingMode OBJECT-TYPE
+  SYNTAX      MultiplexingModeEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Selects the SDH multiplexing mode. Either it is STM1-AU3-VC3 or 
+          STM1-AU4-VC4."
+  ::= { stm1CardEntry 7 }
+
+stm1CardJ0TraceMonitoring OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "If trace monitoring is disable no alarm is propagated to PEM and 
+          also no RDI/AIS is inserted."
+  ::= { stm1CardEntry 8 }
+                      
+stm1CardJ1TraceMonitoring OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "If trace monitoring is disable no alarm is propagated to PEM and 
+          also no RDI/AIS is inserted."
+  ::= { stm1CardEntry 9 }
+
+stm1CardJ2TraceMonitoring OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "If trace monitoring is disable no alarm is propagated to PEM and 
+          also no RDI/AIS is inserted."
+  ::= { stm1CardEntry 10 }
+
+stm1CardJ0PathTraceSize OBJECT-TYPE
+  SYNTAX      TraceSizeEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Size of the Regenerator Section Trace Message."
+  ::= { stm1CardEntry 11 }
+
+stm1CardJ0PathTraceSend OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Configurable Regenerator Section (RS) Trace Message."
+  ::= { stm1CardEntry 12 }
+
+stm1CardJ0PathTraceExpected OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Regenerator Section (RS) Trace Message that should be received."
+  ::= { stm1CardEntry 13 }
+
+stm1CardJ0PathTraceReceive OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Regenerator Section (RS) Trace Message that is be received."
+  ::= { stm1CardEntry 14 }
+
+stm1CardLaserOperationMode OBJECT-TYPE
+  SYNTAX      LaserOperationModeEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Configuration of the 'Automatic Laser Shutdown' feature."
+  ::= { stm1CardEntry 15 }
+
+stm1CardLaserState OBJECT-TYPE
+  SYNTAX      LaserStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Actual state of the laser."
+  ::= { stm1CardEntry 16 }
+
+stm1CardOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { stm1CardEntry 17 }
+
+stm1CardAvailabilityState OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { stm1CardEntry 18 }
+
+stm1CardMgmtCommState OBJECT-TYPE
+  SYNTAX      CommStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The Management Comm State indicates the state of the management
+          connection between the PEM Server and the STM-1 card.
+          disconnected            No connection has been established.
+          init                    A connection has freshly been established on
+                                  the underlying protocol, but no management
+                                  information has been transmitted so far.
+          identification          The connected device is being identified.
+          check hardware          The connected hardware is compared to the one
+                                  stored in the configuration.
+          hardware adaptation     If the configured and the existing device do
+                                  not match, an adoption is made. The behaviour
+                                  in this case can be configured with the 'HW
+                                  Adaptation Policy' option.
+          check program version   The program version of the connected hardware
+                                  is compared to the one stored in the
+                                  configuration.
+          check config version    The configuration version of the connected
+                                  hardware is compared to the one stored in the
+                                  configuration.
+          download config         If a configuration version mismatch has been
+                                  detected and the 'Config Priority' of 'PEGASUS
+                                  system' is set to 'Device', the configuration
+                                  is downloaded from the device to the PEM
+                                  Server.
+          upload config           If a configuration version mismatch has been
+                                  detected and the 'Config Priority' of 'PEGASUS
+                                  system' is set to 'Server', the configuration
+                                  is uploaded from the PEM Server to the device.
+          status synch            The values of the status properties are being
+                                  synchronised.
+          resetting               The device is resetting.
+          inactive                The device is connected, but it is inactive,
+                                  that is not operational. This may be due to a
+                                  hardware mismatch.
+          active                  The management connection between the device
+                                  and the PEM Server is fully established and
+                                  the device is active."
+  ::= { stm1CardEntry 19 }
+
+stm1CardPRBSGeneratorSink OBJECT-TYPE
+  SYNTAX      SdhInterfaceEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Determines, whether the PRBS Generator should be used on the 
+          optical or on the E1 links."
+  ::= { stm1CardEntry 20 }
+
+stm1CardPRBSAnalyzerSource OBJECT-TYPE
+  SYNTAX      SdhInterfaceEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Determines, whether the PRBS Analyzer should be used on the 
+          optical or on the E1 links."
+  ::= { stm1CardEntry 21 }
+
+stm1CardPRBSPattern OBJECT-TYPE
+  SYNTAX      PRBSPatternEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Determines the PRBS Pattern to be used."
+  ::= { stm1CardEntry 22 }
+
+stm1CardAlarmStatus OBJECT-TYPE
+  SYNTAX      Integer32 (1..511)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "This variable indicates the status of STM-1 card, regenerator 
+          section and multiplex section. It's a bitmap represented as a sum. 
+          Therefore multiple alarms can be displayed simultaneously. The value 
+          noAlarm is only set if there isn't any alarm active. 
+          The various bit positions are:
+            1     No alarm present
+            -- STM-1 card --
+            2     Initialization failure
+            4     Firmware Version Mismatch
+            8     Maintenance
+            -- regenerator section RS --
+            16    Loss of Signal (LOS)
+            32    Loss of Frame (LOF)
+            64    Trace ID Mismatch (RS-TIM)
+            -- multiplex section MS --
+            128   Alarm Indication Signal (MS-AIS)
+            256   Remote Defect Indication (MS-RDI, former FERF)"
+  ::= { stm1CardEntry 23 }
+
+-- STM-1 Card: STM-1 Card Clock Table
+
+stm1CardClockTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF Stm1CardClockEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "A table containing stm1 card specific clock information."
+  ::= { pegasusSdhMibModule 2 }
+
+stm1CardClockEntry OBJECT-TYPE
+  SYNTAX      Stm1CardClockEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for stm1 card clock table."
+  INDEX   { stm1CardSlotNumber }
+  ::= { stm1CardClockTable 1 }
+
+Stm1CardClockEntry ::= SEQUENCE {
+    -- clock settings
+    stm1CardActiveClockSource       ClockSourceEnum,
+    stm1CardClockSyncState          ClockSyncStateEnum,
+    stm1CardTxLineClockQuality      ClockQualityEnum,
+    stm1CardRxClockMode             ClockModeEnum,
+    stm1CardRxClockPriority         ClockPriorityEnum,
+    stm1CardRxClockQuality          ClockQualityEnum,
+    stm1CardRxClockState            ClockStateEnum,
+    stm1CardReferenceClockMode      ClockModeEnum,
+    stm1CardReferenceClockPriority  ClockPriorityEnum,
+    stm1CardReferenceClockQuality   ClockQualityEnum,
+    stm1CardReferenceClockState     ClockStateEnum
+  }
+
+stm1CardActiveClockSource OBJECT-TYPE
+  SYNTAX      ClockSourceEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Displays which clock sourceis active and used as sync source."
+  ::= { stm1CardClockEntry 1 }
+
+stm1CardClockSyncState OBJECT-TYPE
+  SYNTAX      ClockSyncStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Sync status is OK if RX or Reference clock is valid and used as 
+          active sync source."
+  ::= { stm1CardClockEntry 2 }
+
+stm1CardTxLineClockQuality OBJECT-TYPE
+  SYNTAX      ClockQualityEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "This is the clock quality of the outgoing SDH signal. The default 
+          sets the outgoing quality to the incoming quality. Sometime it may 
+          be useful to set a fix outgoing quality."
+  ::= { stm1CardClockEntry 3 }
+
+stm1CardRxClockMode OBJECT-TYPE
+  SYNTAX      ClockModeEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "If enabled the RX line clock can be used as sync source."
+  ::= { stm1CardClockEntry 4 }
+
+stm1CardRxClockPriority OBJECT-TYPE
+  SYNTAX      ClockPriorityEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "This value has always the opposite value of Reference Clock 
+          Priority."
+  ::= { stm1CardClockEntry 5 }
+
+stm1CardRxClockQuality OBJECT-TYPE
+  SYNTAX      ClockQualityEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "This is the clock quality of the incoming SDH signal."
+  ::= { stm1CardClockEntry 6 }
+
+stm1CardRxClockState OBJECT-TYPE
+  SYNTAX      ClockStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Clock status is valid if a good clock can be found on input 
+          (clock checker)."
+  ::= { stm1CardClockEntry 7 }
+
+stm1CardReferenceClockMode OBJECT-TYPE
+  SYNTAX      ClockModeEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "If enabled the Reference clock (V5 card input) can be used as sync 
+          source."
+  ::= { stm1CardClockEntry 8 }
+
+stm1CardReferenceClockPriority OBJECT-TYPE
+  SYNTAX      ClockPriorityEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "This value has always the opposite value of Rx Clock Priority."
+  ::= { stm1CardClockEntry 9 }
+
+stm1CardReferenceClockQuality OBJECT-TYPE
+  SYNTAX      ClockQualityEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Defines the quality of the reference clock input. This value will 
+          be transmitted in SDH-TX if reference clock is used as active sync 
+          source."
+  ::= { stm1CardClockEntry 10 }
+
+stm1CardReferenceClockState OBJECT-TYPE
+  SYNTAX      ClockStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Clock status is valid if a good clock can be found on input 
+          (clock checker)."
+  ::= { stm1CardClockEntry 11 }
+
+
+-- STM-1 Card: Ethernet Interface Table
+
+ethernetIfTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF EthernetIfEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "This table contains additional information concerning the ethernet 
+          interfaces of a STM-1 card. It represents an extension of the 
+          if(X)Table (see IF-MIB)."
+  ::= { pegasusSdhMibModule 3 }
+
+ethernetIfEntry OBJECT-TYPE
+  SYNTAX      EthernetIfEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for the ethernetIfTable."
+  INDEX       { ifIndex }
+  ::= { ethernetIfTable 1 }
+
+EthernetIfEntry ::= SEQUENCE {
+    etherIfConcatenationOption  ConcatenationTypeEnum,
+    etherIfEncapsulation        EthernetIfEncapsulationEnum,
+    etherIfOrderLevel           OrderLevelEnum,
+    etherIfAlarmStatus          Integer32
+  }
+
+etherIfConcatenationOption OBJECT-TYPE
+  SYNTAX      ConcatenationTypeEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Configuration of the Link Capacity Adjustment Scheme."
+  ::= { ethernetIfEntry 1 }
+
+etherIfEncapsulation OBJECT-TYPE
+  SYNTAX      EthernetIfEncapsulationEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "This attribute shows the used Ethernet encapsulation protocol."
+  ::= { ethernetIfEntry 2 }
+
+etherIfOrderLevel OBJECT-TYPE
+  SYNTAX      OrderLevelEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Only relevant, if SDH Multiplexing Mode (see STM-1 card propertied) 
+          is set to VC3."
+  ::= { ethernetIfEntry 3 }
+
+etherIfAlarmStatus OBJECT-TYPE
+  SYNTAX      Integer32 (1..511)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "This variable indicates the status of an Ethernet Interface. It's 
+          a bitmap represented as a sum. Therefore multiple defects can be 
+          displayed simultaneously. The value noAlarm is only set if there 
+          isn't any alarm. 
+          The various bit positions are (LO = LowOrder, HO = HighOrder):
+            1   No alarm
+            2   LO LCAS group identifier mismatch (Rx)
+            4   HO LCAS group identifier mismatch (Rx)
+            8   LO VCG exceeds max. differential delay (Rx)
+            16  HO VCG exceeds max. differential delay (Rx)
+            32  LO VCG exceeds max. differential delay, calculated over all 
+                containers (Rx)
+            64  HO VCG exceeds max. differential delay, calculated over all 
+                containers (Rx)
+            128 Transmit FIFO overflow (Tx)
+            256 Rx head-of-line blocking FIFO overflow"
+  ::= { ethernetIfEntry 4 }
+
+-- STM-1 Card: Virtual Container (VC) Configuration Table
+
+vcTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF VcEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "This table contains additional information for VC concerning the 
+          multiplexing configuration. It's an extension of the ifTable 
+          (IF-MIB) and the tables of the SONET/SDH-MIB.
+          "
+  ::= { pegasusSdhMibModule 4 }
+
+vcEntry OBJECT-TYPE
+  SYNTAX      VcEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for the vcConfigTable."
+  INDEX       { ifIndex }
+  ::= { vcTable 1 }
+
+VcEntry ::= SEQUENCE {
+    vcType                  VirtualContainerTypeEnum,
+    vcRelatedTUG            TUGIndexOrZero,
+    vcRelatedVC             InterfaceIndexOrZero,
+    vcAssignedIfIndex       InterfaceIndexOrZero,
+    vcPathTraceSend         DisplayString,            -- same as dsx1CircuitIdentifier
+    vcPathTraceExpected     DisplayString,
+    vcPathTraceReceive      DisplayString,
+    vcSignalLabelSend       SignalLabel,
+    vcSignalLabelExpected   SignalLabel,
+    vcSignalLabelReceive    SignalLabel,
+    vcAlarmStatus           Integer32
+  }
+
+vcType OBJECT-TYPE
+  SYNTAX      VirtualContainerTypeEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Type of Virtual Container (VC). In Pegasus VC-4, VC-3 or VC-12."
+  ::= { vcEntry 1 }
+
+vcRelatedTUG OBJECT-TYPE
+  SYNTAX      TUGIndexOrZero
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Represents the index of the Tributary Unit Group within the 
+          tugConfigTable to which this VC is assigned to. The value depends 
+          also on the multiplexing mode. If the value is 0, there doesn't 
+          exist the relation VC-x to TUG-3. Possible values:
+          1) multiplexing mode = AU-4:
+              VC-4:    vcRelatedTUG = 0
+              VC-3/12: vcRelatedTUG = 1..3
+          2) multiplexing mode = AU-3:
+              vcRelatedTUG = 0 (no dependency on VC type)"
+  ::= { vcEntry 2 }
+
+vcRelatedVC OBJECT-TYPE
+  SYNTAX      InterfaceIndexOrZero
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Represents the index of the Virtual Container within the 
+          ifTable to which this VC is assigned to. The value depends 
+          also on the multiplexing mode. If the value is 0, there doesn't 
+          exist the relation VC-x to VC-x. Possible values:
+          1) multiplexing mode = AU-4:
+              vcRelatedVC = 0 (no dependency on VC type)
+          2) multiplexing mode = AU-3:
+              VC-3:   vcRelatedVC = 0
+              VC-12:  vcRelatedVC = 2031..2033 (example for slot 2)"
+  ::= { vcEntry 3 }
+
+vcAssignedIfIndex OBJECT-TYPE
+  SYNTAX      InterfaceIndexOrZero
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Represents the index of the interface within the ifTable (IF-MIB) 
+          that transmits to this VC."
+  ::= { vcEntry 4 }
+
+vcPathTraceSend OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "The value of the outgoing J1 Byte VC Path Trace byte message."
+  ::= { vcEntry 5 }
+
+vcPathTraceExpected OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "The value of the expected J1 Byte VC Path Trace byte message."
+  ::= { vcEntry 6 }
+
+vcPathTraceReceive OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The value of the incoming J1 Byte VC Path Trace byte message."
+  ::= { vcEntry 7 }
+
+vcSignalLabelSend OBJECT-TYPE
+  SYNTAX      SignalLabel
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "The outgoing C2 VC Signal Label (0x02 = TUG structure)."
+  ::= { vcEntry 8 }
+
+vcSignalLabelExpected OBJECT-TYPE
+  SYNTAX      SignalLabel
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "The expected C2 VC Signal Label (0x02 = TUG structure)."
+  ::= { vcEntry 9 }
+
+vcSignalLabelReceive OBJECT-TYPE
+  SYNTAX      SignalLabel
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The incoming C2 VC Signal Label (0x02 = TUG structure)."
+  ::= { vcEntry 10 }
+
+vcAlarmStatus OBJECT-TYPE
+  SYNTAX      Integer32 (1..524287)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "This variable indicates the status of the VC. It's a bitmap 
+           represented as a sum. Therefore multiple defects can be displayed 
+           simultaneously. The value noDefect should only be set if there is 
+           no other defect. Some alarms can't occur actually.
+           The various bit positions are:
+            1       vcNoDefect
+            2       vcAlarmAIS
+            4       vcAlarmLOP
+            8       vcAlarmRDI
+            16      vcAlarmUnequipped
+            32      vcAlarmPLM
+            64      vcAlarmTIM
+            128     vcAlarmLOM
+            256     vcAlarmRFI
+            512     vcgTxAddTimeout     -- not used (deprecated)
+            1024    vcgTxAdd            -- not used (deprecated)
+            2048    vcgTxRemove         -- not used (deprecated)
+            4096    vcgTxDnu            -- not used (deprecated)
+            8192    vcgDnuOk            -- not used (deprecated)
+            16384   vcgRxAdd            -- not used (deprecated)
+            32768   vcgRxRemove         -- not used (deprecated)
+            65536   vcgRxFail           -- not used (deprecated)
+            131072  vcgLcasCrcError
+            262144  vcgNonLcasSeqError"
+  ::= { vcEntry 11 }
+
+-- STM-1 Card: Tributary Unit Group (TUG) Configuration Table
+
+tugConfigTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF TugConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "This table contains information concerning Tributary Unit Groups. 
+          If AU-3 structure is used, this table is empty."
+  ::= { pegasusSdhMibModule 5 }
+
+tugConfigEntry OBJECT-TYPE
+  SYNTAX      TugConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for the tugConfigTable."
+  INDEX       { tugIndex }
+  ::= { tugConfigTable 1 }
+
+TugConfigEntry ::= SEQUENCE {
+    tugIndex        TUGIndex,
+    tugRelatedVC4   InterfaceIndex,
+    tugOrderLevel   OrderLevelEnum
+  }
+
+tugIndex OBJECT-TYPE
+  SYNTAX      TUGIndex
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Number of the TUG. Range 1..3"
+  ::= { tugConfigEntry 1 }
+
+tugRelatedVC4 OBJECT-TYPE
+  SYNTAX      InterfaceIndex
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          ""
+  ::= { tugConfigEntry 2 }
+
+tugOrderLevel OBJECT-TYPE
+  SYNTAX      OrderLevelEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Individual Order Level of this TUG. If high order is used, the TUG 
+          has exactly one VC-3 and no VC-12s. If low order is used, the TUG 
+          has exactly 21 VC-12 and no VC-3."
+  ::= { tugConfigEntry 3 }
+
+
+-- STM-1 Support: Additional information
+
+sdhMibRevision OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The version number assigned by the version control system. You can query
+      this from the agent, to find out with which version of the MIB was built
+      into the agent. The value is also present in copies of the MIB to feed
+      into SNMP managers. Comparing the version numbers from both sources can
+      help to detect mismatches. The revision string for this version is:
+      $Workfile: PEGASUS-SDH-MIB.txt $ $Revision: 14 $ $Date: 3/18/04 6:40p $"
+  DEFVAL    { "$Workfile: PEGASUS-SDH-MIB.txt $ $Revision: 14 $ $Date: 3/18/04 6:40p $" }
+  ::= { pegasusSdhMibModule 6 }
+
+END

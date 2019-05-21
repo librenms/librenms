@@ -1,0 +1,272 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-SUPER-VLAN-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-SUPER-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    switch
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC;
+
+prvtSuperVlanMIB MODULE-IDENTITY
+    LAST-UPDATED "201008040000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "Private MIB supporting Super VLANs"
+    REVISION    "201008040000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 136 }
+
+
+prvtSuperVlanMIBObjects OBJECT IDENTIFIER
+    ::= { prvtSuperVlanMIB 1 }
+
+prvtSuperVlanIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSuperVlanIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of Super-VLAN source ports.
+         A source port must always be associated with either a single target port
+         (specified by a non-zero value for prvtSuperVlanIfTargetPort) or must be
+         associated with a pair of ring ports (specified by creating an entry in
+         prvtSuperVlanIfRingPortTable).
+         Thus when creating a new entry in prvtSuperVlanIfTable, either the object
+         prvtSuperVlanIfTargetPort must be simultaneously set to a valid non-zero
+         ifIndex value or an entry in prvtSuperVlanIfRingPortTable must be
+         simultaneously created to specify the associated ring ports."
+    ::= { prvtSuperVlanMIBObjects 1 }
+
+prvtSuperVlanIfEntry OBJECT-TYPE
+    SYNTAX      PrvtSuperVlanIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtSuperVlanIfTable."
+    INDEX       { prvtSuperVlanIfIndex }
+    ::= { prvtSuperVlanIfTable 1 }
+
+PrvtSuperVlanIfEntry ::= SEQUENCE {
+    prvtSuperVlanIfIndex        InterfaceIndex,
+    prvtSuperVlanIfTargetPort   InterfaceIndexOrZero,
+    prvtSuperVlanIfRowStatus    RowStatus
+}
+
+prvtSuperVlanIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The ifIndex of a Super-VLAN source port."
+    ::= { prvtSuperVlanIfEntry 1 }
+
+prvtSuperVlanIfTargetPort OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The IfIndex of a target port associated with this Super-VLAN source port.
+         A value of zero indicates that the source port is not associated with a
+         single target port but is associated with a pair of ring ports specified
+         in prvtSuperVlanIfRingPortTable.
+         Changing this object from a zero value to a non-zero value that is a valid
+         ifIndex (i.e. changing from a ring-port to a single target port), will
+         result in the associated entry in prvtSuperVlanIfRingPortTable being
+         automatically deleted."
+    ::= { prvtSuperVlanIfEntry 2 }
+
+prvtSuperVlanIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for prvtSuperVlanIfTable."
+    ::= { prvtSuperVlanIfEntry 3 }
+
+prvtSuperVlanIfCVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSuperVlanIfCVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of customer VLANs belonging to a Super-VLAN source port."
+    ::= { prvtSuperVlanMIBObjects 2 }
+
+prvtSuperVlanIfCVlanEntry OBJECT-TYPE
+    SYNTAX      PrvtSuperVlanIfCVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtSuperVlanIfCVlanTable."
+    INDEX       { prvtSuperVlanIfIndex, prvtSuperVlanIfCVlanId }
+    ::= { prvtSuperVlanIfCVlanTable 1 }
+
+PrvtSuperVlanIfCVlanEntry ::= SEQUENCE {
+    prvtSuperVlanIfCVlanId          Integer32,
+    prvtSuperVlanIfCVlanMask        OCTET STRING,
+    prvtSuperVlanIfCVlanRowStatus   RowStatus
+}
+
+prvtSuperVlanIfCVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4092)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The VLAN identifier of a customer VLAN belonging to a Super-VLAN source port."
+    ::= { prvtSuperVlanIfCVlanEntry 1 }
+
+prvtSuperVlanIfCVlanMask OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The mask to apply to the VLAN identifier (prvtSuperVlanIfCVlanId).
+         A value of all zeros represents that no mask is applied "
+    ::= { prvtSuperVlanIfCVlanEntry 2 }
+
+prvtSuperVlanIfCVlanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for prvtSuperVlanIfCVlanTable."
+    ::= { prvtSuperVlanIfCVlanEntry 3 }
+
+prvtSuperVlanIfRingPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtSuperVlanIfRingPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table specifies a pair of ring ports to associate with a Super-VLAN
+         source port.
+         Only a single pair of ring ports may be associated per source port.
+         
+         A source port must always be associated with either a single target port
+         (specified by a non-zero value for prvtSuperVlanIfTargetPort) or must be
+         associated with a pair of ring ports (specified by creating an entry in
+         prvtSuperVlanIfRingPortTable).
+         When an entry is successfully created in prvtSuperVlanIfRingPortTable for
+         a particular source port, that source port's prvtSuperVlanIfTargetPort
+         object is automatically set to a zero value indicating that the source
+         port is associated with a pair of ring ports instead of a single target
+         port (i.e. when creating an entry in prvtSuperVlanIfRingPortTable, it is
+         not neccessary to also clear prvtSuperVlanIfTargetPort)."
+    ::= { prvtSuperVlanMIBObjects 3 }
+
+prvtSuperVlanIfRingPortEntry OBJECT-TYPE
+    SYNTAX      PrvtSuperVlanIfRingPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtSuperVlanIfRingPortTable."
+    INDEX       { prvtSuperVlanIfIndex, prvtSuperVlanIfRingPort1, 
+                  prvtSuperVlanIfRingPort2 }
+    ::= { prvtSuperVlanIfRingPortTable 1 }
+
+PrvtSuperVlanIfRingPortEntry ::= SEQUENCE {
+    prvtSuperVlanIfRingPort1            InterfaceIndex,
+    prvtSuperVlanIfRingPort2            InterfaceIndex,
+    prvtSuperVlanIfRingPortVlanId       Integer32,
+    prvtSuperVlanIfRingPortPreferred    InterfaceIndexOrZero,
+    prvtSuperVlanIfRingPortActive       InterfaceIndexOrZero,
+    prvtSuperVlanIfRingPortRowStatus    RowStatus
+}
+
+prvtSuperVlanIfRingPort1 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The ifIndex of the first ring port target associated with this Super-VLAN source port."
+    ::= { prvtSuperVlanIfRingPortEntry 1 }
+
+prvtSuperVlanIfRingPort2 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The ifIndex of the second ring port target associated with this Super-VLAN source port."
+    ::= { prvtSuperVlanIfRingPortEntry 2 }
+
+prvtSuperVlanIfRingPortVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (0..4092)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The VLAN to use in Spanning Tree decisions to determine the active Super-VLAN port.
+         The value '0' indicates no VLAN has been selected."
+    ::= { prvtSuperVlanIfRingPortEntry 3 }
+
+prvtSuperVlanIfRingPortPreferred OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The ifIndex of the preferred ring port to use for this ring."
+    ::= { prvtSuperVlanIfRingPortEntry 4 }
+
+prvtSuperVlanIfRingPortActive OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The ifIndex of the currently active ring port for this ring."
+    ::= { prvtSuperVlanIfRingPortEntry 5 }
+
+prvtSuperVlanIfRingPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for prvtSuperVlanIfRingPortTable."
+    ::= { prvtSuperVlanIfRingPortEntry 6 }
+
+END -- end of module PRVT-SUPER-VLAN-MIB.

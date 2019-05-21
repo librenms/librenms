@@ -1,0 +1,1485 @@
+HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32, Unsigned32, TimeTicks 
+            FROM SNMPv2-SMI
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TruthValue
+            FROM SNMPv2-TC
+        hpSwitch
+            FROM HP-ICF-OID
+        ifIndex
+            FROM IF-MIB;
+
+    hpicfTransceiverMIB MODULE-IDENTITY
+         LAST-UPDATED "201107250000Z" -- July 25, 2011
+         ORGANIZATION "HP Networking"
+         CONTACT-INFO "Hewlett Packard Company
+                       8000 Foothills Blvd.
+                       Roseville, CA 95747"
+         DESCRIPTION  "This MIB module describes HP transceiver
+                       information."
+         REVISION     "201107250000Z" -- July 25, 2011
+         DESCRIPTION  "Deprecated hpicfXcvrDiagnosticsTimeStamp, add
+                       hpicfXcvrDiagnosticsTimeTicks."
+         REVISION     "201106080000Z" -- June 8, 2011
+         DESCRIPTION  "Add objects for reporting phy and cable 
+                       diagnostics information."
+         REVISION     "201103140000Z" -- March 14, 2011
+         DESCRIPTION  "Change hpicfXcvrInfoEntry INDEX to ifIndex and
+                      hpicfXcvrPortIndex to Integer32 and read-only."
+         REVISION     "201103020000Z" -- March 2, 2011
+         DESCRIPTION  "Management Infromation Base module for transceiver
+                       information and statistics."
+
+         ::= { hpSwitch 82 }
+
+-- *******************************************************************
+-- Textual Conventions
+-- *******************************************************************
+
+-- *******************************************************************
+-- Transceiver Objects
+-- *******************************************************************
+
+    hpicfXcvrObjects               OBJECT IDENTIFIER
+          ::= { hpicfTransceiverMIB 1 }
+
+    hpicfXcvrInfo                  OBJECT IDENTIFIER 
+          ::= { hpicfXcvrObjects 1 }
+
+-- *******************************************************************
+-- Transceiver Info
+-- *******************************************************************
+
+    hpicfXcvrInfoTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HpicfXcvrInfoEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                 "A table of objects that display transceiver
+                  characteristics." 
+          ::= { hpicfXcvrInfo 1 }
+
+    hpicfXcvrInfoEntry OBJECT-TYPE
+          SYNTAX      HpicfXcvrInfoEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                 "A set of objects that displays information of
+                  a transceiver."
+          INDEX { ifIndex }
+          ::= { hpicfXcvrInfoTable 1 }
+
+    HpicfXcvrInfoEntry ::=
+          SEQUENCE {
+             hpicfXcvrPortIndex      Integer32,
+             hpicfXcvrPortDesc       SnmpAdminString,
+             hpicfXcvrModel          SnmpAdminString,
+             hpicfXcvrSerial         SnmpAdminString,
+             hpicfXcvrType           SnmpAdminString,
+             hpicfXcvrConnectorType  SnmpAdminString,
+             hpicfXcvrWavelength     SnmpAdminString,
+             hpicfXcvrTxDist         SnmpAdminString,
+             hpicfXcvrDiagnostics    INTEGER,
+             hpicfXcvrDiagnosticsUpdate TruthValue,
+             hpicfXcvrTemp           Integer32,
+             hpicfXcvrVoltage        Unsigned32,
+             hpicfXcvrBias           Unsigned32,
+             hpicfXcvrTxPower        Integer32,
+             hpicfXcvrRxPower        Integer32,
+             hpicfXcvrAlarms         BITS,
+             hpicfXcvrErrors         BITS,
+             hpicfXcvrTempHiAlarm    Integer32,
+             hpicfXcvrTempLoAlarm    Integer32,
+             hpicfXcvrTempHiWarn     Integer32,
+             hpicfXcvrTempLoWarn     Integer32,
+             hpicfXcvrVccHiAlarm     Unsigned32, 
+             hpicfXcvrVccLoAlarm     Unsigned32, 
+             hpicfXcvrVccHiWarn      Unsigned32, 
+             hpicfXcvrVccLoWarn      Unsigned32, 
+             hpicfXcvrBiasHiAlarm    Unsigned32,
+             hpicfXcvrBiasLoAlarm    Unsigned32,
+             hpicfXcvrBiasHiWarn     Unsigned32,
+             hpicfXcvrBiasLoWarn     Unsigned32,
+             hpicfXcvrPwrOutHiAlarm  Unsigned32,
+             hpicfXcvrPwrOutLoAlarm  Unsigned32,
+             hpicfXcvrPwrOutHiWarn   Unsigned32,
+             hpicfXcvrPwrOutLoWarn   Unsigned32,
+             hpicfXcvrRcvPwrHiAlarm  Unsigned32,
+             hpicfXcvrRcvPwrLoAlarm  Unsigned32,
+             hpicfXcvrRcvPwrHiWarn   Unsigned32,
+             hpicfXcvrRcvPwrLoWarn   Unsigned32,
+             hpicfXcvrDiagnosticsTimeStamp SnmpAdminString,
+             hpicfXcvrPhyLinkStatus  INTEGER,
+             hpicfXcvrPhySpeed       Unsigned32,
+             hpicfXcvrPhyDuplex      INTEGER,
+             hpicfXcvrMdiPairACableStatus INTEGER,
+             hpicfXcvrMdiPairACableLength Unsigned32,
+             hpicfXcvrMdiPairADistanceToFault Unsigned32,
+             hpicfXcvrMdiPairAPolaritySwap INTEGER,
+             hpicfXcvrMdiPairASkew Unsigned32,
+             hpicfXcvrMdiPairBCableStatus INTEGER,
+             hpicfXcvrMdiPairBCableLength Unsigned32,
+             hpicfXcvrMdiPairBDistanceToFault Unsigned32,
+             hpicfXcvrMdiPairBPolaritySwap INTEGER,
+             hpicfXcvrMdiPairBSkew Unsigned32,
+             hpicfXcvrMdiPairCCableStatus INTEGER,
+             hpicfXcvrMdiPairCCableLength Unsigned32,
+             hpicfXcvrMdiPairCDistanceToFault Unsigned32,
+             hpicfXcvrMdiPairCPolaritySwap INTEGER,
+             hpicfXcvrMdiPairCSkew Unsigned32,
+             hpicfXcvrMdiPairDCableStatus INTEGER,
+             hpicfXcvrMdiPairDCableLength Unsigned32,
+             hpicfXcvrMdiPairDDistanceToFault Unsigned32,
+             hpicfXcvrMdiPairDPolaritySwap INTEGER,
+             hpicfXcvrMdiPairDSkew Unsigned32,
+             hpicfXcvrMdiPairABSwap INTEGER,
+             hpicfXcvrMdiPairCDSwap INTEGER,
+             hpicfXcvrDiagnosticsTimeTicks TimeTicks
+          }
+
+    hpicfXcvrPortIndex OBJECT-TYPE
+          SYNTAX      Integer32(1..2147483647)
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "The interface number for this entry."
+          ::= { hpicfXcvrInfoEntry 1 }
+
+    hpicfXcvrPortDesc OBJECT-TYPE
+          SYNTAX      SnmpAdminString (SIZE(1..8))
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "A textual description of the interface."
+          ::= { hpicfXcvrInfoEntry 2 }
+
+    hpicfXcvrModel OBJECT-TYPE
+          SYNTAX      SnmpAdminString (SIZE(1..32))
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "A textual description of the transceiver
+                  model number."
+          ::= { hpicfXcvrInfoEntry 3 }
+
+    hpicfXcvrSerial OBJECT-TYPE
+          SYNTAX      SnmpAdminString (SIZE(1..32))
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "A textual description of the transceiver
+                  serial number."
+          ::= { hpicfXcvrInfoEntry 4 }
+
+    hpicfXcvrType OBJECT-TYPE
+          SYNTAX      SnmpAdminString (SIZE(1..32))
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "A textual description of the transceiver type."
+          ::= { hpicfXcvrInfoEntry 5 }
+
+    hpicfXcvrConnectorType OBJECT-TYPE
+          SYNTAX      SnmpAdminString (SIZE(1..64))
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "A textual description of the transceiver
+                  connector type."
+          ::= { hpicfXcvrInfoEntry 6 }
+
+    hpicfXcvrWavelength OBJECT-TYPE
+          SYNTAX      SnmpAdminString (SIZE(1..96))
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "A textual description of the central optical
+                  wavelength.
+
+                  n/a will be reported for copper transceivers." 
+          ::= { hpicfXcvrInfoEntry 7 }
+
+    hpicfXcvrTxDist OBJECT-TYPE
+          SYNTAX      SnmpAdminString (SIZE(1..64))
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "A textual description of the link length
+                  supported by the transceiver."
+          ::= { hpicfXcvrInfoEntry 8 }
+
+    hpicfXcvrDiagnostics OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              none(0),
+                              dom(1),
+                              vct(2),
+                              other(3)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates transceiver diagnostic support.
+                  May be one of Virtual Cable Test (VCT), Diagnostic 
+                  Optical Monitoring (DOM), other or none."
+          ::= { hpicfXcvrInfoEntry 9 }
+
+    hpicfXcvrDiagnosticsUpdate OBJECT-TYPE
+          SYNTAX      TruthValue
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                 "This object will cause specific actions
+                  depending on the diagnostic support of the
+                  transceiver.
+
+                  Transceiver Diagnostic support:
+
+                  None  : No action taken.
+                  DOM   : Will update diagnostic information
+                          for the transceiver.
+                  VCT   : Will update diagnostic information
+                          for the transceiver.
+                  Other : Vendor specific.
+
+                  The value of the object will be reset after
+                  the completion of the update.
+
+                  Please note: VCT and other (cable-diagnostics)
+                  may cause a loss of link and take a few second
+                  to run for each interface."
+          ::= { hpicfXcvrInfoEntry 10 }
+
+    hpicfXcvrTemp OBJECT-TYPE
+          SYNTAX      Integer32
+          UNITS       "thousandths of degrees Celsius"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This is transceiver internal temperature
+                  in thousandths of degrees Celsius.
+
+                  As an example: 49120 is 49.120 degrees Celsius.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 11 }
+
+    hpicfXcvrVoltage OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "hundreds of microvolts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This is transceiver supply voltage
+                  in hundreds of microvolts.
+
+                  As an example: 32928 is 3.2928 volts.
+
+                  Will be zero if the transceiver does not report
+                  this object.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 12 }
+
+    hpicfXcvrBias OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "microamps"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This is Tx bias current in microamps.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 13 }
+
+    hpicfXcvrTxPower OBJECT-TYPE
+          SYNTAX      Integer32
+          UNITS       "thousandths of dBm"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This is transmit output power
+                  in thousandths of dBm.
+
+                  As an example: -5840 is -5.840dBm.
+
+                  -in dBm (0 microwatts) will be reported as -99999999.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 14 }
+
+    hpicfXcvrRxPower OBJECT-TYPE
+          SYNTAX      Integer32
+          UNITS       "thousandths of dBm"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This is received optical power
+                  in thousandths of dBm.
+
+                  As an example: -5840 is -5.840dBm.
+
+                  -in dBm (0 microwatts) will be reported as -99999999.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 15 }
+
+    hpicfXcvrAlarms OBJECT-TYPE
+          SYNTAX      BITS {
+                           rxPowerLowWarning(0),
+                           rxPowerHighWarning(1),
+                           txPowerLowWarning(2),
+                           txPowerHighWarning(3),
+                           txBiasLowWarning(4),
+                           txBiasHighWarning(5),
+                           vccLowWarning(6),
+                           vccHighWarning(7),
+                           tempLowWarning(8),
+                           tempHighWarning(9),
+                           rxPowerLowAlarm(10),
+                           rxPowerHighAlarm(11),
+                           txPowerLowAlarm(12),
+                           txPowerHighAlarm(13),
+                           txBiasLowAlarm(14),
+                           txBiasHighAlarm(15),
+                           vccLowAlarm(16),
+                           vccHighAlarm(17),
+                           tempLowAlarm(18),
+                           tempHighAlarm(19)
+                           }
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                 "Bitmask indicating transceiver alarms,
+                  Rx power low warning(0)
+                  Rx power high warning(1)
+                  Tx power low warning(2)
+                  Tx power high warning(3)
+                  Tx bias low warning(4)
+                  Tx bias high warning(5)
+                  Vcc low warning(6)
+                  Vcc high warning(7)
+                  Temp low warning(8)
+                  Temp high warning(9)
+                  Rx power low alarm(10)
+                  Rx power high alarm(11)
+                  Tx power low alarm(12)
+                  Tx power high alarm(13)
+                  Tx bias low alarm(14)
+                  Tx bias high alarm(15)
+                  Vcc low alarm(16)
+                  Vcc high alarm(17)
+                  Temp low alarm(18)
+                  Temp high alarm(19) 
+
+                  Unused(20-31)
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 16 }
+
+    hpicfXcvrErrors OBJECT-TYPE
+          SYNTAX      BITS {
+                           xcvrIOError(0),
+                           xcvrChecksum(1),
+                           xcvrTypeAndPortConfigMismatch(2),
+                           xcvrTypeNotSupported(3),
+                           wisLocalFault(4),
+                           rcvOpticalPowerFault(5),
+                           pmapmdReceiverLocalFault(6),
+                           pcsReceiveLocalFault(7),
+                           phyXSReceiveLocalFault(8),
+                           laserBiasCurrentFault(9),
+                           laserTemperatureFault(10),
+                           laserOutputPowerFault(11),
+                           txFault(12),
+                           pmapmdTransmitterLocalFault(13),
+                           pcsTransmitLocalFault(14),
+                           phyXSTransmitLocalFault(15),
+                           rxLossOfSignal(16)
+                           }
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                 "Bitmask indicating transceiver errors.
+                  Transceiver information I/O error(0)
+                  Transceiver information checksum error(1)
+                  Transceiver type and port configuration mismatch(2)
+                  Transceiver type not supported by port hardware(3)
+                  WIS local fault(4)
+                  Receive optical power fault(5)
+                  PMA/PMD receiver local fault(6)
+                  PCS receive local fault(7)
+                  PHY XS receive local fault(8)
+                  Laser bias current fault(9)
+                  Laser temperature fault(10)
+                  Laser output power fault(11)
+                  TX fault(12)
+                  PMA/PMD transmitter local fault(13)
+                  PCS transmit local fault(14)
+                  PHY XS Transmit Local Fault(15)
+                  RX loss of signal(16)
+
+                  Unused(17-31)
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 17 }
+
+    hpicfXcvrTempHiAlarm OBJECT-TYPE
+          SYNTAX      Integer32
+          UNITS       "thousandths of degrees Celsius"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver temperature high alarm
+                  threshold limit in thousandths of degrees Celsius.
+
+                  As an example: 49120 is 49.120 degrees Celsius.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 18 }
+
+    hpicfXcvrTempLoAlarm OBJECT-TYPE
+          SYNTAX      Integer32
+          UNITS       "thousandths of degrees Celsius"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver temperature low alarm
+                  threshold limit in thousandths of degrees Celsius.
+
+                  As an example: 49120 is 49.120 degrees Celsius.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 19 }
+
+    hpicfXcvrTempHiWarn OBJECT-TYPE
+          SYNTAX      Integer32
+          UNITS       "thousandths of degrees Celsius"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver temperature high warning
+                  threshold limit in thousandths of degrees Celsius.
+
+                  As an example: 49120 is 49.120 degrees Celsius.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 20 }
+
+    hpicfXcvrTempLoWarn OBJECT-TYPE
+          SYNTAX      Integer32
+          UNITS       "thousandths of degrees Celsius"
+          MAX-ACCESS  read-only
+          STATUS        current
+          DESCRIPTION
+                 "Transceiver temperature low warning
+                  threshold limit in thousandths of degrees Celsius.
+
+                  As an example: 49120 is 49.120 degrees Celsius.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 21 }
+
+    hpicfXcvrVccHiAlarm OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "hundreds of microvolts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver VCC high alarm
+                  threshold limit in hundreds of microvolts.
+
+                  As an example: 32928 is 3.2928 volts.
+
+                  Returns zero if not supported on the transceiver.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 22 }
+
+    hpicfXcvrVccLoAlarm OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "hundreds of microvolts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver VCC low alarm
+                  threshold limit in hundreds of microvolts.
+
+                  As an example: 32928 is 3.2928 volts.
+
+                  Returns zero if not supported on the transceiver.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 23 }
+
+    hpicfXcvrVccHiWarn OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "hundreds of microvolts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver VCC high warning
+                  threshold limit in hundreds of microvolts.
+
+                  As an example: 32928 is 3.2928 volts.
+
+                  Returns zero if not supported on the transceiver.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 24 }
+
+    hpicfXcvrVccLoWarn OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "hundreds of microvolts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver VCC low warning
+                  threshold limit in hundreds of microvolts.
+
+                  As an example: 32928 is 3.2928 volts.
+
+                  Returns zero if not supported on the transceiver.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 25 }
+
+    hpicfXcvrBiasHiAlarm OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "microamps"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver bias high alarm
+                  threshold limit in microamps.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 26 }
+
+    hpicfXcvrBiasLoAlarm OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "microamps"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver bias low alarm
+                  threshold limit in microamps.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 27 }
+
+    hpicfXcvrBiasHiWarn OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "microamps"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver bias high warning
+                  threshold limit in microamps.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 28 }
+
+    hpicfXcvrBiasLoWarn OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "microamps"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver bias low warning
+                  threshold limit in microamps.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 29 }
+
+    hpicfXcvrPwrOutHiAlarm OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "tenths of microwatts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver transmit power high alarm
+                  threshold limit in tenths of microwatts.
+
+                  As an example: 10000 is 1 milliwatt.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 30 }
+
+    hpicfXcvrPwrOutLoAlarm OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "tenths of microwatts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver transmit power low alarm
+                  threshold limit in tenths of microwatts.
+
+                  As an example: 10000 is 1 milliwatt.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 31 }
+
+    hpicfXcvrPwrOutHiWarn OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "tenths of microwatts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver transmit power high warning
+                  threshold limit in tenths of microwatts
+
+                  As an example: 10000 is 1 milliwatt.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 32 }
+
+    hpicfXcvrPwrOutLoWarn OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "tenths of microwatts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver transmit power low warning
+                  threshold limit in tenths of microwatts.
+
+                  As an example: 10000 is 1 milliwatt.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 33 }
+
+    hpicfXcvrRcvPwrHiAlarm OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "tenths of microwatts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver receive power high alarm
+                  threshold limit in tenths of microwatts.
+
+                  As an example: 10000 is 1 milliwatt.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 34 }
+
+    hpicfXcvrRcvPwrLoAlarm OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "tenths of microwatts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver receive power low alarm
+                  threshold limit in tenths of microwatts.
+
+                  As an example: 10000 is 1 milliwatt.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 35 }
+
+    hpicfXcvrRcvPwrHiWarn OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "tenths of microwatts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver receive power high warning
+                  threshold limit in tenths of microwatts.
+
+                  As an example: 10000 is 1 milliwatt.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 36 }
+
+    hpicfXcvrRcvPwrLoWarn OBJECT-TYPE
+          SYNTAX      Unsigned32 (0..65535)
+          UNITS       "tenths of microwatts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "Transceiver receive power low warning
+                  threshold limit in tenths of microwatts.
+
+                  As an example: 10000 is 1 milliwatt.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is DOM."
+          ::= { hpicfXcvrInfoEntry 37 }
+
+    hpicfXcvrDiagnosticsTimeStamp OBJECT-TYPE
+          SYNTAX      SnmpAdminString (SIZE(1..64))
+          MAX-ACCESS  read-only
+          STATUS      deprecated
+          DESCRIPTION
+                 "********* THIS OBJECT IS DEPRECATED *********
+
+                  A textual description of the diagnostics
+                  information updated for the last time in the
+                  transceiver.
+
+                  This object has been deprecated. Its functionality
+                  has been replaced by hpicfXcvrDiagnosticsTimeticks."
+          ::= { hpicfXcvrInfoEntry 38 }
+
+    hpicfXcvrPhyLinkStatus  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              down(0),
+                              up(1)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the link status as reported
+                  by the physical entity.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 39 }
+
+    hpicfXcvrPhySpeed  OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "megabits per second"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the speed in Mbps as reported
+                  by the physical entity. 
+
+                  Will be zero if speed and duplex are unresolved.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 40 }
+
+    hpicfXcvrPhyDuplex  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              half(0),
+                              full(1),
+                              unspecified(2)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the duplex as reported by
+                  the physical entity.
+
+                  Will be unspecified if speed and duplex are unresolved.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 41 }
+
+    hpicfXcvrMdiPairACableStatus  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              normal(0),
+                              short(1),
+                              open(2),
+                              failed(3),
+                              impedanceMismatch(4),
+                              unspecified(5)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the diagnostics
+                  test status on the cable pair.
+
+                  Normal = No cable fault detected.
+                  Open = Lack of continuity between ends.
+                  Short = Short detected.
+                  Impedance mismatch =
+                         - Cable pair is not connected properly or
+                         - Cable pair is damaged or
+                         - Connector is faulty.
+                  Failed = TDR test failed on cable pair.
+                  Unspecified : This object is unavailable or not reported.
+ 
+                  As reported through cable diagnostics.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 42 }
+
+    hpicfXcvrMdiPairACableLength  OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "meters"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the cable pair length in
+                  meters as reported by cable diagnostics.
+
+                  A gigabit link must be present for this object
+                  to be non zero.
+ 
+                  Will be zero if not available or the transceiver
+                  does not report this object.
+
+                  Accuracy is +/- 10 meters.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 43 }
+
+    hpicfXcvrMdiPairADistanceToFault  OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "meters"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the distance in meters to
+                  a fault in the cable pair as reported through cable
+                  diagnostics.
+
+                  Will be zero if no fault or the transceiver does not
+                  report this object. 
+
+                  Accuracy is +/- 2 meters.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 44 }
+
+    hpicfXcvrMdiPairAPolaritySwap  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              normal(0),
+                              reversed(1),
+                              unspecified(2)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates if the cable pair connected
+                  to the phy is inverted as reported through cable
+                  diagnostics.
+
+                  Will be unspecified if the this object is unavailable
+                  or not reported.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 45 }
+
+    hpicfXcvrMdiPairASkew    OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "nanoseconds"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the delay skew in nanoseconds 
+                  of this cable pair and the fastest cable pair as
+                  reported through cable diagnostics.
+
+                  Will be zero if the lowest of the pairs or if the
+                  transceiver does not report this object.  
+
+                  Accuracy is +/- 8 ns.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 46 }
+
+    hpicfXcvrMdiPairBCableStatus  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              normal(0),
+                              short(1),
+                              open(2),
+                              failed(3),
+                              impedanceMismatch(4),
+                              unspecified(5) 
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the cable diagnostics
+                  test status on the cable pair.
+
+                  Normal = No cable fault detected.
+                  Open = Lack of continuity between ends.
+                  Short = Short detected.
+                  Impedance mismatch =
+                         - Cable pair is not connected properly or
+                         - Cable pair is damaged or
+                         - Connector is faulty.
+                  Failed = TDR test failed on cable pair.
+                  Unspecified : This object is unavailable or not 
+                                reported. 
+ 
+                  As reported through cable diagnostics.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 47 }
+
+    hpicfXcvrMdiPairBCableLength  OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "meters"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                  "This object indicates the cable pair length in 
+                  meters as reported by cable diagnostics.
+
+                  A gigabit link must be present for this object
+                  to be non zero.
+ 
+                  Will be zero if not available or the transceiver
+                  does not report this object. 
+
+                  Accuracy is +/- 10 meters.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 48 }
+
+    hpicfXcvrMdiPairBDistanceToFault  OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "meters"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the distance in meters to
+                  a fault in the cable pair as reported through cable
+                  diagnostics.
+
+                  Will be zero if no fault or the transceiver does not
+                  report this object. 
+
+                  Accuracy is +/- 2 meters.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 49 }
+
+    hpicfXcvrMdiPairBPolaritySwap  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              normal(0),
+                              reversed(1),
+                              unspecified(2)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates if the cable pair connected
+                  to the phy were inverted as reported through cable
+                  diagnostics.
+
+                  Will be unspecified if the this object is unavailable
+                  or not reported.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 50 }
+
+    hpicfXcvrMdiPairBSkew    OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "nanoseconds"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the delay skew in nanoseconds 
+                  of this cable pair and the fastest cable pair as
+                  reported through cable diagnostics.
+
+                  Will be zero if the lowest of the pairs or if the
+                  transceiver does not report this object.   
+
+                  Accuracy is +/- 8 ns.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 51 }
+
+    hpicfXcvrMdiPairCCableStatus  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              normal(0),
+                              short(1),
+                              open(2),
+                              failed(3),
+                              impedanceMismatch(4),
+                              unspecified(5) 
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the cable diagnostics
+                  test status on the cable pair.
+
+                  Normal = No cable fault detected.
+                  Open = Lack of continuity between ends.
+                  Short = Short detected.
+                  Impedance Mismatch =
+                         - Cable pair is not connected properly or
+                         - Cable pair is damaged or
+                         - Connector is faulty.
+                  Failed = TDR test failed on cable pair.
+                  Unspecified : This object is unavailable or not reported. 
+ 
+                  As reported through cable diagnostics.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 52 }
+
+    hpicfXcvrMdiPairCCableLength  OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "meters"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the cable length in meters 
+                  of the cable pair as reported through cable
+                  diagnostics.
+
+                  A gigabit link must be present for this object
+                  to be non zero.
+ 
+                  Will be zero if not available or the transceiver
+                  does not report this object.  
+
+                  Accuracy is +/- 10 meters.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 53 }
+
+    hpicfXcvrMdiPairCDistanceToFault  OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "meters"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the distance in meters to
+                  a fault in the cable pair as reported through cable
+                  diagnostics. 
+
+                  Will be zero if there is no fault or the
+                  transceiver does not report this object. 
+                 
+                  Accuracy is +/- 2 meters.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 54 }
+
+    hpicfXcvrMdiPairCPolaritySwap  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              normal(0),
+                              reversed(1),
+                              unspecified(2)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates if the cable pair connected
+                  to the phy were inverted as reported through cable
+                  diagnostics.
+
+                  Will be unspecified if the this object is unavailable
+                  or not reported.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 55 }
+
+    hpicfXcvrMdiPairCSkew    OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "nanoseconds"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the delay skew in nanoseconds 
+                  of this cable pair and the fastest cable pair as
+                  reported through cable diagnostics.
+
+                  Will be zero if the lowest of the pairs or if the
+                  transceiver does not report this object.   
+
+                  Accuracy is +/- 8 ns.
+            
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 56 }
+
+    hpicfXcvrMdiPairDCableStatus  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              normal(0),
+                              short(1),
+                              open(2),
+                              failed(3),
+                              impedanceMismatch(4),
+                              unspecified(5) 
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the cable diagnostics
+                  test status on the cable pair.
+
+                  Normal = No cable fault detected.
+                  Open = Lack of continuity between ends.
+                  Short = Short detected.
+                  Impedance Mismatch =
+                         - Cable pair is not connected properly or
+                         - Cable pair is damaged or
+                         - Connector is faulty.
+                  Failed = TDR test failed on cable pair.
+                  Unspecified : This object is unavailable or not 
+                                reported. 
+ 
+                  As reported through cable diagnostics.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 57 }
+
+    hpicfXcvrMdiPairDCableLength  OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "meters"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the cable length in meters 
+                  of the cable pair as reported through cable
+                  diagnostics.
+
+                  A gigabit link must be present for this object
+                  to be non zero.
+ 
+                  Will be zero if not available or the transceiver
+                  does not report this object.  
+
+                  Accuracy is +/- 10 meters.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 58 }
+
+    hpicfXcvrMdiPairDDistanceToFault  OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "meters"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the distance in meters to
+                  a fault in the cable pair as reported through cable
+                  diagnostics.
+
+                  Will be zero if no fault or the transceiver does not
+                  report this object. 
+
+                  Accuracy is +/- 2 meters.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 59 }
+
+    hpicfXcvrMdiPairDPolaritySwap  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              normal(0),
+                              reversed(1),
+                              unspecified(2)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates if the cable pair connected
+                  to the phy were inverted as reported through cable
+                  diagnostics.
+
+                  Will be unspecified if the this object is unavailable
+                  or not reported.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 60 }
+
+    hpicfXcvrMdiPairDSkew    OBJECT-TYPE
+          SYNTAX      Unsigned32(0..4294967295)
+          UNITS       "nanoseconds"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the delay skew in nanoseconds 
+                  of this cable pair and the fastest cable pair as
+                  reported through cable diagnostics.
+
+                  Will be zero if the lowest of the pairs or if the
+                  transceiver does not report this object.   
+
+                  Accuracy is +/- 8 ns.
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 61 }
+
+    hpicfXcvrMdiPairABSwap  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              mdi(0),
+                              mdix(1),
+                              unspecified(2)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates the if the channels are
+                  swapped for channels A and B as reported through
+                  cable diagnostics.
+
+                  MDI  : Channel A received on MDI[1], Channel B on MDI[0]
+                  MDIX : Channel A received on MDI[0], Channel B on MDI[1]
+                  Unspecified : This object is unavailable or not reported. 
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 62 }
+
+    hpicfXcvrMdiPairCDSwap  OBJECT-TYPE
+          SYNTAX      INTEGER {
+                              mdi(0),
+                              mdix(1),
+                              unspecified(2)
+                              }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "This object indicates if the channels are
+                  swapped for channels C and D as reported through
+                  cable diagnostics.
+
+                  MDI  : Channel C received on MDI[3], Channel D on MDI[2]
+                  MDIX : Channel C received on MDI[2], Channel D on MDI[3].
+                  Unspecified : This object is unavailable or not reported. 
+
+                  The value of this object is valid when the value of 
+                  the hpicfXcvrDiagnostics object is VCT or other."
+          ::= { hpicfXcvrInfoEntry 63 }
+
+    hpicfXcvrDiagnosticsTimeTicks OBJECT-TYPE
+          SYNTAX      TimeTicks
+          UNITS       "centi-seconds"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "The value of sysUpTime of when this diagnostic
+                  information was last updated. If this diagnostic
+                  information was never updated, then this object
+                  will contain a zero value."
+          ::= { hpicfXcvrInfoEntry 64 }
+
+-- *******************************************************************
+-- Conformance Section
+-- *******************************************************************
+
+    hpicfXcvrConformance  OBJECT IDENTIFIER
+          ::= { hpicfTransceiverMIB 2 }
+
+    hpicfXcvrGroups       OBJECT IDENTIFIER
+          ::= { hpicfXcvrConformance 1 }
+
+    hpicfXcvrInfoGroup OBJECT-GROUP
+          OBJECTS {
+             hpicfXcvrPortIndex,
+             hpicfXcvrPortDesc,
+             hpicfXcvrModel,
+             hpicfXcvrSerial,
+             hpicfXcvrType,
+             hpicfXcvrConnectorType,
+             hpicfXcvrWavelength,
+             hpicfXcvrTxDist,
+             hpicfXcvrDiagnostics,
+             hpicfXcvrDiagnosticsUpdate,
+             hpicfXcvrTemp,
+             hpicfXcvrVoltage,
+             hpicfXcvrBias,
+             hpicfXcvrRxPower,
+             hpicfXcvrTxPower,
+             hpicfXcvrAlarms,
+             hpicfXcvrErrors,
+             hpicfXcvrTempHiAlarm,
+             hpicfXcvrTempLoAlarm,
+             hpicfXcvrTempHiWarn,
+             hpicfXcvrTempLoWarn,
+             hpicfXcvrVccHiAlarm, 
+             hpicfXcvrVccLoAlarm, 
+             hpicfXcvrVccHiWarn, 
+             hpicfXcvrVccLoWarn, 
+             hpicfXcvrBiasHiAlarm,
+             hpicfXcvrBiasLoAlarm,
+             hpicfXcvrBiasHiWarn,
+             hpicfXcvrBiasLoWarn,
+             hpicfXcvrPwrOutHiAlarm,
+             hpicfXcvrPwrOutLoAlarm,
+             hpicfXcvrPwrOutHiWarn,
+             hpicfXcvrPwrOutLoWarn,
+             hpicfXcvrRcvPwrHiAlarm,
+             hpicfXcvrRcvPwrLoAlarm,
+             hpicfXcvrRcvPwrHiWarn,
+             hpicfXcvrRcvPwrLoWarn,
+             hpicfXcvrDiagnosticsTimeStamp,
+             hpicfXcvrPhyLinkStatus,
+             hpicfXcvrPhySpeed,
+             hpicfXcvrPhyDuplex,
+             hpicfXcvrMdiPairACableStatus,
+             hpicfXcvrMdiPairACableLength,
+             hpicfXcvrMdiPairADistanceToFault,
+             hpicfXcvrMdiPairAPolaritySwap,
+             hpicfXcvrMdiPairASkew,
+             hpicfXcvrMdiPairBCableStatus,
+             hpicfXcvrMdiPairBCableLength,
+             hpicfXcvrMdiPairBDistanceToFault,
+             hpicfXcvrMdiPairBPolaritySwap,
+             hpicfXcvrMdiPairBSkew,
+             hpicfXcvrMdiPairCCableStatus,
+             hpicfXcvrMdiPairCCableLength,
+             hpicfXcvrMdiPairCDistanceToFault,
+             hpicfXcvrMdiPairCPolaritySwap,
+             hpicfXcvrMdiPairCSkew,
+             hpicfXcvrMdiPairDCableStatus,
+             hpicfXcvrMdiPairDCableLength,
+             hpicfXcvrMdiPairDDistanceToFault,
+             hpicfXcvrMdiPairDPolaritySwap,
+             hpicfXcvrMdiPairDSkew,
+             hpicfXcvrMdiPairABSwap,
+             hpicfXcvrMdiPairCDSwap
+          }
+    STATUS  deprecated
+    DESCRIPTION
+           "********* THIS GROUP IS DEPRECATED *********
+
+            A collection of objects representing transceiver 
+            information.
+
+            This object has been deprecated and replaced with
+            hpicfXcvrInfoGroup1."
+          ::= { hpicfXcvrGroups 1 }
+
+    hpicfXcvrInfoGroup1 OBJECT-GROUP
+          OBJECTS {
+             hpicfXcvrPortIndex,
+             hpicfXcvrPortDesc,
+             hpicfXcvrModel,
+             hpicfXcvrSerial,
+             hpicfXcvrType,
+             hpicfXcvrConnectorType,
+             hpicfXcvrWavelength,
+             hpicfXcvrTxDist,
+             hpicfXcvrDiagnostics,
+             hpicfXcvrDiagnosticsUpdate,
+             hpicfXcvrTemp,
+             hpicfXcvrVoltage,
+             hpicfXcvrBias,
+             hpicfXcvrRxPower,
+             hpicfXcvrTxPower,
+             hpicfXcvrAlarms,
+             hpicfXcvrErrors,
+             hpicfXcvrTempHiAlarm,
+             hpicfXcvrTempLoAlarm,
+             hpicfXcvrTempHiWarn,
+             hpicfXcvrTempLoWarn,
+             hpicfXcvrVccHiAlarm, 
+             hpicfXcvrVccLoAlarm, 
+             hpicfXcvrVccHiWarn, 
+             hpicfXcvrVccLoWarn, 
+             hpicfXcvrBiasHiAlarm,
+             hpicfXcvrBiasLoAlarm,
+             hpicfXcvrBiasHiWarn,
+             hpicfXcvrBiasLoWarn,
+             hpicfXcvrPwrOutHiAlarm,
+             hpicfXcvrPwrOutLoAlarm,
+             hpicfXcvrPwrOutHiWarn,
+             hpicfXcvrPwrOutLoWarn,
+             hpicfXcvrRcvPwrHiAlarm,
+             hpicfXcvrRcvPwrLoAlarm,
+             hpicfXcvrRcvPwrHiWarn,
+             hpicfXcvrRcvPwrLoWarn,
+             hpicfXcvrPhyLinkStatus,
+             hpicfXcvrPhySpeed,
+             hpicfXcvrPhyDuplex,
+             hpicfXcvrMdiPairACableStatus,
+             hpicfXcvrMdiPairACableLength,
+             hpicfXcvrMdiPairADistanceToFault,
+             hpicfXcvrMdiPairAPolaritySwap,
+             hpicfXcvrMdiPairASkew,
+             hpicfXcvrMdiPairBCableStatus,
+             hpicfXcvrMdiPairBCableLength,
+             hpicfXcvrMdiPairBDistanceToFault,
+             hpicfXcvrMdiPairBPolaritySwap,
+             hpicfXcvrMdiPairBSkew,
+             hpicfXcvrMdiPairCCableStatus,
+             hpicfXcvrMdiPairCCableLength,
+             hpicfXcvrMdiPairCDistanceToFault,
+             hpicfXcvrMdiPairCPolaritySwap,
+             hpicfXcvrMdiPairCSkew,
+             hpicfXcvrMdiPairDCableStatus,
+             hpicfXcvrMdiPairDCableLength,  
+             hpicfXcvrMdiPairDDistanceToFault,  
+             hpicfXcvrMdiPairDPolaritySwap, 
+             hpicfXcvrMdiPairDSkew,    
+             hpicfXcvrMdiPairABSwap,  
+             hpicfXcvrMdiPairCDSwap,
+             hpicfXcvrDiagnosticsTimeTicks
+          }
+    STATUS  current
+    DESCRIPTION
+           "A collection of objects representing transceiver 
+            information."
+          ::= { hpicfXcvrGroups 2 }
+
+    hpicfXcvrCompliances OBJECT IDENTIFIER ::=
+        { hpicfXcvrConformance 2 }
+
+    hpicfXcvrCompliance  MODULE-COMPLIANCE
+          STATUS  deprecated
+          DESCRIPTION
+                "********* THIS COMPLIANCE IS DEPRECATED *********
+
+                Describes the requirements for conformance to the
+                transceiver MIB.
+
+                This compliance section has been deprecated and
+                replaced with hpicfXcvrCompliance1."
+    MODULE  -- this module
+          MANDATORY-GROUPS { hpicfXcvrInfoGroup }
+          ::= { hpicfXcvrCompliances 1 }
+
+    hpicfXcvrCompliance1  MODULE-COMPLIANCE
+          STATUS  current
+          DESCRIPTION
+                "Describes the requirements for conformance to the
+                transceiver MIB."
+    MODULE  -- this module
+          MANDATORY-GROUPS { hpicfXcvrInfoGroup1 }
+          ::= { hpicfXcvrCompliances 2 }
+END
+
+

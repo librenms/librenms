@@ -1,0 +1,84 @@
+PRODUCTS-MIB-4RF DEFINITIONS ::= BEGIN
+
+--
+-- File: $Id: 4RF-PRODUCTS-MIB.txt,v 1.3 2007/05/02 00:26:45 pk Exp $
+--
+-- Copyright: 2002  4RF COMMUNICATIONS LTD
+--
+-- Description:
+--   Products MIB sub-tree for 4RF Communications Ltd. It defines the root
+--   identifiers for all 4RF SNMP managed products.
+--
+-- Versions:
+--
+-- Notes:
+--  None
+--
+
+IMPORTS
+
+    -- Standard imports
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI
+
+    -- 4RF Specific imports
+    fourRFModules, fourRFProducts, fourRFExperimental
+        FROM MIB-4RF;
+
+
+-- Module Identification
+fourRFProductsModule MODULE-IDENTITY
+    LAST-UPDATED "200704300000Z"
+    ORGANIZATION "www.4rf.com"
+    CONTACT-INFO    
+         "postal:   4RF Communications Ltd
+                    26 Glover Street
+                    Ngauranga
+                    PO Box 13-506
+                    Wellington 6032
+                    New Zealand
+                    
+          phone:    +64 4 499 6000
+          email:    support@4rf.com"
+    DESCRIPTION 
+        "4RF product registrations, all 4RF SNMP managed products have
+         a root identifier specified here."
+
+	-- Revision history
+    -- (in reverse chronological order)
+
+    REVISION    "200704300000Z"
+    DESCRIPTION "Second draft"
+
+    REVISION    "200402130000Z"
+    DESCRIPTION "First draft"
+    ::= { fourRFModules 2 }
+
+
+--
+-- OID Registrations
+--
+
+
+--
+-- Currently the MIB is still being defined, all objects are placed
+-- under fourRFExperimental, when the MIB has been completed these
+-- objects will be moved to fourRFProducts.
+--
+
+fourRFCommon OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for common elements."
+    ::= { fourRFExperimental 1 }
+
+fourRFAprisa OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for Aprisa/AprisaView."
+    ::= { fourRFExperimental 2 } 
+
+fourRFAprisaXE OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Sub-tree for AprisaXE."
+    ::= { fourRFExperimental 3 } 
+
+END

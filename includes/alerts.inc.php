@@ -22,14 +22,36 @@
  * @subpackage Alerts
  */
 
-use LibreNMS\Authentication\Auth;
+use App\Models\DevicePerf;
+use LibreNMS\Alert\Template;
+use LibreNMS\Alert\AlertData;
+use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Config;
+use PHPMailer\PHPMailer\PHPMailer;
+use LibreNMS\Util\Time;
+
+/**
+ * @param $rule
+ * @param $query_builder
+ * @return bool|string
+ */
+function GenSQL($rule, $query_builder = false)
+{
+    if ($query_builder) {
+        return QueryBuilderParser::fromJson($query_builder)->toSql();
+    } else {
+        return GenSQLOld($rule);
+    }
+}
 
 /**
  * Generate SQL from Rule
  * @param string $rule Rule to generate SQL for
  * @return string|boolean
  */
-function GenSQL($rule)
+function GenSQLOld($rule)
 {
     $rule = RunMacros($rule);
     if (empty($rule)) {
@@ -102,7 +124,7 @@ function RunMacros($rule, $x = 1)
             $rule = str_replace('%macros.'.$macro, '('.$value.')', $rule);
         }
     }
-    if (strstr($rule, "%macros")) {
+    if (strstr($rule, "%macros.")) {
         if (++$x < 30) {
             $rule = RunMacros($rule, $x);
         } else {
@@ -114,49 +136,43 @@ function RunMacros($rule, $x = 1)
 
 /**
  * Get Alert-Rules for Devices
- * @param int $device Device-ID
+ * @param int $device_id Device-ID
  * @return array
  */
-function GetRules($device)
+function GetRules($device_id)
 {
-    $groups = GetGroupsFromDevice($device);
-    $params = array($device,$device);
-    $where = "";
-    foreach ($groups as $group) {
-        $where .= " || alert_map.target = ?";
-        $params[] = 'g'.$group;
-    }
-    return dbFetchRows('SELECT alert_rules.* FROM alert_rules LEFT JOIN alert_map ON alert_rules.id=alert_map.rule WHERE alert_rules.disabled = 0 && ( (alert_rules.device_id = -1 || alert_rules.device_id = ? ) || alert_map.target = ? '.$where.' )', $params);
+    $query = "SELECT DISTINCT a.* FROM alert_rules a
+  LEFT JOIN alert_device_map d ON a.id=d.rule_id
+  LEFT JOIN alert_group_map g ON a.id=g.rule_id
+  LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id
+  WHERE a.disabled = 0 AND ((d.device_id IS NULL AND g.group_id IS NULL) OR d.device_id=? OR dg.device_id=?)";
+
+    $params = [$device_id, $device_id];
+    return dbFetchRows($query, $params);
 }
 
 /**
  * Check if device is under maintenance
- * @param int $device Device-ID
- * @return int
+ * @param int $device_id Device-ID
+ * @return bool
  */
-function IsMaintenance($device)
+function IsMaintenance($device_id)
 {
-    $groups = GetGroupsFromDevice($device);
-    $params = array($device);
-    $where = "";
-    foreach ($groups as $group) {
-        $where .= " || alert_schedule_items.target = ?";
-        $params[] = 'g'.$group;
-    }
-    return dbFetchCell('SELECT alert_schedule.schedule_id FROM alert_schedule LEFT JOIN alert_schedule_items ON alert_schedule.schedule_id=alert_schedule_items.schedule_id WHERE ( alert_schedule_items.target = ?'.$where.' ) && ((alert_schedule.recurring = 0 AND (NOW() BETWEEN alert_schedule.start AND alert_schedule.end)) OR (alert_schedule.recurring = 1 AND (alert_schedule.start_recurring_dt <= date_format(NOW(), \'%Y-%m-%d\') AND (end_recurring_dt >= date_format(NOW(), \'%Y-%m-%d\') OR end_recurring_dt is NULL OR end_recurring_dt = \'0000-00-00\' OR end_recurring_dt = \'\')) AND (date_format(now(), \'%H:%i:%s\') BETWEEN `start_recurring_hr` AND end_recurring_hr) AND (recurring_day LIKE CONCAT(\'%\',date_format(now(), \'%w\'),\'%\') OR recurring_day is null or recurring_day = \'\'))) LIMIT 1', $params);
+    $device = \App\Models\Device::find($device_id);
+    return !is_null($device) && $device->isUnderMaintenance();
 }
 /**
  * Run all rules for a device
- * @param int $device Device-ID
+ * @param int $device_id Device-ID
  * @return void
  */
-function RunRules($device)
+function RunRules($device_id)
 {
-    if (IsMaintenance($device) > 0) {
+    if (IsMaintenance($device_id) > 0) {
         echo "Under Maintenance, Skipping alerts.\r\n";
         return false;
     }
-    foreach (GetRules($device) as $rule) {
+    foreach (GetRules($device_id) as $rule) {
         c_echo('Rule %p#'.$rule['id'].' (' . $rule['name'] . '):%n ');
         $extra = json_decode($rule['extra'], true);
         if (isset($extra['invert'])) {
@@ -165,12 +181,11 @@ function RunRules($device)
             $inv = false;
         }
         d_echo(PHP_EOL);
-        $chk   = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
         if (empty($rule['query'])) {
-            $rule['query'] = GenSQL($rule['rule']);
+            $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
         }
         $sql = $rule['query'];
-        $qry = dbFetchRows($sql, array($device));
+        $qry = dbFetchRows($sql, array($device_id));
         $cnt = count($qry);
         for ($i = 0; $i < $cnt; $i++) {
             if (isset($qry[$i]['ip'])) {
@@ -187,36 +202,46 @@ function RunRules($device)
         } else { //( $s > 0 && $inv == false ) {
             $doalert = false;
         }
+
+        $current_state = dbFetchCell("SELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1", [$rule['id'], $device_id]);
         if ($doalert) {
-            if ($chk['state'] === "2") {
+            if ($current_state == 2) {
                 c_echo('Status: %ySKIP');
-            } elseif ($chk['state'] >= "1") {
+            } elseif ($current_state >= 1) {
                 c_echo('Status: %bNOCHG');
                 // NOCHG here doesn't mean no change full stop. It means no change to the alert state
                 // So we update the details column with any fresh changes to the alert output we might have.
-                $alert_log           = dbFetchRow('SELECT alert_log.id, alert_log.details FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($device, $rule['id']));
-                $details             = json_decode(gzuncompress($alert_log['details']), true);
+                $alert_log           = dbFetchRow('SELECT alert_log.id, alert_log.details FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($device_id, $rule['id']));
+                $details             = [];
+                if (!empty($alert_log['details'])) {
+                    $details = json_decode(gzuncompress($alert_log['details']), true);
+                }
                 $details['contacts'] = GetContacts($qry);
                 $details['rule']     = $qry;
                 $details             = gzcompress(json_encode($details), 9);
                 dbUpdate(array('details' => $details), 'alert_log', 'id = ?', array($alert_log['id']));
             } else {
                 $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)), 9);
-                if (dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'details' => $extra), 'alert_log')) {
-                    if (!dbUpdate(array('state' => 1, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device,$rule['id']))) {
-                        dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
+                if (dbInsert(['state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra], 'alert_log')) {
+                    if (is_null($current_state)) {
+                        dbInsert(array('state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
+                    } else {
+                        dbUpdate(['state' => 1, 'open' => 1], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                     }
                     c_echo(PHP_EOL . 'Status: %rALERT');
                 }
             }
         } else {
-            if ($chk['state'] === "0") {
+            if (!is_null($current_state) && $current_state == 0) {
                 c_echo('Status: %bNOCHG');
             } else {
-                if (dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id']), 'alert_log')) {
-                    if (!dbUpdate(array('state' => 0, 'open' => 1), 'alerts', 'device_id = ? && rule_id = ?', array($device,$rule['id']))) {
-                        dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0), 'alerts');
+                if (dbInsert(['state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id']], 'alert_log')) {
+                    if (is_null($current_state)) {
+                        dbInsert(['state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
+                    } else {
+                        dbUpdate(['state' => 0, 'open' => 1, 'note' => ''], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                     }
+
                     c_echo(PHP_EOL . 'Status: %gOK');
                 }
             }
@@ -232,15 +257,16 @@ function RunRules($device)
  */
 function GetContacts($results)
 {
-    global $config, $authorizer;
+    global $config;
 
-    if (sizeof($results) == 0) {
-        return array();
+    if (empty($results)) {
+        return [];
     }
-    if ($config['alert']['default_only'] === true || $config['alerts']['email']['default_only'] === true) {
-        return array(''.($config['alert']['default_mail'] ? $config['alert']['default_mail'] : $config['alerts']['email']['default']) => '');
+    if (Config::get('alert.default_only') === true || Config::get('alerts.email.default_only') === true) {
+        $email = Config::get('alert.default_mail', Config::get('alerts.email.default'));
+        return $email ? [$email => ''] : [];
     }
-    $users = Auth::get()->getUserlist();
+    $users = LegacyAuth::get()->getUserlist();
     $contacts = array();
     $uids = array();
     foreach ($results as $result) {
@@ -252,14 +278,14 @@ function GetContacts($results)
             }
         }
         if (is_numeric($result["port_id"])) {
-            $tmpa = dbFetchRows("SELECT user_id FROM ports_perms WHERE access_level >= 0 AND port_id = ?", array($result["port_id"]));
+            $tmpa = dbFetchRows("SELECT user_id FROM ports_perms WHERE port_id = ?", array($result["port_id"]));
             foreach ($tmpa as $tmp) {
                 $uids[$tmp['user_id']] = $tmp['user_id'];
             }
         }
         if (is_numeric($result["device_id"])) {
             if ($config['alert']['syscontact'] == true) {
-                if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", array($result["device_id"])) === "1") {
+                if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", [$result["device_id"]])) {
                     $tmpa = dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_string' AND device_id = ?", array($result["device_id"]));
                 } else {
                     $tmpa = dbFetchCell("SELECT sysContact FROM devices WHERE device_id = ?", array($result["device_id"]));
@@ -268,7 +294,7 @@ function GetContacts($results)
                     $contacts[$tmpa] = '';
                 }
             }
-            $tmpa = dbFetchRows("SELECT user_id FROM devices_perms WHERE access_level >= 0 AND device_id = ?", array($result["device_id"]));
+            $tmpa = dbFetchRows("SELECT user_id FROM devices_perms WHERE device_id = ?", array($result["device_id"]));
             foreach ($tmpa as $tmp) {
                 $uids[$tmp['user_id']] = $tmp['user_id'];
             }
@@ -282,7 +308,7 @@ function GetContacts($results)
             $user['realname'] = $user['username'];
         }
         if (empty($user['level'])) {
-            $user['level'] = Auth::get()->getUserlevel($user['username']);
+            $user['level'] = LegacyAuth::get()->getUserlevel($user['username']);
         }
         if ($config['alert']['globals'] && ( $user['level'] >= 5 && $user['level'] < 10 )) {
             $contacts[$user['email']] = $user['realname'];
@@ -330,80 +356,6 @@ function GetContacts($results)
     return $tmp_contacts;
 }
 
-
-/**
- * Format Alert
- * @param array  $obj Alert-Array
- * @return string
- */
-function FormatAlertTpl($obj)
-{
-    $tpl    = $obj["template"];
-    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
-    $parsed = $msg;
-    $s      = strlen($msg);
-    $x      = $pos = -1;
-    $buff   = '';
-    $if     = $for = $calc = false;
-    while (++$x < $s) {
-        if ($msg[$x] == '{' && $buff == '') {
-            $buff .= $msg[$x];
-        } elseif ($buff == '{ ') {
-            $buff = '';
-        } elseif ($buff != '') {
-            $buff .= $msg[$x];
-        }
-
-        if ($buff == '{if') {
-            $pos = $x;
-            $if  = true;
-        } elseif ($buff == '{foreach') {
-            $pos = $x;
-            $for = true;
-        } elseif ($buff == '{calc') {
-            $pos  = $x;
-            $calc = true;
-        }
-
-        if ($pos != -1 && $msg[$x] == '}') {
-            $orig = $buff;
-            $buff = '';
-            $pos  = -1;
-            if ($if) {
-                $if     = false;
-                $o      = 3;
-                $native = array(
-                    '"; if( ',
-                    ' ) { $ret .= "',
-                );
-            } elseif ($for) {
-                $for    = false;
-                $o      = 8;
-                $native = array(
-                    '"; foreach( ',
-                    ' as $key=>$value) { $ret .= "',
-                );
-            } elseif ($calc) {
-                $calc   = false;
-                $o      = 5;
-                $native = array(
-                    '"; $ret .= (float) (0+(',
-                    ')); $ret .= "',
-                );
-            } else {
-                continue;
-            }
-
-            $cond   = trim(populate(substr($orig, $o, -1), false));
-            $native = $native[0].$cond.$native[1];
-            $parsed = str_replace($orig, $native, $parsed);
-            unset($cond, $o, $orig, $native);
-        }//end if
-    }//end while
-    $parsed = populate($parsed);
-    return RunJail($parsed, $obj);
-}//end FormatAlertTpl()
-
 /**
  * Populate variables
  * @param string  $txt  Text with variables
@@ -439,20 +391,6 @@ function populate($txt, $wrap = true)
 }//end populate()
 
 /**
- * "Safely" run eval
- * @param string $code Code to run
- * @param array  $obj  Object with variables
- * @return string|mixed
- */
-function RunJail($code, $obj)
-{
-    $ret = '';
-    eval($code);
-    return $ret;
-}//end RunJail()
-
-
-/**
  * Describe Alert
  * @param array $alert Alert-Result from DB
  * @return array|boolean
@@ -461,36 +399,45 @@ function DescribeAlert($alert)
 {
     $obj         = array();
     $i           = 0;
-    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, hardware, version, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
-    $tpl         = dbFetchRow('SELECT `template`,`title`,`title_rec` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
-    if (!$tpl) {
-        $tpl = dbFetchRow("SELECT `template`,`title`,`title_rec` FROM `alert_templates`  WHERE `name`='Default Alert Template'");
-    }
-    $default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
-    $obj['hostname']     = $device['hostname'];
-    $obj['sysName']      = $device['sysName'];
+    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, purpose, notes, uptime, status, status_reason, locations.location FROM devices LEFT JOIN locations ON locations.id = devices.location_id WHERE device_id = ?', array($alert['device_id']));
+    $attribs     = get_dev_attribs($alert['device_id']);
+
+    $obj['hostname']      = $device['hostname'];
+    $obj['sysName']       = $device['sysName'];
     $obj['sysDescr']      = $device['sysDescr'];
+    $obj['sysContact']    = $device['sysContact'];
+    $obj['os']            = $device['os'];
+    $obj['type']          = $device['type'];
+    $obj['ip']            = inet6_ntop($device['ip']);
     $obj['hardware']      = $device['hardware'];
-    $obj['version']      = $device['version'];
-    $obj['location']     = $device['location'];
-    $obj['uptime']       = $device['uptime'];
-    $obj['uptime_short'] = formatUptime($device['uptime'], 'short');
-    $obj['uptime_long']  = formatUptime($device['uptime']);
-    $obj['description']  = $device['purpose'];
-    $obj['notes']        = $device['notes'];
-    $obj['device_id']    = $alert['device_id'];
-    $extra               = $alert['details'];
-    if (!isset($tpl['template'])) {
-        $obj['template'] = $default_tpl;
-    } else {
-        $obj['template'] = $tpl['template'];
+    $obj['version']       = $device['version'];
+    $obj['location']      = $device['location'];
+    $obj['uptime']        = $device['uptime'];
+    $obj['uptime_short']  = Time::formatInterval($device['uptime'], 'short');
+    $obj['uptime_long']   = Time::formatInterval($device['uptime']);
+    $obj['description']   = $device['purpose'];
+    $obj['notes']         = $device['notes'];
+    $obj['alert_notes']   = $alert['note'];
+    $obj['device_id']     = $alert['device_id'];
+    $obj['rule_id']       = $alert['rule_id'];
+    $obj['status']        = $device['status'];
+    $obj['status_reason'] = $device['status_reason'];
+    if (can_ping_device($attribs)) {
+        $ping_stats = DevicePerf::where('device_id', $alert['device_id'])->latest('timestamp')->first();
+        $obj['ping_timestamp'] = $ping_stats->template;
+        $obj['ping_loss']      = $ping_stats->loss;
+        $obj['ping_min']       = $ping_stats->min;
+        $obj['ping_max']       = $ping_stats->max;
+        $obj['ping_avg']       = $ping_stats->avg;
+        $obj['debug']          = json_decode($ping_stats->debug, true);
     }
+    $extra               = $alert['details'];
+
+    $tpl                 = new Template;
+    $template            = $tpl->getTemplate($obj);
+
     if ($alert['state'] >= 1) {
-        if (!empty($tpl['title'])) {
-            $obj['title'] = $tpl['title'];
-        } else {
-            $obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
-        }
+        $obj['title'] = $template->title ?: 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
         if ($alert['state'] == 2) {
             $obj['title'] .= ' got acknowledged';
         } elseif ($alert['state'] == 3) {
@@ -502,9 +449,10 @@ function DescribeAlert($alert)
         foreach ($extra['rule'] as $incident) {
             $i++;
             $obj['faults'][$i] = $incident;
+            $obj['faults'][$i]['string'] = null;
             foreach ($incident as $k => $v) {
                 if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
-                    $obj['faults'][$i]['string'] .= $k.' => '.$v.'; ';
+                    $obj['faults'][$i]['string'] .= $k.' = '.$v.'; ';
                 }
             }
         }
@@ -513,17 +461,22 @@ function DescribeAlert($alert)
             $obj['diff'] = $extra['diff'];
         }
     } elseif ($alert['state'] == 0) {
+        // Alert is now cleared
         $id = dbFetchRow('SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != 2 && alert_log.state != 0 && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id'], $alert['id']));
         if (empty($id['id'])) {
             return false;
         }
 
-        $extra          = json_decode(gzuncompress($id['details']), true);
-        if (!empty($tpl['title_rec'])) {
-            $obj['title'] = $tpl['title_rec'];
-        } else {
-            $obj['title']   = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
+        $extra = [];
+        if (!empty($id['details'])) {
+            $extra = json_decode(gzuncompress($id['details']), true);
         }
+
+        // Reset count to 0 so alerts will continue
+        $extra['count'] = 0;
+        dbUpdate(array('details' => gzcompress(json_encode($id['details']), 9)), 'alert_log', 'id = ?', array($alert['id']));
+
+        $obj['title'] = $template->title_rec ?: 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
         $obj['elapsed'] = TimeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
         $obj['id']      = $id['id'];
         foreach ($extra['rule'] as $incident) {
@@ -538,16 +491,16 @@ function DescribeAlert($alert)
     } else {
         return 'Unknown State';
     }//end if
+    $obj['builder']   = $alert['builder'];
     $obj['uid']       = $alert['id'];
+    $obj['alert_id']  = $alert['alert_id'];
     $obj['severity']  = $alert['severity'];
     $obj['rule']      = $alert['rule'];
     $obj['name']      = $alert['name'];
     $obj['timestamp'] = $alert['time_logged'];
     $obj['contacts']  = $extra['contacts'];
     $obj['state']     = $alert['state'];
-    if (strstr($obj['title'], '%')) {
-        $obj['title'] = RunJail('$ret = "'.populate(addslashes($obj['title'])).'";', $obj);
-    }
+    $obj['template']  = $template;
     return $obj;
 }//end DescribeAlert()
 
@@ -594,20 +547,20 @@ function ClearStaleAlerts()
 
 /**
  * Re-Validate Rule-Mappings
- * @param integer $device Device-ID
+ * @param integer $device_id Device-ID
  * @param integer $rule   Rule-ID
  * @return boolean
  */
-function IsRuleValid($device, $rule)
+function IsRuleValid($device_id, $rule)
 {
     global $rulescache;
-    if (empty($rulescache[$device]) || !isset($rulescache[$device])) {
-        foreach (GetRules($device) as $chk) {
-            $rulescache[$device][$chk['id']] = true;
+    if (empty($rulescache[$device_id]) || !isset($rulescache[$device_id])) {
+        foreach (GetRules($device_id) as $chk) {
+            $rulescache[$device_id][$chk['id']] = true;
         }
     }
 
-    if ($rulescache[$device][$rule] === true) {
+    if ($rulescache[$device_id][$rule] === true) {
         return true;
     }
 
@@ -629,7 +582,7 @@ function IssueAlert($alert)
 
     if ($config['alert']['fixed-contacts'] == false) {
         if (empty($alert['query'])) {
-            $alert['query'] = GenSQL($alert['rule']);
+            $alert['query'] = GenSQL($alert['rule'], $alert['builder']);
         }
         $sql = $alert['query'];
         $qry = dbFetchRows($sql, array($alert['device_id']));
@@ -638,10 +591,8 @@ function IssueAlert($alert)
 
     $obj = DescribeAlert($alert);
     if (is_array($obj)) {
-        echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].': ';
-        if (!empty($config['alert']['transports'])) {
-            ExtTransports($obj);
-        }
+        echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].':' . PHP_EOL;
+        ExtTransports($obj);
 
         echo "\r\n";
     }
@@ -656,26 +607,12 @@ function IssueAlert($alert)
  */
 function RunAcks()
 {
-    foreach (dbFetchRows('SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state = 2 && alerts.open = 1') as $alert) {
-        $tmp   = array(
-            $alert['rule_id'],
-            $alert['device_id'],
-        );
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
-        if (empty($alert['rule']) || !IsRuleValid($tmp[1], $tmp[0])) {
-            // Alert-Rule does not exist anymore, let's remove the alert-state.
-            echo 'Stale-Rule: #'.$tmp[0].'/'.$tmp[1]."\r\n";
-            dbDelete('alerts', 'rule_id = ? && device_id = ?', array($tmp[0], $tmp[1]));
-            continue;
-        }
 
-        $alert['details'] = json_decode(gzuncompress($alert['details']), true);
-        $alert['state']   = 2;
+    foreach (loadAlerts('alerts.state = 2 && alerts.open = 1') as $alert) {
         IssueAlert($alert);
         dbUpdate(array('open' => 0), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
     }
 }//end RunAcks()
-
 
 /**
  * Run Follow-Up alerts
@@ -683,62 +620,82 @@ function RunAcks()
  */
 function RunFollowUp()
 {
-    global $config;
-    foreach (dbFetchRows('SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state != 2 && alerts.state > 0 && alerts.open = 0') as $alert) {
-        $tmp   = array(
-            $alert['rule_id'],
-            $alert['device_id'],
-        );
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule, alert_rules.query,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
-        if (empty($alert['rule']) || !IsRuleValid($tmp[1], $tmp[0])) {
-            // Alert-Rule does not exist anymore, let's remove the alert-state.
-            echo 'Stale-Rule: #'.$tmp[0].'/'.$tmp[1]."\r\n";
-            dbDelete('alerts', 'rule_id = ? && device_id = ?', array($tmp[0], $tmp[1]));
-            continue;
-        }
-
-        $alert['details'] = json_decode(gzuncompress($alert['details']), true);
-        $rextra           = json_decode($alert['extra'], true);
-        if ($rextra['invert']) {
-            continue;
-        }
-
-        if (empty($alert['query'])) {
-            $alert['query'] = GenSQL($alert['rule']);
-        }
-        $chk   = dbFetchRows($alert['query'], array($alert['device_id']));
-        //make sure we can json_encode all the datas later
-        $cnt = count($chk);
-        for ($i = 0; $i < $cnt; $i++) {
-            if (isset($chk[$i]['ip'])) {
-                $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
-            }
-        }
-        $o     = sizeof($alert['details']['rule']);
-        $n     = sizeof($chk);
-        $ret   = 'Alert #'.$alert['id'];
-        $state = 0;
-        if ($n > $o) {
-            $ret  .= ' Worsens';
-            $state = 3;
-            $alert['details']['diff'] = array_diff($chk, $alert['details']['rule']);
-        } elseif ($n < $o) {
-            $ret  .= ' Betters';
-            $state = 4;
-            $alert['details']['diff'] = array_diff($alert['details']['rule'], $chk);
-        }
-
-        if ($state > 0 && $n > 0) {
-            $alert['details']['rule'] = $chk;
-            if (dbInsert(array('state' => $state, 'device_id' => $alert['device_id'], 'rule_id' => $alert['rule_id'], 'details' => gzcompress(json_encode($alert['details']), 9)), 'alert_log')) {
-                dbUpdate(array('state' => $state, 'open' => 1, 'alerted' => 1), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
+    foreach (loadAlerts('alerts.state > 0 && alerts.open = 0') as $alert) {
+        if ($alert['state'] != 2 || ($alert['info']['until_clear'] === false)) {
+            $rextra = json_decode($alert['extra'], true);
+            if ($rextra['invert']) {
+                continue;
             }
 
-            echo $ret.' ('.$o.'/'.$n.")\r\n";
+            if (empty($alert['query'])) {
+                $alert['query'] = GenSQL($alert['rule'], $alert['builder']);
+            }
+            $chk = dbFetchRows($alert['query'], array($alert['device_id']));
+            //make sure we can json_encode all the datas later
+            $cnt = count($chk);
+            for ($i = 0; $i < $cnt; $i++) {
+                if (isset($chk[$i]['ip'])) {
+                    $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
+                }
+            }
+            $o = sizeof($alert['details']['rule']);
+            $n = sizeof($chk);
+            $ret = 'Alert #' . $alert['id'];
+            $state = 0;
+            if ($n > $o) {
+                $ret .= ' Worsens';
+                $state = 3;
+                $alert['details']['diff'] = array_diff($chk, $alert['details']['rule']);
+            } elseif ($n < $o) {
+                $ret .= ' Betters';
+                $state = 4;
+                $alert['details']['diff'] = array_diff($alert['details']['rule'], $chk);
+            }
+
+            if ($state > 0 && $n > 0) {
+                $alert['details']['rule'] = $chk;
+                if (dbInsert(array(
+                    'state' => $state,
+                    'device_id' => $alert['device_id'],
+                    'rule_id' => $alert['rule_id'],
+                    'details' => gzcompress(json_encode($alert['details']), 9)
+                ), 'alert_log')) {
+                    dbUpdate(array('state' => $state, 'open' => 1, 'alerted' => 1), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
+                }
+
+                echo $ret . ' (' . $o . '/' . $n . ")\r\n";
+            }
         }
     }//end foreach
 }//end RunFollowUp()
 
+function loadAlerts($where)
+{
+    $alerts = [];
+    foreach (dbFetchRows("SELECT alerts.id, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
+        $alert = dbFetchRow(
+            'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.builder FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
+            array($alert_status['device_id'], $alert_status['rule_id'])
+        );
+
+        if (empty($alert['rule_id']) || !IsRuleValid($alert_status['device_id'], $alert_status['rule_id'])) {
+            echo 'Stale-Rule: #' . $alert_status['rule_id'] . '/' . $alert_status['device_id'] . "\r\n";
+            // Alert-Rule does not exist anymore, let's remove the alert-state.
+            dbDelete('alerts', 'rule_id = ? && device_id = ?', [$alert_status['rule_id'], $alert_status['device_id']]);
+        } else {
+            $alert['alert_id'] = $alert_status['id'];
+            $alert['state'] = $alert_status['state'];
+            $alert['note'] = $alert_status['note'];
+            if (!empty($alert['details'])) {
+                $alert['details'] = json_decode(gzuncompress($alert['details']), true);
+            }
+            $alert['info'] = json_decode($alert_status['info'], true);
+            $alerts[] = $alert;
+        }
+    }
+
+    return $alerts;
+}
 
 /**
  * Run all alerts
@@ -747,25 +704,18 @@ function RunFollowUp()
 function RunAlerts()
 {
     global $config;
-    foreach (dbFetchRows('SELECT alerts.device_id, alerts.rule_id, alerts.state FROM alerts WHERE alerts.state != 2 && alerts.open = 1') as $alert) {
-        $tmp   = array(
-            $alert['rule_id'],
-            $alert['device_id'],
-        );
-        $alert = dbFetchRow('SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1', array($alert['device_id'], $alert['rule_id']));
-        if (empty($alert['rule_id']) || !IsRuleValid($tmp[1], $tmp[0])) {
-            echo 'Stale-Rule: #'.$tmp[0].'/'.$tmp[1]."\r\n";
-            // Alert-Rule does not exist anymore, let's remove the alert-state.
-            dbDelete('alerts', 'rule_id = ? && device_id = ?', array($tmp[0], $tmp[1]));
-            continue;
-        }
-
-        $alert['details'] = json_decode(gzuncompress($alert['details']), true);
+    foreach (loadAlerts('alerts.state != 2 && alerts.open = 1') as $alert) {
         $noiss            = false;
         $noacc            = false;
         $updet            = false;
         $rextra           = json_decode($alert['extra'], true);
+        if (!isset($rextra['recovery'])) {
+            // backwards compatibility check
+            $rextra['recovery'] = true;
+        }
+
         $chk              = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', array($alert['device_id'], $alert['rule_id']));
+
         if ($chk['alerted'] == $alert['state']) {
             $noiss = true;
         }
@@ -804,7 +754,7 @@ function RunAlerts()
                 }
             }
 
-            if ($alert['state'] == 1 && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
+            if (in_array($alert['state'], [1,3,4]) && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
                 if ($alert['details']['count'] < $rextra['count']) {
                     $noacc = true;
                 }
@@ -838,6 +788,11 @@ function RunAlerts()
             log_event('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
         }
 
+        if ($alert['state'] == 0 && $rextra['recovery'] == false) {
+            // Rule is set to not send a recovery alert
+            $noiss = true;
+        }
+
         if (!$noiss) {
             IssueAlert($alert);
             dbUpdate(array('alerted' => $alert['state']), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
@@ -857,38 +812,72 @@ function RunAlerts()
  */
 function ExtTransports($obj)
 {
-    global $config;
-    $tmp = false;
-    // To keep scrutinizer from naging because it doesnt understand eval
-    foreach ($config['alert']['transports'] as $transport => $opts) {
-        if (is_array($opts)) {
-            $opts = array_filter($opts);
+    $type  = new Template;
+
+    // If alert transport mapping exists, override the default transports
+    $transport_maps = AlertUtil::getAlertTransports($obj['alert_id']);
+
+    if (!$transport_maps) {
+        $transport_maps = AlertUtil::getDefaultAlertTransports();
+    }
+
+    // alerting for default contacts, etc
+    if (Config::get('alert.transports.mail') === true && !empty($obj['contacts'])) {
+        $transport_maps[] = [
+            'transport_id' => null,
+            'transport_type' => 'mail',
+            'opts' => $obj,
+        ];
+    }
+
+    foreach ($transport_maps as $item) {
+        $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($item['transport_type']);
+        if (class_exists($class)) {
+            //FIXME remove Deprecated transport
+            $transport_title = "Transport {$item['transport_type']}";
+            $obj['transport'] = $item['transport_type'];
+            $obj['transport_name'] = $item['transport_name'];
+            $obj['alert']     = new AlertData($obj);
+            $obj['title']     = $type->getTitle($obj);
+            $obj['alert']['title'] = $obj['title'];
+            $obj['msg']       = $type->getBody($obj);
+            c_echo(" :: $transport_title => ");
+            $instance = new $class($item['transport_id']);
+            $tmp = $instance->deliverAlert($obj, $item['opts']);
+            AlertLog($tmp, $obj, $obj['transport']);
+            unset($instance);
+            echo PHP_EOL;
         }
-        $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
-        if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
-            $obj['transport'] = $transport;
-            $msg        = FormatAlertTpl($obj);
-            $obj['msg'] = $msg;
-            echo $transport.' => ';
-            $instance = new $class;
-            $tmp = $instance->deliverAlert($obj, $opts);
-            $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
-            $prefix[3] = &$prefix[0];
-            $prefix[4] = &$prefix[0];
-            if ($tmp === true) {
-                echo 'OK';
-                log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
-            } elseif ($tmp === false) {
-                echo 'ERROR';
-                log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
-            } else {
-                echo "ERROR: $tmp\r\n";
-                log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $tmp, $obj['device_id'], 'error', 5);
-            }
-        }
-        echo '; ';
+    }
+
+    if (count($transport_maps) === 0) {
+        echo 'No configured transports';
     }
 }//end ExtTransports()
+
+// Log alert event
+function AlertLog($result, $obj, $transport)
+{
+    $prefix = [
+        0 => "recovery",
+        1 => $obj['severity']." alert",
+        2 => "acknowledgment"
+    ];
+    $prefix[3] = &$prefix[0];
+    $prefix[4] = &$prefix[0];
+    if ($result === true) {
+        echo 'OK';
+        log_event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
+    } elseif ($result === false) {
+        echo 'ERROR';
+        log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
+    } else {
+        echo "ERROR: $result\r\n";
+        log_event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', 5);
+    }
+    return;
+}//end AlertLog()
+
 
 /**
  * Check if a device's all parent are down

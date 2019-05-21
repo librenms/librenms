@@ -2,6 +2,10 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Models\Notification;
+use App\Models\NotificationAttrib;
+use App\Models\User;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
 
@@ -9,44 +13,43 @@ class MysqlAuthorizer extends AuthorizerBase
 {
     protected static $HAS_AUTH_USERMANAGEMENT = 1;
     protected static $CAN_UPDATE_USER = 1;
+    protected static $CAN_UPDATE_PASSWORDS = 1;
 
-    public function authenticate($username, $password)
+    public function authenticate($credentials)
     {
-        $encrypted_old = md5($password);
-        $row           = dbFetchRow('SELECT username,password FROM `users` WHERE `username`= ?', array($username));
-        if ($row['username'] && $row['username'] == $username) {
-            // Migrate from old, unhashed password
-            if ($row['password'] == $encrypted_old) {
-                $row_type = dbFetchRow('DESCRIBE users password');
-                if ($row_type['Type'] == 'varchar(34)') {
-                    $this->changePassword($username, $password);
-                }
+        $username = $credentials['username'] ?? null;
+        $password = $credentials['password'] ?? null;
 
-                return true;
-            } elseif (substr($row['password'], 0, 3) == '$1$') {
-                $row_type = dbFetchRow('DESCRIBE users password');
-                if ($row_type['Type'] == 'varchar(60)') {
-                    if ($row['password'] == crypt($password, $row['password'])) {
-                        $this->changePassword($username, $password);
-                    }
-                }
-            }
+        $hash = User::thisAuth()->where(['username' => $username])->value('password');
 
-            $hasher = new PasswordHash(8, false);
-            if ($hasher->CheckPassword($password, $row['password'])) {
+        // check for old passwords
+        if (strlen($hash) == 32) {
+            // md5
+            if (md5($password) === $hash) {
+                $this->changePassword($username, $password);
                 return true;
             }
-        }//end if
+        } elseif (starts_with($hash, '$1$')) {
+            // old md5 crypt
+            if (crypt($password, $hash) == $hash) {
+                $this->changePassword($username, $password);
+                return true;
+            }
+        } elseif (starts_with($hash, '$P$')) {
+            // Phpass
+            $hasher = new PasswordHash();
+            if ($hasher->CheckPassword($password, $hash)) {
+                $this->changePassword($username, $password);
+                return true;
+            }
+        }
+
+        if (password_verify($password, $hash)) {
+            return true;
+        }
 
         throw new AuthenticationException();
-    }//end authenticate()
-
-
-    public function reauthenticate($sess_id, $token)
-    {
-        return $this->checkRememberMe($sess_id, $token);
-    }//end reauthenticate()
-
+    }
 
     public function canUpdatePasswords($username = '')
     {
@@ -55,107 +58,115 @@ class MysqlAuthorizer extends AuthorizerBase
          * user is explicitly prohibited to do so.
          */
 
-        if (empty($username) || !$this->userExists($username)) {
+        if (!static::$CAN_UPDATE_PASSWORDS) {
+            return 0;
+        } elseif (empty($username) || !$this->userExists($username)) {
             return 1;
         } else {
-            return dbFetchCell('SELECT can_modify_passwd FROM users WHERE username = ?', array($username));
+            return User::thisAuth()->where('username', $username)->value('can_modify_passwd');
         }
-    }//end passwordscanchange()
-
-
-    /**
-     * From: http://code.activestate.com/recipes/576894-generate-a-salt/
-     * This public function generates a password salt as a string of x (default = 15) characters
-     * ranging from a-zA-Z0-9.
-     * @param $max integer The number of characters in the string
-     * @author AfroSoft <scripts@afrosoft.co.cc>
-     */
-    public function generateSalt($max = 15)
-    {
-        $characterList = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $i             = 0;
-        $salt          = '';
-        do {
-            $salt .= $characterList{mt_rand(0, strlen($characterList))};
-            $i++;
-        } while ($i <= $max);
-
-        return $salt;
-    }//end generateSalt()
-
+    }
 
     public function changePassword($username, $password)
     {
-        $hasher    = new PasswordHash(8, false);
-        $encrypted = $hasher->HashPassword($password);
-        return dbUpdate(array('password' => $encrypted), 'users', '`username` = ?', array($username));
-    }//end changepassword()
-
-    public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 1, $description = '')
-    {
-        if (!$this->userExists($username)) {
-            $hasher    = new PasswordHash(8, false);
-            $encrypted = $hasher->HashPassword($password);
-            $userid    = dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
-            if ($userid == false) {
-                return false;
-            } else {
-                foreach (dbFetchRows('select notifications.* from notifications where not exists( select 1 from notifications_attribs where notifications.notifications_id = notifications_attribs.notifications_id and notifications_attribs.user_id = ?) order by notifications.notifications_id desc', array($userid)) as $notif) {
-                    dbInsert(array('notifications_id'=>$notif['notifications_id'],'user_id'=>$userid,'key'=>'read','value'=>1), 'notifications_attribs');
-                }
-            }
-            return $userid;
-        } else {
-            return false;
+        // check if updating passwords is allowed (mostly for classes that extend this)
+        if (!static::$CAN_UPDATE_PASSWORDS) {
+            return 0;
         }
-    }//end adduser()
 
+        /** @var User $user */
+        $user = User::thisAuth()->where('username', $username)->first();
+
+        if ($user) {
+            $user->setPassword($password);
+            return $user->save();
+        }
+
+        return false;
+    }
+
+    public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 1, $descr = '')
+    {
+        $user_array = get_defined_vars();
+
+        // no nulls
+        $user_array = array_filter($user_array, function ($field) {
+            return !is_null($field);
+        });
+
+        $new_user = User::thisAuth()->firstOrNew(['username' => $username], $user_array);
+
+        // only update new users
+        if (!$new_user->user_id) {
+            $new_user->auth_type = LegacyAuth::getType();
+            $new_user->setPassword($password);
+            $new_user->email = (string)$new_user->email;
+
+            $new_user->save();
+            $user_id = $new_user->user_id;
+
+            // set auth_id
+            $new_user->auth_id = $this->getUserid($username);
+            $new_user->save();
+
+            if ($user_id) {
+                return $user_id;
+            }
+        }
+
+        return false;
+    }
 
     public function userExists($username, $throw_exception = false)
     {
-        $return = @dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
-        return $return;
-    }//end userExists()
-
+        return User::thisAuth()->where('username', $username)->exists();
+    }
 
     public function getUserlevel($username)
     {
-        return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($username));
-    }//end getUserlevel()
-
+        return User::thisAuth()->where('username', $username)->value('level');
+    }
 
     public function getUserid($username)
     {
-        return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($username));
-    }//end getUserid()
+        // for mysql user_id == auth_id
+        return User::thisAuth()->where('username', $username)->value('user_id');
+    }
 
-
-    public function deleteUser($userid)
+    public function deleteUser($user_id)
     {
-        dbDelete('bill_perms', '`user_id` =  ?', array($userid));
-        dbDelete('devices_perms', '`user_id` =  ?', array($userid));
-        dbDelete('ports_perms', '`user_id` =  ?', array($userid));
-        dbDelete('users_prefs', '`user_id` =  ?', array($userid));
-        dbDelete('users', '`user_id` =  ?', array($userid));
+        // could be used on cli, use Eloquent helper
+        Eloquent::DB()->table('bill_perms')->where('user_id', $user_id)->delete();
+        Eloquent::DB()->table('devices_perms')->where('user_id', $user_id)->delete();
+        Eloquent::DB()->table('ports_perms')->where('user_id', $user_id)->delete();
+        Eloquent::DB()->table('users_prefs')->where('user_id', $user_id)->delete();
 
-        return dbDelete('users', '`user_id` =  ?', array($userid));
-    }//end deluser()
-
+        return User::destroy($user_id);
+    }
 
     public function getUserlist()
     {
-        return dbFetchRows('SELECT * FROM `users` ORDER BY `username`');
-    }//end getUserlist()
-
+        return User::thisAuth()->orderBy('username')->get()->toArray();
+    }
 
     public function getUser($user_id)
     {
-        return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id));
-    }//end getUser()
-
+        $user = User::find($user_id);
+        if ($user) {
+            return $user->toArray();
+        }
+        return null;
+    }
 
     public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email)
     {
-        dbUpdate(array('realname' => $realname, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
-    }//end updateUser()
+        $user = User::find($user_id);
+
+        $user->realname = $realname;
+        $user->level = (int)$level;
+        $user->can_modify_passwd = (int)$can_modify_passwd;
+        $user->email = $email;
+
+        $user->save();
+    }
 }

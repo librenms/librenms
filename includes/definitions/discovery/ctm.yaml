@@ -1,0 +1,149 @@
+mib: CTMMIBCUSTOM
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid:  pwrP
+                    num_oid: '.1.3.6.1.4.1.25868.1.6.{{ $index }}'
+                    descr: 'Master Primary Power'
+                    states:
+                        - { descr: Power OK, graph: 0, value: 1, generic: 0 }
+                        - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
+                -
+                    oid:  pwrS
+                    num_oid: '.1.3.6.1.4.1.25868.1.7.{{ $index }}'
+                    descr: 'Master Secondary Power'
+                    states:
+                        - { descr: Power OK, graph: 0, value: 1, generic: 0 }
+                        - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
+                -
+                    oid:  pwrSP
+                    num_oid: '.1.3.6.1.4.1.25868.1.23.{{ $index }}'
+                    descr: 'Slave Primary Power'
+                    states:
+                        - { descr: Power OK, graph: 0, value: 1, generic: 0 }
+                        - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
+                -
+                    oid:  pwrSS
+                    num_oid: '.1.3.6.1.4.1.25868.1.24.{{ $index }}'
+                    descr: 'Slave Secondary Power'
+                    states:
+                        - { descr: Power OK, graph: 0, value: 1, generic: 0 }
+                        - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
+
+        voltage:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: voltsM1
+                    num_oid: '.1.3.6.1.4.1.25868.1.10.{{ $index }}'
+                    descr: 'Master Primary Voltage'
+                    index: portPwrM1.0
+                -
+                    oid: voltsM2
+                    num_oid: '.1.3.6.1.4.1.25868.1.11.{{ $index }}'
+                    descr: 'Master Secondary Voltage'
+                    index: portPwrM2.0
+                -
+                    oid: voltsS1
+                    num_oid: '.1.3.6.1.4.1.25868.1.27.{{ $index }}'
+                    descr: 'Slave Primary Voltage'
+                    index: portPwrS1.0
+                -
+                    oid: voltsS2
+                    num_oid: '.1.3.6.1.4.1.25868.1.28.{{ $index }}'
+                    descr: 'Slave Secondary Voltage'
+                    index: portPwrS2.0
+        temperature:
+            data:
+                - 
+                    oid: tempC
+                    num_oid: '.1.3.6.1.4.1.25868.1.9.{{ $index }}'
+                    index: tempC.0
+                    descr: 'Temperature'
+        power:
+            options:
+                divisor: 10
+            data:
+                - 
+                    oid: portPwrM1
+                    num_oid: '.1.3.6.1.4.1.25868.1.14.{{ $index }}'
+                    descr: 'Port Power Master 1'
+                    index: portPwrM1.0
+                - 
+                    oid: portPwrM2
+                    num_oid: '.1.3.6.1.4.1.25868.1.15.{{ $index }}'
+                    descr: 'Port Power Master 2'
+                    index: portPwrM2.0
+                - 
+                    oid: portPwrM3
+                    num_oid: '.1.3.6.1.4.1.25868.1.16.{{ $index }}'
+                    descr: 'Port Power Master 3'
+                    index: portPwrM3.0
+                - 
+                    oid: portPwrM4
+                    num_oid: '.1.3.6.1.4.1.25868.1.17.{{ $index }}'
+                    descr: 'Port Power Master 4'
+                    index: portPwrM4.0
+                - 
+                    oid: portPwrM5
+                    num_oid: '.1.3.6.1.4.1.25868.1.18.{{ $index }}'
+                    descr: 'Port Power Master 5'
+                    index: portPwrM5.0
+                - 
+                    oid: portPwrM6
+                    num_oid: '.1.3.6.1.4.1.25868.1.19.{{ $index }}'
+                    descr: 'Port Power Master 6'
+                    index: portPwrM6.0
+                - 
+                    oid: portPwrM7
+                    num_oid: '.1.3.6.1.4.1.25868.1.20.{{ $index }}'
+                    descr: 'Port Power Master 7'
+                    index: portPwrM7.0
+                - 
+                    oid: portPwrM8
+                    num_oid: '.1.3.6.1.4.1.25868.1.21.{{ $index }}'
+                    descr: 'Port Power Master 8'
+                    index: portPwrM8.0
+                - 
+                    oid: portPwrS1
+                    num_oid: '.1.3.6.1.4.1.25868.1.31.{{ $index }}'
+                    descr: 'Port Power Slave 1'
+                    index: portPwrS1.0
+                - 
+                    oid: portPwrS2
+                    num_oid: '.1.3.6.1.4.1.25868.1.32.{{ $index }}'
+                    descr: 'Port Power Slave 2'
+                    index: portPwrS2.0
+                - 
+                    oid: portPwrS3
+                    num_oid: '.1.3.6.1.4.1.25868.1.33.{{ $index }}'
+                    descr: 'Port Power Slave 3'
+                    index: portPwrS3.0
+                - 
+                    oid: portPwrS4
+                    num_oid: '.1.3.6.1.4.1.25868.1.34.{{ $index }}'
+                    descr: 'Port Power Slave 4'
+                    index: portPwrS4.0
+                - 
+                    oid: portPwrS5
+                    num_oid: '.1.3.6.1.4.1.25868.1.35.{{ $index }}'
+                    descr: 'Port Power Slave 5'
+                    index: portPwrS5.0
+                - 
+                    oid: portPwrS6
+                    num_oid: '.1.3.6.1.4.1.25868.1.36.{{ $index }}'
+                    descr: 'Port Power Slave 6'
+                    index: portPwrS6.0
+                - 
+                    oid: portPwrS7
+                    num_oid: '.1.3.6.1.4.1.25868.1.37.{{ $index }}'
+                    descr: 'Port Power Slave 7'
+                    index: portPwrS7.0
+                - 
+                    oid: portPwrS8
+                    num_oid: '.1.3.6.1.4.1.25868.1.38.{{ $index }}'
+                    descr: 'Port Power Slave 8'
+                    index: portPwrS8.0

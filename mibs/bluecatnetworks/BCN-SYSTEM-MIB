@@ -1,0 +1,291 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BCN-SYSTEM-MIB.mib:  BlueCat Networks System
+--
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BCN-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TimeStamp
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    BcnAlarmSeverity
+        FROM BCN-TC-MIB
+    bcnMgmt
+        FROM BCN-SMI-MIB;
+    
+        
+bcnSystemMIB MODULE-IDENTITY
+    LAST-UPDATED	"201011301200Z"
+    ORGANIZATION	"BlueCat Networks"
+    CONTACT-INFO
+        "BlueCat Networks.
+        Customer Care
+
+        North America
+        Call: +1.866.491.2228
+
+        Europe
+        Call: +44.8081.011.306
+
+        Other
+        Call: +1.416.646.8433
+        
+        Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "This module contains the objects that define a system.  "
+    REVISION "201011301200Z"
+    DESCRIPTION
+                "Initial version of this MIB module."
+    ::= { bcnSystem 1 }
+
+bcnSystem OBJECT IDENTIFIER  ::= { bcnMgmt 2 }
+
+-- Organization
+
+bcnSystemObjects OBJECT IDENTIFIER 
+    ::= { bcnSystem 2 }
+
+bcnSystemNotification OBJECT IDENTIFIER 
+    ::= { bcnSystem 3 }
+
+bcnSystemConformance OBJECT IDENTIFIER 
+    ::= { bcnSystem 4 }
+
+
+-- Basic types
+
+bcnSysIdentification OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+       "Identification of the running system."
+    ::= { bcnSystemObjects 1 }
+
+bcnSysIdProduct OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OIDs for this object are obtained from BCN-PRODUCTS-MIB, i.e.:
+        bcnProductsAdonis250 1.3.6.1.4.1.13315.2.1"
+    ::= { bcnSysIdentification 1 }
+
+bcnSysIdOSRelease OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The BlueCat Networks running OS release."
+    ::= { bcnSysIdentification 2 }
+
+bcnSysIdSerial OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Serial number usually assigned to a hardware platform."
+    ::= { bcnSysIdentification 3 }
+
+bcnSysIdServiceTag OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Manufacturer service tag."
+    ::= { bcnSysIdentification 4 }
+
+bcnSysIdPlatform OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Platform identification."
+    ::= { bcnSysIdentification 5 }
+
+bcnSysIdVendorPlatform OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Platform vendor identification."
+    ::= { bcnSysIdentification 6 }
+
+bcnSysIdServicesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BcnSysIdServicesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table enumerates the services available on this system."
+    ::= { bcnSysIdentification 7 }
+
+bcnSysIdServicesEntry  OBJECT-TYPE
+    SYNTAX      BcnSysIdServicesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+	DESCRIPTION "A logical row in the bcnSysIdServicesTable."
+    INDEX   { bcnSysIdServicesIndex }
+    ::= { bcnSysIdServicesTable 1 }
+
+BcnSysIdServicesEntry  ::=
+    SEQUENCE {
+        bcnSysIdServicesIndex          Unsigned32,
+        bcnSysIdServicesOID            OBJECT IDENTIFIER,
+        bcnSysIdServicesStateTS        TimeStamp
+    }
+
+bcnSysIdServicesIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table index."
+    ::= { bcnSysIdServicesEntry 1 }
+
+bcnSysIdServicesOID   OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the OID of the service available on the system."
+    ::= { bcnSysIdServicesEntry 2 }
+
+bcnSysIdServicesStateTS   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last time this particular service changed state."
+    ::= { bcnSysIdServicesEntry 3 }
+
+
+bcnSysServices OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+       "Identification of services or Components available on this system."
+    ::= { bcnSystemObjects 2 }
+
+bcnSysServDNSService OBJECT IDENTIFIER ::= { bcnSysServices 1 }
+bcnSysServDHCPService OBJECT IDENTIFIER ::= { bcnSysServices 2 }
+bcnSysServTFTPService OBJECT IDENTIFIER ::= { bcnSysServices 3 }
+bcnSysServLicensing OBJECT IDENTIFIER ::= { bcnSysServices 4 }
+bcnSysServTFTP OBJECT IDENTIFIER ::= { bcnSysServices 5 }
+bcnSysServNTP OBJECT IDENTIFIER ::= { bcnSysServices 6 }
+bcnSysServPowerSupply OBJECT IDENTIFIER ::= { bcnSysServices 7 }
+bcnSysServNetworkInterface OBJECT IDENTIFIER ::= { bcnSysServices 8 }
+bcnSysServHighAvailability OBJECT IDENTIFIER ::= { bcnSysServices 9 }
+bcnSysServReplication OBJECT IDENTIFIER ::= { bcnSysServices 10 }
+bcnSysServSystem OBJECT IDENTIFIER ::= { bcnSysServices 11 }
+
+
+-- Notification definitions
+
+
+bcnSysNotificationEvents OBJECT IDENTIFIER 
+    ::= { bcnSystemNotification 0 }
+
+bcnSysNotificationData OBJECT IDENTIFIER 
+    ::= { bcnSystemNotification 1 }
+
+-- Notification data
+
+bcnSysSerOperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+      start(1),
+      reboot(2),
+      shutdown(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System operational states. The possible states are:
+        start(1)	The system started.
+        reboot(2)	The system is rebooting.
+        shutdown(3)	The system is shutting down.
+        "
+    ::= { bcnSysNotificationData 1 }
+
+bcnSysAlarmSeverity OBJECT-TYPE
+    SYNTAX          BcnAlarmSeverity
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Severity classification for the alarm."
+    ::= { bcnSysNotificationData 2 }
+
+bcnSysAlarmInfo OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Descriptive information about the alarm event."
+    ::= { bcnSysNotificationData 3 }
+
+-- Notification events
+
+bcnSysAlarmNotif NOTIFICATION-TYPE
+    OBJECTS {
+	      bcnSysSerOperState,
+                bcnSysAlarmSeverity,
+                bcnSysAlarmInfo
+            }
+    STATUS  current
+    DESCRIPTION
+    "This notification is sent when the system starts, reboots or shuts down"
+    ::= { bcnSysNotificationEvents 1 }
+
+-- Conformance
+
+bcnSysServliances OBJECT IDENTIFIER 
+    ::= { bcnSystemConformance 1 }
+
+bcnSysGroups OBJECT IDENTIFIER 
+    ::= { bcnSystemConformance 2 }
+
+
+bcnSysIdentificationGroup OBJECT-GROUP
+    OBJECTS { 
+	bcnSysIdProduct, bcnSysIdOSRelease, bcnSysIdSerial,
+	bcnSysIdServiceTag, bcnSysIdPlatform, bcnSysIdVendorPlatform, 
+	bcnSysIdServicesOID, bcnSysIdServicesStateTS }
+
+    STATUS current
+    DESCRIPTION "At a minimum a system must be able to identify itself. This
+        group has to be implemented even by unconfigured systems."
+    ::= { bcnSysGroups 1 }
+
+bcnSysNotificationEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { 
+        bcnSysAlarmNotif
+    }
+    STATUS current
+    DESCRIPTION "System notifications conformance."
+    ::= { bcnSysGroups 2 }
+
+bcnSysNotificationDataGroup OBJECT-GROUP
+    OBJECTS { 
+        bcnSysSerOperState,
+        bcnSysAlarmSeverity,
+        bcnSysAlarmInfo
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnSysGroups 3 }
+
+bcnSysServliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Basic conformance"
+    MODULE -- This module
+    MANDATORY-GROUPS {
+        bcnSysIdentificationGroup,
+        bcnSysNotificationEventGroup,
+        bcnSysNotificationDataGroup }
+    ::= {bcnSysServliances 1 }
+
+END

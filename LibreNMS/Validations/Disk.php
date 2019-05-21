@@ -26,10 +26,9 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Validator;
 
-class Disk implements ValidationGroup
+class Disk extends BaseValidation
 {
     /**
      * Validate this module.
@@ -55,15 +54,5 @@ class Disk implements ValidationGroup
         if ($space_check < 1) {
             $validator->fail("Disk space where $rrd_dir is located is empty!!!");
         }
-    }
-
-    /**
-     * Returns if this test should be run by default or not.
-     *
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return true;
     }
 }

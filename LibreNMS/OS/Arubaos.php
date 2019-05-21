@@ -51,9 +51,9 @@ class Arubaos extends OS implements
     public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated
-        return array(
+        return [
             new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Clients')
-        );
+        ];
     }
 
     /**
@@ -99,18 +99,15 @@ class Arubaos extends OS implements
 
     private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
     {
-        $data = snmpwalk_cache_oid_num($this->getDevice(), $oid, array(), 'AI-AP-MIB');
+        $data = snmpwalk_cache_numerical_oid($this->getDevice(), $oid, [], 'AI-AP-MIB');
 
-        $sensors = array();
-        foreach ($data as $oid => $entry) {
-            $oid_parts = explode('.', $oid);
-            $index = end($oid_parts);
-            $tmp_index = "$oid.$index";
+        $sensors = [];
+        foreach ($data as $index => $entry) {
+            $value = reset($entry);
+            $oid = key($entry);
 
             if ($type == 'frequency') {
-                $current = WirelessSensor::channelToFrequency($this->decodeChannel($entry[$oid]));
-            } else {
-                $current = $entry[$oid];
+                $value = WirelessSensor::channelToFrequency($this->decodeChannel($value));
             }
 
             $sensors[] = new WirelessSensor(
@@ -118,9 +115,9 @@ class Arubaos extends OS implements
                 $this->getDeviceId(),
                 $oid,
                 'arubaos-iap',
-                $tmp_index,
+                $oid,
                 sprintf($desc, $index),
-                $current
+                $value
             );
         }
 
@@ -148,6 +145,6 @@ class Arubaos extends OS implements
      */
     public function pollWirelessFrequency(array $sensors)
     {
-        return $this->pollWirelessChannelAsFrequency($sensors, array($this, 'decodeChannel'));
+        return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }
 }

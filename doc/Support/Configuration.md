@@ -1,4 +1,5 @@
 source: Support/Configuration.md
+path: blob/master/doc/
 The options shown below also contain the default values.
 
 If you would like to alter any of these then please add your config option to `config.php`.
@@ -99,6 +100,15 @@ $config['icmp_check'] = false;
 
 If you would like to do this on a per device basis then you can do so under Device -> Edit -> Misc -> Disable ICMP Test? On
 
+#### traceroute
+LibreNMS uses traceroute / traceroute6 to record debug information when a device is down due to icmp AND you have `$config['debug']['run_trace'] = true;`
+set.
+
+```php
+$config['traceroute']  = '/usr/bin/traceroute';
+$config['traceroute6'] = '/usr/bin/traceroute6';
+```
+
 #### SNMP
 
 ```php
@@ -120,6 +130,13 @@ $config['dot']              = "/usr/bin/dot";
 $config['unflatten']        = "/usr/bin/unflatten";
 $config['neato']            = "/usr/bin/neato";
 $config['sfdp']             = "/usr/bin/sfdp";
+```
+### Authentication
+
+Generic Authentication settings.
+
+```php
+$config['password']['min_length'] = 8;  // password minimum length for auth that allows user creation
 ```
 
 ### Proxy support
@@ -284,6 +301,10 @@ Enable or disable the sysDescr output for a device.
 $config['force_ip_to_sysname'] = false;
 ```
 When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don't have DNS records for most of your devices.
+```php
+$config['force_hostname_to_sysname'] = false;
+```
+When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the SNMP sysName instead as the preferred reference to the device.
 
 ```php
 $config['device_traffic_iftype'][] = '/loopback/';
@@ -318,6 +339,11 @@ You can increase this if you want to try and fit more of the hostname in graph t
 The default value is 12
 However, this can possibly break graph generation if this is very long.
 
+You can enable dynamic graphs within the WebUI under Global Settings -> Webui Settings -> Graph Settings.
+
+Graphs will be movable/scalable without reloading the page:
+![Example dynamic graph usage](img/dynamic-graph-usage.gif)
+
 ### Stacked Graphs
 You can enable stacked graphs instead of the default inverted graphs. 
 Enabling them is possible via webui Global Settings -> Webui Settings -> Graph settings -> Use stacked graphs
@@ -340,25 +366,31 @@ $config['allow_duplicate_sysName'] = false;
 Generally, it is a better to set these [per OS](../Developing/os/Settings.md#poller-and-discovery-modules) or device.
 
 ```php
-$config['discovery_modules]['arp-table'] = 1;
-$config['poller_modules']['bgp-peers'] = 0;
+$config['discovery_modules]['arp-table'] = true;
+$config['poller_modules']['bgp-peers'] = false;
 ```
 
 ### SNMP Settings
 
-```php
-$config['snmp']['timeout'] = 1;            # timeout in seconds
-$config['snmp']['retries'] = 5;            # how many times to retry the query
-$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
-$config['snmp']['version'] = "v2c";         # Default version to use
-$config['snmp']['port'] = 161;
-```
 Default SNMP options including retry and timeout settings and also default version and port.
+
+```php
+$config['snmp']['timeout'] = 1;            				# timeout in seconds
+$config['snmp']['retries'] = 5;            				# how many times to retry the query
+$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');	# Transports to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];         		# Default versions to use
+$config['snmp']['port'] = 161;						# Default port
+$config['snmp']['exec_timeout'] = 1200;					# execution time limit in seconds
+```
+>NOTE: `timeout` is the time to wait for an answer and `exec_timeout` is the max time to run a query. 
+
+The default v1/v2c snmp community to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
 
 ```php
 $config['snmp']['community'][0] = "public";
 ```
-The default v1/v2c snmp community to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
+
+The default v3 snmp details to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
 
 ```php
 $config['snmp']['v3'][0]['authlevel'] = "noAuthNoPriv";  # noAuthNoPriv | authNoPriv | authPriv
@@ -368,7 +400,6 @@ $config['snmp']['v3'][0]['authalgo'] = "MD5";            # MD5 | SHA
 $config['snmp']['v3'][0]['cryptopass'] = "";             # Privacy (Encryption) Passphrase
 $config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
 ```
-The default v3 snmp details to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
 
 ### Auto discovery settings
 
@@ -396,7 +427,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Alerting/Rules.md)
+[Alerting](../Alerting/index.md)
 
 ### Billing
 
@@ -431,6 +462,7 @@ Enable / disable additional port statistics.
 
 ```php
 $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
+$config['rancid_repo_type']             = 'svn';
 $config['rancid_ignorecomments']        = 0;
 ```
 Rancid configuration, `rancid_configs` is an array containing all of the locations of your rancid files.
@@ -444,7 +476,28 @@ Setting `rancid_ignorecomments` will disable showing lines that start with #
 ```php
 $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 ```
-Specify the location of the collectd rrd files.
+Specify the location of the collectd rrd files. Note that the location in config.php should be consistent with the location set in /etc/collectd.conf and etc/collectd.d/rrdtool.conf
+
+```php
+<Plugin rrdtool>
+        DataDir "/var/lib/collectd/rrd"
+        CreateFilesAsync false
+        CacheTimeout 120
+        CacheFlush   900
+        WritesPerSecond 50
+</Plugin>
+```
+/etc/collectd.conf
+
+```php
+LoadPlugin rrdtool
+<Plugin rrdtool>
+       DataDir "/var/lib/collectd/rrd"
+       CacheTimeout 120
+       CacheFlush   900
+</Plugin>
+```
+/etc/collectd.d/rrdtool.conf
 
 ```php
 $config['collectd_sock']                 = 'unix:///var/run/collectd.sock';
@@ -460,6 +513,8 @@ Specify the location of the collectd unix socket. Using a socket allows the coll
 [NFSen](../Extensions/NFSen.md)
 
 ### Location mapping
+
+If you just want to set GPS coordinates on a location, you should visit Devices > Geo Locations > All Locations and edit the coordinates there.
 
 Exact Matching:
 ```php
@@ -532,8 +587,20 @@ $config['bad_entity_sensor_regex'][] = '/Physical id [0-9]+/';
 $config['os']['cisco']['bad_entity_sensor_regex'] = '/Physical id [0-9]+/';
 ```
 
+### Entity sensors limit values
+
+Vendors may give some limit values (or thresholds) for the discovered sensors. By default, when no such value is given,
+both high and low limit values are guessed, based on the value measured during the initial discovery.
+
+When it is preferred to have no high and/or low limit values at all if these are not provided by the vendor, the guess
+method can be disabled:
+```php
+$config['sensors']['guess_limits'] = false;
+```
+
 ### Storage configuration
 
+Mounted storage / mount points to ignore in discovery and polling.
 ```php
 $config['ignore_mount_removable']  = 1;
 $config['ignore_mount_network']    = 1;
@@ -561,7 +628,12 @@ $config['ignore_mount_regexp'][] = "/^\/dev\/md0/";
 $config['ignore_mount_regexp'][] = "/^\/var\/dhcpd\/dev,/";
 $config['ignore_mount_regexp'][] = "/UMA/";
 ```
-Mounted storage / mount points to ignore in discovery and polling.
+
+Custom storage warning percentage
+```php
+$config['storage_perc_warn'] = 60;
+$config['os']['linux']['storage_perc_warn'] = 60;
+```
 
 ### IRC Bot
 
@@ -581,9 +653,11 @@ $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
 $config['perf_times_purge']                               = 30;
 $config['device_perf_purge']                              = 7;
+$config['alert_log_purge']                                = 365;
+$config['port_fdb_purge']                                 = 10;
 $config['rrd_purge']                                      = 90;// Not set by default
 ```
-These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually,
+These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually.
 values are in days.
 
 > NOTE: Please be aware that `$config['rrd_purge']` is _NOT_ set by default. This option will remove any old data within 

@@ -19,7 +19,7 @@ if (!empty($oids)) {
     $warnlimit   = 10;
     $descr       = 'Battery Charge';
 
-    discover_sensor($valid['sensor'], 'charge', $device, $current_oid, $index, $sensorType, $descr, $precision, '1', $lowlimit, $warnlimit, null, $limit, $current_val);
+    discover_sensor($valid['sensor'], 'charge', $device, $current_oid, $index, $sensorType, $descr, $precision, 1, $lowlimit, $warnlimit, null, $limit, $current_val);
 } else {
     // Try to just get capacity
     $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.2.1.0', '-OsqnU');
@@ -40,6 +40,6 @@ if (!empty($oids)) {
         $warnlimit   = 10;
         $descr       = 'Battery Charge';
 
-        discover_sensor($valid['sensor'], 'charge', $device, $current_oid, $index, $sensorType, $descr, $precision, '1', $lowlimit, $warnlimit, null, $limit, $current_val);
+        discover_sensor($valid['sensor'], 'charge', $device, $current_oid, $index, $sensorType, $descr, $precision, 1, $lowlimit, $warnlimit, null, $limit, $current_val);
     }
 }//end if

@@ -1,0 +1,223 @@
+-- =================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: the huawei cpu mib from huawei-device-mib
+-- Reference:
+-- Version:     V1.03
+-- History:
+--    
+-- =================================================================
+
+HUAWEI-CPU-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwFrameIndex, hwSlotIndex
+            FROM HUAWEI-DEVICE-MIB    
+        OBJECT-GROUP, MODULE-COMPLIANCE            
+            FROM SNMPv2-CONF                                
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32
+            FROM SNMPv2-SMI
+        huaweiUtility            
+            FROM HUAWEI-MIB;
+    
+    --This mib defines the CPU usage statistics information. NMS can query CPU utilization
+    --from device by the mib.
+    
+    hwDev MODULE-IDENTITY
+        LAST-UPDATED "201708170000Z"
+        ORGANIZATION "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Huawei Industrial Base
+            Bantian, Longgang
+            Shenzhen 518129
+            People's Republic of China
+            Website: http://www.huawei.com
+            Email: support@huawei.com
+            " 
+        DESCRIPTION 
+            "huawei device  mib."	
+   
+    REVISION     "201708170000Z"
+        DESCRIPTION  "Change hwMultiCpuDevIndex, hwMultiCpuDuty DESCRIPTION"
+		
+    REVISION     "201610270000Z"
+        DESCRIPTION  "Add the range of hwMultiCpuDevTable elements"
+		
+    REVISION     "201610200000Z"
+        DESCRIPTION  "Add new table of hwMultiCpuDevTable"
+		
+	REVISION     "201407260000Z"
+        DESCRIPTION  "V1.00, initial version."
+        ::= { huaweiUtility 3 }
+    
+    hwCpuDevTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCpuDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            This table provides the information of CPU usage statistics of device 
+            in the period of last 5 seconds, 1 minute,or 5 minutes.
+            "
+        ::= { hwDev 4 }
+    
+    hwCpuDevEntry OBJECT-TYPE
+        SYNTAX HwCpuDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Entries of hwCpuDevTable.                
+            
+            The hwCpuDevTable is indexed by hwFrameIndex, hwSlotIndex and hwCpuDevIndex.
+            
+            hwFrameIndex  - the index of frame of the device. for example, hwFrameIndex 
+            equals 0 in NE16.
+            hwSlotIndex   - the slot number of the device, the MAX value varies with 
+            different devices.
+            hwCpuDevIndex - for the purpose of extension.In single CPU devices (NE16,eg.),
+            hwCpuDevIndex equals 0."
+        INDEX { hwFrameIndex, hwSlotIndex, hwCpuDevIndex }
+        ::= { hwCpuDevTable 1 }
+    
+    HwCpuDevEntry ::=
+        SEQUENCE { 
+            hwCpuDevIndex
+                Integer32,
+            hwCpuDevDuty
+                Integer32,
+            hwAvgDuty1min
+                Integer32,
+            hwAvgDuty5min
+                Integer32
+            }
+
+    hwCpuDevIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The object is used only for the purpose of extension. 
+            For single-CPU devices, the value of this object equals 0.
+            "
+        ::= { hwCpuDevEntry 1 }
+    
+    hwCpuDevDuty OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The value of this object identifies the average CPU occupancy of a board or an entity."
+        ::= { hwCpuDevEntry 2 }
+    
+    hwAvgDuty1min OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The value of this object identifies the average CPU occupancy of a board or an entity 
+            in the last one minute before you access the object. "
+        ::= { hwCpuDevEntry 3 }
+    
+    hwAvgDuty5min OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The value of this object identifies the average CPU occupancy of a board or an entity  
+            in the last five minutes before you access the object. "
+        ::= { hwCpuDevEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.6.3.33
+        hwMultiCpuDevTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMultiCpuDevEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                This table provides the information of multiple CPUs usage statistics of device 
+                in the period of last 5 seconds, 1 minute,or 5 minutes.
+                "
+            ::= { hwDev 33 }
+        -- 1.3.6.1.4.1.2011.6.3.33.1
+        hwMultiCpuDevEntry OBJECT-TYPE
+			SYNTAX HwMultiCpuDevEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The Entries of hwMultiCpuDevTable.                
+				
+				The hwMultiCpuDevTable is indexed by hwFrameIndex, hwSlotIndex and hwMultiCpuDevIndex.
+				
+				hwFrameIndex  - the index of frame of the device. for example, hwFrameIndex 
+				equals 0 in NE16.
+				hwSlotIndex   - the slot number of the device, the MAX value varies with 
+				different devices.
+				hwMultiCpuDevIndex - for the purpose of extension.
+				"
+			INDEX { hwFrameIndex, hwSlotIndex, hwMultiCpuDevIndex }
+			::= { hwMultiCpuDevTable 1 }
+		
+		HwMultiCpuDevEntry ::=
+			SEQUENCE { 
+				hwMultiCpuDevIndex
+					Integer32,
+				hwMultiCpuDuty
+					Integer32,
+				hwMultiCpuAvgDuty1min
+					Integer32,
+				hwMultiCpuAvgDuty5min
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.3.33.1.1
+		hwMultiCpuDevIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				This object indicates the CPU core index.
+				"
+			::= { hwMultiCpuDevEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.3.33.1.2
+		hwMultiCpuDuty OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+                                                                            The value of this object identifies the current CPU occupancy of a board or an entity.
+			                  This object indicates the average CPU usage within 5s.
+                                                                            "
+			::= { hwMultiCpuDevEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.3.33.1.3
+		hwMultiCpuAvgDuty1min OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The value of this object identifies the average CPU occupancy of a board or an entity  
+				in the last one minutes before you access the object.
+				"
+			::= { hwMultiCpuDevEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.3.33.1.4
+		hwMultiCpuAvgDuty5min OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+				MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The value of this object identifies the average CPU occupancy of a board or an entity  
+				in the last five minutes before you access the object.
+				"
+			::= { hwMultiCpuDevEntry 4 }
+END

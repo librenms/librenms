@@ -16,7 +16,7 @@
 
 echo 'EATON-ATS';
 
-$oids = snmpwalk_cache_oid($device, 'ats2InputVoltage', array(), 'EATON-ATS2-MIB');
+$oids = snmpwalk_cache_oid($device, 'ats2InputVoltage', [], 'EATON-ATS2-MIB');
 foreach ($oids as $volt_id => $data) {
     //we need to retrieve the numerical value of oid
     $source_oid="EATON-ATS2-MIB::ats2InputIndex.".$volt_id;

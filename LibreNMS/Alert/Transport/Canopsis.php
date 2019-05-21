@@ -1,17 +1,29 @@
 <?php
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Canopsis implements Transport
+class Canopsis extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['host'] = $this->config['canopsis-host'];
+            $opts['port'] = $this->config['canopsis-port'];
+            $opts['user'] = $this->config['canopsis-user'];
+            $opts['pass'] = $this->config['canopsis-pass'];
+            $opts['vhost'] = $this->config['canopsis-vhost'];
+        }
+        return $this->contactCanopsis($obj, $opts);
+    }
+
+    public function contactCanopsis($obj, $opts)
     {
         // Configurations
         $host     = $opts["host"];
         $port     = $opts["port"];
         $user     = $opts["user"];
-        $pass     = $opts["passwd"];
+        $pass     = $opts["pass"];
         $vhost    = $opts["vhost"];
         $exchange = "canopsis.events";
 
@@ -29,13 +41,13 @@ class Canopsis implements Transport
                 $state = 0;
                 break;
             case "warning":
-                $state = 1;
-                break;
-            case "critical":
                 $state = 2;
                 break;
-            default:
+            case "critical":
                 $state = 3;
+                break;
+            default:
+                $state = 0;
         }
         $msg_body = array(
             "timestamp" => time(),
@@ -44,9 +56,8 @@ class Canopsis implements Transport
             "event_type" => "check",
             "source_type" => "resource",
             "component" => $obj['hostname'],
-            "resource" => $obj['faults'][1]['storage_descr'],
+            "resource" => $obj['name'],
             "state" => $state,
-            "state_type" => 1,
             "output" => $obj['msg'],
             "display_name" => "librenms"
         );
@@ -67,5 +78,50 @@ class Canopsis implements Transport
         $ch->close();
         $conn->close();
         return true;
+    }
+    
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Hostname',
+                    'name' => 'canopsis-host',
+                    'descr' => 'Canopsis Hostname',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Port Number',
+                    'name' => 'canopsis-port',
+                    'descr' => 'Canopsis Port Number',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'User',
+                    'name' => 'canopsis-user',
+                    'descr' => 'Canopsis User',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Password',
+                    'name' => 'canopsis-pass',
+                    'descr' => 'Canopsis Password',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Vhost',
+                    'name' => 'canopsis-vhost',
+                    'descr' => 'Canopsis Vhost',
+                    'type' => 'text'
+                ],
+            ],
+            'validation' => [
+                'canopsis-host' => 'required|string',
+                'canopsis-port' => 'required|numeric',
+                'canopsis-user' => 'required|string',
+                'canopsis-pass' => 'required|string',
+                'canopsis-vhost' => 'required|string',
+            ]
+        ];
     }
 }

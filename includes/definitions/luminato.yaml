@@ -1,0 +1,12 @@
+os: luminato
+text: 'Teleste Luminato'
+type: network
+icon: teleste
+group: luminato
+mib_dir:
+    - teleste
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3715

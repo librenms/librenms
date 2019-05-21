@@ -27,29 +27,30 @@
 if (!isset($init_modules)) {
     $opts = getopt('ldh:u:p:n:t:s:');
 
-    $db_vars = array(
-        'db_host' => 'h',
-        'db_user' => 'u',
-        'db_pass' => 'p',
-        'db_name' => 'n',
-        'db_port' => 't',
-        'db_socket' => 's',
-    );
+    $map = [
+        'h' => 'DB_HOST',
+        'u' => 'DB_USERNAME',
+        'p' => 'DB_PASSWORD',
+        'n' => 'DB_DATABASE',
+        't' => 'DB_PORT',
+        's' => 'DB_SOCKET',
+    ];
 
-    $config = array();
-    foreach ($db_vars as $setting => $opt) {
+    // set env variables
+    foreach ($map as $opt => $env_name) {
         if (isset($opts[$opt])) {
-            $config[$setting] = $opts[$opt];
+            putenv("$env_name=" . $opts[$opt]);
         }
     }
 
-    $init_modules = array();
-    require __DIR__  . '/includes/init.php';
+    $init_modules = ['nodb', 'laravel'];
+    require __DIR__ . '/includes/init.php';
 
-    $debug = isset($opts['d']);
+    set_debug(isset($opts['d']));
+
     $skip_schema_lock = isset($opts['l']);
 }
 
-require 'includes/sql-schema/update.php';
+require __DIR__ . '/includes/sql-schema/update.php';
 
 exit($return);

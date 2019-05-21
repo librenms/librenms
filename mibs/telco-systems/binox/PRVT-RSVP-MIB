@@ -1,0 +1,201 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-RSVP-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-RSVP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    mpls
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+prvtRsvpMIB MODULE-IDENTITY
+    LAST-UPDATED "201103210000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The MIB module for management of the PRVT-RSVP product."
+    REVISION    "201103210000Z"
+    DESCRIPTION 
+        "Added prvtRsvpProductFastRerouteCaps."
+    REVISION    "200902100000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { mpls 7 }
+
+
+PrvtRsvpAdminStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The desired administrative state of an RSVP
+         entity."
+    SYNTAX      INTEGER { up(1), down(2) }
+
+PrvtRsvpOperStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The current operational state of an RSVP entity."
+    SYNTAX      INTEGER { up(1), down(2), goingUp(3), goingDown(4), 
+                    actFailed(5) }
+
+PrvtRsvpIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The index value identifying an RSVP entity."
+    SYNTAX      Unsigned32
+
+prvtRsvpObjects OBJECT IDENTIFIER
+    ::= { prvtRsvpMIB 1 }
+
+prvtRsvpProductTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtRsvpProductEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table of RSVP entities."
+    ::= { prvtRsvpObjects 1 }
+
+prvtRsvpProductEntry OBJECT-TYPE
+    SYNTAX      PrvtRsvpProductEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry represents an RSVP entity."
+    INDEX       { prvtRsvpProductIndex }
+    ::= { prvtRsvpProductTable 1 }
+
+PrvtRsvpProductEntry ::= SEQUENCE {
+    prvtRsvpProductIndex                PrvtRsvpIndex,
+    prvtRsvpProductRowStatus            RowStatus,
+    prvtRsvpProductAdminStatus          PrvtRsvpAdminStatus,
+    prvtRsvpProductOperStatus           PrvtRsvpOperStatus,
+    prvtRsvpProductProtocolExtensions   BITS,
+    prvtRsvpProductFastRerouteCaps      BITS
+}
+
+prvtRsvpProductIndex OBJECT-TYPE
+    SYNTAX      PrvtRsvpIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The index of this prvtRsvpProductEntry. This is the
+         HAF entity index passed on the entity create parameters."
+    ::= { prvtRsvpProductEntry 1 }
+
+prvtRsvpProductRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Used to create and delete a PRVT-RSVP Product Table entry.
+         When this object is set to 'active', only the
+         prvtRsvpProductAdminStatus object in the row may be modified."
+    ::= { prvtRsvpProductEntry 2 }
+
+prvtRsvpProductAdminStatus OBJECT-TYPE
+    SYNTAX      PrvtRsvpAdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The desired administrative state of the RSVP entity."
+    ::= { prvtRsvpProductEntry 3 }
+
+prvtRsvpProductOperStatus OBJECT-TYPE
+    SYNTAX      PrvtRsvpOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current operational state of this instance of PRVT-RSVP."
+    ::= { prvtRsvpProductEntry 4 }
+
+prvtRsvpProductProtocolExtensions OBJECT-TYPE
+    SYNTAX      BITS { bypassFastReroute(0), detourFastReroute(1), 
+                    noResAffOnInIf(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies which extensions to the standard RSVP-TE protocol
+         are enabled. For fully standards-compliant behavior, set
+         this parameter to zero (no bits set). To enable specific
+         non-standard protocol extensions, set this parameter to the
+         bitwise OR of whichever of the following behaviors you wish
+         to enable.
+         
+         - bypassFastReroute: Enable support for facility fast reroute
+         protection of LSPs (bypass LSP protection).
+         
+         - detourFastReroute: Enable support for one-to-one fast
+         reroute protection of LSPs (detour LSP protection).
+         
+         - noResAffOnInIf: Disable resource affinity checking on
+         incoming interfaces for LSPs. If this flag is set, RSVP
+         will accept Path messages which use invalid resource
+         affinities for the incoming interface used by the LSP."
+    ::= { prvtRsvpProductEntry 5 }
+
+prvtRsvpProductFastRerouteCaps OBJECT-TYPE
+    SYNTAX      BITS { fastReroutePLR(0), fastRerouteMP(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies what fast reroute capabilities are enabled
+         on this node.
+         This field is only valid when the fast reroute extension
+         is enabled (i.e. prvtRsvpProductProtocolExtensions has
+         either of the bypassFastReroute, or detourFastReroute
+         bits set or both).
+         When the fast reroute extension is not enabled, this
+         field should be cleared (no bits set).
+         
+         - PLR: Node provides fast reroute point of local repair
+         capability.
+         
+         - MP: Node provides fast reroute merge point capability."
+    ::= { prvtRsvpProductEntry 6 }
+
+END -- end of module PRVT-RSVP-MIB.

@@ -3,14 +3,14 @@ text: 'Rittal LCP'
 type: environment
 icon: rittal
 over:
-    - { graph: device_temperature, text: 'Temperatures' }
+    - { graph: device_temperature, text: Temperatures }
     - { graph: device_power, text: 'Cooling capacity' }
 mib_dir:
     - rittal
 discovery_modules:
-    storage: 0
-    mempools: 0
-    processors: 0
+    storage: false
+    mempools: false
+    processors: false
 discovery:
     -
         sysObjectID:

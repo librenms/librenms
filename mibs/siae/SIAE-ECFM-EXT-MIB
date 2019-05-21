@@ -1,0 +1,525 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-ECFM-EXT-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Unsigned32
+        FROM SNMPv2-SMI
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    siaeEcfmExtMib MODULE-IDENTITY
+        LAST-UPDATED "201607250000Z" 
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail:  help@siaemic.com
+            "
+        DESCRIPTION
+            "This mib provides alarm objects to interface
+             ECFM MEP alarm condition to SIAE-ALARM module
+            "
+        REVISION "201607250000Z"
+        DESCRIPTION
+            "MIB version 01.00.02
+             Added defLckConditionAlarm and mepLckConditionAlarmsSeverityCode
+            "        
+        REVISION "201506260000Z"
+        DESCRIPTION
+            "MIB version 01.00.01
+             Changed siaeMepAlarms8021agTable description.
+             Added siaeMepAlarmsY1731Table and Y1731 alarms severity code.
+            "        
+       REVISION "201504140000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00.
+            "
+    ::= { siaeMib 94 }
+
+-- ----------------------------------------------------------------------------
+-- Groups in the SIAE-MEP-ALARMS-MIB Module
+-- ----------------------------------------------------------------------------
+
+  -- -----------------------------------------------------------------
+  -- MIB version
+  --
+    siaeEcfmExtMibVersion OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+    ::= {siaeEcfmExtMib 1}
+
+  -- -----------------------------------------------------------------
+  -- siaeMepAlarmsTable - Start 802.1ag
+  --
+  siaeMepAlarms8021agTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SiaeMepAlarms8021agEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "MEPs for the corresponding index (MdIndex, MaIndex and MepIdentifier)."
+  ::= { siaeEcfmExtMib 2 }
+
+  siaeMepAlarms8021agEntry OBJECT-TYPE
+    SYNTAX      SiaeMepAlarms8021agEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  MEP alarm entry"
+    INDEX {
+            defMIEcfmContextId,
+            defMIEcfmMdIndex,
+            defMIEcfmMaIndex,
+            defMIEcfmMepIdentifier
+          }
+    ::= { siaeMepAlarms8021agTable 1 }
+
+  SiaeMepAlarms8021agEntry ::= 
+      SEQUENCE {
+          defMIEcfmContextId     Unsigned32,
+          defMIEcfmMdIndex       Unsigned32,
+          defMIEcfmMaIndex       Unsigned32,
+          defMIEcfmMepIdentifier Unsigned32,
+          defRdiCcmAlarm         AlarmStatus,
+          defMacStatusAlarm      AlarmStatus,
+          defRemoteCcmAlarm      AlarmStatus,
+          defErrorCcmAlarm       AlarmStatus,
+          defXconCcmAlarm        AlarmStatus
+      }
+
+  defMIEcfmContextId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "context ID: as fsMIEcfmContextId of ARICENT-ECFM-MI-MIB"
+  ::= { siaeMepAlarms8021agEntry 1 } 
+
+  defMIEcfmMdIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Mep Maintenance Domanin: as fsMIEcfmMdIndex of ARICENT-ECFM-MI-MIB"
+  ::= { siaeMepAlarms8021agEntry 2 } 
+
+  defMIEcfmMaIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Mep Maintenance Association: as fsMIEcfmMaIndex of ARICENT-ECFM-MI-MIB"
+  ::= { siaeMepAlarms8021agEntry 3 } 
+
+  defMIEcfmMepIdentifier OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Mep Identifier: as fsMIEcfmIdentifier of ARICENT-ECFM-MI-MIB"
+  ::= { siaeMepAlarms8021agEntry 4 }       
+
+  defRdiCcmAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A remote MEP is reported the RDI bit in its last CCM.
+         According to fsMIEcfmMepDefects (bit 1) in fsMIEcfmMepTable
+         -- ARICENT-ECFM-MI-MIB"
+  ::= { siaeMepAlarms8021agEntry 5 }  
+
+  defMacStatusAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Either some remote MEP is reporting its
+         Interface Status TLV as not isUp, or all remote
+         MEPs are reporting a Port Status TLV that
+         contains some value other than psUp.
+         According to fsMIEcfmMepDefects (bit 2) in fsMIEcfmMepTable
+         -- ARICENT-ECFM-MI-MIB"
+  ::= { siaeMepAlarms8021agEntry 6 }    
+
+  defRemoteCcmAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MEP is not receiving valid CCMs from at
+         least one of the remote MEPs.
+         According to fsMIEcfmMepDefects (bit 3) in fsMIEcfmMepTable
+         -- ARICENT-ECFM-MI-MIB"
+  ::= { siaeMepAlarms8021agEntry 7 }  
+
+  defErrorCcmAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MEP has received at least one invalid CCM
+         whose CCM Interval has not yet timed out.
+         According to fsMIEcfmMepDefects (bit 4) in fsMIEcfmMepTable
+         -- ARICENT-ECFM-MI-MIB"
+  ::= { siaeMepAlarms8021agEntry 8 }
+
+  defXconCcmAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MEP has received at least one CCM from
+         either another MAID or a lower MD Level whose
+         CCM Interval has not yet timed out.
+         According to fsMIEcfmMepDefects (bit 5) in fsMIEcfmMepTable
+         -- ARICENT-ECFM-MI-MIB"
+  ::= { siaeMepAlarms8021agEntry 9 } 
+
+  --
+  -- siaeMepAlarmsTable - End 802.1ag
+  -- -----------------------------------------------------------------
+  
+  -- -----------------------------------------------------------------
+  -- siaeMepAlarmsTable - Start Y.1731
+  --
+
+   siaeMepAlarmsY1731Table OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SiaeMepAlarmsY1731Entry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "MEPs for the corresponding index (MegIndex, MeIndex and MepIdentifier)."
+  ::= { siaeEcfmExtMib 3 }
+
+  siaeMepAlarmsY1731Entry OBJECT-TYPE
+    SYNTAX      SiaeMepAlarmsY1731Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  MEP alarm entry"
+    INDEX {
+            defMIEcfmY1731ContextId,
+            defMIEcfmY1731MegIndex,
+            defMIEcfmY1731MeIndex,
+            defMIEcfmY1731MepIdentifier
+          }
+    ::= { siaeMepAlarmsY1731Table 1 }
+
+  SiaeMepAlarmsY1731Entry ::= 
+      SEQUENCE {
+          defMIEcfmY1731ContextId           Unsigned32,
+          defMIEcfmY1731MegIndex            Unsigned32,
+          defMIEcfmY1731MeIndex             Unsigned32,
+          defMIEcfmY1731MepIdentifier       Unsigned32,
+          defRdiConditionAlarm              AlarmStatus,
+          defLossOfContinuityAlarm          AlarmStatus,
+          defUnexpectedPeriodAlarm          AlarmStatus,
+          defUnexpectedMepAlarm             AlarmStatus,
+          defMisMergeAlarm                  AlarmStatus,
+          defUnexpectedMegLevelAlarm        AlarmStatus,
+          defAisConditionAlarm              AlarmStatus,
+          defLckConditionAlarm              AlarmStatus
+      }
+
+  defMIEcfmY1731ContextId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Context ID: as fsMIY1731ContextId of ARICENT-ECFM-Y1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 1 } 
+
+  defMIEcfmY1731MegIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Mep Maintenance Entity Group: as fsMIY1731MegIndex of ARICENT-ECFM-Y1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 2 } 
+
+  defMIEcfmY1731MeIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Mep Maintenance Entity: as fsMIY1731MeIndex of ARICENT-ECFM-Y1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 3 } 
+
+  defMIEcfmY1731MepIdentifier OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Mep Identifier: as fsMIEcfmIdentifier of ARICENT-ECFM-Y1731-MI-MIB"
+    
+  ::= { siaeMepAlarmsY1731Entry 4 }
+  
+   defRdiConditionAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A MEP detects RDI with it receives a CCM frame with the RDI field set.
+         According to fsMI1731ErrorLogType (bit 1) in fsMI1731ErrorLogTable
+         -- ARICENT-ECFM-1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 5 }  
+
+  defLossOfContinuityAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A MEP detects LOC with a peer MEP when it stops receiving CCM frames
+         from that peer ME.
+         According to fsMI1731ErrorLogType (bit 2) in fsMI1731ErrorLogTable
+         -- ARICENT-ECFM-1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 6 }    
+
+  defUnexpectedPeriodAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A MEP detects UnexpectedPeriod with it receives a CCM frame with a
+         correct MEG Level (i.e.MEG Level equal to the MEPs own MEG Level),
+         a correct MEG Id, a correct MEP ID, but with Period field value 
+         different than the MEP's own CCM transmission period.
+         According to fsMI1731ErrorLogType (bit 3) in fsMI1731ErrorLogTable
+         -- ARICENT-ECFM-1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 7 }  
+
+  defUnexpectedMepAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A MEP detects UnexpectedMEP when it receives a CCM frame with a correct
+         MEG Level (i.e.MEG Level equal to the MEPs own MEG Level), a correct
+         MEG ID but an unexpected MEP ID which includes the MEP's own MEP ID.
+         According to fsMI1731ErrorLogType (bit 4) in fsMI1731ErrorLogTable
+         -- ARICENT-ECFM-1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 8 }
+
+  defMisMergeAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A MEP detects Mismerge when it receives a CCM frame with a correct
+         MEG Level(i.e. MEG Level same as MEPs own MEG Level) but incorrect
+         MEG ID (indicating that frames from a different service instance are
+         merged with the service instance represented by the MEP's own MEG ID).                                                                                                                                                                                                                                
+         According to fsMI1731ErrorLogType (bit 5) in fsMI1731ErrorLogTable
+         -- ARICENT-ECFM-1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 9 } 
+  
+  defUnexpectedMegLevelAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A MEP detects UnexpectedMEGLevel with it receives a CCM frame with
+         incorrect MEG Level.
+         Incorrect MEG Level is less than the MEPs own MEG Level.
+         According to fsMI1731ErrorLogType (bit 6) in fsMI1731ErrorLogTable
+         -- ARICENT-ECFM-1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 10 } 
+  
+  defAisConditionAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A MEP detects AIS when it receives an AIS frame.
+         Such a defect is caused by detection of signal fail condition at a 
+         server layer or reception of AIS at a server (sub) layer MEP in the
+         case that the MEP does not use ETH-CC function.
+         According to fsMI1731ErrorLogType (bit 10) in fsMI1731ErrorLogTable
+         -- ARICENT-ECFM-1731-MI-MIB"
+  ::= { siaeMepAlarmsY1731Entry 11 } 
+  
+  defLckConditionAlarm OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "To communicate the administrative locking of
+         a server (sub) layer MEP and consequential interruption of data traffic
+         forwarding towards the MEP expecting this traffic. 
+         It allows a MEP receiving frames with ETH-LCK information to differentiate
+         between a defect condition and an administrative locking action at the 
+         server (sub) layer MEP."
+  ::= { siaeMepAlarmsY1731Entry 12 } 
+  
+  -- siaeMepAlarmsTable - End Y.1731
+  -- -----------------------------------------------------------------
+
+  mepRdiCcmAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defRdiCcmAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {warningTrapEnable}
+  ::= {siaeEcfmExtMib 4}
+
+  mepMacStatusAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defMacStatusAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 5}
+
+  mepRemoteCcmAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defRemoteCcmAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 6}
+
+  mepErrorCcmAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defErrorCcmAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 7}
+
+  mepXconCcmAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defXconCcmAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 8}
+  
+   mepRdiConditionAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defRdiConditionAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {warningTrapEnable}
+  ::= {siaeEcfmExtMib 9}
+
+  mepLossOfContinuityAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defLossOfContinuityAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 10}
+
+  mepUnexpectedPeriodAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defUnexpectedPeriodAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 11}
+
+  mepUnexpectedMepAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defUnexpectedMepAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 12}
+
+  mepMisMergeAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defMisMergeAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 13}
+  
+  mepUnexpectedMegLevelAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defUnexpectedMegLevelAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 14}
+  
+  mepAisConditionAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defAisConditionAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {majorTrapEnable}
+  ::= {siaeEcfmExtMib 15}
+  
+  mepLckConditionAlarmsSeverityCode  OBJECT-TYPE
+    SYNTAX      AlarmSeverityCode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the severity associated to the defLckConditionAlarm
+         and enables/disables the trap generation on status change event.
+        "
+    DEFVAL {statusTrapEnable}
+  ::= {siaeEcfmExtMib 16}
+
+END

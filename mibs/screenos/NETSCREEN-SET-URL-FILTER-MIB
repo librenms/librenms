@@ -1,0 +1,133 @@
+-- This module defines enterprise MIBs for URL filtering
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-URL-FILTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetUrlFilterMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor all
+         the configuration info"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311120000Z" -- November 12, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 4 }
+
+nsSetURLFilter OBJECT IDENTIFIER ::= { netscreenSetting 4 }
+
+nsSetUrlFilterViaWebsense OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable URL Filtering via Websense Server."
+    ::= { nsSetURLFilter 1 }
+
+nsSetUrlServerName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Websense Server Name."
+    ::= { nsSetURLFilter 2 }
+
+nsSetUrlServerPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Websense Server Port."
+    ::= { nsSetURLFilter 3 }
+
+nsSetUrlCommTimeout OBJECT-TYPE
+    SYNTAX        INTEGER (0..240)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Communication timeout threshold of url filtering."
+    ::= { nsSetURLFilter 4 }
+
+nsSetUrlServerStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        not-applicable(0),
+        running(1),
+        down(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current server status."
+    ::= { nsSetURLFilter 5 }
+
+nsSetUrlSerLostHdlWay OBJECT-TYPE
+    SYNTAX        INTEGER {
+        block-all(0),
+        permit-all(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "If connectivity to the Websense server is lost, the way of
+         handling HTTP requests."
+    ::= { nsSetURLFilter 6 }
+
+nsSetUrlBlockMsgType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        websense(0),
+        netscreen(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "URL filter block message type."
+    ::= { nsSetURLFilter 7 }
+
+nsSetUrlNsBlockMsg OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..220))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "NetScreen device block message."
+    ::= { nsSetURLFilter 8 }
+
+END
+
+

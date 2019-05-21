@@ -1,0 +1,32 @@
+mib: PDU-MIB
+modules:
+    sensors:
+        power:
+            data:
+                -
+                    oid: outletTable
+                    value: outletActivePower
+                    num_oid: '.1.3.6.1.4.1.534.6.6.6.1.2.2.1.7.{{ $index }}'
+                    multiplier: 1
+                    descr: 'S{{ $index }} {{ $outletLabel }} Output'
+                    index: 'outletActivePower.{{ $index }}'
+        current:
+            data:
+                -
+                    oid: outletTable
+                    value: outletCurrent
+                    num_oid: '.1.3.6.1.4.1.534.6.6.6.1.2.2.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: 'S{{ $index }} {{ $outletLabel }} Current'
+                    index: 'outletCurrent.{{ $index }}'
+                    high_limit: outletCurrentUpperCritical
+                    warn_limit: outletCurrentUpperWarning
+        voltage:
+            data:
+                -
+                    oid: outletTable
+                    value: outletVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.6.1.2.2.1.6.{{ $index }}'
+                    descr: 'S{{ $index }} {{ $outletLabel }} Voltage'
+                    index: 'outletVoltage.{{ $index }}'
+

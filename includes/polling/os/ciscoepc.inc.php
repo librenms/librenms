@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$ciscoepc = snmp_get_multi_oid($device, 'saHwDescrModel.0 saHwDescrSerialNumber.0', '-OUQs', 'SA-HARDWARE-MIB');
+$ciscoepc = snmp_get_multi_oid($device, ['saHwDescrModel.0', 'saHwDescrSerialNumber.0'], '-OUQs', 'SA-HARDWARE-MIB');
 
 $hardware = $ciscoepc['saHwDescrModel.0'];
 $serial   = $ciscoepc['saHwDescrSerialNumber.0'];

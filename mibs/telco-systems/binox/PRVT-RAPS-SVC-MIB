@@ -1,0 +1,598 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-RAPS-SVC-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-RAPS-SVC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    PrvtRapsActionType, PrvtRapsBlockTimerType, PrvtRapsCfmLevelType, 
+    PrvtRapsGuardTimerType, PrvtRapsHoldOffType, PrvtRapsInstIndexType, 
+    PrvtRapsInstStatusType, PrvtRapsLinkAggIdType, 
+    PrvtRapsLinkOperStatusType, PrvtRapsMepIdType, 
+    PrvtRapsMonitoringMethodType, PrvtRapsReceivedCommandType, 
+    PrvtRapsReceivedInfoType, PrvtRapsRingIdType, PrvtRapsRoleType, 
+    PrvtRapsStatesType, PrvtRapsTopPriCmdType, PrvtRapsVlanIdType, 
+    PrvtRapsWaitTimerType
+        FROM PRVT-RAPS-MIB
+    serviceAccessSwitch
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, MacAddress, RowStatus, TruthValue
+        FROM SNMPv2-TC;
+
+prvtRapsSvcMIB MODULE-IDENTITY
+    LAST-UPDATED "201103020000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The SNMP MIB module for Ring Automatic Protection Switching with Service Support (G.8032)."
+    REVISION    "201103020000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { serviceAccessSwitch 6 }
+
+
+prvtRapsSvcMIBNotifications OBJECT IDENTIFIER
+    ::= { prvtRapsSvcMIB 0 }
+
+prvtRapsSvcMIBObjects OBJECT IDENTIFIER
+    ::= { prvtRapsSvcMIB 1 }
+
+prvtRapsSvcInstTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtRapsSvcInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "R-APS Instance table.
+         Each entry in this table defines an instance of a Ring APS."
+    ::= { prvtRapsSvcMIBObjects 1 }
+
+prvtRapsSvcInstEntry OBJECT-TYPE
+    SYNTAX      PrvtRapsSvcInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtRapsSvcInstTable."
+    INDEX       { prvtRapsSvcInstIndex }
+    ::= { prvtRapsSvcInstTable 1 }
+
+PrvtRapsSvcInstEntry ::= SEQUENCE {
+    prvtRapsSvcInstIndex            PrvtRapsInstIndexType,
+    prvtRapsSvcInstRowStatus        RowStatus,
+    prvtRapsSvcInstCfmDomainLevel   PrvtRapsCfmLevelType,
+    prvtRapsSvcInstDescription      DisplayString
+}
+
+prvtRapsSvcInstIndex OBJECT-TYPE
+    SYNTAX      PrvtRapsInstIndexType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An arbitrary index uniquely identifying a Ring APS instance."
+    ::= { prvtRapsSvcInstEntry 1 }
+
+prvtRapsSvcInstRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this R-APS instance."
+    ::= { prvtRapsSvcInstEntry 2 }
+
+prvtRapsSvcInstCfmDomainLevel OBJECT-TYPE
+    SYNTAX      PrvtRapsCfmLevelType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The CFM domain level for this R-APS instance.
+         Must perform shutdown to change this object."
+    ::= { prvtRapsSvcInstEntry 3 }
+
+prvtRapsSvcInstDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RAPS instance description."
+    ::= { prvtRapsSvcInstEntry 4 }
+
+prvtRapsSvcInstSubRingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtRapsSvcInstSubRingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "R-APS Instance Sub-ring Table
+         Each entry in this table defines a sub-ring belonging to a R-APS instance.
+         Sub-rings are not available in version 1 mode."
+    ::= { prvtRapsSvcMIBObjects 2 }
+
+prvtRapsSvcInstSubRingEntry OBJECT-TYPE
+    SYNTAX      PrvtRapsSvcInstSubRingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtRapsSvcInstSubRingTable."
+    INDEX       { prvtRapsSvcInstIndex, prvtRapsSvcInstSubRingIndex }
+    ::= { prvtRapsSvcInstSubRingTable 1 }
+
+PrvtRapsSvcInstSubRingEntry ::= SEQUENCE {
+    prvtRapsSvcInstSubRingIndex             PrvtRapsInstIndexType,
+    prvtRapsSvcInstSubRingRowStatus         RowStatus,
+    prvtRapsSvcInstSubRingId                PrvtRapsRingIdType,
+    prvtRapsSvcInstSubRingRole              PrvtRapsRoleType,
+    prvtRapsSvcInstSubRingVirtChanService   Unsigned32,
+    prvtRapsSvcInstSubRingRevertiveMode     TruthValue,
+    prvtRapsSvcInstSubRingHoldOffTimer      PrvtRapsHoldOffType,
+    prvtRapsSvcInstSubRingWaitTimer         PrvtRapsWaitTimerType,
+    prvtRapsSvcInstSubRingGuardTimer        PrvtRapsGuardTimerType,
+    prvtRapsSvcInstSubRingBlockTimer        PrvtRapsBlockTimerType,
+    prvtRapsSvcInstSubRingPropTopChng       TruthValue,
+    prvtRapsSvcInstSubRingShutdown          TruthValue,
+    prvtRapsSvcInstSubRingClear             PrvtRapsActionType,
+    prvtRapsSvcInstSubRingManualSwitch      PrvtRapsActionType,
+    prvtRapsSvcInstSubRingForcedSwitch      PrvtRapsActionType,
+    prvtRapsSvcInstSubRingOperStatus        PrvtRapsInstStatusType,
+    prvtRapsSvcInstSubRingRapsState         PrvtRapsStatesType,
+    prvtRapsSvcInstSubRingTopPriCmd         PrvtRapsTopPriCmdType,
+    prvtRapsSvcInstSubRingPortName          OCTET STRING,
+    prvtRapsSvcInstSubRingLinkStatus        PrvtRapsLinkOperStatusType,
+    prvtRapsSvcInstSubRingRcvdNodeId        MacAddress,
+    prvtRapsSvcInstSubRingRcvdCmd           PrvtRapsReceivedCommandType,
+    prvtRapsSvcInstSubRingRcvdInfo          PrvtRapsReceivedInfoType,
+    prvtRapsSvcInstSubRingDescription       DisplayString,
+    prvtRapsSvcInstSubRingVcRcvdNodeId      MacAddress,
+    prvtRapsSvcInstSubRingVcRcvdCmd         PrvtRapsReceivedCommandType,
+    prvtRapsSvcInstSubRingVcRcvdInfo        PrvtRapsReceivedInfoType,
+    prvtRapsSvcInstSubRingControlVlan       PrvtRapsVlanIdType
+}
+
+prvtRapsSvcInstSubRingIndex OBJECT-TYPE
+    SYNTAX      PrvtRapsInstIndexType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An arbitrary index uniquely identifying a sub-ring for this R-APS instance."
+    ::= { prvtRapsSvcInstSubRingEntry 1 }
+
+prvtRapsSvcInstSubRingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 2 }
+
+prvtRapsSvcInstSubRingId OBJECT-TYPE
+    SYNTAX      PrvtRapsRingIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The ring ID for this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 3 }
+
+prvtRapsSvcInstSubRingRole OBJECT-TYPE
+    SYNTAX      PrvtRapsRoleType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The role of the node inside this sub-ring.
+         Must perform shutdown to change this object."
+    ::= { prvtRapsSvcInstSubRingEntry 4 }
+
+prvtRapsSvcInstSubRingVirtChanService OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967294)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configures the virtual channel VLAN for this sub-ring.
+         Must be a VLAN from the prvtRapsInstMonVlanTable.
+         No two sub-rings can use the same VLAN for the virtual channel VLAN."
+    ::= { prvtRapsSvcInstSubRingEntry 5 }
+
+prvtRapsSvcInstSubRingRevertiveMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to select revertive behavior for this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 6 }
+
+prvtRapsSvcInstSubRingHoldOffTimer OBJECT-TYPE
+    SYNTAX      PrvtRapsHoldOffType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The hold-off timer time-out value for this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 7 }
+
+prvtRapsSvcInstSubRingWaitTimer OBJECT-TYPE
+    SYNTAX      PrvtRapsWaitTimerType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The wait-to-restore timer time-out value for this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 8 }
+
+prvtRapsSvcInstSubRingGuardTimer OBJECT-TYPE
+    SYNTAX      PrvtRapsGuardTimerType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The guard timer time-out value for this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 9 }
+
+prvtRapsSvcInstSubRingBlockTimer OBJECT-TYPE
+    SYNTAX      PrvtRapsBlockTimerType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The wait to block timer time-out value for this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 10 }
+
+prvtRapsSvcInstSubRingPropTopChng OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to enable topology change propagation for this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 11 }
+
+prvtRapsSvcInstSubRingShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to de-activate this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 12 }
+
+prvtRapsSvcInstSubRingClear OBJECT-TYPE
+    SYNTAX      PrvtRapsActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Send the Clear command to this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 13 }
+
+prvtRapsSvcInstSubRingManualSwitch OBJECT-TYPE
+    SYNTAX      PrvtRapsActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Send the Manual Switch command to this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 14 }
+
+prvtRapsSvcInstSubRingForcedSwitch OBJECT-TYPE
+    SYNTAX      PrvtRapsActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Send the Forced Switch command to this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 15 }
+
+prvtRapsSvcInstSubRingOperStatus OBJECT-TYPE
+    SYNTAX      PrvtRapsInstStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The operational status of this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 16 }
+
+prvtRapsSvcInstSubRingRapsState OBJECT-TYPE
+    SYNTAX      PrvtRapsStatesType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current state of this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 17 }
+
+prvtRapsSvcInstSubRingTopPriCmd OBJECT-TYPE
+    SYNTAX      PrvtRapsTopPriCmdType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The received Top Priority Request and Status value for this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 18 }
+
+prvtRapsSvcInstSubRingPortName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The textual name of the port belonging to this sub-ring.
+         For a physical port, the format is U/S/P.
+         For a LAG interface, the format is agX."
+    ::= { prvtRapsSvcInstSubRingEntry 19 }
+
+prvtRapsSvcInstSubRingLinkStatus OBJECT-TYPE
+    SYNTAX      PrvtRapsLinkOperStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The operational status of the port belonging to this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 20 }
+
+prvtRapsSvcInstSubRingRcvdNodeId OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MAC address of the remote R-APS device connected to the port belonging to this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 21 }
+
+prvtRapsSvcInstSubRingRcvdCmd OBJECT-TYPE
+    SYNTAX      PrvtRapsReceivedCommandType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The command received on the port belonging to this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 22 }
+
+prvtRapsSvcInstSubRingRcvdInfo OBJECT-TYPE
+    SYNTAX      PrvtRapsReceivedInfoType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The info received on the port belonging to this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 23 }
+
+prvtRapsSvcInstSubRingDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RAPS instance sub-ring description."
+    ::= { prvtRapsSvcInstSubRingEntry 24 }
+
+prvtRapsSvcInstSubRingVcRcvdNodeId OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MAC address of the remote R-APS device connected through the virtual channel."
+    ::= { prvtRapsSvcInstSubRingEntry 25 }
+
+prvtRapsSvcInstSubRingVcRcvdCmd OBJECT-TYPE
+    SYNTAX      PrvtRapsReceivedCommandType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The command received through the virtual channel belonging to this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 26 }
+
+prvtRapsSvcInstSubRingVcRcvdInfo OBJECT-TYPE
+    SYNTAX      PrvtRapsReceivedInfoType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The info received through the virtual channel belonging to this sub-ring."
+    ::= { prvtRapsSvcInstSubRingEntry 27 }
+
+prvtRapsSvcInstSubRingControlVlan OBJECT-TYPE
+    SYNTAX      PrvtRapsVlanIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The control VLAN for this R-APS sub-ring instance.
+         This object must be set to the ID of an existing VLAN.
+         Each R-APS sub-ring instance must use a unique VLAN for the control VLAN.
+         Must perform shutdown to change this object."
+    ::= { prvtRapsSvcInstSubRingEntry 28 }
+
+prvtRapsSvcInstSubRingPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtRapsSvcInstSubRingPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "R-APS Instance Sub-ring port Table
+         An entry in this table defines a physical port belonging to a sub-ring.
+         Exactly one interface must be defined per sub-ring. This includes physical
+         ports (defined in prvtRapsInstSubRingPortTable) and LAG interfaces (defined
+         in prvtRapsInstSubRingLagTable).
+         A sub-ring port can not be part of the main ring."
+    ::= { prvtRapsSvcMIBObjects 3 }
+
+prvtRapsSvcInstSubRingPortEntry OBJECT-TYPE
+    SYNTAX      PrvtRapsSvcInstSubRingPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtRapsInstSubRingPortTable."
+    INDEX       { prvtRapsSvcInstIndex, prvtRapsSvcInstSubRingIndex, 
+                  ifIndex }
+    ::= { prvtRapsSvcInstSubRingPortTable 1 }
+
+PrvtRapsSvcInstSubRingPortEntry ::= SEQUENCE {
+    prvtRapsSvcInstSubRingPortRowStatus         RowStatus,
+    prvtRapsSvcInstSubRingPortMep               PrvtRapsMepIdType,
+    prvtRapsSvcInstSubRingPortRpl               TruthValue,
+    prvtRapsSvcInstSubRingPortMonitoringMethod  PrvtRapsMonitoringMethodType
+}
+
+prvtRapsSvcInstSubRingPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this sub-ring port."
+    ::= { prvtRapsSvcInstSubRingPortEntry 1 }
+
+prvtRapsSvcInstSubRingPortMep OBJECT-TYPE
+    SYNTAX      PrvtRapsMepIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The peer maintenance entity group end point ID that should monitor this sub-ring port.
+         A sub-ring MEP can not be used in another ring."
+    ::= { prvtRapsSvcInstSubRingPortEntry 2 }
+
+prvtRapsSvcInstSubRingPortRpl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to define this sub-ring port as a Ring Protection Link port.
+         Exactly one RPL port must be defined when sub-ring role (prvtRapsInstSubRingRole)
+         is not 'simpleNode'.
+         In 'simpleNode' role, no RPL ports must be defined."
+    ::= { prvtRapsSvcInstSubRingPortEntry 3 }
+
+prvtRapsSvcInstSubRingPortMonitoringMethod OBJECT-TYPE
+    SYNTAX      PrvtRapsMonitoringMethodType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Ethernet ring protection monitoring methods"
+    ::= { prvtRapsSvcInstSubRingPortEntry 4 }
+
+prvtRapsSvcInstSubRingLagTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtRapsSvcInstSubRingLagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "R-APS Instance Sub-ring LAG interface Table
+         An entry in this table defines a LAG interface belonging to a sub-ring.
+         Exactly one interface must be defined per sub-ring. This includes physical
+         ports (defined in prvtRapsInstSubRingPortTable) and LAG interfaces (defined
+         in prvtRapsInstSubRingLagTable)."
+    ::= { prvtRapsSvcMIBObjects 4 }
+
+prvtRapsSvcInstSubRingLagEntry OBJECT-TYPE
+    SYNTAX      PrvtRapsSvcInstSubRingLagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtRapsInstSubRingLagTable."
+    INDEX       { prvtRapsSvcInstIndex, prvtRapsSvcInstSubRingIndex, 
+                  prvtRapsSvcInstSubRingLagId }
+    ::= { prvtRapsSvcInstSubRingLagTable 1 }
+
+PrvtRapsSvcInstSubRingLagEntry ::= SEQUENCE {
+    prvtRapsSvcInstSubRingLagId                 PrvtRapsLinkAggIdType,
+    prvtRapsSvcInstSubRingLagRowStatus          RowStatus,
+    prvtRapsSvcInstSubRingLagMep                PrvtRapsMepIdType,
+    prvtRapsSvcInstSubRingLagRpl                TruthValue,
+    prvtRapsSvcInstSubRingLagMonitoringMethod   PrvtRapsMonitoringMethodType
+}
+
+prvtRapsSvcInstSubRingLagId OBJECT-TYPE
+    SYNTAX      PrvtRapsLinkAggIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a LAG interface belonging to a sub-ring.
+         Must be set to the LAG ID of an existing LAG interface.
+         A sub-ring LAG port can not be part of the main ring."
+    ::= { prvtRapsSvcInstSubRingLagEntry 1 }
+
+prvtRapsSvcInstSubRingLagRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this sub-ring LAG interface."
+    ::= { prvtRapsSvcInstSubRingLagEntry 2 }
+
+prvtRapsSvcInstSubRingLagMep OBJECT-TYPE
+    SYNTAX      PrvtRapsMepIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The peer maintenance entity group end point ID that should monitor this sub-ring LAG interface.
+         A sub-ring MEP can not be used in another ring."
+    ::= { prvtRapsSvcInstSubRingLagEntry 3 }
+
+prvtRapsSvcInstSubRingLagRpl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to define this sub-ring LAG port as a Ring Protection Link port.
+         Exactly one RPL port must be defined when sub-ring role (prvtRapsInstSubRingRole)
+         is not 'simpleNode'.
+         In 'simpleNode' role, no RPL ports must be defined."
+    ::= { prvtRapsSvcInstSubRingLagEntry 4 }
+
+prvtRapsSvcInstSubRingLagMonitoringMethod OBJECT-TYPE
+    SYNTAX      PrvtRapsMonitoringMethodType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Ethernet ring protection monitoring methods"
+    ::= { prvtRapsSvcInstSubRingLagEntry 5 }
+
+prvtRapsSvcInstSubRingDefectAlarm NOTIFICATION-TYPE
+    OBJECTS     { prvtRapsSvcInstSubRingOperStatus, 
+                  prvtRapsSvcInstSubRingControlVlan }
+    STATUS      current
+    DESCRIPTION 
+        "This trap will be sent by any subring instance when it notices a defect.
+         So far only the situation when two or more RPL-owners are defined
+         in the ring is identified as a defect. This scenario is noticed when
+         the instance with the RPL-Owner role receives a RAPS packet with the
+         RB bit set in its status field from a different NodeID than its own.
+         The management entity receiving the notification can identify
+         the system from the network source address of the
+         notification, and can identify the instance reporting the change
+         by the indices in the OID of the prvtRapsInstSubRingOperStatus
+         variable in the notification."
+    ::= { prvtRapsSvcMIBNotifications 1 }
+
+prvtRapsSvcInstSubRingSwitchoverAlarm NOTIFICATION-TYPE
+    OBJECTS     { prvtRapsSvcInstSubRingRapsState, 
+                  prvtRapsSvcInstSubRingControlVlan }
+    STATUS      current
+    DESCRIPTION 
+        "This trap will be sent by any subring instance when it changes state.
+         The management entity receiving the notification can identify
+         the system from the network source address of the
+         notification, and can identify the instance reporting the change
+         by the indices in the OID of the prvtRapsInstSubRingRapsState
+         variable in the notification."
+    ::= { prvtRapsSvcMIBNotifications 2 }
+
+END -- end of module PRVT-RAPS-SVC-MIB.

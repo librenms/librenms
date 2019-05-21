@@ -1,0 +1,73 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "ups-apcups",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "ups-apcups",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "battery_nominal",
+                    "value": "24.0",
+                    "value_prev": null,
+                    "app_type": "ups-apcups"
+                },
+                {
+                    "metric": "battery_voltage",
+                    "value": "27.0",
+                    "value_prev": null,
+                    "app_type": "ups-apcups"
+                },
+                {
+                    "metric": "charge",
+                    "value": "100.0",
+                    "value_prev": null,
+                    "app_type": "ups-apcups"
+                },
+                {
+                    "metric": "input_voltage",
+                    "value": "117.0",
+                    "value_prev": null,
+                    "app_type": "ups-apcups"
+                },
+                {
+                    "metric": "load",
+                    "value": "37.0",
+                    "value_prev": null,
+                    "app_type": "ups-apcups"
+                },
+                {
+                    "metric": "nominal_voltage",
+                    "value": "120",
+                    "value_prev": null,
+                    "app_type": "ups-apcups"
+                },
+                {
+                    "metric": "time_remaining",
+                    "value": "8.1",
+                    "value_prev": null,
+                    "app_type": "ups-apcups"
+                }
+            ]
+        }
+    }
+}

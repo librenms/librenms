@@ -1,0 +1,3 @@
+CREATE TABLE ports_nac (ports_nac_id int(10) unsigned PRIMARY KEY NOT NULL AUTO_INCREMENT, auth_id varchar(50) NOT NULL, device_id int(11) unsigned NOT NULL, port_id int(11) NOT NULL, domain varchar(50) NOT NULL, username varchar(50) NOT NULL, mac_address varchar(50) NOT NULL, ip_address varchar(50) NOT NULL, host_mode varchar(50) NOT NULL, authz_status varchar(50) NOT NULL, authz_by varchar(50) NOT NULL, authc_status varchar(50) NOT NULL, method varchar(50) NOT NULL, timeout varchar(50) NOT NULL, time_left varchar(50) NOT NULL);
+CREATE INDEX ports_nac_device_id_index ON ports_nac (device_id);
+CREATE INDEX ports_nac_port_id_mac_address_index ON ports_nac (port_id, mac_address);

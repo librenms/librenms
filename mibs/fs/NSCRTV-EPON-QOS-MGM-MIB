@@ -1,0 +1,524 @@
+
+NSCRTV-EPON-QOS-MGM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    DateAndTime, MacAddress, TimeStamp, RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    EponDeviceIndex, EponCardIndex, EponPortIndex, EponAlarmCode, EponAlarmInstance, EponSeverityType,
+    AutoNegotiationTechAbility, TAddress, EponStats15MinRecordType, EponStats24HourRecordType, EponStatsThresholdType
+		FROM NSCRTV-EPONEOC-EPON-MIB
+    qosManagementObjects
+        FROM NSCRTV-EPONEOC-EPON-MIB;
+
+--------------------------------------------------------------------------------
+--  qosManagementObjects[ Qos管理项](1.3.6.1.4.1.17409.2.3.8)
+-------------------------------------------------------------------------------- 
+
+    qosGlobalSetTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF QosGlobalSetEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "Global QoS parameters."
+      ::= { qosManagementObjects 1 }
+    
+    qosGlobalSetEntry OBJECT-TYPE
+      SYNTAX QosGlobalSetEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      INDEX { qosGlobalSetDeviceIndex }
+      ::= { qosGlobalSetTable 1 }    
+    QosGlobalSetEntry ::=
+      SEQUENCE { 
+        qosGlobalSetDeviceIndex
+          EponDeviceIndex,
+        qosGlobalSetMaxQueueCount
+          INTEGER,
+        qosGlobalSetMode
+          INTEGER
+       }
+
+    qosGlobalSetDeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Device index        
+        For OLT - Set to corresponding device
+        For ONU - Set to 0
+        "
+      ::= { qosGlobalSetEntry 1 }
+    
+    qosGlobalSetMaxQueueCount OBJECT-TYPE
+      SYNTAX INTEGER (1..256)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        最大队列数，该设备支持的最大队列数。如果最大队列数为8，则队列编号为0-7。"
+      ::= { qosGlobalSetEntry 2 }
+
+    qosGlobalSetMode OBJECT-TYPE
+      SYNTAX INTEGER 
+        {
+          deviceBased(1),
+          portBased(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        Define how to set QoS parameter
+        deviceBased(1)  - When set, only the table started with deviceBase is applicable
+        portBased(2)  - When set, only the table started with portBase is applicable
+        "
+      DEFVAL { deviceBased }
+      ::= { qosGlobalSetEntry 3 }
+    
+    deviceBaseQosMapTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF DeviceBaseQosMapEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "Deviced based setting.        
+        It is used to define how to map QoS options to queue"
+      ::= { qosManagementObjects 2 }
+    
+    deviceBaseQosMapEntry OBJECT-TYPE
+      SYNTAX DeviceBaseQosMapEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      INDEX { deviceBaseQosMapDeviceIndex, deviceBaseQosMapRuleIndex }
+      ::= { deviceBaseQosMapTable 1 }
+    
+    DeviceBaseQosMapEntry ::=
+      SEQUENCE { 
+        deviceBaseQosMapDeviceIndex
+          EponDeviceIndex,
+        deviceBaseQosMapRuleIndex
+          INTEGER,
+        deviceBaseQosMapOctet
+          OCTET STRING
+       }
+
+    deviceBaseQosMapDeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Device index        
+        For OLT - Set to corresponding device/slot/port
+        For ONU - Set to 0
+        "
+      ::= { deviceBaseQosMapEntry 1 }
+    
+    deviceBaseQosMapRuleIndex OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        cos(1),
+        tos(2),
+        diffserv(3)
+        }
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        映射规则编号"
+      ::= { deviceBaseQosMapEntry 2 }
+    
+    deviceBaseQosMapOctet OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (8 | 64))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        映射值。
+        长度为8字节，或64字节。每字节表示一个映射关系。
+        队列编号不能超过对应的qosGlobalSetMaxQueueCount值，如果qosGlobalSetMaxQueueCount为8，则队列编号为0-7。        
+        对于 cos，长度为 8字节，每个字节分别表示cos0-7 映射到的队列编号。
+        对于 tos，长度为 16字节，每个字节分别表示tos0-15 映射到的队列编号。
+        对于 diffserv，长度为64字节，每个字节分别表示diffserv0-63映射到的队列编号。        
+        举例如下：
+        get 1.3.6.1.4.1.17409.2.3.8.3.1.3.deviceBaseQosMapDeviceIndex(410100101).cos(1) = hex(00 00 01 02 03 03 04 04)
+        则映射关系为：
+        cos 0 -> queue 0
+        cos 1 -> queue 0
+        cos 2 -> queue 1
+        cos 3 -> queue 2
+        cos 4 -> queue 3
+        cos 5 -> queue 3
+        cos 6 -> queue 4
+        cos 7 -> queue 4
+        "
+      ::= { deviceBaseQosMapEntry 3 }    
+    deviceBaseQosPolicyTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF DeviceBaseQosPolicyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "Deviced based setting
+        
+        It is used to define QoS specification"
+      ::= { qosManagementObjects 3 }
+    
+    deviceBaseQosPolicyEntry OBJECT-TYPE
+      SYNTAX DeviceBaseQosPolicyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      INDEX { deviceBaseQosPolicyDeviceIndex }
+      ::= { deviceBaseQosPolicyTable 1 }
+    
+    DeviceBaseQosPolicyEntry ::=
+      SEQUENCE { 
+        deviceBaseQosPolicyDeviceIndex
+          EponDeviceIndex,
+        deviceBaseQosPolicyMode
+          INTEGER,
+        deviceBaseQosPolicyWeightOctet
+          OCTET STRING,
+        deviceBaseQosPolicySpBandwidthRange
+          OCTET STRING
+       }
+
+    deviceBaseQosPolicyDeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Device index        
+        For OLT - Set to corresponding device/slot/port
+        For ONU - Set to 0
+        "
+      ::= { deviceBaseQosPolicyEntry 1 }
+    
+    deviceBaseQosPolicyMode OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        sp(1),
+        wrr(2),
+        spWrr(3),
+        wfp(4)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        调度模式"
+      ::= { deviceBaseQosPolicyEntry 2 }
+    
+    deviceBaseQosPolicyWeightOctet OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        权重值。        
+        长度等于队列数目，每字节表示一个队列的权重。
+        对于 sp，读写该节点无意义，读时始终为全0。
+        对于 wrr，每字节描述一个队列的权重。权重的范围为1-100，全部队列权重之和应等于100。
+        对于 spWrr，每字节描述一个队列的权重。权重范围为0-100，权重为0表示该队列用sp模式，权重值非0的队列权重之和应等于100。
+        对于 wfp，读写该节点无意义，读时始终为全0。        
+        举例如下：
+        get 1.3.6.1.4.1.17409.2.3.8.4.1.2.deviceBaseQosPolicyDeviceIndex(410100101). = wrr(2)
+        get 1.3.6.1.4.1.17409.2.3.8.4.1.3.deviceBaseQosPolicyDeviceIndex(410100101). = hex(5 5 5 5 10 20 20 30)
+        
+        说明：共8个队列
+        queue 0 权重为 5
+        queue 1 权重为 5
+        queue 2 权重为 5
+        queue 3 权重为 5
+        queue 4 权重为 10
+        queue 5 权重为 20
+        queue 6 权重为 20
+        queue 7 权重为 30
+        
+        "
+      ::= { deviceBaseQosPolicyEntry 3 }
+    
+    deviceBaseQosPolicySpBandwidthRange OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        Define SP assured bandwidth for each queue.        
+        The size of this object is 4*(number of queue). For each queue, use 4 octets 
+        to represend the assured bandwidth for the queue. The four-octet could be mapped
+        to an unsigned integer, in units of kbps. The sequence of the map is from queue 
+        0 to queue max (for example, 7).        
+        For example, 00 00 00 10  00 00 01 00  00 00 00 00  00 00 00 00
+                     00 00 10 00  00 00 00 01  00 01 01 00  00 00 11 11                     
+        It means, 8 queues and the assured bandwidth for each queue as:        
+        queue 0  16kbps
+        queue 1  256kbps
+        queue 2  0 
+        queue 3  0
+        queue 4  4096kbps
+        queue 5  1kbps
+        queue 6  65792kbps
+        queue 7  65535kbps
+        "
+      ::= { deviceBaseQosPolicyEntry 4 }
+    
+    portBaseQosMapTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF PortBaseQosMapEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      ::= { qosManagementObjects 4 }
+    
+    portBaseQosMapEntry OBJECT-TYPE
+      SYNTAX PortBaseQosMapEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      INDEX { deviceBaseQosMapDeviceIndex, portBaseQosMapCardIndex, portBaseQosMapPortIndex, deviceBaseQosMapRuleIndex }
+      ::= { portBaseQosMapTable 1 }
+    
+    PortBaseQosMapEntry ::=
+      SEQUENCE { 
+        portBaseQosMapDeviceIndex
+          EponDeviceIndex,
+        portBaseQosMapCardIndex
+          EponPortIndex,
+        portBaseQosMapPortIndex
+          EponPortIndex,
+        portBaseQosMapRuleIndex
+          INTEGER,
+        portBaseQosMapOctet
+          OCTET STRING
+       }
+
+    portBaseQosMapDeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Device index        
+        For OLT, set to corresponding SNI port or PON port
+        For ONU, set to 0
+        "
+      ::= { portBaseQosMapEntry 1 }
+    
+    portBaseQosMapCardIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        板卡索引号        
+        For OLT, set to 0
+        For ONU, set to corresponding slot
+        "
+      ::= { portBaseQosMapEntry 2 }
+    
+    portBaseQosMapPortIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        端口索引        
+        For OLT, set to 0
+        For ONU, set to corresponding port
+        "
+      ::= { portBaseQosMapEntry 3 }
+    
+    portBaseQosMapRuleIndex OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        cos(1),
+        tos(2),
+        diffserv(3)
+        }
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        映射规则编号"
+      ::= { portBaseQosMapEntry 4 }
+    
+    portBaseQosMapOctet OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (8..64))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        映射值。
+        长度为8字节，或64字节。每字节表示一个映射关系。
+        队列编号不能超过对应的qosGlobalSetMaxQueueCount值，如果qosGlobalSetMaxQueueCount为8，则队列编号为0-7。        
+        对于 cos，长度为 8字节，每个字节分别表示cos0-7 映射到的队列编号。
+        对于 tos，长度为 16字节，每个字节分别表示tos0-16 映射到的队列编号。
+        对于 diffserv，长度为64字节，每个字节分别表示diffserv0-64映射到的队列编号。        
+        举例如下：
+        get 1.3.6.1.4.1.17409.2.3.8.3.1.3.deviceBaseQosMapDeviceIndex(410100101).cos(1) = hex(00 00 01 02 03 03 04 04)
+        则映射关系为：
+        cos 0 -> queue 0
+        cos 1 -> queue 0
+        cos 2 -> queue 1
+        cos 3 -> queue 2
+        cos 4 -> queue 3
+        cos 5 -> queue 3
+        cos 6 -> queue 4
+        cos 7 -> queue 4
+        "
+      ::= { portBaseQosMapEntry 5 }
+    
+    portBaseQosPolicyTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF PortBaseQosPolicyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "Description."
+      ::= { qosManagementObjects 5 }
+    
+    portBaseQosPolicyEntry OBJECT-TYPE
+      SYNTAX PortBaseQosPolicyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      INDEX { deviceBaseQosPolicyDeviceIndex, portBaseQosPolicyCardIndex, portBaseQosPolicyPortIndex }
+      ::= { portBaseQosPolicyTable 1 }
+    
+    PortBaseQosPolicyEntry ::=
+      SEQUENCE { 
+        portBaseQosPolicyDeviceIndex
+          EponDeviceIndex,
+        portBaseQosPolicyCardIndex
+          EponPortIndex,
+        portBaseQosPolicyPortIndex
+          EponPortIndex,
+        portBaseQosPolicyMode
+          INTEGER,
+        portBaseQosPolicyWeightOctet
+          OCTET STRING,
+        portBaseQosPolicySpBandwidthRange
+          OCTET STRING
+       }
+    portBaseQosPolicyDeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Device index
+        For OLT, set to corresponding SNI port or PON port
+        For ONU, set to 0
+        "
+      ::= { portBaseQosPolicyEntry 1 }
+    
+    portBaseQosPolicyCardIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        板卡索引号        
+        For OLT, set to 0
+        For ONU, set to corresponding slot
+        "
+      ::= { portBaseQosPolicyEntry 2 }
+    
+    portBaseQosPolicyPortIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        端口索引        
+        For OLT, set to 0
+        For ONU, set to corresponding port
+        "
+      ::= { portBaseQosPolicyEntry 3 }
+    
+    portBaseQosPolicyMode OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        sp(1),
+        wrr(2),
+        spWrr(3),
+        wfp(4)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        调度模式        
+        sp 严格优先级
+        wrr 加权轮循
+        spWrr sp+wrr混合
+        wfp 加权公平排队"
+      ::= { portBaseQosPolicyEntry 4 }
+    
+    portBaseQosPolicyWeightOctet OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..256))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        权重值        
+        长度等于队列数目，每字节表示一个队列的权重。        
+        对于 sp，读写该节点无意义，读时始终为全0。
+        对于 wrr，每字节描述一个队列的权重。权重的范围为1-100，全部队列权重之和应等于100。
+        对于 spWrr，每字节描述一个队列的权重。权重范围为0-100，权重为0表示该队列用sp模式，权重值非0的队列权重之和应等于100。
+        对于 wfp，读写该节点无意义，读时始终为全0。        
+        举例如下：
+        get 1.3.6.1.4.1.17409.2.3.8.4.1.2.deviceBaseQosPolicyDeviceIndex(410100101). = wrr(2)
+        get 1.3.6.1.4.1.17409.2.3.8.4.1.3.deviceBaseQosPolicyDeviceIndex(410100101). = hex(5 5 5 5 10 20 20 30)        
+        说明：共8个队列
+        queue 0 权重为 5
+        queue 1 权重为 5
+        queue 2 权重为 5
+        queue 3 权重为 5
+        queue 4 权重为 10
+        queue 5 权重为 20
+        queue 6 权重为 20
+        queue 7 权重为 30        
+        "
+      ::= { portBaseQosPolicyEntry 5 }
+    
+    portBaseQosPolicySpBandwidthRange OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "     
+        Define SP assured bandwidth for each queue.        
+        The size of this object is 4*(number of queue). For each queue, use 4 octets 
+        to represend the assured bandwidth for the queue. The four-octet could be mapped
+        to an unsigned integer, in units of kbps. The sequence of the map is from queue 
+        0 to queue max (for example, 7).        
+        For example, 00 00 00 10  00 00 01 00  00 00 00 00  00 00 00 00
+                     00 00 10 00  00 00 00 01  00 01 01 00  00 00 11 11                     
+        It means, 8 queues and the assured bandwidth for each queue as:        
+        queue 0  16kbps
+        queue 1  256kbps
+        queue 2  0 
+        queue 3  0
+        queue 4  4096kbps
+        queue 5  1kbps
+        queue 6  65792kbps
+        queue 7  65535kbps
+        "
+      ::= { portBaseQosPolicyEntry 6 }
+
+--
+-- END of NSCRTV-EPON-QOS-MGM-MIB
+--
+
+END

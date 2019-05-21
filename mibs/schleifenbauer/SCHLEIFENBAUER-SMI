@@ -1,0 +1,68 @@
+-------------------------------------------------------------------------------
+--
+-- SCHLEIFENBAUER-DATABUS-MIB.txt: Schleifenbauer Enterprise Structure of Management Information
+--
+-- October 2015, Marco Veeneman
+--
+-- Copyright (c) 2015 by Schleifenbauer Holding BV
+-- All rights reserved.
+--
+-------------------------------------------------------------------------------
+
+SCHLEIFENBAUER-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI;
+        
+schleifenbauer MODULE-IDENTITY
+    LAST-UPDATED
+        "201510230000Z" -- October 23th, 2015
+    ORGANIZATION
+        "Schleifenbauer Engineering"
+    CONTACT-INFO
+        "Schleifenbauer Engineering
+         Alain Schuermans
+         Chief Technology Officer
+         Turnhoutseweg 22
+         5541 NX Reusel
+         The Netherlands
+         t. +31 73 5230256
+         f. +31 73 5212383
+         alain@schleifenbauer.eu
+         www.schleifenbauer.eu"
+    DESCRIPTION
+        "The Structure of Management Information for the Schleifenbauer
+         enterprise.
+        
+         Copyright (c) 2015 by Schleifenbauer Products BV"
+    REVISION
+        "201510230000Z" -- October 23th, 2015
+    DESCRIPTION
+        "The initial revision of this MIB module"
+    ::= { enterprises 31034 }
+    
+schleifenbauerProducts OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "schleifenbauerProducts is the root OBJECT IDENTIFIER from which
+         sysObjectId values are assigned. Acutal values are defined in 
+         SCHLEIFENBAUER-PRODUCTS-MIB."
+    ::= { schleifenbauer 11 }
+    
+schleifenbauerMgmt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "schleifenbauerMgmt is the main subtree for new mib development."
+    ::= { schleifenbauer 12 }
+    
+schleifenbauerModules OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "schleifenbauerModules provides a root object identifier from which
+         MODULE-IDENTITY values may be assigned."
+    ::= { schleifenbauer 13 }
+    
+END

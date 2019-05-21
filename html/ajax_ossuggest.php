@@ -15,13 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-session_start();
-if (!isset($_SESSION['authenticated'])) {
-    die('Unauthorized.');
-}
+use LibreNMS\Authentication\LegacyAuth;
 
-$init_modules = array('web');
+$init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+if (!LegacyAuth::check()) {
+    die('Unauthorized');
+}
 
 set_debug($_REQUEST['debug']);
 
@@ -55,6 +56,7 @@ function levsortos($base, $obj, $keys)
 
 header('Content-type: application/json');
 if (isset($_GET['term'])) {
+    load_all_os();
     $_GET['term'] = clean($_GET['term']);
     $sortos = levsortos($_GET['term'], $config['os'], array("text", "os"));
     $sortos = array_slice($sortos, 0, 20);

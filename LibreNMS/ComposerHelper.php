@@ -25,11 +25,28 @@
 
 namespace LibreNMS;
 
-use Composer\Script\Event;
 use Composer\Installer\PackageEvent;
+use Composer\Script\Event;
 
 class ComposerHelper
 {
+    public static function postRootPackageInstall(Event $event)
+    {
+        if (!file_exists('.env')) {
+            self::setPermissions();
+            self::populateEnv();
+        }
+    }
+
+    public static function postInstall(Event $event)
+    {
+        if (!file_exists('.env')) {
+            self::setPermissions();
+        }
+
+        self::populateEnv();
+    }
+
     public static function preUpdate(Event $event)
     {
         if (!getenv('FORCE')) {
@@ -38,39 +55,111 @@ class ComposerHelper
             echo "If you don't know what to do, run: composer install\n";
             exit(1);
         }
+    }
 
-        if (!$event->isDevMode()) {
-            $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
+    public static function preInstall(Event $event)
+    {
+        $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
 
+        if (!is_file("$vendor_dir/autoload.php")) {
+            // checkout vendor from 1.36
             $cmds = array(
-                "git checkout $vendor_dir",
-                "git clean -x -d -f $vendor_dir"
+                "git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- $vendor_dir",
+                "git reset HEAD $vendor_dir"  // don't add vendor directory to the index
             );
 
             self::exec($cmds);
         }
     }
 
-    public static function postAutoloadDump(Event $event)
+
+    /**
+     * Initially populate .env file
+     */
+    private static function populateEnv()
     {
-        $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
+        if (!file_exists('.env')) {
+            copy('.env.example', '.env');
+            self::exec('php artisan key:generate');
+        }
 
-        $no = $event->isDevMode() ? '' : 'no-';
-        $cmd = "git ls-files -z $vendor_dir | xargs -0 git update-index --{$no}assume-unchanged";
+        $config = [
+            'db_host' => '',
+            'db_port' => '',
+            'db_name' => '',
+            'db_user' => '',
+            'db_pass' => '',
+            'db_socket' => '',
+            'base_url' => '',
+            'user' => '',
+            'group' => '',
+        ];
 
-        self::exec($cmd);
+        @include 'config.php';
+
+        self::setEnv([
+            'NODE_ID'        => uniqid(),
+            'DB_HOST'        => $config['db_host'],
+            'DB_PORT'        => $config['db_port'],
+            'DB_USERNAME'    => $config['db_user'],
+            'DB_PASSWORD'    => $config['db_pass'],
+            'DB_DATABASE'    => $config['db_name'],
+            'DB_SOCKET'      => $config['db_socket'],
+            'APP_URL'        => $config['base_url'],
+            'LIBRENMS_USER'  => $config['user'],
+            'LIBRENMS_GROUP' => $config['group'],
+        ]);
     }
 
-    public static function commit(Event $event)
+    /**
+     * Set a setting in .env file
+     *
+     * @param array $settings KEY => value list of settings
+     * @param string $file
+     */
+    private static function setEnv($settings, $file = '.env')
     {
-        $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
-        $composer_json_path = $event->getComposer()->getConfig()->getConfigSource()->getName();
-        $cmds = array(
-            "git add -f $vendor_dir $composer_json_path",
-            "git commit"
-        );
+        $original_content = $content = file_get_contents($file);
 
-        self::exec($cmds);
+        // ensure trailing line return
+        if (substr($content, -1) !== PHP_EOL) {
+            $content .= PHP_EOL;
+        }
+
+        foreach ($settings as $key => $value) {
+            // only add non-empty settings
+            if (empty($value)) {
+                continue;
+            }
+
+            // quote strings with spaces
+            if (strpos($value, ' ') !== false) {
+                $value = "\"$value\"";
+            }
+
+            if (strpos($content, "$key=") !== false) {
+                // only replace ones that aren't already set for safety and uncomment
+                // escape $ in the replacement
+                $content = preg_replace("/#?$key=\n/", addcslashes("$key=$value\n", '$'), $content);
+            } else {
+                $content .= "$key=$value\n";
+            }
+        }
+
+        // only write if the content has changed
+        if ($content !== $original_content) {
+            file_put_contents($file, $content);
+        }
+    }
+
+    private static function setPermissions()
+    {
+        $permissions_cmds = [
+            'setfacl -R -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
+            'setfacl -d -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
+        ];
+
+        self::exec($permissions_cmds);
     }
 
     /**

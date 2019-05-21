@@ -1,6 +1,6 @@
 os: opengear
 text: Opengear
-type: OOB Management
+type: 'OOB Management'
 icon: opengear
 mib_dir:
     - opengear

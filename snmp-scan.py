@@ -30,7 +30,7 @@ import json
 from collections import namedtuple
 from multiprocessing import Pool
 from os import path, chdir
-from socket import gethostbyname, gethostbyaddr, herror
+from socket import gethostbyname, gethostbyaddr, herror, gaierror
 from subprocess import check_output, CalledProcessError
 from sys import stdout
 from time import time
@@ -114,10 +114,11 @@ def scan_host(ip):
 
     try:
         try:
+            # attempt to convert IP to hostname, if anything goes wrong, just use the IP
             tmp = gethostbyaddr(ip)[0]
             if gethostbyname(tmp) == ip:  # check that forward resolves
                 hostname = tmp
-        except herror:
+        except (herror, gaierror):
             pass
 
         try:

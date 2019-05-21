@@ -1,11 +1,15 @@
 os: cmm
-text: Cambium CMM
+text: 'Cambium CMM'
 type: wireless
 icon: cambium
-mib_dir: cambium
+group: cambium
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-group: cambium
+    - { graph: device_state, text: 'Power Status' }
+poller_modules:
+    processors: false
+discovery_modules:
+    processors: false
 discovery:
     -
         sysObjectID:

@@ -1,4 +1,5 @@
 source: General/Callback-Stats-and-Privacy.md
+path: blob/master/doc/
 ## Stats data and your privacy ##
 
 This document has been put together to explain what LibreNMS does when it calls back home to report some anonymous statistics.

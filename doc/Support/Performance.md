@@ -1,4 +1,5 @@
 source: Support/Performance.md
+path: blob/master/doc/
 # Performance optimisations
 
 This document will give you some guidance on optimising your setup.
@@ -27,11 +28,14 @@ MySQL crashes or your server does but it provides an amazing difference in IO us
 
 ### Polling modules
 
+Review the graph of poller module time take under gear > pollers > performance to see what modules are consuming poller time.
+This data is shown per device under device > graphs > poller.
+
 Disable polling (and discovery) modules that you do not need. You can do this globally in `config.php` like:
 
 Disable OSPF polling
 ```php
-$config['poller_modules']['ospf'] = 0;
+$config['poller_modules']['ospf'] = false;
 ```
 
 You can disable modules globally then re-enable the module per device or the opposite way. For a list of modules please see

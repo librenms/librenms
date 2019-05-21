@@ -1,0 +1,96 @@
+------------------------------------------------------------------------------
+--
+--  File              : gbnPlatformOAMSsh-MIB.mi2
+--  Description       : SSH configuration MIB 
+--  Version           : 1.0  
+--  Date              : May 25, 2005     
+--  Author            : wukaijian
+--  Copyright (c) 2001-2008 admin Co. Ltd.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+
+    GBNPlatformOAMSsh-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter32, Gauge32,
+        Unsigned32, Integer32,
+        IpAddress, NOTIFICATION-TYPE            FROM SNMPv2-SMI
+        
+        RowStatus, TruthValue, 
+        DisplayString, MacAddress               FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        snmpTraps                               FROM SNMPv2-MIB
+        
+        gbnPlatformOAM                          FROM GBNPlatformOAM-MIB;
+    
+    gbnPlatformOAMSsh  MODULE-IDENTITY
+        LAST-UPDATED    "0505250000Z"  -- May 25, 2005
+        ORGANIZATION    "admin Co. Ltd"
+        CONTACT-INFO    "admin Co. Ltd
+                         E-mail: service@admin.com.cn"
+
+        DESCRIPTION     "Ssh mib definition."
+
+        REVISION        "0505250000Z"  -- May 25, 2005
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnPlatformOAM 11 }
+        
+    sshVersion OBJECT-TYPE
+        SYNTAX INTEGER {
+            v1(1),
+            v2(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SSH version."
+            --SSH 版本。
+        ::= { gbnPlatformOAMSsh 1 }
+
+	sshState OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable or disable SSH."
+            --打开或关闭SSH功能。
+        ::= { gbnPlatformOAMSsh 2 } 
+
+	sshKeyAvailable OBJECT-TYPE
+        SYNTAX INTEGER {
+            available(1),
+            unavailable(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SSH key file state."
+            --SSH密钥文件状态: 已从Flash中加载密钥文件则状态为available，否则为unavailable。
+        ::= { gbnPlatformOAMSsh 3 } 
+        
+  sshUserLimit OBJECT-TYPE
+        SYNTAX Integer32 (0..5)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The max user limit of ssh"
+            --允许ssh登录的最大用户数目
+        ::= { gbnPlatformOAMSsh 4 }               
+   
+  sshLoginUsers  OBJECT-TYPE
+        SYNTAX Counter32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Current login users of ssh"
+            --当前ssh登录的用户数目
+        ::= { gbnPlatformOAMSsh 5 }          
+                                           
+   END

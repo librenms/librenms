@@ -1,0 +1,1019 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-SYNC-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32, Counter32
+        FROM SNMPv2-SMI
+             DisplayString, RowStatus
+        FROM SNMPv2-TC
+             ifIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    sync MODULE-IDENTITY
+        LAST-UPDATED "201404020000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Timing Source Management.
+            "
+        REVISION "201404020000Z"
+        DESCRIPTION
+            "MIB version 01.00.01
+             Added esmcTable.
+             Changed MAX-ACCESS clause from read-write to read-create in
+             tables with row status.
+             Changed STATUS clause of timingSinkEthPortRole from current to 
+             deprecated
+            "
+        REVISION "201402170000Z"
+        DESCRIPTION
+            "MIB version 01.00.01
+             Added timingSinkSelectorTable
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of syncMibVersion
+             Removed TimeTicks from IMPORTS list
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+      ::= { siaeMib 28 }
+
+----------------------------------------------------------------------------------
+--  object identifier inside the module
+----------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------
+--  30.28 timingGenerator GROUP
+----------------------------------------------------------------------------------
+--
+-- This group is used to manage the Timing Generator (two instances if the EPS
+-- protection is present).
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    syncMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {sync 1}
+
+-------  Begin of timingGeneratorTable
+--
+    timingGeneratorTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     TimingGenerator
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with TimingGenerator records."
+    ::= {sync 2}
+
+    timingGeneratorRecord  OBJECT-TYPE
+        SYNTAX      TimingGenerator
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "TimingGenerator record."
+        INDEX {timingGeneratorId}
+    ::= {timingGeneratorTable 1}
+
+    TimingGenerator  ::=
+        SEQUENCE {
+            timingGeneratorId                 Integer32,
+            timingGeneratorT4vsT0             INTEGER,
+            timingGeneratorHoldOffTime        INTEGER,
+            timingGeneratorWtrTime            INTEGER,
+            timingGeneratorSinkLosSet         INTEGER,
+            timingGeneratorSinkLosReset       INTEGER,
+            timingGeneratorT0SquelchAlarm     AlarmStatus,
+            timingGeneratorT4SquelchAlarm     AlarmStatus,
+            timingGeneratorFreeRunningStatus  AlarmStatus,
+            timingGeneratorHoldoverStatus     AlarmStatus,
+            timingGeneratorActiveStatus       INTEGER,
+            timingGeneratorT0CurrentQuality   INTEGER,
+            timingGeneratorT4CurrentQuality   INTEGER,
+            timingGeneratorT4MinimumQuality   INTEGER,
+            timingGeneratorT0PreferredSource  OBJECT IDENTIFIER,
+            timingGeneratorT4PreferredSource  OBJECT IDENTIFIER,
+            timingGeneratorRowStatus          RowStatus
+         }
+
+    timingGeneratorId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used as Index of the Timing Generator Table."
+    ::= {timingGeneratorRecord 1}
+
+    timingGeneratorT4vsT0  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             t4NotEqualT0 (1),
+                             t4EqualT0    (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to set or reset the condition T4 equal T0."
+        DEFVAL {t4EqualT0}
+    ::= {timingGeneratorRecord 2}
+
+    timingGeneratorHoldOffTime  OBJECT-TYPE
+        SYNTAX      INTEGER    (300..1800)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "HoldOff time in milliseconds (300..1800)."
+        DEFVAL {300}
+    ::= {timingGeneratorRecord 3}
+
+    timingGeneratorWtrTime  OBJECT-TYPE
+        SYNTAX      INTEGER    (0..12)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Wait Time to Restore in minutes (0..12)."
+        DEFVAL {5}
+    ::= {timingGeneratorRecord 4}
+
+    timingGeneratorSinkLosSet  OBJECT-TYPE
+        SYNTAX      INTEGER    (0..60)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Wait time (seconds) before to set Los of reference signal."
+        DEFVAL {1}
+    ::= {timingGeneratorRecord 5}
+
+    timingGeneratorSinkLosReset  OBJECT-TYPE
+        SYNTAX      INTEGER    (0..60)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Wait time (seconds) before to reset Los of reference signal."
+        DEFVAL {1}
+    ::= {timingGeneratorRecord 6}
+
+    timingGeneratorT0SquelchAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "T0 squelch Alarm (Probable cause = xxx) with associated severity."
+    ::= {timingGeneratorRecord 7}
+
+    timingGeneratorT4SquelchAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "T4 squelch Alarm (Probable cause = xxx) with associated severity."
+    ::= {timingGeneratorRecord 8}
+
+    timingGeneratorFreeRunningStatus  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Free running status (Probable cause = xxx) with associated severity."
+    ::= {timingGeneratorRecord 9}
+
+    timingGeneratorHoldoverStatus  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Holdover status (Probable cause = xxx) with associated severity."
+    ::= {timingGeneratorRecord 10}
+
+    timingGeneratorActiveStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             cleared                 (1),
+                             activeReportableStatus  (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Active status (Probable cause = xxx) with associated severity."
+    ::= {timingGeneratorRecord 11}
+
+   timingGeneratorT0CurrentQuality  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             qUNKN  (0),
+                             qPRC   (2),
+                             qSSUT  (4),
+                             qSSUL  (8),
+                             qSEC   (11),
+                             qDNU   (15)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current quality on T0."
+    ::= {timingGeneratorRecord 12}
+
+    timingGeneratorT4CurrentQuality  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             qUNKN  (0),
+                             qPRC   (2),
+                             qSSUT  (4),
+                             qSSUL  (8),
+                             qSEC   (11),
+                             qDNU   (15)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current quality on T4."
+    ::= {timingGeneratorRecord 13}
+
+    timingGeneratorT4MinimumQuality  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             qPRC   (2),
+                             qSSUT  (4),
+                             qSSUL  (8),
+                             qSEC   (11)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "If the Quality Level of the signal used to derive T4 falls below
+             timingGeneratorT4MinimumQuality then the output will be squelched.
+             The value ql-DNU inhibits T4 squelch due to this minimum Quality
+             Level. This feature is enabled by timingGeneratorT4Squelch when
+             timingGeneratorQualityEnable is on(2)."
+        DEFVAL {qSEC}
+    ::= {timingGeneratorRecord 14}
+
+    timingGeneratorT0PreferredSource   OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Object identifier of the leaf timingSinkGenId of the timingSink
+             instance selected as preferential clock source of T0.
+             If no preferential timing sink is selected,
+             the value should be set to the OBJECT IDENTIFIER { 0 0 }.
+            "
+--        DEFVAL {0 0}
+    ::= {timingGeneratorRecord 15}
+
+    timingGeneratorT4PreferredSource   OBJECT-TYPE 
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Object identifier of the leaf timingSinkGenId of the timingSink
+             instance selected as preferential clock source of T4.
+             If no preferential timing sink is selected,
+             the value should be set to the OBJECT IDENTIFIER { 0 0 }.
+            "
+--        DEFVAL {0 0}
+    ::= {timingGeneratorRecord 16}
+
+    timingGeneratorRowStatus   OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of timingGeneratorTable.
+            "
+    ::= {timingGeneratorRecord 17}
+
+--
+-------  End of timingGeneratorTable
+
+
+-------  Begin of timingGeneratorMaintTable
+--
+    timingGeneratorMaintTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     TimingGeneratorMaintRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with TimingGenerator records."
+    ::= {sync 3}
+
+    timingGeneratorMaintRecord  OBJECT-TYPE
+        SYNTAX      TimingGeneratorMaintRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "TimingGenerator record."
+        INDEX {timingGeneratorId}
+    ::= {timingGeneratorMaintTable 1}
+
+    TimingGeneratorMaintRecord  ::=
+        SEQUENCE {
+            timingGeneratorT4Squelch          INTEGER,
+            timingGeneratorStatusControl      INTEGER,
+            timingGeneratorT0ForcedSource     OBJECT IDENTIFIER,
+            timingGeneratorT4ForcedSource     OBJECT IDENTIFIER,
+            timingGeneratorWtrClearSource     OBJECT IDENTIFIER
+         }
+
+    timingGeneratorT4Squelch  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to enable/disable T4 squelch."
+    ::= {timingGeneratorMaintRecord 1}
+
+    timingGeneratorStatusControl  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             freerunning  (1),
+                             holdover     (2),
+                             locked       (3)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Clock generator operating mode control.
+             This item is linked to a manual operation (ManOpRecord) instance."
+        DEFVAL {locked}
+    ::= {timingGeneratorMaintRecord 2}
+
+    timingGeneratorT0ForcedSource   OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Object identifier of the leaf timingSinkGenId of the timingSink
+             instance selected as forced clock source of T0.
+             If no forced timing sink is selected,
+             the value should be set to the OBJECT IDENTIFIER { 0 0 }.
+            "
+--        DEFVAL {0 0}
+    ::= {timingGeneratorMaintRecord 3}
+
+    timingGeneratorT4ForcedSource   OBJECT-TYPE 
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Object identifier of the leaf timingSinkGenId of the timingSink
+             instance selected as forced clock source of T4.
+             If no forced timing sink is selected,
+             the value should be set to the OBJECT IDENTIFIER { 0 0 }.
+            "
+--        DEFVAL {0 0}
+    ::= {timingGeneratorMaintRecord 4}
+
+
+    timingGeneratorWtrClearSource  OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Object identifier of the leaf timingSinkGenId of the timingSink
+             instance selected to clear WTR time. On read, this object return
+             alvays an OBJECT IDENTIFIER {0 0}.
+            "
+--        DEFVAL {0 0}
+    ::= {timingGeneratorMaintRecord 5}
+
+
+--
+-------  End of timingGeneratorMaintTable
+
+
+-------  Begin of timingSinkTable
+--
+    timingSinkTable  OBJECT-TYPE
+        SYNTAX       SEQUENCE OF TimingSink
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Table with TimingSink records."
+    ::= {sync 4}
+
+    timingSinkRecord  OBJECT-TYPE
+        SYNTAX      TimingSink
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "TimingSink record."
+        INDEX {timingSinkGenId, timingSinkId, timingSinkType}
+    ::= {timingSinkTable 1}
+
+    TimingSink  ::=
+        SEQUENCE {
+            timingSinkGenId               Integer32,
+            timingSinkId                  Integer32,
+            timingSinkType                INTEGER,
+            timingSinkIfIndex             InterfaceIndexOrZero,
+            timingSinkSelector            Integer32,
+            timingSinkPriority            INTEGER,
+            timingSinkLabel               DisplayString,
+            timingSinkLosAlarm            AlarmStatus,
+            timingSinkDriftAlarm          AlarmStatus,
+            timingSinkActiveStatus        INTEGER,
+            timingSinkCurrentQuality      INTEGER,
+            timingSinkOverwriteTxQuality  INTEGER,
+            timingSinkOverwriteRxQuality  INTEGER,
+            timingSinkSentQuality         INTEGER,
+            timingSinkE1Sabit             INTEGER,
+            timingSinkEthPortRole         INTEGER,
+            timingSinkRowStatus           RowStatus
+        }
+
+    timingSinkGenId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used as Index of the timingGeneratorTable and
+             defines in union with timingSinkType and timingSinkId the
+             reference signal.
+            "
+    ::= {timingSinkRecord 1}
+
+    timingSinkId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used as Index of the timingSinkTable and
+             defines in union with timingSinkType and timingSinkGenId the 
+             reference signal.
+            "
+    ::= {timingSinkRecord 2}
+
+    timingSinkType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             t0  (1),
+                             t4  (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used as Index of the timingSinkTable and defines 
+             if the reference signal is used to generate T0 or T4 system clock.
+            "
+    ::= {timingSinkRecord 3}
+
+    timingSinkIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " The ifIndex value the agent selected for this
+              timingSink interface.
+            "
+    ::= {timingSinkRecord 4}
+
+    timingSinkSelector  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to select one of the possible clock source
+             connected to this timingSink. Valid values are listed in
+             timingSinkSelectorTable: only values of timingSinkSelectorId
+             related to this instance of timinkSinkRecord are accepted.
+             Only the values corresponding to the index timingSinkSelectorId of
+             timinkSinkSelectorTable related to this instance of
+             timinkSinkRecord will be accepted.
+            "
+    ::= {timingSinkRecord 5}
+
+    timingSinkPriority  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             p1       (1),
+                             p2       (2),
+                             p3       (3),
+                             p4       (4),
+                             p5       (5),
+                             p6       (6),
+                             p7       (7),
+                             p8       (8),
+                             p9       (9),
+                             p10      (10),
+                             p11      (11),
+                             p12      (12),
+                             p13      (13),
+                             p14      (14),
+                             p15      (15),
+                             disable  (16)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to set the priority of the reference signal (p1 is
+             the highest priority)."
+        DEFVAL {disable}
+    ::= {timingSinkRecord 6}
+
+    timingSinkLabel  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to describe the reference signal when a trap is sent."
+    ::= {timingSinkRecord 7}
+
+    timingSinkLosAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Loss of reference signal (Probable cause = xxx) alarm
+             with associated severity."
+    ::= {timingSinkRecord 8}
+
+    timingSinkDriftAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Drift of reference signal (Probable cause = xxx) alarm
+             with associated severity."
+    ::= {timingSinkRecord 9}
+
+    timingSinkActiveStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             cleared                 (1),
+                             activeReportableStatus  (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Active status (Probable cause = xxx) status for the reference signal."
+    ::= {timingSinkRecord 10}
+
+    timingSinkCurrentQuality  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             qUNKN  (0),
+                             qPRC   (2),
+                             qSSUT  (4),
+                             qSSUL  (8),
+                             qSEC   (11),
+                             qDNU   (15)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current quality on sink instance."
+    ::= {timingSinkRecord 11}
+
+    timingSinkOverwriteTxQuality  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             noOverwrite (0),
+                             qPRC        (2),
+                             qSSUT       (4),
+                             qSSUL       (8),
+                             qSEC        (11),
+                             qDNU        (15)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Forcing of Tx quality parameter."
+        DEFVAL {noOverwrite}
+    ::= {timingSinkRecord 12}
+
+    timingSinkOverwriteRxQuality  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             noOverwrite   (0),
+                             qPRC          (2),
+                             qSSUT         (4),
+                             qSSUL         (8),
+                             qSEC          (11),
+                             qDNU          (15)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Forcing of Rx quality parameter."
+        DEFVAL {noOverwrite}
+    ::= {timingSinkRecord 13}
+
+    timingSinkSentQuality  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             qUNKN    (0),
+                             qPRC     (2),
+                             qSSUT    (4),
+                             qSSUL    (8),
+                             qSEC     (11),
+                             qDNU     (15)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Quality level written in the S1 byte of the outgoing STM-n."
+    ::= {timingSinkRecord 14}
+
+    timingSinkE1Sabit OBJECT-TYPE
+        SYNTAX      INTEGER  (4..8)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the San synchronization status bit used 
+             to indicate the clock quality level.
+             Meaningful when the Sink source is an E1  "
+        DEFVAL { 4 }
+    ::= {timingSinkRecord 15}
+
+    timingSinkEthPortRole OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             static   (1),
+                             dynamic  (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      deprecated
+        DESCRIPTION
+            "This item configures how to handle the role of a 1000BASE-T port
+             when it is used as a source of timing: choosing 'static', the
+             role is set according ethLanPhyTable settings, choosing 'dynamic',
+             the role is set consistently with the timing direction over the
+             1000baseT link chosen by SSM protocol."
+        DEFVAL {dynamic}
+    ::= {timingSinkRecord 16}
+
+    timingSinkRowStatus   OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of timingSinkTable
+            "
+    ::= {timingSinkRecord 17}
+
+--
+-------  End of timingSinkTable
+
+    timingGeneratorManualSwitch   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "timingGeneratorId of the forced timingGenerator instance.
+             If no preferred timing generator is selected, the value
+             should be set to 0.
+            "
+    ::= {sync 5}
+
+    timingGeneratorForcedSwitch   OBJECT-TYPE 
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "timingGeneratorId of the forced timingGenerator instance.
+             If no forced timing generator is selected, the value
+             should be set to 0.
+            "
+    ::= {sync 6}
+
+--
+------- The following objects define the profile of Timing Generator alarms:
+--
+
+    timingGeneratorT0SquelchAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the TimingGeneratorT0SquelchAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {sync 7}
+
+    timingGeneratorT4SquelchAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the timingGeneratorT4SquelchAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {sync 8}
+
+    timingGeneratorFreeRunningStatusSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the timingGeneratorFreeRunningStatus
+             and enables/disables the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {sync 9}
+
+    timingGeneratorHoldoverStatusSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the timingGeneratorHoldoverStatus
+             and enables/disables the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {sync 10}
+
+    timingGeneratorActiveStatusSeverityCode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable                  (1),
+                             statusTrapEnable         (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the timingGeneratorActiveStatus
+             and enables/disables the trap generation on status change event."
+        DEFVAL {statusTrapEnable}
+    ::= {sync 11}
+
+    timingGeneratorQualityEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             off  (1),
+                             on   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Quality policy enable "
+        DEFVAL {off}
+    ::= {sync 12}
+
+--
+-------  The following objects define the profile of Timing Sink alarms:
+--
+
+    timingSinkLosAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the TimingSinkLosAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {sync 13}
+
+    timingSinkDriftAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the TimingSinkDriftAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {sync 14}
+
+    timingSinkActiveStatusSeverityCode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable                  (1),
+                             statusTrapEnable         (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the timingSinkActiveStatus
+             and enables/disables the trap generation on status change event."
+        DEFVAL {statusTrapEnable}
+    ::= {sync 15}
+
+-------  Begin of timingSinkSelectorTable
+--
+    timingSinkSelectorTable  OBJECT-TYPE
+        SYNTAX       SEQUENCE OF TimingSinkSelector
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Table with TimingSinkSelector records."
+    ::= {sync 16}
+
+    timingSinkSelectorRecord  OBJECT-TYPE
+        SYNTAX      TimingSinkSelector
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "TimingSinkSelector entry.
+             Several instances of this entry can be create for each instance of
+             timingSinkTable. Each entry represents a possible source selected
+             by a multiplexer outside the SETS for a specific timingSink.
+             Only the values corresponding to the index timingSinkSelectorId can
+             be set to timingSinkSelector.
+            "
+        INDEX {timingSinkGenId, timingSinkId, timingSinkType, timingSinkSelectorId}
+    ::= {timingSinkSelectorTable 1}
+
+    TimingSinkSelector  ::=
+        SEQUENCE {
+            timingSinkSelectorId          Integer32,
+            timingSinkSelectorLabel       DisplayString
+        }
+
+    timingSinkSelectorId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used as Index of the timingSinkSelectorTable and
+             defines in union with timingSinkGenId, timingSinkType and
+             timingSinkId the selected source by a multiplexer outside the
+             SETS.
+            "
+    ::= {timingSinkSelectorRecord 1}
+
+    timingSinkSelectorLabel  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to describe the selectable timing source.
+            "
+    ::= {timingSinkSelectorRecord 2}
+
+--
+-------  End of timingSinkSelectorTable
+
+
+-------  Begin of esmcTable
+--
+
+    esmcTable  OBJECT-TYPE
+        SYNTAX       SEQUENCE OF EsmcRecord
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Table with TimingSinkSelector records."
+    ::= {sync 17}
+
+    esmcRecord  OBJECT-TYPE
+        SYNTAX      EsmcRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "esmcTable entry.
+             Every entries describes an ESMC channel of a TE interface.
+            "
+        INDEX {ifIndex}
+    ::= {esmcTable 1}
+
+    EsmcRecord  ::=
+        SEQUENCE {
+            esmcSsmEnable     INTEGER,
+            esmcQlRx          INTEGER,
+            esmcQlTx          INTEGER,
+            esmcPktsRx        Counter32,
+            esmcPktsTx        Counter32,
+            esmcPktsRxDropped Counter32,
+            esmcPktsRxErrored Counter32,
+            esmc1000BaseTRole INTEGER,
+            esmcRowStatus     RowStatus
+        }
+
+    esmcSsmEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object enables SSM messaging on this ifIndex.
+            "
+        DEFVAL {disable}
+    ::= {esmcRecord 1}
+
+    esmcQlRx  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             qUNKN  (0),
+                             qPRC   (2),
+                             qSSUT  (4),
+                             qSSUL  (8),
+                             qSEC   (11),
+                             qDNU   (15)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object show quality received on ESMC-PDU this interface.
+            "
+    ::= {esmcRecord 2}
+
+    esmcQlTx  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             qUNKN  (0),
+                             qPRC   (2),
+                             qSSUT  (4),
+                             qSSUL  (8),
+                             qSEC   (11),
+                             qDNU   (15)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object show quality transmitted in ESMC-PDU on this interface.
+            "
+    ::= {esmcRecord 3}
+
+    esmcPktsRx  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object contains the total number of received ESMC-PDU packets
+             on this interface.
+            "
+    ::= {esmcRecord 4}
+
+    esmcPktsTx  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object contains the total number of transmitted ESMC-PDU
+             packets on this interface.
+            "
+    ::= {esmcRecord 5}
+
+    esmcPktsRxDropped  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object contains the total number of dropped ESMC-PDU packets
+             on this interface.
+            "
+    ::= {esmcRecord 6}
+
+    esmcPktsRxErrored  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object contains the total number of dropped ESMC-PDU packets
+             whose processing(decoding) resulted into error.
+            "
+    ::= {esmcRecord 7}
+
+    esmc1000BaseTRole  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              slave (1),
+                              master(2),
+                              auto  (3)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object allows to input the clock generator role of a 1000BaseT
+             interface. This objects is applicable when the quality management
+             is disabled (timingGeneratorQualityEnable set to off(1)) and to 
+             all interfaces not connected to any timingSink when the quality
+             management is enabled.
+            "
+        DEFVAL {auto}
+    ::= {esmcRecord 8}
+
+    esmcRowStatus   OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of esmcTable.
+            "
+    ::= {esmcRecord 9}
+
+--
+-------  End of esmcTable
+
+END
+

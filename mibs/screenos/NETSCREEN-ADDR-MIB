@@ -1,0 +1,142 @@
+-- This module defines enterprise MIBs for address book
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-ADDR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenAddr
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenAddrMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor all
+         the entries in the Address Book"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105140000Z" -- May 14, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenAddr 0 }
+
+NsAddrEntry ::= SEQUENCE
+{
+    nsAddrIndex      Integer32,
+    nsAddrName       DisplayString,
+    nsAddrVsys       Integer32,
+    nsAddrZone       Integer32,
+    nsAddrIpOrDomain DisplayString,
+    nsAddrNetmask    IpAddress,
+    nsAddrComment    DisplayString
+}
+
+nsAddrTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsAddrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The NetScreen ScreenOS classifies the addresses of all other
+         devices by location and netmask. For example trusted addresses
+         are located behind the trusted interface. This table collects
+         all address items that exist in ScreenOS"
+    ::= { netscreenAddr 1 }
+
+nsAddrEntry OBJECT-TYPE
+    SYNTAX        NsAddrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Address entry collects some attributes of the address item."
+    INDEX
+        { nsAddrIndex }
+    ::= { nsAddrTable 1 }
+
+nsAddrIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each address.  Its value ranges between 0
+         and 65535 and may not be contiguous."
+    ::= { nsAddrEntry 1 }
+
+nsAddrName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Address item name."
+    ::= { nsAddrEntry 2 }
+
+nsAddrVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system name this address belongs to."
+    ::= { nsAddrEntry 3 }
+
+nsAddrZone OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Security zone name this address belongs to."
+    ::= { nsAddrEntry 4 }
+
+nsAddrIpOrDomain OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Address item's ip address or domain name."
+    ::= { nsAddrEntry 5 }
+
+nsAddrNetmask OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Subnet mask address use."
+    ::= { nsAddrEntry 6 }
+
+nsAddrComment OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Comments on this address."
+    ::= { nsAddrEntry 7 }
+
+END
+
+

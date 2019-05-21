@@ -1,7 +1,7 @@
 os: extremeware
 text: Extremeware
 type: network
-ifname: 1
+ifname: true
 icon: extreme
 over:
     - { graph: device_bits, text: 'Device Traffic' }

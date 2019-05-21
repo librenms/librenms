@@ -1,0 +1,800 @@
+--
+-- MODULE-IDENTITY
+--  OrgName
+--     Fortinet Technologies, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+
+FORTINET-FORTIWEB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    fnSysSerial, fortinet
+        FROM FORTINET-CORE-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter32, Gauge32, Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE
+        FROM SNMPv2-SMI
+	sysName
+        FROM SNMPv2-MIB
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+fnFortiWebMib MODULE-IDENTITY
+    LAST-UPDATED "201711170000Z"
+    ORGANIZATION 
+        "Fortinet Technologies, Inc."
+    CONTACT-INFO 
+        "
+         Technical Support
+         email: support@fortinet.com
+         http://www.fortinet.com"
+    DESCRIPTION
+        "MIB module for Fortinet FortiWeb devices"
+    REVISION    "201711170000Z"
+    DESCRIPTION
+	"add  fwbKVMPAYG."
+    REVISION    "201702130000Z"
+    DESCRIPTION
+	"add  fwb1000E."
+    REVISION    "201612130000Z"
+    DESCRIPTION
+	"add  fwbPAYG."
+    REVISION    "201610250000Z"
+    DESCRIPTION 
+	"add  fwb2000E."
+    REVISION    "201609130000Z"
+    DESCRIPTION 
+        "add fwb600D."
+    REVISION    "201607010000Z"
+    DESCRIPTION 
+        "fix syntax error"
+    REVISION    "201512170000Z"
+    DESCRIPTION 
+        "add  fwb3010E."
+    REVISION    "201512160000Z"
+    DESCRIPTION 
+        "add  fwb400D."
+    REVISION    "201512030000Z"
+    DESCRIPTION 
+        "add  fwbAZURE."
+    REVISION    "201510200000Z"
+    DESCRIPTION 
+        "Modify model name from fwzxxx to fwbxxx."
+    REVISION    "201507130000Z"
+    DESCRIPTION 
+        "Adjust MIB tree."
+    REVISION    "201003220000Z"
+    DESCRIPTION 
+        "Initial version of FORTINET-FORTIWEB-MIB."
+    ::= { fortinet 107 }
+
+FwOpMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "enumerated type for device operation modes"
+    SYNTAX      INTEGER { inline(1), offline(2), transparent(3), wccp(4)}
+
+FwHaMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "enumerated type for HA cluster modes"
+    SYNTAX      INTEGER { standalone(1), master(2), 
+                    slave(3) }
+
+--
+-- fortinet.fnFortiWebMib.fwModel
+--
+fwModel OBJECT IDENTIFIER
+    ::= { fnFortiWebMib 1 }
+
+fwb400B OBJECT IDENTIFIER
+    ::= { fwModel 4002 }
+
+fwb100D OBJECT IDENTIFIER
+    ::= { fwModel 1004 }
+
+fwb400C OBJECT IDENTIFIER
+    ::= { fwModel 4003 }
+
+fwb400D OBJECT IDENTIFIER
+    ::= { fwModel 4004 }
+
+fwb600D OBJECT IDENTIFIER
+    ::= { fwModel 6004 }
+
+fwb1000B OBJECT IDENTIFIER
+    ::= { fwModel 10002 }
+
+fwb1000C OBJECT IDENTIFIER
+    ::= { fwModel 10003 }
+
+fwb1000D OBJECT IDENTIFIER
+    ::= { fwModel 10004 }
+
+fwb2000E OBJECT IDENTIFIER
+    ::= { fwModel 10005 }
+
+fwb1000E OBJECT IDENTIFIER
+    ::= { fwModel 10006 }
+
+fwb3000C OBJECT IDENTIFIER
+    ::= { fwModel 30003 }
+
+fwb3000CFSX OBJECT IDENTIFIER
+    ::= { fwModel 30004 }
+
+fwb3000D OBJECT IDENTIFIER
+    ::= { fwModel 30005 }
+fwb3000DFSX OBJECT IDENTIFIER
+    ::= { fwModel 30006 }
+
+fwb3000E OBJECT IDENTIFIER
+    ::= { fwModel 30007 }
+fwb3010E OBJECT IDENTIFIER
+    ::= { fwModel 30008 }
+
+fwb4000C OBJECT IDENTIFIER
+    ::= { fwModel 40003 }
+fwb4000D OBJECT IDENTIFIER
+    ::= { fwModel 40004 }
+fwb4000E OBJECT IDENTIFIER
+    ::= { fwModel 40005 }
+
+fwbVM OBJECT IDENTIFIER
+   ::= { fwModel 50001 }
+
+fwbXENOPEN OBJECT IDENTIFIER
+    ::= { fwModel 50002 }
+fwbXENSERVER OBJECT IDENTIFIER
+    ::= { fwModel 50003}
+fwbXENAWS OBJECT IDENTIFIER
+    ::= { fwModel 50004 }
+fwbHYPERV OBJECT IDENTIFIER
+    ::= { fwModel 50005 }
+fwbKVM OBJECT IDENTIFIER
+    ::= { fwModel 50006}
+fwbAZURE OBJECT IDENTIFIER
+    ::= { fwModel 50007}
+fwbVMPAYG OBJECT IDENTIFIER
+    ::= { fwModel 50008}
+fwbKVMPAYG OBJECT IDENTIFIER
+    ::= { fwModel 50009}
+--
+-- fortinet.fnFortiWebMib.fwSystem
+--
+
+fwSystem OBJECT IDENTIFIER
+    ::= { fnFortiWebMib 2 }
+
+--
+-- fortinet.fnFortiWebMib.fwSystem.fwSystemInfo
+--
+
+fwSystemInfo OBJECT IDENTIFIER
+    ::= { fwSystem 1 }
+
+
+fwSystemCPU OBJECT IDENTIFIER
+    ::= { fwSystem 2 }
+
+cPUNumber OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of CPU."
+    ::= { fwSystemCPU 1 }
+
+cPUTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF CPUEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "cpu"
+    ::= { fwSystemCPU 2 }
+
+cPUEntry OBJECT-TYPE
+    SYNTAX  CPUEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "CPU"
+    INDEX   { cPUIndex }
+    ::= { cPUTable 1 }
+
+CPUEntry ::=
+    SEQUENCE {
+        cPUIndex
+            Integer32 ,
+        cPUusage
+            Integer32 
+    }
+
+cPUIndex OBJECT-TYPE
+    SYNTAX  Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each CPU." 
+    ::= { cPUEntry 1 }
+
+
+cPUusage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            " CPU usage"
+    ::= { cPUEntry 2 }
+
+fwSysModel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "System Model of the device"
+    ::= { fwSystemInfo 1 }
+
+fwSysVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of the device"
+    ::= { fwSystemInfo 2 }
+
+fwSysHaMode OBJECT-TYPE
+    SYNTAX      FwHaMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "High-availability mode HA mode(Standalone, Master, Slave)"
+    ::= { fwSystemInfo 3 }
+
+fwSysOpMode OBJECT-TYPE
+    SYNTAX      FwOpMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Operation mode of the device (Inline or Offlinet or Transparent or WCCP)"
+    ::= { fwSystemInfo 4 }
+
+fwSysCpuUsage OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current CPU usage (percentage)"
+    ::= { fwSystemInfo 5 }
+
+fwSysCpuFreq OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current CPU frequency (MHz)"
+    ::= { fwSystemInfo 6 }
+
+fwSysMemUsage OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current memory utilization (percentage)"
+    ::= { fwSystemInfo 7 }
+
+fwSysMemCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total physical memory (RAM) installed (MB)"
+    ::= { fwSystemInfo 8 }
+
+fwSysDiskUsage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current hard disk usage rate, if disk is present"
+    ::= { fwSystemInfo 9 }
+
+fwSysDiskCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total hard disk capacity (MB), if disk is present"
+    ::= { fwSystemInfo 10 }
+
+--
+-- fortinet.fnFortiWebMib.fwProxy
+--
+
+fwProxy OBJECT IDENTIFIER
+    ::= { fnFortiWebMib 3 }
+
+fwProxyNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Policy number"
+    ::= { fwProxy 1 }
+
+fwPServerNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Physical server number"
+    ::= { fwProxy 2 }
+
+fwVServerNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Virtual server number"
+    ::= { fwProxy 3 }
+
+fwMonitorNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Monitor number"
+    ::= { fwProxy 4 }
+
+fwServiceNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Service number"
+    ::= { fwProxy 5 }
+
+fwPortSvrNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Protection server number"
+    ::= { fwProxy 6 }
+
+--
+-- fortinet.fnFortiWebMib.fwXMLProtection
+--
+
+--
+-- fortinet.fnFortiWebMib.fwWAFProtection
+--
+
+fwWAFProtection OBJECT IDENTIFIER
+    ::= { fnFortiWebMib 4 }
+
+fwWAFInputRuleNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "WAF input rule number"
+    ::= { fwWAFProtection 1 }
+
+fwWAFParameterNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "WAF paramater validation rules number"
+    ::= { fwWAFProtection 2 }
+
+fwWAFAccessNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "WAF page access rule number"
+    ::= { fwWAFProtection 3 }
+
+fwWAFSvrPortNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "WAF server protection number"
+    ::= { fwWAFProtection 4 }
+
+fwWAFStartPageNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "WAF start page number"
+    ::= { fwWAFProtection 5 }
+
+--fwWAFBlacklistNumber OBJECT-TYPE
+--    SYNTAX      Counter32
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION 
+--        "WAF black list number"
+--    ::= { fwWAFProtection 6 }
+
+--fwWAFWhitelistNumber OBJECT-TYPE
+--    SYNTAX      Counter32
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION 
+--        "WAF white list number"
+--    ::= { fwWAFProtection 7 }
+
+fwWAFProfileNumber  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "WAF profile number"
+    ::= { fwWAFProtection 6 }
+
+--
+-- fortinet.fnFortiWebMib.fwTraps
+--
+fwTraps OBJECT IDENTIFIER
+    ::= { fnFortiWebMib 10 }
+
+fwTrapPrefix OBJECT IDENTIFIER
+    ::= { fwTraps 0 }
+--
+-- add by xhwang  begin
+--
+fnWafInfo OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FnWafInfoDetail
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " Details of one fortiweb attack infomation."
+    ::= { fwTraps 1}
+
+fnWafInfoDetail OBJECT-TYPE
+    SYNTAX      FnWafInfoDetail
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable to an attack of fortiweb"
+    INDEX       { fnWafIndex }
+    ::= { fnWafInfo 1 }
+
+FnWafInfoDetail ::= SEQUENCE {
+    fnWafIndex  	Integer32,
+    fnWafDate         DisplayString,
+    fnWafTime         DisplayString,
+    fnWafSrcIP         DisplayString,
+    fnWafDstIP         DisplayString,
+    fnWafSrcPort         DisplayString,
+    fnWafDstPort         DisplayString,
+    fnWafHost         DisplayString,
+    fnWafURL         DisplayString
+}
+fnWafIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index uniquely defining an attack within the fnWafInfo"
+    ::= { fnWafInfoDetail 1 }
+
+fnWafDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date of attack happened ( yyyy-mm-dd)"
+    ::= { fnWafInfoDetail 2 }
+
+fnWafTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time of attack happened ( hh:mm:ss)"
+    ::= { fnWafInfoDetail 3 }
+
+fnWafSrcIP OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the source ip of the attack "
+    ::= { fnWafInfoDetail 4 }
+
+fnWafDstIP OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the dest ip of the attack "
+    ::= { fnWafInfoDetail 5 }
+
+fnWafSrcPort OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the source port of the attack "
+    ::= { fnWafInfoDetail 6 }
+
+fnWafDstPort OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the dest port of the attack "
+    ::= { fnWafInfoDetail 7 }
+
+fnWafHost OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The host of http request"
+    ::= { fnWafInfoDetail 8 }
+
+fnWafURL OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The URL of the http request "
+    ::= { fnWafInfoDetail 9 }
+--
+-- add by xhwang end
+--
+fwTrapHaHBFail NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "HA Master detects Slave is offline"
+    ::= { fwTrapPrefix 1 }
+
+fwTrapModeChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "System run mode is changed(inline/offline/transparent change)"
+    ::= { fwTrapPrefix 2 }
+
+fwTrapPolicyStart NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "Policy is started"
+    ::= { fwTrapPrefix 3 }
+
+fwTrapPolicyStop NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "Policy is stopped"
+    ::= { fwTrapPrefix 4 }
+
+fwTrapPServerFailed NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "Physical server is drop-line"
+    ::= { fwTrapPrefix 5 }
+
+fwTrapXMLIntrusionAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "XML Intrusion trap"
+    ::= { fwTrapPrefix 10 }
+
+fwTrapXMLSchemaAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "XML Schema trap"
+    ::= { fwTrapPrefix 11 }
+
+fwTrapXMLFilterAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "XML filterRule trap"
+    ::= { fwTrapPrefix 12 }
+
+fwTrapXMLSigEncAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "XML Signature/Encrypte trap"
+    ::= { fwTrapPrefix 13 }
+
+fwTrapXMLWSDLAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "XML WSDL check trap"
+    ::= { fwTrapPrefix 14 }
+
+fwTrapXMLSqlAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "XML SQL injection trap"
+    ::= { fwTrapPrefix 15 }
+
+fwTrapWAFAMethodAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Allow method trap"
+    ::= { fwTrapPrefix 30 }
+
+fwTrapWAFXSSAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF XSS trap"
+    ::= { fwTrapPrefix 31 }
+
+fwTrapWAFSqlAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF SQL injection trap"
+    ::= { fwTrapPrefix 32 }
+
+fwTrapWAFExploitAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Common Exploits trap"
+    ::= { fwTrapPrefix 33 }
+
+fwTrapWAFDisclosureAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Information Disclosure trap"
+    ::= { fwTrapPrefix 34 }
+
+fwTrapWAFAccessAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Access page rule trap"
+    ::= { fwTrapPrefix 35 }
+
+fwTrapWAFSPageAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Start page rule trap"
+    ::= { fwTrapPrefix 36 }
+
+fwTrapWAFPValidAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Parameter validation rule trap"
+    ::= { fwTrapPrefix 37 }
+
+fwTrapWAFBListAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Black list trap"
+    ::= { fwTrapPrefix 38 }
+
+fwTrapWAFBLoginAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Brute force login trap"
+    ::= { fwTrapPrefix 39 }
+
+fwTrapWAFRobotAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Robot control trap"
+    ::= { fwTrapPrefix 40 }
+
+fwTrapWAFHideFieldAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF hide field  trap"
+    ::= { fwTrapPrefix 41 }
+
+fwTrapWAFUrlAccessAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF url access trap"
+    ::= { fwTrapPrefix 42 }
+fwTrapWAFBadRobotAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF Bad Robot control trap"
+    ::= { fwTrapPrefix 43 }
+fwTrapWAFSignatureAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF signature attack trap"
+    ::= { fwTrapPrefix 44 }
+fwTrapWAFWListAttack NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,fnWafInfoDetail }
+    STATUS      current
+    DESCRIPTION 
+        "WAF white list trap"
+    ::= { fwTrapPrefix 45 }
+
+
+
+
+
+--
+-- fortinet.fnFortiWebMib.fwMibConformance
+--
+fwMibConformance OBJECT IDENTIFIER
+    ::= { fnFortiWebMib 100 }
+
+fwTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { fwTrapHaHBFail, fwTrapModeChange,	
+                    fwTrapPolicyStart, fwTrapPolicyStop,
+		    fwTrapPServerFailed, fwTrapXMLIntrusionAttack,
+		    fwTrapXMLSchemaAttack, fwTrapXMLFilterAttack,
+		    fwTrapXMLSigEncAttack, fwTrapXMLWSDLAttack,
+		    fwTrapXMLSqlAttack, fwTrapWAFAMethodAttack,
+		    fwTrapWAFXSSAttack, fwTrapWAFSqlAttack,
+		    fwTrapWAFExploitAttack, fwTrapWAFDisclosureAttack,
+		    fwTrapWAFAccessAttack, fwTrapWAFSPageAttack,	
+		    fwTrapWAFPValidAttack, fwTrapWAFBListAttack,
+		    fwTrapWAFWListAttack, fwTrapWAFBLoginAttack,
+		    fwTrapWAFRobotAttack }
+    STATUS      current
+    DESCRIPTION 
+        "Traps are intended for use."
+    ::= { fwMibConformance 1 }
+
+fwSystemObjectGroup OBJECT-GROUP
+    OBJECTS     { fwSysModel, fwSysVersion,
+                  fwSysHaMode, fwSysOpMode,
+		  fwSysCpuUsage, fwSysCpuFreq,
+		  fwSysMemUsage, fwSysMemCapacity,
+		  fwSysDiskUsage, fwSysDiskCapacity }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to the system status of the device."
+    ::= { fwMibConformance 2 }
+
+fwMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "The compliance statement for the application MIB."
+
+    MODULE      -- this module
+
+        GROUP   fwTrapGroup
+        DESCRIPTION   
+              "Traps are optional. Not all models support all traps. Consult product literature to see which traps are supported."
+
+        GROUP   fwSystemObjectGroup
+        DESCRIPTION   
+              "Object identifiers used in notifications. Objects are required if their containing trap is implemented."
+
+    ::= { fwMibConformance 100 }
+
+
+END -- end of module FORTINET-FORTIWEB-MIB.

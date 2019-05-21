@@ -1,0 +1,292 @@
+-- MibName=raisecomSynce
+-- *****************************************************************
+-- Version 1.0 Created 2010.12.30 by hongding
+-- This version of MIB is created just for the Management of fan .
+--
+-- Copyright(c) 2002-2012 by RAISECOM TECH, Ltd. 
+-- All rights reserved.
+--
+-- modify history 
+-- 01,20120418,yangzhonghong, ITS00020700,change the enum values of the raisecomFanCardState node  
+-- 01,20121206,guokai, ESW00006977,add raisecomFanMonitorTrapSendEnable
+-- *****************************************************************
+RAISECOM-FANMONITOR-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+        raisecomSystem
+            FROM RAISECOM-SYSTEM-MIB     
+          TruthValue
+              FROM SNMPv2-TC
+        Integer32,Unsigned32,Counter32                         
+        	FROM SNMPv2-SMI;
+
+	raisecomFanMonitor MODULE-IDENTITY
+        LAST-UPDATED    "201012270000Z"
+        ORGANIZATION    "Raisecom, Inc."
+        CONTACT-INFO
+                "       Raise Systems
+
+                Postal: Beijing,
+                        China
+
+                   Tel: 86-010-82884499
+
+                E-mail: support@raisecom.com"
+        DESCRIPTION
+                "Configuration of fanMonitor object." 
+-- -------------------------------------------------------------
+-- modify history
+-- -------------------------------------------------------------       
+        REVISION    "201012300000Z"
+        DESCRIPTION "The initial revision of this MIB."
+                ::= { raisecomSystem 5}         
+
+-- -------------------------------------------------------------
+-- groups in the raisecomFanMonitor MIB
+-- -------------------------------------------------------------
+raisecomFanMonitorNotification  OBJECT IDENTIFIER ::= { raisecomFanMonitor 1 }  
+raisecomFanMonitorMibObjects    OBJECT IDENTIFIER ::= { raisecomFanMonitor 2 }  
+
+-- -------------------------------------------------------------
+-- raisecomFanMonitorNotification
+-- -------------------------------------------------------------    
+    raisecomFanSpeedNormal NOTIFICATION-TYPE
+        OBJECTS { raisecomFanIndex,
+                  raisecomFanSpeedValue
+                }
+        STATUS current
+        DESCRIPTION
+                "The trap notification occur when fan state translating from abnormal to normal."            
+        ::= { raisecomFanMonitorNotification 1 }  
+        
+	raisecomFanSpeedAbnormal NOTIFICATION-TYPE
+        OBJECTS { raisecomFanIndex,
+                  raisecomFanSpeedValue,
+                  raisecomFanSpeedDueValue
+                }
+        STATUS current
+        DESCRIPTION
+                "The trap notification occur when fan state translatingfrom normal to abnormal."
+        ::= { raisecomFanMonitorNotification 2 }    
+        
+    raisecomFanCardUp NOTIFICATION-TYPE
+        OBJECTS { raisecomFanCardState }
+        STATUS current
+        DESCRIPTION
+                "The trap notification occur when fan card state translating from down to up."
+        ::= { raisecomFanMonitorNotification 3 }    
+        
+    raisecomFanCardDown NOTIFICATION-TYPE
+        OBJECTS { raisecomFanCardState }
+        STATUS current
+        DESCRIPTION
+                "The trap notification occur when fan card state translating from up to down."
+        ::= { raisecomFanMonitorNotification 4 } 
+-- -------------------------------------------------------------
+-- raisecomFanMonitorMibObjects
+-- -------------------------------------------------------------  
+raisecomFanMonitorGlobalGroup   OBJECT IDENTIFIER ::= { raisecomFanMonitorMibObjects 1 }   
+
+-- -------------------------------------------------------------
+-- raisecomFanMonitorGlobalGroup
+-- -------------------------------------------------------------          
+    raisecomFanMonitorMode OBJECT-TYPE
+        SYNTAX	INTEGER
+        {
+        	enforce(1),
+    		auto(2)     	
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           	"An integer value that specify the current monitor mode.
+           	ENFORCE(1) means that the fan speed need to set manully;
+           	AUTO(2) means that the fan speed will ajusted autoly according 
+           	to the temperature"
+        ::= { raisecomFanMonitorGlobalGroup 1 } 
+        
+	raisecomFanMonitorSpdLevel OBJECT-TYPE
+        SYNTAX	Unsigned32(1..4)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           	"Specify the speed level of fan in enforce mode."  
+        ::= { raisecomFanMonitorGlobalGroup 2 }
+        
+	raisecomFanMonitorNumber OBJECT-TYPE
+        SYNTAX	Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           	"Specify the number of fan being monitorred."  
+        ::= { raisecomFanMonitorGlobalGroup 3 } 
+        
+	raisecomFanMonitorLevlNumber OBJECT-TYPE
+        SYNTAX	Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           	"Specify the total number of fan speed levels."  
+        ::= { raisecomFanMonitorGlobalGroup 4 }
+
+      
+    raisecomFanCardState OBJECT-TYPE  
+        SYNTAX	INTEGER
+        {
+        	all-down(1),
+        	all-up(2),
+    		card1-up(3),
+    		card2-up(4)    		     	
+        }
+        MAX-ACCESS  read-only        
+        STATUS      current
+        DESCRIPTION
+           	"Specify the current state of fan cards.
+			 all_down(1) means that all fan cards are down;
+			 all_up(2) means that all fan cards are up;
+			 card1_up(3) means that fan card 1 is up, the others are down;
+			 card2_up(4) means that fan card 2 is up, the others are down." 
+        ::= { raisecomFanMonitorGlobalGroup 5 }
+        
+    raisecomFanCardSerialNumber OBJECT-TYPE  
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only        
+        STATUS      current
+        DESCRIPTION
+           	"specify the identical serial number of current fan card,this 
+           	string number will be set when device leaving factory" 
+        ::= { raisecomFanMonitorGlobalGroup 6 }   
+        
+   raisecomFanMonitorTrapSendEnable  OBJECT-TYPE 
+	SYNTAX   INTEGER  
+	 { 
+	     disable(0), 
+	     enable (1)
+	 }
+	MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Specifies the status of sending trap"  
+   ::= {raisecomFanMonitorGlobalGroup  7 }        
+                        
+-- -------------------------------------------------------------
+-- raisecomFanMonitorStateTable
+-- -------------------------------------------------------------
+    raisecomFanMonitorStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RaisecomFanMonitorStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Fan monitor state table."
+        ::= { raisecomFanMonitorMibObjects 2 }
+
+    raisecomFanMonitorStateEntry OBJECT-TYPE
+        SYNTAX RaisecomFanMonitorStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Fan monitor state entry."
+        INDEX { raisecomFanIndex }
+        ::= { raisecomFanMonitorStateTable 1 }
+
+    RaisecomFanMonitorStateEntry ::= SEQUENCE {
+        raisecomFanIndex               Unsigned32,
+        raisecomFanSpeedValue          Unsigned32,
+        raisecomFanWorkState            INTEGER,
+        raisecomFanSpeedCurrentLevel   Unsigned32  
+    }
+    
+    raisecomFanIndex OBJECT-TYPE
+        SYNTAX  Unsigned32  
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Specify the sequence number of fan."
+        ::= { raisecomFanMonitorStateEntry 1 } 
+        
+    raisecomFanSpeedValue OBJECT-TYPE
+        SYNTAX  Unsigned32
+	    MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specify the actural speed of the current fan."
+        ::= { raisecomFanMonitorStateEntry 2 }
+    
+    raisecomFanWorkState OBJECT-TYPE
+        SYNTAX  INTEGER
+		{
+			normal(1),
+			abnormal(2)
+		}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specify the current state of fan
+            normal(1) means the current fan operate normally;
+            abnormal(2) means the current fan operate abnormally"
+        ::= { raisecomFanMonitorStateEntry 3 }    
+        
+     raisecomFanSpeedCurrentLevel OBJECT-TYPE
+        SYNTAX  Unsigned32(1..4)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specify the temperature scale border that match the speed levle,
+            based on this scale border,the current fan speed will ajusted autoly
+            according to the current temperature" 
+        ::= { raisecomFanMonitorStateEntry 4 }           
+-- -------------------------------------------------------------
+-- raisecomFanSpeedLevelTable
+-- -------------------------------------------------------------
+    raisecomFanSpeedLevelTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RaisecomFanSpeedLevelEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "fan speed level information table."
+        ::= { raisecomFanMonitorMibObjects 3 }
+
+    raisecomFanSpeedLevelEntry OBJECT-TYPE
+        SYNTAX RaisecomFanSpeedLevelEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "fan speed level information entry."
+        INDEX { raisecomFanSpeedLevelIndex }
+        ::= { raisecomFanSpeedLevelTable 1 }
+
+    RaisecomFanSpeedLevelEntry ::= SEQUENCE { 
+        raisecomFanSpeedLevelIndex              Unsigned32,
+        raisecomFanSpeedDueValue               Unsigned32,
+        raisecomFanSpeedTemperatureScale       Unsigned32
+    }
+        
+    raisecomFanSpeedLevelIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Specify the fan speed level index."  
+        ::= { raisecomFanSpeedLevelEntry 1 }    
+    
+    raisecomFanSpeedDueValue OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specify the speed value that match the fan levle index.
+            this value can ben get from a new or normal fan ,not an used
+            fan ,because the used fan may be aged" 
+        ::= { raisecomFanSpeedLevelEntry 2 }   
+ 
+     raisecomFanSpeedTemperatureScale OBJECT-TYPE
+        SYNTAX  Unsigned32(45..75)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specify the temperature scale border that match the speed levle,
+            based on this scale border,the current fan speed will ajusted autoly
+            according to the current temperature" 
+        ::= { raisecomFanSpeedLevelEntry 3 }    
+                 
+END

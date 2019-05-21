@@ -1,0 +1,356 @@
+    GBNServiceMACAUTHEN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, IpAddress,
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+
+        DisplayString, MacAddress,
+        RowStatus, TruthValue                   FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnServiceAAA                           FROM ADMIN-MASTER-MIB
+        ;
+        
+
+    gbnMacAuthenMib MODULE-IDENTITY
+        LAST-UPDATED    "2010/06/01"  -- Jun 01, 2010
+        ORGANIZATION    "Admin"
+        CONTACT-INFO    "Admin
+                         E-mail: support@Admin.com"
+
+        DESCRIPTION     "gbn macauthen Enterprise MIB definition."
+
+        REVISION        "2010/06/01"  -- Jun 01, 2010
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnServiceAAA 4 }
+
+
+------------------------------------------------------------------------------
+--  Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+    --
+    --  "DURABLE":
+    --    Objects that are saved across a system reset and/or power cycle
+    --    are noted as "DURABLE" for convenience in the DESCRIPTION
+    --    section of the object definition.  Code must be explicitly
+    --    written to implement these DURABLE objects.
+    --
+
+------------------------------------------------------------------------------
+--  define groups in gbn-TACACS-MIB
+        globalEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "global config of mac-authentication.default is false."
+        ::= { gbnMacAuthenMib 1 }
+
+        radiusDomain OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..24))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "domain name of radius domain.use size 0 to delete.default is size 0,indicating none."
+        ::= { gbnMacAuthenMib 2 }
+
+        offlineTimer OBJECT-TYPE
+        SYNTAX Integer32 (30..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "offline time of mac.unit is second.default is 300 seconds."
+        ::= { gbnMacAuthenMib 3 }
+
+        quietTimer OBJECT-TYPE
+        SYNTAX Integer32 (30..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "quiet time of mac.unit is second.default is 60 secondsl"
+        ::= { gbnMacAuthenMib 4 }
+
+        userMode OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          fixed(1),       -- use fixed name and password
+                          macaddress(0)   -- use mac-address
+                      }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "how to make username and password of radius.default is macaddress(0)."
+        ::= { gbnMacAuthenMib 5 }
+
+        userName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "username when usermode is fiexed.use size 0 to delete.default is size 0,indicating none."
+        ::= { gbnMacAuthenMib 6 }
+
+        password OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "password when usermode is fiexed.use size 0 to delete.default is size 0,indicating none."
+        ::= { gbnMacAuthenMib 7 }
+
+	macAuthenPortTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF MacAuthenPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of information of ports."
+	    REFERENCE
+	        "9.6.1"
+	    ::= { gbnMacAuthenMib 8 }
+
+	macAuthenPortEntry OBJECT-TYPE
+	    SYNTAX      MacAuthenPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of information of ports."
+	    INDEX { macAuthenPortNumber }
+	    ::= { macAuthenPortTable 1 }
+
+	MacAuthenPortEntry ::=
+	    SEQUENCE {
+	        macAuthenPortNumber
+	            Unsigned32,
+	        macAuthenEnable
+	            TruthValue,
+	        guestVlan
+	            Integer32,
+	        maxUsers
+	            Integer32,
+	        rateLimit
+	            Integer32,
+	        rateLimitTimer
+	            Integer32,
+	        uplink
+	            TruthValue
+	        }
+
+	macAuthenPortNumber OBJECT-TYPE
+	    SYNTAX      Unsigned32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The Port number associated with this Port."
+	    REFERENCE
+	        "9.6.1, Port number"
+	    ::= { macAuthenPortEntry 1 }
+
+
+	macAuthenEnable OBJECT-TYPE
+	    SYNTAX      TruthValue
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "Enable/disable mac-authentication of this Port.default is disabled."
+	    REFERENCE
+	        "9.6.1, Protocol version"
+	    ::= { macAuthenPortEntry 2 }
+
+     guestVlan OBJECT-TYPE
+        SYNTAX Integer32 (0..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "guest vlan.0 is disable.default is 0."
+	    ::= { macAuthenPortEntry 3 }
+
+     maxUsers OBJECT-TYPE
+        SYNTAX Integer32 (1..256)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "maximum users.range is from 1 to 256.default is 256."
+	    ::= { macAuthenPortEntry 4 }
+	    
+     rateLimit OBJECT-TYPE
+        SYNTAX Integer32 (10..300)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "rate limit of authentition packets.when reach this value, the port can not authenticate users, is in block state.range is form 10 to 300.default is 300 packets per sencond"
+	    ::= { macAuthenPortEntry 5 }
+
+     rateLimitTimer OBJECT-TYPE
+        SYNTAX Integer32 (30..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "when port is in block state because ratelimit, after this timer ,port turns to normal state..default is 60"
+	    ::= { macAuthenPortEntry 6 }
+
+     uplink OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "uplink port of vlan"
+	    ::= { macAuthenPortEntry 7 }
+
+        encrptionMode OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          chap(1),       -- use chap
+                          pap(0)   -- use pap
+                      }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "radius password encrption mode,default is pap."
+        ::= { gbnMacAuthenMib 9 }
+
+        macvlanEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "whethe to use mac vlan function.default is false."
+        ::= { gbnMacAuthenMib 10 }
+
+        questVlanReauthTimer OBJECT-TYPE
+        SYNTAX Integer32 (30..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "guestvlan users reauthentication timer .unit is second.range is from 30 to 3600.default is 30 secondsl"
+        ::= { gbnMacAuthenMib 11 }
+
+	macUsersTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF MacUsersEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of information of users."
+	    REFERENCE
+	        "9.6.1"
+	    ::= { gbnMacAuthenMib 12 }
+
+	macUsersEntry OBJECT-TYPE
+	    SYNTAX      MacUsersEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of information of users."
+	    INDEX { userMac }
+	    ::= { macUsersTable 1 }
+
+	MacUsersEntry ::=
+	    SEQUENCE {
+	        userMac
+	            MacAddress,
+	        userState
+	            Unsigned32,
+	        userPort
+	            Unsigned32,
+	        userVlan
+	            Integer32,
+	        userInGuestVlan
+	        	TruthValue,
+	        userPriority
+	        	Integer32,
+	        userAcl
+	            DisplayString,
+	        userRate
+	            Integer32,            
+	        userPeakRate
+	            Integer32,            
+	        userBasicRate
+	            Integer32
+	        }
+
+	userMac OBJECT-TYPE
+	    SYNTAX      MacAddress
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "user macaddress."
+	    ::= { macUsersEntry 1 }
+
+	userState OBJECT-TYPE
+	    SYNTAX      Unsigned32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "user state.bit 0:quiet state,bit 1:authenticating state,bit 2:authenticated state, bit 3:off-line detecting state"
+	    ::= { macUsersEntry 2 }
+
+	userPort OBJECT-TYPE
+	    SYNTAX      Unsigned32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "the port number of this user belongs to.start form 1"
+	    ::= { macUsersEntry 3 }
+
+	userVlan OBJECT-TYPE
+	    SYNTAX      Integer32 (1..4094)
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "the vlan number of this user belongs to."
+	    ::= { macUsersEntry 4 }
+
+	userInGuestVlan OBJECT-TYPE
+	    SYNTAX      TruthValue
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "whether user is in guest vlan."
+	    ::= { macUsersEntry 5 }
+
+	userPriority OBJECT-TYPE
+	    SYNTAX      Integer32 (0..7)
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "the priority of this user belongs to."
+	    ::= { macUsersEntry 6 }
+
+	userAcl OBJECT-TYPE
+	    SYNTAX      DisplayString (SIZE (0..63))
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "the acl name of this user belongs to."
+	    ::= { macUsersEntry 7 }
+
+	userRate OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "average bandwith of this user.unit is kbps"
+	    ::= { macUsersEntry 8 }
+
+	userPeakRate OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "peak bandwith of this user.unit is kbps"
+	    ::= { macUsersEntry 9 }
+
+	userBasicRate OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "basic bandwith of this user.unit is kbps"
+	    ::= { macUsersEntry 10 }
+
+--
+-- END of gbn-MACAUTHEN-MIB                
+--
+
+END
+

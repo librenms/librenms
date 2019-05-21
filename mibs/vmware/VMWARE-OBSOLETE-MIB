@@ -1,0 +1,578 @@
+-- **********************************************************
+-- Copyright 2008 VMware, Inc.  All rights reserved. 
+-- **********************************************************
+
+VMWARE-OBSOLETE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+        Counter32, Gauge32, Counter64, Integer32
+    FROM SNMPv2-SMI
+        DisplayString
+    FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+        vmwResources, vmwTraps, vmwObsolete, vmwNotifications
+    FROM VMWARE-ROOT-MIB
+       	vmwESX 
+    FROM VMWARE-PRODUCTS-MIB
+       	vmwVmID, vmwVmConfigFilePath
+    FROM VMWARE-VMINFO-MIB
+        vmwMemory, vmwCPU
+    FROM VMWARE-RESOURCES-MIB;
+
+    vmwObsoleteMIB MODULE-IDENTITY
+    LAST-UPDATED "200810151159Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://communities.vmware.com/community/developer/forums/managementapi
+    "
+DESCRIPTION
+     "This MIB module contains all previously published managed objects that have been made
+      obsolete. The mib preserves OID mappings such that backward compatiblity is maintained."
+
+REVISION      "200810151159Z"
+DESCRIPTION
+    "This is the first version of this mib module. Objects from VMWARE-RESOURCES-MIB, 
+     VMWARE-TRAPS-MIB moved here."
+::= { vmwObsolete 1 }
+
+
+-- Originally defined in VMWARE-VMKERNEL-MIB
+vmkLoaded OBJECT-TYPE 
+   SYNTAX      DisplayString
+   MAX-ACCESS      read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Has the vmkernel been loaded? (yes/no)"
+   ::= { vmwESX 1 }
+
+-- Originally defined in VMWARE-RESOURCES-MIB
+--vmwResources OBJECT IDENTIFIER ::= { vmware 3 }
+--vmwCPU OBJECT IDENTIFIER ::= { vmwResources 1 }
+
+vmwCpuTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VmwCpuEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      obsolete
+    DESCRIPTION
+        "CPU Usage table by virtual machine."
+    ::= { vmwCPU 2 }
+
+vmwCpuEntry OBJECT-TYPE
+    SYNTAX      VmwCpuEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      obsolete
+    DESCRIPTION
+        "A record for CPU usage by a single virtual machine."
+    INDEX       { vmwCpuVMID }
+    ::= { vmwCpuTable 1 }
+
+    VmwCpuEntry ::= SEQUENCE {
+    vmwCpuVMID    Integer32,
+    vmwCpuShares  Gauge32,
+    vmwCpuUtil    Gauge32
+    }
+
+vmwCpuVMID OBJECT-TYPE
+    SYNTAX      Integer32 (0..1023)
+    MAX-ACCESS  not-accessible  
+    STATUS      current
+    DESCRIPTION
+        "ID allocated to running vm by the vmkernel."
+    ::= { vmwCpuEntry 1 }
+
+vmwCpuShares OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "unknown"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Share of CPU allocated to vm by vmkernel."
+    ::= { vmwCpuEntry 2 }
+
+vmwCpuUtil OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time the virtual machine has been running on the CPU (seconds)."
+    ::= { vmwCpuEntry 3 }
+
+vmwMemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VmwMemEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      obsolete
+    DESCRIPTION
+        "Table of memory usage by virtual machine."
+    ::= { vmwMemory 4 }
+
+vmwMemEntry OBJECT-TYPE
+    SYNTAX      VmwMemEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      obsolete
+    DESCRIPTION
+        "A record for memory usage by a single virtual machine."
+    INDEX       { vmwMemVMID }
+    ::= { vmwMemTable 1 }
+
+    VmwMemEntry ::= SEQUENCE {
+    vmwMemVMID       Integer32,
+    vmwMemShares     Gauge32,
+    vmwMemConfigured Gauge32,
+    vmwMemUtil       Gauge32
+    }
+
+vmwMemVMID OBJECT-TYPE
+    SYNTAX      Integer32 (0..1023)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "ID allocated to running vm by the vmkernel."
+    ::= { vmwMemEntry 1 }
+
+vmwMemShares OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "unknown"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Shares of memory allocated to vm by vmkernel."
+    ::= { vmwMemEntry 2 }
+
+vmwMemConfigured OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Amount of memory the vm was configured with. (KB)"
+    ::= { vmwMemEntry 3 }
+
+vmwMemUtil OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Amount of memory utilized by the vm. (KB; instantaneous)"
+    ::= { vmwMemEntry 4 }
+
+vmwHBATable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VmwHbaEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      obsolete
+    DESCRIPTION
+        "Disk adapter and target information table."
+    ::= { vmwResources 3 }
+
+vmwHBAEntry OBJECT-TYPE
+    SYNTAX      VmwHbaEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      obsolete
+    DESCRIPTION
+        "A record for a single hba on the machine."
+    INDEX       { vmwHbaIdx }
+    ::= { vmwHBATable 1 }
+
+    VmwHbaEntry ::= SEQUENCE {
+    vmwHbaIdx     Integer32,
+    vmwHbaName    DisplayString,
+    vmwHbaVMID    Integer32,
+    vmwDiskShares Gauge32,
+    vmwNumReads   Counter32,
+    vmwKbRead     Counter32,
+    vmwNumWrites  Counter32,
+    vmwKbWritten  Counter32
+    }
+
+
+vmwHbaIdx OBJECT-TYPE
+    SYNTAX      Integer32 (0..1023)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Index for HBA table @todo fix this!."
+    ::= { vmwHBAEntry 1 }
+
+vmwHbaName OBJECT-TYPE
+    SYNTAX      DisplayString   
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "String describing the disk. Format: <devname#>:<tgt>:<lun> "
+    ::= { vmwHBAEntry 2 }
+
+vmwHbaVMID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "ID assigned to running vm by the vmkernel."
+    ::= { vmwHBAEntry 3 }
+
+vmwDiskShares OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Share of disk bandwidth allocated to this vm."
+    ::= { vmwHBAEntry 4 }
+
+vmwNumReads OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Number of reads to this disk since disk module was loaded."
+    ::= { vmwHBAEntry 5 }
+
+vmwKbRead OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Kilobytes read from this disk since disk module was loaded."
+    ::= { vmwHBAEntry 6 }
+
+vmwNumWrites OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Number of writes to this disk since disk module was loaded." 
+    ::= { vmwHBAEntry 7 }
+
+vmwKbWritten OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Kilobytes written to this disk since disk module was loaded."
+    ::= { vmwHBAEntry 8 }
+
+
+vmwNetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VmwNetEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      obsolete
+    DESCRIPTION
+        "Network adapter statistics."
+    ::= { vmwResources 4 }
+
+vmwNetEntry OBJECT-TYPE
+    SYNTAX      VmwNetEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      obsolete
+    DESCRIPTION
+        "A record for a single nic on the machine."
+    INDEX       { vmwNetIdx }
+    ::= { vmwNetTable 1 }
+
+    VmwNetEntry ::= SEQUENCE {
+    vmwNetIdx         Integer32,
+    vmwNetName        DisplayString,
+    vmwNetVMID        Integer32,
+    vmwNetIfAddr      DisplayString,
+    vmwNetShares      Gauge32,
+    vmwNetPktsTx      Counter32,
+    vmwNetKbTx        Counter32,
+    vmwNetPktsRx      Counter32,
+    vmwNetKbRx        Counter32,
+    vmwNetHCPktsTx    Counter64,
+    vmwNetHCKbTx      Counter64,
+    vmwNetHCPktsRx    Counter64,
+    vmwNetHCKbRx      Counter64
+    }
+
+
+vmwNetIdx OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Index for net table."
+    ::= { vmwNetEntry 1 }
+
+vmwNetName OBJECT-TYPE
+    SYNTAX      DisplayString   
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "String describing the network adapter. Format: vmnic*" 
+    ::= { vmwNetEntry 2 }
+
+vmwNetVMID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "ID assigned to running vm by the vmkernel."
+    ::= { vmwNetEntry 3 }
+
+vmwNetIfAddr OBJECT-TYPE
+    SYNTAX      DisplayString   
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "MAC address of vm's virtual NIC." 
+    ::= { vmwNetEntry 4 }
+
+vmwNetShares OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Share of net bandwidth allocated to this vm."
+    ::= { vmwNetEntry 5 }
+
+vmwNetPktsTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Number of pkts transmitted on this NIC since network module was
+        loaded. Deprecated in favour of pktsHCTx."
+    ::= { vmwNetEntry 6 }
+
+vmwNetKbTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Kilobytes sent from this NIC since network module was loaded.
+        Deprecated in favour of kbHCTx."
+    ::= { vmwNetEntry 7 }
+
+vmwNetPktsRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Number of pkts received on this NIC since network module was loaded.
+        Deprecated in favour of pktsHCRx."
+    ::= { vmwNetEntry 8 }
+
+vmwNetKbRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Kilobytes received on this NIC since network module was loaded.
+        Deprecated in favour of kbHCRx."
+    ::= { vmwNetEntry 9 }
+
+-- 
+-- High Capacity Counter objects. These objects are all 64 bit version
+-- of the above four counter objects. They have the same
+-- basic semantics as their 32-bit counterparts, however, their syntax
+-- has been extended to 64 bits.
+--
+
+vmwNetHCPktsTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Number of pkts transmitted on this NIC since network module was loaded."
+    ::= { vmwNetEntry 10 }
+
+vmwNetHCKbTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Kilobytes sent from this NIC since network module was loaded."
+    ::= { vmwNetEntry 11 }
+
+vmwNetHCPktsRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Number of pkts received on this NIC since network module was loaded."
+    ::= { vmwNetEntry 12 }
+
+vmwNetHCKbRx OBJECT-TYPE
+    SYNTAX      Counter64       
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Kilobytes received on this NIC since network module was loaded."
+    ::= { vmwNetEntry 13 }
+
+-- VMWARE-TRAPS-MIB
+
+vpxdTrapType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the trap type in the preceding traps."
+    ::= { vmwTraps 301 }
+
+vpxdHostName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the name of the host in the preceding traps."
+    ::= { vmwTraps 302 }
+
+vpxdVMName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the name of the VM in the preceding traps."
+    ::= { vmwTraps 303 }
+
+vpxdOldStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the old status in the preceding traps."
+    ::= { vmwTraps 304 }
+
+vpxdNewStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the new status in the preceding traps."
+    ::= { vmwTraps 305 }
+
+vpxdObjValue OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the current object value in the preceding traps."
+    ::= { vmwTraps 306 }
+
+-- obsolete notifications as originally published in VMWARE-TRAPS-MIB.mib
+
+
+vmPoweredOn NOTIFICATION-TYPE
+    OBJECTS     { vmwVmID, vmwVmConfigFilePath }
+    STATUS      obsolete
+    DESCRIPTION 
+        "This trap is sent when a virtual machine is powered ON from a suspended 
+         or a powered off state."
+    ::= {  vmwNotifications 1 }
+
+vmPoweredOff NOTIFICATION-TYPE
+    OBJECTS     { vmwVmID, vmwVmConfigFilePath }
+    STATUS      obsolete
+    DESCRIPTION 
+        "This trap is sent when a virtual machine is powered OFF."
+    ::= {  vmwNotifications 2 }
+
+vmHBLost NOTIFICATION-TYPE
+    OBJECTS     { vmwVmID, vmwVmConfigFilePath }
+    STATUS      obsolete
+    DESCRIPTION 
+        "This trap is sent when a virtual machine detects a loss in guest heartbeat."
+    ::= {  vmwNotifications 3 }
+
+vmHBDetected NOTIFICATION-TYPE
+    OBJECTS     { vmwVmID, vmwVmConfigFilePath }
+    STATUS      obsolete
+    DESCRIPTION 
+        "This trap is sent when a virtual machine detects or regains the guest heartbeat."
+    ::= {  vmwNotifications 4 }
+
+vmSuspended NOTIFICATION-TYPE
+    OBJECTS     { vmwVmID, vmwVmConfigFilePath }
+    STATUS      obsolete
+    DESCRIPTION 
+        "This trap is sent when a virtual machine is suspended."
+    ::= {  vmwNotifications 5 }
+
+vpxdTrap NOTIFICATION-TYPE
+    OBJECTS { vpxdTrapType, vpxdHostName, vpxdVMName, vpxdNewStatus, 
+              vpxdOldStatus, vpxdObjValue }
+    STATUS      obsolete
+    DESCRIPTION 
+        "This trap is sent when entity status changed."
+    ::= { vmwNotifications 201 }
+
+
+-- conformance information
+
+vmwObsoleteMIBConformance
+OBJECT IDENTIFIER ::= { vmwObsoleteMIB 2 }
+vmwObsoleteMIBCompliances
+OBJECT IDENTIFIER ::= { vmwObsoleteMIBConformance 1 }
+vmwObsMIBGroups  OBJECT IDENTIFIER ::= { vmwObsoleteMIBConformance 2 }
+
+vmwObsoleteObsoleteMIBCompliance MODULE-COMPLIANCE
+STATUS  obsolete
+DESCRIPTION
+    "The compliance statement for entities which implement the 
+    VMWARE-RESOURCE-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwObsoleteGroup, vmwOldVCNotificationGroup }
+::= { vmwObsoleteMIBCompliances 3 }
+
+vmwObsoleteGroup OBJECT-GROUP
+    OBJECTS { 
+    vmkLoaded,
+    vmwCpuShares,
+    vmwCpuUtil,
+    vmwMemShares,
+    vmwMemConfigured,
+    vmwMemUtil,
+    vmwHbaName,
+    vmwHbaVMID,
+    vmwDiskShares,
+    vmwNumReads,
+    vmwKbRead,
+    vmwNumWrites,
+    vmwKbWritten,
+    vmwNetName,
+    vmwNetVMID,
+    vmwNetIfAddr,
+    vmwNetShares,
+    vmwNetPktsTx,
+    vmwNetKbTx,
+    vmwNetPktsRx,
+    vmwNetKbRx,
+    vmwNetHCPktsTx,
+    vmwNetHCKbTx,
+    vmwNetHCPktsRx,
+    vmwNetHCKbRx,
+    vpxdTrapType,
+    vpxdHostName,
+    vpxdVMName,
+    vpxdOldStatus,
+    vpxdNewStatus,
+    vpxdObjValue
+    }
+    STATUS  obsolete
+    DESCRIPTION
+        "These objects are no longer provided, see VMWARE-VMINFO-MIB for replacement."
+    ::= { vmwObsMIBGroups 2 }
+
+vmwOldVCNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+          vpxdTrap,
+          vmPoweredOn,
+          vmPoweredOff,
+          vmHBLost,
+          vmHBDetected,
+          vmSuspended
+       }
+       STATUS obsolete
+       DESCRIPTION 
+           "Group of objects describing notifications (traps)."
+       ::= { vmwObsMIBGroups 3 }  
+
+END

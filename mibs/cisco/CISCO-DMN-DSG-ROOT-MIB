@@ -1,0 +1,58 @@
+--*****************************************************************
+-- CISCO-DMN-DSG-ROOT.mib : Root Mib file for D9865 IRD.
+--
+-- August 2010, TEL MIB Team
+--
+--
+-- Copyright (c) 1999-2010 by Cisco Systems, Inc.
+-- All rights reserved.
+--*****************************************************************
+
+-- ********************* start log section ************************
+--  $Log::
+-- ********************* end log section **************************
+
+CISCO-DMN-DSG-ROOT-MIB 
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS 
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+   
+ciscoSPVTG MODULE-IDENTITY
+    LAST-UPDATED    "201008301100Z" -- August 30 2010 11:00:00 GMT
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO   
+       "Cisco Systems, Inc.
+        Customer Service 
+        Postal: 170 W Tasman Drive
+        San Jose, CA 95134
+        USA  
+        Tel: +1 800 553 NETS
+        
+        E-mail: cs-ipsla@cisco.com"
+    DESCRIPTION     "Cisco top level MIB."
+
+    REVISION        "201008301100Z"
+    DESCRIPTION     "V01.00.01 2010-08-30
+                    Updated for adherence to SNMPv2 format."
+
+    REVISION        "200911261500Z"
+    DESCRIPTION     "V01.00.00 2009-11-26
+                    Initial Version."
+    
+    ::= { enterprises 1429 }
+
+
+
+ciscoSat                    OBJECT IDENTIFIER ::= { ciscoSPVTG 2 }
+
+ciscoDMN                    OBJECT IDENTIFIER ::= { ciscoSat 2 }
+
+ciscoDSGUtilities           OBJECT IDENTIFIER ::= { ciscoDMN 5 }
+
+ciscoDSGProducts            OBJECT IDENTIFIER ::= { ciscoDMN 6 }
+
+END
+

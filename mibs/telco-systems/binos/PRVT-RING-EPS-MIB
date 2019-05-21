@@ -1,0 +1,1272 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-RING-EPS-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-RING-EPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI                  -- RFC2578
+    TEXTUAL-CONVENTION, RowStatus, MacAddress, TruthValue, DisplayString
+        FROM SNMPv2-TC                   -- RFC2579
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF                 -- [RFC2580]
+    InterfaceIndexOrZero
+        FROM IF-MIB                      -- [RFC2863]
+    VlanIdOrNone
+        FROM Q-BRIDGE-MIB                -- [RFC4363]
+    Dot1agCfmMDLevelOrNone, Dot1agCfmMepIdOrZero
+        FROM IEEE8021-CFM-MIB
+    switch
+ 	FROM PRVT-SWITCH-MIB;
+
+prvtRingEpsMib MODULE-IDENTITY
+LAST-UPDATED "201003160000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"This private MIB provides capability of controlling the
+ automatic Ring Ethernet Protection Switching (ITU-T G.8032)"
+
+-- revision history
+	REVISION "201302220000Z"
+    DESCRIPTION
+    "Added raps monitoring methods for rings and subrings"
+    REVISION "201103110000Z"
+    DESCRIPTION
+    "Added ring ID for rings and subrings"
+    REVISION "201012170000Z"
+    DESCRIPTION
+    "Added descriptions for rings and subrings"
+    REVISION "201003160000Z"
+    DESCRIPTION
+    "Added support for subrings"
+	REVISION "201002020000Z"
+	DESCRIPTION
+	"Added prvtRingEpsWaitToBlockTimer, changed values order for PrvtRingEpsPortStatusType "
+	REVISION       "200911040000Z"
+	DESCRIPTION
+	"Initial version."
+
+::= { switch 134 }
+
+-- ***********************************************
+-- ************ Top level structure of the MIB****
+-- ***********************************************
+prvtRingEpsNotifications              OBJECT IDENTIFIER ::= { prvtRingEpsMib 0 }
+prvtRingEpsObjects                    OBJECT IDENTIFIER ::= { prvtRingEpsMib 1 }
+prvtRingEpsConformance                OBJECT IDENTIFIER ::= { prvtRingEpsMib 2 }
+
+prvtRingEpsInstances OBJECT IDENTIFIER ::= { prvtRingEpsObjects 1 }
+prvtRingEpsVlans     OBJECT IDENTIFIER ::= { prvtRingEpsObjects 2 }
+prvtRingEpsSubRings  OBJECT IDENTIFIER ::= { prvtRingEpsObjects 3 }
+
+PrvtRingEpsModeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Version of the protocol the instance will use"
+    REFERENCE
+       "G.8032v2 clause 10.1.13"
+    SYNTAX      INTEGER {
+                  rapsMode8032v1      (1),
+                  rapsMode8032v2      (2)
+                }
+
+PrvtRingEpsStateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "State of the R-APS request processing logic"
+    REFERENCE
+       "G.8032v2 clause 10.1.2"
+    SYNTAX      INTEGER {
+                  rapsInit            (0),
+                  rapsIdle            (1),
+                  rapsProtection      (2),
+                  rapsManualSwitch    (3),
+                  rapsForcedSwitch    (4),
+                  rapsPending         (5)
+                }
+
+PrvtRingEpsLocalCommandType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Local system state given by the top priority command received"
+    REFERENCE
+       "G.8032v2 clause 8"
+    SYNTAX      INTEGER {
+                  rapsLcNoRequest                  (0),
+                  rapsLcExercise                   (1),
+                  rapsLcManualSwitch               (2),
+                  rapsLcSignalDegrade              (3),
+                  rapsLcSignalFail                 (4),
+                  rapsLcForcedSwitch               (5),
+                  rapsLcClear                      (6),
+                  rapsLcLockoutOfProtection        (7)
+                }
+
+PrvtRingEpsRemoteRequestType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Remote command received via RAPS packets"
+    REFERENCE
+       "G.8032v2 clause 10.3"
+    SYNTAX      INTEGER {
+                  rapsRsNone                       (-1),
+                  rapsRsNoRequest                  (0),
+                  rapsRsManualSwitch               (7),
+                  rapsRsSignalFail                 (11),
+                  rapsRsForcedSwitch               (13),
+                  rapsRsEvent                      (14)
+                }
+
+PrvtRingEpsNodeRoleType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Role of the defined node inside the protected ring"
+    REFERENCE
+       "G.8032v2"
+    SYNTAX      INTEGER {
+                  rapsNrSimpleNode             (0),
+                  rapsNrRplNeighborNode        (1),
+                  rapsNrRplOwner               (2)
+                }
+
+PrvtRingEpsRplPortType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Ring port designated as RPL
+       (only valid if prvtRingEpsNodeRole is rapsNrRplOwner or rapsNrRplNeighborNode"
+    REFERENCE
+       "G.8032v2"
+    SYNTAX      INTEGER {
+                  port0    (0),
+                  port1    (1),
+                  none     (2)
+                }
+
+PrvtRingEpsDefectType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Ring port designated as RPL
+       (only valid if prvtRingEpsNodeRole is rapsNrRplOwner or rapsNrRplNeighborNode"
+    REFERENCE
+       "G.8032v2 10.4"
+    SYNTAX      BITS {
+                  rapsDprovisioningMismatch    (0)
+                }
+
+PrvtRingEpsPortStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Status of the port link"
+    SYNTAX      INTEGER {
+		        rapsPsOk        (0),
+                rapsPsBlocked   (1),
+                rapsPsFailed    (2)
+
+                }
+
+PrvtRingEpsPeerStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Status bits set in the received RAPS packet. The meanings are:
+
+        bRplBlocked(0) The RPL link is blocked by the RPL owner.
+        bDoNotFlush(1) RAPS sender requests that we do don flush our FDB.
+        bBlockedPortReference(2) The port that is blocked by the sender of the RAPS packet.
+       "
+    REFERENCE
+       "ITU-T G.8032v2 clause 10.3"
+    SYNTAX BITS {
+                bRplBlocked(0),
+                bDoNotFlush(1),
+                bBlockedPortReference(2)
+                }
+
+
+-- ***********************************************
+--      Table definitions
+-- ***********************************************
+prvtRingEpsInstanceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PrvtRingEpsInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table includes information about the ring instances
+     defined on this node."
+    ::= { prvtRingEpsInstances 1 }
+
+prvtRingEpsInstanceEntry OBJECT-TYPE
+	SYNTAX PrvtRingEpsInstanceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"NONE"
+	INDEX  { prvtRingEpsInstanceIndex }
+	::= { prvtRingEpsInstanceTable 1 }
+
+PrvtRingEpsInstanceEntry  ::= SEQUENCE {
+    prvtRingEpsInstanceIndex         Unsigned32,
+    prvtRingEpsMode                  PrvtRingEpsModeType,
+    prvtRingEpsNodeRole              PrvtRingEpsNodeRoleType,
+    prvtRingEpsState                 PrvtRingEpsStateType,
+	prvtRingEpsLocalCommand          PrvtRingEpsLocalCommandType,
+    prvtRingEpsControlVlan           VlanIdOrNone,
+    prvtRingEpsPort0Ifindex          InterfaceIndexOrZero,
+    prvtRingEpsPort1Ifindex          InterfaceIndexOrZero,
+    prvtRingEpsRplPort               PrvtRingEpsRplPortType,
+    prvtRingEpsManualSwitchPort      PrvtRingEpsRplPortType,
+    prvtRingEpsCfmMdLevel            Dot1agCfmMDLevelOrNone,
+    prvtRingEpsPort0Mep              Dot1agCfmMepIdOrZero,
+    prvtRingEpsPort1Mep              Dot1agCfmMepIdOrZero,
+	prvtRingEpsRevertive             TruthValue,
+	prvtRingEpsNoVirtualChannel      TruthValue,
+	prvtRingEpsHoldOffTimer          Unsigned32,
+	prvtRingEpsWaitToRestoreTimer    Unsigned32,
+	prvtRingEpsGuardTimer            Unsigned32,
+	prvtRingEpsWaitToBlockTimer      Unsigned32,
+	prvtRingEpsDefectFop             PrvtRingEpsDefectType,
+	prvtRingEpsPort0Status           PrvtRingEpsPortStatusType,
+	prvtRingEpsPort1Status           PrvtRingEpsPortStatusType,
+	prvtRingEpsPort0PeerNodeId       MacAddress,
+	prvtRingEpsPort1PeerNodeId	 	 MacAddress,
+	prvtRingEpsPort0PeerCommand 	 PrvtRingEpsRemoteRequestType,
+	prvtRingEpsPort1PeerCommand		 PrvtRingEpsRemoteRequestType,
+	prvtRingEpsPort0PeerStatus		 PrvtRingEpsPeerStatusType,
+	prvtRingEpsPort1PeerStatus 		 PrvtRingEpsPeerStatusType,
+	prvtRingEpsOperationalStatus     TruthValue,
+	prvtRingEpsAdminStatus           TruthValue,
+    prvtRingEpsRowStatus             RowStatus,
+    prvtRingEpsForcedSwitchPort      PrvtRingEpsRplPortType,
+    prvtRingEpsInstanceDescription   DisplayString,
+    prvtRingEpsRingId                Unsigned32,
+	prvtRingEpsPort0MonitoringMethod INTEGER,
+	prvtRingEpsPort1MonitoringMethod INTEGER
+    }
+
+prvtRingEpsInstanceIndex OBJECT-TYPE
+	SYNTAX          Unsigned32 (1..10)
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION	    "RAPS instance index"
+	::= { prvtRingEpsInstanceEntry 1 }
+
+prvtRingEpsMode OBJECT-TYPE
+	SYNTAX          PrvtRingEpsModeType
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION	    "Version of the protocol the instance will use"
+	DEFVAL          {rapsMode8032v2}
+	::= { prvtRingEpsInstanceEntry 2 }
+
+prvtRingEpsNodeRole OBJECT-TYPE
+	SYNTAX          PrvtRingEpsNodeRoleType
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION
+    "This variable identifies the role that the node will play inside the ring.
+     The node can have two special roles, RPL owner or RPL neighbor, when one
+     of its ports is designated as RPL. The ring can have a single RPL owner
+     and a single RPL neighbor, connected between eachother via the RPL.
+     If neither of the node ports are designated as RPL, then the node should
+     have the role of a Simple node"
+	DEFVAL          {rapsNrSimpleNode}
+	::= { prvtRingEpsInstanceEntry 3 }
+
+prvtRingEpsState OBJECT-TYPE
+	SYNTAX          PrvtRingEpsStateType
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "This variable identifies the state of the ring node according to
+     the standard state machine."
+	DEFVAL          {rapsInit}
+	::= { prvtRingEpsInstanceEntry 4 }
+
+prvtRingEpsLocalCommand OBJECT-TYPE
+	SYNTAX          PrvtRingEpsLocalCommandType
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION
+    "The user can control the ring using a set of commands allowing
+     blocking and unblocking of ports. These commands are rapsLcManualSwitch,
+     rapsLcForcedSwitch and rapsLcClear. The others are either read-only values
+     or not yet defined by the standard."
+	DEFVAL          {rapsLcNoRequest}
+	::= { prvtRingEpsInstanceEntry 5 }
+
+prvtRingEpsControlVlan OBJECT-TYPE
+    SYNTAX          VlanIdOrNone
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The vlan ID used for RAPS & CFM traffic."
+    DEFVAL          {0}
+    ::= { prvtRingEpsInstanceEntry 6 }
+
+prvtRingEpsPort0Ifindex OBJECT-TYPE
+	SYNTAX          InterfaceIndexOrZero
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION
+    "This variable is the interface index of the interface either a
+    bridge port, or an aggregated IEEE 802.1 link within a bridge
+    port, attached to the ring as port 0."
+	DEFVAL          {0}
+	::= { prvtRingEpsInstanceEntry 7 }
+
+prvtRingEpsPort1Ifindex OBJECT-TYPE
+	SYNTAX          InterfaceIndexOrZero
+	MAX-ACCESS      read-create
+	STATUS          current
+    DESCRIPTION
+    "This variable is the interface index of the interface either a
+    bridge port, or an aggregated IEEE 802.1 link within a bridge
+    port, attached to the ring as port 1."
+	DEFVAL          {0}
+	::= { prvtRingEpsInstanceEntry 8 }
+
+prvtRingEpsRplPort OBJECT-TYPE
+	SYNTAX          PrvtRingEpsRplPortType
+	MAX-ACCESS      read-create
+	STATUS          current
+    DESCRIPTION
+    "This object controls whether the one of the ring ports is designated as RPL
+     for the ring or not."
+	DEFVAL          {none}
+	::= { prvtRingEpsInstanceEntry 9 }
+
+prvtRingEpsManualSwitchPort OBJECT-TYPE
+	SYNTAX          PrvtRingEpsRplPortType
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION	    "The port blocked by the Manual Switch command"
+	DEFVAL          {none}
+	::= { prvtRingEpsInstanceEntry 10 }
+
+prvtRingEpsCfmMdLevel OBJECT-TYPE
+	SYNTAX          Dot1agCfmMDLevelOrNone
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION
+	"Value of the CFM MD level where the protected domain is situated"
+	DEFVAL          {-1}
+	::= { prvtRingEpsInstanceEntry 11 }
+
+prvtRingEpsPort0Mep OBJECT-TYPE
+	SYNTAX          Dot1agCfmMepIdOrZero
+	MAX-ACCESS      read-create
+	STATUS          current
+    DESCRIPTION
+    "This variable is the peer MEP ID that should send CCMs towards port 0."
+	DEFVAL          {0}
+	::= { prvtRingEpsInstanceEntry 12 }
+
+prvtRingEpsPort1Mep OBJECT-TYPE
+	SYNTAX          Dot1agCfmMepIdOrZero
+	MAX-ACCESS      read-create
+	STATUS          current
+    DESCRIPTION
+    "This variable is the peer MEP ID that should send CCMs towards port 1."
+	DEFVAL          {0}
+	::= { prvtRingEpsInstanceEntry 13 }
+
+prvtRingEpsRevertive OBJECT-TYPE
+	SYNTAX          TruthValue
+	MAX-ACCESS      read-create
+	STATUS          current
+    DESCRIPTION
+    "This is the MI_RAPS_Revertive variable defined in the standard.
+     It controls whether the RPL is blocked again after a failure of
+     some ring link recovers."
+    REFERENCE       "G.8032v2 clause 9.1"
+	DEFVAL          {true}
+	::= { prvtRingEpsInstanceEntry 14 }
+
+prvtRingEpsNoVirtualChannel OBJECT-TYPE
+	SYNTAX          TruthValue
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION	    "Node is part of a subring that doesn't use RAPS virtual channel"
+	REFERENCE       "G.8032v2 10.1.14"
+	DEFVAL          {false}
+	::= { prvtRingEpsInstanceEntry 15 }
+
+prvtRingEpsHoldOffTimer OBJECT-TYPE
+	SYNTAX          Unsigned32 (0..10000)
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION	    "Range is from 0 to 10 seconds in 100msec intervals"
+	REFERENCE       "G.8032v2 clause 10.1.8"
+	DEFVAL          {0}
+	::= { prvtRingEpsInstanceEntry 16 }
+
+prvtRingEpsWaitToRestoreTimer OBJECT-TYPE
+	SYNTAX          Unsigned32 (1..12)
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION	    "Range is from 1 to 12 minutes"
+	REFERENCE       "G.8032v2 clause 10.1.4"
+	DEFVAL          {5}
+	::= { prvtRingEpsInstanceEntry 17 }
+
+prvtRingEpsGuardTimer OBJECT-TYPE
+	SYNTAX          Unsigned32 (10..2000)
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION	    "Range is from 10msec to 2 seconds in 10msec intervals"
+	REFERENCE       "G.8032v2 clause 10.1.5"
+	DEFVAL          {500}
+	::= { prvtRingEpsInstanceEntry 18 }
+
+prvtRingEpsWaitToBlockTimer OBJECT-TYPE
+	SYNTAX          Unsigned32 (5010..7000)
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "Range is from 5010msec to 7 seconds in 10msec intervals.
+     This time is actulally the Guard Timer + 5 seconds"
+	REFERENCE       "G.8032v2 clause 10.1.5"
+	DEFVAL          {5500}
+	::= { prvtRingEpsInstanceEntry 19 }
+
+prvtRingEpsDefectFop OBJECT-TYPE
+	SYNTAX          PrvtRingEpsDefectType
+	MAX-ACCESS      read-only
+	STATUS          current
+    DESCRIPTION
+    "So far only the situation when two or more RPL-owners are defined
+     in the ring is identified as a defect. This scenario is noticed when
+     the instance with the RPL-Owner role receives a RAPS packet with the
+     RB bit set in its status field from a different NodeID than its own."
+	REFERENCE       "G.8032v2 clause 10.4"
+	::= { prvtRingEpsInstanceEntry 20 }
+
+prvtRingEpsPort0Status OBJECT-TYPE
+	SYNTAX          PrvtRingEpsPortStatusType
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "This variable reflects the state of port 0.
+     It can be either Ok (unblocked), Blocked or Failed."
+	DEFVAL          {rapsPsFailed}
+	::= { prvtRingEpsInstanceEntry 21 }
+
+prvtRingEpsPort1Status OBJECT-TYPE
+	SYNTAX          PrvtRingEpsPortStatusType
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "This variable reflects the state of port 1.
+     It can be either Ok (unblocked), Blocked or Failed."
+	DEFVAL          {rapsPsFailed}
+	::= { prvtRingEpsInstanceEntry 22 }
+
+prvtRingEpsPort0PeerNodeId OBJECT-TYPE
+	SYNTAX          MacAddress
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "This variable reflects the Node ID from the RAPS packet received
+     via port 0."
+	::= { prvtRingEpsInstanceEntry 23 }
+
+prvtRingEpsPort1PeerNodeId OBJECT-TYPE
+	SYNTAX          MacAddress
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "This variable reflects the Node ID from the RAPS packet received
+     via port 1."
+	::= { prvtRingEpsInstanceEntry 24 }
+
+prvtRingEpsPort0PeerCommand OBJECT-TYPE
+	SYNTAX          PrvtRingEpsRemoteRequestType
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "This variable reflects the Request/State of the RAPS packet received
+     via port 0."
+	DEFVAL          {rapsRsNone}
+	::= { prvtRingEpsInstanceEntry 25 }
+
+prvtRingEpsPort1PeerCommand OBJECT-TYPE
+	SYNTAX          PrvtRingEpsRemoteRequestType
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "This variable reflects the Request/State of the RAPS packet received
+     via port 1."
+	DEFVAL          {rapsRsNone}
+	::= { prvtRingEpsInstanceEntry 26 }
+
+prvtRingEpsPort0PeerStatus OBJECT-TYPE
+	SYNTAX          PrvtRingEpsPeerStatusType
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "This variable reflects the status field of the RAPS packet received
+     via port 0."
+	::= { prvtRingEpsInstanceEntry 27 }
+
+prvtRingEpsPort1PeerStatus OBJECT-TYPE
+	SYNTAX          PrvtRingEpsPeerStatusType
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "This variable reflects the status field of the RAPS packet received
+     via port 1."
+	::= { prvtRingEpsInstanceEntry 28 }
+
+prvtRingEpsOperationalStatus OBJECT-TYPE
+	SYNTAX          TruthValue
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+    "The purpose of this status is to identify to the user whether
+     this instance is ready for running. The operational status can
+     be up or down. When creating the instance the operational
+     status will be down. Receiving CCMs from the expected peer MEPs on
+     both ring ports will bring the operational status to up. If any
+     needed CFM configuration is removed the operational status will
+     go back to down"
+	DEFVAL          {false}
+	::= { prvtRingEpsInstanceEntry 29 }
+
+prvtRingEpsAdminStatus OBJECT-TYPE
+	SYNTAX          TruthValue
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION	    "Administrative status of the instance"
+	DEFVAL          {false}
+	::= { prvtRingEpsInstanceEntry 30 }
+
+prvtRingEpsRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The status of the row."
+    ::= { prvtRingEpsInstanceEntry 31 }
+
+prvtRingEpsForcedSwitchPort OBJECT-TYPE
+    SYNTAX          PrvtRingEpsRplPortType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The port blocked by the Forced Switch command"
+    DEFVAL          {none}
+    ::= { prvtRingEpsInstanceEntry 32 }
+
+prvtRingEpsInstanceDescription OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "RAPS instance description."
+::= { prvtRingEpsInstanceEntry 33 }
+
+prvtRingEpsRingId OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "The last octet of the RAPS destination MAC address
+     is designated as Ring ID (01-19-A7-00-00-[Ring ID]).
+     As of G.8032v2 the destination MAC address
+     '01-19-A7-00-00-01' is used. The usage of other
+     MAC addresses is for further study."
+    REFERENCE       "G.8032v2 Appendix VII"
+    DEFVAL          {1}
+    ::= { prvtRingEpsInstanceEntry 34 }
+	
+prvtRingEpsPort0MonitoringMethod  OBJECT-TYPE
+	SYNTAX INTEGER
+        {
+		ccm ( 1 ),
+		link-status( 2 )
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Raps monitoring methods for port 0: 
+    ccm - CCM messages and link status will be used for raps monitoring,
+    link-status -Link status will be used for raps monitoring"
+	DEFVAL { 1 }
+	::= { prvtRingEpsInstanceEntry 35 }	
+
+prvtRingEpsPort1MonitoringMethod  OBJECT-TYPE
+	SYNTAX INTEGER
+        {
+		ccm ( 1 ),
+		link-status( 2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Raps monitoring methods for port 1:
+	ccm - CCM messages and link status will be used for raps monitoring,
+    link-status - Link status will be used for raps monitoring"
+	DEFVAL { 1 }
+	::= { prvtRingEpsInstanceEntry 36 }		
+
+
+prvtRingEpsVlanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PrvtRingEpsVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table includes information about protected vlans and the ring
+     instances that monitor them."
+    ::= { prvtRingEpsVlans 1 }
+
+prvtRingEpsVlanEntry OBJECT-TYPE
+	SYNTAX PrvtRingEpsVlanEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Connection between vlan IDs and the RAPS instance that monitors them"
+	INDEX  { prvtRingEpsVlanIndex }
+	::= { prvtRingEpsVlanTable 1 }
+
+PrvtRingEpsVlanEntry  ::= SEQUENCE {
+    prvtRingEpsVlanIndex         Unsigned32,
+    prvtRingEpsInstance          Unsigned32,
+    prvtRingEpsVlanRowStatus     RowStatus
+    }
+
+prvtRingEpsVlanIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4094)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The vlan ID."
+    ::= { prvtRingEpsVlanEntry 1 }
+
+prvtRingEpsInstance OBJECT-TYPE
+	SYNTAX          Unsigned32 (0..10)
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION	    "RAPS instance that will monitor this vlan"
+	DEFVAL          { 0 }
+	::= { prvtRingEpsVlanEntry 2 }
+
+prvtRingEpsVlanRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The status of the row."
+    ::= { prvtRingEpsVlanEntry 3 }
+
+
+
+
+
+
+
+
+prvtRingEpsSubRingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PrvtRingEpsSubRingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table containing information about the subring instances
+     defined on this node."
+    ::= { prvtRingEpsSubRings 1 }
+
+prvtRingEpsSubRingEntry OBJECT-TYPE
+    SYNTAX PrvtRingEpsSubRingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Configuration of a subring that is interconnected to the main ring in an interconnection node"
+    INDEX  { prvtRingEpsInstanceIndex, prvtRingEpsSubRingIndex }
+    ::= { prvtRingEpsSubRingTable 1 }
+
+PrvtRingEpsSubRingEntry  ::= SEQUENCE {
+    prvtRingEpsSubRingIndex                 Unsigned32,
+    prvtRingEpsSubRingNodeRole              PrvtRingEpsNodeRoleType,
+    prvtRingEpsSubRingState                 PrvtRingEpsStateType,
+    prvtRingEpsSubRingLocalCommand          PrvtRingEpsLocalCommandType,
+    prvtRingEpsSubRingPortIfindex           InterfaceIndexOrZero,
+    prvtRingEpsSubRingPortMep               Dot1agCfmMepIdOrZero,
+    prvtRingEpsSubRingRplPort               PrvtRingEpsRplPortType,
+    prvtRingEpsSubRingVirtualChannelVlan    VlanIdOrNone,
+    prvtRingEpsSubRingRevertive             TruthValue,
+    prvtRingEpsSubRingHoldOffTimer          Unsigned32,
+    prvtRingEpsSubRingWaitToRestoreTimer    Unsigned32,
+    prvtRingEpsSubRingGuardTimer            Unsigned32,
+    prvtRingEpsSubRingWaitToBlockTimer      Unsigned32,
+    prvtRingEpsSubRingDefectFop             PrvtRingEpsDefectType,
+    prvtRingEpsSubRingPortStatus            PrvtRingEpsPortStatusType,
+    prvtRingEpsSubRingPortPeerNodeId        MacAddress,
+    prvtRingEpsSubRingPeerCommand           PrvtRingEpsRemoteRequestType,
+    prvtRingEpsSubRingPeerStatus            PrvtRingEpsPeerStatusType,
+    prvtRingEpsSubRingVcPeerNodeId          MacAddress,
+    prvtRingEpsSubRingVcPeerCommand         PrvtRingEpsRemoteRequestType,
+    prvtRingEpsSubRingVcPeerStatus          PrvtRingEpsPeerStatusType,
+    prvtRingEpsSubRingPropagateTC           TruthValue,
+    prvtRingEpsSubRingOperationalStatus     TruthValue,
+    prvtRingEpsSubRingAdminStatus           TruthValue,
+    prvtRingEpsSubRingRowStatus             RowStatus,
+    prvtRingEpsSubRingControlVlan           VlanIdOrNone,
+    prvtRingEpsSubRingDescription           DisplayString,
+    prvtRingEpsSubRingRingId                Unsigned32,
+	prvtRingEpsSubRingMonitoringMethod      INTEGER
+    }
+
+prvtRingEpsSubRingIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..10)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A subring ID"
+    ::= { prvtRingEpsSubRingEntry 1 }
+
+prvtRingEpsSubRingNodeRole OBJECT-TYPE
+    SYNTAX          PrvtRingEpsNodeRoleType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "This variable identifies the role that the node will play inside the subring.
+     The node can have two special roles, RPL owner or RPL neighbor, when the
+     subring port is designated as RPL. The subring can have a single RPL owner
+     and a single RPL neighbor, connected between eachother via the RPL.
+     If the subring port is not designated as RPL, then the node should
+     have the role of a Simple node"
+    DEFVAL          {rapsNrSimpleNode}
+    ::= { prvtRingEpsSubRingEntry 2 }
+
+prvtRingEpsSubRingState OBJECT-TYPE
+    SYNTAX          PrvtRingEpsStateType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This variable identifies the state of the subring node according to
+     the standard state machine."
+    REFERENCE       "G.8032v2 clause 10.1.2"
+    DEFVAL          {rapsInit}
+    ::= { prvtRingEpsSubRingEntry 3 }
+
+prvtRingEpsSubRingLocalCommand OBJECT-TYPE
+    SYNTAX          PrvtRingEpsLocalCommandType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "The user can control the ring using a set of commands allowing
+     blocking and unblocking of ports. These commands are rapsLcManualSwitch,
+     rapsLcForcedSwitch and rapsLcClear. The others are either read-only values
+     or not yet defined by the standard."
+    DEFVAL          {rapsLcNoRequest}
+    ::= { prvtRingEpsSubRingEntry 4 }
+
+prvtRingEpsSubRingPortIfindex OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "This variable is the interface index of the interface either a
+    bridge port, or an aggregated IEEE 802.1 link within a bridge
+    port, attached to the subring."
+    DEFVAL          {0}
+    ::= { prvtRingEpsSubRingEntry 5 }
+
+prvtRingEpsSubRingPortMep OBJECT-TYPE
+    SYNTAX          Dot1agCfmMepIdOrZero
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "This variable is the peer MEP ID that should send CCMs towards the subring port."
+    DEFVAL          {0}
+    ::= { prvtRingEpsSubRingEntry 6 }
+
+prvtRingEpsSubRingRplPort OBJECT-TYPE
+    SYNTAX          PrvtRingEpsRplPortType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "This object controls whether the subring port is designated as RPL
+     for the subring or not."
+    DEFVAL          {none}
+    ::= { prvtRingEpsSubRingEntry 7 }
+
+prvtRingEpsSubRingVirtualChannelVlan OBJECT-TYPE
+    SYNTAX          VlanIdOrNone
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The vlan ID used for Virtual Channel encapsulation"
+    DEFVAL          {0}
+    ::= { prvtRingEpsSubRingEntry 8 }
+
+prvtRingEpsSubRingRevertive OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "This is the MI_RAPS_Revertive variable defined in the standard.
+     It controls whether the RPL is blocked again after a failure of
+     some subring link recovers."
+    REFERENCE       "G.8032v2 clause 9.1"
+    DEFVAL          {true}
+    ::= { prvtRingEpsSubRingEntry 9 }
+
+prvtRingEpsSubRingHoldOffTimer OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..10000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Range is from 0 to 10 seconds in 100msec intervals"
+    REFERENCE       "G.8032v2 clause 10.1.8"
+    DEFVAL          {0}
+    ::= { prvtRingEpsSubRingEntry 10 }
+
+prvtRingEpsSubRingWaitToRestoreTimer OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..12)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Range is from 1 to 12 minutes"
+    REFERENCE       "G.8032v2 clause 10.1.4"
+    DEFVAL          {5}
+    ::= { prvtRingEpsSubRingEntry 11 }
+
+prvtRingEpsSubRingGuardTimer OBJECT-TYPE
+    SYNTAX          Unsigned32 (10..2000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Range is from 10msec to 2 seconds in 10msec intervals"
+    REFERENCE       "G.8032v2 clause 10.1.5"
+    DEFVAL          {500}
+    ::= { prvtRingEpsSubRingEntry 12 }
+
+prvtRingEpsSubRingWaitToBlockTimer OBJECT-TYPE
+    SYNTAX          Unsigned32 (5010..7000)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "Range is from 5010msec to 7 seconds in 10msec intervals.
+     This time is actulally the Guard Timer + 5 seconds"
+    REFERENCE       "G.8032v2 clause 10.1.5"
+    DEFVAL          {5500}
+    ::= { prvtRingEpsSubRingEntry 13 }
+
+prvtRingEpsSubRingDefectFop OBJECT-TYPE
+    SYNTAX          PrvtRingEpsDefectType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "So far only the situation when two or more RPL-owners are defined
+     in the ring is identified as a defect. This scenario is noticed when
+     the instance with the RPL-Owner role receives a RAPS packet with the
+     RB bit set in its status field from a different NodeID than its own."
+    REFERENCE       "G.8032v2 clause 10.4"
+    ::= { prvtRingEpsSubRingEntry 14 }
+
+prvtRingEpsSubRingPortStatus OBJECT-TYPE
+    SYNTAX          PrvtRingEpsPortStatusType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This variable reflects the state of the subring port.
+     It can be either Ok (unblocked), Blocked or Failed."
+    DEFVAL          {rapsPsFailed}
+    ::= { prvtRingEpsSubRingEntry 15 }
+
+prvtRingEpsSubRingPortPeerNodeId OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This variable reflects the Node ID from the RAPS packet received
+     via the subring port."
+    ::= { prvtRingEpsSubRingEntry 16 }
+
+prvtRingEpsSubRingPeerCommand OBJECT-TYPE
+    SYNTAX          PrvtRingEpsRemoteRequestType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This variable reflects the Request/State of the RAPS packet received
+     via the subring port."
+    DEFVAL          {rapsRsNone}
+    ::= { prvtRingEpsSubRingEntry 17 }
+
+prvtRingEpsSubRingPeerStatus OBJECT-TYPE
+    SYNTAX          PrvtRingEpsPeerStatusType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This variable reflects the status field of the RAPS packet received
+     via the subring port."
+    ::= { prvtRingEpsSubRingEntry 18 }
+
+prvtRingEpsSubRingVcPeerNodeId OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This variable reflects the Node ID from the RAPS packet received
+     via the virtual channel."
+    ::= { prvtRingEpsSubRingEntry 19 }
+
+prvtRingEpsSubRingVcPeerCommand OBJECT-TYPE
+    SYNTAX          PrvtRingEpsRemoteRequestType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This variable reflects the Request/State of the RAPS packet received
+     via the virtual channel."
+    DEFVAL          {rapsRsNone}
+    ::= { prvtRingEpsSubRingEntry 20 }
+
+prvtRingEpsSubRingVcPeerStatus OBJECT-TYPE
+    SYNTAX          PrvtRingEpsPeerStatusType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This variable reflects the status field of the RAPS packet received
+     via the virtual channel."
+    ::= { prvtRingEpsSubRingEntry 21 }
+
+prvtRingEpsSubRingPropagateTC OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "This is the MI_RAPS_Propagate_TC variable mentioned in the standard.
+     If this is enabled a flush in the subring will be followed by a flush in
+     the main instance."
+    REFERENCE       "G.8032v2 10.1.11"
+    DEFVAL          {false}
+    ::= { prvtRingEpsSubRingEntry 22 }
+
+prvtRingEpsSubRingOperationalStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "The purpose of this status is to identify to the user whether
+     this instance is ready for running. The operational status can
+     be up or down. When creating the instance the operational
+     status will be down. Receiving CCMs from the expected peer MEP on
+     the subring port will bring the operational status to up. If any
+     needed CFM configuration is removed the operational status will
+     go back to down"
+    DEFVAL          {false}
+    ::= { prvtRingEpsSubRingEntry 23 }
+
+prvtRingEpsSubRingAdminStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Administrative status of the subring instance"
+    DEFVAL          {false}
+    ::= { prvtRingEpsSubRingEntry 24 }
+
+prvtRingEpsSubRingRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The status of the row."
+    ::= { prvtRingEpsSubRingEntry 25 }
+
+prvtRingEpsSubRingControlVlan OBJECT-TYPE
+    SYNTAX          VlanIdOrNone
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The vlan ID used for RAPS & CFM traffic."
+    DEFVAL          {0}
+    ::= { prvtRingEpsSubRingEntry 26 }
+
+prvtRingEpsSubRingDescription OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "RAPS instance sub-ring description."
+    ::= { prvtRingEpsSubRingEntry 27 }
+
+prvtRingEpsSubRingRingId OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "The last octet of the RAPS destination MAC address
+     is designated as Ring ID (01-19-A7-00-00-[Ring ID]).
+     As of G.8032v2 the destination MAC address
+     '01-19-A7-00-00-01' is used. The usage of other
+     MAC addresses is for further study."
+    REFERENCE       "G.8032v2 Appendix VII"
+    DEFVAL          {1}
+    ::= { prvtRingEpsSubRingEntry 28 }
+	
+prvtRingEpsSubRingMonitoringMethod  OBJECT-TYPE
+	SYNTAX INTEGER
+    {
+		ccm ( 1 ),
+		link-status( 2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Raps monitoring methods for subring port:
+	ccm - CCM messags and link status  will be used for raps monitoring,
+    link-status -Link status will be used for raps monitoring"
+	DEFVAL { 1 }
+	::= { prvtRingEpsSubRingEntry 29 }		
+	
+	
+
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- ******************************************************************
+
+prvtRingEpsDefectAlarm NOTIFICATION-TYPE
+    OBJECTS     { prvtRingEpsOperationalStatus,
+                  prvtRingEpsDefectFop
+                }
+    STATUS      current
+    DESCRIPTION
+       "This trap will be sent by any instance when it notices a defect.
+        So far only the situation when two or more RPL-owners are defined
+        in the ring is identified as a defect. This scenario is noticed when
+        the instance with the RPL-Owner role receives a RAPS packet with the
+        RB bit set in its status field from a different NodeID than its own.
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the instance reporting the change
+        by the indices in the OID of the prvtRingEpsDefectFop
+        variable in the notification."
+    ::= { prvtRingEpsNotifications 1 }
+
+prvtRingEpsSwitchoverAlarm NOTIFICATION-TYPE
+    OBJECTS     { prvtRingEpsState
+                }
+    STATUS      current
+    DESCRIPTION
+       "This trap will be sent by any instance when it changes state.
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the instance reporting the change
+        by the indices in the OID of the prvtRingEpsState
+        variable in the notification."
+    ::= { prvtRingEpsNotifications 2 }
+
+prvtRingEpsSubRingDefectAlarm NOTIFICATION-TYPE
+    OBJECTS     { prvtRingEpsSubRingOperationalStatus,
+                  prvtRingEpsSubRingDefectFop
+                }
+    STATUS      current
+    DESCRIPTION
+       "This trap will be sent by any subring instance when it notices a defect.
+        So far only the situation when two or more RPL-owners are defined
+        in the ring is identified as a defect. This scenario is noticed when
+        the instance with the RPL-Owner role receives a RAPS packet with the
+        RB bit set in its status field from a different NodeID than its own.
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the instance reporting the change
+        by the indices in the OID of the prvtRingEpsDefectFop
+        variable in the notification."
+    ::= { prvtRingEpsNotifications 3 }
+
+prvtRingEpsSubRingSwitchoverAlarm NOTIFICATION-TYPE
+    OBJECTS     { prvtRingEpsSubRingState
+                }
+    STATUS      current
+    DESCRIPTION
+       "This trap will be sent by any subring instance when it changes state.
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the instance reporting the change
+        by the indices in the OID of the prvtRingEpsSubRingState
+        variable in the notification."
+    ::= { prvtRingEpsNotifications 4 }
+
+
+
+
+
+-- ******************************************************************
+-- PRVT-RING-EPS MIB Module - Conformance Information
+-- ******************************************************************
+
+prvtRingEpsCompliances   OBJECT IDENTIFIER ::= { prvtRingEpsConformance 1 }
+prvtRingEpsGroups        OBJECT IDENTIFIER ::= { prvtRingEpsConformance 2 }
+
+-- ******************************************************************
+-- Units of conformance
+-- ******************************************************************
+
+prvtRingEpsGroup OBJECT-GROUP
+    OBJECTS {
+	    prvtRingEpsMode,
+	    prvtRingEpsNodeRole,
+        prvtRingEpsState,
+		prvtRingEpsLocalCommand,
+	    prvtRingEpsControlVlan,
+	    prvtRingEpsPort0Ifindex,
+	    prvtRingEpsPort1Ifindex,
+	    prvtRingEpsRplPort,
+	    prvtRingEpsManualSwitchPort,
+	    prvtRingEpsCfmMdLevel,
+	    prvtRingEpsPort0Mep,
+	    prvtRingEpsPort1Mep,
+		prvtRingEpsRevertive,
+	    prvtRingEpsNoVirtualChannel,
+		prvtRingEpsHoldOffTimer,
+		prvtRingEpsWaitToRestoreTimer,
+		prvtRingEpsGuardTimer,
+        prvtRingEpsWaitToBlockTimer,
+		prvtRingEpsDefectFop,
+		prvtRingEpsPort0Status,
+		prvtRingEpsPort1Status,
+		prvtRingEpsPort0PeerNodeId,
+		prvtRingEpsPort1PeerNodeId,
+		prvtRingEpsPort0PeerCommand,
+		prvtRingEpsPort1PeerCommand,
+		prvtRingEpsPort0PeerStatus,
+		prvtRingEpsPort1PeerStatus,
+		prvtRingEpsOperationalStatus,
+		prvtRingEpsAdminStatus,
+	    prvtRingEpsRowStatus,
+        prvtRingEpsForcedSwitchPort,
+        prvtRingEpsInstanceDescription,
+        prvtRingEpsRingId,
+		prvtRingEpsPort0MonitoringMethod,
+		prvtRingEpsPort1MonitoringMethod
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the RAPS instances group."
+    ::= { prvtRingEpsGroups 1 }
+
+prvtRingEpsVlanGroup OBJECT-GROUP
+    OBJECTS {
+	    prvtRingEpsInstance,
+	    prvtRingEpsVlanRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the RAPS monitored vlans group."
+    ::= { prvtRingEpsGroups 2 }
+
+prvtRingEpsSubRingGroup OBJECT-GROUP
+    OBJECTS {
+        prvtRingEpsSubRingNodeRole,
+        prvtRingEpsSubRingState,
+        prvtRingEpsSubRingLocalCommand,
+        prvtRingEpsSubRingPortIfindex,
+        prvtRingEpsSubRingPortMep,
+        prvtRingEpsSubRingRplPort,
+        prvtRingEpsSubRingVirtualChannelVlan,
+        prvtRingEpsSubRingRevertive,
+        prvtRingEpsSubRingHoldOffTimer,
+        prvtRingEpsSubRingWaitToRestoreTimer,
+        prvtRingEpsSubRingGuardTimer,
+        prvtRingEpsSubRingWaitToBlockTimer,
+        prvtRingEpsSubRingDefectFop,
+        prvtRingEpsSubRingPortStatus,
+        prvtRingEpsSubRingPortPeerNodeId,
+        prvtRingEpsSubRingPeerCommand,
+        prvtRingEpsSubRingPeerStatus,
+        prvtRingEpsSubRingVcPeerNodeId,
+        prvtRingEpsSubRingVcPeerCommand,
+        prvtRingEpsSubRingVcPeerStatus,
+        prvtRingEpsSubRingPropagateTC,
+        prvtRingEpsSubRingOperationalStatus,
+        prvtRingEpsSubRingAdminStatus,
+        prvtRingEpsSubRingRowStatus,
+        prvtRingEpsSubRingControlVlan,
+        prvtRingEpsSubRingDescription,
+        prvtRingEpsSubRingRingId,
+		prvtRingEpsSubRingMonitoringMethod
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the RAPS subring group."
+    ::= { prvtRingEpsGroups 3 }
+
+prvtRingEpsNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+      prvtRingEpsSwitchoverAlarm,
+      prvtRingEpsDefectAlarm,
+      prvtRingEpsSubRingSwitchoverAlarm,
+      prvtRingEpsSubRingDefectAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Notifications group."
+    ::= { prvtRingEpsGroups 4 }
+
+-- ******************************************************************
+-- MIB Module Compliance statements
+-- ******************************************************************
+
+prvtRingEpsCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the Ring EPS MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            prvtRingEpsGroup,
+            prvtRingEpsVlanGroup,
+            prvtRingEpsSubRingGroup,
+            prvtRingEpsNotificationsGroup
+            }
+
+    OBJECT prvtRingEpsRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                               createAndWait(5), destroy(6) }
+      DESCRIPTION "Support for createAndWait is required."
+
+    OBJECT prvtRingEpsVlanRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                               createAndWait(5), destroy(6) }
+      DESCRIPTION "Support for createAndWait is required."
+
+    OBJECT prvtRingEpsSubRingRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                               createAndWait(5), destroy(6) }
+      DESCRIPTION "Support for createAndWait is required."
+
+    ::= { prvtRingEpsCompliances 1 }
+
+END
+

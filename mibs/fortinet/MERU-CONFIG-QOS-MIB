@@ -1,0 +1,708 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-QOS-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlAdmissionControl,
+    MwlDropPolicy,
+    MwlQosRulesMatchClass,
+    MwlQosRulesMatchClassBits,
+    MwlQosProtocol,
+    MwlQosAction,
+    MwlOnOffSwitch,
+    MwlQosCodec,
+    MwlQosCodecProtocol,
+    MwlDscpType
+        FROM MERU-TC;
+
+  mwConfigQoS  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Quality-of-Service Configuration infrastructure"
+    ::= { mwConfiguration 8 } 
+  
+    mwQosVars                                OBJECT IDENTIFIER ::= { mwConfigQoS 1 }
+    mwDscpMarkingMgmtPkts                    OBJECT IDENTIFIER ::= { mwConfigQoS 4 }
+    
+  
+  mwQosVarsQosOnOff  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes On/Off"
+    ::= { mwQosVars    1 }
+
+  mwQosVarsQosAdmissionControl  OBJECT-TYPE
+    SYNTAX MwlAdmissionControl
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Admission Control"
+    ::= { mwQosVars    2 }
+
+  mwQosVarsQosDropPolicy  OBJECT-TYPE
+    SYNTAX MwlDropPolicy
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Drop Policy"
+    ::= { mwQosVars    3 }
+
+  mwQosVarsQosDefaultTimeToLive  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Default Time-to-live (seconds)"
+    ::= { mwQosVars    4 }
+
+  mwQosVarsQosUdpTimeToLive  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes UDP Time-to-live (seconds)"
+    ::= { mwQosVars    5 }
+
+  mwQosVarsQosTcpTimeToLive  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes TCP Time-to-live (seconds)"
+    ::= { mwQosVars    6 }
+
+  mwQosVarsPercentBWScaling  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Bandwidth Scaling (percent)"
+    ::= { mwQosVars    7 }
+
+  mwQosVarsQosMaxCallsPerAp  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Maximum Calls Per AP"
+    ::= { mwQosVars    8 }
+
+  mwQosVarsQosMaxCallsPerInterfRegion  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Maximum Calls Per Interference Region"
+    ::= { mwQosVars    9 }
+
+  mwQosVarsQosLoadBalanceMaxStationsPerAp  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Maximum Stations Per Radio"
+    ::= { mwQosVars   10 }
+
+  mwQosVarsQosLoadBalanceMaxStationsPerBssid  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Maximum Stations Per BSSID"
+    ::= { mwQosVars   11 }
+
+  mwQosVarsQosLoadBalanceOverflow  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Native Load Balance Overflow"
+    ::= { mwQosVars   12 }
+
+  mwQosVarsQosMaxCallsPerBssid  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Maximum Calls Per BSSID"
+    ::= { mwQosVars   13 }
+
+  mwQosVarsQosCacDeauth  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes CAC Deauth"
+    ::= { mwQosVars   14 }
+
+  mwQosVarsQosStationAssignAge  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Assignment Aging Time (seconds)"
+    ::= { mwQosVars   15 }
+
+  mwQosVarsQosSipIdleTimeout  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes SIP Idle Timeout (seconds)"
+    ::= { mwQosVars   16 }
+
+  mwQosRuleTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwQosRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes QoS and Firewall Rules "
+    ::= { mwConfigQoS 2 }
+
+  mwQosRuleEntry  OBJECT-TYPE
+    SYNTAX MwQosRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes QoS and Firewall Rules "
+    INDEX {  mwQosRuleTableIndex  }
+    ::= { mwQosRuleTable 1 }
+
+  MwQosRuleEntry  ::=  SEQUENCE { 
+       mwQosRuleTableIndex                                         Integer32, 
+       mwQosRuleId                                                 Unsigned32,
+       mwQosRuleDscp                                               MwlDscpType,
+       mwQosRuleDstIp                                              IpAddress,
+       mwQosRuleSrcIp                                              IpAddress,
+       mwQosRuleAction                                             MwlQosAction,
+       mwQosRuleDstMask                                            IpAddress,
+       mwQosRuleDstPort                                            Integer32(0..65535),
+       mwQosRuleSrcMask                                            IpAddress,
+       mwQosRuleSrcPort                                            Integer32(0..65535),
+       mwQosRuleProtocol                                           MwlQosProtocol,
+       mwQosRulePriority                                           Integer32(0..8),
+       mwQosRuleIdUfcFlag                                          MwlQosRulesMatchClass,
+       mwQosRuleDstIpFlag                                          MwlQosRulesMatchClassBits,
+       mwQosRuleSrcIpFlag                                          MwlQosRulesMatchClassBits,
+       mwQosRuleL4Protocol                                         Integer32(0..255),
+       mwQosRuleDstPortFlag                                        MwlQosRulesMatchClassBits,
+       mwQosRuleSrcPortFlag                                        MwlQosRulesMatchClassBits,
+       mwQosRuleDstIpUfcFlag                                       MwlQosRulesMatchClassBits,
+       mwQosRuleSrcIpUfcFlag                                       MwlQosRulesMatchClassBits,
+       mwQosRuleAvgPacketRate                                      Unsigned32,
+       mwQosRuleDstPortUfcFlag                                     MwlQosRulesMatchClassBits,
+       mwQosRuleSrcPortUfcFlag                                     MwlQosRulesMatchClassBits,
+       mwQosRuleL4ProtocolFlag                                     MwlQosRulesMatchClassBits,
+       mwQosRuleTrafficControl                                     MwlOnOffSwitch,
+       mwQosRuleLogging                                            MwlOnOffSwitch,
+       mwQosRulePacketMinLength                                    Unsigned32,
+       mwQosRulePacketMaxLength                                    Unsigned32,
+       mwQosRuleTokenBucketRate                                    Unsigned32,
+       mwQosRuleFirewallFilterId                                   DisplayString(SIZE (0..16)),
+       mwQosRuleL4ProtocolUfcFlag                                  MwlQosRulesMatchClassBits,
+       mwQosRulePacketMinLengthFlag                                MwlQosRulesMatchClassBits,
+       mwQosRuleFirewallFilterIdFlag                               MwlQosRulesMatchClassBits,
+       mwQosRulePacketMinLengthUfcFlag                             MwlQosRulesMatchClassBits,
+       mwQosRuleFirewallFilterIdUfcFlag                            MwlQosRulesMatchClassBits,
+       mwQosRuleLoggingFrequency                                   Integer32(30..60),
+       mwQosRuleRowStatus                                          RowStatus 
+  }
+   
+   
+  mwQosRuleTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwQosRuleEntry 1 }
+
+  mwQosRuleId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes ID"
+    ::= { mwQosRuleEntry    2 }
+
+  mwQosRuleDscp  OBJECT-TYPE
+    SYNTAX MwlDscpType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes DiffServ Codepoint"
+    ::= { mwQosRuleEntry    3 }
+
+  mwQosRuleDstIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination IP"
+    ::= { mwQosRuleEntry    4 }
+
+  mwQosRuleSrcIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Source IP"
+    ::= { mwQosRuleEntry    5 }
+
+  mwQosRuleAction  OBJECT-TYPE
+    SYNTAX MwlQosAction
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Action"
+    ::= { mwQosRuleEntry    6 }
+
+  mwQosRuleDstMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination Netmask"
+    ::= { mwQosRuleEntry    7 }
+
+  mwQosRuleDstPort  OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination Port"
+    ::= { mwQosRuleEntry    8 }
+
+  mwQosRuleSrcMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Source Netmask"
+    ::= { mwQosRuleEntry    9 }
+
+  mwQosRuleSrcPort  OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Source Port"
+    ::= { mwQosRuleEntry   10 }
+
+  mwQosRuleProtocol  OBJECT-TYPE
+    SYNTAX MwlQosProtocol
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes QoS Protocol"
+    ::= { mwQosRuleEntry   11 }
+
+  mwQosRulePriority  OBJECT-TYPE
+    SYNTAX Integer32(0..8)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Priority"
+    ::= { mwQosRuleEntry   12 }
+
+  mwQosRuleIdUfcFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClass
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Id Class flow class"
+    ::= { mwQosRuleEntry   13 }
+
+  mwQosRuleDstIpFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination IP match"
+    ::= { mwQosRuleEntry   14 }
+
+  mwQosRuleSrcIpFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Source IP match"
+    ::= { mwQosRuleEntry   15 }
+
+  mwQosRuleL4Protocol  OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Network Protocol"
+    ::= { mwQosRuleEntry   16 }
+
+  mwQosRuleDstPortFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination Port match"
+    ::= { mwQosRuleEntry   18 }
+
+  mwQosRuleSrcPortFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Source Port match"
+    ::= { mwQosRuleEntry   19 }
+
+  mwQosRuleDstIpUfcFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination IP flow class"
+    ::= { mwQosRuleEntry   20 }
+
+  mwQosRuleSrcIpUfcFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Source IP flow class"
+    ::= { mwQosRuleEntry   21 }
+
+  mwQosRuleAvgPacketRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Average Packet Rate"
+    ::= { mwQosRuleEntry   22 }
+
+  mwQosRuleDstPortUfcFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination Port flow class"
+    ::= { mwQosRuleEntry   23 }
+
+  mwQosRuleSrcPortUfcFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Source Port flow class"
+    ::= { mwQosRuleEntry   24 }
+
+  mwQosRuleL4ProtocolFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Network Protocol match"
+    ::= { mwQosRuleEntry   25 }
+
+  mwQosRuleTrafficControl  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Traffic Control"
+    ::= { mwQosRuleEntry   26 }
+
+  mwQosRuleLogging  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Qos Rule Logging"
+    ::= { mwQosRuleEntry   27 }
+
+  mwQosRulePacketMinLength  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Packet minimum length"
+    ::= { mwQosRuleEntry   28 }
+
+  mwQosRulePacketMaxLength  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Packet maximum length"
+    ::= { mwQosRuleEntry   29 }
+
+  mwQosRuleTokenBucketRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Token Bucket Rate"
+    ::= { mwQosRuleEntry   30 }
+
+  mwQosRuleFirewallFilterId  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..16))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Firewall Filter ID"
+    ::= { mwQosRuleEntry   31 }
+
+  mwQosRuleL4ProtocolUfcFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Network Protocol flow class"
+    ::= { mwQosRuleEntry   32 }
+
+  mwQosRulePacketMinLengthFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Packet Length match"
+    ::= { mwQosRuleEntry   33 }
+
+  mwQosRuleFirewallFilterIdFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Filter Id match"
+    ::= { mwQosRuleEntry   34 }
+
+  mwQosRulePacketMinLengthUfcFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Packet Length flow class"
+    ::= { mwQosRuleEntry   35 }
+
+  mwQosRuleFirewallFilterIdUfcFlag  OBJECT-TYPE
+    SYNTAX MwlQosRulesMatchClassBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Filter Id Flow Class"
+    ::= { mwQosRuleEntry   36 }
+
+  mwQosRuleLoggingFrequency  OBJECT-TYPE
+    SYNTAX Integer32(30..60)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Qos Rule Logging Frequency"
+    ::= { mwQosRuleEntry   37 }
+
+  mwQosRuleRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwQosRuleEntry 48 }
+
+  mwQosCodecTranslRuleTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwQosCodecTranslRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes QoS Codec Rules "
+    ::= { mwConfigQoS 3 }
+
+  mwQosCodecTranslRuleEntry  OBJECT-TYPE
+    SYNTAX MwQosCodecTranslRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes QoS Codec Rules "
+    INDEX {  mwQosCodecTranslRuleTableIndex  }
+    ::= { mwQosCodecTranslRuleTable 1 }
+
+  MwQosCodecTranslRuleEntry  ::=  SEQUENCE { 
+       mwQosCodecTranslRuleTableIndex                              Integer32, 
+       mwQosCodecTranslRuleId                                      Unsigned32,
+       mwQosCodecTranslRuleQosCtrProtocol                          MwlQosCodecProtocol,
+       mwQosCodecTranslRuleQosCtrCodecEnum                         MwlQosCodec,
+       mwQosCodecTranslRuleQosCtrRspecRate                         Unsigned32,
+       mwQosCodecTranslRuleQosCtrRspecSlack                        Unsigned32,
+       mwQosCodecTranslRuleQosCtrSampleRate                        Unsigned32,
+       mwQosCodecTranslRuleQosCtrTspecPeakRate                     Unsigned32,
+       mwQosCodecTranslRuleQosCtrTspecMinPolicedUnit               Unsigned32,
+       mwQosCodecTranslRuleQosCtrTspecTokenBucketRate              Unsigned32,
+       mwQosCodecTranslRuleQosCtrTspecTokenBucketSize              Unsigned32,
+       mwQosCodecTranslRuleQosCtrTspecMaxDatagramSize              Unsigned32,
+       mwQosCodecTranslRuleRowStatus                               RowStatus 
+  }
+   
+   
+  mwQosCodecTranslRuleTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwQosCodecTranslRuleEntry 1 }
+
+  mwQosCodecTranslRuleId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes ID"
+    ::= { mwQosCodecTranslRuleEntry    2 }
+
+  mwQosCodecTranslRuleQosCtrProtocol  OBJECT-TYPE
+    SYNTAX MwlQosCodecProtocol
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes QoS Protocol"
+    ::= { mwQosCodecTranslRuleEntry    3 }
+
+  mwQosCodecTranslRuleQosCtrCodecEnum  OBJECT-TYPE
+    SYNTAX MwlQosCodec
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Codec"
+    ::= { mwQosCodecTranslRuleEntry    4 }
+
+  mwQosCodecTranslRuleQosCtrRspecRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Reservation Rate (0-1,000,000 bytes/second)"
+    ::= { mwQosCodecTranslRuleEntry    5 }
+
+  mwQosCodecTranslRuleQosCtrRspecSlack  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Reservation  Slack (0-1,000,000 microseconds)"
+    ::= { mwQosCodecTranslRuleEntry    6 }
+
+  mwQosCodecTranslRuleQosCtrSampleRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Packet Rate (0-200 packets/second)"
+    ::= { mwQosCodecTranslRuleEntry    7 }
+
+  mwQosCodecTranslRuleQosCtrTspecPeakRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Peak Rate (0-1,000,000 bytes/second)"
+    ::= { mwQosCodecTranslRuleEntry    8 }
+
+  mwQosCodecTranslRuleQosCtrTspecMinPolicedUnit  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Minimum Policed Unit (0-1,500 bytes)"
+    ::= { mwQosCodecTranslRuleEntry    9 }
+
+  mwQosCodecTranslRuleQosCtrTspecTokenBucketRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Token Bucket Rate (0-1,000,000 bytes/second)"
+    ::= { mwQosCodecTranslRuleEntry   10 }
+
+  mwQosCodecTranslRuleQosCtrTspecTokenBucketSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Token Bucket Size (0-16,000 bytes)"
+    ::= { mwQosCodecTranslRuleEntry   11 }
+
+  mwQosCodecTranslRuleQosCtrTspecMaxDatagramSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Maximum Packet Size (0-1,500 bytes)"
+    ::= { mwQosCodecTranslRuleEntry   12 }
+
+  mwQosCodecTranslRuleRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwQosCodecTranslRuleEntry 14 }
+
+  mwDscpMarkingMgmtPktsDscpControllerToEzRF  OBJECT-TYPE
+    SYNTAX MwlDscpType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller To EzRF"
+    ::= { mwDscpMarkingMgmtPkts    2 }
+
+  mwDscpMarkingMgmtPktsDscpControllerToAp  OBJECT-TYPE
+    SYNTAX MwlDscpType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller to AP"
+    ::= { mwDscpMarkingMgmtPkts    3 }
+
+  mwDscpMarkingMgmtPktsDscpApToController  OBJECT-TYPE
+    SYNTAX MwlDscpType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP to Controller"
+    ::= { mwDscpMarkingMgmtPkts    4 }
+
+  
+END
+   

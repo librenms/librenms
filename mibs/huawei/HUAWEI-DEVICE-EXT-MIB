@@ -1,0 +1,120 @@
+--====================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: Huawei Device extent MIB File for base device infomation
+-- Reference:
+-- Version: V2.01
+-- History:
+-- V1.0 2009-01-05, publish
+-- ===================================================================
+    HUAWEI-DEVICE-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, IpAddress            
+                FROM SNMPv2-SMI            
+            RowStatus,DateAndTime            
+                FROM SNMPv2-TC
+           SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB;         -- [RFC3411]             
+    
+    
+        hwDeviceExt MODULE-IDENTITY 
+            LAST-UPDATED "201612231414Z"
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+                    Bantian, Longgang
+                     Shenzhen 518129
+                     People's Republic of China
+                     Website: http://www.huawei.com
+                     Email: support@huawei.com
+                   "
+            DESCRIPTION 
+                "The MIB module for collect base device information."
+            REVISION "201612231414Z"
+            DESCRIPTION
+                "modify the description."
+            REVISION "200812171414Z"
+            DESCRIPTION 
+                "The initial revision of this MIB module ."
+            ::= { hwDatacomm 188 }     
+    
+        
+        hwDeviceExtObject OBJECT IDENTIFIER ::= { hwDeviceExt 1 }
+
+        hwDeviceEsn OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The equipment serial number of device.Its type is string.If the esn of lr0 is xxx,
+                 then the esn of lrn is xxx.ss,ss is the lrn's id."  
+            ::= { hwDeviceExtObject 1 }
+            
+        hwPlatformName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of a platform."  
+            ::= { hwDeviceExtObject 2 }
+            
+        hwPlatformVersion OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The version of a platform."  
+            ::= { hwDeviceExtObject 3 }               
+            
+        hwProductName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of a product."  
+            ::= { hwDeviceExtObject 4 }   
+            
+        hwProductVersion OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The version of a product."  
+            ::= { hwDeviceExtObject 5 }
+
+        
+        hwDeviceExtConformance OBJECT IDENTIFIER ::= { hwDeviceExt 4 }
+        
+        hwDeviceExtCompliances OBJECT IDENTIFIER ::= { hwDeviceExtConformance 1 }  
+
+        hwDeviceExtCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Compliance statement for agents that provide full support for 
+                hwDeviceExt."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwDeviceInfoGroup }
+            ::= { hwDeviceExtCompliances 1 }
+
+        hwDeviceExtGroups OBJECT IDENTIFIER ::= { hwDeviceExtConformance 2 }
+     
+        hwDeviceInfoGroup OBJECT-GROUP
+            OBJECTS { hwDeviceEsn, 
+                      hwPlatformName, 
+                      hwPlatformVersion, 
+                      hwProductName, 
+                      hwProductVersion
+                    }
+            STATUS current
+            DESCRIPTION 
+                "Group for base device information."
+            ::= { hwDeviceExtGroups 1 }
+                                  
+    
+    END

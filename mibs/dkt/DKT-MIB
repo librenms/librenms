@@ -1,0 +1,18 @@
+DKT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises                FROM SNMPv2-SMI;
+
+dkt MODULE-IDENTITY
+    LAST-UPDATED  "200802240000Z"
+    ORGANIZATION  "DKT A/S"
+    CONTACT-INFO
+        "postal: DKT A/S
+                 Fanoevej 6
+                 DK-4060 Kirke Saaby
+                 Denmark
+
+         email:  info@dkt.dk"
+    DESCRIPTION   "Base MIB for DKT."
+    ::= { enterprises 27304 }
+END

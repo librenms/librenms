@@ -25,12 +25,13 @@
 
 namespace LibreNMS\Tests;
 
-class DBTestCase extends TestCase
+abstract class DBTestCase extends LaravelTestCase
 {
     public function setUp()
     {
         parent::setUp();
         $this->dbSetUp();
+        set_debug(false);
     }
 
     public function tearDown()

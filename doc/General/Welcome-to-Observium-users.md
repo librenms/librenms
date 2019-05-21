@@ -1,4 +1,5 @@
 source: General/Welcome-to-Observium-users.md
+path: blob/master/doc/
 
 LibreNMS is a fork of Observium.  The reason for the fork has nothing to do
 with Observium's [move to community vs. paid versions][1].  It is simply

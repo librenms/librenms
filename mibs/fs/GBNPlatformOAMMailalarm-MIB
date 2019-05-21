@@ -1,0 +1,160 @@
+------------------------------------------------------------------------------
+--
+--  File              : gbnPlatformOAMMailalarm-MIB.mi2
+--  Description       : Mailalarm configuration MIB 
+--  Version           : 1.0  
+--  Date              : Jul 25, 2005     
+--  Author            : wukaijian
+--  Copyright (c) 2001-2008 admin Co. Ltd.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+
+    GBNPlatformOAMMailalarm-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter32, Gauge32,
+        Unsigned32, Integer32,
+        IpAddress, NOTIFICATION-TYPE            FROM SNMPv2-SMI
+        
+        RowStatus, TruthValue, 
+        DisplayString, MacAddress               FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        snmpTraps                               FROM SNMPv2-MIB
+        
+        gbnPlatformOAM                          FROM GBNPlatformOAM-MIB;
+    
+    gbnPlatformOAMMailalarm  MODULE-IDENTITY
+        LAST-UPDATED    "0507250000Z"  -- Jul 25, 2005
+        ORGANIZATION    "admin Co. Ltd"
+        CONTACT-INFO    "admin Co. Ltd
+                         E-mail: service@admin.com.cn"
+
+        DESCRIPTION     "Mailalarm mib definition."
+
+        REVISION        "0507250000Z"  -- Jul 25, 2005
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnPlatformOAM 12 }
+        
+	mailalarmState OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable or disable Mailalarm."
+            --打开或关闭邮件告警功能。
+        ::= { gbnPlatformOAMMailalarm 1 } 
+        
+     mailalarmSrvAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "the address of the SMTP server used by Mailalarm."
+            --邮件告警使用的SMTP服务器地址。
+        ::= { gbnPlatformOAMMailalarm 2 }
+        
+	mailalarmRceiverAddr OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..127))
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "the e-mail address of the receiver."
+            --邮件接收者的e-mail地址。
+        ::= { gbnPlatformOAMMailalarm 3 }         
+                     
+    mailalarmLogLevel OBJECT-TYPE
+        SYNTAX   INTEGER (0..7)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "the mailalarm level of syslog."
+            --发送邮件告警的syslog级别。
+        ::= { gbnPlatformOAMMailalarm 4 }
+
+	mailalarmSmtpAuthEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable or disable smtp authentication."
+            --使能或禁止smtp身份验证。
+        ::= { gbnPlatformOAMMailalarm 5 }
+
+	mailalarmSmtpUsername OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..31))
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "smtp username."
+            --smtp用户帐号。
+        ::= { gbnPlatformOAMMailalarm 6 }
+               
+	mailalarmSmtpPasswd OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..31))
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "smtp password."
+            --smtp用户密码。
+        ::= { gbnPlatformOAMMailalarm 7 }
+                               
+------------------------------------------------------------------------------     
+--  mailalarmCcAddrTable:
+------------------------------------------------------------------------------
+
+    mailalarmCcAddrTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF MailalarmCcAddrEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "the e-mail address table of the Cc. receiver."
+            --需要抄送的邮件接收者e-mail地址表。
+        ::= { gbnPlatformOAMMailalarm 8 }   
+        
+    mailalarmCcAddrEntry OBJECT-TYPE
+        SYNTAX   MailalarmCcAddrEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "the e-mail address entry of the Cc. receiver."
+            --需要抄送的邮件接收者e-mail地址条目。
+        INDEX { mailalarmCcAddrIdx }
+        ::= { mailalarmCcAddrTable 1 }
+        
+    MailalarmCcAddrEntry ::=
+	    SEQUENCE {
+	        mailalarmCcAddrIdx
+	            INTEGER (0..3),
+	        mailalarmCcAddr
+	        	OCTET STRING (SIZE (0..127))       	            
+	        }
+                 
+	mailalarmCcAddrIdx OBJECT-TYPE
+        SYNTAX   INTEGER (0..3)
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "the index of the address entry."
+            --地址条目的索引。
+        ::= { mailalarmCcAddrEntry 1 }               
+                 
+	mailalarmCcAddr OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..127))
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "the e-mail address of the Cc. receiver."
+            --需要抄送的邮件接收者e-mail地址。
+        ::= { mailalarmCcAddrEntry 2 } 
+                                                   
+   END

@@ -26,32 +26,20 @@
 foreach ($pre_cache['fabos_sensors'] as $data) {
     if (is_numeric($data['swSensorValue']) && $data['swSensorValue'] !== '-2147483648') {
         $descr = $data['swSensorInfo'];
-        $state_index_id = create_state_index($descr);
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id, 'unknown', 0, 1, 3),
-                array($state_index_id, 'faulty', 1, 2, 2),
-                array($state_index_id, 'below-min', 1, 3, 1),
-                array($state_index_id, 'nominal', 1, 4, 0),
-                array($state_index_id, 'above-max', 1, 5, 1),
-                array($state_index_id, 'absent', 1, 6, 1),
-            );
+        $states = [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'faulty'],
+            ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'below-min'],
+            ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'nominal'],
+            ['value' => 5, 'generic' => 1, 'graph' => 1, 'descr' => 'above-max'],
+            ['value' => 6, 'generic' => 1, 'graph' => 1, 'descr' => 'absent'],
+        ];
+        create_state_index($state_name, $states);
 
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
         $index = $data['swSensorIndex'];
         $oid = '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.' . $index;
         $value = $data['swSensorStatus'];
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $descr, $descr, '1', '1', null, null, null, null, $value);
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $descr, $descr, 1, 1, null, null, null, null, $value);
         create_sensor_to_state_index($device, $descr, $index);
     }
 }

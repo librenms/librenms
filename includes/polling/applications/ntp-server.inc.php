@@ -1,16 +1,34 @@
 <?php
 
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
-//NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ntp-server"
 $name = 'ntp-server';
 $app_id = $app['app_id'];
-$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.116.112.45.115.101.114.118.101.114';
-$ntpserver_data = snmp_get($device, $oid, '-Oqv');
-$ntpserver_data = str_replace('"', '', $ntpserver_data);
-list ($stratum, $offset, $frequency, $jitter, $noise, $stability, $uptime, $buffer_recv, $buffer_free, $buffer_used, $packets_drop, $packets_ignore, $packets_recv, $packets_sent) = explode("\n", $ntpserver_data);
 
-echo ' '.$name;
+echo $name;
+
+try {
+    $ntp=json_app_get($device, $name);
+} catch (JsonAppParsingFailedException $e) {
+    // Legacy script, build compatible array
+    $legacy = $e->getOutput();
+
+    $ntp=array(
+        data => array(),
+    );
+
+    list ($ntp['data']['stratum'], $ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['jitter'],
+          $ntp['data']['noise'], $ntp['data']['stability'], $ntp['data']['uptime'], $ntp['data']['buffer_recv'],
+          $ntp['data']['buffer_free'], $ntp['data']['buffer_used'], $ntp['data']['packets_drop'],
+          $ntp['data']['packets_ignore'], $ntp['data']['packets_recv'], $ntp['data']['packets_sent']) = explode("\n", $legacy);
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    return;
+}
+
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -31,23 +49,23 @@ $rrd_def = RrdDefinition::make()
 
 
 $fields = array(
-    'stratum'        => $stratum,
-    'offset'         => $offset,
-    'frequency'      => $frequency,
-    'jitter'         => $jitter,
-    'noise'          => $noise,
-    'stability'      => $stability,
-    'uptime'         => $uptime,
-    'buffer_recv'    => $buffer_recv,
-    'buffer_free'    => $buffer_free,
-    'buffer_used'    => $buffer_used,
-    'packets_drop'   => $packets_drop,
-    'packets_ignore' => $packets_ignore,
-    'packets_recv'   => $packets_recv,
-    'packets_sent'   => $packets_sent,
+    'stratum'        => $ntp['data']['stratum'],
+    'offset'         => $ntp['data']['offset'],
+    'frequency'      => $ntp['data']['frequency'],
+    'jitter'         => $ntp['data']['sys_jitter'],
+    'noise'          => $ntp['data']['clk_jitter'],
+    'stability'      => $ntp['data']['clk_wander'],
+    'uptime'         => $ntp['data']['time_since_reset'],
+    'buffer_recv'    => $ntp['data']['receive_buffers'],
+    'buffer_free'    => $ntp['data']['free_receive_buffers'],
+    'buffer_used'    => $ntp['data']['used_receive_buffers'],
+    'packets_drop'   => $ntp['data']['dropped_packets'],
+    'packets_ignore' => $ntp['data']['ignored_packets'],
+    'packets_recv'   => $ntp['data']['received_packets'],
+    'packets_sent'   => $ntp['data']['packets_sent'],
 );
 
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-update_application($app, $ntpserver_data, $fields);
+update_application($app, 'OK', $fields);

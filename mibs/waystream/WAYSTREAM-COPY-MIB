@@ -1,0 +1,178 @@
+WAYSTREAM-COPY-MIB DEFINITIONS ::= BEGIN
+--
+-- This is the Waystream MIB definition for the iBOS file copy function
+--
+-- Copyright (c) 2017 Waystream AB, All rights reserved
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+        Unsigned32
+	FROM SNMPv2-SMI
+	
+	DisplayString
+	FROM SNMPv2-TC
+	
+        wsExperiment
+        FROM WAYSTREAM-SMI;
+
+
+wsCopy  MODULE-IDENTITY
+    LAST-UPDATED "201702101100Z"	-- February 10, 2017
+    ORGANIZATION "Waystream AB"
+    CONTACT-INFO
+        "Waystream AB
+         Customer Service
+
+         Mail : Farogatan 33
+                SE-164 51 Kista
+                Sweden
+
+         Tel  : +46 8 5626 9450
+
+         E-mail: info@waystream.com
+         Web   : http://www.waystream.com"
+    DESCRIPTION
+        "MIB describing the file copy functions available on Waystream ASRs"
+
+    REVISION "201702101100Z"	-- February 10, 2017
+    DESCRIPTION
+        "Company name change:
+	 In October 2015 PacketFront Network Products was renamed Waystream.
+	 In this update all PacketFront were changed to Waystream and all
+	 pf* to ws*."
+    REVISION "201101111735Z"	-- January 11th, 2011
+    DESCRIPTION
+        "Updated company name"
+    REVISION "200903231117Z"
+    DESCRIPTION
+        "Updated telephone information in contact-info"
+    REVISION "200809101538Z"
+    DESCRIPTION
+        "Initial - moved pfCopy from PACKETFRONT-MIB"
+
+        ::= { wsExperiment 2 }
+
+
+-- Get filehandle
+wsCopyNextState	OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Generate a unique filehandle. The filehandle is
+                         used with the other objects in the wsCopy branch
+                         to set the source and destination and commence
+                         file transfer activities."
+                ::= { wsCopy 1 }
+
+-- the ws Copy table
+-- Table with states of current copy sessions.
+wsCopyTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsCopyEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A list of current copy sessions. The next available entry is
+			 given by the value of wsCopyNextState."
+		::= { wsCopy 2 }
+
+wsCopyEntry	OBJECT-TYPE
+		SYNTAX WsCopyEntry 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for a copy session."
+		INDEX { wsCopyIndex }
+		::= { wsCopyTable 1 }
+
+WsCopyEntry ::=
+	SEQUENCE {
+		wsCopyIndex		Unsigned32,
+		wsCopySource		DisplayString,
+		wsCopyDestination	DisplayString,
+		wsCopyStatus		INTEGER,
+		wsCopyError		DisplayString
+	}
+
+
+wsCopyIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A unique value for each copy session."
+		::= { wsCopyEntry 1 }
+
+-- Set copy source
+wsCopySource 	OBJECT-TYPE
+                SYNTAX DisplayString (SIZE (0..255))
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "The source URL for a filhandle. The string 
+                         provided must match an acceptable URL as 
+                         typed in the command line interface copy command."
+                ::= { wsCopyEntry 2 }
+
+-- Set copy destination
+wsCopyDestination	OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (0..255))
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The destination filename for a filehandle. The
+                                 string provided must match an acceptable destination
+                                 as typed in the command line interface copy command."
+                        ::= { wsCopyEntry 3 }
+
+-- Set/Get copy status
+wsCopyStatus   	OBJECT-TYPE
+                SYNTAX INTEGER {
+                       notused(0),
+                       start(1),
+                       stop(2),
+                       destroy(3),
+                       init(4),
+                       inprogress(5),
+                       failed(6),
+                       finished(7)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "The status of a filehandle
+
+                         notused - Get: The filehandle has not been used during the last 24 hours
+                                   Set: Not possible
+                         start - Get: Not possible
+                                 Set: Start filetransfer
+                         stop - Get: Not possible
+                                Set: Stop filetransfer in progress
+                         destroy - Get: Not possible
+                                   Set: Remove source and destination entries for filehandle
+                         init - Get: Filtransfer started
+                                Set: Not possible
+                         inprogress - Get: Filetransfer in progress
+                                      Set: Not possible
+                         failed - Get: A failure occured during last filetransfer
+                                  Set: Not possible
+                         finished - Get: The file was successfully transferred and stored 
+                                    Set: not possible
+                        "
+                ::= { wsCopyEntry 4 }
+
+wsCopyError	OBJECT-TYPE
+                SYNTAX DisplayString (SIZE (0..255))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "A textual description of the filehandle last
+                         error status. If the filehandle does not exist or
+                         has not been used for the last 24 hours, a 'No Error'
+                         message is returned."
+                ::= { wsCopyEntry 5 }
+
+
+END

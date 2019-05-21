@@ -1,0 +1,190 @@
+-- This module defines enterprise MIBs for VPN IKE info
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VPN-IKE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenVpnIkeMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor 
+         VPN IKE info"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No comment"
+    REVISION      "200105140000Z" -- May 14, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVpnMibModule 3 }
+
+NsVpnIkeEntry ::= SEQUENCE
+{
+    nsVpnIkeIndex            Integer32,
+    nsVpnIkeName             DisplayString,
+    nsVpnIkeReplayProc       INTEGER,
+    nsVpnIkeGWTun            DisplayString,
+    nsVpnIkePh2ProOne        DisplayString,
+    nsVpnIkePh2ProTwo        DisplayString,
+    nsVpnIkePh2ProThree      DisplayString,
+    nsVpnIkePh2ProFour       DisplayString,
+    nsVpnIkeMonitorEnable    INTEGER,
+    nsVpnIkeTransMode        INTEGER,
+    nsVpnIkeVsys             Integer32
+}
+
+nsVpnIke OBJECT IDENTIFIER ::= { netscreenVpn 3 }
+
+nsVpnIkeTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnIkeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "IPSec supports the automated generation and negotiation of
+         keys and security associations using the Internet Key
+         Exchange(IKE) protocol. This table collects the IKE
+         configuration in NetScreen device."
+    ::= { nsVpnIke 1 }
+
+nsVpnIkeEntry OBJECT-TYPE
+    SYNTAX        NsVpnIkeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnIkeTable holds a set of configuration
+         parameters associated with an IKE."
+    INDEX
+        { nsVpnIkeIndex }
+    ::= { nsVpnIkeTable 1 }
+
+nsVpnIkeIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for  ike table.  Its value ranges between 0 and
+         65535 and may not be contiguous."
+    ::= { nsVpnIkeEntry 1 }
+
+nsVpnIkeName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Each IKE configuration can have a readable name."
+    ::= { nsVpnIkeEntry 2 }
+
+nsVpnIkeReplayProc OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Replay Protection"
+    ::= { nsVpnIkeEntry 3 }
+
+nsVpnIkeGWTun OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Remote Gateway Tunnel Name"
+    ::= { nsVpnIkeEntry 4 }
+
+nsVpnIkePh2ProOne OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase 2 Proposal one"
+    ::= { nsVpnIkeEntry 5 }
+
+nsVpnIkePh2ProTwo OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase 2 Proposal two"
+    ::= { nsVpnIkeEntry 6 }
+
+nsVpnIkePh2ProThree OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase 2 Proposal three"
+    ::= { nsVpnIkeEntry 7 }
+
+nsVpnIkePh2ProFour OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase 2 Proposal four"
+    ::= { nsVpnIkeEntry 8 }
+
+nsVpnIkeMonitorEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable to monitor VPN tunnel's link status."
+    ::= { nsVpnIkeEntry 9 }
+
+nsVpnIkeTransMode OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Transport Mode   Enable (For L2TP-over-IPSec only)"
+    ::= { nsVpnIkeEntry 10 }
+
+nsVpnIkeVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys the configuration belongs to."
+    ::= { nsVpnIkeEntry 11 }
+
+END
+
+

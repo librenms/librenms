@@ -1,10 +1,10 @@
 MIMOSA-NETWORKS-BFIVE-MIB DEFINITIONS ::= BEGIN
 
---  Copyright (C) 2016, Mimosa Networks, Inc. All Rights Reserved.
+--  Copyright (C) 2017, Mimosa Networks, Inc. All Rights Reserved.
 --
 --  Mimosa Networks MIB
---  Revision: 1.01
---  Date: October 24, 2016
+--  Revision: 1.02
+--  Date: April 28, 2017
 --
 --  Mimosa Networks, Inc.
 --  469 El Camino Real Ste 100
@@ -63,9 +63,9 @@ mimosaB5Module MODULE-IDENTITY
         email: support@mimosa.co"
     DESCRIPTION
 		"Mimosa device MIB definitions"
-	REVISION	"201610240000Z"
+	REVISION	"201704280000Z"
     DESCRIPTION
-		"Compatible with Firmware 1.4.1"
+		"Compatible with Firmware 1.4.5"
     ::= { mimosaConformanceGroup 1 }
 
 mimosaGeneral       OBJECT IDENTIFIER ::= { mimosaWireless 1 }
@@ -380,7 +380,7 @@ mimosaChain OBJECT-TYPE
     ::= { mimosaChainEntry 1 }
 
 mimosaTxPower OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      DecimalOne
     UNITS       "dBm"
     MAX-ACCESS  read-only
     STATUS      current
@@ -390,7 +390,7 @@ mimosaTxPower OBJECT-TYPE
     ::= { mimosaChainEntry 2 }
 
 mimosaRxPower OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      DecimalOne
     UNITS       "dBm"
     MAX-ACCESS  read-only
     STATUS      current
@@ -400,7 +400,7 @@ mimosaRxPower OBJECT-TYPE
     ::= { mimosaChainEntry 3 }
 
 mimosaRxNoise OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      DecimalOne
     UNITS       "dBm"
     MAX-ACCESS  read-only
     STATUS      current
@@ -409,7 +409,7 @@ mimosaRxNoise OBJECT-TYPE
     ::= { mimosaChainEntry 4 }
 
 mimosaSNR OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      DecimalOne
     UNITS       "dB"
     MAX-ACCESS  read-only
     STATUS      current
@@ -465,7 +465,7 @@ MimosaStreamEntry ::=
         mimosaTxPhy        Integer32,
         mimosaTxMCS        Integer32,
         mimosaTxWidth      Integer32,
-	 mimosaRxPhy        Integer32,
+	mimosaRxPhy        Integer32,
         mimosaRxMCS        Integer32,
         mimosaRxWidth      Integer32,
 	mimosaRxEVM        DecimalOne
@@ -536,7 +536,7 @@ mimosaRxWidth OBJECT-TYPE
     ::= { mimosaStreamEntry 7 }
 
 mimosaRxEVM OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      DecimalOne
     UNITS       "dB"
     MAX-ACCESS  read-only
     STATUS      current
@@ -956,4 +956,3 @@ mimosaNtpServer OBJECT-TYPE
     ::= { mimosaServices 8 }
 
 END
-

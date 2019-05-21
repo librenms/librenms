@@ -1,0 +1,35 @@
+mib: SMARTNODE-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: cpuTable
+                  value: cpuWorkloadCurrent
+                  num_oid: '.1.3.6.1.4.1.1768.100.70.10.2.1.2.{{ $index }}'
+                  descr: '{{ $cpuDescr }} Processor'
+                  index: 'cpu.{{ $index }}'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: tempProbeTable
+                    value: currentDegreesCelsius
+                    num_oid: '.1.3.6.1.4.1.1768.100.70.30.2.1.2.{{ $index }}'
+                    descr: '{{ $tempProbeDescr }}'
+                    index: 'temp.{{ $index }}'
+        count:
+            data:
+                -
+                    oid: gwTable
+                    value: gwCurrentOngoingCalls
+                    num_oid: '.1.3.6.1.4.1.1768.100.70.40.2.1.3.{{ $index }}'
+                    descr: '{{ $gwDescr }} ongoing calls'
+                    index: 'gw-{{ $index }}'
+                    group: 'Ongoing calls'
+                -
+                    oid: isdnPortTable
+                    value: isdnPortCurrentOngoingCalls
+                    num_oid: '.1.3.6.1.4.1.1768.100.70.50.2.1.3.{{ $index }}'
+                    descr: '{{ $isdnPortDescr }} ongoing calls'
+                    index: 'isdn-{{ $index }}'
+                    group: 'Ongoing calls'

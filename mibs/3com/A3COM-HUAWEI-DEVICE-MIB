@@ -1,0 +1,2198 @@
+-- ==================================================================
+-- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: Lan Switch Device Physical Information MIB
+-- Reference:
+-- Version: V3.61
+-- History:
+--    v1.0 (1) Created by Hou Qiang, 2001.5.15
+--         (2) Revised by Qi Zhenglin, 2002.01.08 ----r003 revision
+--    v1.1 2004-7-12 add some card type define(hwLswSlotType 119-138)
+--    v1.2 add enum value from 42 to 49 in hwLswPortType.
+--    v1.3 2004-7-29 add some port type define(hwLswPortType 50-58)
+--    v1.4 2004-8-11 add some slot type define
+--                    (hwLswSlotType    type_LSA1FP8U(139))
+--                    (hwLswSubslotType type_LSA1FP8U(139))
+--    v1.5 2004-08-25 change emunation name
+--                     from type_LS81SFCA(120) to type_LS81SRPG0(120),
+--                     from type_LS81SFCB(121) to type_LS81SRPG1(121),
+--                     from type_LS81SFCC(122) to type_LS81SRPG2(122),
+--                     from type_LS81SFCD(123) to type_LS81SRPG3(123).
+--                    modify comments for these emunations as well.
+--    v1.6 2004-8-26 add some port types define(h2LswPortType 59-71)
+--    v1.7 2004-09-08 add enum value from 140 to 148 in hwLswSlotType and hwLswSubSlotType by kangyinan
+--    v1.8 2004-09-14 add enum value from 149 to 157 in hwLswSlotType and hwLswSubSlotType by wangyahui
+--                    add enum value from 158 to 159 in hwLswSlotType and hwLswSubSlotType by kangyinan
+--                    add enum value from 72 to 93 in hwLswPortType by wangyahui
+--                    add enum value from 94 to 96 in hwLswPortType by kangyinan
+--                    add type description for type_SP4, type_UP1, type_XP4 by kangyinan
+--    v1.9 2004-10-12 updated by gaolong
+--         Change all underscore('_') characters to hyphen characters('-') because underscore character is not allowed in MIB module.
+--         The change refers to the value of hwLswSlotType, hwLswSlotAdminStatus, hwLswSubslotType, hwLswPortType, hwLswSubslotAdminStatus
+--         Change MAX-ACCESS clause value of hwLswPortLoopbackOperate from write-only to read-write, and
+--         update its DESCRIPTION.
+--    v2.0 2004-10-19 add enum value from 160 to 162 in hwLswSlotType and hwLswSubSlotType by kangyinan
+--                    add enum value 97 in hwLswPortType by kangyinan
+--    v2.1  2004-11-23 add enum value from 163 to 166 in hwLswSlotType and hwLswSubSlotType by zhangchengmei
+--    V2.2  2004-12-23 add enum value from 167 to 169 in hwLswSlotType and hwLswSubSlotType by zhangjianfeng
+--    V2.3  2004-12-26 add enum value 170 in hwLswSlotType and hwLswSubSlotType by wangyahui
+--    V2.4  2004-12-23 add enum value from 171 to 172 in hwLswSlotType and hwLswSubSlotType
+--                     add enum value from 98 to 99 hwLswPortType by liyue
+--    V2.5  2004-12-29 add enum value 173 in hwLswSlotType and hwLswSubSlotType by zhangjianfeng
+--                     add enum value from 100 in hwLswPortType by zhangjianfeng
+--    V2.6  2005-01-07 add enum value 174 and 175 in hwLswSlotType and hwLswSubSlotType by wangyahui
+--    V2.7  2005-01-31 add enum value 176 in hwLswSlotType and hwLswSubSlotType by wangyahui
+--    V2.8  2005-02-03 define HwLswTypeOfSlot
+--                     change the SYNTAX of hwLswSlotType and hwLswSubSlotType to HwLswTypeOfSlot,add new enum vlaue to HwLswTypeOfSlot
+--                     add enum value from 101 to 137 in hwLswPortType by zhangchengmei
+--                     add enum value 178 in HwLswTypeOfSlot by zhouqiang
+--                     add enum value 138 in hwLswPortType by zhouqiang
+--                     add enum value from 179 to 180 in hwLswSubSlotType by wangyahui
+--    V2.9  2005-03-22 add enum value from 181 to 187 in HwLswTypeOfSlot by zhangchengmei
+--    V3.0  2005-05-10 add enum value from 188 to 216 in HwLswTypeOfSlot by zhangchengmei
+--    V3.1  2005-07-18 add enum value from 217 to 219 in HwLswTypeOfSlot by yangliming
+--          2005-06-25 add enum value from 139 to 142 in hwLswPortType by wangyahui
+--    V3.11  2005-07-29 add enum value from 220 to 225 in HwLswTypeOfSlot by wangyahui
+--    V3.12  2005-07-21 change the name of subidentifier 183 in HwLswTypeOfSlot by zhangchengmei
+--                     add enum value 226 to 227 in HwLswTypeOfSlot by zhangchengmei
+--           2005-08-29 add enum value 143 in hwLswPortType by qianxiaoyu
+--    V3.13  2005-09-13 add enum value 228 to 253 in HwLswTypeOfSlot by zhangchengmei
+--           2005-09-13 add enum value 257 to 268 in HwLswTypeOfSlot by zhangchengmei
+--    V3.14  2005-11-04 add enum value 144 to 149 in hwLswPortType by zhangchengmei
+--                      add enum value 150 in hwLswPortType by huangyuetao
+--                      add enum value 269 to 271 in hwLswSlotType by yangxiaopeng
+--                      add enum value 272 in HwLswTypeOfSlot by qianxiaoyu
+--    V3.15  2005-11-24 add enum value 500 to 501 in hwLswSlotType by wangyahui
+--    V3.16  2005-11-28 add enum value 300 to 316 in HwLswTypeOfSlot by zhangchengmei
+--    V3.17  2005-12-30 add enum value 151 to 170 in hwLswPortType by zhangchengmei
+--    V3.18  2006-01-04 add enum value 701 in HwLswTypeOfSlot by qianxiaoyu
+--    V3.19  2006-02-12 add enum value 702 in HwLswTypeOfSlot by chenxiaohui
+--                      add enum value 317 in HwLswTypeOfSlot by zhangchengmei
+--    V3.20  2006-02-20 add enum value 703 in HwLswTypeOfSlot by chijuntao
+--    V3.21  2006-02-28 add enum value 171 to 174 in hwLswPortType by wangshunli
+--                      add enum value 318 to 336 in HwLswTypeOfSlot by zhaiyingying
+--                      Modify description of hwLswSysIpAddr, hwLswSlotCpuRatio, hwLswSysCpuRatio
+--                      and some wrong format of the description by wangyong
+--    V3.22  2006-03-14 add enum value 175 in hwLswPortType by wangyahui
+--                      add enum value 502 to 504 in HwLswTypeOfSlot by wangyahui
+--    V3.23  2006-04-03 add enum value 176 in hwLswPortType by wangyahui
+--    V3.24  2006-04-21 add enum value 337 to 340 in HwLswTypeOfSlot by zhaiyingying
+--    V3.25  2006-04-21 add enum value 704 to 705 under HwLswTypeOfSlot by zhangxianguo
+--                      add enum value 505 to 506 under HwLswTypeOfSlot by zhangjianfeng
+--                      add enum value 341 to 349 under HwLswTypeOfSlot by zhaiyingying
+--                      add enum value 177 to 178 under hwLswPortType by zhangjianfeng
+--                      add enum value 179 to 180 under hwLswPortType by zhangxianguo
+--    V3.26  2006-07-12 add enum value 507 to 509 in HwLswTypeOfSlot by wangyahui
+--                      modify enum name 502 and 503 of HwLswTypeOfSlot by wangyahui
+--                      add enum value 350 to 357 under HwLswTypeOfSlot by zhaiyingying
+--                      Modify description of enum element(3) in HwLswTypeOfSlot by zhangxianguo
+--    V3.27  2006-08-31 add enum value 510 to 514 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 800 to 801 in HwLswTypeOfSlot by luoguixing
+--    V3.28  2006-10-26 add enum value 358 to 370 under HwLswTypeOfSlot by zhaiyingying
+--                      add enum value 183 under hwLswPortType by zhaiyingying
+--                      add enum value 515 to 526 in HwLswTypeOfSlot by wangyahui
+--                      modify enum 505 and 506 of HwLswTypeOfSlot by wangyahui
+--                      add enum value 181 to 182 in hwLswPortType by wangyahui
+--    V3.29  2006-11-02 add enum value 527 to 536 in HwLswTypeOfSlot by wangyahui
+--                      modify description of 511 to 513 in HwLswTypeOfSlot by wangyahui
+--           2006-11-10 add enum value 371 to 378 under HwLswTypeOfSlot by shuxiongtao
+--           2006-11-08 add enum value 184 to 185 under hwLswPortType by zhaiyingying
+--    V3.30  2007-03-19 add enum value 537 in HwLswTypeOfSlot by wangyahui
+--    V3.31  2007-04-25 add enum value 538 to 542 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 379 to 380 under HwLswTypeOfSlot by zhaiyingying
+--                      add enum value 706 in HwLswTypeOfSlot by zhangzongyi
+--    V3.32  2007-05-28 add enum value 707 in HwLswTypeOfSlot by ligaoxu
+--                      add enum value 381 to 392 in HwLswTypeOfSlot by shuxiongtao
+--                      modify name of enum value 371 and 374 in HwLswTypeOfSlot by shuxiongtao
+--                      add enum value 186 in hwLswPortType by jinzhaoqiong
+--    V3.33  2007-07-09 add enum value 543 to 551 in HwLswTypeOfSlot by Zhangjianfeng
+--                      add enum value 552 to 554 in HwLswTypeOfSlot by wangyahui
+--    V3.34  2007-07-26 add enum value 708 in HwLswTypeOfSlot by Xiuyihong
+--    V3.35  2007-08-27 add enum value 187 to 188 in hwLswPortType by ruanhan
+--                      add enum value 802 to 804 in HwLswTypeOfSlot by luoguixing
+--                      add enum value 393 to 397 under HwLswTypeOfSlot by shuxiongtao
+--    V3.36  2007-09-25 add enum value 555 to 559 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 805 in HwLswTypeOfSlot by luoguixing
+--                      add enum value 398 to 399 in HwLswTypeOfSlot by hexuefei
+--    V3.37  2007-10-16 add enum value 189 in hwLswPortType by liaoxin
+--    V3.38  2007-11-20 add enum value 400 to 407 in HwLswTypeOfSlot by shuxiongtao
+--    V3.39  2007-12-27 add enum value 560 to 568 in HwLswTypeOfSlot by wangyahui
+--    V3.40  2008-01-30 add enum value 408 in HwLswTypeOfSlot by hexuefei
+--                      add enum value 569 to 572 in HwLswTypeOfSlot by wangyahui
+--    V3.41  2008-02-20 add enum value 573 to 574 in HwLswTypeOfSlot by zhangjianfeng
+--                      modify name and comments of enum value 546 in HwLswTypeOfSlot by zhangjianfeng
+--                      add enum value 575 to 576 in HwLswTypeOfSlot by wangyahui
+--    V3.42  2008-03-31 add enum value 806 to 808 in HwLswTypeOfSlot by luoguixing
+--                      add enum value 709 to 715 under HwLswTypeOfSlot by wangcong
+--                      add enum value 191 to 196 under hwLswPortType by wangcong
+--                      add enum value 409 to 431 in HwLswTypeOfSlot by zhaiyingying
+--                      add enum value 432 in HwLswTypeOfSlot by shuxiongtao
+--    V3.43  2008-04-29 add enum value 577 to 589 in HwLswTypeOfSlot by wangyahui
+--    V3.44  2008-07-28 add enum value 590 to 592 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 809 to 810 in HwLswTypeOfSlot by luoguixing
+--    V3.45  2008-08-26 modify name of enum value 379 and 399 in HwLswTypeOfSlot by wangwei
+--                      modify description of 408 in HwLswTypeOfSlot by wangwei
+--                      modify name and description of enum value 804 in HwLswTypeOfSlot by wangwei
+--                      add enum value 433 to 434 in HwLswTypeOfSlot by wangwei
+--                      add enum value 593 to 595 in HwLswTypeOfSlot by wangyahui
+--    V3.46  2008-10-13 add enum vlaue 197 in hwLswPortType by ruanhan
+--                      add enum value 811 in HwLswTypeOfSlot by luoguixing
+--                      add enum value 596 and 601 in HwLswTypeOfSlot by wangyahui
+--    V3.47  2008-12-01 add enum vlaue 725 in HwLswTypeOfSlot by ruanhan
+--                      add enum value 602 to 619 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 435 to 442 in HwLswTypeOfSlot by zhaiyingying
+--                      modify name of enum value 546 in HwLswTypeOfSlot by zhangjianfeng
+--                      add enum value 443 in HwLswTypeOfSlot by shuxiongtao
+--    V3.48  2008-12-25 add enum value 620 to 622 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 716 to 718 in HwLswTypeOfSlot by zhangshilin
+--                      add enum value 444 to 445 in HwLswTypeOfSlot by wangchang
+--    V3.49  2009-01-05 add enum value 446 to 452 in HwLswTypeOfSlot by wangchang
+--                      add enum value 719 in HwLswTypeOfSlot by zhangshilin
+--                      add enum value 623 to 633 in HwLswTypeOfSlot by wangyahui
+--    V3.50  2009-03-19 add enum value 453 to 464 in HwLswTypeOfSlot by huyinxing
+--    V3.51  2009-07-02 add enum value 634 to 637 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 465 to 468 in HwLswTypeOfSlot by zhaiyingying
+--                      add enum value 469 to 472 in HwLswTypeOfSlot by huyinxing
+--                      add enum value 198 in hwLswPortType by huyinxing
+--                      add enum vlaue 199 in hwLswPortType by zhangjianfeng
+--    V3.52  2009-08-28 add enum value 638 to 640 in HwLswTypeOfSlot by wangyahui
+--    V3.53  2009-11-09 add enum value 726 in HwLswTypeOfSlot by ruanhan
+--                      add enum value 641 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 473 to 477 in HwLswTypeOfSlot by yudongyang
+--                      add enum value 478 to 485 in HwLswTypeOfSlot by heweibin
+--    V3.54  2009-12-31 add enum value 200 to 201 in hwLswPortType by zhanghaiyang
+--                      add enum value 642 to 651 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 486 in HwLswTypeOfSlot by yudongyang
+--                      add enum value 727 to 728 in HwLswTypeOfSlot by xiaobing
+--                      add enum value 652 to 659 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 487 to 488 in HwLswTypeOfSlot by huyinxing
+--                      add enum value 660 to 662 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 202 to 203 in hwLswPortType by yangdonghong
+--    V3.55  2010-03-03 Added hwLswSysPhyMemory, hwLswSysMemory,
+--                      hwLswSysMemoryUsed, hwLswSysMemoryRatio by songhao
+--                      add enum value 812 in HwLswTypeOfSlot by mashuhang
+--                      add enum value 489 to 497 in HwLswTypeOfSlot by liubuxiang
+--                      add enum value 498 to 499 in HwLswTypeOfSlot by shikejun
+--                      add enum value 900 in HwLswTypeOfSlot by yangqiulin
+--                      add enum value 901 to 902 in HwLswTypeOfSlot by huyinxing
+--    V3.56  2010-08-29 add enum value 903 to 904 in HwLswTypeOfSlot by huyinxing
+--                      add enum value 905 to 907 in HwLswTypeOfSlot by shikejun
+--                      add enum value 663 to 685 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 813 in HwLswTypeOfSlot by mashuhang
+--                      add enum value 729 in HwLswTypeOfSlot by zhangshilin
+--                      add enum value 908 to 913 in HwLswTypeOfSlot by yangbin
+--                      add enum value 914 to 918 in HwLswTypeOfSlot by huyinxing
+--                      add enum value 919 to 927 in HwLswTypeOfSlot by langgaoyi
+--                      add hwLswFabricTable by songhao
+--    V3.57  2011-01-31 add enum value 686 to 691 in HwLswTypeOfSlot by wangyahui
+--                      add enum value 928 to 929 in HwLswTypeOfSlot by langgaoyi
+--                      add hwLswSysTemperature, hwLswSlotPhyMemory,
+--                      hwLswSlotMemory, hwLswSlotMemoryUsed,
+--                      hwLswSlotMemoryRatio and hwLswSlotTemperature by songhao
+--    V3.58  2011-04-23 Add enum value 930 in HwLswTypeOfSlot by liuhui
+--                      Add enum value 814 to 815 in HwLswTypeOfSlot by mashuhang
+--                      Add enum value 692 to 694 in HwLswTypeOfSlot by wangyahui
+--                      Add enum value 204 in hwLswPortType by yangliming
+--    V3.59  2011-06-30 Add enum value 695, 1201 to 1211 in HwLswTypeOfSlot by wangyahui
+--                      Add enum value 205 to 207 in hwLswPortType by gaoruichang
+--    V3.60  2011-08-31 Add enum value 696 to 697 in HwLswTypeOfSlot by langgaoyi
+--                      Add enum value 208 in hwLswPortType by wangshunli
+--                      Add enum value 931 to 933 in HwLswTypeOfSlot by langgaoyi
+--                      Add enum value 934 in HwLswTypeOfSlot by zhaohonghai
+--    V3.61  2012-04-20 Add enum value 935 to 938, 942 in HwLswTypeOfSlot by wangjiangnan
+--                      Add enum value 1212 to 1218 in HwLswTypeOfSlot by wangyahui
+--                      Add enum value 939 to 941 in HwLswTypeOfSlot by herui
+--                      Modify name of enum value 205 to 207 in hwLswPortType by xvman
+--                      Add enum value 943 to 945 in HwLswTypeOfSlot by langgaoyi
+--                      Add enum value 209, 211 in hwLswPortType by wangyahui
+--                      Add enum value 730 to 731 in HwLswTypeOfSlot by panxiyuan
+--                      Add enum value 210 in hwLswPortType by panxiyuan
+--                      Add enum value 946 to 948 in HwLswTypeOfSlot by zhangheng
+--                      Add enum value 949 to 956 in HwLswTypeOfSlot by zhengjiang
+--                      Add enum value 957 in HwLswTypeOfSlot by zhaohonghai
+--                      Add enum value 212 in hwLswPortType by wangyahui
+--                      Add enum value 732 in HwLswTypeOfSlot by houchengshuai
+--                      Add enum value 1219 to 1230 in HwLswTypeOfSlot by wangyahui
+-- ==================================================================
+A3COM-HUAWEI-DEVICE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    DisplayString, DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    lswCommon
+        FROM A3COM-HUAWEI-OID-MIB;
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+-- system information: hwLswDeviceAdmin
+-- ==================================================================
+    hwLswDeviceAdmin MODULE-IDENTITY
+        LAST-UPDATED "200903190000Z"
+        ORGANIZATION
+            "Hangzhou H3C Technologies Co., Ltd."
+        CONTACT-INFO
+            "Platform Team H3C Technologies Co., Ltd.
+             Hai-Dian District Beijing P.R. China
+             http://www.h3c.com
+             Zip: 100085"
+        DESCRIPTION
+        "The latest baseline."
+        REVISION "200104040000Z"
+        DESCRIPTION
+        "The first baseline."
+        ::= { lswCommon  18 }
+
+    HwLswTypeOfSlot ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The type of slots for lan switch devices."
+        SYNTAX INTEGER {
+            type-NULL(0),           -- NULL
+            type-10OR100M(1),           -- 10M/100M Ethernet Copper Interface Module
+            type-1000BASE-LX-SM(2),     -- 1000BASE-X Module (SMF, LC)
+            type-1000BASE-SX-MM(3),     -- 1000BASE-X Module (MMF, SC)
+            type-1000BASE-TX(4),        --
+            type-100M-SINGLEMODE-FX(5),     -- 100M Ethernet Single Mode Optical Interface Module
+            type-100M-MULTIMODE-FX(6),      -- 100M Ethernet Multi-mode Optical Interface Module
+            type-100M-100BASE-TX(7),        -- 100M Ethernet copper Interface Module(RJ45)
+            type-100M-HUB(8),           -- 100M Base-TX transportation Interface Module
+            type-VDSL(9),           -- VDSL
+            type-STACK(10),         -- GigaStack Module
+            type-1000BASE-ZENITH-FX(11),    -- 1000M Ethernet Single Mode Optical Interface Module(1550nm,70km,LC)
+            type-1000BASE-LONG-FX(12),      -- 1000M Ethernet Single Mode Optical Interface Module(1550nm,40km,LC)
+            type-ADSL(13),          -- ADSL
+            type-4T10OR100-4FX100SM(14),    -- 4-Port Single Mode Optical Interface and 4-Port 10M/100M Ethernet Interface Module
+            type-4T10OR100-4FX100MM(15),    -- 4-Port Multi-mode Optical Interface and 4-Port 10M/100M Ethernet Interface Module
+            type-VSPL(16),          -- VDSL Board
+            type-ASPL(17),          -- ADSL Board
+            type-1000M-SFP(18),         -- 1000BASE-X SFP Module
+            type-LS82O2CM(19),          -- ATM OC-3c/STM-1 Daughter Card (SFP)
+            type-LS82P2CM(20),          -- POS OC-3c/STM-1 Daughter Card (SFP)
+            type-LS82O4GM(21),          -- MPLS 1000BASE-X Daughter Card (GBIC)
+            type-LS82GB4C(22),          -- 1000BASE-X Daughter Card (GBIC)
+            type-LS82GT4C(23),          -- 1000BASE-T Daughter Card (RJ-45)
+            type-LS82ST4C(24),          -- GigaStack Daughter Card
+            bOARD-TYPE-LS82DSPU(25),        -- Dual Service Processing Module
+            bOARD-TYPE-LS81GP8U(26),        -- Gigabit Ethernet Interface Process Module
+            bOARD-TYPE-LS82GT20(27),        -- 1000BASE-T Module (RJ-45)
+            bOARD-TYPE-LS82FE48(28),        -- 10/100BASE-TX Module (RJ-45)
+            type-LS82T24B(29),          -- 24-Port 10/100BASE-TX (RJ-45) and 2 Port 1000BASE-X (GBIC) Module
+            type-LSB1SRPA(30),          --
+            type-LSB1FT48A(31),         -- 48-Port 10Base-T/100Base-TX Auto-sensing Fast Ethernet Board A
+            type-LSB1FT48B(32),         -- 48-Port 10Base-T/100Base-TX Auto-sensing Fast Ethernet Board B
+            type-LSB1F48GA(33),         -- 32-Port 10Base-T/100Base-TX Auto-sensing Fast Ethernet and 4-Port 1000Base-X (SFP) GE Board A
+            type-LSB1F48GB(34),         -- 32-Port 10Base-T/100Base-TX Auto-sensing Fast Ethernet and 4-Port 1000Base-X (SFP) GE Board B
+            type-LSB1FP20A(35),         -- 20-Port 100Base-FX (SFP) Fast Ethernet Board A
+            type-LSB1FP20B(36),         -- 20-Port 100Base-FX (SFP) Fast Ethernet Board B
+            type-FT48A(37),         -- 48-Port 10Base-T/100Base-TX Auto-sensing Fast Ethernet Interface Module
+            type-GP4U(38),          -- 1000Base-X (SFP)  GE Interface Module
+            type-GP2U(39),          -- 1000Base-X (SFP)  GE Interface Module
+            type-TGX1A(40),         -- 10GBASE-R  (XENPAK) Interface Module
+            type-1000BASE-LX-SM-IR-SC(41),  -- 1000M Ethernet Single Mode Optical Interface Module(1310nm,10km,SC)
+            type-1000BASE-SX-MM-SR-SC(42),  -- 1000M Ethernet Multi-mode Optical Interface Module(850nm,500m,SC)
+            type-1000BASE-T-RJ45(43),       -- 1000M Ethernet Copper Interface Module(RJ45)
+            type-100BASE-FX-SM-IR-SC(44),   -- 100M Ethernet Single Mode Optical SubCard
+            type-100BASE-FX-MM-SR-SC(45),   -- 100M Ethernet Multi-mode Optical SubCard
+            type-GIGA-STACK-1M-PC(46),      -- GigaStack Daughter SubCard
+            type-1000BASE-LX-SM-VLR-LC(47), -- 1000M Ethernet Single Mode Optical SubCard(1550nm,70km,LC)
+            type-1000BASE-LX-SM-LR-LC(48),  -- 1000M Ethernet Single Mode Optical SubCard(1550nm,40km,LC)
+            type-100BASE-FX-SM-LR-SC(49),   -- 100M Ethernet Single Mode Optical SubCard(1310nm,15km,SC)
+            type-1000BASE-X-GBIC(50),       --
+            type-100M-SINGLEMODE-FX-LC(51), -- 100M Ethernet Single-mode Optical SubCard(1310nm,2km,SC)
+            type-100M-MULTIMODE-FX-LC(52),  -- 100M Ethernet Multi-mode Optical SubCard(1310nm,2km,SC)
+            type-1000BASE-4SFP(53),     -- 4-Port 1000BASE-FX Single Mode Fiber Optic Transceivers LR with SC Connector
+            type-1000BASE-4GBIC(54),        -- 4-Port 1000BASE-X Module(GBIC)
+            type-1000BASE-FIXED-4SFP(55),   -- 4-Port 1000BASE-FX Single Mode Fiber Optic Transceivers LR with SC Connector
+            type-1000BASE-FIXED-4GBIC(56),  -- 4-Port 1000BASE-X Module(GBIC)
+            type-LSB1GP12A(57),         -- 12-Port 1000Base-X (SFP) GE Board A
+            type-LSB1GP12B(58),         -- 12-Port 1000Base-X (SFP) GE Board B
+            type-LSB1TGX1A(59),         -- 1-Port 10GBASE-R (XENPAK) Board A
+            type-LSB1TGX1B(60),         -- 1-Port 10GBASE-R (XENPAK) Board B
+            type-LSB1P4G8A(61),         -- 4*155M POS Optical Interface Module 8-Port 1000Base-X (SFP) GE and 4-Port 155M POS Board A
+            type-LSB1P4G8B(62),         -- 4*155M POS Optical Interface Module 8-Port 1000Base-X (SFP) GE and 4-Port 155M POS Board B
+            type-LSB1A4G8A(63),         -- 4*155M ATM Optical Interface Module 8-Port 1000Base-X (SFP) GE and 4-Port 155M ATM Board A
+            type-LSB1A4G8B(64),         -- 4*155M ATM Optical Interface Module 8-Port 1000Base-X (SFP) GE and 4-Port 155M ATM Board B
+            type-FT48C(65),         -- 48-Port 10Base-T/100Base-TX Auto-sensing Fast Ethernet Board C
+            type-FP20(66),                  -- 20-port 100BASE-TX Module
+            bOARD-TYPE-LS81FT48(67),        -- 48-Port 10/100BASE-TX Module (RJ-45)
+            bOARD-TYPE-LS81GB8U(68),        -- 8-Port 1000BASE-X Module (GBIC)
+            bOARD-TYPE-LS81GT8U(69),        -- 8-Port 1000BASE-T Module (RJ-45)
+            bOARD-TYPE-LS81FS24(70),        -- 24-Port 100BASE-FX Module (SMF,MT-RJ)
+            bOARD-TYPE-LS81FM24(71),        -- 24-Port 100BASE-FX Module (MMF,MT-RJ)
+            bOARD-TYPE-LS82GP20(72),        -- Switching and Route Processing Board B (main board)
+            type-LSB1SRPB(73),          --
+            type-LSB1F32GA(74),         -- 32-Port Fast Ethernet + 4-Port Gigabit Ethernet module A
+            type-LSB1F32GB(75),         -- 32-Port Fast Ethernet + 4-Port Gigabit Ethernet module B
+            type-LSB2FT48A(76),         -- 48-Port 10Base-T/100Base-TX Auto-sensing Fast Ethernet Board A (ver 2)
+            type-LSB2FT48B(77),         -- 48-Port 10Base-T/100Base-TX Auto-sensing Fast Ethernet Board B (ver 2)
+            type-LSB1GT12A(78),         -- 12 Port 10/100/1000 Base-T  Interface Module
+            type-LSB1GT12B(79),         -- 12 Port 10/100/1000 Base-T  Interface Module
+            type-PC4U(80),          -- 4 Port155M POS(SFP) Interface Module
+            type-FT32A(81),         -- 32 Port 10/100 Base-T FE Interface Module
+            type-GT4U(82),          -- 4 Port 10/100/1000 Base-T  Interface Module
+            bOARD-TYPE-LS83FP20A(83),       --
+            bOARD-TYPE-LS82HGMU(84),        --
+            type-LSB1GP8TB(85),         --
+            type-LSB1GP8TC(86),         --
+            type-LSB1GT8PB(87),         --
+            type-LSB1GT8PC(88),         --
+            type-LSB1FT48C(89),         -- 48-Port 100Base-TX Ethernet Interface module C
+            type-LSB1FP20C(90),         -- 20-Port 100Base-FX(SFP) Fast Ethernet Interface Module C
+            type-LSB1F32GC(91),         -- 32-Port Fast Ethernet + 4-Port Gigabit Ethernet interface module C
+            type-LSB1GT12C(92),         -- 12-Port 10/100/1000 Base-T  Interface Module C
+            type-LSB1GP12C(93),         -- 12-Port 1000Base-X(SFP) GE Interface Module C
+            type-LSB1P4G8C(94),         -- 8-Port 1000Base-X(SFP) GE + 4-Port 155M POS Interface Module C
+            type-LSB1TGX1C(95),         -- 1-Port 10GBase-R/X  Ethernet XENPAK Optical Interface Module C
+            type-LSB1GT24B(96),         -- 24-Ports 10/100/1000Base-T Ethernet Interface Module B
+            type-LSB1GT24C(97),         -- 24-Ports 10/100/1000Base-T Ethernet Interface Module C
+            type-LSB1GP24B(98),         -- 24-Ports 1000Base-X Ethernet Interface Module B
+            type-LSB1GP24C(99),         -- 24-Ports 1000Base-X Ethernet Interface Module C
+            type-LSB1XP2B(100),         -- 2-Port 10GBase-R/W Ethernet XFP Optical Interface Module B
+            type-LSB1XP2C(101),         -- 2-Port 10GBase-R/W Ethernet XFP Optical Interface Module C
+            type-LSB1GV48B(102),        -- 48-Ports 10/100/1000Base-T Ethernet Interface Module B
+            type-LSB1GV48C(103),        -- 48-Ports 10/100/1000Base-T Ethernet Interface Module C
+            type-LSB1SRPC(104),         -- Switching and Route Processing Board C
+            type-LSB1SRP1N0(105),       -- Switching and Route Processing Board 1N0
+            type-LSB1SRP1N1(106),       -- Switching and Route Processing Board 1N1
+            type-LSB1SRP1N2(107),       -- Switching and Route Processing Board 1N2
+            type-GT24(108),         --
+            type-GP24(109),         --
+            type-XP2(110),          --
+            type-GV48(111),         --
+            type-LSG1GP8U(112),         -- 8 Port 1000BASE Module (SFP)
+            type-LSG1GT8U(113),         -- 8 Port 1000BASE-T Module (RJ45)
+            type-LSG1TG1U(114),         -- 1 Port 10GBASE Module(XENPAK)
+            type-LSG1TD1U(115),         -- 1 Port 10GBASE-CX4 Module(IB4X)
+            type-LSB2FT48C(116),        -- 48-Ports 100Base-TX Ethernet Interface module C
+            type-LSB1GT48B(117),        -- 48-Ports 10/100/1000Base-T Ethernet Interface Module B
+            type-LSB1GT48C(118),        -- 48-Ports 10/100/1000Base-T Ethernet Interface Module C
+            type-LS81GT48(119),             -- 48 Port Gigabit Ethernet Electric Interface Unit
+
+            type-LS81SRPG0(120),        -- Salience III, Switch and Route Processing Board
+            type-LS81SRPG1(121),        -- Salience III Plus
+            type-LS81SRPG2(122),        -- Salience III Lite
+            type-LS81SRPG3(123),        -- Salience III Edge
+
+--          type-LS81SRPG(124),              Switch And Route Processing Unit, Salience III. not used. not used.
+
+            type-SR01SRPUB(125),                -- Switching and Route Processing Unit
+            type-SR01SRPUA(126),                -- Switching and Route Processing Unit
+            type-SR01GP12L(127),                -- 12-Port 1000Base-X Ethernet SFP Optical Interface Line Card(L)
+            type-SR01GP12W(128),                -- 12-Port 1000Base-X Ethernet SFP Optical Interface Line Card(W)
+            type-SR01FT48L(129),                -- 48-Port 10/100Base-TX Ethernet RJ45 Electrical Interface Line Card (L)
+            type-SR01FT48W(130),                -- 48-Port 10/100Base-TX Ethernet RJ45 Electrical Interface Line Card (W)
+            type-SR01XK1W(131),                 -- 1-Port 10GBase-R Ethernet XENPAK Optical Interface Line Card (W)
+            type-SR01FP20W(132),                -- 20-Port 100Base-FX Ethernet SFP Optical Interface Line Card (W)
+            type-SR01GT12W(133),                -- 12-Port 10/100/1000Base-T Ethernet RJ45 Electrical Interface Line Card (W)
+            type-SR01F32GL(134),                -- 32-Port 10/100Base-TX Ethernet RJ45 Electrical Interface + 4-Port 1000Base-X Ethernet SFP Optical interface Line Card (L)
+            type-SR01F32GW(135),                -- 32-Port 10/100Base-TX Ethernet RJ45 Electrical Interface  + 4-Port 1000Base-X  Ethernet SFP Optical interface Line Card (W)
+            type-SR01GT8PL(136),                -- 8-Port 10/100/1000Base-T Ethernet RJ45 Electrical Interface + 4-Port 1000Base-X Ethernet SFP Optical Line Card (L)
+            type-SR01GT8PW(137),                -- 8-Port 10/100/1000Base-T Ethernet RJ45 Electrical Interface + 4-Port 1000Base-X Ethernet SFP Optical Line Card (W)
+            type-SR01P4G8W(138),                -- 4-Port 155M POS Optical Interface + 8-Port 1000Base-X Ethernet SFP Optical Interface Line Card (W)
+            type-LSA1FP8U(139),                 -- 8 Ports 100Base-FX Ethernet SFP Card
+
+            type-LSB1SP4B(140),                 -- 4-Port OC-48 POS SFP Optical Interface Board B
+            type-LSB1SP4C(141),                 -- 4-Port OC-48 POS SFP Optical Interface Board C
+            type-LSB1UP1B(142),                 -- 1-Port OC-192 POS XFP Optical Interface Board B
+            type-LSB1UP1C(143),                 -- 1-Port OC-192 POS XFP Optical Interface Board C
+            type-LSB1XP4B(144),                 -- 4-Port 10GBase Ethernet XFP Optical Interface Board B
+            type-LSB1XP4C(145),                 -- 4-Port 10GBase Ethernet XFP Optical Interface Board C
+            type-SP4(146),                      -- 4-Port OC-48 POS SFP Optical Interface Module
+            type-UP1(147),                      -- 1-Port OC-192 POS XFP Optical Interface Module
+            type-XP4(148),                      -- 4-Port 10GBase Ethernet XFP Optical Interface Module
+
+            type-LS81VSNP(149),                 -- VerSatile Network Processing Board
+            type-LS81T12P(150),                 -- 12-Port 1000Base-T Gigabit Ethernet Interface(RJ45)+4-Port 1000BASE-X  Gigabit Ethernet Optical Interface Board(SFP,LC)
+            type-LS81P12T(151),                 -- 12-Port 1000BASE-X Gigabit Ethernet Optical Interface(SFP,LC)+4-Port 1000BASE-T Gigabit Ethernet Interface Board(RJ45)
+            type-LS81GP8UB(152),                -- 8-Port 1000M Ethernet Optical Interface Board(SFP,LC),LC Connector
+            type-LS81FT48E(153),                -- 48-Port 100M Ethernet Electrical Interface Switch Unit(RJ45)
+            type-LS81GP4UB(154),                -- 4-Port 1000M Ethernet Optical Interface Board(SFP,LC)
+            type-LS81GT8UE(155),                -- 8-Port 1000M Ethernet Electrical Interface Switch Unit (RJ45)
+            type-LS81GT48A(156),                -- 48 Port Gigabit Ethernet Electric Interface Unit
+            type-LS81FP48(157),                 -- 48 Port 100M Ethernet Optical Interface Board(SFP,LC)
+
+            type-LSB1XK1B(158),                 -- 1-Port 10GBase-R Ethernet XENPAK Optical Interface Board B
+            type-LSB1XK1C(159),                 -- 1-Port 10GBase-R Ethernet XENPAK Optical Interface Board C
+
+            type-SR01SRPUC(160),                -- Switching and Route Processing Unit C
+            type-SR01SRPUD(161),                -- Switching and Route Processing Unit D
+            type-SR01SRPUE(162),                -- Switching and Route Processing Unit E
+
+            type-LSB1SRP1N3(163),               -- Switching and Route Process Unit, Clock Module
+            type-LSB1VP2B(164),                 -- 2*10G Resilient Packet Ring Interface Line Card (B)
+            type-LSB1NATB(165),                 -- NAT Service Processing Card (B)
+            type-LSB1VPNB(166),                 -- VPN Service Processing Card (B)
+
+            type-LSGP8P(167),                   -- 8-Port 1000M SFP Module
+            type-LSXK1P(168),                   -- 1-Port 10G Xenpak Module
+            type-LSXP2P(169),                   -- 2-Port 10G XFP Module
+
+            type-LS81FT48F(170),                -- 48-Port 100M Ethernet Electrical Interface Switch Unit(RJ45)
+
+            type-LS81PT8G(171),                 -- 8 Port 1000BASE-X Gigabit Passive Optical Line Interface Board
+            type-LS81PT4G(172),                 -- 4 Port 1000BASE-X Gigabit Passive Optical Line Interface Board
+
+            type-LSSTK24G(173),                 -- 2-Port 24G Cascade Port Module
+
+            type-LS82GT20A(174),                -- 20-Port 1000Base-T Gigabit Ethernet Electrical Interface Board(RJ45), BCM5697
+            type-LS82GP20A(175),                -- 20-Port 1000BASE-X Gigabit Ethernet Optical Interface Board(SFP,LC), BCM5697
+            type-LS81TGX1C(176),                -- 1-Port 10G Base-R Ethernet Board
+
+            type-VP2(177),                      -- 2*10G Resilient Packet Ring Interface Module
+            type-LSA1FB8U(178),                 -- 8-Port 100Base-Fx BIDI Ethernet Board
+
+            type-LS81T12PE(179),                -- 12-Port 1000Base-T GE Interface+4-Port 1000BASE-X GE Optical Interface Board(SFP,LC)
+            type-LS81P12TE(180),                -- 12-Port 1000BASE-X GE Optical Interface(SFP,LC)+4-Port 1000 BASE-T GE Interface Board(RJ45)
+
+            type-LSB1SRP2N0(181),               -- Switching and Route Process Unit,12*LPU
+            type-LSB1SRP2N3(182),               -- Switching and Route Process Unit, Clock Module
+            type-LSB1GV48DB(183),               -- 48 Ports 1000Base-T Ethernet Interface Line Card with POE(DB)
+            type-LSB1FW8B(184),                 -- Firewall Service Processing Board with 8GE (B)
+            type-LSB1IPSEC8B(185),              -- VPN Service Processing Board with 8GE (B)
+            type-LSB1IDSB(186),                 -- IDS Service Processing Board (B)
+            type-LSB1IPSB(187),                 -- IPS Service Processing Board (B)
+            type-LSB2FT48CA(188),               -- 48 Ports 100Base-TX Ethernet Line Card (CA)
+            type-LSB1FP20CA(189),               -- 20 Ports 100Base-FX Ethernet Interface Service Card (CA)
+            type-LSB1F32GCA(190),               -- 32 Ports FE and 4 Ports GE Line Card(CA)
+            type-LSB1P4G8CA(191),               -- 4 Ports OC-3c POS and 8 Ports GE Line Card(CA)
+            type-LSB1GT12CA(192),               -- 12 Ports 1000Base-T Ethernet Interface Line Card(CA)
+            type-LSB1GT24CA(193),               -- 24 Ports 1000Base-T Ethernet Interface Line Card(CA)
+            type-LSB1GP12CA(194),               -- 12 Ports 1000Base Ethernet Optical Interface Service Card(CA)
+            type-LSB1GP24CA(195),               -- 24 Ports 1000Base-X Ethernet Interface Line Card (CA)
+            type-LSB1GT8PCA(196),               -- 8 Ports 1000Base-T Ethernet Interface & 4 Ports 1000Base-X Ethernet SFP Interface Line Card(CA)
+            type-LSB1XP2CA(197),                -- 2-Port 10GBase-R/W Ethernet XFP Optical Interface Card(CA)
+            type-LSB1XK1CA(198),                -- 10GBase-R Ethernet XENPAK Optical Interface Line Card(CA)
+            type-LSB1XP4CA(199),                -- 4-Port 10GBase-R/X Ethernet Optical Interface Line Card(CA)
+            type-LSB1UP1CA(200),                -- Single Port OC-192c POS XFP Optical Interface Card(CA)
+            type-LSB1SP4CA(201),                -- 4-Port OC-48c POS SFP Optical Interface Card(CA)
+            type-LSB1VP2CA(202),                -- 2*10G RPR Process Unit(CA)
+            type-SR01FT48WA(203),               -- 48 Ports 100Base-TX Ethernet Line Card (WA)
+            type-SR01FP20WA(204),               -- 20 Ports 100Base-FX Ethernet Interface Service Card (WA)
+            type-SR01F32GWA(205),               -- 32 Ports FE and 4 Ports GE Line Card(WA)
+            type-SR01P4G8WA(206),               -- 4 Ports OC-3c POS and 8 Ports GE Line Card(WA)
+            type-SR01GT12WA(207),               -- 12 Ports 1000Base-T Ethernet Interface Line Card(WA)
+            type-SR01GT24WA(208),               -- 24 Ports 1000Base-T Ethernet Interface Line Card(WA)
+            type-SR01GP12WA(209),               -- 12 Ports 1000Base Ethernet Optical Interface Service Card(WA)
+            type-SR01GP24WA(210),               -- 24 Ports 1000Base-X Ethernet Interface Line Card (WA)
+            type-SR01GT8PWA(211),               -- 8 Ports 1000Base-T Ethernet Interface & 4 Ports 1000Base-X Ethernet SFP Interface Line Card(WA)
+            type-SR01XP2WA(212),                -- 2-Port 10GBase-R/W Ethernet XFP Optical Interface Card(WA)
+            type-SR01XK1WA(213),                -- 10GBase-R Ethernet XENPAK Optical Interface Line Card(WA)
+            type-SR01UP1WA(214),                -- Single Port OC-192c POS XFP Optical Interface Card(WA)
+            type-SR01SP4WA(215),                -- 4-Port OC-48c POS SFP Optical Interface Card(WA)
+            type-GP8U(216),                     -- 8-Port 1000Base-X SFP Optical Interface Module
+            type-LSEXP1P(217),                  -- Single 10G SFP Optical Interface Module
+            type-LSEXK1P(218),                  -- Single 10G XENPAK Interface Module
+            type-LSEXS1P(219),                  -- Single 10G STACK Interface Module
+
+            type-LS81GP48(220),                 -- 48-Port 1000M Ethernet Optical Interface Board(SFP,LC),LC Connector
+            type-LS81GT48B(221),                -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)
+            type-LS81T16P(222),                 -- 16-Port 1000Base-T Gigabit Ethernet Interface(RJ45) + 8-Port 1000BASE-X Gigabit Ethernet Optical Interface Board(SFP,LC)
+            type-LS81T32P(223),                 -- 32-Port 1000Base-T Gigabit Ethernet Interface(RJ45) + 16-Port 1000BASE-X Gigabit Ethernet Optical Interface Board(SFP,LC)
+            type-LS81TGX2(224),                 -- 2-Port 10GBASE Ethernet Interface Board(XFP,LC)
+            type-LS81TGX4(225),                 -- 4-Port 10GBASE Ethernet Interface Module(XFP,LC),XG
+
+            type-LSB1GV48DA(226),               -- 48 Ports 1000Base-T Ethernet Interface Line Card with POE(DA)
+            type-SR01GV48VB(227),               -- 48 Ports 1000Base-T Ethernet Interface Line Card with POE(VB)
+
+            type-LSB1GT24DB(228),               -- 24 Ports 1000Base-T Ethernet Interface Line Card(DB)
+            type-LSB1GP24DB(229),               -- 24 Ports 1000Base-X Ethernet Interface Line Card(DB)
+            type-LSB1GP24DC(230),               -- 24 Ports 1000Base-X Ethernet Interface Line Card(DC)
+            type-LSB1FW8DB(231),                -- 8-port 1000BASE-X (SFP) Firewall Service Card(DB)
+            type-LSB1IPSEC8DB(232),             -- 8-port 1000BASE-X (SFP) IPSEC Service Card(DB)
+            type-SR01GT24VB(233),               -- 24 Ports 1000Base-T Ethernet Interface Line Card(VB)
+            type-SR01GP24VC(234),               -- 24 Ports 1000Base-X Ethernet Interface Line Card(VC)
+            type-SR01VP2WA(235),                -- 2*10G RPR Process Unit(WA)
+            type-SR01FW8VB(236),                -- 8-port 1000BASE-X (SFP) Firewall Service Card(VB)
+            type-SR01IPSEC8VB(237),             -- 8-port 1000BASE-X (SFP) IPSEC Service Card(VB)
+            type-SR01NATL(238),                 -- NAT Service Processing Card (L)
+            type-SR01VPNL(239),                 -- VPN Service Processing Card (L)
+
+            type-LSB1GP24CB(240),               -- 24 Ports 1000Base-X Ethernet Interface Line Card(CB)
+            type-LSB1GP48DB(241),               -- 48-Port Gigabit Ethernet Optical Interface Line Card(DB)
+            type-LSB1XP2CB(242),                -- 2-Port 10Gigabit Ethernet Optical Interface Card(CB)
+            type-XP4L(243),                     -- 4 Port 1000BASE Optic Interface Module (XFP)
+            type-LSB1XP4LDB(244),               -- 4-Port 10GBase-R/W Ethernet XFP Optical Interface Line Speed Card(DB)
+            type-LSB1XP4LDC(245),               -- 4-Port 10GBase-R/W Ethernet XFP Optical Interface Line Speed Card(DC)
+            type-AHP4(246),                     -- 2-Port OC-3 ATM and 2-Port OC-3/12 ATM Interface Module (SFP)
+            type-LSB1AHP4GCA(247),              -- 2-Port OC-3 ATM and 2-Port OC-3/12 ATM and 8-Port 1000Base-X Ethernet Optical Interface Line Card(CA)
+            type-CLP4(248),                     -- 4 Ports OC-3/STM-1 CPOS Optical Interface Module(SFP)
+            type-LSB1CLP4GCA(249),              -- 4 Ports OC-3/STM-1 CPOS Optical Interface and 4-Port 1000Base-X Ethernet Optical Interface Line Card(CA)
+            type-ET32(250),                     -- 32-Port Channelized E1/T1 Interface Module
+            type-LSB1ET32GCA(251),              -- 32-Port Channelized E1/T1 Interface and 4-Port 1000Base-X Ethernet Optical Interface Line Card(CA)
+            type-LSB1IDSDB(252),                -- Intrusion Detection Service Card(DB)
+            type-LSB1SRP2N1(253),               -- Switching and Route Processing Board,8*LPU
+
+            bOARD-TYPE-LS82SRPB(254),           --
+            bORAD-TYPE-LS83SRPC(255),           --
+            type-Main(256),                     --
+
+            type-LSB1SRP2N2(257),               -- Switching and Route Processing Board,5*LPU
+            type-LSB1NAMB(258),                 -- NAM Service Processing Card (B)
+            type-RSP2(259),                     -- 2*2.5G Resilient Packet Ring Interface
+            type-LSB1RSP2CA(260),               -- 2*2.5G Resilient Packet Ring Interface Line Card(CA)
+            type-SR01XP4LVC(261),               -- 4-Port 10GBase-R/W Ethernet XFP Optical Interface Line Speed Card(VC)
+            type-SR01AHP4GWA(262),              -- 2-Port OC-3 ATM and 2-Port OC-3/12 ATM and 8-Port 1000Base-X Ethernet Optical Interface Line Card(WA)
+            type-SR01CLP4GWA(263),              -- 4 Ports OC-3/STM-1 CPOS Optical Interface and 4-Port 1000Base-X Ethernet Optical Interface Line Card(WA)
+            type-SR01ET32GWA(264),              -- 32-Port Channelized E1/T1 Interface and 4-Port 1000Base-X Ethernet Optical Interface Line Card(WA)
+            type-SR01IDSVB(265),                -- Intrusion Detection Service Card(VB)
+            type-SR01SRPUF(266),                -- Switching and Route Processing Board,12*LPU
+            type-SR01NAML(267),                 -- NAM Service Processing Card (L)
+            type-SR01RSP2WA(268),                -- 2*2.5G Resilient Packet Ring Interface Line Card(WA)
+            type-LSPM1XP1P(269),                -- 1-Port 10G XFP Module
+            type-LSPM1XP2P(270),                -- 2-Port 10G XFP Module
+            type-LSPM1CX2P(271),                -- 2-Port 10G CX4 Module
+            type-STK-1000BASE-T(272),           -- Single Port 1000BASE-T Stack Ethernet Interface Card
+--
+-- 273 to 299 reserved for other product
+--
+
+
+--
+-- 300 to 499 reserved for advanced switchs part I
+--
+            type-LSB1SRP1M0(300),               -- Switching and Route Process Unit,2*LPU or 3*LPU
+            type-LSB1SRP1M1(301),               -- Switching and Route Process Unit
+            type-LSB1GP12DB(302),               -- 12 Ports 1000Base Ethernet Optical Interface Service Card(DB)
+            type-LSB1GT12DB(303),               -- 12 Ports 1000Base-T Ethernet Interface Line Card(DB)
+            type-LSB1XK1DB (304),               -- 10GBase-R Ethernet XENPAK Optical Interface Line Card(DB)
+            type-LSB1XP2DB (305),               -- 2-Port 10GBase-R/W Ethernet XFP Optical Interface Card(DB)
+            type-LSB1XP2DC (306),               -- 2-Port 10GBase-R/W Ethernet XFP Optical Interface Card(DC)
+            type-LSB1GT48LDB(307),              -- 48-Port Gigabit Ethernet RJ45 Electrical Interface Card (DB)
+            type-LSB1XP4TDB(308),               -- 4-Port 10GBase-R/W Ethernet XFP Optical Interface Line Speed Test Card(DB)
+            type-LSB1XP4TDC(309),               -- 4-Port 10GBase-R/W Ethernet XFP Optical Interface Line Speed Test Card(DC)
+            type-LSB1RSP2DC(310),               -- 2*2.5G Resilient Packet Ring Interface Line Card(DC)
+            type-LSB1VP2DC (311),               -- 2*10G Resilient Packet Ring Process Unit(DC)
+            type-LSB1XP4DB (312),               -- 4-Port 10GBase-R/X Ethernet Optical Interface Line Card(DB)
+            type-LSB1SRP2E0(313),               -- Switching and Route Process Unit,12*LPU
+            type-LSB1SRP2E1(314),               -- Switching and Route Process Unit,8*LPU
+            type-LSB1SRP2E2(315),               -- Switching and Route Process Unit,5*LPU
+            type-LSB1SRP2E3(316),               -- Switching and Route Process Unit, Clock module
+            type-SR01SRPUQ(317),                -- Switching and Route Processing Unit Q
+            type-AHP1(318),                     -- 1-Port OC-12c(3c)/STM-4(1) ATM Optical Interface Module(SFP)
+            type-AHP2(319),                     -- 2-Port OC-12c(3c)/STM-4(1) ATM Optical Interface Module(SFP)
+            type-CLP1(320),                     -- 1-Port OC-3/STM-1 CPOS Optical Interface Module(SFP)
+            type-CLP2(321),                     -- 2-Port OC-3/STM-1 CPOS Optical Interface Module(SFP)
+            type-ET16(322),                     -- 16-Port Channelized E1/T1 Interface Module
+            type-LSB1SRP1NA0(323),              -- Switching and Route Process Unit,12*LPU
+            type-LSB1SRP1NA1(324),              -- Switching and Route Process Unit,8*LPU
+            type-LSB1SRP1NA2(325),              -- Switching and Route Process Unit,5*LPU
+            type-LSB1SRP1NA3(326),              -- Switching and Route Process Unit, Clock module
+            type-SR01AHP1GWA(327),              -- 1-Port OC-12c(3c)/STM-4(1) ATM Optical Interface and 4-Port 1000Base-X Ethernet Optical Interface Line Card(WA)
+            type-SR01AHP2GWA(328),              -- 2-Port OC-12c(3c)/STM-4(1) ATM Optical Interface and 4-Port 1000Base-X Ethernet Optical Interface Line Card(WA)
+            type-SR01CLP1GWA(329),              -- 1-Port OC-3/STM-1 CPOS Optical Interface and 4-Port 1000Base-X Ethernet Optical Interface Line Card(WA)
+            type-SR01CLP2GWA(330),              -- 2-Port OC-3/STM-1 CPOS Optical Interface and 4-Port 1000Base-X Ethernet Optical Interface Line Card(WA)
+            type-SR01ET16GWA(331),              -- 16-Port Channelized E1/T1 Interface and  4-Port 1000Base-X Ethernet Optical Interface Line Card(WA)
+            type-SR01GP12VB (332),              -- 12-Port Gigabit Ethernet Optical Interface Card(VB)
+            type-SR01XK1VB(333),                -- 1-Port 10Gigabit Ethernet Optical Interface Card(VB)
+            type-SR01XP2VC(334),                -- 2-Port 10GBase-RW Ethernet XFP Optical Interface Line Card(VC)
+            type-SR01XP4LVB(335),               -- 4-Port 10GBase-R/W Ethernet XFP Optical Interface Line Speed Card(VB)
+            type-SR01SRPUEA(336),               -- Switching and Route Process Unit£¬Clock Module
+            type-LSB1SRP1N4(337),               -- Switching and Route Process Unit, 12*LPU
+            type-LSB1SRP1N5(338),               -- Switching and Route Process Unit, 8*LPU
+            type-LSB1SRP1N6(339),               -- Switching and Route Process Unit, 5*LPU
+            type-LSB1SRP1N7(340),               -- Switching and Route Process Unit, Clock Module
+            type-LSB1SRP2N4(341),               -- Switching and Route Process Unit, 12*LPU
+            type-LSB1SRP2N5(342),               -- Switching and Route Process Unit, 8*LPU
+            type-LSB1SRP2N6(343),               -- Switching and Route Process Unit, 5*LPU
+            type-LSB1SRP2N7(344),               -- Switching and Route Process Unit, Clock Module
+            type-LSB1SRP1NA4(345),              -- Switching and Route Process Unit, 12*LPU
+            type-LSB1SRP1NA5(346),              -- Switching and Route Process Unit, 8*LPU
+            type-LSB1SRP1NA6(347),              -- Switching and Route Process Unit, 5*LPU
+            type-LSB1SRP1NA7(348),              -- Switching and Route Process Unit, Clock Module
+            type-LSB2GV48DA(349),               -- 48-Ports 1000Base-T Ethernet Interface Line Card with POE(DA)
+            type-LSB1RGP2GDB(350),              -- 2-Port GE RPR and 8-Port GE Optical Interface Service Card(DB)
+            type-LSB1RGP4GDB(351),              -- 4-Port GE RPR and 8-Port GE Optical Interface Service Card(DB)
+            type-LSB2GP24DB(352),               -- 24-Port 1000BASE-X  Interface Module(DB),(SFP,LC)
+            type-LSB2GP24DC(353),               -- 24-Port 1000BASE-X  Interface Module(DC),(SFP,LC)
+            type-LSB2GT24DB(354),               -- 24-Port 10/100/1000BASE-T Interface Module(DB),(RJ45)
+            type-LSB2FW8DB (355),               -- 8-Port 1000BASE-X Interface Firewall Service Module(DB),(SFP,LC)
+            type-LSB2IPSEC8DB(356),             -- 8-Port 1000BASE-X Interface IPSEC Service Module(DB),(SFP,LC)
+            type-LSB2GV48DB(357),               -- 48-Port 10/100/1000BASE-T Interface Module(DB),(PoE,RJ45)
+            type-RGP2(358),                     -- 2-Port GE Resilient Packet Ring Interface Module
+            type-RGP4(359),                     -- 4-Port GE Resilient Packet Ring Interface Module
+            type-SR02FW8VB(360),                -- 8-Port 1000BASE-X Interface Firewall Service Module(VB),(SFP,LC)
+            type-SR02IPSEC8VB(361),             -- 8-Port 1000BASE-X Interface IPSEC Service Module(VB),(SFP,LC)
+            type-LSB2SRP1N0(362),               -- Switching and Route Process Unit, 12*LPU
+            type-LSB2SRP1N1(363),               -- Switching and Route Process Unit, 8*LPU
+            type-LSB2SRP1N2(364),               -- Switching and Route Process Unit, 5*LPU
+            type-LSB2SRP1N3(365),               -- Switching and Route Process Unit, Clock module
+            type-LSB2SRP1N4(366),               -- Switching and Route Process Unit, 12*LPU
+            type-LSB2SRP1N5(367),               -- Switching and Route Process Unit, 8*LPU
+            type-LSB2SRP1N6(368),               -- Switching and Route Process Unit, 5*LPU
+            type-LSB2SRP1N7(369),               -- Switching and Route Process Unit, Clock module
+            type-SR02SRPUE (370),               -- Switching and Route Process Unit, Clock module
+            type-SR01LN1BQH0(371),              -- Single XG Service Board(BQH)
+            type-SR01DXP1L (372),               -- 1-Port 10GBASE-R/W Ethernet Optical Interface Card,(XFP,LC)
+            type-SR01DGP10L(373),               -- 10-Port 1000BASE-X Optical Interface Card,(SFP,LC)
+            type-SR01DRSP2L(374),               -- 2-Port 2.5G RPR Optical Interface Card,(SFP,LC)
+            type-SR01DRUP1L(375),               -- 1-Port 10G RPR Optical Interface Card,(XFP,LC)
+            type-SR01DGP20R(376),               -- 20-Port 1000BASE-X Optical Interface Card,(SFP,LC)
+            type-SR01DPLP8L(377),               -- 8-Port 155M POS Optical Interface Card,(SFP,LC)
+            type-SR01DXP2R (378),               -- 2-Port 10GBASE-R/W Ethernet Optical Interface Card,(XFP,LC)
+            type-LSB1FW2A0(379),                -- Gigabit Firewall Card, 4 Gigabit Port for Management
+            type-LSB1GP48LDB(380),              -- 48-Port Line Rate Gigabit Ethernet Optical Interface Card(DB)
+            type-SR01LN1BNA0(381),              -- Single XG Service Board(BNA)
+            type-SR01LN2BQH0(382),              -- Dual XG Service Board(BQH)
+            type-SR01LN2BNA0(383),              -- Dual XG Service Board(BNA)
+            type-SR01DGT20R(384),               -- 20-Port 10/100/1000BASE-T Electrical Interface Card,(RJ45)
+            type-SR01DPSP4L(385),               -- 4-Port 2.5G POS Optical Interface Card(SFP,LC)
+            type-SR01DPUP1L(386),               -- 1-Port 10G POS Optical Interface Card,(XFP,LC)
+            type-SR01DPL2G6L(387),              -- 2-Port 155M POS Optical Interface(SFP,LC)+6-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-SR01DPH2G6L(388),              -- 2-Port 622M POS Optical Interface(SFP,LC)+6-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-SR01DPS2G4L(389),              -- 2-Port 2.5G POS Optical Interface(SFP,LC)+4-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-SR01DCL1G8L(390),              -- 1-Port 155M CPOS Optical Interface(SFP,LC)+8-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-SR01DCL2G8L(391),              -- 2-Port 155M CPOS Optical Interface(SFP,LC)+8-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-SR01DET8G8L(392),              -- 8-Port E1/T1 Electrical Interface(RJ45)+8-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-SR02SRP2E3(393),               -- Switching and Route Process Unit, Clock Module
+            type-SR02SRP1E3(394),               -- Switching and Route Process Unit, Clock Module
+            type-SR02SRP1M3(395),               -- Switching and Route Process Unit, Clock Module
+            type-SR01DQCP4L(396),               -- 4-Port OC-3c/OC-12c/OC-48c POS/GE Optical Interface Card,(SFP,LC)
+            type-SR01DTCP8L(397),               -- 8-Port OC-3c/OC-12c POS/GE Optical Interface Card,(SFP,LC)
+            type-LSB1AFC1A0(398),               -- Anomaly Flow Cleaner Board
+            type-LSB1SSL1A0(399),               -- SSL VPN High-end Board
+            type-IMNAM(400),                    -- Net Analysis Service Processing Board
+            type-IMNAT(401),                    -- Network Address Translation Service Processing Board
+            type-PICAHP1L(402),                 -- 1-Port OC-12c/STM-4c ATM Optical Interface Card,(SFP,LC)
+            type-PICALP4L(403),                 -- 4-Port OC-3c/STM-1c ATM Optical Interface Card,(SFP,LC)
+            type-PICCHP4L(404),                 -- 4-Port 622M CPOS Optical Interface Card(SFP,LC)
+            type-PICCHS1G4L(405),               -- 1-Port 622M CPOS Optical Interface(Channelized to E3/T3)+4-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-PICCLS4G4L(406),               -- 4-Port 155M CPOS Optical Interface(Channelized to E3/T3)+4-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-PICCSP1L(407),                 -- 1-Port 2.5G CPOS Optical Interface Card(SFP,LC)
+            type-LSB1ACG1A0(408),               -- Application Control Gateway Board
+            type-LST1MRPNC1(409),               -- Management and Route Process Unit
+            type-LST1SF18B1(410),               -- S12518 Switch Fabric Card
+            type-LST1SF08B1(411),               -- S12508 Switch Fabric Card
+            type-LST1GT48LEC1(412),             -- 48-Port 10/100/1000BASE-T Interface Module(LEC),(RJ45)
+            type-LST1GP48LEC1(413),             -- 48-Port 1000BASE-X Interface Module (LEC),(SFP,LC)
+            type-LST1XP4LEC1(414),              -- 4-Port 10GBASE-R/W Interface Module (LEC),(XFP,LC)
+            type-LST1XP8LEC1(415),              -- 8-Port 10GBASE-R/W Interface Module (LEC),(XFP,LC)
+            type-LSR1SRP2B1(416),               -- Switching and Route Process Unit
+            type-LSR1SRP2C1(417),               -- Switching and Route Process Unit
+            type-LSR1SRP2B2(418),               -- Switching and Route Process Unit
+            type-LSR1SRP2C2(419),               -- Switching and Route Process Unit
+            type-LSR1GT24LEC1(420),             -- 16-Port 10/100/1000BASE-T Interface and 8-port 1000BASE-T/1000BASE-X Combo Interface Service Card(LEC)
+            type-LSR1GP24LEB1(421),             -- 16-Port 1000BASE-X Interface and 8-port 1000BASE-T/1000BASE-X Combo Interface Service Card(LEB)
+            type-LSR1GP24LEC1(422),             -- 16-Port 1000BASE-X Interface and 8-port 1000BASE-T/1000BASE-X Combo Interface Service Card(LEC)
+            type-LSR1GT48LEB1(423),             -- 48-Port 10/100/1000BASE-T Interface Module(LEB),(RJ45)
+            type-LSR1GT48LEC1(424),             -- 48-Port 10/100/1000BASE-T Interface Module(LEC),(RJ45)
+            type-LSR1GP48LEB1(425),             -- 48-Port 1000BASE-X Interface Module(LEB),(SFP,LC)
+            type-LSR1GP48LEC1(426),             -- 48-Port 1000BASE-X Interface Module(LEC),(SFP,LC)
+            type-LSR2GV48REB1(427),             -- 48-Port 10/100/1000BASE-T Interface Module(REB),(PoE,RJ45)
+            type-LSR1XP2LEB1(428),              -- 2-Port 10GBase-R/W Interface Module (LEB),(XFP,LC)
+            type-LSR1XP2LEC1(429),              -- 2-Port 10GBase-R/W Interface Module (LEC),(XFP,LC)
+            type-LSR1XP4LEB1(430),              -- 4-Port 10GBase-R/W Interface Module (LEB),(XFP,LC)
+            type-LSR1XP4LEC1(431),              -- 4-Port 10GBase-R/W Interface Module (LEC),(XFP,LC)
+            type-IMFW(432),                     -- Firewall Service Processing Board
+            type-LSB1LB1A0(433),                -- Load Balance Board
+            type-LSB1IPS1A0(434),               -- Gigabit IPS Card
+            type-LST1GT48LEB1(435),             -- 48-Port 10/100/1000BASE-T Interface Module(LEB),(RJ45)
+            type-LST1GP48LEB1(436),             -- 48-Port 1000BASE-X Interface Module (LEB),(SFP,LC)
+            type-LST1XP4LEB1(437),              -- 4-Port 10GBASE-R/W Interface Module (LEB),(XFP,LC)
+            type-LST1XP8LEB1(438),              -- 8-Port 10GBASE-R/W Interface Module (LEB),(XFP,LC)
+            type-LST1XP32REB1(439),             -- 32-Port 10GBASE-R Interface Module (REB),(SFP+,LC)
+            type-LST1XP32REC1(440),             -- 32-Port 10GBASE-R Interface Module (REC),(SFP+,LC)
+            type-LSR1FW2A1(441),                -- Firewall Service Module
+            type-LSR1SSL1A1(442),               -- SSL VPN Service Module
+            type-SR01DET32G2L(443),             -- 32-Port E1/T1 75ohm Electrical Interface(DB56 Female Socket)+2-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-LSR1GP24LEF1(444),             -- 16-Port 1000BASE-X Interface and 8-port 1000BASE-T/1000BASE-X Combo Interface Service Card(LEF)
+            type-LSR1XP4LEF1(445),              -- 4-Port 10GBASE-R/W Interface Module (LEF),(XFP,LC)
+            type-LSR1LB1A1(446),                -- Load Balance Module
+            type-LSR1NSM1A1(447),               -- NetStream Module
+            type-LSR1ACG1A1(448),               -- Application Control Gateway Service Module
+            type-LSR1IPS1A1(449),               -- Intrusion Protection System Service Module
+            type-LSR2GP24LEB1(450),             -- 16-Port 1000BASE-X Interface and 8-port 1000BASE-T/1000BASE-X Combo Interface Service Card(LEB)
+            type-LSR2GT24LEB1(451),             -- 16-Port 10/100/1000BASE-T Interface and 8-port 1000BASE-T/1000BASE-X Combo Interface Service Card(LEB)
+            type-LSR2GT48LEB1(452),             -- 48-Port 10/100/1000BASE-T Interface Module(LEB),(RJ45)
+            type-SPC-GP24L(453),                -- 24-Port 1000BASE-X Interface Service Card,(SFP,LC)
+            type-SPC-GT48L(454),                -- 48-Port 10/100/1000BASE-T Interface Module,(RJ45)
+            type-SPC-GP48L(455),                -- 48-Port 1000BASE-X Interface Module,(SFP,LC)
+            type-SPC-XP2L(456),                 -- 2-Port 10GBASE-R/W Interface Service Card,(XFP,LC)
+            type-SPC-XP4L(457),                 -- 4-Port 10GBase-R/W Interface Module,(XFP,LC)
+            type-SR06SRP2E3(458),               -- SDI,Routing Switch Processing Board
+            type-SPE-2010-E(459),               -- SDI,Single XG Service Board
+            type-SPE-2020-E(460),               -- SDI,Dual XG Service Board
+            type-SPC-XP4L-S-SDI(461),           -- SDI 4-Port 10GBase-R/W Interface Module,(XFP,LC)
+            type-SPC-GT48L-SDI(462),            -- SDI 48-Port 10/100/1000BASE-T Interface Module,(RJ45)
+            type-SPC-GP48L-S-SDI(463),          -- SDI 48-Port 1000BASE-X Interface Module,(SFP,LC)
+            type-SR02OPMA0(464),                -- Single Mode 1310&1550nm Optical Protect Board(LC)
+            type-LSR1XP16REB1(465),             -- 16-Port 10GBASE-R Interface Module (REB),(SFP+,LC)
+            type-LSR1GP48LEF1(466),             -- 48-Port 1000BASE-X Interface Module (LEF),(SFP,LC)
+            type-LST1GP48LEF1(467),             -- 48-Port 1000BASE-X Interface Module (LEF),(SFP,LC)
+            type-LST1XP8LEF1(468),              -- 8-Port 10GBASE-R/W Interface Module (LEF),(XFP,LC)
+            type-SPE-1010-II(469),              -- Single XG Service Board-II
+            type-SPE-1010-E-II(470),            -- Enhanced Single XG Service Board-II
+            type-SPE-1020-II(471),              -- Double XG Service Board-II
+            type-SPE-1020-E-II(472),            -- Enhanced Double XG Service Board-II
+            type-LST1FW2A1(473),                -- Firewall Board (LEC)
+            type-LST1NSM1A1(474),               -- NetStream Service Board (LEC)
+            type-LST1LB1A1(475),                -- Load Balancing Board (LEC)
+            type-LST1ACG1A1(476),               -- Application Control Gateway Board Module (LEC)
+            type-LST1IPS1A1(477),               -- Gigabit Intrusion Prevention System Module
+            type-LSR1DRUP1L1(478),              -- 1-Port OC-192c/STM-64c RPR Optical Interface Card,(XFP,LC)
+            type-LSR1DPUP1L1(479),              -- 1-Port OC-192c/STM-64c POS Optical Interface Card,(XFP,LC)
+            type-LSR1DPSP4L1(480),              -- 4-Port OC-48c/STM-16c POS Optical Interface Card,(SFP,LC)
+            type-LSR1DTCP8L1(481),              -- 8-Port OC-3c/OC-12c POS/GE Optical Interface Card,(SFP,LC)
+            type-LSR1DXP1L1(482),               -- 1-Port 10GBASE-R/W Ethernet Optical Interface Card,(XPF,LC)
+            type-LSR1DGP10L1(483),              -- 10-Port 1000BASE-X Optical Interface Card,(SFP,LC)
+            type-LSR1LN1BNL1(484),              -- Single Service Processing Board
+            type-LSR1LN2BL1(485),               -- Dual Serivice Processing Board
+            type-LSR1SRP2D1(486),               -- Switching and Route Process Unit With Clock
+            type-IM-NAT-II(487),                -- Network Address Translation Service Processing Board,II
+            type-IM-NAM-II(488),                -- Net Analysis Service Processing Board,II
+            type-CR-MRP-I(489),                 -- Management and Route Unit With OAM Module and Clock Module
+            type-CR-SF18C(490),                 -- Switch Fabric Card
+            type-CR-SF08C(491),                 -- Switch Fabric Card
+            type-CR-SPC-XP8LEF(492),            -- 8-Port 10GBASE-R/W Interface Module,(XFP,LC)
+            type-CR-SPC-XP4LEF(493),            -- 4-Port 10GBASE-R/W Interface Module,(XFP,LC)
+            type-CR-SPC-GP48LEF(494),           -- 48-Port 1000BASE-X Interface Module,(SFP,LC)
+            type-CR-SPC-GT48LEF(495),           -- 48-Port 10/100/1000BASE-T Interface Module
+            type-CR-SPE-3020-E(496),            -- Double XG Service Board (Enhanced)
+            type-CR-SPC-PUP4L-E(497),           -- 4-Port 10G POS Optical Interface Module,(XFP,LC)
+            type-LST1SF08C1(498),               -- Switch Fabric Card
+            type-LST1SF18C1(499),               -- Switch Fabric Card
+
+--
+-- 500 to 699 reserved for secondary switchs part I
+--
+            type-LS81GP16TM(500),               -- 12-port 1000BASE-X SFP Interface and 4-port 1000BASE-T/1000BASE-X Combo Interface Metro Switch and Route Processing Board
+            type-LS81VP4C(501),                 -- 4-port 1000BASE-X SFP Interface Virtual Daughter Card
+            type-LS8M1PT8P0(502),               -- 8-Port 1000BASE-PX Optical Line Interface Board, SFP Req
+            type-LS8M1PT8GB0(503),              -- 8-Port 1000BASE-PX20 Gigabit Passive Optical Line Interface Board B(20km, SFF), SC Connector
+            type-LS8M1PT4GB0(504),              -- 4-Port 1000BASE-PX20 Gigabit Passive Optical Line Interface Board B(20km, SFF), SC Connector
+            type-LS81GP2R(505),                 -- 2-Port 1000M Ethernet Optical Interface RPR Board
+            type-LS81GP4R(506),                 -- 4-Port 1000M Ethernet Optical Interface RPR Board
+            type-LS81IPSECA(507),               -- IPSec Service Board
+            type-LS81FWA(508),                  -- Firewall Service Board
+            type-LS82VSNP(509),                 -- Versatile Network Processing Service Module (PBR/NAT/NetStream) with 12-port 1000BASE-X SFP, XGBUS Uplink
+            type-LSQ1GV48SA(510),               -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)
+            type-LSQ1SRPB(511),                 -- Salience VI
+            type-LSQ1SRP2XB(512),               -- Salience VI-10GE
+            type-LSQ1SRP1CB(513),               -- Salience VI-Turbo
+            type-LSQ1FV48SA(514),               -- 48-Port 100M Ethernet Electrical Interface Switch Unit(RJ45)
+            type-LSD1MPUA(515),                 -- Main Control Unit
+            type-LSD1GP20A0(516),               -- 16-port 1000BASE-X SFP Interface and 4-port 1000BASE-T/1000BASE-X Combo Interface Line Card
+            type-LSD1GP20TA0(517),              -- 16-port 1000BASE-X SFP Interface and 4-port 1000BASE-T/1000BASE-X Combo Interface and 16 1000BASE-T Interface Line Card
+            type-LSD1GP36A0(518),               -- 32-port 1000BASE-X SFP Interface and 4-port 1000BASE-T/1000BASE-X Combo Interface Line Card
+            type-LSD1GP20XA0(519),              -- 16-port 1000BASE-X SFP Interface and 4-port 1000BASE-T/1000BASE-X Combo Interface and 2-port 10GBASE-X XFP Interface Line Card
+            type-LSD1GP20EA0(520),              -- 16-port 1000BASE-X SFP Interface and 4-port 1000BASE-T/1000BASE-X Combo Interface and 2-port GE RPR Interface Line Card
+            type-LSD1GP20RA0(521),              -- 16-port 1000BASE-X SFP Interface and 4-port 1000BASE-T/1000BASE-X Combo Interface and 2-port OC48 RPR Interface Line Card
+            type-LSD1GP16A0(522),               -- 16-port 1000BASE-X SFP Ethernet Interface SubCard
+            type-LSD1GT16A0(523),               -- 16-port 1000BASE-T Ethernet Interface SubCard
+            type-LSD1XP2A0(524),                -- 2-port 10GBASE-X XFP Ethernet Interface SubCard
+            type-LSD1EP2A0(525),                -- 2-port 1000BASE-T Ethernet RPR Interface SubCard
+            type-LSD1RP2A0(526),                -- 2-port OC48 RPR Interface SubCard
+            type-LSQ1GV48SC(527),               -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)-POE
+            type-LSQ1FP48SA(528),               -- 48 Port 100M Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ1GP24SC(529),               -- 24 Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ1GT24SC(530),               -- 24-Port 1000BASE-T Ethernet Interface Board (RJ45)
+            type-LSQ1TGX2SC(531),               -- 2-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1GP12EA(532),               -- 12-Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ1TGX1EA(533),               -- 1-Port 10GBASE Ethernet Optical Interface Module(XFP,LC)
+            type-LSQ1P24XGSC(534),              -- 24-Port 1000BASE-X Gigabit Ethernet Optical Interface(SFP,LC)+2-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1T24XGSC(535),              -- 24-Port 1000BASE-T Gigabit Ethernet Interface(RJ45)+2-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LS81TGX1B(536),                -- 1 Port 10GBase-R Ethernet Interface Board(XENPAK,SC)
+            type-LSQ1PT4PSC0(537),              -- 4-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-LS81SRPG13(538),               -- Salience V, Switch and Route Processing Board
+            type-LS81SRPG14(539),               -- Salience V Edge
+            type-LS81SRPG15(540),               -- Salience V Plus
+            type-LSQ1GP48SC0(541),              -- 48-Port 1000BASE Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ1GP12SC0(542),              -- 12-Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)
+            type-LSD1SRPA0(543),                -- Salience VIII 160
+            type-LSD1SRPB0(544),                -- Salience VIII 480
+            type-LSD1SRPC0(545),                -- Salience VIII 800
+            type-LSD1GT16PES0(546),             -- 16-Port 10/100/1000BASE-T and 8-Port 100/1000BASE-X SFP Interface Card
+            type-LSD1GP24ES0(547),              -- 24-Port 1000BASE-X Ethernet SFP Interface Card
+            type-LSD1GT24XES0(548),             -- 24-Port 10/100/1000BASE-T and 2-port 10GBASE-X Ethernet XFP Optical Interface Card
+            type-LSD1GP24XES0(549),             -- 24-Port 1000BASE-X Ethernet SFP interface and 2-port 10GBASE-X Ethernet XFP Optical Interface Card
+            type-LSD1XP2ES0(550),               -- 2-Port 10GBASE-X Ethernet XFP Optical Interface Card
+            type-LSD1GP48ES0(551),              -- 48-Port 1000BASE-X Ethernet SFP Interface Card
+            type-LSQ1MPUA0(552),                -- Master Process Board
+            type-LSQ1MPUA1(553),                -- Master Process Unit
+            type-LSQ1FWBSC0(554),               -- Gigabit Firewall Card£¬4 Gigabit Port for Management
+            type-LSQ1PT8PSC0(555),              -- 8-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-LSQ1PT16PSC0(556),             -- 16-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-SA11MPUA0(557),                -- SmartEngine I-Lite
+            type-SA11MPUB0(558),                -- SmartEngine I
+            type-LSQ1AFCBSC0(559),              -- Anomaly Flow Cleaner Board
+            type-LSQ1MPUB0(560),                -- Salience VI-Lite
+            type-LSQ1MPUB1(561),                -- Salience VI-Lite
+            type-LSQ1PT4PSC1(562),              -- 4-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-LSQ1PT8PSC1(563),              -- 8-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-LSQ1PT16PSC1(564),             -- 16-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-LSQ1FP48USA0(565),             -- 48-Port 100M Ethernet Optical Interface Switch Unit(SFP,LC)
+            type-LSQ1FP48USA1(566),             -- 48-Port 100M Ethernet Optical Interface Switch Unit(SFP,LC)
+            type-LSQ1FV48USA0(567),             -- 48-Port 100M Ethernet Electrical Interface Switch Unit(RJ45),PoE
+            type-LSQ1FV48USA1(568),             -- 48-Port 100M Ethernet Electrical Interface Switch Unit(RJ45),PoE
+            type-LSQ1SRPD0(569),                -- Switch and Route Processing Unit, Salience VI-Plus
+            type-LSQ1CGP24TSC0(570),            -- Switching and Routing Processing Unit with 24 1000BASE-X Gigabit Ethernet Optical Ports,including 8 Combo Ports,SFP Req.
+            type-LSQ1GP24TSC0(571),             -- 16-Port 1000BASE-X Gigabit Ethernet Optical(SFP,LC) And 8-Port 10/100/1000BASE-T RJ45/1000BASE-X SFP Combo Interface Board
+            type-LSQ1ACGASC0(572),              -- Application Control Gateway Board
+            type-LSD1XP1ES0(573),               -- 1-Port 10GBASE-X Ethernet XFP Optical Interface Card
+            type-LSD1GP12ES0(574),              -- 12-Port 1000BASE-X Ethernet SFP Interface Card
+            type-LSQ1SRP12GB0(575),             -- Switch And Route Processing Unit with 12 1000BASE Ethernet Optical Interfaces(SFP,LC),Salience VI-GE
+            type-LSQ1GV40PSC0(576),             -- 40-Port 10/100/1000BASE-T Electrical(RJ45) And 8-Port 1000BASE-X Optical Ethernet Interface Board(SFP,LC),PoE
+            type-LSQ1FWBSC1(577),               -- Firewall Board
+            type-LSQ1NSMSC0(578),               -- NetStream Board
+            type-LSQ1NSMSC1(579),               -- NetStream Board
+            type-LSQ1AFDBSC0(580),              -- Anomaly Flow Detector Board
+            type-LS81MPUB(581),                 -- Salience IV
+            type-LS81FP48XL(582),               -- 48-Port 100M Ethernet Optical Interface Module,(SFP,LC)
+            type-LS81FT48XL(583),               -- 48-Port 10/100M Ethernet Electrical Interface Module(RJ45)
+            type-LS81GP12XL(584),               -- 12-Port 1000/100M Ethernet Optical Interface Module(SFP,LC)
+            type-LS81GP24XL(585),               -- 24-Port 1000/100M Ethernet Optical Interface Module(SFP,LC)
+            type-LS81GP48XL(586),               -- 48-Port 1000/100M Ethernet Optical Interface Module(SFP,LC)
+            type-LS81GT24XL(587),               -- 24-Port 10/100/1000M Ethernet Electrical Interface Module(RJ45)
+            type-LS81GT48XL(588),               -- 48-Port 10/100/1000M Ethernet Electrical Interface Module(RJ45)
+            type-LS81TGX2XL(589),               -- 2-Port 10GBASE Ethernet Optical Interface Module(XFP,LC)
+            type-LSQ1GV48SD0(590),              -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45),PoE
+            type-LSQ1GP48EB0(591),              -- 48-Port Enhanced 1000BASE-X Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ1IPSSC0(592),               -- Gigabit IPS Card
+            type-LSQ1GV48SD1(593),              -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45),PoE
+            type-LSQ1GP48SD0(594),              -- 48-Port 1000BASE-X Gigabit Ethernet Optical Interface(SFP,LC) Interface Board
+            type-LSQ1GP48SD1(595),              -- 48-Port 1000BASE-X Gigabit Ethernet Optical Interface(SFP,LC) Interface Board
+            type-LSQ1SRPA0(596),                -- Salience VI-Smart
+            type-LSQ1SRPA1(597),                -- Salience VI-Smart
+            type-LSQ2FP48SA0(598),              -- 48 Port 100M Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ2FP48SA1(599),              -- 48 Port 100M Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ2FT48SA0(600),              -- 48-Port 100M Ethernet Electrical Interface Switch Unit(RJ45)
+            type-LSQ2FT48SA1(601),              -- 48-Port 100M Ethernet Electrical Interface Switch Unit(RJ45)
+            type-LSQ1GV24PSC0(602),             -- 24-Port 10/100/1000BASE-T Electrical(RJ45) Interface Board,including 4 Combo Ports,SFP Req,PoE,No Spell
+            type-LSQ1GV24PSC1(603),             -- 24-Port 10/100/1000BASE-T Electrical(RJ45) Interface Board,including 4 Combo Ports,SFP Req,PoE,No Spell
+            type-LSQ1CGV24PSC0(604),            -- Switching and Routing Processing Unit with 24 10/100/1000BASE-T Electrical Ports(RJ45),including 4 Combo Ports,SFP Req,PoE,No Spell
+            type-LSQ1CGV24PSC1(605),            -- Switching and Routing Processing Unit with 24 10/100/1000BASE-T Electrical Ports(RJ45),including 4 Combo Ports,SFP Req,PoE,No Spell
+            type-LSQ1GP24TEB0(606),             -- 16-Port 1000BASE-X Gigabit Ethernet Optical Interface(SFP,LC)+8-Port Combo Interface Board
+            type-LSQ1GP24TEB1(607),             -- 16-Port 1000BASE-X Gigabit Ethernet Optical Interface(SFP,LC)+8-Port Combo Interface Board
+            type-LSQ1GP24TSD0(608),             -- 16-Port 1000BASE-X Gigabit Ethernet Optical Interface(SFP,LC)+8-Port Combo Interface Board
+            type-LSQ1GP24TSD1(609),             -- 16-Port 1000BASE-X Gigabit Ethernet Optical Interface(SFP,LC)+8-Port Combo Interface Board
+            type-LSQ1GP24TXSD0(610),            -- 16-Port GE Optical Interface(SFP,LC)+8-Port Combo Interface+2-Port 10GE Optical Interface Board(XFP,LC)
+            type-LSQ1GP24TXSD1(611),            -- 16-Port GE Optical Interface(SFP,LC)+8-Port Combo Interface+2-Port 10GE Optical Interface Board(XFP,LC)
+            type-LSQ1TGX2EB0(612),              -- 2-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1TGX2EB1(613),              -- 2-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1TGX2SD0(614),              -- 2-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1TGX2SD1(615),              -- 2-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1TGX4SD0(616),              -- 4-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1TGX4SD1(617),              -- 4-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1TGX8SD0(618),              -- 8-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1TGX8SD1(619),              -- 8-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1GP48EB1(620),              -- 48-Port Enhanced 1000BASE-X Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ1TGX4EB0(621),              -- 4-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1TGX4EB1(622),              -- 4-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)
+            type-LSQ1GP12SC3(623),              -- 12-Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ1GP24TSC3(624),             -- 16-Port 1000BASE-X Gigabit Ethernet Optical(SFP,LC) And 8-Port 10/100/1000BASE-T RJ45/1000BASE-X SFP Combo Interface Board
+            type-LSQ1GP48SC3(625),              -- 48-Port 1000BASE Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ1GV48SC3(626),              -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45),PoE
+            type-LSQ1MPUA3(627),                -- Master Process Board
+            type-LSQ1SRP1CB3(628),              -- Salience VI-Turbo
+            type-LSQ1SRPA3(629),                -- Salience VI-Smart
+            type-LSQ2FP48SA3(630),              -- 48 Port 100M Ethernet Optical Interface Board(SFP,LC)
+            type-LSQ2FT48SA3(631),              -- 48-Port 100M Ethernet Electrical Interface Switch Unit(RJ45)
+            type-LSQ1MPUB3(632),                -- Salience VI-Lite
+            type-LSQ1CGP24TSC3(633),            -- Switching and Routing Processing Unit with 24 1000BASE-X Gigabit Ethernet Optical Ports,including 8 Combo Ports,SFP Req.
+            type-LSQ1MPUB4(634),                -- Salience VI-Lite
+            type-LSQ1SRPD4(635),                -- Salience VI-Plus
+            type-LSQ1SSLSC0(636),               -- SSL VPN Service Board(B)
+            type-LSQ1LBSC0(637),                -- Gigabit Load Balancing Card
+            type-LSQ1NAT24SC0(638),             -- NAT/NetStream-Supported Line Processing Unit with 24 10/100/1000BASE-T Electrical Ports(RJ45),including Combo Ports,Upgradeable to PoE
+            type-LSQ1SRP12GB4(639),             -- Salience VI-GE
+            type-LSQ1TGS8SC0(640),              -- 8-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-LSQ3PT4PSC0(641),              -- 4-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-EWPXM2MPUB0(642),              -- Salience VI-Lite
+            type-EWPXM2SRP12GB0(643),           -- Salience VI-GE
+            type-EWPXM2SRPD0(644),              -- Salience VI-Plus
+            type-EWPXM2GP24TSD0(645),           -- 16-Port 1000BASE-X Ethernet Optical Interface(SFP Req.)+8-Port Combo Interface Module
+            type-EWPXM2GP24TXSD0(646),          -- 16-Port 1000BASE-X Ethernet Optical Interface(SFP Req.)+8-Port Combo Interface+2-Port 10GE Optical Interface(XFP Req.) Module
+            type-EWPXM2TGX4SD0(647),            -- 4-Port 10GBASE Ethernet Optical Interface Module,XFP Req
+            type-EWPXM2GP48SD0(648),            -- 48-Port 1000BASE-X Gigabit Ethernet Optical Interface Module,SFP Req
+            type-EWPXM2GP24TSC0(649),           -- 24-Port 1000BASE-X/100BASE-FX Optical  Interface Module,including 8 Combo Ports,SFP Req
+            type-EWPXM2TGX2SC0(650),            -- 2-Port 10GBASE Ethernet Optical Interface Module,XFP Req
+            type-EWPXM2GP48SC0(651),            -- 48-Port 1000BASE-X/100BASE-FX Ethernet Optical Interface Module,SFP Req
+            type-LS7500-GP48-SC(652),           -- 48-Port 1000BASE-X/100BASE-FX Ethernet Optical Interface Module(SFP,LC)
+            type-LS7500-GP48-SD(653),           -- 48-Port 1000BASE-X Gigabit Ethernet Optical Interface Module(SFP,LC)
+            type-LS7500-GT48-SC(654),           -- 48-Port 10/100/1000BASE-TX Ethernet Interface Module(RJ45)
+            type-LS7500-GT48-SD(655),           -- 48-Port 10/100/1000BASE-T Ethernet Interface Module(RJ45)
+            type-LS7500-SRPG1(656),             -- Main Control Unit
+            type-LS7500-SRPG2(657),             -- Salience VI-Lite
+            type-LS7500-XP4-SD(658),            -- 4-Port 10GBASE Ethernet Optical Interface Module(XFP,LC)
+            type-LS7500-XP8-SD(659),            -- 8-Port 10GBASE Ethernet Optical Interface Module(XFP,LC)
+            type-LSQ4PT4PSC0(660),              -- 4-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-LSQ4PT8PSC0(661),              -- 8-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-LSQ4PT16PSC0(662),             -- 16-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
+            type-LSQ1GP24TSA0(663),             -- 16-Port 1000BASE-X Gigabit Ethernet Optical(SFP,LC) And 8-Port 10/100/1000BASE-T RJ45/1000BASE-X SFP Combo Interface Board
+            type-LSQ1GV24PSA0(664),             -- 24-Port 10/100/1000BASE-T Electrical(RJ45) Interface Board,including 4 Combo Ports,SFP Req,Upgradeable to PoE
+            type-LSQ1SRPD3(665),                -- Salience VI-Plus
+            type-LSQ1SUPA0(666),                -- Supervisor Engine Board
+            type-LSU1FAB04A0(667),              -- Switch Fabric Board
+            type-LSU1FAB08A0(668),              -- Switch Fabric Board
+            type-LSU1TGS8EA0(669),              -- 8-Port 10GBASE Ethernet SFP+ Optical Interface Board(EA)
+            type-LSU1TGS8EB0(670),              -- 8-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-LSU1TGS8SE0(671),              -- 8-Port 10GBASE Ethernet SFP+ Optical Interface Board(SE)
+            type-LSUTGS16SC0(672),              -- 16-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-LUS1SUPA0(673),                -- Supervisor Engine Board
+            type-LSU1GP24TXEA0(674),            -- 16-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port Combo Interface+2-Port 10GE Optical Interface Board(XFP,LC)(EA)
+            type-LSU1GP24TXEB0(675),            -- 16-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port Combo Interface+2-Port 10GE Optical Interface Board(XFP,LC)(EB)
+            type-LSU1GP24TXSE0(676),            -- 16-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port Combo Interface+2-Port 10GE Optical Interface Board(XFP,LC)(SE)
+            type-LSU1GP48EA0(677),              -- 48-Port 1000BASE-X Gigabit Ethernet Optical Interface(SFP,LC) Interface Board(EA)
+            type-LSU1GP48EB0(678),              -- 48-Port Enhanced 1000BASE-X Ethernet Optical Interface Board(SFP,LC)(EB)
+            type-LSU1GP48SE0(679),              -- 48-Port 1000BASE Ethernet Optical Interface Board(SFP,LC)(SE)
+            type-LSU1GT48EA0(680),              -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(EA)
+            type-LSU1GT48SE0(681),              -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SE)
+            type-LSU1TGX4EA0(682),              -- 4-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)(EA)
+            type-LSU1TGX4EB0(683),              -- 4-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)(EB)
+            type-LSU1TGX4SE0(684),              -- 4-Port 10GBASE Ethernet Optical Interface Board(XFP,LC)(SE)
+            type-LSQ1FAB08A0(685),              -- Switching Fabric Board
+            type-EWPX2WCMD0(686),               -- Access Controller Card
+            type-LSQ1WCMD0(687),                -- Access Controller Card
+            type-LSQ1IAGSC0(688),               -- Wireless&IAG Service Card
+            type-LSU1GP24TSE0(689),             -- 16-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port Combo Interface Board(SE)
+            type-LSQ1TGS16SC0(690),             -- 16-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-EWPX2TGS16SC0(691),            -- 16-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-LSQ1SUPA3(692),                -- Supervisor Engine Board
+            type-LSQ1FAB04A3(693),              -- 320G Switch Fabric Board
+            type-LSQ1FAB08A3(694),              -- 640G Switch Fabric Board,For S7608-X & S7608-XV
+            type-LSQ1GT48SC0(695),              -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)
+            type-LSR2SRP2C1(696),               -- Management and Route Process Unit
+            type-LSR2SRP2C2(697),               -- Management and Route Process Unit
+
+--
+-- 700 to 799 reserved for primary switchs
+--
+            type-1000BASE-X-COMBO(701),         -- Single port 10/100/1000BASE-T/1000BASE-X Combo Interface Board
+            type-EPON-1000M(702),               -- Optical Network Unit Interface Board
+            type-1000BASE-FIXED-2SFP-T-2RJ45(703),         -- 2 port 10/100/1000BASE-T and 2 port 1000BASE-X Interface Board
+            type-100M-1550-BIDI(704),           -- 100BASE-X BIDI Interface Board,Tx 1550nm, Rx 1310nm
+            type-100M-1310-BIDI(705),           -- 100BASE-X BIDI reverse Interface Board,Tx 1310nm, Rx 1550nm
+            type-1000BASE-FIXED-4RJ45-4SFP-COMBO(706),     -- 4 port 10/100/1000BASE-T and 4 port 1000BASE-X COMBO Interface Board
+            type-LSH1PK2T(707),                 -- OSM Interface Board
+            type-LSPM2GP2P(708),                -- 2-Port 1000BASE-X SFP Module
+            type-LSWM1GT16P(709),               -- 16-Port 10/100/1000BASE-T Ethernet Electrical Interface Module
+            type-LSWM1GP16P(710),               -- 16-Port 100/1000BASE-X Ethernet Optical Interface Module
+            type-LSWM1XP2P(711),                -- 2-Port 10G Ethernet XFP Optical Interface Module
+            type-LSWM1XP4P(712),                -- 4-Port 10G Ethernet XFP Optical Interface Module
+            type-LSWM1SP2P(713),                -- 2-Port 10G Ethernet SFP PLUS Optical Interface Module
+            type-LSWM1SP4P(714),                -- 4-Port 10G Ethernet SFP PLUS Optical Interface Module
+            type-LSWM148POEM(715),              -- 48 Port Mid Power PoE Module
+            type-LSWM1FW10(716),                -- RMI CPU XLR 732, with Firewall software
+            type-LSWM1WCM10(717),               -- RMI CPU XLR 732, with Wireless Access Controller software
+            type-LSWM1IPS10(718),               -- RMI CPU XLR 732, with IPS/AV software
+            type-LSWM1WCM20(719),               -- RMI CPU XLR 408, with Wireless Access Controller software
+            type-LSPM2SP2P(725),                -- 2-Port 10G Ethernet SFP PLUS Optical Interface Module
+            type-LSPM2SP2PA(726),               -- 2-Port Second Version SFP+ Module
+            type-LSP5GP8P(727),                 -- 8-Port 1G Ethernet SFP Optical Interface Module
+            type-LSP5GT8P(728),                 -- 8-Port 10/100/1000BASE-T Ethernet Electrical Interface Module
+            type-LSWM1FC4P(729),                -- 4-Port 8G Fibre Channel Interface Module
+            type-LSW1XGT4P0(730),               -- 4-Port 10G Ethernet Copper Interface Module
+            type-LSW1XGT2P0(731),               -- 2-Port 10G Ethernet Copper Interface Module
+            type-LSP1XGT2P(732),                -- 2-Port 10G Ethernet Copper Interface Board
+
+--
+-- 800 to 899 reserved for WLAN products
+--
+            type-WX5002MPU(800),                -- Wireless Lan Control Board with 2-port 1000BASE-T/1000BASE-X Combo Interface
+            type-LS8M1WCMA(801),                -- Wireless Lan Service Board
+            type-EWPX1G24XA0(802),              -- 24-Port 1000BASE-T Gigabit Ethernet Interface(RJ45) and 4-port 1000BASE-T/1000BASE-X Combo Interface and 2-port 10GBASE Interface Line Card
+            type-LSQ1WCMB0(803),                -- 1 Port 10GBASE Interface Board
+            type-LSB1WCM2A0(804),               -- Wireless Controller Module Board
+            type-EWPX1WCMB0(805),               -- 1 Port 10GBASE Interface Board
+            type-EWPX1G24XC0(806),              -- 24-Port 1000BASE-T Gigabit Ethernet Interface(RJ45) and 4-port 1000BASE-T/1000BASE-X Combo Interface Line Card
+            type-EWPX1WCMC0(807),               -- 1-Port 1000BASE-T Gigabit Ethernet of wireless Lan Service Board
+            type-EWPX1FWA0(808),                -- Firewall Service Board
+            type-EWPX1G10XC0(809),              -- 8-Port 1000BASE-T Gigabit Ethernet Interface(RJ45) and 2-port 1000BASE-X SFP Interface Line Card
+            type-EWPX1WCM10C0(810),             -- 1-Port 1000BASE-T Gigabit Ethernet of wireless Lan Service Board
+            type-LSR1WCM2A1(811),               -- 1-Port 1000BASE-T Gigabit Ethernet of wireless Lan Service Board
+            type-EWPX1WAP0(812),                -- WAPI Encryption Card
+            type-EWPX1WCMD0(813),               -- 2 Port 10GBASE Interface Board
+            type-EWPX1G24XCE0(814),             -- 24-Port 1000BASE-T Gigabit Ethernet Interface(RJ45) and 4-port 1000BASE-T/1000BASE-X Combo Interface Line Card
+            type-EWPX1WCMCE0(815),              -- 2-Port 1000BASE-T Gigabit Ethernet of wireless Lan Service Board
+
+--
+-- 900 to 1199 reserved for advanced switchs part II
+--
+            type-LSR1DRSP2L1(900),              -- 2-Port OC-48c/STM-16c RPR Optical Interface Card(SFP,LC)
+            type-PIC-CLF2G8L(901),              -- 2-Port 155M CPOS Optical Interface(SFP,LC)+8-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-PIC-CLF4G8L(902),              -- 4-Port 155M CPOS Optical Interface(SFP,LC)+8-Port 1000BASE-X Optical Interface Card(SFP,LC)
+            type-SR02SRP2F3(903),               -- Routing Switch Processing Board(2F)
+            type-SR02SRP1F3(904),               -- Routing Switch Processing Board(1F)
+            type-LST1GT48LEA1(905),             -- 48-Port 10/100/1000BASE-T Interface Module(LEA),(RJ45)
+            type-LST1GP48LEA1(906),             -- 48-Port 1000BASE-X Interface Module(LEA),(SFP,LC)
+            type-LST2XP8LEA1(907),              -- 8-Port 10GBASE-R Interface Module(LEA),(SFP+,LC)
+            type-LST1GT48LEY1(908),             -- 48-Port 10/100/1000BASE-T Interface Module(LEY),(RJ45)
+            type-LST1GP48LEY1(909),             -- 48-Port 1000BASE-X Interface Module(LEY),(SFP,LC)
+            type-LST1XP32REY1(910),             -- 32-Port 10GBASE-R Interface Module(REY),(SFP+,LC)
+            type-LST1XP8LEY1(911),              -- 8-Port 10GBASE-R/W Interface Module(LEY),(XFP,LC)
+            type-LST1GP48LEZ1(912),             -- 48-Port 1000BASE-X Interface Module(LEZ),(SFP,LC)
+            type-LST1XP8LEZ1(913),              -- 8-Port 10GBASE-R/W Interface Module(LEZ),(XFP,LC)
+            type-IM-FW-II(914),                 -- Firewall Service Processing Board-II
+            type-IM-IPS(915),                   -- Intrusion Prevention System Service Processing Board
+            type-IM-SSL(916),                   -- SSL VPN Service Processing Board
+            type-IM-LB(917),                    -- Load Balance Service Processing Board
+            type-IM-ACG(918),                   -- Application Control Gateway Service Processing Board
+            type-LSR1XP16REC1(919),             -- 16-Port 10GBASE-R Interface Module(REC),(SFP+,LC)
+            type-LST2XP8LEB1(920),              -- 8-Port 10GBASE-R Interface Module(LEB),(SFP+,LC)
+            type-LST2XP8LEC1(921),              -- 8-Port 10GBASE-R Interface Module(LEC),(SFP+,LC)
+            type-LST2XP8LEF1(922),              -- 8-Port 10GBASE-R Interface Module(LEF),(SFP+,LC)
+            type-LST2XP4LEB1(923),              -- 4-Port 10GBase-R Interface Module(LEB),(SFP+,LC)
+            type-LST2XP4LEC1(924),              -- 4-Port 10GBase-R Interface Module(LEC),(SFP+,LC)
+            type-LST2XP32REB1(925),             -- 32-Port 10GBASE-R Interface Module(REB),(SFP+,LC)
+            type-LST2XP32REC1(926),             -- 32-Port 10GBASE-R Interface Module(REC),(SFP+,LC)
+            type-LSR1WCM3A1(927),               -- Access Controller Module
+            type-LST1XP16LEB1(928),             -- 16-Port 10GBASE-R Interface Module (LEB),(SFP+,LC)
+            type-LST1XP16LEC1(929),             -- 16-Port 10GBASE-R Interface Module (LEC),(SFP+,LC)
+            type-CR-SPC-XP4L-E-I(930),          -- 4-Port 10GBASE-R/W Optical Interface Module,(XFP,LC)
+            type-LST2MRPNC1(931),               -- Management and Route Process Unit
+            type-LST2SF08C1(932),               -- Switch Fabric Card
+            type-LST2SF18C1(933),               -- Switch Fabric Card
+            type-SR02SRP2G3(934),               -- Routing Switch Processing Board(2G)
+            type-CR-SPE-3020-E-I(935),          -- CR15LN3CNA1, Dual Service Processing Board
+            type-CR-SPC-PUP4L-E-I(936),         -- 4-Port 10G POS Optical Interface Board(Enhanced),(XFP,LC)
+            type-CR-SPC-XP4LEF-I(937),          -- 4-Port 10GBASE-R/W Interface Module (LEF),(XFP,LC)
+            type-CR-SPC-XP8LEF-I(938),          -- 8-Port 10GBASE-R/W Interface Module (LEF),(XFP,LC)
+            type-LST3XP8LEB1(939),              -- 8-Port 10GBASE-R Interface Module (LEB),(XFP,LC)
+            type-LST3XP8LEC1(940),              -- 8-Port 10GBASE-R Interface Module (LEC),(XFP,LC)
+            type-LST1FW3A1(941),                -- Firewall Board
+            type-CR-IM-NAM1A(942),              -- CR1M1NAM1A1, Network Analysis Service Module, Domestic&Overseas Version
+            type-LSR2SRP2B1(943),               -- Management and Route Process Unit
+            type-LSR2SRP2B2(944),               -- Management and Route Process Unit
+            type-LSR2SRP2D1(945),               -- Management and Route Process Unit
+            type-LST3XP8LEY1(946),              -- 8-Port 10GBASE-R/W Interface Module (LEY),(XFP,LC)
+            type-LST2XP32REY1(947),             -- 32-Port 10GBASE-R Interface Module(REY),(SFP+,LC)
+            type-LST1XP16LEY1(948),             -- 16-Port 10GBASE-R Interface Module (LEY),(SFP+,LC)
+            type-SR0M2SRP2G3(949),              -- Routing Switch Processing Board(2G)
+            type-SR0M2SRP1G3(950),              -- Routing Switch Processing Board(1G)
+            type-SPC-GP48LA(951),               -- 48-Port 1000BASE-X Interface Service Module,(SFP,LC)
+            type-SPC-GT48LA(952),               -- 48-Port 10/100/1000BASE-T Interface Service Module,(RJ45)
+            type-SPC-XP4LA(953),                -- 4-Port 10GBase-R/W Interface Service Module,(XFP,LC)
+            type-SPC-XP2LA(954),                -- 2-Port 10GBASE-R/W Interface Service Module,(XFP,LC)
+            type-SPC-GP24LA(955),               -- 16-Port 1000BASE-X Interface(SFP,LC)+8-Port Combo Interface Service Module
+            type-SPC-XP16RA(956),               -- 16-Port 10GBASE-R Optical Interface Service Module(RA),(SFP+,LC)
+            type-CR-IM-FW1A(957),               -- Firewall Service Processing Board
+
+--
+-- 1200 to 1399 reserved for secondary switchs part II
+--
+            type-LSU1QGC4SF0(1201),             -- 4 Port 40G BASE Ethernet Optical Interface Board(CFP,SC)(SF)
+            type-LSU1QGS8SF0(1202),             -- 8-Port 40G BASE Ethernet Optical Interface Board(QSFP,MPO)(SF)
+            type-LSU1TGS48SF0(1203),            -- 48-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-LSU1QGS4SF0(1204),             -- 4-Port 40G BASE Ethernet Optical Interface Board(QSFP,MPO)(SF)
+            type-LSU1TGS32SF0(1205),            -- 32-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-LSU1FAB08D0(1206),             -- Switching Fabric Module
+            type-LSU1FAB04B0(1207),             -- Switching Fabric Module
+            type-LSU1FAB08B0(1208),             -- Switching Fabric Module
+            type-LSU1FAB12D0(1209),             -- Switching Fabric Module
+            type-LSU1FAB12B0(1210),             -- Switching Fabric Module
+            type-LSU1FAB04D0(1211),             -- Switching Fabric Module
+            type-LSQ1CTGS16SC0(1212),           -- Supervisor Engine Board With 16-Port 10GBASE Ethernet SFP+ Optical Interfaces
+            type-EWPX2CTGS16SC0(1213),          -- Supervisor Engine Board With 16-Port 10GBASE Ethernet SFP+ Optical Interfaces
+            type-LSUM3WCMD0(1214),              -- High Performance Access Cotroller Module
+            type-EWPXM3WCMD0(1215),             -- High Performance Access Cotroller Module
+            type-LSQ1QGS4SC0(1216),             -- 4-Port 40G BASE Ethernet Optical Interface Board(QSFP+,MPO)(SC)
+            type-LSQ1QGC4SC0(1217),             -- 4 Port 40GBASE Ethernet Optical Interface Board(CFP)(SC)
+            type-LSU1TGT24SF0(1218),            -- 24-Port 10GBASE-T Ethernet Electrical Interface Board(RJ45)(SF)
+            type-LSQ1QGS8SC3(1219),             -- 8-Port 40G BASE Ethernet Optical Interface Board(QSFP+,MPO)
+            type-LSQ1TGS32SC3(1220),            -- 32-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-LSQ1QGS4SC3(1221),             -- 4-Port 40GBASE Ethernet Optical Interface Board(QSFP+,MPO)(SC)
+            type-LSQ1TGS48SC3(1222),            -- 48-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-LSQ1QGC4SC3(1223),             -- 4-Port 40GBASE Ethernet Optical Interface Board(CFP)(SC)
+            type-LSQ1FAB12D3(1224),             -- Switch Fabric Board
+            type-LSQ1FAB08D3(1225),             -- Switching Fabric Module
+            type-LSQ1FAB04D3(1226),             -- Switching Fabric Module
+            type-LSQ1TGS8EB3(1227),             -- 8-Port 10GBASE Ethernet SFP+ Optical Interface Board
+            type-LSQ1TGT24SC3(1228),            -- 24-Port 10GBASE-T Ethernet Electrical Interface Board(RJ45)(SC)
+            type-LSQ1FAB08B0(1229),             -- Switching Fabric Module
+            type-EWPX2CTGS16SC(1230)            -- Supervisor Engine Board With 16-Port 10GBASE Ethernet SFP+ Optical Interfaces
+        }
+
+    hwLswSystemPara OBJECT IDENTIFIER ::= {  hwLswDeviceAdmin 1  }
+
+-- ==================================================================
+
+    hwLswSysIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "System IP address, which is the primary IP address of the VLAN
+         interface that has smallest VLAN ID and is configured IP address."
+        ::= { hwLswSystemPara 1 }
+
+    hwLswSysIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Mask of the system IP address."
+        ::= { hwLswSystemPara 2 }
+
+    hwLswSysCpuRatio OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "CPU usage of the system in accuracy of 1%, and the range of value is
+        1 to 100."
+        ::= { hwLswSystemPara 3 }
+
+    hwLswSysVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Information of the system version."
+        ::= { hwLswSystemPara 4 }
+
+     hwLswSysTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "System time."
+        ::= { hwLswSystemPara 5 }
+
+     hwLswSysUNMCastDropEnable OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            disable (0),
+            enable  (1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Enable or disable discarding of unknown multicast packet."
+        ::= { hwLswSystemPara 6 }
+
+     hwLswSysManagementVlan OBJECT-TYPE
+        SYNTAX Integer32 (1..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "System management VLAN."
+        ::= { hwLswSystemPara 7 }
+
+     hwLswSysVlanRange OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..10))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "System VLAN range, if set VLAN range, must bind mangement IP/Mask."
+        ::= { hwLswSystemPara 8 }
+
+     hwLswSysManagementIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "System IP address."
+        ::= { hwLswSystemPara 9 }
+
+    hwLswSysManagementIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Mask of the system IP address."
+        ::= { hwLswSystemPara 10 }
+
+    hwMacAddressCountPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Supportted MAC address number on port."
+        ::= { hwLswSystemPara 11 }
+
+    hwMacAddressCountMachine OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Supportted MAC address number on machine."
+        ::= { hwLswSystemPara 12 }
+
+    hwLswSysPhyMemory OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "byte"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The memory of physical.
+        For the distributed device, it represents the memory size on the master
+        slot.
+
+        If the amount of physical memory exceeds 4,294,967,295 bytes,
+        the value remains 4,294,967,295 bytes."
+        ::= { hwLswSystemPara 13 }
+
+    hwLswSysMemory OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "byte"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The memory of system.
+        Note that the system memory means the memory can be used by the software
+        platform.
+
+        For the distributed device, it represents the memory size on the master
+        slot.
+
+        If the amount of system memory exceeds 4,294,967,295 bytes,
+        the value remains 4,294,967,295 bytes."
+        ::= { hwLswSystemPara 14 }
+
+    hwLswSysMemoryUsed OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "byte"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The system memory in use.
+        Note that the system memory means the memory can be used by the software
+        platform.
+
+        For the distributed device, it represents the memory size on the master
+        slot.
+
+        If the amount of used memory exceeds 4,294,967,295 bytes,
+        the value remains 4,294,967,295 bytes."
+        ::= { hwLswSystemPara 15 }
+
+    hwLswSysMemoryRatio OBJECT-TYPE
+        SYNTAX Unsigned32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The percentage of system memory in use.
+        Note that the system memory means the memory can be used by the software
+        platform.
+
+                                hwLswSysMemoryUsed
+        hwLswSysMemoryRatio = --------------------
+                                 hwLswSysMemory
+
+        For the distributed device, it represents the memory used ratio on the
+        master slot."
+        ::= { hwLswSystemPara 16 }
+
+    hwLswSysTemperature OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The temperature of system.
+
+        For the distributed device, it represents the temperature on the
+        master slot."
+        ::= { hwLswSystemPara 17 }
+
+-- ==================================================================
+--
+-- slot and port management group
+--
+-- ==================================================================
+
+    hwLswSlotConf OBJECT IDENTIFIER ::= { hwLswDeviceAdmin 4 }
+
+-- ==================================================================
+--
+-- Frame information table
+--
+-- ==================================================================
+
+    hwLswFrameTable    OBJECT-TYPE
+        SYNTAX     SEQUENCE OF HwLswFrameEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Frame information table."
+        ::= {hwLswSlotConf 2}
+
+    hwLswFrameEntry    OBJECT-TYPE
+        SYNTAX     HwLswFrameEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Frame description table entry."
+        INDEX { hwLswFrameIndex }
+        ::= {hwLswFrameTable 1}
+
+   HwLswFrameEntry ::= SEQUENCE
+    {
+        hwLswFrameIndex        Integer32,
+        hwLswFrameType         Integer32,
+        hwLswFrameDesc         DisplayString,
+        hwLswSlotNumber        Integer32,
+        hwLswFrameAdminStatus  INTEGER
+    }
+
+    hwLswFrameIndex    OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "The unique index of frame."
+        ::= {hwLswFrameEntry 1}
+
+    hwLswFrameType    OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "Frame type."
+        ::= {hwLswFrameEntry 2}
+
+    hwLswFrameDesc    OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(0..64))
+        MAX-ACCESS     read-write
+        STATUS     current
+        DESCRIPTION
+        "Frame description."
+        ::= {hwLswFrameEntry 3}
+
+    hwLswSlotNumber    OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "Number of slots of the current frame."
+        ::= {hwLswFrameEntry 4}
+
+    hwLswFrameAdminStatus    OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+              normal (1),
+              fault  (2),
+              other  (3)
+        }
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "The Status of frame."
+        ::= {hwLswFrameEntry 5}
+
+
+-- ==================================================================
+--
+-- slot information table
+--
+-- ==================================================================
+
+    hwLswSlotTable    OBJECT-TYPE
+        SYNTAX     SEQUENCE OF HwLswSlotEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Slot description table."
+        ::= {hwLswSlotConf 3}
+
+    hwLswSlotEntry    OBJECT-TYPE
+        SYNTAX     HwLswSlotEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Slot description table entry."
+        INDEX { hwLswFrameIndex, hwLswSlotIndex }
+        ::= {hwLswSlotTable 1}
+
+   HwLswSlotEntry ::= SEQUENCE
+    {
+        hwLswSlotIndex                Integer32,
+        hwLswSlotType                 HwLswTypeOfSlot,
+        hwLswSlotDesc                 DisplayString,
+        hwLswSlotCpuRatio             Integer32,
+        hwLswSlotPcbVersion           DisplayString,
+        hwLswSlotSoftwareVersion      DisplayString,
+        hwLswSubslotNumber            Integer32,
+        hwLswSlotAdminStatus          INTEGER,
+        hwLswSlotOperStatus           INTEGER,
+        hwLswSlotPhyMemory            Unsigned32,
+        hwLswSlotMemory               Unsigned32,
+        hwLswSlotMemoryUsed           Unsigned32,
+        hwLswSlotMemoryRatio          Unsigned32,
+        hwLswSlotTemperature          Integer32
+   }
+
+    hwLswSlotIndex    OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "Slot index. When the slot is empty, listed as vacant slot."
+        ::= {hwLswSlotEntry 1}
+
+    hwLswSlotType    OBJECT-TYPE
+        SYNTAX     HwLswTypeOfSlot
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "Slot type. BOM number is recommended."
+        ::= {hwLswSlotEntry 2}
+
+    hwLswSlotDesc    OBJECT-TYPE
+        SYNTAX     DisplayString(SIZE(0..64))
+        MAX-ACCESS     read-write
+        STATUS     current
+        DESCRIPTION
+        "Slot description."
+        ::= {hwLswSlotEntry 3}
+
+    hwLswSlotCpuRatio     OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+        "CPU usage of the slot in accuracy of 1%, and the range of value is 1 to
+         100."
+        ::= {hwLswSlotEntry 4}
+
+    hwLswSlotPcbVersion    OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Hardware version of the board."
+        ::= {hwLswSlotEntry 5}
+
+    hwLswSlotSoftwareVersion    OBJECT-TYPE
+        SYNTAX               DisplayString (SIZE(0..64))
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+        "Software version of the board."
+        ::= {hwLswSlotEntry 6}
+
+    hwLswSubslotNumber    OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "Number of the cards of the board."
+        ::= {hwLswSlotEntry 7}
+
+    hwLswSlotAdminStatus    OBJECT-TYPE
+        SYNTAX           INTEGER
+        {
+            not-install (1),
+            normal      (2),
+            fault       (3),
+            forbidden   (4)
+        }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+        "Slot status."
+        ::= {hwLswSlotEntry 8}
+
+    hwLswSlotOperStatus    OBJECT-TYPE
+        SYNTAX          INTEGER
+        {
+            disable (1),
+            enable  (2),
+            reset   (3),
+            test    (4)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+        "Slot operation status."
+        ::= {hwLswSlotEntry 9}
+
+    hwLswSlotPhyMemory    OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "byte"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The memory of physical on the board.
+
+        If the amount of physical memory exceeds 4,294,967,295 bytes,
+        the value remains 4,294,967,295 bytes."
+        ::= {hwLswSlotEntry 10}
+
+    hwLswSlotMemory    OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "byte"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The memory of system on the board.
+
+        Note that the system memory means the memory can be used by
+        the software platform.
+
+        If the amount of system memory exceeds 4,294,967,295 bytes,
+        the value remains 4,294,967,295 bytes."
+        ::= {hwLswSlotEntry 11}
+
+    hwLswSlotMemoryUsed    OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS "byte"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The system memory in use on the board.
+
+        Note that the system memory means the memory can be used by
+        the software platform.
+
+        If the amount of used memory exceeds 4,294,967,295 bytes,
+        the value remains 4,294,967,295 bytes."
+        ::= {hwLswSlotEntry 12}
+
+    hwLswSlotMemoryRatio    OBJECT-TYPE
+        SYNTAX Unsigned32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The percentage of system memory in use on the board.
+
+        Note that the system memory means the memory can be used by
+        the software platform."
+        ::= {hwLswSlotEntry 13}
+
+    hwLswSlotTemperature    OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The temperature of system on the board."
+        ::= {hwLswSlotEntry 14}
+
+-- ==================================================================
+--
+-- sub slot information table
+--
+-- ==================================================================
+
+    hwLswSubslotTable    OBJECT-TYPE
+        SYNTAX     SEQUENCE OF HwLswSubslotEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Subslot description table."
+        ::= {hwLswSlotConf 4}
+
+    hwLswSubslotEntry    OBJECT-TYPE
+        SYNTAX     HwLswSubslotEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Subslot description table entry."
+        INDEX {
+            hwLswFrameIndex,
+            hwLswSlotIndex,
+            hwLswSubslotIndex
+        }
+        ::= {hwLswSubslotTable 1}
+
+   HwLswSubslotEntry ::= SEQUENCE
+    {
+        hwLswSubslotIndex       Integer32,
+        hwLswSubslotType        HwLswTypeOfSlot,
+        hwLswSubslotPortNum     Integer32,
+        hwLswSubslotAdminStatus INTEGER,
+        hwLswSubslotFirstIfIndex Integer32
+   }
+
+   hwLswSubslotIndex      OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+        "Subslot index."
+        ::= {hwLswSubslotEntry 1}
+
+-- value list of hwLswSubslotType are identical with the value list of hwLswSlotType.
+    hwLswSubslotType      OBJECT-TYPE
+        SYNTAX         HwLswTypeOfSlot
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+        "Type of the pinch board in the subslot."
+        ::= {hwLswSubslotEntry 2}
+
+    hwLswSubslotPortNum   OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+        "Number of physical ports in the pinch board."
+        ::= {hwLswSubslotEntry 3}
+
+
+    hwLswSubslotAdminStatus    OBJECT-TYPE
+        SYNTAX              INTEGER
+        {
+            not-install (1),
+            normal      (2),
+            fault       (3),
+            forbidden   (4)
+        }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+        "Status of the pinch board in the subslot."
+        ::= {hwLswSubslotEntry 4}
+
+    hwLswSubslotFirstIfIndex   OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+        "The value of ifIndex of the first physical port in the pinch board."
+        ::= {hwLswSubslotEntry 5}
+-- ==================================================================
+--
+-- port information table
+--
+-- ==================================================================
+
+    hwLswPortTable    OBJECT-TYPE
+        SYNTAX     SEQUENCE OF HwLswPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Port configuration table."
+        ::= {hwLswSlotConf 5}
+
+    hwLswPortEntry    OBJECT-TYPE
+        SYNTAX     HwLswPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Port configuration table entry."
+        INDEX {
+            hwLswFrameIndex,
+            hwLswSlotIndex,
+            hwLswSubslotIndex,
+            hwLswPortIndex
+        }
+        ::= {hwLswPortTable 1}
+
+    HwLswPortEntry ::= SEQUENCE
+    {
+        hwLswPortIndex             Integer32,
+        hwLswPortType              INTEGER,
+        hwLswPortIfindex           Integer32,
+        hwLswPortIsPlugged         INTEGER
+     }
+
+    hwLswPortIndex    OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "The port number on the device. The first port number is 1, which is
+         reserved if the port does not exist."
+        ::= {hwLswPortEntry 1}
+
+    hwLswPortType   OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            type-NULL(0),           -- NULL
+            type-10OR100M(1),           -- 10BASE-T or 100BASE-TX  Electrical Interface
+            type-1000BASE-LX-SM(2),     -- 1000BASE-LX Single Mode Fiber Optic Transceivers IR
+            type-1000BASE-SX-MM(3),     -- 1000BASE-SX Multi Mode Fiber Optic Transceivers SR
+            type-1000BASE-TX(4),        -- 1000BASE-T Electrical Interface
+            type-100M-SINGLEMODE-FX(5),     -- 100BASE-FX Single Mode Fiber Optic Transceivers
+            type-100M-MULTIMODE-FX(6),      -- 100BASE-FX Multi Mode Fiber Optic Transceivers
+            type-100M-100BASE-TX(7),        -- 100BASE-TX Electrical Interface
+            type-100M-HUB(8),           -- 100M HUB
+            type-VDSL(9),           -- Very High Speed DSL
+            type-STACK(10),         -- Gigabit STACK
+            type-1000BASE-ZENITH-FX(11),    -- 1000BASE-LX Single Mode Fiber Optic Transceivers VLR
+            type-1000BASE-LONG-FX(12),      -- 1000BASE-LX Single Mode Fiber Optic Transceivers LR
+            type-ADSL(13),          -- Asymmetric Digital Subscriber Line
+            type-10OR100M-db(14),       -- 10/100M ethernet electric port,each RJ-45 has 2 ethernet ports
+            type-10GBASE-LR-SM(15),     -- 10GBASE-LR  Single Mode Fiber Optic Transceivers
+            type-10GBASE-LX4-MM(16),        -- 10GBASE-LX4 Multi Mode Fiber Optic Transceivers
+            type-10GBASE-LX4-SM(17),        -- 10GBASE-LX4 Single Mode Fiber Optic Transceivers
+            type-100M-LONG-FX(18),      -- 100BASE-FX Single Mode Fiber Optic Transceivers LR SC
+            type-1000BASE-CX(19),       -- 1000BASE-CX
+            type-1000BASE-ZENITH-FX-LC(20), -- 1000BASE-LX Single Mode Fiber Optic Transceivers VLR with LC Connector
+            type-1000BASE-LONG-FX-LC(21),   -- 1000BASE-LX Single Mode Fiber Optic Transceivers LR with LC Connector
+            type-100M-SM-FX-SC(22),     -- 100BASE-FX Single Mode Fiber Optic Transceivers with SC Connector
+            type-100M-MM-FX-SC(23),     -- 100BASE-FX Multi Mode Fiber Optic Transceivers with SC Connector
+            type-100M-SM-FX-LC(24),     -- 100BASE-FX Single Mode Fiber Optic Transceivers with LC Connector
+            type-100M-MM-FX-LC(25),     -- 100BASE-FX Multi Mode Fiber Optic Transceivers with LC Connector
+            type-GBIC-NO-CONNECTOR(26),     --
+            type-GBIC-1000-BASE-T(27),      --
+            type-GBIC-1000-BASE-LX(28),     --
+            type-GBIC-1000-BASE-SX(29),     --
+            type-GBIC-1000-BASE-ZX(30),     --
+            type-COMBO-NO-CONNECTOR(31),    --
+            type-COMBO-1000-BASE-LX(32),    --
+            type-COMBO-1000-BASE-LX-FIBER(33),  --
+            type-COMBO-1000-BASE-LX-COPPER(34), --
+            type-COMBO-1000-BASE-SX(35),    --
+            type-COMBO-1000-BASE-SX-FIBER(36),  --
+            type-COMBO-1000-BASE-SX-COPPER(37), --
+            type-COMBO-1000-BASE-ZX(38),    --
+            type-COMBO-1000-BASE-ZX-FIBER(39),  --
+            type-COMBO-1000-BASE-ZX-COPPER(40), --
+            type-155-POS-SX-MMF(41),        --
+            type-155-POS-LX-SMF(42),        --
+            type-1000BASE-T(43),        -- 1000 Base-T Port
+            type-1000BASE-SX-SFP(44),       -- 1000 Base-SX SFP Port
+            type-1000BASE-LX-SFP(45),       -- 1000 Base-SX SFP Port
+            type-1000BASE-T-AN-SFP(46),     -- 1000 Base-T AN SFP Port
+            type-10GBASE-LX4-XENPAK(47),    -- 10G Base-LX4 XENPAK Port
+            type-10GBASE-LR-XENPAK(48),     -- 10G Base-LR XENPAK Port
+            type-10GBASE-CX4(49),       -- 10G Base-CX4 Port
+            type-1000BASE-ZX-SFP(50),           -- 1000 Base-ZX SFP Port
+            type-1000BASE-MM-SFP(51),           -- 1000 Base-MM SFP Port
+            type-100BASE-SX-SFP(52),            -- 100 Base-SX SFP Port
+            type-100BASE-LX-SFP(53),            -- 100 Base-LX SFP Port
+            type-100BASE-T-AN-SFP(54),          -- 100 Base-T SFP Port
+            type-100BASE-ZX-SFP(55),            -- 100 Base-ZX SFP Port
+            type-100BASE-MM-SFP(56),            -- 100 Base-MM SFP Port
+            type-SFP-NO-CONNECTOR(57),          -- No Connector SFP Port
+            type-SFP-UNKNOWN-CONNECTOR(58),     --  Unknown SFP Port
+            type-POS-NO-CONNECTOR(59),          -- POS no connector
+            type-10G-BASE-SR(60),               -- 10GBASE-SR Fiber Optic Transceivers with SC Connector
+            type-10G-BASE-ER(61),               -- 10GBASE-ER Fiber Optic Transceivers with SC Connector
+            type-10G-BASE-LX4(62),              -- 10GBASE-LX4 Fiber Optic Transceivers with SC Connector
+            type-10G-BASE-SW(63),               -- 10GBASE-SW Fiber Optic Transceivers with SC Connector
+            type-10G-BASE-LW(64),               -- 10GBASE-LW Fiber Optic Transceivers with SC Connector
+            type-10G-BASE-EW(65),               -- 10GBASE-EW Fiber Optic Transceivers with SC Connector
+            type-10G-LR-SM-LC(66),              -- 10GBASE-LR Single Mode Fiber Optic Transceivers with LC Connector
+            type-10G-SR-MM-LC(67),              -- 10GBASE-SR Multi Mode Fiber Optic Transceivers with LC Connector
+            type-10G-ER-SM-LC(68),              -- 10GBASE-ER Single Mode Fiber Optic Transceivers with LC Connector
+            type-10G-LW-SM-LC(69),              -- 10GBASE-LW Single Mode Fiber Optic Transceivers with LC Connector
+            type-10G-SW-MM-LC(70),              -- 10GBASE-SW Multi Mode Fiber Optic Transceivers with LC Connector
+            type-10G-EW-SM-LC(71),              -- 10GBASE-EW Single Mode Fiber Optic Transceivers with LC Connector
+
+            type-100BASE-SM-MTRJ(72),           -- 100 Base-SM MTRJ Port
+            type-100BASE-MM-MTRJ(73),           -- 100 Base-MM MTRJ Port
+
+            type-XFP-NO-CONNECTOR(74),          -- XFP without Transceiver
+            type-XFP-10GBASE-SR(75),            -- 10GBASE-SR XFP Transceiver
+            type-XFP-10GBASE-LR(76),            -- 10GBASE-LR XFP Transceiver
+            type-XFP-10GBASE-ER(77),            -- 10GBASE-ER XFP Transceiver
+            type-XFP-10GBASE-SW(78),            -- 10GBASE-SW XFP Transceiver
+            type-XFP-10GBASE-LW(79),            -- 10GBASE-LW XFP Transceiver
+            type-XFP-10GBASE-EW(80),            -- 10GBASE-EW XFP Transceiver
+            type-XFP-10GBASE-CX4(81),           -- 10GBASE-CX4 XFP Transceiver
+            type-XFP-10GBASE-LX4(82),           -- 10GBASE-LX4 XFP Transceiver
+            type-XFP-UNKNOWN(83),               -- Unknown  XFP Transceiver
+
+            type-XPK-NOCONNECTOR(84),           -- Xenpak without Transceiver
+            type-XPK-10GBASE-SR(85),            -- 10GBASE-SR Xenpak Transceiver
+            type-XPK-10GBASE-LR(86),            -- 10GBASE-LR Xenpak Transceiver
+            type-XPK-10GBASE-ER(87),            -- 10GBASE-ER Xenpak Transceiver
+            type-XPK-10GBASE-SW(88),            -- 10GBASE-SW Xenpak Transceiver
+            type-XPK-10GBASE-LW(89),            -- 10GBASE-LW Xenpak Transceiver
+            type-XPK-10GBASE-EW(90),            -- 10GBASE-EW Xenpak Transceiver
+            type-XPK-10GBASE-CX4(91),           -- 10GBASE-CX4 Xenpak Transceiver
+            type-XPK-10GBASE-LX4(92),           -- 10GBASE-LX4 Xenpak Transceiver
+            type-XPK-UNKNOWN(93),               -- Unknown Xenpak Transceiver
+
+            type-POS-OC48-SR-SM-LC(94),         -- OC48-SR Single Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC48-IR-SM-LC(95),         -- OC48-IR Single Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC48-LR-SM-LC(96),         -- OC48-LR Single Mode Fiber Optic Transceivers with LC Connector
+
+            type-10G-BASE-CX4(97),              -- 10G BASE-CX4 Electrical Interface
+
+            type-OLT-1000BASE-BX-SFF-SC(98),    -- 1000 BASE-BX SFF SC OLT Port
+            type-ONU-1000BASE-BX-SFF-SC(99),    -- 1000 BASE-BX SFF SC ONU Port
+
+            type-24G-CASCADE(100),              -- 24G Cascade port
+
+            type-POS-OC3-SR-MM(101),            -- STM1/OC3 Short Reach Multi Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC3-IR-SM(102),            -- STM1/OC3 Intermediate Reach Single Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC3-IR-1-SM(103),          -- STM1/OC3 Intermediate Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 1)
+            type-POS-OC3-IR-2-SM(104),          -- STM1/OC3 Intermediate Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 2)
+            type-POS-OC3-LR-SM(105),            -- STM1/OC3 Long Reach Single Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC3-LR-1-SM(106),          -- STM1/OC3 Long Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 1)
+            type-POS-OC3-LR-2-SM(107),          -- STM1/OC3 Long Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 2)
+            type-POS-OC3-LR-3-SM(108),          -- STM1/OC3 Long Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 3)
+            type-POS-OC12-SR-MM(109),           -- STM4/OC12 Short Reach Multi Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC12-IR-SM(110),           -- STM4/OC12 Intermediate Reach Single Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC12-IR-1-SM(111),         -- STM4/OC12 Intermediate Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 1)
+            type-POS-OC12-IR-2-SM(112),         -- STM4/OC12 Intermediate Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 2)
+            type-POS-OC12-LR-SM(113),           -- STM4/OC12 Long Reach Single Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC12-LR-1-SM(114),         -- STM4/OC12 Long Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 1)
+            type-POS-OC12-LR-2-SM(115),         -- STM4/OC12 Long Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 2)
+            type-POS-OC12-LR-3-SM(116),         -- STM4/OC12 Long Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 3)
+            type-POS-OC48-SR-SM(117),           -- STM16/OC48 Short Reach Single Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC48-IR-SM(118),           -- STM16/OC48 Intermediate Reach Single Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC48-IR-1-SM(119),         -- STM16/OC48 Intermediate Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 1)
+            type-POS-OC48-IR-2-SM(120),         -- STM16/OC48 Intermediate Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 2)
+            type-POS-OC48-LR-SM(121),           -- STM16/OC48 Long Reach Single Mode Fiber Optic Transceivers with LC Connector
+            type-POS-OC48-LR-1-SM(122),         -- STM16/OC48 Long Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 1)
+            type-POS-OC48-LR-2-SM(123),         -- STM16/OC48 Long Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 2)
+            type-POS-OC48-LR-3-SM(124),         -- STM16/OC48 Long Reach Single Mode Fiber Optic Transceivers with LC Connector(variation 3)
+            type-POS-I-64-1(125),               -- STM64/OC192 Interconnect Fiber Optic Transceivers with LC Connector(wavelength 1310nm G.652 fiber)
+            type-POS-I-64-2(126),               -- STM64/OC192 Interconnect Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.652 fiber)
+            type-POS-I-64-3(127),               -- STM64/OC192 Interconnect Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.653 fiber)
+            type-POS-I-64-5(128),               -- STM64/OC192 Interconnect Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.655 fiber)
+            type-POS-S-64-1(129),               -- STM64/OC192 Short Haul Fiber Optic Transceivers with LC Connector(wavelength 1310nm G.652 fiber)
+            type-POS-S-64-2(130),               -- STM64/OC192 Short Haul Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.652 fiber)
+            type-POS-S-64-3(131),               -- STM64/OC192 Short Haul Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.653 fiber)
+            type-POS-S-64-5(132),               -- STM64/OC192 Short Haul Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.655 fiber)
+            type-POS-L-64-1(133),               -- STM64/OC192 Long Haul Fiber Optic Transceivers with LC Connector(wavelength 1310nm G.652 fiber)
+            type-POS-L-64-2(134),               -- STM64/OC192 Long Haul Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.652 fiber)
+            type-POS-L-64-3(135),               -- STM64/OC192 Long Haul Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.653 fiber)
+            type-POS-V-64-2(136),               -- STM64/OC192 Very Long Haul Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.652 fiber)
+            type-POS-V-64-3(137),               -- STM64/OC192 Very Long Haul Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.653 fiber)
+            type-100BASE-FX-BIDI(138),          -- 100 BASE-FX BIDI Port
+            type-100BASE-BX10-U-SFP(139),       -- 100 BASE-BX10-U-SFP Port
+            type-100BASE-BX10-D-SFP(140),       -- 100 BASE-BX10-D-SFP Port
+            type-1000BASE-BX10-U-SFP(141),      -- 1000 BASE-BX10-U-SFP Port
+            type-1000BASE-BX10-D-SFP(142),      -- 1000 BASE-BX10-D-SFP Port
+            type-STK-1000BASE-T(143),           -- 1000 BASE-T Stack Port
+            type-RPR-PHYPOS-CONNECTOR(144),     -- Resilient Packet Ring POS physical port
+            type-RPR-PHY10GE-CONNECTOR(145),    -- 10G Resilient Packet Ring physical port
+            type-RPR-LOGICPOS-CONNECTOR(146),   -- Resilient Packet Ring POS logical port
+            type-RPR-LOGIC10GE-CONNECTOR(147),  -- 10G Resilient Packet Ring logical port
+            type-10GBASE-ZR(148),               -- Fiber Optic Transceivers with SC Connector, XENPAK
+            type-TYPE-ERROR-CONNECTOR(149),     -- Error Optic Transceivers type
+            type-10G-STACK(150),                -- 10G Stack Port
+            type-155-ATM-SX-MMF(151),           -- ATM OC-3 Multi-mode Short Reach Optical Transceiver
+            type-155-ATM-LX-SMF(152),           -- ATM OC-3 single mode long reach optical transceiver
+            type-622-ATM-SX-MMF(153),           -- ATM OC-12 Multi-mode Short Reach Optical Transceiver
+            type-622-ATM-LX-SMF(154),           -- ATM OC-12 Single Mode Long Reach Optical Transceiver
+            type-155-ATM-NO-CONNECTOR(155),     -- ATM OC-3 No Connector
+            type-622-ATM-NO-CONNECTOR(156),     -- ATM OC-12 No Connector
+            type-155-CPOS-E1-NO-CONNECTOR(157), -- CPOS(E1) OC-3 No Connector
+            type-155-CPOS-T1-NO-CONNECTOR(158), -- CPOS(T1) OC-3 No Connector
+            type-622-CPOS-E1-NO-CONNECTOR(159), -- CPOS(E1) OC-12 No Connector
+            type-622-CPOS-T1-NO-CONNECTOR(160), -- CPOS(T1) OC-12 No Connector
+            type-155-CPOS-E1-SX-MMF(161),       -- CPOS(E1) OC-3 Multi-mode Short Reach Optical Transceiver
+            type-155-CPOS-T1-SX-MMF(162),       -- CPOS(T1) OC-3 Multi-mode Short Reach Optical Transceiver
+            type-155-CPOS-E1-LX-SMF(163),       -- CPOS(E1) OC-3 Single Mode Long Reach Optical Transceiver
+            type-155-CPOS-T1-LX-SMF(164),       -- CPOS(T1) OC-3 Single Mode Long Reach Optical Transceiver
+            type-622-CPOS-E1-SX-MMF(165),       -- CPOS(E1) OC-12 Multi-mode Short Reach Optical Transceiver
+            type-622-CPOS-T1-SX-MMF(166),       -- CPOS(T1) OC-12 Multi-mode Short Reach Optical Transceiver
+            type-622-CPOS-E1-LX-SMF(167),       -- CPOS(E1) OC-12 Single Mode Long Reach Optical Transceiver
+            type-622-CPOS-T1-LX-SMF(168),       -- CPOS(T1) OC-12 Single Mode Long Reach Optical Transceiver
+            type-E1-CONNECTOR(169),             -- E1 RJ45 Transceiver
+            type-T1-CONNECTOR(170),             -- T1 RJ45 Transceiver
+            type-1000BASE-STK-SFP(171),         -- 1-port 1000 Base-STK SFP Module
+            type-1000BASE-BIDI-SFP(172),        -- 1-port 1000 Base-BIDI SFP Module
+            type-1000BASE-CWDM-SFP(173),        -- 1-port 1000 Base-CWDM SFP Module
+            type-100BASE-BIDI-SFP(174),         -- 1-port 100 Base-BIDI SFP Module
+            type-OLT-1000BASE-PX-SFP(175),      -- 1000BASE-PX SFP OLT Interface
+            type-OLT-1000BASE-NO-CONNECTOR(176), -- 1000BASE OLT No Connector
+            type-RPR-PHYGE-CONNECTOR(177),      -- Resilient Packet Ring GE physical port
+            type-RPR-LOGICGE-CONNECTOR(178),    -- Resilient Packet Ring GE logical port
+            type-100M-1550-BIDI(179),           -- Single Port 100M Ethernet Bi-direction Optical Interface Module(TX1550nm, RX1310nm, 15km, SC)
+            type-100M-1310-BIDI(180),           -- Single Port 100M Ethernet Bi-direction Optical reverse Interface Module(TX1310nm, RX1550nm, 15km, SC)
+            type-RPR-PHYOC48-CONNECTOR(181),    -- Resilient Packet Ring OC48 physical port
+            type-RPR-LOGICOC48-CONNECTOR(182),  -- Resilient Packet Ring OC48 logical port
+            type-100-1000-BASE-LX-SMF(183),     -- 100BASE-LX/1000BASE-LX Single Mode Fiber Optic Transceivers
+            type-10G-ZW-SM-LC(184),             -- 10GBASE-ZW Single Mode Fiber Optic Transceivers with LC Connector
+            type-10G-ZR-SM-LC(185),             -- 10GBASE-ZR Single Mode Fiber Optic Transceivers with LC Connector
+            type-XPK-10GBASE-ZR(186),           -- 10GBASE-ZR Xenpak Transceiver:LH80,SM1550
+            type-SGMII-100-BASE-LX-SFP(187),    -- SGMII-100-BASE-LX-SFP Port
+            type-SGMII-100-BASE-FX-SFP(188),    -- SGMII-100-BASE-FX-SFP Port
+            type-WLAN-RADIO(189),               -- WLAN-RADIO Port
+            type-SFP-PLUS-NO-CONNECTOR(191),    -- SFP+ without Transceiver
+            type-SFP-PLUS-10GBASE-SR(192),      -- 10GBASE-SR SFP+ Transceiver
+            type-SFP-PLUS-10GBASE-LR(193),      -- 10GBASE-LR SFP+ Transceiver
+            type-SFP-PLUS-10GBASE-LRM(194),     -- 10GBASE-LRM SFP+ Transceiver
+            type-SFP-PLUS-10GBASE-Cu(195),      -- 10GBASE-Cu SFP+ Transceiver
+            type-SFP-PLUS-UNKNOWN(196),         -- Unknown SFP+ Transceiver
+            type-SFP-PLUS-STACK-CONNECTOR(197), -- SFP+ STACK Transceiver
+            type-POS-L-64-4(198),               -- STM64/OC192 Long Haul Fiber Optic Transceivers with LC Connector(wavelength 1550nm G.653 fiber)
+            type-MINISAS-HD-STACK-CONNECTOR(199), -- MiniSAS HD STACK Transceiver
+            type-ONU-1000BASE-PX-SFF(200),      -- 1000BASE-PX SFF ONU Interface
+            type-RS485(201),                    -- RS485 Interface
+            type-SFP-PLUS-10GBASE-ER(202),      -- 10GBASE-ER SFP+ Transceiver
+            type-SFP-PLUS-10GBASE-ZR(203),      -- 10GBASE-ZR SFP+ Transceiver
+            type-XFP-10GBASE-ZR(204),           -- 10GBASE-ZR XFP Transceiver
+            type-QSFP-PLUS-40GBASE-SR4(205),    -- 40BASE-SR4 QSFP+ Optical Transceiver
+            type-QSFP-PLUS-STACK-CONNECTOR(206), -- QSFP+ STACK Transceiver
+            type-QSFP-PLUS-TO-4SFP-PLUS-STACK-CONNECTOR(207), -- QSFP+ to 4 SFP+ STACK Transceiver
+            type-SFP-STACK-CONNECTOR(208),      -- SFP STACK Transceiver
+            type-QSFP-NO-CONNECTOR(209),        -- QSFP No Connector
+            type-10GBase-T(210),                -- 10G Base-T Port
+            type-CFP-NO-CONNECTOR(211),         -- CFP No Connector
+            type-CFP-40GBASE-LR4(212)           -- 40GBASE-LR4 CFP Transceiver
+        }
+
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "Normally the port type is the same as its card type. When there are
+         different types of ports in one card, use the actual port type."
+        ::= {hwLswPortEntry 2}
+
+
+     hwLswPortIfindex OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "The value of ifIndex of the port."
+        ::= {hwLswPortEntry 3}
+
+
+     hwLswPortIsPlugged   OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            unplugged(0),
+            plugged(1)
+        }
+
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "Port is plugged or not."
+        ::= {hwLswPortEntry 4}
+
+
+-- ==================================================================
+--
+-- port loopback test table
+--
+-- ==================================================================
+
+    hwLswPortLoopbackTable    OBJECT-TYPE
+        SYNTAX     SEQUENCE OF HwLswPortLoopbackEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Port loopback test table."
+        ::= {hwLswSlotConf 6}
+
+    hwLswPortLoopbackEntry  OBJECT-TYPE
+        SYNTAX     HwLswPortLoopbackEntry
+        MAX-ACCESS     not-accessible
+        STATUS     current
+        DESCRIPTION
+        "Port loopback test table entry."
+      AUGMENTS    {hwLswPortEntry }
+      ::= {hwLswPortLoopbackTable 1}
+
+    HwLswPortLoopbackEntry ::= SEQUENCE
+    {
+        hwLswPortLoopbackIsSupport        INTEGER,
+        hwLswPortLoopbackOperate          INTEGER,
+        hwLswPortLoopbackResult           INTEGER,
+        hwLswPortLoopbackAutoStopSupport  INTEGER,
+        hwLswPortLoopbackRemoteResult     INTEGER,
+        hwLswPortLoopbackLocalResult      INTEGER,
+        hwLswPortLoopbackInternalResult   INTEGER,
+        hwLswPortLoopbackExternalResult   INTEGER
+     }
+
+      hwLswPortLoopbackIsSupport  OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            neither(1),
+            both(2),
+            internalOnly(3),
+            externalOnly(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The loopback type can be supported by current port."
+        ::= {hwLswPortLoopbackEntry 1}
+
+    hwLswPortLoopbackOperate OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            stopRemoteOrLocalLoopBack(0),
+            internalLoopback(1),
+            externalLoopback(2),
+            remoteLoopback(3),
+            localLoopback(4)
+        }
+        MAX-ACCESS     read-write
+        STATUS     current
+        DESCRIPTION
+        "Port loopback operate type. Read operation not supported."
+        ::= {hwLswPortLoopbackEntry 2}
+
+     hwLswPortLoopbackResult OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            testing (0),
+            testok (1),
+            testfailed (2)
+        }
+        MAX-ACCESS     read-only
+        STATUS     current
+        DESCRIPTION
+        "Loopback test result of the port, used for checking if the test is successful.
+         Only after the testing will the query value on the node make sense."
+        ::= {hwLswPortLoopbackEntry 3}
+
+      hwLswPortLoopbackAutoStopSupport  OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            support(1),
+            notSupport(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Whether this port support NEED-MANNUL-NOLOOP mode or not."
+        ::= {hwLswPortLoopbackEntry 4}
+
+     hwLswPortLoopbackRemoteResult OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            loopbackTestInit(0),
+            loopbackTesting(1),
+            loopbackTestSuccessed (2),
+            loopbackTestFailed (3),
+            loopbackTestTestAndFailed (4)
+        }
+        MAX-ACCESS     read-write
+        STATUS     current
+        DESCRIPTION
+        "The remote loopback test result of the port, used for checking if the
+         test is successful. Only after the testing will the query value on
+         the node make sense."
+        ::= {hwLswPortLoopbackEntry 5}
+
+     hwLswPortLoopbackLocalResult OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            loopbackTestInit(0),
+            loopbackTesting(1),
+            loopbackTestSuccessed (2),
+            loopbackTestFailed (3),
+            loopbackTestTestAndFailed (4)
+        }
+        MAX-ACCESS     read-write
+        STATUS     current
+        DESCRIPTION
+        "The local loopback test result of the port, used for checking if the
+         test is successful. Only after the testing will the query value on the
+         node make sense."
+        ::= {hwLswPortLoopbackEntry 6}
+
+     hwLswPortLoopbackInternalResult OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            loopbackTestInit(0),
+            loopbackTesting(1),
+            loopbackTestSuccessed (2),
+            loopbackTestFailed (3),
+            loopbackTestTestAndFailed (4)
+        }
+        MAX-ACCESS     read-write
+        STATUS     current
+        DESCRIPTION
+        "The internal loopback test result of the port, used for checking if
+         the test is successful. Only after the testing will the query value
+         on the node make sense."
+        ::= {hwLswPortLoopbackEntry 7}
+
+     hwLswPortLoopbackExternalResult OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            loopbackTestInit(0),
+            loopbackTesting(1),
+            loopbackTestSuccessed (2),
+            loopbackTestFailed (3),
+            loopbackTestTestAndFailed (4)
+        }
+        MAX-ACCESS     read-write
+        STATUS     current
+        DESCRIPTION
+        "The external loopback test result of the port, used for checking if the
+         test is successful. Only after the testing will the query value on the
+         node make sense."
+        ::= {hwLswPortLoopbackEntry 8}
+
+-- ==================================================================
+-- Fabric table
+-- ==================================================================
+    hwLswFabricTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF HwLswFabricEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table contains the information of fabric."
+        ::= {hwLswSlotConf 7}
+
+    hwLswFabricEntry  OBJECT-TYPE
+        SYNTAX          HwLswFabricEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry in hwLswFabricTable."
+        INDEX           {
+                            hwLswFrameIndex,
+                            hwLswSlotIndex,
+                            hwLswSubslotIndex,
+                            hwLswFabricChannelIndex
+                        }
+        ::= {hwLswFabricTable 1}
+
+    HwLswFabricEntry ::= SEQUENCE {
+        hwLswFabricChannelIndex   Integer32,
+        hwLswFabricUtilIn         Integer32,
+        hwLswFabricUtilOut        Integer32,
+        hwLswFabricPeakIn         Integer32,
+        hwLswFabricPeakInTime     DateAndTime,
+        hwLswFabricPeakOut        Integer32,
+        hwLswFabricPeakOutTime    DateAndTime
+     }
+
+    hwLswFabricChannelIndex   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        "The channel number of fabric."
+        ::= {hwLswFabricEntry 1}
+
+    hwLswFabricUtilIn    OBJECT-TYPE
+        SYNTAX          Integer32 (0..100)
+        UNITS           "one percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Ingress utilization of fabric."
+        ::= {hwLswFabricEntry 2}
+
+    hwLswFabricUtilOut    OBJECT-TYPE
+        SYNTAX          Integer32 (0..100)
+        UNITS           "one percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Egress utilization of fabric."
+        ::= {hwLswFabricEntry 3}
+
+    hwLswFabricPeakIn     OBJECT-TYPE
+        SYNTAX          Integer32 (0..100)
+        UNITS           "one percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Ingress peak of utilization for fabric."
+        ::= {hwLswFabricEntry 4}
+
+    hwLswFabricPeakInTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Ingress peak time of utilization for fabric."
+        ::= {hwLswFabricEntry 5}
+
+    hwLswFabricPeakOut    OBJECT-TYPE
+        SYNTAX          Integer32 (0..100)
+        UNITS           "one percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Egress peak of utilization for fabric."
+        ::= {hwLswFabricEntry 6}
+
+    hwLswFabricPeakOutTime    OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Egress peak time of utilization for fabric."
+        ::= {hwLswFabricEntry 7}
+
+END

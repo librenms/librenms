@@ -1,0 +1,1142 @@
+-- Synso UPS Software Management Information Base
+-- SYNSO-UPSMIB
+-- {iso org(3) internet(1) private(4) enterprises(1) synso(9557)}
+
+SYNSO-UPSMIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, IpAddress
+		FROM RFC1155-SMI
+	DisplayString
+		FROM RFC1213-MIB;
+
+
+synso			OBJECT IDENTIFIER ::= {enterprises 9557}
+synsoUpsSoftware	OBJECT IDENTIFIER ::= {synso 1}
+
+--
+-- The Basic Setting Group
+--
+
+syupsBasicSetting		OBJECT IDENTIFIER ::= {synsoUpsSoftware 1}
+
+syupsPlatForm OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..31))
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The platform which the UPS software is running on."
+	::= {syupsBasicSetting 1}
+
+syupsFeatureTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF SyupsFeatureEntry
+    ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "A table containing the supported features."
+	::= {syupsBasicSetting 2}
+
+syupsFeatureEntry OBJECT-TYPE
+	SYNTAX      SyupsFeatureEntry
+    ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "An entry representing the support information for a feature."
+	INDEX {syupsFeature}
+	::= {syupsFeatureTable 1}
+
+SyupsFeatureEntry ::= SEQUENCE {
+	syupsFeature INTEGER,
+	syupsSupportInfo DisplayString
+}
+
+syupsFeature OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The string representing a feature."
+	::= {syupsFeatureEntry 1}
+
+syupsSupportInfo OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The string containing the support information for a feature."
+	::= {syupsFeatureEntry 2}
+
+syupsSystemStartTime OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The time that the UPS software starts.  It is the 
+		number of seconds elapsed since 00:00:00,
+                January 1, 1970."
+	::= {syupsBasicSetting 3}
+
+syupsSignalType OBJECT-TYPE
+	SYNTAX      INTEGER {
+		basicSignal(0),
+		smartSignal(1)
+	}
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The signaling method between the UPS and software.
+
+                When the basicSignal used, the UPS changes the voltage
+                level of some specific pins to notify the software of what
+                critical event occurs.  Usually, the UPS will inform
+                software when a power failure or a low battery condition
+                occurs.  On the other hand, the software can change the
+                voltage signal of a specific pin to ask the UPS to shut
+                down (turn off).
+
+                When the smartSignal used, the UPS asks like a standard
+                communication device (such as mouse or modem).  That means 
+                the UPS and software communicate with each other using a
+                pre-defined protocol.  The protocol should include at
+                least the following commands:
+                        - query the power status of the UPS
+                        - query the power data of the UPS
+                        - command the UPS to shut down
+                "
+        ::= {syupsBasicSetting 4}
+
+syupsBasicSignalDefinition OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The signal definitions for the basic signaling UPS.  The
+                value can be the following bit combinations:
+                        SG_POWER_FAILURE_ENABLE         0x01
+                        SG_BATTERY_LOW_ENABLE           0x02
+                        SG_SHUTDOWN_ENABLE              0x04
+
+                        SG_POWER_FAILURE_VOLTHIGH       0x10
+                        SG_BATTERY_LOW_VOLTHIGH         0x20
+                        SG_SHUTDOWN_VOLTHIGH            0x40
+
+                SG_POWER_FAILURE_ENABLE, SG_BATTERY_LOW_ENABLE, and
+                SG_SHUTDOWN_ENABLE indicate whether the signals for
+                a power failure , a low battery condition, and the UPS
+                shutdown are enabled.  SG_POWER_FAILURE_VOLTHIGH,
+                SG_BATTERY_LOW_VOLTHIGH, and SG_SHUTDOWN_VOLTHIGH indicate
+                whether the voltage level for these signals are high or low."
+        ::= {syupsBasicSetting 5}
+
+syupsUpsComPort OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..31))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The serial port which the UPS software use to communicate
+                with the UPS.  The format varies from platform to platform.
+                For DOS program, the format is 'portNo, portAddress, portIRQ'
+                (e.g. '1, 0x2f8, 3' for COM2).  For Windows program, it
+                is 'portNo'. For NetWare program, it is
+                'portType, boardNo, portNo'.  For UNIX, it is 'device name'."
+	::= {syupsBasicSetting 6}
+
+syupsModemComPort OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..31))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The serial port which the UPS software use to dial out
+                when some particular events occur.  The format varies from
+                platform to platform.  For DOS program, the format is
+                'portNo, portAddress, portIRQ' (e.g. '1, 0x2f8, 3' for COM2).
+                For Windows program, it is 'portNo'.  For NetWare program,
+                it is 'portType, boardNo, portNo'. For UNIX, it is
+                'device name'."
+	::= {syupsBasicSetting 7}
+
+
+--
+-- The Ups Extension Group
+--
+
+syupsUpsExtension		OBJECT IDENTIFIER ::= {synsoUpsSoftware 2}
+
+
+syupsUpsAlarm OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "It is used internally.  Each bit indicates a critical event,
+                such as input bad, on battery, communications lost, ...,etc."
+        ::= {syupsUpsExtension 1}
+
+syupsSerialNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..63))
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The serial number of the UPS connected to the UPS software."
+	::= {syupsUpsExtension 2}
+
+syupsConfigBatteryVoltage OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The nominal battery voltage."
+        ::= {syupsUpsExtension 3}
+
+syupsBatteryReplaceDate OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The last battery replacement date.  It represents the
+                number of days elapsed since January 1, 1901."
+        ::= {syupsUpsExtension 4}
+
+syupsNoOutlet OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The total number of controllable outlets."
+        ::= {syupsUpsExtension 5}
+
+syupsOutletParamter OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "This object is not used any more."
+        ::= {syupsUpsExtension 6}
+
+syupsShutdownDepend OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "A string containing those who should perform their shutdown 
+		procedure before the UPS turns off. The agent will inform each
+		one in the list to begin their shutdown procedure before it turns 
+		off the power of the UPS."
+	::= {syupsUpsExtension 7}
+
+syupsEnableAutoSave OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Setting it to 1, the agent will try to save all files opened by 
+		applications before shutting down the operation system. Setting it 
+		to 0 will disable the auto save feature." 
+	::= {syupsUpsExtension 8}
+
+syupsShutdownOsDelay OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The delay time before shutting down the operation system. 
+		When it is necessary to shut down the operation system, the agent
+		will run the specified command file and try to save all files
+		opened by applications before shutting down the OS. This delay 
+		time is used to do such things."
+	::= {syupsUpsExtension 9}
+
+syupsShutdownUpsDelay OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The delay time before shutting down the UPS. Before shutting down 
+		the operation system, the agent will send a command to tell the UPS 
+		to shut down. This delay time is used to allow the agent to shut down 
+		the operation system safely."
+	::= {syupsUpsExtension 10}
+
+syupsSaveConfig OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Used to inform the agnet to save the configurations. Its value indicates 
+		which  group to be saved. For example, a 1 indicates group 1 (syupsBasicSetting)
+		to be saved, a 6 1 indicates group 6 (syupsCoworker) to be saved. You have to 
+		use it to save configurations after changing settings, or the settings may be 
+		lost."
+	::= {syupsUpsExtension 11}
+
+syupsNoOutlets OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The number of controllable outlets."
+        ::= {syupsUpsExtension 12}
+
+
+syupsOutletTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF syupsOutletEntry
+       MAX-ACCESS not-accessible
+       STATUS     mandatory
+       DESCRIPTION
+               "A list of outlet table entries.  The number of entries
+               is given by the value of syupsNoOutlets."
+       ::= {syupsUpsExtension 13}
+
+syupsOutletEntry OBJECT-TYPE
+       SYNTAX     SyupsOutletEntry
+       MAX-ACCESS not-accessible
+       STATUS     mandatory
+       DESCRIPTION
+               "An entry containing information applicable to a
+               particular controllable outlet."
+       INDEX { syupsOutletIndex }
+       ::= {syupsOutletTable 1}
+
+syupsOutletEntry ::= SEQUENCE {
+       syupsOutletIndex              INTEGER,
+       syupsOutletDescription        DisplayString (SIZE (0..15)),
+       syupsOutletShutdownDelay      INTEGER,
+       syupsOutletShutdownDepend     DisplayString (SIZE (0..63))
+   }
+
+syupsOutletIndex OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS not-accessible
+       STATUS     mandatory
+       DESCRIPTION
+               "The outlet identifier."
+       ::= {syupsOutletEntry 1}
+
+syupsOutletDescription OBJECT-TYPE
+	SYNTAX	    DisplayString (SIZE (0..15))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+               "The outlet description."
+	::= {syupsOutletEntry 2}
+
+syupsOutletShutdownDelay OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "The delay time (in seconds) before turning off the outlet. 
+                Before turning off the outlet, the agent will send a shutdown 
+                command to anyone specified in the syupsOutletShutdownDepend, 
+                telling them to start	their shutdown procedure. This delay 
+                time is used to allow those cmputers to be shut down safely."
+       ::= {syupsOutletEntry 3}
+
+syupsOutletShutdownDepend OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..63))
+       MAX-ACCESS read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "A string containing those who should perform their shutdown 
+		procedure before the outlet turns off. The agent will inform each
+		one in the list to begin their shutdown procedure before it turns 
+		off the power of the outlet."
+       ::= {syupsOutletEntry 4}
+       
+syupsOutletOperator OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The operator is used to control the outlets. There are two commands:
+                1. 'SWITCH: OutletNo, OnOff'. 
+                   The OutletNo specify the outlet.
+                   The OnOff can be 0 (off) or 1 (on).
+                   For example, 'SWITCH: 2, 1' means turning on (1) the outlet #2. 
+                   'SWITCH: 4, 0' means turning off (0) the outlet #4. 
+                2. 'SET: OutletNo, Desc, DelayTime, Depend'.
+                   The OutletNo specify the outlet.
+                   The Desc specifies the outlet description.
+                   The DelayTime specifies the shutdown delay time for the outlet.
+                   The Depend specifies the shutdown dependent list for the outlet.
+                   For example, 'SET: 3, My Printer, 20, 192.168.1.9' means setting 
+                   the description of outlet #3 to 'My Printer', the shutdown delay 
+                   time to 20 seconds and the Shutdown Dependent to '192.168.1.9'."
+	::= {syupsUpsExtension 14}
+
+--
+-- The Event Action Group
+--
+
+syupsEventAction		OBJECT IDENTIFIER ::= {synsoUpsSoftware 3}
+
+syupsNoEventActionEntries OBJECT-TYPE
+	SYNTAX	    INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+		"The number of event-action items. This variable indicates 
+		the number of rows in the event-action table."
+       ::= {syupsEventAction 1}
+
+syupsEventActionTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SyupsEventActionEntry
+	ACCESS 	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+               "A list of event action entries.  The number of entries
+               is given by the value of syupsNoEventActionEntries."
+       ::= {syupsEventAction 2}
+
+syupsEventActionEntry OBJECT-TYPE
+	SYNTAX  SyupsEventActionEntry
+	ACCESS 	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+               "An entry containing information applicable to a
+               particular event action."
+       INDEX {syupsEventId}
+       ::= {syupsEventActionTable 1}
+
+SyupsEventActionEntry ::= SEQUENCE {
+	syupsEventId		INTEGER,
+	syupsLogEnable		INTEGER,
+	syupsNotifyEnable	INTEGER,
+	syupsNotifyDelay	INTEGER,
+	syupsNotifyMessage	DisplayString (SIZE(0..63)),
+	syupsNotifyPeriod	INTEGER,
+	syupsNotifyUsers	DisplayString (SIZE(0..255)),
+	syupsEmailEnable	INTEGER,
+	syupsEmailDelay		INTEGER,
+	syupsEmailMessage	DisplayString (SIZE(0..63)),
+	syupsEmailUsers		DisplayString (SIZE(0..255)),
+	syupsPageEnable		INTEGER,
+	syupsPageDelay		INTEGER,
+	syupsPageMessage	DisplayString (SIZE(0..63)),
+	syupsPageUsers		DisplayString (SIZE(0..255)),
+	syupsCommandEnable	INTEGER,
+	syupsCommandDelay	INTEGER,
+	syupsCommandFile	DisplayString (SIZE(0..255)),
+	syupsShutdownEnable	INTEGER,
+	syupsShutdownDelay	INTEGER
+}
+
+syupsEventId OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The event ID."
+        ::= {syupsEventActionEntry 1}
+
+syupsLogEnable OBJECT-TYPE
+	SYNTAX      INTEGER {
+           disable(0),
+           enable(1)
+	}
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Whether to log the event in the log file when it occurs.
+		A 1 indicates enable, a 0 indicates disable."
+        ::= {syupsEventActionEntry 2}
+
+syupsNotifyEnable OBJECT-TYPE
+	SYNTAX      INTEGER {
+           disable(0),
+           enable(1)
+	}
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Whether to notify users when the event occurs. 
+		A 1 indicates enable, a 0 indicates disable."
+        ::= {syupsEventActionEntry 3}
+
+syupsNotifyDelay OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "How long the event must last before notifying users."
+        ::= {syupsEventActionEntry 4}
+
+syupsNotifyMessage OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..63))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The message which will be sent when the event occurs."
+	::= {syupsEventActionEntry 5}
+
+syupsNotifyPeriod OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "How often (in seconds) to send the message. The -1 means once."
+	::= {syupsEventActionEntry 6}
+
+syupsNotifyUsers OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Who will receive the message when the event occurs."
+	::= {syupsEventActionEntry 7}
+
+syupsEmailEnable OBJECT-TYPE
+	SYNTAX      INTEGER {
+           disable(0),
+           enable(1)
+	}
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Whether to email users when the event occurs. 
+		A 1 indicates enable, a 0 indicates disable."
+        ::= {syupsEventActionEntry 8}
+
+syupsEmailDelay OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "How long the event must last before emailing users."
+        ::= {syupsEventActionEntry 9}
+
+syupsEmailMessage OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..63))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The additional message which will be sent when the event occurs."
+	::= {syupsEventActionEntry 10}
+
+syupsEmailUsers OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Who will receive the mail when the event occurs."
+	::= {syupsEventActionEntry 11}
+
+syupsPageEnable OBJECT-TYPE
+	SYNTAX      INTEGER {
+           disable(0),
+           enable(1)
+	}
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Whether to page users when the event occurs. 
+		A 1 indicates enable, a 0 indicates disable."
+        ::= {syupsEventActionEntry 12}
+
+syupsPageDelay OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "How long the event must last before paging users."
+        ::= {syupsEventActionEntry 13}
+
+syupsPageMessage OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..15))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The message which will be sent when the event occurs."
+	::= {syupsEventActionEntry 14}
+
+syupsPageUsers OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Who will receive the code when the event occurs."
+	::= {syupsEventActionEntry 15}
+
+syupsCommandEnable OBJECT-TYPE
+	SYNTAX      INTEGER {
+           disable(0),
+           enable(1)
+	}
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Whether to execute the external command file when the event occurs. 
+		A 1 indicates enable, a 0 indicates disable."
+        ::= {syupsEventActionEntry 16}
+
+syupsCommandDelay OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "How long the event must last before executing the external command file."
+        ::= {syupsEventActionEntry 17}
+
+syupsCommandFile OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..63))
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The external command file which will be executed when the event occurs."
+	::= {syupsEventActionEntry 18}
+
+syupsShutdownEnable OBJECT-TYPE
+	SYNTAX      INTEGER {
+           disable(0),
+           enable(1)
+	}
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "Whether to shut down the system when the event occurs. 
+		A 1 indicates enable, a 0 indicates disable."
+        ::= {syupsEventActionEntry 19}
+
+syupsShutdownDelay OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "How long the event must last before shutting down the system."
+        ::= {syupsEventActionEntry 20}
+
+
+--
+-- The History Group
+--
+
+syupsHistory		OBJECT IDENTIFIER ::= {synsoUpsSoftware 4}
+
+syupsMaxEventFileLength OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The maximum length (in bytes) of the event log file.
+                UPS software will cut the first half of the file whenever
+                the file exceeds this maximum length."
+	::= {syupsHistory 1}
+
+syupsEventNumRecords OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The total number of records in the event log file."
+	::= {syupsHistory 2}
+
+syupsEventTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF SyupsEventEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "A list of event entries.  Each entry represents a record
+                in the event log file."
+	::= {syupsHistory 3}
+
+syupsEventEntry OBJECT-TYPE
+	SYNTAX      SyupsEventEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "An entry representing a record in the event log file."
+	INDEX {syupsEventIndex}
+	::= {syupsEventTable 1}
+
+SyupsEventEntry ::= SEQUENCE {
+	syupsEventIndex   INTEGER,
+	syupsEventRecord  DisplayString
+}
+
+syupsEventIndex OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The record number of an event entry."
+	::= {syupsEventEntry 1}
+
+syupsEventRecord OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The string containing an event entry."
+	::= {syupsEventEntry 2}
+
+syupsDataRecordInterval OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The number of minutes to wait between each
+                recording to the data log file."
+	::= {syupsHistory 4}
+
+syupsMaxDataFileLength OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The maximum length (in bytes) of the data log file.
+                UPS software will cut the first half of the file whenever
+                the file exceeds this maximum length."
+	::= {syupsHistory 5}
+
+syupsDataNumRecords OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The total number of records in the data log file."
+	::= {syupsHistory 6}
+
+syupsDataTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF SyupsDataEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "A list of data entries.  Each entry represents a record
+                in the data log file."
+	::= {syupsHistory 7}
+
+syupsDataEntry OBJECT-TYPE
+	SYNTAX      SyupsDataEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "An entry representing a record in the data log file."
+	INDEX {syupsDataIndex}
+	::= {syupsDataTable 1}
+
+SyupsDataEntry ::= SEQUENCE {
+	syupsDataIndex   INTEGER,
+	syupsDataRecord  DisplayString
+}
+
+syupsDataIndex OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The record number of a data entry."
+	::= {syupsDataEntry 1}
+
+syupsDataRecord OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The string containing a data entry."
+	::= {syupsDataEntry 2}
+
+syupsHistoryOperator OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The operator which is used to operate on the
+                history file.  The command format is
+                'Command, File, Range'.  So far, Command can be
+                PURGE, File can be EVENT or DATA, and Range can be
+                ALL or 'mm/dd/year..mm/dd/year'.  For example,
+                'PURGE, EVENT, ALL' tells the UPS software to purge
+                all entries in the event log file.  And
+                'PURGE, DATA, 03/20/1995..07/02/1995' tells the UPS
+                software to purge the entries which are recorded
+                form 03/20/1995 to 07/20/1995 from the event log
+                file."
+	::= {syupsHistory 8}
+
+syupsScopeSettings OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The string contains the settings for UPS Scope Chart,
+                including Value Original Point, Value Unit, Time Unit,
+                Time Interval, and Display Items.  The format for the
+                settings string is '%d, %d, %d, %d, %d'.  Display Items can
+                be any one or any combination of the following items:
+                        SCOPE_INPUT_VOLT                0x0001
+                        SCOPE_OUTPUT_VOLT               0x0010
+                        SCOPE_INPUT_FREQ                0x0100
+                        SCOPE_OUTPUT_FREQ               0x1000
+                "
+        ::= {syupsHistory 9}
+
+
+
+--
+-- The Schedule Group
+--
+
+syupsSchedule	OBJECT IDENTIFIER ::= {synsoUpsSoftware 5}
+
+syupsNoSchEntries OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+		"The total number of schedule entries."
+	::= {syupsSchedule 1}
+
+syupsSchOperator OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The operator which is used to operate on the
+                schedule table.  There are three commands:
+                1.  'ADD: action, mm/dd/yyyy, hh:mm:ss,
+                    week_day, repeat' indicates to add a new entry
+                    to the schedule list.
+                2.  'REPLACE: i, action, mm/dd/yyyy, hh:mm:ss,
+                    week_day, repeat' indicates to replace the
+                    i-th entry in the table with the new settings.
+                3.  'DELETE:n1, n2' indicates to delete the entries
+                    ranging from number n1 to number n2 from the schedule
+                    table.
+                'action' could be the following:
+			General System Test (1)
+                	Quick Battery Test (2) 
+			Deep Battery Test (3)
+			Turn On UPS (11)
+			Turn Off UPS (21)
+			Turn On Outlet (100+x)
+			Turn Off Outlet (200+x)
+		where x indicates the outlet number.
+		'mm/dd/year' and 'hh:mm:ss' specify the action's 
+                starting time. 'repeat' indicates the frequency
+                of the action, it could be Once(1), Daily(2),
+                Weekly(3) and Monthly(4).  'week_day' indicating the
+                day of week is meaningful only when the repeat is
+                set to Weekly, and it could be Sun(0), Mon(1), ...,
+                and Sat(6).
+                For example, '1, 07/08/1994, 15:30:00, 0, 4'
+                indicates that the UPS will do a General System Test
+                at 3:30 PM every month from July 8, 1994.
+                '203, 06/20/1995, 07:00:00, 0, 1' indicates that the UPS
+                will turn off outlet #3 at 7 o'clock on June 20, 1995 and 
+		do it only once."
+	::= {syupsSchedule 2}
+
+syupsSchTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF SyupsSchEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "A list of schedule entries."
+	::= {syupsSchedule 3}
+
+syupsSchEntry OBJECT-TYPE
+	SYNTAX      SyupsSchEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "A schedule entry."
+	INDEX {syupsSchIndex}
+	::= {syupsSchTable 1}
+
+SyupsSchEntry ::= SEQUENCE {
+	syupsSchIndex   	INTEGER,
+	syupsSchStartDate	DisplayString,
+	syupsSchStartTime	DisplayString,
+	syupsSchWeekDay		INTEGER,
+	syupsSchAction		INTEGER,
+	syupsSchRepeat		INTEGER
+}
+
+syupsSchIndex OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The entry number of a schedule setting."
+	::= {syupsSchEntry 1}
+
+syupsSchStartDate	OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The starting date (mm/dd/yyyy) of the schedule entry."
+	::= {syupsSchEntry 2}
+
+syupsSchStartTime	OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The starting time (hh:mm:ss) of the schedule entry."
+	::= {syupsSchEntry 3}
+
+syupsSchWeekDay OBJECT-TYPE
+	SYNTAX      INTEGER {
+	   	sunday(0), 
+		monday(1),
+	   	tuesday(2), 
+		wednesday(3),
+		thursday(4),
+		friday(5),
+		saturday(6)
+	}
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The starting day of week for the schedule entry. It could
+		be Sun(0), Mon(1), ..., and Sat(6). It is used when syupsSchRepeat 
+		is set to weekly."
+	::= {syupsSchEntry 4}
+
+syupsSchAction OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The action of the schedule entry. It could be:
+			General System Test (1)
+                	Quick Battery Test (2) 
+			Deep Battery Test (3)
+			Turn On UPS (11)
+			Turn Off UPS (21)
+			Turn On Outlet (100+x)
+			Turn Off Outlet (200+x)
+		where x indicates the outlet number."
+	::= {syupsSchEntry 5}
+
+syupsSchRepeat OBJECT-TYPE
+	SYNTAX      INTEGER {
+		once(1), 
+		daily(2), 
+		weekly(3),
+		monthly(4)
+	}
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "It indicates the frequency of the action, it could be 
+		Once(1), Daily(2), Weekly(3) and Monthly(4)."
+	::= {syupsSchEntry 6}
+
+
+--
+-- The Co-worker Group
+--
+
+syupsCoworker             OBJECT IDENTIFIER ::= {synsoUpsSoftware 6}
+
+syupsNoAccessControl OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The total number of access control entries."
+        ::= {syupsCoworker 1}
+
+syupsAccessControlOperator OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The operator which is used to operate on the
+                access control table.  There are three commands:
+                1.  'ADD: community' indicates
+                    to add a new entry to the access control list.
+                2.  'REPLACE: x, community'
+                    indicates to replace the x-th entry in the table
+                    with the new settings.
+                3.  'DELETE:n1, n2' indicates to delete the entries
+                    from number n1 to number n2 from the access control
+                    table."
+        ::= {syupsCoworker 2}
+
+syupsAccessControlTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF SyupsAccessControlEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "A list of access control entries.  Only entries in this list
+                can have access to the agent."
+        ::= {syupsCoworker 3}
+
+syupsAccessControlEntry OBJECT-TYPE
+	SYNTAX      SyupsAccessControlEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "An access control entry."
+        INDEX {syupsAccessControlIndex}
+        ::= {syupsAccessControlTable 1}
+
+SyupsAccessControlEntry ::= SEQUENCE {
+        syupsAccessControlIndex           INTEGER,
+        syupsAccessControlSetting         DisplayString
+}
+
+syupsAccessControlIndex OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The entry number of a access control setting."
+        ::= {syupsAccessControlEntry 1}
+
+syupsAccessControlSetting OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "A string containing the community name."
+        ::= {syupsAccessControlEntry 2}
+
+
+syupsNoTrapReceiver OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The total number of trap receiver entries."
+        ::= {syupsCoworker 4}
+
+syupsTrapReceiverOperator OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+                "The operator which is used to operate on the
+                trap receiver table.  There are three commands:
+                1.  'ADD: ipAddress' indicates to add a new
+                    entry to the trap receiver list.
+                2.  'REPLACE: x, ipAddress' indicates to replace
+                    the x-th entry in the table with the new settings.
+                3.  'DELETE:n1, n2' indicates to delete the entries
+                    from number n1 to number n2 from the trap receiver
+                    table."
+        ::= {syupsCoworker 5}
+
+syupsTrapReceiverTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF SyupsTrapReceiverEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "A list of trap receiver entries.  When an important event
+                occurs, the agent will send traps to all the entries in the
+                list."
+        ::= {syupsCoworker 6}
+
+syupsTrapReceiverEntry OBJECT-TYPE
+	SYNTAX      SyupsTrapReceiverEntry
+	ACCESS      not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+                "An trap receiver entry."
+        INDEX {syupsTrapReceiverIndex}
+        ::= {syupsTrapReceiverTable 1}
+
+SyupsTrapReceiverEntry ::= SEQUENCE {
+        syupsTrapReceiverIndex            INTEGER,
+        syupsTrapReceiverSetting          DisplayString
+}
+
+syupsTrapReceiverIndex OBJECT-TYPE
+	SYNTAX      INTEGER
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "The entry number of a trap receiver setting."
+        ::= {syupsTrapReceiverEntry 1}
+
+syupsTrapReceiverSetting OBJECT-TYPE
+	SYNTAX      DisplayString
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+                "A string containing a trap receiver's IP address."
+        ::= {syupsTrapReceiverEntry 2}
+
+
+--
+-- notifications, i.e., traps
+--
+syupsTraps              OBJECT IDENTIFIER ::= { synsoUpsSoftware 7 }
+
+-- This section defines the extension notifications sent by
+-- UPS agents.
+
+syupsTrapOverTemperature NOTIFICATION-TYPE
+       OBJECTS { upsBatteryTemperature }
+       STATUS  current
+       DESCRIPTION
+               "The battery temperature is too high. This trap is
+               persistent and is resent at one minute intervals until
+               the UPS either turns off or the status is no longer 
+               present."
+     ::= { syupsTraps 1 }
+
+syupsTrapOverCurrent NOTIFICATION-TYPE
+       OBJECTS { upsInputCurrent }
+       STATUS  current
+       DESCRIPTION
+               "The current is too high. This trap is
+               persistent and is resent at one minute intervals until
+               the UPS either turns off or the status is no longer 
+               present."
+     ::= { syupsTraps 2 }
+
+syupsTrapOverVoltage NOTIFICATION-TYPE
+       OBJECTS { upsInputVoltage }
+       STATUS  current
+       DESCRIPTION
+               "The voltage is too high. This trap is
+               persistent and is resent at one minute intervals until
+               the UPS either turns off or the status is no longer 
+               present."
+     ::= { syupsTraps 3 }
+
+syupsTrapUnderVoltage NOTIFICATION-TYPE
+       OBJECTS { upsInputVoltage }
+       STATUS  current
+       DESCRIPTION
+               "The voltage is too low. This trap is
+               persistent and is resent at one minute intervals until
+               the UPS either turns off or the status is no longer 
+               present."
+     ::= { syupsTraps 4 }
+
+syupsOffFrequency NOTIFICATION-TYPE
+       OBJECTS { upsInputFrequency }
+       STATUS  current
+       DESCRIPTION
+               "The frequency is abnormal. This trap is
+               persistent and is resent at one minute intervals until
+               the UPS either turns off or the status is no longer 
+               present."
+     ::= { syupsTraps 5 }
+
+syupsLowBattery NOTIFICATION-TYPE
+       OBJECTS { upsBatteryStatus, upsBatteryVoltage }
+       STATUS  current
+       DESCRIPTION
+               "The battery is too low. This trap is
+               persistent and is resent at one minute intervals until
+               the UPS either turns off or the status is no longer 
+               present."
+     ::= { syupsTraps 6 }
+
+syupsBadBattery NOTIFICATION-TYPE
+       OBJECTS { upsBatteryStatus, upsBatteryVoltage }
+       STATUS  current
+       DESCRIPTION
+               "The battery is bad. This trap is
+               persistent and is resent at one minute intervals until
+               the UPS either turns off or the status is no longer 
+               present."
+     ::= { syupsTraps 7 }
+
+END 

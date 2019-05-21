@@ -1,0 +1,1775 @@
+
+AC-ANALOG-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        Unsigned32,
+		Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+		audioCodes,       
+		acRegistrations,
+		acGeneric, 
+		acProducts,acBoardMibs						FROM AUDIOCODES-TYPES-MIB;
+
+       
+acAnalog  MODULE-IDENTITY       
+    LAST-UPDATED "201207260446Z"          --Thursday, July 26 2012
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+	     AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+	     Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"
+		
+
+    DESCRIPTION       
+    ""
+
+
+
+
+    ::= {acBoardMibs 8}  
+
+
+
+
+
+
+
+
+     acAnalogConfiguration OBJECT IDENTIFIER ::= {acAnalog 1}
+
+
+     acAnalogConfig OBJECT IDENTIFIER ::= {acAnalogConfiguration 1}
+
+
+     acAnalogMisc OBJECT IDENTIFIER ::= {acAnalogConfig 1}
+
+
+     acAnalogMiscCurrentDisconnectDuration OBJECT-TYPE
+       SYNTAX Unsigned32 (200..1500)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the current-disconnect duration (in msec). This value
+is used in generation and detection.
+Access: Offline.
+AC INI-Param: CurrentDisconnectDuration"
+       ::= {acAnalogMisc 1}
+
+
+
+     acAnalogMiscFlashHookPeriod OBJECT-TYPE
+       SYNTAX Unsigned32 (25..3000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the flashhook period (in msec) for both analog and IP
+sides.
+
+For the analog side it defines:
+
+- The maximal hook-flash detection period (for FXS gateways).
+ A longer signal is considered offhook / onhook event. 
+
+- The hook-flash generation period (for FXO gateways).
+
+For the IP side it defines the flash-hook period that is reported
+to IP.
+
+The valid range is 25 to 1500. The default value is 700 msec.
+Note: For FXO gateways, a constant of 90 msec must be added
+to the required hook-flash period. For example, to generate
+a 450 msec hook-flash, set ‘FlashHookPeriod’ to 540.
+.
+Access: Instant.
+AC INI-Param: FLASHHOOKPERIOD"
+       ::= {acAnalogMisc 2}
+
+
+
+     acAnalogMiscGroundKeyDetection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables/disables the analog ground key detection.
+0 = Disable
+1= Enable.
+Access: Offline.
+AC INI-Param: GroundKeyDetection"
+       ::= {acAnalogMisc 3}
+
+
+
+     acAuxiliaryFiles OBJECT IDENTIFIER ::= {acAnalogConfig 2}
+
+
+     acAuxiliaryFilesFxsCoefficients OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..47))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Defines the FXS loop coefficient filename.
+
+Max. 47 characters.
+AC INI-Param: FXSCOEFFILENAME"
+       ::= {acAuxiliaryFiles 1}
+
+
+
+     acAuxiliaryFilesFxoCoefficients OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..47))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Defines the FXO loop coefficient filename.
+
+Max. 47 characters.
+AC INI-Param: FXOCOEFFILENAME"
+       ::= {acAuxiliaryFiles 2}
+
+
+
+     acAnalogFxoConfig OBJECT IDENTIFIER ::= {acAnalogConfiguration 2}
+
+
+     acAnalogFxo OBJECT IDENTIFIER ::= {acAnalogFxoConfig 1}
+
+
+     acAnalogFxoFarEndDisconnectType OBJECT-TYPE
+       SYNTAX Unsigned32 (0..128)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter sets the source for the acEV_FAR_END_DISCONNECTED
+event (or for the relevant control protocol event). It
+is a bit field parameter, hence (for example) if both CPT and
+current disconnect are required, the parameter should be set
+to 5.
+FarDisconnect contributor:
+1 = CPT
+2 = PolarityReversal
+4 = CurrentDisconnect
+8 = Silence.
+Access: Offline.
+AC INI-Param: FARENDDISCONNECTTYPE"
+       ::= {acAnalogFxo 1}
+
+
+
+     acAnalogFxoCountryCoefficients OBJECT-TYPE
+       SYNTAX INTEGER {
+                  europe(66)
+,
+                  unitedStates(70)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Allows the user to modify the line characteristic (AC and DC)
+according to country.
+Access: Offline.
+AC INI-Param: CountryCoefficients"
+       ::= {acAnalogFxo 2}
+
+
+
+     acAnalogFxoDCRemover OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines whether to enable the analog DC remover in the DAA.
+
+One of the following values:
+
+0 = DC remover is disabled
+1 = DC remover is enabled.
+Access: Offline.
+AC INI-Param: EnableAnalogDCRemover"
+       ::= {acAnalogFxo 3}
+
+
+
+     acAnalogFxoDefaultLinePolarityState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  positive-polarity(0)
+,
+                  negative-polarity(1)
+,
+                  polarity-auto-detect(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the TTX pulses voltage level.
+0 = 0Vrms sinusoidal bursts
+1 = 0.5Vrms sinusoidal bursts
+2 = 1Vrms  sinusoidal bursts.
+Access: Offline.
+AC INI-Param: SetDefaultLinePolarityState"
+       ::= {acAnalogFxo 4}
+
+
+
+     acAnalogFxoTxGainControl OBJECT-TYPE
+       SYNTAX Integer32 (-15..12)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets gain\attenuation of the FXO Tx path between -15db and 12db.
+default no gain.
+Access: Offline.
+AC INI-Param: FXOTxGainControl"
+       ::= {acAnalogFxo 5}
+
+
+
+     acAnalogFxoRxGainControl OBJECT-TYPE
+       SYNTAX Integer32 (-15..12)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets gain\attenuation of the FXO Rx path between -15db and 12db.
+default no gain.
+Access: Offline.
+AC INI-Param: FXORxGainControl"
+       ::= {acAnalogFxo 6}
+
+
+
+     -- ****************************************
+     -- acAnalogFxoFarEndDisconnectTone table declaration
+     -- ****************************************
+     acAnalogFxoFarEndDisconnectToneTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAnalogFxoFarEndDisconnectToneEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acAnalogFxo 21}
+
+
+
+     -- ****************************************
+     -- acAnalogFxoFarEndDisconnectTone table entry
+     -- ****************************************
+     acAnalogFxoFarEndDisconnectToneEntry OBJECT-TYPE
+       SYNTAX AcAnalogFxoFarEndDisconnectToneEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acAnalogFxoFarEndDisconnectToneIndex}
+       ::= {acAnalogFxoFarEndDisconnectToneTable 1}
+
+
+
+     -- ****************************************
+     -- acAnalogFxoFarEndDisconnectTone TABLE
+     -- ****************************************
+     AcAnalogFxoFarEndDisconnectToneEntry ::= SEQUENCE {
+       acAnalogFxoFarEndDisconnectToneRowStatus        Unsigned32,
+       acAnalogFxoFarEndDisconnectToneAction           Unsigned32,
+       acAnalogFxoFarEndDisconnectToneActionResult     Unsigned32,
+       acAnalogFxoFarEndDisconnectToneIndex            Unsigned32,
+       acAnalogFxoFarEndDisconnectToneType             INTEGER
+     }
+
+
+
+     acAnalogFxoFarEndDisconnectToneRowStatus OBJECT-TYPE
+       SYNTAX Unsigned32 (1..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Far End Disconnect table row-status.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoFarEndDisconnectToneEntry 1}
+
+
+
+     acAnalogFxoFarEndDisconnectToneAction OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Far End Disconnect table action.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoFarEndDisconnectToneEntry 2}
+
+
+
+     acAnalogFxoFarEndDisconnectToneActionResult OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Far End Disconnect table result.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoFarEndDisconnectToneEntry 3}
+
+
+
+     acAnalogFxoFarEndDisconnectToneIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Index for table use.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoFarEndDisconnectToneEntry 4}
+
+
+
+     acAnalogFxoFarEndDisconnectToneType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acNullTone(0)
+,
+                  acDialTone(1)
+,
+                  acRingingTone(2)
+,
+                  acBusyTone(3)
+,
+                  acCongestionTone(4)
+,
+                  acSpecialInfoTone(5)
+,
+                  acWarningTone(6)
+,
+                  acReorderTone(7)
+,
+                  acConfirmationTone(8)
+,
+                  acWaitingTone(9)
+,
+                  acCallProgressCo1Tone(10)
+,
+                  acCallProgressCo2Tone(11)
+,
+                  acOldMilliwattTone(12)
+,
+                  acNewMilliwattTone(13)
+,
+                  acMessageWaitingIndicator(14)
+,
+                  acStutterDialTone(15)
+,
+                  acStutterOffHookWarningTone(16)
+,
+                  acWaitingTone1(17)
+,
+                  acComfortTone(18)
+,
+                  acNAKTone(19)
+,
+                  acVacantNumberTone(20)
+,
+                  acSpecialConditionTone(21)
+,
+                  acDialTone2(22)
+,
+                  acOnHoldTone(23)
+,
+                  acCallTransferDialTone(24)
+,
+                  acCallForwardTone(25)
+,
+                  acCreditCardServiceTone(26)
+,
+                  acSpecialRecallDialTone(27)
+,
+                  acAlertingTone(28)
+,
+                  acNetworkCongestionTone(29)
+,
+                  acWaitingTone2(30)
+,
+                  acWaitingTone3(31)
+,
+                  acWaitingTone4(32)
+,
+                  acConfEnterTone(33)
+,
+                  acConfExitTone(34)
+,
+                  acConfLockTone(35)
+,
+                  acConfUnlockTone(36)
+,
+                  acConfTimeLimitTone(37)
+,
+                  acPayphoneRecognitionTone(38)
+,
+                  acCallerWaitingTone(39)
+,
+                  acCNGFaxTone(40)
+,
+                  acPrecConfNotifyType(41)
+,
+                  acPresConfNotifyType(42)
+,
+                  acPrecPreemptType(43)
+,
+                  acPrecRTType(44)
+,
+                  acR15reqOfANItone(45)
+,
+                  acCo1Tone(200)
+,
+                  acCo2Tone(201)
+,
+                  acPlayRecordBeepTone(202)
+,
+                  acTrunkTestingTestProgressTone(203)
+,
+                  acTrunkTestingTestTone(204)
+,
+                  acTrunkTestingGuardTone(205)
+,
+                  acFSKTrunkTestingTone(206)
+,
+                  acGeneralTrunkTestingTone1(207)
+,
+                  acGeneralTrunkTestingTone2(208)
+,
+                  acGeneralTrunkTestingTone3(209)
+,
+                  acSpecialInfoToneFirst(210)
+,
+                  acSpecialInfoToneSecond(211)
+,
+                  acSpecialInfoToneThird(212)
+,
+                  acTTYTone(213)
+,
+                  acTT904ContinuityTone(214)
+,
+                  acTTMilliwattLossMeasureTone(215)
+,
+                  acCarrierDialTone(216)
+,
+                  acCarrierAnswerTone(217)
+,
+                  acCarrierChargingTone(218)
+,
+                  acLongDistanceIndicatorTone(219)
+,
+                  acSTUModemFirstTone(298)
+,
+                  acSTUModemSecondTone(299)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines which CPT types are detected as far-end disconnect.
+The CPT type is based on  the  acTCallProgressToneType enum.
+This is valid when FarEndDisconnectType allows CPT detection.
+
+Range = An array of up to 4 tone types.
+Access: Offline.
+AC INI-Param: DISCONNECTTONETYPE"
+       ::= {acAnalogFxoFarEndDisconnectToneEntry 5}
+
+
+
+     acAnalogFxsConfig OBJECT IDENTIFIER ::= {acAnalogConfiguration 3}
+
+
+     acAnalogFxs OBJECT IDENTIFIER ::= {acAnalogFxsConfig 1}
+
+
+     acAnalogFxsPolarityReversalType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  soft(0)
+,
+                  hard(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the type of the polarity reversal signal used for the network
+far-end answer and disconnect indications. Smooth reversal
+prevents negative effects as non-required ringing.
+0 = Soft reverse polarity
+1 = Hard reverse polarity.
+Access: Offline.
+AC INI-Param: POLARITYREVERSALTYPE"
+       ::= {acAnalogFxs 1}
+
+
+
+     acAnalogFxsMeteringType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  mt12kHz(0)
+,
+                  mt16kHz(1)
+,
+                  mtPolarityReversal(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the metering method for charging pulses.
+0 = 12 kHz sinusoidal bursts
+1 = 16 kHz sinusoidal bursts
+2 = Polarity Reversal pulses.
+Access: Offline.
+AC INI-Param: METERINGTYPE"
+       ::= {acAnalogFxs 2}
+
+
+
+     acAnalogFxsLifeLineType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acLifeLineType-Hardware-Only(0)
+,
+                  acLifeLineTypeHardware-And-Link-Detection(1)
+,
+                  acLifeLineType-Hardware-And-Link-And-Network-Detection(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the Lifeline phone type. The Lifeline phone is available
+(for FXS only) on port 4 in MP-104 and MP-108, on port
+2 in MP-102, on ports 1-4 in the MP-118, and on port 2 of each
+analog module in the Mediant 1000. 
+0 = activate Lifeline phone on power down 
+1 = activate Lifeline phone on power down or on detection of
+LAN disconnect 
+2 = activate Lifeline phone on power down, or on detection
+of LAN disconnect, or on loss of ping.
+Access: Offline.
+AC INI-Param: LIFELINETYPE"
+       ::= {acAnalogFxs 3}
+
+
+
+     acAnalogFxsMinFlashHookTime OBJECT-TYPE
+       SYNTAX Unsigned32 (25..300)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the minimal time (in msec) for detection of a flash-hook
+event (for FXS only). The valid range is 25 to 300. The default
+value is 300 msec.
+
+Detection is guaranteed for flash hook periods of at least
+60 msec (when setting the minimal time to 25). Flash-hook signals
+that last a shorter period of time are ignored.
+
+Note: It is recommended to reduce the detection time by 50
+msec from the desired value (e.g. if you set the value as 200
+msec, then enter 150 msec, i.e. 200 minus 50).
+.
+Access: Offline.
+AC INI-Param: MINFLASHHOOKTIME"
+       ::= {acAnalogFxs 4}
+
+
+
+     acAnalogFxsCallerIDTimingMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the Analog CallerID Timing Mode.
+
+0 = CallerID transferred between first and second rings 
+1 = CallerID transferred on valid Off ring.
+Access: Offline.
+AC INI-Param: ANALOGCALLERIDTIMINGMODE"
+       ::= {acAnalogFxs 5}
+
+
+
+     acAnalogFxsBellcoreCallerIDTypeOneSubStandard OBJECT-TYPE
+       SYNTAX INTEGER {
+                  bellcore-Between-Rings(0)
+,
+                  bellcore-Not-Ring-Related(1)
+,
+                  bellcore-Before-Ring-RP-AS(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the sub-standard of the Bellcore Caller ID type. 
+
+0 = Between_Rings 
+1 = Not_Ring_Related
+2 = Before_Ring_RP_AS.
+Access: Offline.
+AC INI-Param: BellcoreCallerIDTypeOneSubStandard"
+       ::= {acAnalogFxs 6}
+
+
+
+     acAnalogFxsETSICallerIDTypeOneSubStandard OBJECT-TYPE
+       SYNTAX INTEGER {
+                  eTSI-Between-Rings(0)
+,
+                  eTSI-Before-Ring-DT-AS(1)
+,
+                  eTSI-Before-Ring-RP-AS(2)
+,
+                  eTSI-Before-Ring-LR-DT-AS(3)
+,
+                  eTSI-Not-Ring-Related-DT-AS(4)
+,
+                  eTSI-Not-Ring-Related-RP-AS(5)
+,
+                  eTSI-Not-Ring-Related-LR-DT-AS(6)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the number denoting the ETSI CallerID Type 1 sub-standard.
+Either:
+0 = ETSI_Between_Rings 
+1 = ETSI_Before_Ring_DT_AS 
+2 = ETSI_Before_Ring_RP_AS 
+3 = ETSI_Before_Ring_LR_DT_AS  
+4 = ETSI_Not_Ring_Related_DT_AS 
+5 = ETSI_Not_Ring_Related_RP_AS 
+6 = ETSI_Not_Ring_Related_LR_DT_AS.
+Access: Offline.
+AC INI-Param: ETSICallerIDTypeOneSubStandard"
+       ::= {acAnalogFxs 7}
+
+
+
+     acAnalogFxsETSIVMWITypeOneStandard OBJECT-TYPE
+       SYNTAX INTEGER {
+                  eTSI-VMWI-Between-Rings(0)
+,
+                  eTSI-VMWI-Before-Ring-DT-AS(1)
+,
+                  eTSI-VMWI-Before-Ring-RP-AS(2)
+,
+                  eTSI-VMWI-Before-Ring-LR-DT-AS(3)
+,
+                  eTSI-VMWI-Not-Ring-Related-DT-AS(4)
+,
+                  eTSI-VMWI-Not-Ring-Related-RP-AS(5)
+,
+                  eTSI-VMWI-Not-Ring-Related-LR-DT-AS(6)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the number denoting the ETSI VMWI Type 1 Standard.
+Choose:
+0 = ETSI_VMWI_Between_Rings 
+1 = ETSI_VMWI_Before_Ring_DT_AS 
+2 = ETSI_VMWI_Before_Ring_RP_AS 
+3 = ETSI_VMWI_Before_Ring_LR_DT_AS  
+4 = ETSI_VMWI_Not_Ring_Related_DT_AS 
+5 = ETSI_VMWI_Not_Ring_Related_RP_AS 
+6 = ETSI_VMWI_Not_Ring_Related_LR_DT_AS.
+Access: Offline.
+AC INI-Param: ETSIVMWITypeOneStandard"
+       ::= {acAnalogFxs 8}
+
+
+
+     acAnalogFxsBellcoreVMWITypeOneStandard OBJECT-TYPE
+       SYNTAX INTEGER {
+                  bellcore-VMWI-Between-Rings(0)
+,
+                  bellcore-VMWI-Not-Ring-Related(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Use this parameter to select the Bellcore VMWI standard.
+
+0 - Between_Rings 
+1 - Not_Ring_Related.
+Access: Offline.
+AC INI-Param: BellcoreVMWITypeOneStandard"
+       ::= {acAnalogFxs 9}
+
+
+
+     acAnalogFxsDisableAutoCalibration OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines whether to enable the analog Autocalibration in the
+DAA.
+
+One of the following values:
+
+0 = Auto calibration is enabled
+1 = Auto calibration is disabled.
+Access: Offline.
+AC INI-Param: DisableAnalogAutoCalibration"
+       ::= {acAnalogFxs 10}
+
+
+
+     acAnalogFxsExternalLifeLinePorts OBJECT-TYPE
+       SYNTAX Unsigned32 (0..24)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Set the amount of FXS ports which will be connected to an external
+life line and will be disabled (max value is half of
+the FXS ports).
+Access: Offline.
+AC INI-Param: ExternalLifeLinePorts"
+       ::= {acAnalogFxs 11}
+
+
+
+     acAnalogFxsCountryCoefficients OBJECT-TYPE
+       SYNTAX INTEGER {
+                  europe(66)
+,
+                  unitedStates(70)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Allows the user to modify the line characteristic (AC and DC)
+according to country.
+Access: Offline.
+AC INI-Param: FXSCountryCoefficients"
+       ::= {acAnalogFxs 12}
+
+
+
+     acAnalogFxsTTXVoltageLevel OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notAvailable(-1)
+,
+                  ttxVoltageLevel0V(0)
+,
+                  ttxVoltageLevel05(1)
+,
+                  ttxVoltageLevel1V(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the TTX pulses voltage level.
+0 = 0Vrms sinusoidal bursts
+1 = 0.5Vrms sinusoidal bursts
+2 = 1Vrms  sinusoidal bursts
+-1 = notAvailable.
+Access: Offline.
+AC INI-Param: AnalogTTXVoltageLevel"
+       ::= {acAnalogFxs 13}
+
+
+
+     acAnalogEMConfig OBJECT IDENTIFIER ::= {acAnalogConfiguration 4}
+
+
+     acAnalogEM OBJECT IDENTIFIER ::= {acAnalogEMConfig 1}
+
+
+     acAnalogEMVoiceType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  twoWire(0)
+,
+                  fourWire(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "E&M Voice Configuration Type 2 or 4 wire.
+Access: Offline.
+AC INI-Param: EnMVoiceType"
+       ::= {acAnalogEM 1}
+
+
+
+     acAnalogEMInterfaceType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  signaling(0)
+,
+                  trunking(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "E&M Signaling Type - Trunking or Signaling.
+Access: Offline.
+AC INI-Param: EnMSystemType"
+       ::= {acAnalogEM 2}
+
+
+
+     acAnalogEMSignalingType OBJECT-TYPE
+       SYNTAX Unsigned32 (1..5)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Set E&M standatd signaling types are described in TIA/EIA-464C.
+Access: Offline.
+AC INI-Param: EnMSignalingType"
+       ::= {acAnalogEM 3}
+
+
+
+     acAnalogEMPortRXGain OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Rx Gain.
+Access: Offline.
+AC INI-Param: EnMPortRXGain"
+       ::= {acAnalogEM 4}
+
+
+
+     acAnalogEMPortTXGain OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Tx Gain.
+Access: Offline.
+AC INI-Param: EnMPortTXGain"
+       ::= {acAnalogEM 5}
+
+
+
+     acAnalogEMCountryCoefficients OBJECT-TYPE
+       SYNTAX INTEGER {
+                  unitedStates(0)
+,
+                  europe(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "E&M Country Coefficients.
+Access: Offline.
+AC INI-Param: EnMCountryCoefficients"
+       ::= {acAnalogEM 6}
+
+
+
+     acAnalogEMHookDebounceTiming OBJECT-TYPE
+       SYNTAX Unsigned32 (30..150)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the on E&M hook detection debounce timing.
+Access: Offline.
+AC INI-Param: EnMhookDebounceTiming"
+       ::= {acAnalogEM 7}
+
+
+
+     acAnalogEMOffHookGlareEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Protect the EnM port from Rx and Tx hook collision.
+Access: Offline.
+AC INI-Param: EnMOffHookGlareEnable"
+       ::= {acAnalogEM 8}
+
+
+
+     acAnalogStatus OBJECT IDENTIFIER ::= {acAnalog 2}
+
+
+     acAnalogStatusMisc OBJECT IDENTIFIER ::= {acAnalogStatus 1}
+
+
+     acAnalogStatusMiscFxsOrFxo OBJECT-TYPE
+       SYNTAX INTEGER {
+                  fXO(0)
+,
+                  fXS(1)
+,
+                  eANDm(2)
+,
+                  fXOandFXS(3)
+,
+                  fXOandFXSandEM(5)
+,
+                  fXOandEM(6)
+,
+                  fXSandEM(7)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Board is Fxs,Fxo, FXS_FXO or  E&M.
+AC INI-Param: N/A"
+       ::= {acAnalogStatusMisc 1}
+
+
+
+     acAnalogStatusMiscBoardTemperature OBJECT-TYPE
+       SYNTAX Unsigned32 (0..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Temperature of the board in degrees Celsius, should not go higher
+then 60!.
+AC INI-Param: N/A"
+       ::= {acAnalogStatusMisc 2}
+
+
+
+     acAnalogStatusMiscAnalogChannelsCount OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of the Analog channels in the board.
+AC INI-Param: N/A"
+       ::= {acAnalogStatusMisc 3}
+
+
+
+     acAnalogFxsFxo OBJECT IDENTIFIER ::= {acAnalogStatus 20}
+
+
+     -- ****************************************
+     -- acAnalogFxsFxo table declaration
+     -- ****************************************
+     acAnalogFxsFxoTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAnalogFxsFxoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acAnalogFxsFxo 1}
+
+
+
+     -- ****************************************
+     -- acAnalogFxsFxo table entry
+     -- ****************************************
+     acAnalogFxsFxoEntry OBJECT-TYPE
+       SYNTAX AcAnalogFxsFxoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acAnalogFxsFxoIndex}
+       ::= {acAnalogFxsFxoTable 1}
+
+
+
+     -- ****************************************
+     -- acAnalogFxsFxo TABLE
+     -- ****************************************
+     AcAnalogFxsFxoEntry ::= SEQUENCE {
+       acAnalogFxsFxoIndex                             Unsigned32,
+       acAnalogFxsFxoType                              INTEGER,
+       acAnalogFxsFxoChipRevNum                        Unsigned32,
+       acAnalogFxsFxoHookState                         INTEGER
+     }
+
+
+
+     acAnalogFxsFxoIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..24)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index for table use.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsFxoEntry 1}
+
+
+
+     acAnalogFxsFxoType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  fXO(0)
+,
+                  fXS(1)
+,
+                  eM(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Line is Fxs, Fxo or E&M.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsFxoEntry 2}
+
+
+
+     acAnalogFxsFxoChipRevNum OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Fxs/Fxo's  Chip revision number.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsFxoEntry 3}
+
+
+
+     acAnalogFxsFxoHookState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  onHookState(1)
+,
+                  offHookState(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The hook state of the analog line.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsFxoEntry 4}
+
+
+
+     acAnalogAction OBJECT IDENTIFIER ::= {acAnalog 3}
+
+
+     acAnalogFxoAction OBJECT IDENTIFIER ::= {acAnalogAction 1}
+
+
+     -- ****************************************
+     -- acAnalogFxoLineTest table declaration
+     -- ****************************************
+     acAnalogFxoLineTestTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAnalogFxoLineTestEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acAnalogFxoAction 1}
+
+
+
+     -- ****************************************
+     -- acAnalogFxoLineTest table entry
+     -- ****************************************
+     acAnalogFxoLineTestEntry OBJECT-TYPE
+       SYNTAX AcAnalogFxoLineTestEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acAnalogFxoLineTestIndex}
+       ::= {acAnalogFxoLineTestTable 1}
+
+
+
+     -- ****************************************
+     -- acAnalogFxoLineTest TABLE
+     -- ****************************************
+     AcAnalogFxoLineTestEntry ::= SEQUENCE {
+       acAnalogFxoLineTestIndex                        Unsigned32,
+       acAnalogFxoLineTestActivate                     INTEGER,
+       acAnalogFxoLineTestHookState                    INTEGER,
+       acAnalogFxoLineTestPolarityStatus               INTEGER,
+       acAnalogFxoLineTestLineConnectionStatus         INTEGER,
+       acAnalogFxoLineTestLineCurrent                  Integer32,
+       acAnalogFxoLineTestLineVoltage                  Integer32,
+       acAnalogFxoLineTestRingState                    INTEGER,
+       acAnalogFxoLineTestLinePolarity                 INTEGER,
+       acAnalogFxoLineTestMwiState                     INTEGER,
+       acAnalogFxoLineTestLastCurrentDisconnectDuration 
+                                                       Unsigned32
+     }
+
+
+
+     acAnalogFxoLineTestIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..24)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index for table use.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 1}
+
+
+
+     acAnalogFxoLineTestActivate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  noTestActivated(0)
+,
+                   runLineTest(1)
+,
+                   lineTestDone(2)
+,
+                   testFailed(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Activate line testing in an FXO analog line according to a given
+line-index.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 2}
+
+
+
+     acAnalogFxoLineTestHookState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  onHookState(1)
+,
+                  offHookState(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The hook state of the analog line.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 3}
+
+
+
+     acAnalogFxoLineTestPolarityStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  normalPolarity(1)
+,
+                   reversePolarity(2)
+,
+                  notAvailable(3)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The line's polarity state.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 4}
+
+
+
+     acAnalogFxoLineTestLineConnectionStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  lineDisconnected(1)
+,
+                   lineConnected(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The connection's status of the line.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 5}
+
+
+
+     acAnalogFxoLineTestLineCurrent OBJECT-TYPE
+       SYNTAX Integer32 (-1..24)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The line's current [ma].
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 6}
+
+
+
+     acAnalogFxoLineTestLineVoltage OBJECT-TYPE
+       SYNTAX Integer32 (-128..128)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The line's voltage [V].
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 7}
+
+
+
+     acAnalogFxoLineTestRingState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  off(1)
+,
+                  on(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The Ring's State.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 8}
+
+
+
+     acAnalogFxoLineTestLinePolarity OBJECT-TYPE
+       SYNTAX INTEGER {
+                  positive(1)
+,
+                  negative(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The line's polarity state.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 9}
+
+
+
+     acAnalogFxoLineTestMwiState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  off(1)
+,
+                  on(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mwi's state.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 10}
+
+
+
+     acAnalogFxoLineTestLastCurrentDisconnectDuration OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Last current disconnect duration in msec.
+AC INI-Param: N/A"
+       ::= {acAnalogFxoLineTestEntry 11}
+
+
+
+     acAnalogFxsAction OBJECT IDENTIFIER ::= {acAnalogAction 2}
+
+
+     -- ****************************************
+     -- acAnalogFxsLineTest table declaration
+     -- ****************************************
+     acAnalogFxsLineTestTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAnalogFxsLineTestEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acAnalogFxsAction 1}
+
+
+
+     -- ****************************************
+     -- acAnalogFxsLineTest table entry
+     -- ****************************************
+     acAnalogFxsLineTestEntry OBJECT-TYPE
+       SYNTAX AcAnalogFxsLineTestEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acAnalogFxsLineTestIndex}
+       ::= {acAnalogFxsLineTestTable 1}
+
+
+
+     -- ****************************************
+     -- acAnalogFxsLineTest TABLE
+     -- ****************************************
+     AcAnalogFxsLineTestEntry ::= SEQUENCE {
+       acAnalogFxsLineTestIndex                        Unsigned32,
+       acAnalogFxsLineTestActivate                     INTEGER,
+       acAnalogFxsLineTestHookState                    INTEGER,
+       acAnalogFxsLineTestRingState                    INTEGER,
+       acAnalogFxsLineTestPolarityStatus               INTEGER,
+       acAnalogFxsLineTestMessageWaitingIndication     INTEGER,
+       acAnalogFxsLineTestLineCurrentReading           Unsigned32,
+       acAnalogFxsLineTestLineVoltageReading           Integer32,
+       acAnalogFxsLineTestAnalogVoltageReading         Unsigned32,
+       acAnalogFxsLineTestRingVoltageReading           Integer32,
+       acAnalogFxsLineTestLongLineCurrentReading       Unsigned32
+     }
+
+
+
+     acAnalogFxsLineTestIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..24)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index for table use.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 1}
+
+
+
+     acAnalogFxsLineTestActivate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  noTestActivated(0)
+,
+                   runLineTest(1)
+,
+                   lineTestDone(2)
+,
+                   testFailed(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Activate line testing in a FXS analog line according to a given
+line-index.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 2}
+
+
+
+     acAnalogFxsLineTestHookState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  onHookState(1)
+,
+                  offHookState(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The hook state of the analog line.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 3}
+
+
+
+     acAnalogFxsLineTestRingState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  offRingState(1)
+,
+                   onRingState(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Line's ring state.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 4}
+
+
+
+     acAnalogFxsLineTestPolarityStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  normalPolarity(1)
+,
+                   reversePolarity(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Line's reversal-polarity.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 5}
+
+
+
+     acAnalogFxsLineTestMessageWaitingIndication OBJECT-TYPE
+       SYNTAX INTEGER {
+                  noWaitingMessage(1)
+,
+                  waitingMessage(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Line's messgae waiting indication state.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 6}
+
+
+
+     acAnalogFxsLineTestLineCurrentReading OBJECT-TYPE
+       SYNTAX Unsigned32 (0..3000)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "The Line current reading in 10ua units.
+This test is supported only in line no. 0.
+Not supported on MP500.
+In case of MP124 this test is supported in all ports except
+ports 2 and 3.
+As of version 6.6 this is an obsolete parameter.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 7}
+
+
+
+     acAnalogFxsLineTestLineVoltageReading OBJECT-TYPE
+       SYNTAX Integer32 (-6000..6000)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "The Line voltage reading in 10mV units.
+In case of MP124 the Line voltage reading in 1V units.
+This test is supported only in line no. 0.
+Not supported on MP500.
+In case of MP124 this test is supported in all ports except
+ports 2 and 3.
+As of version 6.6 this is an obsolete parameter.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 8}
+
+
+
+     acAnalogFxsLineTestAnalogVoltageReading OBJECT-TYPE
+       SYNTAX Unsigned32 (300..340)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "The current analog voltage reading in 10mV units.
+his test is supported only in line no. 0.
+Not supported on MP500.
+In case of MP124 this test is supported in all ports except
+ports 2 and 3.
+As of version 6.6 this is an obsolete parameter.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 9}
+
+
+
+     acAnalogFxsLineTestRingVoltageReading OBJECT-TYPE
+       SYNTAX Integer32 (-13000..13000)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "The current ring voltage reading in 10mV units.
+This test is supported only in line no. 0.
+Not supported on MP500.
+In case of MP124 this test is supported in all ports except
+ports 2 and 3.
+As of version 6.6 this is an obsolete parameter.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 10}
+
+
+
+     acAnalogFxsLineTestLongLineCurrentReading OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4000)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "The current long line reading in 10ua units.
+This test is supported only in line no. 0.
+Not supported on MP500.
+In case of MP124 this test is supported in all ports except
+ports 2 and 3.
+As of version 6.6 this is an obsolete parameter.
+AC INI-Param: N/A"
+       ::= {acAnalogFxsLineTestEntry 11}
+
+
+
+     acAnalogCommonAction OBJECT IDENTIFIER ::= {acAnalogAction 3}
+
+
+     -- ****************************************
+     -- acAnalogCommonChannel table declaration
+     -- ****************************************
+     acAnalogCommonChannelTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAnalogCommonChannelEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Table for common channels operations."
+       ::= {acAnalogCommonAction 1}
+
+
+
+     -- ****************************************
+     -- acAnalogCommonChannel table entry
+     -- ****************************************
+     acAnalogCommonChannelEntry OBJECT-TYPE
+       SYNTAX AcAnalogCommonChannelEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acAnalogCommonChannelIndex}
+       ::= {acAnalogCommonChannelTable 1}
+
+
+
+     -- ****************************************
+     -- acAnalogCommonChannel TABLE
+     -- ****************************************
+     AcAnalogCommonChannelEntry ::= SEQUENCE {
+       acAnalogCommonChannelIndex                      Unsigned32,
+       acAnalogCommonChannelAction                     INTEGER
+     }
+
+
+
+     acAnalogCommonChannelIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index for table use, the current channel.
+AC INI-Param: N/A"
+       ::= {acAnalogCommonChannelEntry 1}
+
+
+
+     acAnalogCommonChannelAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  noAction(0)
+,
+                  reset(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "An action to make on the current channel, The Reset action is
+for Analog channels only.
+AC INI-Param: N/A"
+       ::= {acAnalogCommonChannelEntry 2}
+
+
+
+     acAnalogLegs OBJECT IDENTIFIER ::= {acAnalogStatus 21}
+
+
+     -- ****************************************
+     -- acAnalogLegs table declaration
+     -- ****************************************
+     acAnalogLegsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAnalogLegsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acAnalogLegs 1}
+
+
+
+     -- ****************************************
+     -- acAnalogLegs table entry
+     -- ****************************************
+     acAnalogLegsEntry OBJECT-TYPE
+       SYNTAX AcAnalogLegsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acAnalogLegsLegIndex}
+       ::= {acAnalogLegsTable 1}
+
+
+
+     -- ****************************************
+     -- acAnalogLegs TABLE
+     -- ****************************************
+     AcAnalogLegsEntry ::= SEQUENCE {
+       acAnalogLegsLegIndex                            Unsigned32,
+       acAnalogLegsCallIndex                           Unsigned32,
+       acAnalogLegsAnalogType                          INTEGER,
+       acAnalogLegsEchoCanceller                       INTEGER,
+       acAnalogLegsHighPassFilter                      INTEGER,
+       acAnalogLegsDTMFDetection                       INTEGER,
+       acAnalogLegsVoiceVolume                         Unsigned32,
+       acAnalogLegsInputGain                           Unsigned32,
+       acAnalogLegsLegName                             SnmpAdminString
+     }
+
+
+
+     acAnalogLegsLegIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Decribes The Digital EndPoint In A Call.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 1}
+
+
+
+     acAnalogLegsCallIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Decribes The Call which The Rtp EndPoint Participant In It.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 2}
+
+
+
+     acAnalogLegsAnalogType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  fxs(1)
+,
+                  fxo(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describs whether the board is FXS or FXO.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 3}
+
+
+
+     acAnalogLegsEchoCanceller OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables the Echo Canceller.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 4}
+
+
+
+     acAnalogLegsHighPassFilter OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables theHigh Pass Filter.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 5}
+
+
+
+     acAnalogLegsDTMFDetection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables the DTMF Detection.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 6}
+
+
+
+     acAnalogLegsVoiceVolume OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describs the volume of the voice in dB.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 7}
+
+
+
+     acAnalogLegsInputGain OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Input Gain on the leg in dB.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 8}
+
+
+
+     acAnalogLegsLegName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Leg Name as in the Control Protocol.
+AC INI-Param: N/A"
+       ::= {acAnalogLegsEntry 9}
+
+
+
+
+
+END

@@ -9,7 +9,7 @@ modules:
             data:
                 -
                     oid: cerentEnvMonVoltageStatsTable
-                    num_oid: .1.3.6.1.4.1.3607.2.80.10.1.30.
+                    num_oid: '.1.3.6.1.4.1.3607.2.80.10.1.30.{{ $index }}'
                     value: cerentEnvMonVoltageStatsCurrentValue
                     index: 'cerentEnvMonVoltageStats.{{ $index }}'
                     descr: '{{ $entPhysicalDescr }} - {{ $cerentEnvMonVoltageStatsDescr }}'
@@ -22,7 +22,7 @@ modules:
             data:
                 -
                     oid: cerentEnvMonTemperatureStatsTable
-                    num_oid: .1.3.6.1.4.1.3607.2.80.20.1.30.
+                    num_oid: '.1.3.6.1.4.1.3607.2.80.20.1.30.{{ $index }}'
                     value: cerentEnvMonTemperatureStatsCurrentValue
                     index: 'cerentEnvMonTemperatureStats.{{ $index }}'
                     descr: '{{ $entPhysicalDescr }} - {{ $cerentEnvMonTemperatureStatsDescr }}'

@@ -1,0 +1,10 @@
+os: raritan-emx
+text: 'Raritan EMX'
+type: environment
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+mib_dir:
+    - raritan
+icon: raritan
+discovery:
+    - sysObjectID: '.1.3.6.1.4.1.13742.8'

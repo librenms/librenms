@@ -1,4 +1,5 @@
 source: Alerting/Device-Dependencies.md
+path: blob/master/doc/
 
 # Device Dependencies
 

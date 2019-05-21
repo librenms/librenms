@@ -1,0 +1,352 @@
+-- ***********************************************************************
+--  Management MIB definitions
+-- ***********************************************************************
+TN-MRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, IpAddress, Counter32, Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue, TimeStamp
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    mrpDomainIndex
+	    FROM IEC-62439-2-MIB;
+tnMrpMIB MODULE-IDENTITY
+    LAST-UPDATED "201210220000Z" -- October 22, 2012
+    ORGANIZATION "Transition Networks"
+    CONTACT-INFO
+        "Copyright (C) 2012  Transition Networks, Inc. All Rights Reserved."
+    DESCRIPTION
+        "A MIB module provides Media Redundancy Protocol Statistics interface."
+    ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) transition (868) products (2) tnProducts(5) tnMRP (120) }
+
+--
+-- Textual conventions
+--
+TnMRPEventType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "MRP Event type."
+    SYNTAX INTEGER {
+	      manager-role-fail (1),
+		ring-open (2),
+		multiple-managers (3)
+    }
+
+TnMRPEventAppear ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Event appear."
+    SYNTAX INTEGER {
+        appear (1),          -- Event appear
+        disappear (2)        -- Event disappear
+    }
+	
+-- ***********************************************************************
+-- objects groups of redundancy object identifiers
+-- ***********************************************************************
+tnMrpObjects          OBJECT IDENTIFIER   ::= { tnMrpMIB 1 }
+
+-- ***********************************************************************
+-- Objects of the MRP Network Management
+-- ***********************************************************************
+tnMrpDomainTable      OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnMrpDomainEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "
+                    Every entry in this table contains additional information 
+                    about a Media Redundancy Protocol (MRP) domain.
+
+                    Row entries can not be created or deleted via
+                    SNMP operations.
+                    "
+    ::= { tnMrpObjects 1 }
+
+tnMrpDomainEntry      OBJECT-TYPE
+    SYNTAX          TnMrpDomainEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry in the tnMrpDomainTable."
+    INDEX           { mrpDomainIndex }
+    ::= { tnMrpDomainTable 1 }
+
+TnMrpDomainEntry ::=  SEQUENCE {
+                    tnMrpDomainTopologyChangeInterval          Integer32,
+                    tnMrpDomainTopologyChangeRepeatCount       Integer32,
+                    tnMrpDomainDefaultTestInterval             Integer32,
+                    tnMrpDomainShortTestInterval               Integer32,
+                    tnMrpDomainTestMonitoringCount             Integer32,
+                    tnMrpDomainNonBlockingMRCsupported         INTEGER,
+                    tnMrpDomainTestMonitoringExtendedCount     Integer32,
+                    tnMrpDomainCheckMediaRedundancy            INTEGER,
+                    tnMrpDomainLinkDownInterval                Integer32,
+                    tnMrpDomainLinkUpInterval                  Integer32,
+                    tnMrpDomainLinkChangeCount                 Integer32
+                    }
+
+tnMrpDomainTopologyChangeInterval  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the interval for sending 
+                    MRP_TopologyChange frames.
+                    "
+    ::= {  tnMrpDomainEntry 1  }
+
+tnMrpDomainTopologyChangeRepeatCount  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the interval count which controls 
+                    repeated transmissions of MRP_TopologyChange frames.
+                    "
+    ::= {  tnMrpDomainEntry 2  }
+
+tnMrpDomainDefaultTestInterval  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the default interval for sending 
+                    MRP_Test frames on ring ports.
+                    "
+    ::= {  tnMrpDomainEntry 3  }
+
+tnMrpDomainShortTestInterval  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the short interval for sending 
+                    MRP_Test frames on ring ports after link changes in the ring.
+                    "
+    ::= {  tnMrpDomainEntry 4  }    
+    
+tnMrpDomainTestMonitoringCount  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the interval count for monitoring 
+                    the reception of MRP_Test frames. 
+                    "
+    ::= {  tnMrpDomainEntry 5  } 
+
+tnMrpDomainNonBlockingMRCsupported  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enabled(1),
+                        disabled(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the ability of the MRM 
+                    to support MRCs without BLOCKED port state support in the ring.
+                    "
+    ::= {  tnMrpDomainEntry 6  } 
+
+tnMrpDomainTestMonitoringExtendedCount  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the extended interval count for monitoring 
+                    the reception of MRP_Test frames.
+                    "
+    ::= {  tnMrpDomainEntry 7  } 
+
+tnMrpDomainCheckMediaRedundancy  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enabled(1),
+                        disabled(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies whether monitoring of MRM state
+                    is enabled or disabled in the redundancy domain.
+                    "
+    ::= {  tnMrpDomainEntry 8  } 
+
+tnMrpDomainLinkDownInterval  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the interval for sending 
+                    MRP_LinkDown frames on ring ports.
+                    "
+    ::= {  tnMrpDomainEntry 9  } 
+
+tnMrpDomainLinkUpInterval  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the interval for sending 
+                    MRP_LinkUp frames on ring ports.
+                    "
+    ::= {  tnMrpDomainEntry 10  } 
+
+tnMrpDomainLinkChangeCount  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "
+                    This attribute specifies the MRP_LinkChange frame count
+                    which controls repeated transmission of MRP_LinkChange frames.
+                    "
+    ::= {  tnMrpDomainEntry 11  } 
+            
+--
+--    MRP statistics
+--	
+tnMrpDomainStatTable  OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnMrpDomainStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "
+                    Every entry in this table contains statistics about
+                    a Media Redundancy Protocol (MRP) domain.
+                    Entries cannot be created or deleted via SNMP
+                    operations.
+                    "
+    ::= { tnMrpObjects 2 }
+
+tnMrpDomainStatEntry  OBJECT-TYPE
+    SYNTAX          TnMrpDomainStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry in the mrpDomainStatTable."
+    INDEX           { mrpDomainIndex }
+    ::= { tnMrpDomainStatTable 1 }
+
+TnMrpDomainStatEntry ::=  SEQUENCE {
+                    tnMrpDomainTransmitTotalCount         Counter64,
+                    tnMrpDomainReceiveTotalCount          Counter64,
+                    tnMrpDomainReceiveErrorTotalCount     Counter64,
+                    tnMrpDomainReceiveUnrecognizedCount   Counter64
+                    }
+
+tnMrpDomainTransmitTotalCount  OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "
+                    The total transmitted frames.
+                    "
+    ::= {  tnMrpDomainStatEntry 1  }
+
+tnMrpDomainReceiveTotalCount  OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "
+                    The total received frames.
+                    "
+    ::= {  tnMrpDomainStatEntry 2  }
+
+tnMrpDomainReceiveErrorTotalCount  OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "
+                    The total received frames with error.
+                    "
+    ::= {  tnMrpDomainStatEntry 3  }
+
+tnMrpDomainReceiveUnrecognizedCount  OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "
+                    The total unrecognized received frames.
+                    "
+    ::= {  tnMrpDomainStatEntry 4  }
+
+tnMrpDomainStatTableReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Write true(1) will cause a reset of all statistic values"
+    DEFVAL      { false }
+    ::= { tnMrpObjects 3 }	
+
+
+--
+--    MRP events
+--	
+tnMrpDomainEventTable 		OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnMrpDomainEventEntry
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "
+                    Every entry in this table contains event about
+                    a Media Redundancy Protocol (MRP) domain.
+                    Entries cannot be created or deleted via SNMP
+                    operations.
+                    "
+    ::= { tnMrpObjects 4 }
+
+tnMrpDomainEventEntry 		OBJECT-TYPE
+    SYNTAX          TnMrpDomainEventEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry in the mrpDomainEventTable."
+    INDEX           { mrpDomainIndex, tnMrpDomainEventIndex }
+    ::= { tnMrpDomainEventTable 1 }
+
+TnMrpDomainEventEntry ::=  SEQUENCE {
+			tnMrpDomainEventIndex                 Unsigned32,
+			tnMrpDomainEventTimestamp             TimeStamp,
+			tnMrpDomainEventType                  TnMRPEventType,
+			tnMrpDomainEventAppear                TnMRPEventAppear
+                    }
+
+tnMrpDomainEventIndex       OBJECT-TYPE
+	SYNTAX      Unsigned32(1..10)
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	  "An arbitrary integer for identifying individual events
+	  within the event log.  "
+	::= { tnMrpDomainEventEntry 1 }
+			
+tnMrpDomainEventTimestamp  	OBJECT-TYPE
+	SYNTAX      TimeStamp
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	  "The value of sysUpTime at the time of the logged event."
+	::= { tnMrpDomainEventEntry 2 }
+		
+tnMrpDomainEventType OBJECT-TYPE
+    SYNTAX 		TnMRPEventType
+    MAX-ACCESS 	read-only
+    STATUS 		current
+    DESCRIPTION "Event type"
+    ::= { tnMrpDomainEventEntry 3 }
+	
+tnMrpDomainEventAppear OBJECT-TYPE
+    SYNTAX 		TnMRPEventAppear
+    MAX-ACCESS 	read-only
+    STATUS 		current
+    DESCRIPTION "Event appear or disappear"
+    ::= { tnMrpDomainEventEntry 4 }
+	
+	
+tnMrpDomainEventTableReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Write true(1) will cause a reset of all events"
+    DEFVAL      { false }
+    ::= { tnMrpObjects 5 }	
+	
+END

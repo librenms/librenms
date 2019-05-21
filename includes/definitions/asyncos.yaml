@@ -13,14 +13,14 @@ discovery:
 mib_dir:
     - cisco
 poller_modules:
-    ipmi: 0
-    bgp-peers: 0
-    ospf: 0
-    stp: 0
-    ntp: 0
+    ipmi: false
+    bgp-peers: false
+    ospf: false
+    stp: false
+    ntp: false
 discovery_modules:
-    ports-stack: 0
-    cisco-vrf-lite: 0
-    bgp-peers: 0
-    stp: 0
-    ntp: 0
+    ports-stack: false
+    cisco-vrf-lite: false
+    bgp-peers: false
+    stp: false
+    ntp: false

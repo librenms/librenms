@@ -1,0 +1,1560 @@
+-- File: RFC1757.MIB - CCD-RMON-MIB
+-- Changes:
+--      Changed IMPORT of DisplayString to RFC1213-MIB
+--        from RFC1158-MIB.
+--      Added import for TimeTicks from RFC1155-SMI.
+-- dperkins@scruznet.com
+
+          GBNServiceRMON-MIB DEFINITIONS ::= BEGIN
+
+              IMPORTS
+                  TimeTicks,
+                  Counter                FROM RFC1155-SMI
+                  DisplayString,        
+                  mib-2                  FROM RFC1213-MIB
+                  OBJECT-TYPE            FROM RFC-1212
+                  rmonMib                FROM ADMIN-MASTER-MIB
+                  TRAP-TYPE              FROM RFC-1215;
+
+              -- textual conventions
+
+              OwnerString ::= DisplayString
+              -- This data type is used to model an administratively
+              -- assigned name of the owner of a resource. This
+              -- information is taken from the NVT ASCII character
+              -- set.  It is suggested that this name contain one or
+              -- more of the following: IP address, management station
+              -- name, network manager's name, location, or phone
+              -- number.
+              -- In some cases the agent itself will be the owner of
+              -- an entry.  In these cases, this string shall be set
+              -- to a string starting with 'monitor'.
+              --
+              -- SNMP access control is articulated entirely in terms
+              -- of the contents of MIB views; access to a particular
+              -- SNMP object instance depends only upon its presence
+              -- or absence in a particular MIB view and never upon
+              -- its value or the value of related object instances.
+              -- Thus, objects of this type afford resolution of
+              -- resource contention only among cooperating managers;
+              -- they realize no access control function with respect
+              -- to uncooperative parties.
+              --
+              -- By convention, objects with this syntax are declared as
+              -- having
+              --
+              --      SIZE (0..127)
+
+              EntryStatus ::= INTEGER
+                         { valid(1),
+                           createRequest(2),
+                           underCreation(3),
+                           invalid(4)
+                         }
+              -- The status of a table entry.
+              --
+              -- Setting this object to the value invalid(4) has the
+              -- effect of invalidating the corresponding entry.
+              -- That is, it effectively disassociates the mapping
+              -- identified with said entry.
+              -- It is an implementation-specific matter as to whether
+              -- the agent removes an invalidated entry from the table.
+              -- Accordingly, management stations must be prepared to
+              -- receive tabular information from agents that
+              -- corresponds to entries currently not in use.  Proper
+              -- interpretation of such entries requires examination
+              -- of the relevant EntryStatus object.
+              --
+              -- An existing instance of this object cannot be set to
+              -- createRequest(2).  This object may only be set to
+              -- createRequest(2) when this instance is created.  When
+              -- this object is created, the agent may wish to create
+              -- supplemental object instances with default values
+              -- to complete a conceptual row in this table.  Because
+              -- the creation of these default objects is entirely at
+              -- the option of the agent, the manager must not assume
+              -- that any will be created, but may make use of any that
+              -- are created. Immediately after completing the create
+              -- operation, the agent must set this object to
+              -- underCreation(3).
+              --
+              -- When in the underCreation(3) state, an entry is
+              -- allowed to exist in a possibly incomplete, possibly
+              -- inconsistent state, usually to allow it to be
+              -- modified in mutiple PDUs.  When in this state, an
+              -- entry is not fully active.  Entries shall exist in
+              -- the underCreation(3) state until the management
+              -- station is finished configuring the entry and sets
+              -- this object to valid(1) or aborts, setting this
+              -- object to invalid(4).  If the agent determines that
+              -- an entry has been in the underCreation(3) state for
+              -- an abnormally long time, it may decide that the
+              -- management station has crashed.  If the agent makes
+              -- this decision, it may set this object to invalid(4)
+              -- to reclaim the entry.  A prudent agent will
+              -- understand that the management station may need to
+              -- wait for human input and will allow for that
+              -- possibility in its determination of this abnormally
+              -- long period.
+              --
+              -- An entry in the valid(1) state is fully configured and
+              -- consistent and fully represents the configuration or
+              -- operation such a row is intended to represent.  For
+              -- example, it could be a statistical function that is
+              -- configured and active, or a filter that is available
+              -- in the list of filters processed by the packet capture
+              -- process.
+              --
+              -- A manager is restricted to changing the state of an
+              -- entry in the following ways:
+              --
+              --                       create   under
+              --      To:       valid  Request  Creation  invalid
+              -- From:
+              -- valid             OK       NO        OK       OK
+              -- createRequest    N/A      N/A       N/A      N/A
+              -- underCreation     OK       NO        OK       OK
+              -- invalid           NO       NO        NO       OK
+              -- nonExistent       NO       OK        NO       OK
+              --
+              -- In the table above, it is not applicable to move the
+              -- state from the createRequest state to any other
+              -- state because the manager will never find the
+              -- variable in that state.  The nonExistent state is
+              -- not a value of the enumeration, rather it means that
+              -- the entryStatus variable does not exist at all.
+              --
+              -- An agent may allow an entryStatus variable to change
+              -- state in additional ways, so long as the semantics
+              -- of the states are followed.  This allowance is made
+              -- to ease the implementation of the agent and is made
+              -- despite the fact that managers should never
+              -- excercise these additional state transitions.
+
+
+              rStatistics        OBJECT IDENTIFIER ::= { rmonMib 1 }
+              rHistory           OBJECT IDENTIFIER ::= { rmonMib 2 }
+              rAlarm             OBJECT IDENTIFIER ::= { rmonMib 3 }
+              rEvent             OBJECT IDENTIFIER ::= { rmonMib 9 }
+
+
+          -- The Ethernet Statistics Group
+          --
+          -- Implementation of the Ethernet Statistics group is
+          -- optional.
+          --
+          -- The ethernet statistics group contains statistics
+          -- measured by the probe for each monitored interface on
+          -- this device.  These statistics take the form of free
+          -- running counters that start from zero when a valid entry
+          -- is created.
+          --
+          -- This group currently has statistics defined only for
+          -- Ethernet interfaces.  Each etherStatsEntry contains
+          -- statistics for one Ethernet interface.  The probe must
+          -- create one etherStats entry for each monitored Ethernet
+          -- interface on the device.
+
+          rEtherStatsTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF CcdRmonEtherStatsEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A list of Ethernet statistics entries."
+              ::= { rStatistics 1 }
+
+          rEtherStatsEntry OBJECT-TYPE
+              SYNTAX CcdRmonEtherStatsEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A collection of statistics kept for a particular
+                  Ethernet interface.  As an example, an instance of the
+                  etherStatsPkts object might be named etherStatsPkts.1"
+              INDEX { rEtherStatsIndex }
+              ::= { rEtherStatsTable 1 }
+
+          CcdRmonEtherStatsEntry ::= SEQUENCE {
+              rEtherStatsIndex                    INTEGER (1..65535),
+              rEtherStatsDataSource               OBJECT IDENTIFIER,
+              rEtherStatsDropEvents               Counter,
+              rEtherStatsOctets                   Counter,
+              rEtherStatsPkts                     Counter,
+              rEtherStatsBroadcastPkts            Counter,
+              rEtherStatsMulticastPkts            Counter,
+              rEtherStatsCRCAlignErrors           Counter,
+              rEtherStatsUndersizePkts            Counter,
+              rEtherStatsOversizePkts             Counter,
+              rEtherStatsFragments                Counter,
+              rEtherStatsJabbers                  Counter,
+              rEtherStatsCollisions               Counter,
+              rEtherStatsPkts64Octets             Counter,
+              rEtherStatsPkts65to127Octets        Counter,
+              rEtherStatsPkts128to255Octets       Counter,
+              rEtherStatsPkts256to511Octets       Counter,
+              rEtherStatsPkts512to1023Octets      Counter,
+              rEtherStatsPkts1024to1518Octets     Counter,
+              rEtherStatsOwner                    OwnerString,
+              rEtherStatsStatus                   EntryStatus
+          }
+
+          rEtherStatsIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The value of this object uniquely identifies this
+                  etherStats entry."
+              ::= { rEtherStatsEntry 1 }
+
+          rEtherStatsDataSource OBJECT-TYPE
+              SYNTAX OBJECT IDENTIFIER
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "This object identifies the source of the data that
+                  this etherStats entry is configured to analyze.  This
+                  source can be any ethernet interface on this device.
+                  In order to identify a particular interface, this
+                  object shall identify the instance of the ifIndex
+                  object, defined in RFC 1213 and RFC 1573 [4,6], for
+                  the desired interface.  For example, if an entry
+                  were to receive data from interface #1, this object
+                  would be set to ifIndex.1.
+
+                  The statistics in this group reflect all packets
+                  on the local network segment attached to the
+                  identified interface.
+
+                  An agent may or may not be able to tell if
+                  fundamental changes to the media of the interface
+                  have occurred and necessitate an invalidation of
+                  this entry.  For example, a hot-pluggable ethernet
+                  card could be pulled out and replaced by a
+                  token-ring card.  In such a case, if the agent has
+                  such knowledge of the change, it is recommended that
+                  it invalidate this entry.
+
+                  This object may not be modified if the associated
+                  etherStatsStatus object is equal to valid(1)."
+              ::= { rEtherStatsEntry 2 }
+
+          rEtherStatsDropEvents OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of events in which packets
+                  were dropped by the probe due to lack of resources.
+                  Note that this number is not necessarily the number of
+                  packets dropped; it is just the number of times this
+                  condition has been detected."
+              ::= { rEtherStatsEntry 3 }
+
+          rEtherStatsOctets OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of octets of data (including
+                  those in bad packets) received on the
+                  network (excluding framing bits but including
+                  FCS octets).
+
+                  This object can be used as a reasonable estimate of
+                  ethernet utilization.  If greater precision is
+                  desired, the etherStatsPkts and etherStatsOctets
+                  objects should be sampled before and after a common
+                  interval.  The differences in the sampled values are
+                  Pkts and Octets, respectively, and the number of
+                  seconds in the interval is Interval.  These values
+                  are used to calculate the Utilization as follows:
+
+                                   Pkts * (9.6 + 6.4) + (Octets * .8)
+                   Utilization = -------------------------------------
+                                           Interval * 10,000
+
+                  The result of this equation is the value Utilization
+                  which is the percent utilization of the ethernet
+                  segment on a scale of 0 to 100 percent."
+              ::= { rEtherStatsEntry 4 }
+
+          rEtherStatsPkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets (including bad packets,
+                  broadcast packets, and multicast packets) received."
+              ::= { rEtherStatsEntry 5 }
+
+          rEtherStatsBroadcastPkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of good packets received that were
+                  directed to the broadcast address.  Note that this
+                  does not include multicast packets."
+              ::= { rEtherStatsEntry 6 }
+
+          rEtherStatsMulticastPkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of good packets received that were
+                  directed to a multicast address.  Note that this
+                  number does not include packets directed to the
+                  broadcast address."
+              ::= { rEtherStatsEntry 7 }
+
+          rEtherStatsCRCAlignErrors OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets received that
+                  had a length (excluding framing bits, but
+                  including FCS octets) of between 64 and 1518
+                  octets, inclusive, but but had either a bad
+                  Frame Check Sequence (FCS) with an integral
+                  number of octets (FCS Error) or a bad FCS with
+                  a non-integral number of octets (Alignment Error)."
+              ::= { rEtherStatsEntry 8 }
+
+          rEtherStatsUndersizePkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets received that were
+                  less than 64 octets long (excluding framing bits,
+                  but including FCS octets) and were otherwise well
+                  formed."
+              ::= { rEtherStatsEntry 9 }
+
+          rEtherStatsOversizePkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets received that were
+                  longer than 1518 octets (excluding framing bits,
+                  but including FCS octets) and were otherwise
+                  well formed."
+              ::= { rEtherStatsEntry 10 }
+
+          rEtherStatsFragments OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets received that were less
+                  than 64 octets in length (excluding framing bits but
+                  including FCS octets) and had either a bad Frame
+                  Check Sequence (FCS) with an integral number of
+                  octets (FCS Error) or a bad FCS with a non-integral
+                  number of octets (Alignment Error).
+
+                  Note that it is entirely normal for
+                  etherStatsFragments to increment.  This is because
+                  it counts both runts (which are normal occurrences
+                  due to collisions) and noise hits."
+              ::= { rEtherStatsEntry 11 }
+
+          rEtherStatsJabbers OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets received that were
+                  longer than 1518 octets (excluding framing bits,
+                  but including FCS octets), and had either a bad
+                  Frame Check Sequence (FCS) with an integral number
+                  of octets (FCS Error) or a bad FCS with a
+                  non-integral number of octets (Alignment Error).
+
+                  Note that this definition of jabber is different
+                  than the definition in IEEE-802.3 section 8.2.1.5
+                  (10BASE5) and section 10.3.1.4 (10BASE2).  These
+                  documents define jabber as the condition where any
+                  packet exceeds 20 ms.  The allowed range to detect
+                  jabber is between 20 ms and 150 ms."
+              ::= { rEtherStatsEntry 12 }
+
+          rEtherStatsCollisions OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The best estimate of the total number of collisions
+                  on this Ethernet segment.
+
+                  The value returned will depend on the location of
+                  the RMON probe. Section 8.2.1.3 (10BASE-5) and
+                  section 10.3.1.3 (10BASE-2) of IEEE standard 802.3
+                  states that a station must detect a collision, in
+                  the receive mode, if three or more stations are
+                  transmitting simultaneously.  A repeater port must
+                  detect a collision when two or more stations are
+                  transmitting simultaneously.  Thus a probe placed on
+                  a repeater port could record more collisions than a
+                  probe connected to a station on the same segment
+                  would.
+
+                  Probe location plays a much smaller role when
+                  considering 10BASE-T.  14.2.1.4 (10BASE-T) of IEEE
+                  standard 802.3 defines a collision as the
+                  simultaneous presence of signals on the DO and RD
+                  circuits (transmitting and receiving at the same
+                  time).  A 10BASE-T station can only detect
+                  collisions when it is transmitting.  Thus probes
+                  placed on a station and a repeater, should report
+                  the same number of collisions.
+
+                  Note also that an RMON probe inside a repeater
+                  should ideally report collisions between the
+                  repeater and one or more other hosts (transmit
+                  collisions as defined by IEEE 802.3k) plus receiver
+                  collisions observed on any coax segments to which
+                  the repeater is connected."
+              ::= { rEtherStatsEntry 13 }
+
+          rEtherStatsPkts64Octets OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were 64 octets in length
+                  (excluding framing bits but including FCS octets)."
+              ::= { rEtherStatsEntry 14 }
+
+          rEtherStatsPkts65to127Octets OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  65 and 127 octets in length inclusive
+                  (excluding framing bits but including FCS octets)."
+              ::= { rEtherStatsEntry 15 }
+
+          rEtherStatsPkts128to255Octets OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  128 and 255 octets in length inclusive
+                  (excluding framing bits but including FCS octets)."
+              ::= { rEtherStatsEntry 16 }
+
+          rEtherStatsPkts256to511Octets OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  256 and 511 octets in length inclusive
+                  (excluding framing bits but including FCS octets)."
+              ::= { rEtherStatsEntry 17 }
+
+          rEtherStatsPkts512to1023Octets OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  512 and 1023 octets in length inclusive
+                  (excluding framing bits but including FCS octets)."
+              ::= { rEtherStatsEntry 18 }
+
+          rEtherStatsPkts1024to1518Octets OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  1024 and 1518 octets in length inclusive
+                  (excluding framing bits but including FCS octets)."
+              ::= { rEtherStatsEntry 19 }
+
+          rEtherStatsOwner OBJECT-TYPE
+              SYNTAX OwnerString
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The entity that configured this entry and is
+                  therefore using the resources assigned to it."
+              ::= { rEtherStatsEntry 20 }
+
+          rEtherStatsStatus OBJECT-TYPE
+              SYNTAX EntryStatus
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The status of this etherStats entry."
+              ::= { rEtherStatsEntry 21 }
+
+
+          -- The History Control Group
+
+          -- Implementation of the History Control group is optional.
+          --
+          -- The history control group controls the periodic statistical
+          -- sampling of data from various types of networks.  The
+          -- historyControlTable stores configuration entries that each
+          -- define an interface, polling period, and other parameters.
+          -- Once samples are taken, their data is stored in an entry
+          -- in a media-specific table.  Each such entry defines one
+          -- sample, and is associated with the historyControlEntry that
+          -- caused the sample to be taken.  Each counter in the
+          -- etherHistoryEntry counts the same event as its
+          -- similarly-named counterpart in the etherStatsEntry,
+          -- except that each value here is a cumulative sum during a
+          -- sampling period.
+          --
+          -- If the probe keeps track of the time of day, it should
+          -- start the first sample of the history at a time such that
+          -- when the next hour of the day begins, a sample is
+          -- started at that instant.  This tends to make more
+          -- user-friendly reports, and enables comparison of reports
+          -- from different probes that have relatively accurate time
+          -- of day.
+          --
+          -- The probe is encouraged to add two history control entries
+          -- per monitored interface upon initialization that describe
+          -- a short term and a long term polling period.  Suggested
+          -- parameters are 30 seconds for the short term polling period
+          -- and 30 minutes for the long term period.
+
+          rHistoryControlTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF CcdRmonHistoryControlEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A list of history control entries."
+              ::= { rHistory 1 }
+
+          rHistoryControlEntry OBJECT-TYPE
+              SYNTAX CcdRmonHistoryControlEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A list of parameters that set up a periodic sampling
+                  of statistics.  As an example, an instance of the
+                  historyControlInterval object might be named
+                  historyControlInterval.2"
+              INDEX { rHistoryControlIndex }
+              ::= { rHistoryControlTable 1 }
+
+          CcdRmonHistoryControlEntry ::= SEQUENCE {
+              rHistoryControlIndex             INTEGER (1..65535),
+              rHistoryControlDataSource        OBJECT IDENTIFIER,
+              rHistoryControlBucketsRequested  INTEGER (1..65535),
+              rHistoryControlBucketsGranted    INTEGER (1..65535),
+              rHistoryControlInterval          INTEGER (1..3600),
+              rHistoryControlOwner             OwnerString,
+              rHistoryControlStatus            EntryStatus
+          }
+
+          rHistoryControlIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "An index that uniquely identifies an entry in the
+                  historyControl table.  Each such entry defines a
+                  set of samples at a particular interval for an
+                  interface on the device."
+              ::= { rHistoryControlEntry 1 }
+
+          rHistoryControlDataSource OBJECT-TYPE
+              SYNTAX OBJECT IDENTIFIER
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "This object identifies the source of the data for
+                  which historical data was collected and
+                  placed in a media-specific table on behalf of this
+                  historyControlEntry.  This source can be any
+                  interface on this device.  In order to identify
+                  a particular interface, this object shall identify
+                  the instance of the ifIndex object, defined
+                  in  RFC 1213 and RFC 1573 [4,6], for the desired
+                  interface.  For example, if an entry were to receive
+                  data from interface #1, this object would be set
+                  to ifIndex.1.
+
+                  The statistics in this group reflect all packets
+                  on the local network segment attached to the
+                  identified interface.
+
+                  An agent may or may not be able to tell if fundamental
+                  changes to the media of the interface have occurred
+                  and necessitate an invalidation of this entry.  For
+                  example, a hot-pluggable ethernet card could be
+                  pulled out and replaced by a token-ring card.  In
+                  such a case, if the agent has such knowledge of the
+                  change, it is recommended that it invalidate this
+                  entry.
+
+                  This object may not be modified if the associated
+                  historyControlStatus object is equal to valid(1)."
+              ::= { rHistoryControlEntry 2 }
+
+          rHistoryControlBucketsRequested OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The requested number of discrete time intervals
+                  over which data is to be saved in the part of the
+                  media-specific table associated with this
+                  historyControlEntry.
+
+                  When this object is created or modified, the probe
+                  should set historyControlBucketsGranted as closely to
+                  this object as is possible for the particular probe
+                  implementation and available resources."
+              DEFVAL { 50 }
+              ::= { rHistoryControlEntry 3 }
+
+          rHistoryControlBucketsGranted OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The number of discrete sampling intervals
+                  over which data shall be saved in the part of
+                  the media-specific table associated with this
+                  historyControlEntry.
+
+                  When the associated historyControlBucketsRequested
+                  object is created or modified, the probe
+                  should set this object as closely to the requested
+                  value as is possible for the particular
+                  probe implementation and available resources.  The
+                  probe must not lower this value except as a result
+                  of a modification to the associated
+                  historyControlBucketsRequested object.
+
+                  There will be times when the actual number of
+                  buckets associated with this entry is less than
+                  the value of this object.  In this case, at the
+                  end of each sampling interval, a new bucket will
+                  be added to the media-specific table.
+
+                  When the number of buckets reaches the value of
+                  this object and a new bucket is to be added to the
+                  media-specific table, the oldest bucket associated
+                  with this historyControlEntry shall be deleted by
+                  the agent so that the new bucket can be added.
+
+                  When the value of this object changes to a value less
+                  than the current value, entries are deleted
+                  from the media-specific table associated with this
+                  historyControlEntry.  Enough of the oldest of these
+                  entries shall be deleted by the agent so that their
+                  number remains less than or equal to the new value of
+                  this object.
+
+                  When the value of this object changes to a value
+                  greater than the current value, the number of
+                  associated media- specific entries may be allowed to
+                  grow."
+              ::= { rHistoryControlEntry 4 }
+
+          rHistoryControlInterval OBJECT-TYPE
+              SYNTAX INTEGER (1..3600)
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The interval in seconds over which the data is
+                  sampled for each bucket in the part of the
+                  media-specific table associated with this
+                  historyControlEntry.  This interval can
+                  be set to any number of seconds between 1 and
+                  3600 (1 hour).
+
+                  Because the counters in a bucket may overflow at their
+                  maximum value with no indication, a prudent manager
+                  will take into account the possibility of overflow
+                  in any of the associated counters.  It is important
+                  to consider the minimum time in which any counter
+                  could overflow on a particular media type and set
+                  the historyControlInterval object to a value less
+                  than this interval.  This is typically most
+                  important for the 'octets' counter in any
+                  media-specific table.  For example, on an Ethernet
+                  network, the etherHistoryOctets counter could
+                  overflow in about one hour at the Ethernet's maximum
+                  utilization.
+
+                  This object may not be modified if the associated
+                  historyControlStatus object is equal to valid(1)."
+              DEFVAL { 1800 }
+              ::= { rHistoryControlEntry 5 }
+
+          rHistoryControlOwner OBJECT-TYPE
+              SYNTAX OwnerString
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The entity that configured this entry and is
+                  therefore using the resources assigned to it."
+              ::= { rHistoryControlEntry 6 }
+
+          rHistoryControlStatus OBJECT-TYPE
+              SYNTAX EntryStatus
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The status of this historyControl entry.
+
+                  Each instance of the media-specific table associated
+                  with this historyControlEntry will be deleted by the
+                  agent if this historyControlEntry is not equal to
+                  valid(1)."
+              ::= { rHistoryControlEntry 7 }
+
+
+          -- The Ethernet History Group
+
+          -- Implementation of the Ethernet History group is optional.
+          --
+          -- The Ethernet History group records periodic
+          -- statistical samples from a network and stores them
+          -- for later retrieval.  Once samples are taken, their
+          -- data is stored in an entry in a media-specific
+          -- table.  Each such entry defines one sample, and is
+          -- associated with the historyControlEntry that caused
+          -- the sample to be taken.  This group defines the
+          -- etherHistoryTable, for Ethernet networks.
+          --
+
+          rEtherHistoryTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF CcdRmonEtherHistoryEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A list of Ethernet history entries."
+              ::= { rHistory 2 }
+
+          rEtherHistoryEntry OBJECT-TYPE
+              SYNTAX CcdRmonEtherHistoryEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "An historical sample of Ethernet statistics on a
+                  particular Ethernet interface.  This sample is
+                  associated with the historyControlEntry which set up
+                  the parameters for a regular collection of these
+                  samples.  As an example, an instance of the
+                  etherHistoryPkts object might be named
+                  etherHistoryPkts.2.89"
+              INDEX { rEtherHistoryIndex , rEtherHistorySampleIndex }
+              ::= { rEtherHistoryTable 1 }
+
+          CcdRmonEtherHistoryEntry ::= SEQUENCE {
+              rEtherHistoryIndex                 INTEGER (1..65535),
+              rEtherHistorySampleIndex           INTEGER (1..2147483647),
+              rEtherHistoryIntervalStart         TimeTicks,
+              rEtherHistoryDropEvents            Counter,
+              rEtherHistoryOctets                Counter,
+              rEtherHistoryPkts                  Counter,
+              rEtherHistoryBroadcastPkts         Counter,
+              rEtherHistoryMulticastPkts         Counter,
+              rEtherHistoryCRCAlignErrors        Counter,
+              rEtherHistoryUndersizePkts         Counter,
+              rEtherHistoryOversizePkts          Counter,
+              rEtherHistoryFragments             Counter,
+              rEtherHistoryJabbers               Counter,
+              rEtherHistoryCollisions            Counter,
+              rEtherHistoryUtilization           INTEGER (0..10000)
+          }
+
+          rEtherHistoryIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The history of which this entry is a part.  The
+                  history identified by a particular value of this
+                  index is the same history as identified
+                  by the same value of historyControlIndex."
+              ::= { rEtherHistoryEntry 1 }
+
+          rEtherHistorySampleIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..2147483647)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "An index that uniquely identifies the particular
+                  sample this entry represents among all samples
+                  associated with the same historyControlEntry.
+                  This index starts at 1 and increases by one
+                  as each new sample is taken."
+              ::= { rEtherHistoryEntry 2 }
+
+          rEtherHistoryIntervalStart OBJECT-TYPE
+              SYNTAX TimeTicks
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The value of sysUpTime at the start of the interval
+                  over which this sample was measured.  If the probe
+                  keeps track of the time of day, it should start
+                  the first sample of the history at a time such that
+                  when the next hour of the day begins, a sample is
+                  started at that instant.  Note that following this
+                  rule may require the probe to delay collecting the
+                  first sample of the history, as each sample must be
+                  of the same interval.  Also note that the sample which
+                  is currently being collected is not accessible in this
+                  table until the end of its interval."
+              ::= { rEtherHistoryEntry 3 }
+
+          rEtherHistoryDropEvents OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of events in which packets
+                  were dropped by the probe due to lack of resources
+                  during this sampling interval.  Note that this number
+              is not necessarily the number of packets dropped, it
+              is just the number of times this condition has been
+              detected."
+              ::= { rEtherHistoryEntry 4 }
+
+          rEtherHistoryOctets OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of octets of data (including
+                  those in bad packets) received on the
+                  network (excluding framing bits but including
+                  FCS octets)."
+              ::= { rEtherHistoryEntry 5 }
+
+          rEtherHistoryPkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The number of packets (including bad packets)
+                  received during this sampling interval."
+              ::= { rEtherHistoryEntry 6 }
+
+          rEtherHistoryBroadcastPkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The number of good packets received during this
+                  sampling interval that were directed to the
+                  broadcast address."
+              ::= { rEtherHistoryEntry 7 }
+
+          rEtherHistoryMulticastPkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The number of good packets received during this
+                  sampling interval that were directed to a
+                  multicast address.  Note that this number does not
+                  include packets addressed to the broadcast address."
+              ::= { rEtherHistoryEntry 8 }
+
+          rEtherHistoryCRCAlignErrors OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The number of packets received during this sampling
+                  interval that had a length (excluding framing bits
+                  but including FCS octets) between 64 and 1518
+                  octets, inclusive, but had either a bad Frame Check
+                  Sequence (FCS) with an integral number of octets
+                  (FCS Error) or a bad FCS with a non-integral number
+                  of octets (Alignment Error)."
+              ::= { rEtherHistoryEntry 9 }
+
+          rEtherHistoryUndersizePkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The number of packets received during this
+                  sampling interval that were less than 64 octets
+                  long (excluding framing bits but including FCS
+                  octets) and were otherwise well formed."
+              ::= { rEtherHistoryEntry 10 }
+
+          rEtherHistoryOversizePkts OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The number of packets received during this
+                  sampling interval that were longer than 1518
+                  octets (excluding framing bits but including
+                  FCS octets) but were otherwise well formed."
+              ::= { rEtherHistoryEntry 11 }
+
+          rEtherHistoryFragments OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The total number of packets received during this
+                  sampling interval that were less than 64 octets in
+                  length (excluding framing bits but including FCS
+                  octets) had either a bad Frame Check Sequence (FCS)
+                  with an integral number of octets (FCS Error) or a bad
+                  FCS with a non-integral number of octets (Alignment
+                  Error).
+
+                  Note that it is entirely normal for
+                  etherHistoryFragments to increment.  This is because
+                  it counts both runts (which are normal occurrences
+                  due to collisions) and noise hits."
+              ::= { rEtherHistoryEntry 12 }
+
+          rEtherHistoryJabbers OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The number of packets received during this
+                  sampling interval that were longer than 1518 octets
+                  (excluding framing bits but including FCS octets),
+                  and  had either a bad Frame Check Sequence (FCS)
+                  with an integral number of octets (FCS Error) or
+                  a bad FCS with a non-integral number of octets
+                  (Alignment Error).
+
+                  Note that this definition of jabber is different
+                  than the definition in IEEE-802.3 section 8.2.1.5
+                  (10BASE5) and section 10.3.1.4 (10BASE2).  These
+                  documents define jabber as the condition where any
+                  packet exceeds 20 ms.  The allowed range to detect
+                  jabber is between 20 ms and 150 ms."
+              ::= { rEtherHistoryEntry 13 }
+
+          rEtherHistoryCollisions OBJECT-TYPE
+              SYNTAX Counter
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The best estimate of the total number of collisions
+                  on this Ethernet segment during this sampling
+                  interval.
+
+                  The value returned will depend on the location of
+                  the RMON probe. Section 8.2.1.3 (10BASE-5) and
+                  section 10.3.1.3 (10BASE-2) of IEEE standard 802.3
+                  states that a station must detect a collision, in
+                  the receive mode, if three or more stations are
+                  transmitting simultaneously.  A repeater port must
+                  detect a collision when two or more stations are
+                  transmitting simultaneously.  Thus a probe placed on
+                  a repeater port could record more collisions than a
+                  probe connected to a station on the same segment
+                  would.
+
+                  Probe location plays a much smaller role when
+                  considering 10BASE-T.  14.2.1.4 (10BASE-T) of IEEE
+                  standard 802.3 defines a collision as the
+                  simultaneous presence of signals on the DO and RD
+                  circuits (transmitting and receiving at the same
+                  time).  A 10BASE-T station can only detect
+                  collisions when it is transmitting.  Thus probes
+                  placed on a station and a repeater, should report
+                  the same number of collisions.
+
+                  Note also that an RMON probe inside a repeater
+                  should ideally report collisions between the
+                  repeater and one or more other hosts (transmit
+                  collisions as defined by IEEE 802.3k) plus receiver
+                  collisions observed on any coax segments to which
+                  the repeater is connected."
+              ::= { rEtherHistoryEntry 14 }
+
+          rEtherHistoryUtilization OBJECT-TYPE
+              SYNTAX INTEGER (0..10000)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The best estimate of the mean physical layer
+                  network utilization on this interface during this
+                  sampling interval, in hundredths of a percent."
+              ::= { rEtherHistoryEntry 15 }
+
+
+          -- The Alarm Group
+
+          -- Implementation of the Alarm group is optional.
+          --
+          -- The Alarm Group requires the implementation of the Event
+          -- group.
+          --
+          -- The Alarm group periodically takes
+          -- statistical samples from variables in the probe and
+          -- compares them to thresholds that have been
+          -- configured.  The alarm table stores configuration
+          -- entries that each define a variable, polling period,
+          -- and threshold parameters.  If a sample is found to
+          -- cross the threshold values, an event is generated.
+          -- Only variables that resolve to an ASN.1 primitive
+          -- type of INTEGER (INTEGER, Counter, Gauge, or
+          -- TimeTicks) may be monitored in this way.
+          --
+          -- This function has a hysteresis mechanism to limit
+          -- the generation of events.  This mechanism generates
+          -- one event as a threshold is crossed in the
+          -- appropriate direction.  No more events are generated
+          -- for that threshold until the opposite threshold is
+          -- crossed.
+          --
+          -- In the case of a sampling a deltaValue, a probe may
+          -- implement this mechanism with more precision if it
+          -- takes a delta sample twice per period, each time
+          -- comparing the sum of the latest two samples to the
+          -- threshold.  This allows the detection of threshold
+          -- crossings that span the sampling boundary.  Note
+          -- that this does not require any special configuration
+          -- of the threshold value.  It is suggested that probes
+          -- implement this more precise algorithm.
+
+          rAlarmTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF CcdRmonAlarmEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A list of alarm entries."
+              ::= { rAlarm 1 }
+
+          rAlarmEntry OBJECT-TYPE
+              SYNTAX CcdRmonAlarmEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A list of parameters that set up a periodic checking
+                  for alarm conditions.  For example, an instance of the
+                  alarmValue object might be named alarmValue.8"
+              INDEX { rAlarmIndex }
+              ::= { rAlarmTable 1 }
+
+          CcdRmonAlarmEntry ::= SEQUENCE {
+              rAlarmIndex                    INTEGER (1..65535),
+              rAlarmInterval                 INTEGER,
+              rAlarmVariable                 OBJECT IDENTIFIER,
+              rAlarmSampleType               INTEGER,
+              rAlarmValue                    INTEGER,
+              rAlarmStartupAlarm             INTEGER,
+              rAlarmRisingThreshold          INTEGER,
+              rAlarmFallingThreshold         INTEGER,
+              rAlarmRisingEventIndex         INTEGER (0..65535),
+              rAlarmFallingEventIndex        INTEGER (0..65535),
+              rAlarmOwner                    OwnerString,
+              rAlarmStatus                   EntryStatus
+          }
+
+          rAlarmIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "An index that uniquely identifies an entry in the
+                  alarm table.  Each such entry defines a
+                  diagnostic sample at a particular interval
+                  for an object on the device."
+              ::= { rAlarmEntry 1 }
+
+          rAlarmInterval OBJECT-TYPE
+              SYNTAX INTEGER
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The interval in seconds over which the data is
+                  sampled and compared with the rising and falling
+                  thresholds.  When setting this variable, care
+                  should be taken in the case of deltaValue
+                  sampling - the interval should be set short enough
+                  that the sampled variable is very unlikely to
+                  increase or decrease by more than 2^31 - 1 during
+                  a single sampling interval.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+              ::= { rAlarmEntry 2 }
+
+          rAlarmVariable OBJECT-TYPE
+              SYNTAX OBJECT IDENTIFIER
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The object identifier of the particular variable to
+                  be sampled.  Only variables that resolve to an ASN.1
+                  primitive type of INTEGER (INTEGER, Counter, Gauge,
+                  or TimeTicks) may be sampled.
+
+                  Because SNMP access control is articulated entirely
+                  in terms of the contents of MIB views, no access
+                  control mechanism exists that can restrict the value
+                  of this object to identify only those objects that
+                  exist in a particular MIB view.  Because there is
+                  thus no acceptable means of restricting the read
+                  access that could be obtained through the alarm
+                  mechanism, the probe must only grant write access to
+                  this object in those views that have read access to
+                  all objects on the probe.
+
+                  During a set operation, if the supplied variable
+                  name is not available in the selected MIB view, a
+                  badValue error must be returned.  If at any time the
+                  variable name of an established alarmEntry is no
+                  longer available in the selected MIB view, the probe
+                  must change the status of this alarmEntry to
+                  invalid(4).
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+              ::= { rAlarmEntry 3 }
+
+          rAlarmSampleType OBJECT-TYPE
+              SYNTAX INTEGER {
+                  absoluteValue(1),
+                  deltaValue(2)
+              }
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The method of sampling the selected variable and
+                  calculating the value to be compared against the
+                  thresholds.  If the value of this object is
+                  absoluteValue(1), the value of the selected variable
+                  will be compared directly with the thresholds at the
+                  end of the sampling interval.  If the value of this
+                  object is deltaValue(2), the value of the selected
+                  variable at the last sample will be subtracted from
+                  the current value, and the difference compared with
+                  the thresholds.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+              ::= { rAlarmEntry 4 }
+
+          rAlarmValue OBJECT-TYPE
+              SYNTAX INTEGER
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The value of the statistic during the last sampling
+                  period.  For example, if the sample type is
+                  deltaValue, this value will be the difference
+                  between the samples at the beginning and end of the
+                  period.  If the sample type is absoluteValue, this
+                  value will be the sampled value at the end of the
+                  period.
+
+                  This is the value that is compared with the rising and
+                  falling thresholds.
+
+                  The value during the current sampling period is not
+                  made available until the period is completed and will
+                  remain available until the next period completes."
+              ::= { rAlarmEntry 5 }
+
+          rAlarmStartupAlarm OBJECT-TYPE
+              SYNTAX INTEGER {
+                  risingAlarm(1),
+                  fallingAlarm(2),
+                  risingOrFallingAlarm(3)
+              }
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The alarm that may be sent when this entry is first
+                  set to valid.  If the first sample after this entry
+                  becomes valid is greater than or equal to the
+                  risingThreshold and alarmStartupAlarm is equal to
+                  risingAlarm(1) or risingOrFallingAlarm(3), then a
+                  single rising alarm will be generated.  If the first
+                  sample after this entry becomes valid is less than
+                  or equal to the fallingThreshold and
+                  alarmStartupAlarm is equal to fallingAlarm(2) or
+                  risingOrFallingAlarm(3), then a single falling alarm
+                  will be generated.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+              ::= { rAlarmEntry 6 }
+
+          rAlarmRisingThreshold OBJECT-TYPE
+              SYNTAX INTEGER
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "A threshold for the sampled statistic.  When the
+                  current sampled value is greater than or equal to
+                  this threshold, and the value at the last sampling
+                  interval was less than this threshold, a single
+                  event will be generated.  A single event will also
+                  be generated if the first sample after this entry
+                  becomes valid is greater than or equal to this
+                  threshold and the associated alarmStartupAlarm is
+                  equal to risingAlarm(1) or risingOrFallingAlarm(3).
+
+                  After a rising event is generated, another such event
+                  will not be generated until the sampled value
+                  falls below this threshold and reaches the
+                  alarmFallingThreshold.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+              ::= { rAlarmEntry 7 }
+
+          rAlarmFallingThreshold OBJECT-TYPE
+              SYNTAX INTEGER
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "A threshold for the sampled statistic.  When the
+                  current sampled value is less than or equal to this
+                  threshold, and the value at the last sampling
+                  interval was greater than this threshold, a single
+                  event will be generated.  A single event will also
+                  be generated if the first sample after this entry
+                  becomes valid is less than or equal to this
+                  threshold and the associated alarmStartupAlarm is
+                  equal to fallingAlarm(2) or risingOrFallingAlarm(3).
+
+                  After a falling event is generated, another such event
+                  will not be generated until the sampled value
+                  rises above this threshold and reaches the
+                  alarmRisingThreshold.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+              ::= { rAlarmEntry 8 }
+
+          rAlarmRisingEventIndex OBJECT-TYPE
+              SYNTAX INTEGER (0..65535)
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The index of the eventEntry that is
+                  used when a rising threshold is crossed.  The
+                  eventEntry identified by a particular value of
+                  this index is the same as identified by the same value
+                  of the eventIndex object.  If there is no
+                  corresponding entry in the eventTable, then
+                  no association exists.  In particular, if this value
+                  is zero, no associated event will be generated, as
+                  zero is not a valid event index.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+              ::= { rAlarmEntry 9 }
+
+          rAlarmFallingEventIndex OBJECT-TYPE
+              SYNTAX INTEGER (0..65535)
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The index of the eventEntry that is
+                  used when a falling threshold is crossed.  The
+                  eventEntry identified by a particular value of
+                  this index is the same as identified by the same value
+                  of the eventIndex object.  If there is no
+                  corresponding entry in the eventTable, then
+                  no association exists.  In particular, if this value
+                  is zero, no associated event will be generated, as
+                  zero is not a valid event index.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+              ::= { rAlarmEntry 10 }
+
+          rAlarmOwner OBJECT-TYPE
+              SYNTAX OwnerString
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The entity that configured this entry and is
+                  therefore using the resources assigned to it."
+              ::= { rAlarmEntry 11 }
+
+          rAlarmStatus OBJECT-TYPE
+              SYNTAX EntryStatus
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The status of this alarm entry."
+              ::= { rAlarmEntry 12 }
+
+
+          -- The Event Group
+
+          -- Implementation of the Event group is optional.
+          --
+          -- The Event group controls the generation and notification
+          -- of events from this device.  Each entry in the eventTable
+          -- describes the parameters of the event that can be
+          -- triggered. Each event entry is fired by an associated
+          -- condition located elsewhere in the MIB.  An event entry
+          -- may also be associated- with a function elsewhere in the
+          -- MIB that will be executed when the event is generated.  For
+          -- example, a channel may be turned on or off by the firing
+          -- of an event.
+          --
+          -- Each eventEntry may optionally specify that a log entry
+          -- be created on its behalf whenever the event occurs.
+          -- Each entry may also specify that notification should
+          -- occur by way of SNMP trap messages.  In this case, the
+          -- community for the trap message is given in the associated
+          -- eventCommunity object.  The enterprise and specific trap
+          -- fields of the trap are determined by the condition that
+          -- triggered the event.  Two traps are defined: risingAlarm
+          -- and fallingAlarm.  If the eventTable is triggered by a
+          -- condition specified elsewhere, the enterprise and
+          -- specific trap fields must be specified for traps
+          -- generated for that condition.
+
+          rEventTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF CcdRmonEventEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A list of events to be generated."
+              ::= { rEvent 1 }
+
+          rEventEntry OBJECT-TYPE
+              SYNTAX CcdRmonEventEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A set of parameters that describe an event to be
+                  generated when certain conditions are met.  As an
+                  example, an instance of the eventLastTimeSent object
+                  might be named eventLastTimeSent.6"
+              INDEX { rEventIndex }
+              ::= { rEventTable 1 }
+
+          CcdRmonEventEntry ::= SEQUENCE {
+              rEventIndex          INTEGER (1..65535),
+              rEventDescription    DisplayString (SIZE (0..127)),
+              rEventType           INTEGER,
+              rEventCommunity      OCTET STRING (SIZE (0..127)),
+              rEventLastTimeSent   TimeTicks,
+              rEventOwner          OwnerString,
+              rEventStatus         EntryStatus
+          }
+
+          rEventIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "An index that uniquely identifies an entry in the
+                  event table.  Each such entry defines one event that
+                  is to be generated when the appropriate conditions
+                  occur."
+              ::= { rEventEntry 1 }
+
+          rEventDescription OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..127))
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "A comment describing this event entry."
+              ::= { rEventEntry 2 }
+
+          rEventType OBJECT-TYPE
+              SYNTAX INTEGER {
+                      none(1),
+                      log(2),
+                      snmp-trap(3),    -- send an SNMP trap
+                      log-and-trap(4)
+              }
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The type of notification that the probe will make
+                  about this event.  In the case of log, an entry is
+                  made in the log table for each event.  In the case of
+                  snmp-trap, an SNMP trap is sent to one or more
+                  management stations."
+              ::= { rEventEntry 3 }
+
+          rEventCommunity OBJECT-TYPE
+              SYNTAX OCTET STRING (SIZE (0..127))
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "If an SNMP trap is to be sent, it will be sent to
+                  the SNMP community specified by this octet string.
+                  In the future this table will be extended to include
+                  the party security mechanism.  This object shall be
+                  set to a string of length zero if it is intended that
+                  that mechanism be used to specify the destination of
+                  the trap."
+              ::= { rEventEntry 4 }
+
+          rEventLastTimeSent OBJECT-TYPE
+              SYNTAX TimeTicks
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The value of sysUpTime at the time this event
+                  entry last generated an event.  If this entry has
+                  not generated any events, this value will be
+                  zero."
+              ::= { rEventEntry 5 }
+
+          rEventOwner OBJECT-TYPE
+              SYNTAX OwnerString
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The entity that configured this entry and is
+                  therefore using the resources assigned to it.
+
+                  If this object contains a string starting with
+                  'monitor' and has associated entries in the log
+                  table, all connected management stations should
+                  retrieve those log entries, as they may have
+                  significance to all management stations connected to
+                  this device"
+              ::= { rEventEntry 6 }
+
+          rEventStatus OBJECT-TYPE
+              SYNTAX EntryStatus
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                  "The status of this event entry.
+
+                  If this object is not equal to valid(1), all
+                  associated log entries shall be deleted by the
+                  agent."
+              ::= { rEventEntry 7 }
+
+          --
+          rLogTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF CcdRmonLogEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A list of events that have been logged."
+              ::= { rEvent 2 }
+
+          rLogEntry OBJECT-TYPE
+              SYNTAX CcdRmonLogEntry
+              ACCESS not-accessible
+              STATUS mandatory
+              DESCRIPTION
+                  "A set of data describing an event that has been
+                  logged.  For example, an instance of the
+                  logDescription object might be named
+                  logDescription.6.47"
+              INDEX { rLogEventIndex, rLogIndex }
+              ::= { rLogTable 1 }
+
+          CcdRmonLogEntry ::= SEQUENCE {
+              rLogEventIndex           INTEGER (1..65535),
+              rLogIndex                INTEGER (1..2147483647),
+              rLogTime                 TimeTicks,
+              rLogDescription          DisplayString (SIZE (0..255))
+          }
+
+          rLogEventIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The event entry that generated this log
+                  entry.  The log identified by a particular
+                  value of this index is associated with the same
+                  eventEntry as identified by the same value
+                  of eventIndex."
+              ::= { rLogEntry 1 }
+
+          rLogIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..2147483647)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "An index that uniquely identifies an entry
+                  in the log table amongst those generated by the
+                  same eventEntries.  These indexes are
+                  assigned beginning with 1 and increase by one
+                  with each new log entry.  The association
+                  between values of logIndex and logEntries
+                  is fixed for the lifetime of each logEntry.
+                  The agent may choose to delete the oldest
+                  instances of logEntry as required because of
+                  lack of memory.  It is an implementation-specific
+                  matter as to when this deletion may occur."
+              ::= { rLogEntry 2 }
+
+          rLogTime OBJECT-TYPE
+              SYNTAX TimeTicks
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "The value of sysUpTime when this log entry was
+                  created."
+              ::= { rLogEntry 3 }
+
+          rLogDescription OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+                  "An implementation dependent description of the
+                  event that activated this log entry."
+              ::= { rLogEntry 4 }
+
+          --  These definitions use the TRAP-TYPE macro as
+          --  defined in RFC 1215 [10]
+
+          --  Remote Network Monitoring Traps
+
+          rRisingAlarm TRAP-TYPE
+              ENTERPRISE rmonMib
+              VARIABLES { rAlarmIndex, rAlarmVariable,
+			  			  rAlarmSampleType, rAlarmValue,
+						  rAlarmRisingThreshold }
+              DESCRIPTION
+                  "The SNMP trap that is generated when an alarm
+                  entry crosses its rising threshold and generates
+                  an event that is configured for sending SNMP
+                  traps."
+              ::= 1
+
+          rFallingAlarm TRAP-TYPE
+              ENTERPRISE rmonMib
+              VARIABLES { rAlarmIndex, rAlarmVariable,
+			  			  rAlarmSampleType, rAlarmValue,
+						  rAlarmFallingThreshold }
+              DESCRIPTION
+                  "The SNMP trap that is generated when an alarm
+                  entry crosses its falling threshold and generates
+                  an event that is configured for sending SNMP
+                  traps."
+              ::= 2
+
+          END
