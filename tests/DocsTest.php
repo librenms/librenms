@@ -37,6 +37,7 @@ class DocTest extends TestCase
         'Extensions/Graphite.md',
         'Extensions/InfluxDB.md',
         'Extensions/OpenTSDB.md',
+        'Extensions/Poller-Service.md',
         'Extensions/Port-Description-Parser.md',
         'Extensions/Prometheus.md',
         'Extensions/RRDCached-Security.md',
