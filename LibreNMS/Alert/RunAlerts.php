@@ -390,7 +390,7 @@ class RunAlerts
      * Run all alerts
      * @return void
      */
-    public function runAlerts()
+    public function __construct()
     {
         global $config;
         foreach ($this->loadAlerts('alerts.state != 2 && alerts.open = 1') as $alert) {
