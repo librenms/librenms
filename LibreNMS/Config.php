@@ -450,6 +450,15 @@ class Config
         }
 
         self::populateTime();
+
+        // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
+        $db_config = config('database.connections.' . config('database.default'));
+        self::set('db_host', $db_config['host'] ?? 'localhost');
+        self::set('db_name', $db_config['database'] ?? 'librenms');
+        self::set('db_user', $db_config['username'] ?? 'librenms');
+        self::set('db_pass', $db_config['password'] ?? null);
+        self::set('db_socket', $db_config['unix_socket'] ?? null);
+        self::set('db_port', $db_config['port'] ?? 3306);
     }
 
     /**
@@ -486,42 +495,6 @@ class Config
             }
             self::set($new, self::get($old));
         }
-    }
-
-    /**
-     * Get just the database connection settings from config.php
-     *
-     * @return array (keys: db_host, db_port, db_name, db_user, db_pass, db_socket)
-     */
-    public static function getDatabaseSettings()
-    {
-        // Do not access global $config in this function!
-
-        $keys = $config = [
-            'db_host' => '',
-            'db_port' => '',
-            'db_name' => '',
-            'db_user' => '',
-            'db_pass' => '',
-            'db_socket' => '',
-        ];
-
-        if (is_file(__DIR__ . '/../config.php')) {
-            include __DIR__ . '/../config.php';
-        }
-
-        // Check for testing database
-        if (isset($config['test_db_name'])) {
-            putenv('DB_TEST_DATABASE=' . $config['test_db_name']);
-        }
-        if (isset($config['test_db_user'])) {
-            putenv('DB_TEST_USERNAME=' . $config['test_db_user']);
-        }
-        if (isset($config['test_db_pass'])) {
-            putenv('DB_TEST_PASSWORD=' . $config['test_db_pass']);
-        }
-
-        return array_intersect_key($config, $keys); // return only the db settings
     }
 
     /**
