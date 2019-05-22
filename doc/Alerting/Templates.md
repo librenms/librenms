@@ -270,7 +270,7 @@ $config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 
-Service Alert:
+#### Service Alert:
 ```
 <div style="font-family:Helvetica;">
 <h2>@if ($alert->state == 1) <span style="color:red;">{{ $alert->severity }} @endif
@@ -304,12 +304,26 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
 {{ $key }}: {{ $value['string'] }}<br>
 @endforeach 
 @if ($alert->faults) <b>Faults:</b><br>
-@foreach ($alert->faults as $key => $value)<img src="https://server/graph.php?device={{ $value['device_id'] }}&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h><br>
+@foreach ($alert->faults as $key => $value)<img src="https://server/graph.php?device={{ $value['device_id'] }}&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h"><br>
 https://server/graphs/id={{ $value['device_id'] }}/type=device_processor/<br>
 @endforeach 
 Template: CPU alert <br>
 @endif
 @endif
+```
+
+#### MS Teams formatted default template:
+```
+<a href="https://your.librenms.url/device/device={{ $alert->device_id }}/">{{ $alert->title }}</a>
+<pre><strong>Device name:</strong> {{ $alert->sysName }}
+<strong>Severity:</strong> {{ $alert->severity }}
+@if ($alert->state == 0)<strong>Time elapsed:</strong>{{ $alert->elapsed }}
+@endif<strong>Timestamp:</strong> {{ $alert->timestamp }}
+<strong>Unique-ID:</strong> {{ $alert->uid }}
+<strong>Rule:</strong>@if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif</pre>
+<pre style="white-space:normal;">@if ($alert->faults) <strong>Faults:</strong>
+ @foreach ($alert->faults as $key => $value)  #{{ $key }}: {{ $value['string'] }}
+ @endforeach </pre>  @endif
 ```
 
 ## Included

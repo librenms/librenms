@@ -24,7 +24,7 @@ if ($phasecount > 1) {
             'AdvOid'      => 'upsAdvOutputLoad',
             'type'        => 'apc',
             'index'       => 0,
-            'descr'       => 'Load',
+            'descr'       => 'Load(VA)',
             'divisor'     => 10,
             'mib'         => '+PowerNet-MIB',
         ],

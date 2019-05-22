@@ -20,6 +20,7 @@ $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
     static $password;
 
     return [
+        'auth_type' => 'mysql',
         'username' => $faker->unique()->userName,
         'realname' => $faker->name,
         'email' => $faker->safeEmail,
@@ -37,6 +38,12 @@ $factory->state(App\Models\User::class, 'admin', function ($faker) {
 $factory->state(App\Models\User::class, 'read', function ($faker) {
     return [
         'level' => '5',
+    ];
+});
+
+$factory->define(\App\Models\Bill::class, function (Faker\Generator $faker) {
+    return [
+        'bill_name' => $faker->text
     ];
 });
 

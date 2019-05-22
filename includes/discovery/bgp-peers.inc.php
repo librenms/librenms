@@ -142,6 +142,11 @@ if (Config::get('enable_bgp')) {
                 if (!empty($af_data)) {
                     $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
                 }
+                if ($device['os'] == 'vrp') {
+                    d_echo("VRP:");
+                    $af_data = snmpwalk_cache_oid($device, 'hwBgpPeers', $af_data, 'HUAWEI-BGP-VPN-MIB');
+                    $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
+                }
 
                 if (!$bgp4_mib && $device['os'] == 'junos') {
                     $afis['ipv4'] = 'ipv4';

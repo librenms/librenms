@@ -34,6 +34,8 @@ class DeviceController extends SelectController
     protected function rules()
     {
         return [
+            'access' => 'nullable|in:normal,inverted',
+            'user' => 'nullable|int',
             'id' => 'nullable|in:device_id,hostname'
         ];
     }
@@ -46,6 +48,19 @@ class DeviceController extends SelectController
     protected function baseQuery($request)
     {
         $this->id = $request->get('id', 'device_id');
+        $user_id = $request->get('user');
+
+        // list devices the user does not have access to
+        if ($request->get('access') == 'inverted' && $user_id && $request->user()->isAdmin()) {
+            return Device::query()
+                ->select('device_id', 'hostname', 'sysName')
+                ->whereNotIn('device_id', function ($query) use ($user_id) {
+                    $query->select('device_id')
+                        ->from('devices_perms')
+                        ->where('user_id', $user_id);
+                })
+                ->orderBy('hostname');
+        }
 
         return Device::hasAccess($request->user())
             ->select('device_id', 'hostname', 'sysName')

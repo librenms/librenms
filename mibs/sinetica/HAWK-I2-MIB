@@ -1,0 +1,2646 @@
+
+HAWK-I2-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, Unsigned32
+		FROM SNMPv2-SMI
+--	DisplayString, sysDescr, sysName
+--		FROM RFC1213-MIB
+--	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+--		FROM SNMPv2-CONF
+	TEXTUAL-CONVENTION, RowStatus, TruthValue, MacAddress -- DateAndTime
+		FROM SNMPv2-TC
+	InetAddress, InetAddressType
+		FROM INET-ADDRESS-MIB 
+	;
+
+hawki2MIB MODULE-IDENTITY
+       LAST-UPDATED "200606271200Z"  -- 27 June 2006
+       ORGANIZATION "Sinetica Corporation"
+       CONTACT-INFO "Development Department
+
+                     Sinetica Corporation Ltd.
+                     Willow House
+                     Llancayo Court
+                     Usk
+                     Monmouthshire
+                     NP15 1HY
+                     U.K.
+
+                     Tel: +44 (0)871 226 5679
+                     Fax: +44 (0)845 456 3562
+                     Web: www.sinetica.co.uk
+                     E-mail: info@sinetica.co.uk"
+       DESCRIPTION
+               "The MIB module for the Sinetica Hawk-i2."
+       REVISION "200606271200Z"  -- 27 June 2006
+       DESCRIPTION
+               "Name change and new objects added"
+       REVISION "200603071200Z"  -- 07 March 2006
+       DESCRIPTION
+               "First issue"
+        ::= { sinetica 24 }
+
+DisplayString ::= OCTET STRING
+
+ContactState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents the state of a set of contacts."
+    SYNTAX       INTEGER { open(1), closed(2) }
+
+InputContactState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents the state of a set of input contacts."
+    SYNTAX       INTEGER { open(1), closed(2), armed(3), triggered(4) }
+
+RelayState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents the energised state of a relay."
+    SYNTAX       INTEGER { on(1), off(2) }       
+    
+OutputControlState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents the control setiing for an output."
+    SYNTAX       INTEGER { activate(1), deactivate(2), logic(3) }    
+    
+EnableState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents the state of an enabling flag."
+    SYNTAX       INTEGER { enabled(1), disabled(2) }
+
+InputDataType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents the type of data read at an input."
+    SYNTAX       INTEGER { autodetect(1), temperature(2), humidity(3), analogue(4), contact(5), inactive(255) }
+
+
+sinetica            	OBJECT IDENTIFIER ::= { enterprises 3711 }
+
+v1       	OBJECT IDENTIFIER ::= { hawki2MIB 1 }	-- MIB variant number
+
+objects  	OBJECT IDENTIFIER ::= { v1 1 }
+traps    	OBJECT IDENTIFIER ::= { hawki2MIB 0 }
+
+-- {{{ objects group
+
+inputs      	OBJECT IDENTIFIER ::= { objects 1 }
+outputs     	OBJECT IDENTIFIER ::= { objects 2 }
+
+keypads     	OBJECT IDENTIFIER ::= { objects 4 }
+acus        	OBJECT IDENTIFIER ::= { objects 5 }
+access      	OBJECT IDENTIFIER ::= { objects 6 }
+pdus        	OBJECT IDENTIFIER ::= { objects 7 }
+ 
+inventory   	OBJECT IDENTIFIER ::= { objects 99 }
+trapInfo    	OBJECT IDENTIFIER ::= { objects 100 }
+
+-- }}} End of objects group
+
+-- {{{ inputs group
+
+-- The Hawk-i2 inputs can all be either temperature, humidity, analogue volts or contact state.
+-- To deal with this there is one table to deal with all analogue-type inputs (temperature, humidity, analogue volts) and another for the contacts.
+-- At any time an input is permitted to have an entry in one table only, depending on which type of input it is currently monitoring.
+
+ipCommon	OBJECT IDENTIFIER ::= { inputs 1 }
+ipTHA   	OBJECT IDENTIFIER ::= { inputs 2 }
+ipContact	OBJECT IDENTIFIER ::= { inputs 3 }
+
+-- {{{ ipCommon group
+
+ipEnable	OBJECT IDENTIFIER ::= { ipCommon 1 }
+
+-- {{{ ipEnable group
+
+ipSelect  OBJECT-TYPE
+	SYNTAX      INTEGER  (0..24)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Selects the channel to be enabled or disabled by ipInsert. 
+		A value of 0 selects no channel."
+	DEFVAL { 0 }
+	::= { ipEnable 1 }
+
+ipInsert  OBJECT-TYPE
+	SYNTAX      InputDataType
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Inserts or removes the channel selected by ipSelect - 
+		causes an entry for that channel to be created or deleted in the relevant tables.
+		- Read behaviour is undefined."
+	::= { ipEnable 2 }
+
+-- }}} End of ipEnable group
+
+-- }}} End of ipCommon group
+-- {{{ ipTHA - i.e. temperature, humidity and analogue Volts monitoring
+
+ipTempScaleFlag   OBJECT-TYPE
+	SYNTAX      INTEGER { celsius(1), fahrenheit(2), kelvin(3) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Temperature scale (Celsius/Fahrenheit) for temperature monitoring."
+	::= { ipTHA 1 }
+
+ipTHATable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF	IpTHAEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "A table giving data for all enabled inputs with analogue-type monitoring."
+	::= { ipTHA 2 }
+
+ipTHAEntry   OBJECT-TYPE
+	SYNTAX      IpTHAEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing information about one analogue-type input."
+	INDEX		{ ipTHAChan }
+	::= { ipTHATable 1 }
+
+IpTHAEntry ::= SEQUENCE {
+	ipTHAChan   	INTEGER,
+	ipTHARS     	RowStatus,
+	ipTHAName   	DisplayString,
+	ipTHALocn  	DisplayString,
+	ipTHAAutoDetect	TruthValue,
+	ipTHAType   	InputDataType,
+	ipTHAValue  	INTEGER,
+	ipTHAScaling	INTEGER,
+	ipTHAOffset  	INTEGER,
+	ipTHAHysteresis	INTEGER
+		}
+
+ipTHAChan    	OBJECT-TYPE
+	SYNTAX      INTEGER  (0..24)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The input number."
+	::= { ipTHAEntry 1 }
+							      
+ipTHARS	OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The analogue-type input table row status."
+	::= { ipTHAEntry 2 }
+
+ipTHAName     	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..15))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+        "The name of this input"
+	::= { ipTHAEntry 3 }
+
+ipTHALocn     	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..4))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A system-defined name for the physical location of this input, e.g. MCU."
+	::= { ipTHAEntry 4 }
+
+ipTHAAutoDetect 	OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+        "Indicates that the type of data this input is monitoring is selected automatically."	
+	::= { ipTHAEntry 5 }
+
+ipTHAType	OBJECT-TYPE
+	SYNTAX      InputDataType
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+        "Indicates the type of data this input is monitoring."	
+	::= { ipTHAEntry 6 }
+
+ipTHAValue  OBJECT-TYPE
+	SYNTAX      INTEGER (-200..1000)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The current reading in the relevant measurement units."
+	::= { ipTHAEntry 7 }
+
+ipTHAScaling  OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Scaling factor for ipTHAValue when ipTHAType=analogue."
+    ::= { ipTHAEntry 8 }
+
+ipTHAOffset  OBJECT-TYPE
+    SYNTAX      INTEGER (-100..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Calibration offset in the same units as for ipTHAValue."	
+    ::= { ipTHAEntry 9 }
+
+ipTHAHysteresis  OBJECT-TYPE
+    SYNTAX      INTEGER (-100..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Hysteresis on threshold levels in the same units as for ipTHAValue."	
+    ::= { ipTHAEntry 10 }
+
+-- {{{ ipTHATrapsCfg group
+
+ipTHATrapsCfg OBJECT IDENTIFIER ::= { ipTHA 3 }
+
+-- {{{ ipTHAThreshTable
+
+ipTHAThreshTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF	IpTHAThreshEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "A table listing the trap threshold levels for all enabled inputs with analogue-type monitoring."
+	::= { ipTHATrapsCfg 1 }
+
+ipTHAThreshEntry   OBJECT-TYPE
+	SYNTAX      IpTHAThreshEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing threshold information for one analogue-type input."
+	INDEX		{ ipTHAThreshChan }
+	::= { ipTHAThreshTable 1 }
+
+IpTHAThreshEntry ::= SEQUENCE {
+	ipTHAThreshChan 	INTEGER,
+	ipTHAThreshRS   	RowStatus,
+	ipTHAUCL        	INTEGER,
+	ipTHAUWL        	INTEGER,
+	ipTHALWL        	INTEGER,
+	ipTHALCL        	INTEGER
+		}
+
+ipTHAThreshChan    	OBJECT-TYPE
+	SYNTAX      INTEGER  (0..24)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The input number."
+	::= { ipTHAThreshEntry 1 }
+							      
+ipTHAThreshRS	OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The analogue-type input table row status."
+	::= { ipTHAThreshEntry 2 }
+
+ipTHAUCL  OBJECT-TYPE
+	SYNTAX      INTEGER (-200..1000)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The Upper Critical Limit for this input in the same units as for ipTHAValue."
+	::= { ipTHAThreshEntry 3 }
+ 
+ipTHAUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "The Upper Warning Limit for this input in the same units as for ipTHAValue."
+    ::= { ipTHAThreshEntry 4 }
+
+ipTHALWL  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "The Lower Warning Limit for this input in the same units as for ipTHAValue."
+    ::= { ipTHAThreshEntry 5 }
+ 
+ipTHALCL  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "The Lower Critical Limit for this input in the same units as for ipTHAValue."
+    ::= { ipTHAThreshEntry 6 }
+
+-- }}} End of ipTHAThreshTable
+-- {{{ ipTHATrapEnTable
+
+ipTHATrapEnTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF	IpTHATrapEnEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "The table that controls trap enabling for all enabled inputs with analogue-type monitoring."
+	::= { ipTHATrapsCfg 2 }
+
+ipTHATrapEnEntry   OBJECT-TYPE
+	SYNTAX      IpTHATrapEnEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing trap enabling information for one analogue-type input."
+	INDEX		{ ipTHATrapEnChan }
+	::= { ipTHATrapEnTable 1 }
+
+IpTHATrapEnEntry ::= SEQUENCE {
+	ipTHATrapEnChan 	INTEGER,
+	ipTHATrapEnRS   	RowStatus,
+	ipTHAUCLTrapEn  	TruthValue,
+	ipTHAUWLTrapEn  	TruthValue,
+	ipTHALWLTrapEn  	TruthValue,
+	ipTHALCLTrapEn  	TruthValue
+		}
+
+ipTHATrapEnChan    	OBJECT-TYPE
+	SYNTAX      INTEGER  (0..24)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The input number."
+	::= { ipTHATrapEnEntry 1 }
+							      
+ipTHATrapEnRS	OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The analogue-type input table row status."
+	::= { ipTHATrapEnEntry 2 }
+
+ipTHAUCLTrapEn  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables and disables input UCL alarm traps."
+    ::= { ipTHATrapEnEntry 3 }
+
+ipTHAUWLTrapEn  OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Enables and disables input UWL alarm traps."
+	::= { ipTHATrapEnEntry 4 }
+
+ipTHALWLTrapEn  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables and disables input LWL alarm traps."
+    ::= { ipTHATrapEnEntry 5 }
+
+ipTHALCLTrapEn  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables and disables input LCL alarm traps."
+    ::= { ipTHATrapEnEntry 6 }
+
+-- }}} End of ipTHATrapEnTable
+-- {{{ ipTHATrapPerTable
+
+ipTHATrapPerTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF	IpTHATrapPerEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "The table that controls trap repetition for all enabled inputs with analogue-type monitoring."
+	::= { ipTHATrapsCfg 3 }
+
+ipTHATrapPerEntry   OBJECT-TYPE
+	SYNTAX      IpTHATrapPerEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing trap repetition information for one analogue-type input."
+	INDEX		{ ipTHATrapPerChan }
+	::= { ipTHATrapPerTable 1 }
+
+IpTHATrapPerEntry ::= SEQUENCE {
+	ipTHATrapPerChan 	INTEGER,
+	ipTHATrapPerRS   	RowStatus,
+	ipTHATrapUCLPer  	INTEGER,
+	ipTHATrapUWLPer  	INTEGER,
+	ipTHATrapLWLPer  	INTEGER,
+	ipTHATrapLCLPer  	INTEGER
+		}
+
+ipTHATrapPerChan    	OBJECT-TYPE
+	SYNTAX      INTEGER  (0..24)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The input number."
+	::= { ipTHATrapPerEntry 1 }
+							      
+ipTHATrapPerRS	OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The table row status."
+	::= { ipTHATrapPerEntry 2 }
+
+ipTHATrapUCLPer  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Set to 0 disables trap repetition, a value of 30 or higher sets the interval between traps in seconds"
+    ::= { ipTHATrapPerEntry 3 }
+
+ipTHATrapUWLPer  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Set to 0 disables trap repetition, a value of 30 or higher sets the interval between traps in seconds"
+    ::= { ipTHATrapPerEntry 4 }
+
+ipTHATrapLWLPer  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Set to 0 disables trap repetition, a value of 30 or higher sets the interval between traps in seconds"
+    ::= { ipTHATrapPerEntry 5 }
+
+ipTHATrapLCLPer  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Set to 0 disables trap repetition, a value of 30 or higher sets the interval between traps in seconds"
+    ::= { ipTHATrapPerEntry 6 }
+
+-- }}} End of ipTHATrapPerTable
+
+-- }}} End of ipTHATrapsCfg group
+-- {{{ ipTHA traps
+
+-- To Be Added
+
+-- }}} End of ipTHA traps
+
+-- }}} End of ipTHA
+-- {{{ ipContact 
+
+ipContTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF	IpContEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A table listing the parameters and data for all enabled inputs with contact-type monitoring."
+	::= { ipContact 1 }
+
+ipContEntry   OBJECT-TYPE
+	SYNTAX      IpContEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing information about one contact input."
+	INDEX		{ ipContChan }
+	::= { ipContTable 1 }
+
+IpContEntry ::= SEQUENCE {
+	ipContChan       	INTEGER,
+	ipContRS          	RowStatus,
+	ipContName        	DisplayString,
+	ipContLocn      	DisplayString,
+	ipContAutoDetect 	TruthValue,
+	ipContNormState 	ContactState,
+	ipContCurrState 	InputContactState,
+	ipContTrigMode  	INTEGER,
+	ipContReset       	Unsigned32,
+	ipContTrapEn		INTEGER,
+	ipContTrapPeriod  	INTEGER
+			              }
+							
+ipContChan       OBJECT-TYPE
+	SYNTAX      INTEGER  (0..24)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The input number."
+	::= { ipContEntry 1 }
+							      
+ipContRS       OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The contact input table row status."
+	::= { ipContEntry 2 }
+
+ipContName            OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..15))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+        "The name of this input"	
+	::= { ipContEntry 3 }
+
+ipContLocn        OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..4))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A system-defined name for the physical location of this input, e.g. MCU."
+	::= { ipContEntry 4 }
+
+ipContAutoDetect      OBJECT-TYPE
+    SYNTAX      TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+        "Indicates that the type of data this input is monitoring is selected automatically."	
+	::= { ipContEntry 5 }
+
+ipContNormState     OBJECT-TYPE
+	SYNTAX      ContactState
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The normal state for this contact."
+	::= { ipContEntry 6 }
+
+ipContCurrState    OBJECT-TYPE
+	SYNTAX      InputContactState
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current state of this contact."
+	::= { ipContEntry 7 }
+
+ipContTrigMode     OBJECT-TYPE
+	SYNTAX      INTEGER { positiveEdge(1), negativeEdge(2), level(3) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The contact trigger mode, level, +ve edge, -ve edge."
+	::= { ipContEntry 8 }
+
+ipContReset           OBJECT-TYPE
+	SYNTAX      Unsigned32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Resets the contact after triggering in edge mode."
+	::= { ipContEntry 9 }
+
+ipContTrapEn  OBJECT-TYPE
+    SYNTAX      INTEGER { critical(1), warning(2), information(3), disabled(255) }
+	MAX-ACCESS    read-write
+	STATUS    current
+	DESCRIPTION
+        "Configure contact input traps."
+	::= { ipContEntry 10 }
+
+ipContTrapPeriod  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Set to 0 disables trap repetition, a value of 30 or higher sets the interval between traps in seconds"
+    ::= { ipContEntry 11 }
+
+-- {{{ ipContact traps
+                          	          	
+-- To Be Added
+
+-- }}} End of ipContact traps
+
+-- }}} End of ipContact
+
+-- }}} End of ip group
+-- {{{ outputs group
+
+opEnable	OBJECT IDENTIFIER ::= { outputs 1 }
+
+-- {{{ opEnable group
+
+opSelect  OBJECT-TYPE
+	SYNTAX      INTEGER  (0..24)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Selects the channel to be enabled or disabled by opEnable. 
+		A value of 0 selects no channel."
+	DEFVAL { 0 }
+	::= { opEnable 1 }
+
+opInsert  OBJECT-TYPE
+	SYNTAX      EnableState
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Enables or disables the channel selected by opSelect - 
+		causes an entry for that channel to be created or deleted in the relevant tables.
+		- Read behaviour is undefined."
+	::= { opEnable 2 }
+
+-- }}} End of opEnable group
+-- {{{ opTable
+
+opTable    OBJECT-TYPE
+	SYNTAX      SEQUENCE OF	OpEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "A table listing the parameters and data for all outputs that are enabled and available (i.e. its extension unit is connected)."
+	::= { outputs 2 }
+
+opEntry    OBJECT-TYPE
+	SYNTAX      OpEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION	
+		"A conceptual row containing information about one output."
+	INDEX { opChan }
+	::= { opTable 1 }
+
+OpEntry ::= SEQUENCE {
+	opChan      	INTEGER,
+	opRS        	RowStatus,
+	opName      	DisplayString,
+	opLocn      	DisplayString,
+	opNormState 	RelayState,
+	opCurrState  	RelayState,
+	opOnDelTime   	Unsigned32,
+	opOffDelTime  	Unsigned32,
+	opBooleanEqn    DisplayString,
+	opTrapEn    	INTEGER,
+	opTrapPeriod	INTEGER,
+	opControlState	OutputControlState
+		}
+
+opChan        	OBJECT-TYPE
+	SYNTAX      INTEGER  (0..18)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The output number."
+	::= { opEntry 1 }
+
+opRS    	OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The contact input table row status."
+	::= { opEntry 2 }
+
+opName         	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..15))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"A user-defined name for this output."
+	::= { opEntry 3 }
+
+opLocn         	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..4))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A system-defined name for the physical location of this output, e.g. MCU."
+	::= { opEntry 4 }
+
+opNormState  	OBJECT-TYPE
+	SYNTAX      RelayState
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Sets or reads the required normal state of this output."
+	::= { opEntry 5 }
+          		
+opCurrState 	OBJECT-TYPE
+	SYNTAX      RelayState
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Reads the current state of this output."
+	::= { opEntry 6 }   
+	
+opOnDelTime  	OBJECT-TYPE
+	SYNTAX      Unsigned32 
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION	
+		"Sets the 'on' delay time for this output."
+	::= { opEntry 7 }
+
+opOffDelTime 	OBJECT-TYPE
+	SYNTAX      Unsigned32 
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION	
+		"Sets the 'off' delay time for this output."
+	::= { opEntry 8 }
+
+opBooleanEqn     	OBJECT-TYPE
+    SYNTAX 	    DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Boolean equation string"	
+    ::= { opEntry 9 } 
+    
+opTrapEn  	OBJECT-TYPE
+    SYNTAX      INTEGER { critical(1), warning(2), information(3), disabled(255) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure output traps."
+    ::= { opEntry 10 }
+
+opTrapPeriod	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Set to 0 disables trap repetition, a value of 30 or higher sets the interval between traps in seconds"
+    ::= { opEntry 11 }  
+    
+opControlState	OBJECT-TYPE
+    SYNTAX    	OutputControlState
+    MAX-ACCESS  read-write
+    STATUS    	current
+    DESCRIPTION
+        "Reads the current control state of an output."
+    ::= { opEntry 12 }  
+
+-- }}} End of opTable
+-- {{{ outputs traps
+
+-- To Be Added
+
+-- }}} End of outputs traps
+
+-- }}} End of outputs group
+-- {{{ keypads group
+                     
+kpEnable      	OBJECT IDENTIFIER ::= { keypads 1 }
+
+-- {{{ kpEnable group
+
+kpSelect  OBJECT-TYPE
+	SYNTAX      INTEGER  (0..24)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Selects the keypad to be enabled or disabled by kpEnable. 
+		A value of 0 selects no keypad."
+	DEFVAL { 0 }
+	::= { kpEnable 1 }
+
+kpInsert  OBJECT-TYPE
+	SYNTAX      EnableState
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Enables or disables the keypad selected by kpSelect - 
+		causes an entry for that keypad to be created or deleted in the relevant tables.
+		- Read behaviour is undefined."
+	::= { kpEnable 2 }
+
+-- }}} End of kpEnable group
+-- {{{ kpTable
+
+kpCtlTable    OBJECT-TYPE
+	SYNTAX      SEQUENCE OF	KpCtlEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "A table listing the parameters and data for the keypads."
+	::= { keypads 2 }
+
+kpCtlEntry    OBJECT-TYPE
+	SYNTAX      KpCtlEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION	
+		"A conceptual row containing information about one keypad."
+	INDEX { kpNumber }
+	::= { kpCtlTable 1 }
+
+KpCtlEntry ::= SEQUENCE {
+	kpNumber        		INTEGER,
+	kpRS            		RowStatus,
+	kpManufacturer     		DisplayString,
+	kpName             		DisplayString,
+	kpDoorLatchTimeOut      Unsigned32,
+	kpRtnToStndbyTimeOut	INTEGER,
+	kpEntryCodeValid   		TruthValue,
+	kpDoorOpenTimeOut   	INTEGER,
+	kpRemoteDoorOpen   		TruthValue,
+	kpInUseTrapEn      		INTEGER
+		}
+
+kpNumber        OBJECT-TYPE
+	SYNTAX      INTEGER  (1..2)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The keypad number."
+	::= { kpCtlEntry 1 }
+
+kpRS	OBJECT-TYPE
+	SYNTAX      RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The keypad table row status."
+	::= { kpCtlEntry 2 }
+
+kpManufacturer  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..15))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the manufacturer of the keypad."
+    ::= { kpCtlEntry 3 }
+
+kpName  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..15))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A name identifying the keypad."
+    ::= { kpCtlEntry 4 }
+
+kpDoorLatchTimeOut		OBJECT-TYPE
+	SYNTAX      Unsigned32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Time-out value in seconds for which the door latch is held open."
+	::= { kpCtlEntry 5 }
+
+kpRtnToStndbyTimeOut	OBJECT-TYPE
+    SYNTAX      INTEGER (0..99)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time-out value in seconds for Return to Standby Mode"
+    ::= { kpCtlEntry 6 }
+
+kpEntryCodeValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Set if previous keypad entry was valid."
+    ::= { kpCtlEntry 7 }  
+    
+kpDoorOpenTimeOut  OBJECT-TYPE
+	SYNTAX      INTEGER (0..99)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Time-out value in seconds for Door Open."
+	::= { kpCtlEntry 8 }
+
+kpRemoteDoorOpen  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to open the door."
+    ::= { kpCtlEntry 9 }
+    
+kpInUseTrapEn  OBJECT-TYPE
+    SYNTAX      INTEGER { critical(1), warning(2), information(3), disabled(255) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'keypad in use' trap enable"
+    ::= { kpCtlEntry 10 }
+    
+-- }}} End of kpTable
+-- {{{ keypads traps
+
+-- To Be Added
+
+-- }}} End of keypads traps
+
+-- }}} End of keypads group
+-- {{{ acus group
+                     
+acuEnable      	OBJECT IDENTIFIER ::= { acus 1 }
+
+-- {{{ acuEnable group
+
+acuSelect  OBJECT-TYPE
+	SYNTAX      INTEGER  (0..24)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Selects the ACU to be enabled or disabled by acuEnable. 
+		A value of 0 selects no ACU."
+	DEFVAL { 0 }
+	::= { acuEnable 1 }
+
+acuInsert  OBJECT-TYPE
+	SYNTAX      EnableState
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Enables or disables the ACU selected by acuSelect - 
+		causes an entry for that ACU to be created or deleted in the relevant tables.
+		- Read behaviour is undefined."
+	::= { acuEnable 2 }
+
+-- }}} End of acuEnable group
+-- {{{ acuTable
+
+acuCtlTable    OBJECT-TYPE
+	SYNTAX      SEQUENCE OF	AcuCtlEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "A table listing the parameters and data for the ACUs."
+	::= { acus 2 }
+
+acuCtlEntry    OBJECT-TYPE
+	SYNTAX      AcuCtlEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION	
+		"A conceptual row containing information about one ACU."
+	INDEX { acuNumber }
+	::= { acuCtlTable 1 }
+
+AcuCtlEntry ::= SEQUENCE {
+	acuNumber           	INTEGER,
+	acuCtlRS            	RowStatus,
+	acuManufacturer     	DisplayString,
+	acuName             	DisplayString,
+	acuDoorLatchTimeOut     Unsigned32,
+	acuRtnToStndbyTimeOut	INTEGER,
+	acuEntryCodeValid   	TruthValue,
+	acuDoorOpenTimeOut   	INTEGER,
+	acuRemoteDoorOpen   	TruthValue,
+	acuInUseTrapEn      	INTEGER
+		}
+
+acuNumber        OBJECT-TYPE
+	SYNTAX      INTEGER  (1..6)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The ACU number."
+	::= { acuCtlEntry 1 }
+
+acuCtlRS	OBJECT-TYPE
+	SYNTAX      RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The ACU table row status."
+	::= { acuCtlEntry 2 }
+
+acuManufacturer  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..15))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the manufacturer of the ACU."
+    ::= { acuCtlEntry 3 }
+
+acuName  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..15))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A name identifying the ACU."
+    ::= { acuCtlEntry 4 }
+
+acuDoorLatchTimeOut		OBJECT-TYPE
+	SYNTAX      Unsigned32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "Time-out value in seconds for which the door latch is held open."
+	::= { acuCtlEntry 5 }
+
+acuRtnToStndbyTimeOut	OBJECT-TYPE
+    SYNTAX      INTEGER (0..99)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time-out value in seconds for Return to Standby Mode"
+    ::= { acuCtlEntry 6 }
+
+acuEntryCodeValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Set if previous ACU entry was valid."
+    ::= { acuCtlEntry 7 }  
+    
+acuDoorOpenTimeOut  OBJECT-TYPE
+	SYNTAX      INTEGER (0..99)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Time-out value in seconds for Door Open."
+	::= { acuCtlEntry 8 }
+
+acuRemoteDoorOpen  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to open the door."
+    ::= { acuCtlEntry 9 }
+    
+acuInUseTrapEn  OBJECT-TYPE
+    SYNTAX      INTEGER { critical(1), warning(2), information(3), disabled(255) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "'ACU in use' trap enable"
+    ::= { acuCtlEntry 10 }
+    
+-- }}} End of acuTable
+-- {{{ acus traps
+
+-- To Be Added
+
+-- }}} End of acus traps
+
+-- }}} End of acus group
+-- {{{ access group
+
+accUserCtl      	OBJECT IDENTIFIER ::= { access 1 }
+
+-- {{{ accUserCtl group
+
+accUserInstance  OBJECT-TYPE
+	SYNTAX      Unsigned32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"A value of 0 causes an access user to be created in the relevant tables.
+		A non-zero value causes the nominated access user table entries to be deleted."
+	::= { accUserCtl 1 }
+
+-- {{{ accUserTable
+
+accUserTable    OBJECT-TYPE
+	SYNTAX      SEQUENCE OF	AccUserEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "A table controlling the access users."
+	::= { accUserCtl 2 }
+
+accUserEntry    OBJECT-TYPE
+	SYNTAX      AccUserEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	    "A conceptual row containing information about one ACU user."
+	INDEX       { accUserNumber }
+	::= { accUserTable 1 }
+
+AccUserEntry ::= SEQUENCE {
+	accUserNumber    	INTEGER,
+	accUserRS        	RowStatus,
+	accUserName      	DisplayString,
+	accUserCode      	OCTET STRING,
+	accUserPrivileges	DisplayString,
+	accUserExpires		DisplayString
+		}
+
+accUserNumber   OBJECT-TYPE
+	SYNTAX      INTEGER  (0..20)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The the access user-table entry number."
+	::= { accUserEntry 1 }
+
+accUserRS       OBJECT-TYPE
+	SYNTAX      RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The access user table row status."
+	::= { accUserEntry 2 }
+
+accUserName    OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..15))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"A name identifying the access user."
+	::= { accUserEntry 3 }
+
+accUserCode    OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE (0..15))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The user's access code."
+	::= { accUserEntry 4 }
+
+accUserPrivileges    OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..11))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "The ACUs and keypads that the user is allowed to gain access through - comma-separated numerical strings."
+	::= { accUserEntry 5 }
+
+accUserExpires    OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "A text string which specifies when the access code in the row expires. The format is defined by the application."
+	::= { accUserEntry 6 }
+
+-- }}} End of accUserTable
+
+accUserSetup  OBJECT-TYPE
+	SYNTAX      OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"A free form octet string for programming accUserTable. The format is defined by the application."
+	::= { accUserCtl 3 }
+
+-- }}} End of accUserCtl group
+-- {{{ pdus group
+
+pduCommon 	OBJECT IDENTIFIER ::= { pdus 1 }
+pduOutlets	OBJECT IDENTIFIER ::= { pdus 2 }
+pduMonitor	OBJECT IDENTIFIER ::= { pdus 3 }
+
+-- {{{ pduCommon group
+
+pdusEnable	OBJECT IDENTIFIER ::= { pduCommon 1 }
+
+-- {{{ pduEnable group
+
+pduSelect  OBJECT-TYPE
+	SYNTAX      INTEGER  (0..6)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Selects the PDU to be enabled or disabled by pduEnable. 
+		A value of 0 selects no PDU."
+	DEFVAL { 0 }
+	::= { pdusEnable 1 }
+
+pduInsert  OBJECT-TYPE
+	SYNTAX      EnableState
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Enables or disables the PDU selected by pduSelect - 
+		causes an entry for that PDU to be created or deleted in the relevant tables.
+		- Read behaviour is undefined."
+	::= { pdusEnable 2 }
+
+-- }}} End of pduEnable group
+-- {{{ pduTable
+
+pduTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF PduEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A table containing information about each enabled PDU."
+	::= { pduCommon 2 }
+
+pduEntry   OBJECT-TYPE
+	SYNTAX      PduEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing information about one PDU."
+	INDEX { pduNumber }
+	::= { pduTable 1 }
+
+PduEntry ::= SEQUENCE {
+	pduNumber    	INTEGER,
+	pduRS       	RowStatus,
+	pduName        	DisplayString,
+	pduOutEn    	TruthValue,
+	pduMonEn    	TruthValue,
+	pduCommsFail   	INTEGER
+		}
+
+pduNumber      OBJECT-TYPE
+	SYNTAX      INTEGER  (1..8)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU number."
+	::= { pduEntry 1 }
+
+pduRS   OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU table row status."
+	::= { pduEntry 2 }
+
+pduName OBJECT-TYPE
+	SYNTAX  	DisplayString(SIZE(0..15))
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"A string identifying the PDU."
+	::= { pduEntry 3}
+
+pduOutEn OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Enables/disables PDU power outlet control - causes an entry for outlets to be created in each relevant PDU table."
+	::= {pduEntry 4 }
+
+pduMonEn OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Enables/disables PDU power monitoring - causes an entry for monitoring to be created in each relevant PDU table."
+	::= {pduEntry 5 }
+
+pduCommsFail OBJECT-TYPE
+	SYNTAX  	INTEGER { commsGood(1), commsFailed(2), commsBadData(3)}
+	MAX-ACCESS	read-only
+	STATUS  	current
+	DESCRIPTION
+		"Indicates comms. status for the PDU."
+	::= {pduEntry 6 }
+
+-- }}} End of pduTable
+
+-- }}} End of pduCommon group
+-- {{{ pduOutlets group
+
+pduOutAll	OBJECT IDENTIFIER ::= { pduOutlets 1 }
+
+-- {{{ pduOutAll group
+
+pduOutCycleAll OBJECT-TYPE
+	SYNTAX  	INTEGER { up(1), down(2) }
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Sets the required state of all power outlets on all connected PDUs."
+	::= { pduOutAll 1 }	   
+
+pduOutCycleAllPwd OBJECT-TYPE
+	SYNTAX  	DisplayString(SIZE(0..7))
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Controls access to setting the required state of all power outlets on all connected PDUs."
+	::= { pduOutAll 2 }
+
+pduOutCycleAllAbort OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Abort command for pduOutCycleAll."
+	::= { pduOutAll 3 }	   
+
+pduOutGlobalCycleDelay OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Sets the delay period for pduOutCycleAll and pduOutCycle commands before they start to execute."
+	::= { pduOutAll 4 }
+	
+pduOutGlobalRebootTime OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Sets the off to on delay period for a pdu outlet reboot."
+	::= { pduOutAll 5 }	
+	
+pduOutGlobalCycleAbortTime OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Time delay to abort power outlet setting task."
+	::= { pduOutAll 6 }	 		   
+
+-- }}} End of pduOutAll group
+-- {{{ pduOutTable
+
+pduOutCmnTable   OBJECT-TYPE
+	SYNTAX  	SEQUENCE OF PduOutCmnEntry
+	MAX-ACCESS	not-accessible
+	STATUS  	current
+	DESCRIPTION
+		"A table containing information about the power outlets of all PDUs enabled for outlet control."
+	::= { pduOutlets 2 }
+
+pduOutCmnEntry   OBJECT-TYPE
+	SYNTAX  	PduOutCmnEntry
+	MAX-ACCESS	not-accessible
+	STATUS  	current
+	DESCRIPTION
+		"A conceptual row containing information about the power outlets of one PDU."
+	INDEX { pduOutCmnPduNumber }
+	::= { pduOutCmnTable 1 }
+
+PduOutCmnEntry ::= SEQUENCE {
+	pduOutCmnPduNumber 		INTEGER,
+	pduOutCmnRS        		RowStatus,
+	pduNumOfOutlets      	INTEGER,
+	pduOutCycle         	INTEGER,
+	pduOutCyclePwd      	DisplayString,
+	pduOutCycleAbortTask	Unsigned32,
+	pduOutCycleAbortTime	Unsigned32
+		}
+
+pduOutCmnPduNumber      OBJECT-TYPE
+	SYNTAX      INTEGER  (1..8)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU number."
+	::= { pduOutCmnEntry 1 }
+
+pduOutCmnRS   OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU table row status."
+	::= { pduOutCmnEntry 2 }
+
+pduNumOfOutlets OBJECT-TYPE
+	SYNTAX      INTEGER (1..32)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The number of switchable outlets on the PDU - determines the number of entries to be created in the outlet table for the relevant PDU."
+	::= { pduOutCmnEntry 3 }	   
+
+pduOutCycle OBJECT-TYPE
+	SYNTAX  	INTEGER { up(1), down(2) }
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Sets the required state of all power outlets on the PDU."
+	::= { pduOutCmnEntry 4 }	   
+
+pduOutCyclePwd OBJECT-TYPE
+	SYNTAX  	DisplayString(SIZE(0..7))
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Password controling access to setting the required state of all power outlets on the PDU."
+	::= { pduOutCmnEntry 5 }	   
+
+pduOutCycleAbortTask  OBJECT-TYPE
+    SYNTAX  	Unsigned32 
+    MAX-ACCESS	read-write
+    STATUS  	current
+    DESCRIPTION
+        "Abort power outlet setting task."
+    ::= { pduOutCmnEntry 6 }
+
+pduOutCycleAbortTime  OBJECT-TYPE
+    SYNTAX    Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+		"Time delay to abort power outlet setting task."
+    ::= { pduOutCmnEntry 7 }
+
+-- }}} End of pduOutCmnTable
+-- {{{ pduOutTable
+
+pduOutTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF	PduOutEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A table listing the states and descriptions for each outlet on the PDU."
+	::= { pduOutlets 3 }
+
+pduOutEntry 	OBJECT-TYPE
+	SYNTAX      PduOutEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A row containing information about one PDU outlet."
+	INDEX { pduOutPduNumber, pduOutNumber }
+	::= { pduOutTable 1 }
+
+PduOutEntry ::= SEQUENCE {
+	pduOutPduNumber 	INTEGER,
+	pduOutNumber     	INTEGER,
+	pduOutRS        	RowStatus,
+	pduOutName      	DisplayString,
+	pduOutOn        	INTEGER,
+	pduOutPwd  			DisplayString,
+	pduOutCycleDelay	Unsigned32,
+	pduOutRebootPeriod	Unsigned32
+		}
+
+pduOutPduNumber     	OBJECT-TYPE
+	SYNTAX      INTEGER  (1..8)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU number on which the outlet resides."
+	::= { pduOutEntry 1 }
+
+pduOutNumber     	OBJECT-TYPE
+	SYNTAX      INTEGER  (1..32)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The outlet number."
+	::= { pduOutEntry 2 }
+
+pduOutRS 	OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU table row status."
+	::= { pduOutEntry 3 }
+
+pduOutName      	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..31))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"A name identifying the outlet."
+	::= { pduOutEntry 4 }
+
+pduOutOn        	OBJECT-TYPE
+    SYNTAX      INTEGER { on(1), off(2), reboot(3)}
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"The current state for this outlet."
+	::= { pduOutEntry 5 }
+
+pduOutPwd  	OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE(0..7))
+	MAX-ACCESS	read-write
+	STATUS  	current
+	DESCRIPTION
+		"The password for this outlet."
+	::= { pduOutEntry 6 }
+
+pduOutCycleDelay	OBJECT-TYPE
+	SYNTAX  	Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS  	current
+	DESCRIPTION
+		"The on/off delay for this outlet in seconds."
+	::= { pduOutEntry 7 }
+
+pduOutRebootPeriod	OBJECT-TYPE
+	SYNTAX  	Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS  	current
+	DESCRIPTION
+		"The pduOutOn reboot off period for this outlet in seconds."
+	::= { pduOutEntry 8 }
+
+-- }}} End of pduOutTable
+
+-- }}} End of pduOut group
+-- {{{ pduMonitor group
+
+-- {{{ pduMonTable
+
+pduMonTable    	OBJECT-TYPE
+	SYNTAX      SEQUENCE OF PduMonEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A table containing monitor information for all PDUs enabled for monitoring."
+	::= { pduMonitor 1 }
+
+pduMonEntry   OBJECT-TYPE
+	SYNTAX      PduMonEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing monitor information for one PDU."
+	INDEX { pduMonPduNumber }
+	::= { pduMonTable 1 }
+
+PduMonEntry ::= SEQUENCE {
+	pduMonPduNumber			INTEGER,
+	pduMonRS    			RowStatus,
+	pduRMSVoltsValue	   	INTEGER,
+	pduRMSAmpsValue    		INTEGER,
+	pduTotalEnergyValue		INTEGER,
+	pduMeanKVAValue			INTEGER,
+	pduMeanKWattsValue		INTEGER,
+	pduPwrFactorValue		INTEGER
+		}
+
+pduMonPduNumber      OBJECT-TYPE
+	SYNTAX      INTEGER  (1..8)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU number."
+	::= { pduMonEntry 1 }
+
+pduMonRS   OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU table row status."
+	::= { pduMonEntry 2 }
+
+pduRMSVoltsValue  OBJECT-TYPE
+    SYNTAX  	INTEGER (0..500)
+    MAX-ACCESS	read-only
+    STATUS	    current
+    DESCRIPTION
+		"RMS Volts value in volts"
+    ::= { pduMonEntry 3 }
+    
+pduRMSAmpsValue  OBJECT-TYPE
+    SYNTAX  	INTEGER (0..500)
+    MAX-ACCESS	read-only
+    STATUS  	current
+    DESCRIPTION
+		"RMS current value in 0.1 Amps"
+    ::= { pduMonEntry 4 }
+    
+pduTotalEnergyValue  OBJECT-TYPE
+    SYNTAX    INTEGER (0..9999999)
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+		"Total energy value in 0.1 kWh"
+    ::= { pduMonEntry 5 }
+
+pduMeanKVAValue  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+		"Kilo Volt-Amperes value in 0.1 kVA"
+    ::= { pduMonEntry 6 }
+
+pduMeanKWattsValue  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+		"Kilo Watts value in 0.1 kW"
+    ::= { pduMonEntry 7 }
+
+pduPwrFactorValue  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100)
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+		"Power factor value in 0.01"
+    ::= { pduMonEntry 8 }
+
+-- }}} End of pduMonTable
+-- {{{ pduTrapThreshTable
+
+pduTrapThreshTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF PduTrapThreshEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A table containing information about the trap threshold values for all PDUs enabled for monitoring."
+	::= { pduMonitor 2 }
+
+pduTrapThreshEntry   OBJECT-TYPE
+	SYNTAX      PduTrapThreshEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing information about the trap threshold values for one PDU."
+	INDEX { pduTrapThreshPduNumber }
+	::= { pduTrapThreshTable 1 }
+
+PduTrapThreshEntry ::= SEQUENCE {
+	pduTrapThreshPduNumber 	INTEGER,
+	pduTrapThreshRS     	RowStatus,
+	pduRMSVoltsUCL	    	INTEGER,
+	pduRMSVoltsUWL      	INTEGER,
+	pduRMSVoltsLWL      	INTEGER,
+	pduRMSVoltsLCL	    	INTEGER,
+	pduRMSAmpsUCL       	INTEGER,
+	pduRMSAmpsUWL       	INTEGER,
+	pduRMSAmpsLWL       	INTEGER,
+	pduRMSAmpsLCL       	INTEGER,
+	pduEnergyUCL        	INTEGER,
+	pduEnergyUWL        	INTEGER,
+	pduMeanKVAUCL			INTEGER,
+	pduMeanKVAUWL			INTEGER,
+	pduMeanKVALWL			INTEGER,
+	pduMeanKVALCL			INTEGER,
+	pduMeanKWattsUCL		INTEGER,
+	pduMeanKWattsUWL		INTEGER,
+	pduMeanKWattsLWL		INTEGER,
+	pduMeanKWattsLCL		INTEGER,
+	pduPwrFactorUCL			INTEGER,
+	pduPwrFactorUWL			INTEGER,
+	pduPwrFactorLWL			INTEGER,
+	pduPwrFactorLCL			INTEGER
+		}
+
+pduTrapThreshPduNumber      OBJECT-TYPE
+	SYNTAX      INTEGER  (1..8)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU number."
+	::= { pduTrapThreshEntry 1 }
+
+pduTrapThreshRS   OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU table row status."
+	::= { pduTrapThreshEntry 2 }
+
+pduRMSVoltsUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..500)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "rms UCL value in volts"
+    ::= { pduTrapThreshEntry 3 }
+
+pduRMSVoltsUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..500)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "rms UWL value in volts"
+    ::= { pduTrapThreshEntry 4 }
+
+pduRMSVoltsLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..500)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "rms LWL value in volts"
+    ::= { pduTrapThreshEntry 5 }
+
+pduRMSVoltsLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..500)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "rms LCL value in volts"
+    ::= { pduTrapThreshEntry 6 }
+
+pduRMSAmpsUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..500)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "rms UCL value in 0.1 amps"
+    ::= { pduTrapThreshEntry 7 }
+
+pduRMSAmpsUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..500)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "rms UWL value in 0.1 amps"
+    ::= { pduTrapThreshEntry 8 }
+
+pduRMSAmpsLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..500)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "rms LWL value in 0.1 amps"
+    ::= { pduTrapThreshEntry 9 }
+
+pduRMSAmpsLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..500)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "rms LCL value in 0.1 amps"
+    ::= { pduTrapThreshEntry 10 }
+
+pduEnergyUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..9999999)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Total energy UCL value in 0.1 kWh"
+    ::= { pduTrapThreshEntry 11 }
+
+pduEnergyUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..9999999)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Total energy UWL value in 0.1 kWh"
+    ::= { pduTrapThreshEntry 12 }
+
+pduMeanKVAUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Mean kVA UCL value in 0.1 kVA"
+    ::= { pduTrapThreshEntry 13 }
+
+pduMeanKVAUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Mean kVA UWL value in 0.1 kVA"
+    ::= { pduTrapThreshEntry 14 }
+
+pduMeanKVALWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Mean kVA LWL value in 0.1 kVA"
+    ::= { pduTrapThreshEntry 15 }
+
+pduMeanKVALCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Mean kVA LCL value in 0.1 kVA"
+    ::= { pduTrapThreshEntry 16 }
+
+pduMeanKWattsUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Mean power UCL value in 0.1 kW"
+    ::= { pduTrapThreshEntry 17 }
+
+pduMeanKWattsUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Mean power UWL value in 0.1 kW"
+    ::= { pduTrapThreshEntry 18 }
+
+pduMeanKWattsLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Mean power LWL value in 0.1 kW"
+    ::= { pduTrapThreshEntry 19 }
+
+pduMeanKWattsLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Mean power LCL value in 0.1 kW"
+    ::= { pduTrapThreshEntry 20 }
+
+pduPwrFactorUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Power factor UCL value in 0.01"
+    ::= { pduTrapThreshEntry 21 }
+
+pduPwrFactorUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Power factor UWL value in 0.01"
+    ::= { pduTrapThreshEntry 22 }
+
+pduPwrFactorLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Power factor LWL value in 0.01"
+    ::= { pduTrapThreshEntry 23 }
+
+pduPwrFactorLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (0..100)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Power factor LCL value in 0.01"
+    ::= { pduTrapThreshEntry 24 }
+
+-- }}} End of pduTrapThreshTable
+-- {{{ pduTrapEnTable
+
+pduTrapEnTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF PduTrapEnEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"The table which controls threshold value trap enabling for all PDUs enabled for monitoring."
+	::= { pduMonitor 3 }
+
+pduTrapEnEntry   OBJECT-TYPE
+	SYNTAX      PduTrapEnEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing information about one PDU."
+	INDEX { pduTrapEnPduNumber }
+	::= { pduTrapEnTable 1 }
+
+PduTrapEnEntry ::= SEQUENCE {
+	pduTrapEnPduNumber     		INTEGER,
+	pduTrapEnRS         		RowStatus,
+	pduRMSVoltsUCLTrapEn   		TruthValue,
+	pduRMSVoltsUWLTrapEn   		TruthValue,
+	pduRMSVoltsLWLTrapEn   		TruthValue,
+	pduRMSVoltsLCLTrapEn   		TruthValue,
+	pduRMSAmpsUCLTrapEn    		TruthValue,
+	pduRMSAmpsUWLTrapEn    		TruthValue,
+	pduRMSAmpsLWLTrapEn    		TruthValue,
+	pduRMSAmpsLCLTrapEn    		TruthValue,
+	pduEnergyUCLTrapEn  		TruthValue,
+	pduEnergyUWLTrapEn  		TruthValue,
+	pduMeanKVAUCLTrapEn    		TruthValue,
+	pduMeanKVAUWLTrapEn    		TruthValue,
+	pduMeanKVALWLTrapEn    		TruthValue,
+	pduMeanKVALCLTrapEn    		TruthValue,
+	pduMeanKWattsUCLTrapEn   	TruthValue,
+	pduMeanKWattsUWLTrapEn   	TruthValue,
+	pduMeanKWattsLWLTrapEn   	TruthValue,
+	pduMeanKWattsLCLTrapEn		TruthValue,
+	pduPwrFactorUCLTrapEn    	TruthValue,
+	pduPwrFactorUWLTrapEn    	TruthValue,
+	pduPwrFactorLWLTrapEn    	TruthValue,
+	pduPwrFactorLCLTrapEn    	TruthValue
+		}
+
+pduTrapEnPduNumber      OBJECT-TYPE
+	SYNTAX      INTEGER  (1..8)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU number."
+	::= { pduTrapEnEntry 1 }
+
+pduTrapEnRS   OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU table row status."
+	::= { pduTrapEnEntry 2 }
+
+pduRMSVoltsUCLTrapEn  OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS	read-write
+    STATUS  	current
+    DESCRIPTION
+        "Enables Volts UCL trap."
+    ::= { pduTrapEnEntry 3 }
+
+pduRMSVoltsUWLTrapEn  OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables UWL Volts trap."
+    ::= { pduTrapEnEntry 4 }
+
+pduRMSVoltsLWLTrapEn  OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables LWL Volts trap."
+    ::= { pduTrapEnEntry 5 }
+
+pduRMSVoltsLCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables LCL Volts trap."
+    ::= { pduTrapEnEntry 6 }
+
+pduRMSAmpsUCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables UCL current trap."
+    ::= { pduTrapEnEntry 7 }
+
+pduRMSAmpsUWLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables UWL current trap."
+    ::= { pduTrapEnEntry 8 }
+
+pduRMSAmpsLWLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables LWL current trap."
+    ::= { pduTrapEnEntry 9 }
+
+pduRMSAmpsLCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables LCL current trap."
+    ::= { pduTrapEnEntry 10 }
+
+pduEnergyUCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables UCL total energy trap."
+    ::= { pduTrapEnEntry 11 }
+
+pduEnergyUWLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS    read-write
+	STATUS    current
+	DESCRIPTION
+		"Enables UWL total energy trap."
+	::= { pduTrapEnEntry 12 }
+
+pduMeanKVAUCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables mean kVA UCL trap."
+    ::= { pduTrapEnEntry 13 }
+
+pduMeanKVAUWLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables mean kVA UWL trap."
+    ::= { pduTrapEnEntry 14 }
+
+pduMeanKVALWLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables mean kVA LWL trap."
+    ::= { pduTrapEnEntry 15 }
+
+pduMeanKVALCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables mean kVA LCL trap."
+    ::= { pduTrapEnEntry 16 }
+
+pduMeanKWattsUCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables mean power UCL trap."
+    ::= { pduTrapEnEntry 17 }
+
+pduMeanKWattsUWLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables mean power UWL trap."
+    ::= { pduTrapEnEntry 18 }
+
+pduMeanKWattsLWLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables mean power LWL trap."
+    ::= { pduTrapEnEntry 19 }
+
+pduMeanKWattsLCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables mean power LCL trap."
+    ::= { pduTrapEnEntry 20 }
+
+pduPwrFactorUCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables power factor UCL trap."
+    ::= { pduTrapEnEntry 21 }
+
+pduPwrFactorUWLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables power factor UWL trap."
+    ::= { pduTrapEnEntry 22 }
+
+pduPwrFactorLWLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables power factor LWL trap."
+    ::= { pduTrapEnEntry 23 }
+
+pduPwrFactorLCLTrapEn	OBJECT-TYPE
+	SYNTAX  	TruthValue
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Enables power factor LCL trap."
+    ::= { pduTrapEnEntry 24 }
+
+-- }}} End of pduTrapEnTable
+-- {{{ pduTrapPerTable
+
+pduTrapPerTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF PduTrapPerEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"The table which controls threshold value trap repetition for all PDUs enabled for monitoring."
+	::= { pduMonitor 4 }
+
+pduTrapPerEntry   OBJECT-TYPE
+	SYNTAX      PduTrapPerEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A conceptual row containing information about one PDU."
+	INDEX { pduTrapPduNumber }
+	::= { pduTrapPerTable 1 }
+
+PduTrapPerEntry ::= SEQUENCE {
+	pduTrapPduNumber        INTEGER,
+	pduTrapPerRS         	RowStatus,
+	pduRMSVoltsUCLTrapPer  	INTEGER,
+	pduRMSVoltsUWLTrapPer  	INTEGER,
+	pduRMSVoltsLWLTrapPer  	INTEGER,
+	pduRMSVoltsLCLTrapPer  	INTEGER,
+	pduRMSAmpsUCLTrapPer   	INTEGER,
+	pduRMSAmpsUWLTrapPer   	INTEGER,
+	pduRMSAmpsLWLTrapPer   	INTEGER,
+	pduRMSAmpsLCLTrapPer   	INTEGER,
+	pduEnergyUCLTrapPer  	INTEGER,
+	pduEnergyUWLTrapPer  	INTEGER,
+	pduMeanKVAUCLTrapPer   	INTEGER,
+	pduMeanKVAUWLTrapPer   	INTEGER,
+	pduMeanKVALWLTrapPer   	INTEGER,
+	pduMeanKVALCLTrapPer   	INTEGER,
+	pduMeanKWattsUCLTrapPer	INTEGER,
+	pduMeanKWattsUWLTrapPer INTEGER,
+	pduMeanKWattsLWLTrapPer INTEGER,
+	pduMeanKWattsLCLTrapPer INTEGER,
+	pduPwrFactorUCLTrapPer  INTEGER,
+	pduPwrFactorUWLTrapPer  INTEGER,
+	pduPwrFactorLWLTrapPer  INTEGER,
+	pduPwrFactorLCLTrapPer  INTEGER
+		}
+
+pduTrapPduNumber      OBJECT-TYPE
+	SYNTAX      INTEGER  (1..8)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU number."
+	::= { pduTrapPerEntry 1 }
+
+pduTrapPerRS   OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The PDU table row status."
+	::= { pduTrapPerEntry 2 }
+
+pduRMSVoltsUCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets UCL Volts trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 3 }
+
+pduRMSVoltsUWLTrapPer  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets UWL Volts trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 4 }
+
+pduRMSVoltsLWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets LWL Volts trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 5 }
+
+pduRMSVoltsLCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets LCL Volts trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 6 }
+
+pduRMSAmpsUCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets UCL current trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 7 }
+
+pduRMSAmpsUWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets UWL current trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 8 }
+
+pduRMSAmpsLWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets LWL current trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 9 }
+
+pduRMSAmpsLCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets LCL current trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 10 }
+
+pduEnergyUCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets UCL total energy trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 11 }
+
+pduEnergyUWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets UWL total energy trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 12 }
+
+pduMeanKVAUCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets mean kVA UCL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 13 }
+
+pduMeanKVAUWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets mean kVA UWL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 14 }
+
+pduMeanKVALWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets mean kVA LWL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 15 }
+
+pduMeanKVALCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets mean kVA LCL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 16 }
+
+pduMeanKWattsUCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets mean power UCL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 17 }
+
+pduMeanKWattsUWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets mean power UWL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 18 }
+
+pduMeanKWattsLWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets mean power LWL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 19 }
+
+pduMeanKWattsLCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets mean power LCL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 20 }
+
+pduPwrFactorUCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets power factor UCL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 21 }
+
+pduPwrFactorUWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets power factor UWL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 22 }
+
+pduPwrFactorLWLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets power factor LWL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 23 }
+
+pduPwrFactorLCLTrapPer	OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Sets power factor LCL trap repeat rate in seconds"
+    ::= { pduTrapPerEntry 24 }
+
+-- }}} End of pduTrapPerTable
+
+-- }}} End of pduMonitor group
+-- {{{ pdus traps
+
+-- To Be Added
+
+-- {{{ pdus RMS Volt traps
+
+-- To Be Added
+
+-- }}} End of pdus RMS Volt traps
+-- {{{ pdus RMS Amp traps
+
+-- To Be Added
+
+-- }}} End of pdus RMS Amp traps
+-- {{{ pdus Total Energy traps
+
+-- To Be Added
+
+-- }}} End of pdus Total Energy traps
+
+-- }}} End of pdus traps
+
+-- }}} End of pdus group
+-- {{{ inventory group
+
+invProdSignature  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..7))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Product data signature."
+	::= { inventory 1 }
+
+invProdFormatVer  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..7))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Product data format version."
+	::= { inventory 2 }
+
+invManufCode  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..15))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Manufacturer code."
+	::= { inventory 3 }
+
+invOrderNum  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..7))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Order number."
+	::= { inventory 4 }
+
+invBatchNum  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..7))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Batch number."
+	::= { inventory 5 }
+
+invProdTestTime  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..15))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Data and time of production test."
+	::= { inventory 6 }
+
+invUnitName  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..15))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Unit name."
+	::= { inventory 7 }
+
+invUnitPartNum  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..31))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Unit part number."
+	::= { inventory 8 }
+
+invHwRevision  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..31))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Hardware revision number."
+	::= { inventory 9 }
+
+invFwRevision  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..15))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Firmware revision number."
+	::= { inventory 10 }
+
+invSerialNum  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..15))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Serial number."
+	::= { inventory 11 }
+
+invDefaultIPAddrType  OBJECT-TYPE
+	SYNTAX      InetAddressType
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The type of the IP addresses."
+	::= { inventory 12 }
+
+invDefaultIPAddr  OBJECT-TYPE
+	SYNTAX      InetAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Default unit IP address."
+	::= { inventory 13 }
+
+invDefaultSubNetMask  OBJECT-TYPE
+	SYNTAX      InetAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Default unit sub-network mask."
+	::= { inventory 14 }
+
+invDefaultGWAddr  OBJECT-TYPE
+	SYNTAX      InetAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Default unit default gateway address."
+	::= { inventory 15 }
+
+invMacAddr  OBJECT-TYPE
+	SYNTAX      MacAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Unit medium access control (MAC) address."
+	::= { inventory 16 }
+
+invOk  OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Confirms that the inventory record isn't corrupted."
+	::= { inventory 20 }
+
+invInputCount	OBJECT-TYPE
+	SYNTAX		INTEGER   (0..24)
+    MAX-ACCESS  read-only
+    STATUS    	current
+    DESCRIPTION
+        "The maximum number of inputs that can be connected to the unit"
+    ::= { inventory 50 }	
+    
+invOutputCount	OBJECT-TYPE
+	SYNTAX		INTEGER (0..24)   
+    MAX-ACCESS  read-only
+    STATUS    	current
+    DESCRIPTION
+        "The maximum number of outputs that can be connected to the unit"
+    ::= { inventory 51 }
+    
+invKeypadCount	OBJECT-TYPE
+	SYNTAX		INTEGER (0..2)
+    MAX-ACCESS  read-only
+    STATUS    	current
+    DESCRIPTION
+        "The maximum number of keypads that can be connected to the unit"    
+    ::= { inventory 52 }	
+    
+invAcuCount	OBJECT-TYPE
+	SYNTAX		INTEGER (0..6)
+    MAX-ACCESS  read-only
+    STATUS    	current
+    DESCRIPTION
+        "The maximum number of ACU's that can be connected to the unit"
+    ::= { inventory 53 }	
+    
+invAccessUserCount	OBJECT-TYPE
+	SYNTAX		INTEGER (0..20)
+    MAX-ACCESS  read-only
+    STATUS    	current
+    DESCRIPTION
+        "The maximum number of user entries on the unit"
+    ::= { inventory 54 }	        
+    
+invPduCount	OBJECT-TYPE
+	SYNTAX		INTEGER (0..6)
+    MAX-ACCESS  read-only
+    STATUS    	current
+    DESCRIPTION
+        "The maximum number of PDU's that can be connected to the unit"
+    ::= { inventory 55 }	    
+
+-- }}} End of inventory group
+-- {{{ trapInfo group
+
+trapCode OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A decimal number to be carried on notifications of types 1 to 4 identifying the event which caused it. 
+		The format of this number is BBEEffCCT where
+
+			BB is the number of the relevant MIB branch.
+ 			EE indicates what type of event caused the notification. This value is dependent upon branch number and implementation.
+			CC is the channel number which was the source of the notification.
+			T discriminates the type of data, e.g. temperature. This value is dependent upon branch number and implementation.
+			ff future use.
+
+			Fields are packed with leading zeros and are set to zero if not relevant to a particular notification."
+	::= { trapInfo 1 }
+
+trapDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..63))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A string to be carried on notifications of types 1 to 4 identifying the event which caused it. 
+		The format of this string is as follows.
+			Field 1 - type of notification, e.g. warning, critical, etc.
+			Field 2 - data source, e.g. inputs. Generally this relates to a particular MIB branch.
+			Field 3 - channel number, e.g. input 1.
+			Field 4 - event, i.e. what caused the trap.
+			Field 5 - value at which the event occured, e.g. 900, indicating 90% humidity.
+			Field 6 - type of data, e.g. relative humidity
+			
+		Fields are omitted if not relevant to a particular notification."
+	::= { trapInfo 2 }
+            
+-- }}} End of trapInfo group
+
+-- {{{ Generic traps
+
+alarmCritical NOTIFICATION-TYPE
+	OBJECTS  { trapCode, trapDescription }
+    STATUS      current
+	DESCRIPTION
+		"Critical alarm."
+	::= { traps 1 }
+
+alarmWarning NOTIFICATION-TYPE
+	OBJECTS  { trapCode, trapDescription }
+    STATUS      current
+	DESCRIPTION
+		"Warning alarm."
+	::= { traps 2 }
+
+alarmInformation NOTIFICATION-TYPE
+	OBJECTS  { trapCode, trapDescription }
+    STATUS      current
+	DESCRIPTION
+		"Information alarm."
+	::= { traps 3 }
+
+alarmCleared NOTIFICATION-TYPE
+	OBJECTS  { trapCode, trapDescription }
+    STATUS      current
+	DESCRIPTION
+		"Alarm cleared."
+	::= { traps 4 }
+
+-- }}} End of Generic traps        
+
+END

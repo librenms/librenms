@@ -28,11 +28,18 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::permanentRedirect('poll-log', 'pollers/tab=log/');
 
     // Two Factor Auth
-    Route::get('2fa', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
-    Route::post('2fa', 'TwoFactorController@verifyTwoFactor')->name('2fa.verify');
-    Route::post('2fa/add', 'TwoFactorController@create');
-    Route::post('2fa/cancel', 'TwoFactorController@cancelAdd')->name('2fa.cancel');
-    Route::post('2fa/remove', 'TwoFactorController@destroy');
+    Route::group(['prefix' => '2fa', 'namespace' => 'Auth'], function () {
+        Route::get('', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
+        Route::post('', 'TwoFactorController@verifyTwoFactor')->name('2fa.verify');
+        Route::post('add', 'TwoFactorController@create');
+        Route::post('cancel', 'TwoFactorController@cancelAdd')->name('2fa.cancel');
+        Route::post('remove', 'TwoFactorController@destroy')->name('2fa.remove');
+
+        Route::post('{user}/unlock', 'TwoFactorManagementController@unlock')->name('2fa.unlock');
+        Route::delete('{user}', 'TwoFactorManagementController@destroy')->name('2fa.delete');
+    });
+
+    Route::resource('users', 'UserController');
 
     // Ajax routes
     Route::group(['prefix' => 'ajax'], function () {
@@ -65,6 +72,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::get('syslog', 'SyslogController');
             Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
+            Route::get('service', 'ServiceController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });
@@ -105,6 +113,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // demo helper
     Route::permanentRedirect('demo', '/');
+
+    // blank page, dummy page for external code using Laravel::bootWeb()
+    Route::any('/blank', function () {
+        return '';
+    });
 
     // Legacy routes
     Route::any('/{path?}', 'LegacyController@index')

@@ -30,7 +30,7 @@
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-global $config, $permissions, $vars, $console_color;
+global $config, $vars, $console_color;
 
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 ini_set('display_errors', 1);
@@ -72,10 +72,10 @@ if (module_selected('mocksnmp', $init_modules)) {
 require_once $install_dir . '/includes/services.inc.php';
 require_once $install_dir . '/includes/functions.php';
 require_once $install_dir . '/includes/rewrites.php';
+require_once $install_dir . '/includes/device-groups.inc.php';
 
 if (module_selected('web', $init_modules)) {
-    chdir($install_dir . '/html');
-    require_once $install_dir . '/html/includes/functions.inc.php';
+    require_once $install_dir . '/includes/html/functions.inc.php';
 }
 
 if (module_selected('discovery', $init_modules)) {
@@ -83,17 +83,19 @@ if (module_selected('discovery', $init_modules)) {
 }
 
 if (module_selected('polling', $init_modules)) {
-    require_once $install_dir . '/includes/device-groups.inc.php';
     require_once $install_dir . '/includes/polling/functions.inc.php';
 }
 
 if (module_selected('alerts', $init_modules)) {
-    require_once $install_dir . '/includes/device-groups.inc.php';
     require_once $install_dir . '/includes/alerts.inc.php';
 }
 
 // Boot Laravel
-\LibreNMS\Util\Laravel::bootCli();
+if (module_selected('auth', $init_modules)) {
+    \LibreNMS\Util\Laravel::bootWeb();
+} else {
+    \LibreNMS\Util\Laravel::bootCli();
+}
 
 set_debug(false); // disable debug initially (hides legacy errors too)
 
@@ -145,36 +147,7 @@ if (module_selected('discovery', $init_modules) && !update_os_cache()) {
 }
 
 if (module_selected('web', $init_modules)) {
-    umask(0002);
-    if (!isset($config['title_image'])) {
-        $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
-    }
-    require $install_dir . '/html/includes/vars.inc.php';
+    require $install_dir . '/includes/html/vars.inc.php';
 }
 
 $console_color = new Console_Color2();
-
-if (module_selected('auth', $init_modules) ||
-    (
-        module_selected('graphs', $init_modules) &&
-        isset($config['allow_unauth_graphs']) &&
-        $config['allow_unauth_graphs'] != true
-    )
-) {
-    // populate the permissions cache TODO: remove?
-    $permissions = [];
-
-    $user_id = LegacyAuth::id();
-    foreach (dbFetchColumn('SELECT device_id FROM devices_perms WHERE user_id=?', [$user_id]) as $device_id) {
-        $permissions['device'][$device_id] = 1;
-    }
-
-    foreach (dbFetchColumn('SELECT port_id FROM ports_perms WHERE user_id=?', [$user_id]) as $port_id) {
-        $permissions['port'][$port_id] = 1;
-    }
-
-    foreach (dbFetchColumn('SELECT bill_id FROM bill_perms WHERE user_id=?', [$user_id]) as $bill_id) {
-        $permissions['bill'][$bill_id] = 1;
-    }
-    unset($user_id, $device_id, $port_id, $bill_id);
-}

@@ -46,6 +46,26 @@ class Laravel
         $kernel->bootstrap();
     }
 
+    public static function bootWeb()
+    {
+        // this is not a substitute for the normal Laravel boot, just a way to make auth work for external php
+        if (self::isBooted()) {
+            return;
+        }
+
+        define('LARAVEL_START', microtime(true));
+        $install_dir = realpath(__DIR__ . '/../..');
+        $app = require_once $install_dir . '/bootstrap/app.php';
+        $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
+
+        $request = \Illuminate\Http\Request::capture();
+        // strip .php to make the url helper in non-laravel pages
+        $request->server->set('REQUEST_URI', str_replace('.php', '', $_SERVER['REQUEST_URI']));
+        $response = $kernel->handle($request);
+
+//        $response->send(); // don't send response, legacy code will
+    }
+
     public static function isBooted()
     {
         return !empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();

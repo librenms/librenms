@@ -1,0 +1,163 @@
+-- *****************************************************************
+-- Layer-2 Topology MIB
+-- *****************************************************************
+
+SL-L2TOPOLOGY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, IpAddress      	FROM SNMPv2-SMI
+	DisplayString, TruthValue, 
+	TimeStamp, RowStatus, PhysAddress	FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+    slMain				        		FROM SL-MAIN-MIB;
+
+slL2Topology MODULE-IDENTITY
+	LAST-UPDATED "200008280000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the Layer-2 Topology"
+	::= { slMain 10 }
+
+--	The Layer-2 Topology MIB consists of the following groups:
+--	Layer-2 Topology Link Table
+--	Layer-2 Topology Change Trap
+
+topologyL2Links	 	OBJECT IDENTIFIER ::= { slL2Topology 1 }
+topologyL2Traps	 	OBJECT IDENTIFIER ::= { slL2Topology 2 }
+
+-- The Layer-2 Topology Link Table
+-- This table defines the Layer-2 topology map
+
+topologyL2LinkTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TopologyL2LinkEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The Topology L2 Link table.
+		This table contains the L2 links."
+	::= { topologyL2Links 1 }
+
+topologyL2LinkEntry OBJECT-TYPE
+	SYNTAX  TopologyL2LinkEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the Topology L2 Link table."
+	INDEX   { topologyL2LinkLocalIp,
+			  topologyL2LinkLocalPort }
+	::= { topologyL2LinkTable 1 }
+
+TopologyL2LinkEntry ::=
+	SEQUENCE {
+		topologyL2LinkLocalIp		IpAddress,
+		topologyL2LinkLocalPort		INTEGER,
+		topologyL2LinkLocalMac		PhysAddress,
+		topologyL2LinkLocalTid		DisplayString,
+		topologyL2LinkRemoteIp		IpAddress,
+		topologyL2LinkRemotePort	INTEGER,
+		topologyL2LinkRemoteMac		PhysAddress,
+		topologyL2LinkRemoteTid		DisplayString
+	}
+
+
+topologyL2LinkLocalIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local ip."
+    ::= { topologyL2LinkEntry 1 }
+	
+topologyL2LinkLocalPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local node port number."
+    ::= { topologyL2LinkEntry 2 }
+
+topologyL2LinkLocalMac OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The local MAC address."
+       ::= { topologyL2LinkEntry 3 }
+
+topologyL2LinkLocalTid OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..20))
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+            "The local TID."
+       ::= { topologyL2LinkEntry 4 }
+
+topologyL2LinkRemoteIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP of the remote node."
+    ::= { topologyL2LinkEntry 5 }
+		
+topologyL2LinkRemotePort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number of the remote node."
+    ::= { topologyL2LinkEntry 6 }
+
+topologyL2LinkRemoteMac OBJECT-TYPE
+       SYNTAX      PhysAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The remote MAC address."
+       ::= { topologyL2LinkEntry 7 }
+
+topologyL2LinkRemoteTid OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..20))
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+            "The remote TID."
+       ::= { topologyL2LinkEntry 8 }
+		
+
+-- The Topology L2 Traps
+
+topologyL2LastChange OBJECT-TYPE
+	SYNTAX  	TimeStamp
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The value of MIB II's sysUpTime object at the
+		time the TopologyL2LinkTable was last changed."
+	::= { topologyL2Traps 1 }
+
+topologyL2ChangeTrapEnable  OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Indicates whether L2 topology change traps
+		should be generated."
+	DEFVAL { true }
+	::= { topologyL2Traps 2 }
+
+topologyL2LinkChange NOTIFICATION-TYPE
+	STATUS  current
+	DESCRIPTION
+		"A topologyL2LinkChange trap is sent when the
+		content of an instance TopologyL2LinkEntry is changed."
+	::= { topologyL2Traps 3 }
+
+END

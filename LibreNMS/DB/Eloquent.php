@@ -36,7 +36,7 @@ class Eloquent
     /** @var Capsule static reference to capsule */
     private static $capsule;
 
-    public static function boot($options = [])
+    public static function boot()
     {
         // boot Eloquent outside of Laravel
         if (!Laravel::isBooted() && is_null(self::$capsule)) {
@@ -46,24 +46,6 @@ class Eloquent
 
             $db_config = include($install_dir . '/config/database.php');
             $settings = $db_config['connections'][$db_config['default']];
-
-            // legacy connection override
-            if (!empty($options)) {
-                $fields = [
-                    'host' => 'db_host',
-                    'port' => 'db_port',
-                    'database' => 'db_name',
-                    'username' => 'db_user',
-                    'password' => 'db_pass',
-                    'unix_socket' => 'db_socket',
-                ];
-
-                foreach ($fields as $new => $old) {
-                    if (isset($options[$old])) {
-                        $settings[$new] = $options[$old];
-                    }
-                }
-            }
 
             self::$capsule = new Capsule;
             self::$capsule->addConnection($settings);

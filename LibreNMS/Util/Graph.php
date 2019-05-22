@@ -32,7 +32,7 @@ class Graph
 {
     public static function getTypes()
     {
-        return ['device', 'port', 'application', 'munin'];
+        return ['device', 'port', 'application', 'munin', 'service'];
     }
 
     /**
@@ -46,7 +46,7 @@ class Graph
         $types = [];
 
         // find the subtypes defined in files
-        foreach (glob(base_path("/html/includes/graphs/$type/*.inc.php")) as $file) {
+        foreach (glob(base_path("/includes/html/graphs/$type/*.inc.php")) as $file) {
             $type = basename($file, '.inc.php');
             if ($type != 'auth') {
                 $types[] = $type;

@@ -229,7 +229,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         $divisor  = 1;
     }
 
-    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current\n");
+    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current, (limits: LL: $low_limit, LW: $low_warn_limit, W: $warn_limit, H: $high_limit)\n");
 
     if (isset($warn_limit, $low_warn_limit) && $low_warn_limit > $warn_limit) {
         // Fix high/low thresholds (i.e. on negative numbers)
@@ -606,6 +606,12 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
     if ($descr && $size > '0') {
         $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', array($index, $device['device_id'], $mib));
         if ($storage === false || !count($storage)) {
+            if (Config::getOsSetting($device['os'], 'storage_perc_warn')) {
+                $perc_warn = Config::getOsSetting($device['os'], 'storage_perc_warn');
+            } else {
+                $perc_warn = Config::get('storage_perc_warn', 60);
+            }
+
             $insert = dbInsert(
                 array(
                     'device_id' => $device['device_id'],
@@ -616,6 +622,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
                     'storage_units' => $units,
                     'storage_size' => $size,
                     'storage_used' => $used,
+                    'storage_perc_warn' => $perc_warn,
                 ),
                 'storage'
             );
@@ -1091,16 +1098,17 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                     $sensor_name = $device['os'];
 
-                    if (isset($user_function) && function_exists($user_function)) {
-                        $value = $user_function($value);
-                    }
-
                     if ($sensor_type === 'state') {
                         $sensor_name = $data['state_name'] ?: $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
                         // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
                         $value = ($value / $divisor) * $multiplier;
+                    }
+
+                    //user_func must be applied after divisor/multiplier
+                    if (isset($user_function) && is_callable($user_function)) {
+                        $value = $user_function($value);
                     }
 
                     $uindex = str_replace('{{ $index }}', $index, isset($data['index']) ? $data['index'] : $index);
@@ -1188,6 +1196,7 @@ function build_bgp_peers($device, $data, $peer2)
         'ARISTA-BGP4V2-MIB::aristaBgp4V2PeerRemoteAs.1.',
         'CISCO-BGP4-MIB::cbgpPeer2RemoteAs.',
         'BGP4-MIB::bgpPeerRemoteAs.',
+        'HUAWEI-BGP-VPN-MIB::hwBgpPeerRemoteAs.',
         '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.',
     );
     $peers = trim(str_replace($remove, '', $data));
@@ -1243,11 +1252,19 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
         d_echo("AFISAFI = $k\n");
 
         $afisafi_tmp = explode('.', $k);
-        $safi        = array_pop($afisafi_tmp);
-        $afi         = array_pop($afisafi_tmp);
-        $bgp_ip      = str_replace(".$afi.$safi", '', $k);
-        if ($device['os_group'] === 'arista') {
-            $bgp_ip      = str_replace("$afi.", '', $bgp_ip);
+        if ($device['os_group'] === 'vrp') {
+            array_shift($afisafi_tmp); //remove 1st value, always 0 so far
+            $afi         = array_shift($afisafi_tmp);
+            $safi        = array_shift($afisafi_tmp);
+            array_shift($afisafi_tmp); //type, always ipv4 so far
+            $bgp_ip      = implode('.', $afisafi_tmp);
+        } else {
+            $safi        = array_pop($afisafi_tmp);
+            $afi         = array_pop($afisafi_tmp);
+            $bgp_ip      = str_replace(".$afi.$safi", '', $k);
+            if ($device['os_group'] === 'arista') {
+                $bgp_ip      = str_replace("$afi.", '', $bgp_ip);
+            }
         }
         $bgp_ip      = preg_replace('/:/', ' ', $bgp_ip);
         $bgp_ip      = preg_replace('/(\S+\s+\S+)\s/', '$1:', $bgp_ip);

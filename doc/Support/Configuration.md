@@ -131,6 +131,13 @@ $config['unflatten']        = "/usr/bin/unflatten";
 $config['neato']            = "/usr/bin/neato";
 $config['sfdp']             = "/usr/bin/sfdp";
 ```
+### Authentication
+
+Generic Authentication settings.
+
+```php
+$config['password']['min_length'] = 8;  // password minimum length for auth that allows user creation
+```
 
 ### Proxy support
 
@@ -420,7 +427,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Alerting/Rules.md)
+[Alerting](../Alerting/index.md)
 
 ### Billing
 
@@ -593,6 +600,7 @@ $config['sensors']['guess_limits'] = false;
 
 ### Storage configuration
 
+Mounted storage / mount points to ignore in discovery and polling.
 ```php
 $config['ignore_mount_removable']  = 1;
 $config['ignore_mount_network']    = 1;
@@ -620,7 +628,12 @@ $config['ignore_mount_regexp'][] = "/^\/dev\/md0/";
 $config['ignore_mount_regexp'][] = "/^\/var\/dhcpd\/dev,/";
 $config['ignore_mount_regexp'][] = "/UMA/";
 ```
-Mounted storage / mount points to ignore in discovery and polling.
+
+Custom storage warning percentage
+```php
+$config['storage_perc_warn'] = 60;
+$config['os']['linux']['storage_perc_warn'] = 60;
+```
 
 ### IRC Bot
 

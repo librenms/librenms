@@ -79,6 +79,12 @@ $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['section'] = 'w
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['order'] = '6';
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['descr'] = 'Other Octets';
 
+// Barracuda Firewall support
+$config['graph_types']['device']['barracuda_firewall_sessions']['section'] = 'firewall';
+$config['graph_types']['device']['barracuda_firewall_sessions']['order'] = 0;
+$config['graph_types']['device']['barracuda_firewall_sessions']['descr'] = 'Active Sessions';
+
+
 // Ceragon Ceraos support
 $config['graph_types']['device']['ceraos_RxLevel']['section'] = 'wireless';
 $config['graph_types']['device']['ceraos_RxLevel']['order'] = '0';
@@ -187,7 +193,7 @@ $config['graph_types']['device']['cambium_epmp_freq']['section'] = 'wireless';
 $config['graph_types']['device']['cambium_epmp_freq']['order']   = '6';
 $config['graph_types']['device']['cambium_epmp_freq']['descr']   = 'Frequency';
 $config['graph_types']['device']['cambium-epmp-frameUtilization']['section'] = 'wireless';
-$config['graph_types']['device']['ccambium-epmp-frameUtilization']['order']   = '7';
+$config['graph_types']['device']['cambium-epmp-frameUtilization']['order']   = '7';
 $config['graph_types']['device']['cambium-epmp-frameUtilization']['descr']   = 'Frame Utilization';
 
 $config['graph_types']['device']['agent']['section'] = 'poller';
@@ -502,6 +508,10 @@ $config['graph_types']['device']['riverbed_passthrough'] = ['section' => 'networ
 $config['graph_types']['device']['routeros_leases']['section'] = 'network';
 $config['graph_types']['device']['routeros_leases']['order'] = 0;
 $config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count';
+
+$config['graph_types']['device']['routeros_pppoe_sessions']['section'] = 'network';
+$config['graph_types']['device']['routeros_pppoe_sessions']['order'] = 0;
+$config['graph_types']['device']['routeros_pppoe_sessions']['descr'] = 'PPPoE Session Count';
 
 
 //CheckPoint SPLAT specific graphs

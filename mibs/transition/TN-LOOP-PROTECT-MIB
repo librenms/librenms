@@ -1,0 +1,187 @@
+-- *****************************************************************
+-- TN-LOOP-PROTECT-MIB.my : TN Loop Protection MIB
+--
+-- Copyright (c) 2012 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+TN-LOOP-PROTECT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP FROM SNMPv2-CONF
+    entPhysicalIndex FROM ENTITY-MIB
+    ifIndex FROM IF-MIB
+    TruthValue, TimeStamp, DateAndTime, DisplayString
+            FROM SNMPv2-TC
+    tnProducts FROM TRANSITION-SMI;
+
+tnLoopProtectMIB MODULE-IDENTITY
+    LAST-UPDATED    "201207251030Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+                  Technical Support
+
+                  10900 Red Circle Drive
+                  Minnetonka, MN 55343 USA
+                  Tel: +1-800-526-9267
+
+                  E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for managing all transition products with Loop protection"
+    REVISION        "201207251030Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tnProducts 22 }
+
+tnLoopProtectNotifications  OBJECT IDENTIFIER  ::= { tnLoopProtectMIB 0 }
+tnLoopProtectObjects        OBJECT IDENTIFIER  ::= { tnLoopProtectMIB 1 }
+
+tnLoopProtectLoopDetectedNotification NOTIFICATION-TYPE
+    OBJECTS     { ifIndex,
+                  tnLoopProtectPortLoopCount,
+                  tnLoopProtectPortAction}
+    STATUS      current
+    DESCRIPTION
+        "A tnLoopProtectLoopDetectedNotification signifies
+         that a loop has been detected by the loop protection protocol.
+         Additional infomation contains port number ,count of loop detected on the port
+         and the action will be execute"
+    ::= { tnLoopProtectNotifications 1 }
+
+tnLoopProtectMgmt   OBJECT IDENTIFIER ::= { tnLoopProtectObjects 1 }
+
+tnLoopProtectBaseTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnLoopProtectBaseEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table is used for configuring global loop protect variables"
+    ::= { tnLoopProtectMgmt 1 }
+
+tnLoopProtectBaseEntry OBJECT-TYPE
+    SYNTAX          TnLoopProtectBaseEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry contains configuration elements of tnLoopProtectBaseTable"
+    INDEX       { entPhysicalIndex }
+    ::= { tnLoopProtectBaseTable 1 }
+
+TnLoopProtectBaseEntry ::= SEQUENCE {
+    tnLoopProtectEnable                 TruthValue,
+    tnLoopProtectTxTime                 INTEGER,
+    tnLoopProtectShutdownTime           INTEGER
+    }
+
+tnLoopProtectEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the loop protect is enable on this device."
+    ::= { tnLoopProtectBaseEntry 1 }
+
+tnLoopProtectTxTime OBJECT-TYPE
+    SYNTAX     INTEGER (1..10)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The interval in seconds between each loop protection PDU sent on each port.
+         valid values are 1 to 10 seconds,the default value is 5 seconds."
+    ::= { tnLoopProtectBaseEntry 2 }
+
+tnLoopProtectShutdownTime OBJECT-TYPE
+    SYNTAX      INTEGER (0..604800)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The period (in seconds) for which a port will be kept disabled in the event of a loop is detected (and the port action shuts down the port).
+        Valid values are 0 to 604800 seconds (7 days). A value of zero will keep a port disabled (until next device restart)."
+    ::= { tnLoopProtectBaseEntry 3 }
+
+tnLoopProtectPortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnLoopProtectPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table is used for configuring loop protect options for each port"
+    ::= { tnLoopProtectMgmt 2 }
+
+tnLoopProtectPortEntry OBJECT-TYPE
+    SYNTAX          TnLoopProtectPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry contains configuration element of tnLoopProtectBaseTable"
+    INDEX           { ifIndex }
+    ::= { tnLoopProtectPortTable 1 }
+TnLoopProtectPortEntry ::= SEQUENCE {
+    tnLoopProtectPortEnable          TruthValue,
+    tnLoopProtectPortAction          INTEGER,
+    tnLoopProtectPortTxModeEnable    TruthValue,
+    tnLoopProtectPortLoopCount       Counter32,
+    tnLoopProtectPortStatus          INTEGER,
+    tnLoopProtectPortLoopDetected    TruthValue,
+    tnLoopProtectPortLastLoopTime    DateAndTime
+}
+
+tnLoopProtectPortEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls whether loop protection is enabled on this switch port."
+    ::= {tnLoopProtectPortEntry 1}
+tnLoopProtectPortAction OBJECT-TYPE
+    SYNTAX     INTEGER {shutdown(1),shutdownAndlog(2),log(3),trap(4),shutdownAndtrap(5),logAndtrap(6),all(7)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configures the action performed when a loop is detected on a port. Valid values are Shutdown Port(1), Shutdown Port and Log(2) or Log Only(3)."
+    ::= { tnLoopProtectPortEntry 2 }
+tnLoopProtectPortTxModeEnable OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Controls whether the port is actively generating loop protection PDU's, or whether it is just passively looking for looped PDU's."
+    ::= { tnLoopProtectPortEntry 3 }
+tnLoopProtectPortLoopCount OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of loops detected on this port."
+    ::= { tnLoopProtectPortEntry 4 }
+tnLoopProtectPortStatus OBJECT-TYPE
+    SYNTAX       INTEGER{up(1),down(2),disable(3)}
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The status of the port.
+         up(1): the status of the port is up.
+         down(2):the status of the port is down.
+         disable(3):loop is detected in this port and shutdown is triggered at the same time"
+    ::= { tnLoopProtectPortEntry 5 }
+tnLoopProtectPortLoopDetected OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Indicates Whether a loop is currently detected on the port."
+    ::= { tnLoopProtectPortEntry 6 }
+tnLoopProtectPortLastLoopTime OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The time of the last loop event detected."
+    ::= { tnLoopProtectPortEntry 7 }
+
+END
+

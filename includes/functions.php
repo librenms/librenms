@@ -26,6 +26,7 @@ use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
 use Symfony\Component\Process\Process;
 use PHPMailer\PHPMailer\PHPMailer;
+use LibreNMS\Util\Time;
 
 if (!function_exists('set_debug')) {
     /**
@@ -376,7 +377,7 @@ function getLogo($device)
  */
 function getLogoTag($device, $class = null)
 {
-    $tag = '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"';
+    $tag = '<img src="' . url(getLogo($device)) . '" title="' . getImageTitle($device) . '"';
     if (isset($class)) {
         $tag .= " class=\"$class\" ";
     }
@@ -617,54 +618,10 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     return $device;
 }
 
+
 function formatUptime($diff, $format = "long")
 {
-    $yearsDiff = floor($diff/31536000);
-    $diff -= $yearsDiff*31536000;
-    $daysDiff = floor($diff/86400);
-    $diff -= $daysDiff*86400;
-    $hrsDiff = floor($diff/60/60);
-    $diff -= $hrsDiff*60*60;
-    $minsDiff = floor($diff/60);
-    $diff -= $minsDiff*60;
-    $secsDiff = $diff;
-
-    $uptime = "";
-
-    if ($format == "short") {
-        if ($yearsDiff > '0') {
-            $uptime .= $yearsDiff . "y ";
-        }
-        if ($daysDiff > '0') {
-            $uptime .= $daysDiff . "d ";
-        }
-        if ($hrsDiff > '0') {
-            $uptime .= $hrsDiff . "h ";
-        }
-        if ($minsDiff > '0') {
-            $uptime .= $minsDiff . "m ";
-        }
-        if ($secsDiff > '0') {
-            $uptime .= $secsDiff . "s ";
-        }
-    } else {
-        if ($yearsDiff > '0') {
-            $uptime .= $yearsDiff . " years, ";
-        }
-        if ($daysDiff > '0') {
-            $uptime .= $daysDiff . " day" . ($daysDiff != 1 ? 's' : '') . ", ";
-        }
-        if ($hrsDiff > '0') {
-            $uptime .= $hrsDiff     . "h ";
-        }
-        if ($minsDiff > '0') {
-            $uptime .= $minsDiff   . "m ";
-        }
-        if ($secsDiff > '0') {
-            $uptime .= $secsDiff   . "s ";
-        }
-    }
-    return trim($uptime);
+    return Time::formatInterval($diff, $format);
 }
 
 function isSNMPable($device)

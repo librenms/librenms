@@ -22,7 +22,7 @@ If you want to install manually then we have some documentation which should mak
 - [RHEL / CentOS 7 Nginx](http://docs.librenms.org/Installation/Installation-CentOS-7-Nginx/)
 
 ### Old Install Docs
-If the above are missing or incomplete then you can try our old docs below.
+These install docs are longer updated and may result in an unsuccessful install.
 
 - [Ubuntu 16.04 Apache](http://docs.librenms.org/Installation/Installation-Ubuntu-1604-Apache/)
 - [Ubuntu 16.04 Nginx](http://docs.librenms.org/Installation/Installation-Ubuntu-1604-Nginx/)

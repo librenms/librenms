@@ -29,19 +29,11 @@ class Smseagle extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
-        $smseagle_opts['url']   = $this->config['playsms-url'];
-        $smseagle_opts['user']  = $this->config['playsms-user'];
-        $smseagle_opts['token'] = $this->config['playsms-pass'];
-        $smseagle_opts['to']    = preg_split('/([,\r\n]+)/', $this->config['playsms-mobiles']);
+        $smseagle_opts['url']   = $this->config['smseagle-url'];
+        $smseagle_opts['user']  = $this->config['smseagle-user'];
+        $smseagle_opts['token'] = $this->config['smseagle-pass'];
+        $smseagle_opts['to']    = preg_split('/([,\r\n]+)/', $this->config['smseagle-mobiles']);
         return $this->contactSmseagle($obj, $smseagle_opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
-        return $this->contactSmseagle($obj, $opts);
     }
 
     public static function contactSmseagle($obj, $opts)
@@ -52,7 +44,8 @@ class Smseagle extends Transport
             'to' => implode(',', $opts['to']),
             'message' => $obj['title'],
         ];
-        $url    = 'http://' . $opts['url'] . '/index.php/http_api/send_sms?' . http_build_query($params);
+        $url = starts_with($opts['url'], 'http') ? '' : 'http://';
+        $url .= $opts['url'] . '/index.php/http_api/send_sms?' . http_build_query($params);
         $curl   = curl_init($url);
 
         set_curl_proxy($curl);
@@ -72,9 +65,9 @@ class Smseagle extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'SMSEagle URL',
+                    'title' => 'SMSEagle Base URL',
                     'name' => 'smseagle-url',
-                    'descr' => 'SMSEagle URL',
+                    'descr' => 'SMSEagle Host',
                     'type' => 'text',
                 ],
                 [

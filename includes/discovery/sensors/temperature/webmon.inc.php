@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS Dantel Webmon temperature sensor
  *
@@ -12,30 +11,44 @@
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Mike Williams
+ * @copyright  2019 PipoCanaja
  * @author     Mike Williams <mike@mgww.net>
+ * @author     PipoCanaja <PipoCanaja@gmail.com>
  */
 
-$env = snmpwalk_group($device, 'pSlot1Table', 'WEBMON-EDGE-MATRIX-MIB');
+$prefixes = [
+    'pSlot1' => '.1.3.6.1.4.1.994.3.4.7.18.1.66.',
+    'pSlot2' => '.1.3.6.1.4.1.994.3.4.7.19.1.66.',
+    'pSlot3' => '.1.3.6.1.4.1.994.3.4.7.20.1.66.',
+    'pSlot4' => '.1.3.6.1.4.1.994.3.4.7.21.1.66.',
+    'pSlot5' => '.1.3.6.1.4.1.994.3.4.7.22.1.66.',
+    'pSlot6' => '.1.3.6.1.4.1.994.3.4.7.23.1.66.',
+    'pOnboardSensor' => '.1.3.6.1.4.1.994.3.4.7.6.1.66.',
+];
 
-if (!empty($env)) {
-    $oid = '.1.3.6.1.4.1.994.3.4.7.18.1.66.2.0';
-    $index = '2';
-    
-    $descr = $env[2]['pSlot1Description'][0];
-    $value = $env[2]['pSlot1LiveRaw'][0];
-    $lowlimit = $env[2]['pSlot1Thresh4'][0];
-    $low_warn_limit = $env[2]['pSlot1Thresh3'][0];
-    $warnlimit = $env[2]['pSlot1Thresh2'][0];
-    $high_limit = $env[2]['pSlot1Thresh1'][0];
-    $func = null;
-    if ($env[2]['pSlot1Units'][0] == 'Fahrenheit') {
-        $func = 'fahrenheit_to_celsius';
-        $value = fahrenheit_to_celsius($value);
-        $lowlimit = fahrenheit_to_celsius($lowlimit);
-        $low_warn_limit = fahrenheit_to_celsius($low_warn_limit);
-        $warnlimit = fahrenheit_to_celsius($warnlimit);
-        $high_limit = fahrenheit_to_celsius($high_limit);
+foreach ($prefixes as $prefix => $numOidPrefix) {
+    $walk = snmpwalk_cache_oid($device, $prefix . 'Table', [], 'WEBMON-EDGE-MATRIX-MIB');
+
+    foreach ($walk as $index => $oid) {
+        $user_function = null;
+        if ($oid[$prefix . 'Configured'] != '0' && ($oid[$prefix . 'SensorType'] == '1' || $oid[$prefix . 'SensorType'] == 'temperature') && $oid[$prefix . 'LiveRaw']) {
+            $num_oid = $numOidPrefix . $index;
+            $descr = $oid[$prefix . 'Description'];
+            $group = $prefix;
+            $value = $oid[$prefix . 'LiveRaw'];
+            $lowLimit = $oid[$prefix . 'Thresh4'];
+            $lowWarnLimit = $oid[$prefix . 'Thresh3'];
+            $highLimit = $oid[$prefix . 'Thresh1'];
+            $highWarnLimit = $oid[$prefix . 'Thresh2'];
+            if ($oid[$prefix . 'Units'] == "Fahrenheit") {
+                $user_function = 'fahrenheit_to_celsius';
+                $value = fahrenheit_to_celsius($value);
+                $lowLimit = fahrenheit_to_celsius($lowLimit);
+                $lowWarnLimit = fahrenheit_to_celsius($lowWarnLimit);
+                $highLimit = fahrenheit_to_celsius($highLimit);
+                $highWarnLimit = fahrenheit_to_celsius($highWarnLimit);
+            }
+            discover_sensor($valid['sensor'], 'temperature', $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, $user_function, $group);
+        }
     }
-
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'webmon', $descr, '1', '1', $lowlimit, $low_warn_limit, $warnlimit, $high_limit, $value, 'snmp', null, null, $func, null);
 }

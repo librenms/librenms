@@ -52,11 +52,26 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
     }
 
     try {
-        if (is_null($db_host) && empty($db_name)) {
-            Eloquent::boot();
-        } else {
-            Eloquent::boot(get_defined_vars());
+        if (!is_null($db_host) || !empty($db_name)) {
+            // legacy connection override
+            \Config::set('database.connections.setup', [
+                "driver" => "mysql",
+                "host" => $db_host,
+                "port" => $db_port,
+                "database" => $db_name,
+                "username" => $db_user,
+                "password" => $db_pass,
+                "unix_socket" => $db_socket,
+                "charset" => "utf8",
+                "collation" => "utf8_unicode_ci",
+                "prefix" => "",
+                "strict" => true,
+                "engine" => null
+            ]);
+            \Config::set('database.default', 'setup');
         }
+
+        Eloquent::boot();
     } catch (PDOException $e) {
         throw new DatabaseConnectException($e->getMessage(), $e->getCode(), $e);
     }
@@ -129,21 +144,27 @@ function dbBulkInsert($data, $table)
     if (empty($data)) {
         return false;
     }
+
     // make sure we have fields to insert
     $fields = array_keys(reset($data));
     if (empty($fields)) {
         return false;
     }
 
-    try {
-        //        $result = Eloquent::DB()->insert($sql.$values);
-        $result = Eloquent::DB()->table($table)->insert((array)$data);
+    // Break into managable chunks to prevent situations where insert
+    // fails due to prepared statement having too many placeholders.
+    $data_chunks = array_chunk($data, 10000, true);
 
-        recordDbStatistic('insert', $time_start);
-        return $result;
-    } catch (PDOException $pdoe) {
-        // FIXME query?
-        dbHandleException(new QueryException("Bulk insert $table", $data, $pdoe));
+    foreach ($data_chunks as $data_chunk) {
+        try {
+            $result = Eloquent::DB()->table($table)->insert((array)$data_chunk);
+
+            recordDbStatistic('insert', $time_start);
+            return $result;
+        } catch (PDOException $pdoe) {
+            // FIXME query?
+            dbHandleException(new QueryException("Bulk insert $table", $data_chunk, $pdoe));
+        }
     }
 
     return false;

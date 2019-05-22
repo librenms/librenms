@@ -42,7 +42,7 @@ cgiurl   = http://yourlibrenms/cgi-bin/smokeping.cgi
 Add the following line to `/etc/smokeping/config` config file:
 
 ```bash
-@include /opt/smokeping/etc/librenms.conf
+@include /etc/smokeping/config.d/librenms.conf
 ```
 
 We will generate the conf file in the next step. 
@@ -90,7 +90,7 @@ Edit `/opt/librenms/config.php` and add the following:
 **Note:** Make sure you point dir to the correct Smokeping data directory:
 
 ```php
-$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 Location
+$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 and newer Location
 #$config['smokeping']['dir'] = '/opt/smokeping/data';
 $config['smokeping']['pings'] = 20;		// should be equal to "pings" in your smokeping config
 $config['smokeping']['integration'] = true;
@@ -122,7 +122,7 @@ You should be able to load the Smokeping web interface at `http://yourhost/cgi-b
 
 ### Nginx Configuration 
 
-This section assumes you have configured LibreNMS with Nginx as specified in [Configure Nginx](https://docs.librenms.org/#Installation/Installation-Ubuntu-1604-Nginx/#web-server).
+This section assumes you have configured LibreNMS with Nginx as specified in [Configure Nginx](https://docs.librenms.org/Installation/Installation-Ubuntu-1804-Nginx/).
 
 Add the following configuration to your `/etc/nginx/conf.d/librenms` config file. 
 
@@ -175,7 +175,7 @@ Use the below commands to start and verify smokeping is running.
 
 Verify: `sudo service smokeping status`
 
-**Ubuntu 16.04:**  `sudo systemctl start smokeping`
+**Ubuntu 16.04 and newer:**  `sudo systemctl start smokeping`
 
 Verify: `sudo systemctl status smokeping`
 
@@ -197,7 +197,7 @@ In terms of configuration, simply add the location of where smokeping data such 
 
 
 ```php
-$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 Location
+$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 and newer Location
 #$config['smokeping']['dir'] = '/opt/smokeping/data';
 $config['smokeping']['pings'] = 20;		// should be equal to "pings" in your smokeping config
 $config['smokeping']['integration'] = true;
@@ -220,7 +220,7 @@ nano /etc/smokeping/config.d/pathnames
 
 ### Smokeping and RRDCached ###
 
-If you are using the standard smokeping data dir (/opt/smokeping/data) then you may need to alter the rrdcached config slightly.
+If you are using the standard smokeping data dir (`/etc/smokeping/data`) then you may need to alter the rrdcached config slightly.
 
 In the standard configuration the -B argument may have been used to restrict rrdcached to read only from a single base dir.
 

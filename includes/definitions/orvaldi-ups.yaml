@@ -1,0 +1,17 @@
+os: orvaldi-ups
+text: Orvaldi UPS
+type: power
+icon: orvaldi
+rfc1628_compat: true
+mib_dir:
+    - orvaldi
+over:
+    - { graph: device_load, text: Load }
+    - { graph: device_power, text: Power }
+    - { graph: device_charge, text: Charge }
+discovery:
+    -
+      snmpget:
+          oid: .1.3.6.1.4.1.21111.1.1.1.6.0
+          op: starts
+          value: VER

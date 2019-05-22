@@ -1,7 +1,7 @@
 <?php
 
-use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'fail2ban';
@@ -77,7 +77,7 @@ $component = new LibreNMS\Component();
 $f2b_components = $component->getComponents($device_id, $options);
 
 // if no jails, delete fail2ban components
-if (empty($jails)) {
+if (empty($f2b['jails'])) {
     if (isset($f2b_components[$device_id])) {
         foreach ($f2b_components[$device_id] as $component_id => $_unused) {
             $component->deleteComponent($component_id);
@@ -92,7 +92,9 @@ if (empty($jails)) {
 
     $id = $component->getFirstComponentID($f2bc);
     $f2bc[$id]['label'] = 'Fail2ban Jails';
-    $f2bc[$id]['jails'] = json_encode(array_keys($f2b['jails']));
+    $jails = array_keys($f2b['jails']);
+    sort($jails);
+    $f2bc[$id]['jails'] = json_encode(array_values($jails));
 
     $component->setComponentPrefs($device_id, $f2bc);
 }

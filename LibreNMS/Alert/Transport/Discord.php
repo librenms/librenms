@@ -34,23 +34,12 @@ class Discord extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
-        $discord_opts['url'] = $this->config['url'];
-        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $discord_opts['options'][$k] = $v;
-        }
-        return $this->contactDiscord($obj, $discord_opts);
-    }
+        $discord_opts = [
+            'url' => $this->config['url'],
+            'options' => $this->parseUserOptions($this->config['options']),
+        ];
 
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $discord_opts) {
-            $this->contactDiscord($obj, $discord_opts);
-        }
-        return true;
+        return $this->contactDiscord($obj, $discord_opts);
     }
 
     public function contactDiscord($obj, $discord_opts)

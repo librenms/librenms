@@ -11,19 +11,19 @@ Some users may want to know if devices stop responding to ping more quickly than
 to run ping checks as quickly as possible without increasing snmp load on your devices by switching to 1 minute polling.
 
 > **WARNING**: If you do not have an alert rule that alerts on device status, enabling this will be a waste of resources.
-> You can find one in the [Alert Rules Collection](../Alerting/Rules.md#Alert Rules Collection).
+> You can find one in the [Alert Rules Collection](../Alerting/Rules.md#alert-rules-collection).
                          
 
 
 ### Setting the ping check to 1 minute
 
 1. Change the ping_rrd_step setting in config.php
-    ```php
+    ```
     $config['ping_rrd_step'] = 60;
     ```
 
 2. Update the rrd files to change the step (step is hardcoded at file creation in rrd files)
-    ```bash
+    ```
     ./scripts/rrdstep.php -h all
     ```
 
@@ -41,12 +41,12 @@ We add two entries, but add a delay before one.
 >Alerts are only run every minute, so you will have to modify them as well. Remove the original alerts.php entry.
 
 1. Set ping_rrd_step
-    ```php
+    ```
    $config['ping_rrd_step'] = 30;
    ```
    
 2. Update the rrd files
-    ```bash
+    ```
     ./scripts/rrdstep.php -h all
     ```
 

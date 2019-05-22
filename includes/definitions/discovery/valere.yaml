@@ -22,8 +22,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.13858.2.1.6.1.4.{{ $index }}'
                     high_limit: vpwrModuleCapacity
                     divisor: 100
-                    descr: 'Module {{ $vpwrBayIndex }}.{{ $vpwrModuleIndex }} Current'
-                    group: Modules
+                    group: 'Shelf {{ $vpwrBayIndex }}'
+                    descr: 'Module {{ $vpwrModuleIndex }} Current'
                     skip_values:
                         -   oid: vpwrModuleOID
                             op: '='
@@ -71,8 +71,8 @@ modules:
                     oid: vpwrSystemIdentTable
                     value: vpwrModuleOperStatus
                     num_oid: '.1.3.6.1.4.1.13858.2.1.6.1.5.{{ $index }}'
-                    descr: "Module {{ $vpwrBayIndex }}.{{ $vpwrModuleIndex }} Status"
-                    group: Modules
+                    group: 'Shelf {{ $vpwrBayIndex }}'
+                    descr: 'Module {{ $vpwrModuleIndex }} Status'
                     state_name: vpwrModuleOperStatus
                     states:
                         - { descr: Ok, graph: 0, value: 0, generic: 0 }

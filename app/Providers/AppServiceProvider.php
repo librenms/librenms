@@ -7,12 +7,28 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Config;
+use LibreNMS\Permissions;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->registerFacades();
+        $this->registerGeocoder();
+
+        $this->app->singleton('permissions', function ($app) {
+            return new Permissions();
+        });
+    }
+
     /**
      * Bootstrap any application services.
      *
@@ -26,17 +42,6 @@ class AppServiceProvider extends ServiceProvider
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
-    }
-
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        $this->registerFacades();
-        $this->registerGeocoder();
     }
 
     private function bootCustomBladeDirectives()
