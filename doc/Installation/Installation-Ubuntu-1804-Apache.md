@@ -30,7 +30,7 @@ path: blob/master/doc/
 #### Install PHP dependencies
 
     su - librenms
-    ./composer_wrapper.php install --no-dev
+    ./scripts/composer_wrapper.php install --no-dev
     exit
 
 ## DB Server ##
