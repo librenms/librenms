@@ -28,7 +28,7 @@ if ($stat == 'pkts') {
     } elseif ($sort == 'out') {
         $sort = 'cipMacHCSwitchedPkts_output_rate';
     } else {
-        $sort = 'bps';
+        $sort = 'bps_in';
     }
 } elseif ($stat == 'bits') {
     $units      = 'bps';
@@ -40,7 +40,7 @@ if ($stat == 'pkts') {
     } elseif ($sort == 'out') {
         $sort = 'cipMacHCSwitchedBytes_output_rate';
     } else {
-        $sort = 'bps';
+        $sort = 'bps_in';
     }
 }//end if
 
@@ -107,10 +107,10 @@ foreach ($accs as $acc) {
         $rrd_options .= ' VDEF:tot'.$this_id.'=octets'.$this_id.',TOTAL';
         $rrd_options .= ' AREA:inB'.$this_id.'#'.$colour.":'".$descr."':STACK";
         if ($rrd_optionsb) {
-            $stack = 'STACK';
+            $stack = ':STACK';
         }
 
-        $rrd_optionsb .= ' AREA:outB'.$this_id.'#'.$colour."::$stack";
+        $rrd_optionsb .= ' AREA:outB'.$this_id.'#'.$colour.":''$stack";
         $rrd_options  .= ' GPRINT:inB'.$this_id.":LAST:%6.2lf%s$units";
         $rrd_options  .= ' GPRINT:inB'.$this_id.":MAX:%6.2lf%s$units";
         $rrd_options  .= ' GPRINT:totin'.$this_id.":%6.2lf%s$unit";

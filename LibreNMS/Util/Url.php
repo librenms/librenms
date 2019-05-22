@@ -201,7 +201,7 @@ class Url
             $args['bg'] = 'FFFFFF00';
         }
 
-        return "<img src='graph.php?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
+        return '<img src="' . url('graph.php') . '?type=' . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . '">';
     }
 
     public static function generate($vars, $new_vars = [])
@@ -231,7 +231,7 @@ class Url
             $urlargs[] = $key . '=' . urlencode($arg);
         }
 
-        return '<img src="graph.php?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return '<img src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
     public static function lazyGraphTag($args)
@@ -244,10 +244,10 @@ class Url
 
 
         if (Config::get('enable_lazy_load', true)) {
-            return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+            return '<img class="lazy img-responsive" data-original="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
         }
 
-        return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
     public static function overlibLink($url, $text, $contents, $class = null)
@@ -306,7 +306,7 @@ class Url
     public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
     {
         $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
-        return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="graph.php?' . implode($sep, $vars) . '">';
+        return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url('graph.php') . '?' . implode($sep, $vars) . '">';
     }
 
     private static function getOverviewGraphsForDevice($device)
