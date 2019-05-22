@@ -2,7 +2,8 @@
 /**
  * services.inc.php
  *
- * Creates the correct handler for the trap and then sends it the trap.
+ * Service discovery module. Will discover services on a device if the
+ * service exists in /etc/services and has a matching nagios pluggin.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +25,8 @@
  */
 
 use LibreNMS\Config;
+
+global $config;
 
 $oids = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4', '-Osqn'));
 foreach (explode("\n", $oids) as $data) {
@@ -48,7 +51,10 @@ foreach (explode("\n", $oids) as $data) {
             }
         }
         $services[] = $tcp_port;
-        if (($service = getservbyport($tcp_port, 'tcp')) && (1 === count(array_keys($services, $tcp_port)))) {
+        $service = getservbyport($tcp_port, 'tcp');
+        $check_pluggin = $config['nagios_plugins'] . "/check_" . $service;
+        $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($service).'.inc.php';
+        if (($service) && (1 === count(array_keys($services, $tcp_port))) && (is_file($check_pluggin) || is_file($check_script))) {
             discover_service($device, $service);
         }
     }
