@@ -39,12 +39,12 @@ class CheckInstalled
      */
     public function handle($request, Closure $next)
     {
-        $installed = !config('librenms.install') && file_exists(base_path('config.php'));
+        $installed = !config('librenms.install') && file_exists(base_path('.env'));
         $is_install_route = $request->is('install*');
 
         if (!$installed && !$is_install_route) {
             // no config.php does so let's redirect to the install
-            return redirect(route('install'));
+            return redirect()->route('install');
         } elseif ($installed && $is_install_route) {
             throw new AuthorizationException('This should only be called during install');
         }

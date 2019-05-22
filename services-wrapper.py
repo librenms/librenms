@@ -192,7 +192,7 @@ if __name__ == '__main__':
     logger = LNMS.logger_get_logger(LOG_FILE, debug=_DEBUG)
 
     install_dir = os.path.dirname(os.path.realpath(__file__))
-    LNMS.check_for_file(install_dir + '/config.php')
+    LNMS.check_for_file(install_dir + '/.env')
     config = json.loads(LNMS.get_config_data(install_dir))
 
     service_path = config['install_dir'] + '/check-services.php'

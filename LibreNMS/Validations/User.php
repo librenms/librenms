@@ -44,13 +44,12 @@ class User extends BaseValidation
     {
         // Check we are running this as the root user
         $username = $validator->getUsername();
-        $lnms_username = Config::get('user');
+        $lnms_username = Config::get('user', 'librenms');
         $lnms_groupname = Config::get('group', $lnms_username); // if group isn't set, fall back to user
 
         if (!($username === 'root' || $username === $lnms_username)) {
             if (isCli()) {
-                $validator->fail('You need to run this script as root' .
-                    (Config::has('user') ? ' or ' . $lnms_username : ''));
+                $validator->fail("You need to run this script as $lnms_username or root");
             } elseif (function_exists('posix_getgrnam')) {
                 $lnms_group = posix_getgrnam($lnms_groupname);
                 if (!in_array($username, $lnms_group['members'])) {
@@ -73,7 +72,7 @@ class User extends BaseValidation
         }
 
         // Let's test the user configured if we have it
-        if (Config::has('user')) {
+        if ($lnms_username) {
             $dir = Config::get('install_dir');
             $log_dir = Config::get('log_dir', "$dir/logs");
             $rrd_dir = Config::get('rrd_dir', "$dir/rrd");
