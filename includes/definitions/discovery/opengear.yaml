@@ -1,0 +1,58 @@
+mib: OG-STATUSv2-MIB
+modules:
+    sensors:
+        signal:
+            data:
+                -
+                    descr: 'Cellular 3G RSSI'
+                    group: 'Cellular Modem {{ $index }}'
+                    index: '11.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.11.{{ $index }}'
+                    oid: CellModemTable
+                    value: ogCellModem3gRssi
+                -
+                    descr: 'Cellular 4G RSSI'
+                    group: 'Cellular Modem {{ $index }}'
+                    index: '12.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.12.{{ $index }}'
+                    oid: CellModemTable
+                    value: ogCellModem4gRssi
+        state:
+            data:
+                -
+                    descr: Radio Status
+                    group: 'Cellular Modem {{ $index }}'
+                    index: '4.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.4.{{ $index }}'
+                    oid: CellModemTable
+                    state_name: ogCellModemEnabled
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'Enabled' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'Disabled' }
+                    value: ogCellModemEnabled
+                -
+                    descr: Radio Connection Status
+                    group: 'Cellular Modem {{ $index }}'
+                    index: '5.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.5.{{ $index }}'
+                    oid: CellModemTable
+                    state_name: ogCellModemConnected
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'Connected' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnected' }
+                    value: ogCellModemConnected
+                -
+                    descr: Radio Access Technology
+                    group: 'Cellular Modem {{ $index }}'
+                    index: '9.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.9.{{ $index }}'
+                    oid: CellModemTable
+                    state_name: ogCellModemRadioTechnology
+                    states:
+                        - { value: 1, generic: 1, graph: 1, descr: 'unavailable' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'CDMA' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'EVDO' }
+                        - { value: 4, generic: 0, graph: 1, descr: 'GSM' }
+                        - { value: 5, generic: 0, graph: 1, descr: 'UMTS' }
+                        - { value: 6, generic: 0, graph: 1, descr: 'LTE' }
+                    value: ogCellModemRadioTechnology
