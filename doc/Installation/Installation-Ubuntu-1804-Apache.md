@@ -15,11 +15,23 @@ path: blob/master/doc/
     useradd librenms -d /opt/librenms -M -r
     usermod -a -G librenms www-data
 
-#### Install LibreNMS
+#### Download LibreNMS
 
     cd /opt
-    composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
+    git clone https://github.com/librenms/librenms.git
+    
+#### Set permissions
 
+    chown -R librenms:librenms /opt/librenms
+    chmod 770 /opt/librenms
+    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+
+#### Install PHP dependencies
+
+    su - librenms
+    ./composer_wrapper.php install --no-dev
+    exit
 
 ## DB Server ##
 
@@ -109,11 +121,6 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
 
     cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
 
-### Set permissions
-
-    chown -R librenms:librenms /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 
 ## Web installer ##
 
