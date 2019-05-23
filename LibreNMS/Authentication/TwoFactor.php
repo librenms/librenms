@@ -55,7 +55,7 @@ class TwoFactor
     /**
      * Base32 Decoding dictionary
      */
-    private static $base32 = array(
+    private static $base32 = [
         "A" => 0,
         "B" => 1,
         "C" => 2,
@@ -88,7 +88,7 @@ class TwoFactor
         "5" => 29,
         "6" => 30,
         "7" => 31
-    );
+    ];
 
     /**
      * Base32 Encoding dictionary
@@ -194,5 +194,21 @@ class TwoFactor
                 ((ord($hash[$offset + 2]) & 0xff) << 8) |
                 (ord($hash[$offset + 3]) & 0xff)) % pow(10, self::OTP_SIZE);
         return str_pad($truncated, self::OTP_SIZE, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Generate 2fa URI
+     * @param string $username
+     * @param string $key
+     * @param bool $counter if type is counter (false for time based)
+     * @return string
+     */
+    public static function generateUri($username, $key, $counter = false)
+    {
+        $title = "LibreNMS:" . urlencode($username);
+
+        return $counter ?
+            "otpauth://hotp/$title?issuer=LibreNMS&counter=1&secret=$key" : // counter based
+            "otpauth://totp/$title?issuer=LibreNMS&secret=$key"; // time based
     }
 }
