@@ -49,7 +49,7 @@ if (is_numeric($vars['vsvr'])) {
         foreach ($graph_types as $graph_type => $graph_text) {
             $i++;
             echo '<tr class="list-bold" bgcolor="'.$bg_colour.'">';
-            echo '<td colspan="5">';
+            echo '<td colspan="6">';
             $graph_type            = 'netscalervsvr_'.$graph_type;
             $graph_array['height'] = '100';
             $graph_array['width']  = '213';
@@ -171,7 +171,7 @@ if (is_numeric($vars['vsvr'])) {
         echo '</tr>';
         if ($vars['view'] == 'graphs') {
             echo '<tr class="list-bold" bgcolor="'.$bg_colour.'">';
-            echo '<td colspan="5">';
+            echo '<td colspan="6">';
             $graph_type            = 'netscalervsvr_'.$vars['graph'];
             $graph_array['height'] = '100';
             $graph_array['width']  = '213';
