@@ -70,5 +70,6 @@ return [
         'RUCKUS-SZ-EVENT-MIB::ruckusSZClusterBackToInServiceTrap' => \LibreNMS\Snmptrap\Handlers\RuckusSzClusterInService::class,
         'SNMPv2-MIB::authenticationFailure' => \LibreNMS\Snmptrap\Handlers\AuthenticationFailure::class,
         'SNMPv2-MIB::coldStart' => \LibreNMS\Snmptrap\Handlers\ColdBoot::class,
+        'SNMPv2-MIB::warmStart' => \LibreNMS\Snmptrap\Handlers\WarmBoot::class,
     ]
 ];
