@@ -177,7 +177,7 @@ syslog {
 
 output {
         exec {
-        command => "echo `echo %{host},,,,%{facility},,,,%{priority},,,,%{severity},,,,%{facility_label},,,,``date --date='%{timestamp}' +%Y-%m-%d%k:%M:%S``echo ',,,,%{message}'``echo ,,,,%{program} | sed 's/\x25\x7b\x70\x72\x6f\x67\x72\x61\x6d\x7d/%{facility_label}/'` | sed 's/,,,,/||/g' | /opt/librenms/syslog.php &"
+        command => "echo `echo %{host},,,,%{facility},,,,%{priority},,,,%{severity},,,,%{facility_label},,,,``date --date='%{timestamp}' '+%Y-%m-%d %H:%M:%S'``echo ',,,,%{message}'``echo ,,,,%{program} | sed 's/\x25\x7b\x70\x72\x6f\x67\x72\x61\x6d\x7d/%{facility_label}/'` | sed 's/,,,,/||/g' | /opt/librenms/syslog.php &"
         }
         elasticsearch {
         hosts => ["10.10.10.10:9200"]
