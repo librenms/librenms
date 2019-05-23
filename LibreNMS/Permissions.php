@@ -37,6 +37,7 @@ class Permissions
     private $devicePermissions;
     private $portPermissions;
     private $billPermissions;
+    private $deviceGroupMap;
 
     /**
      * Check if a device can be accessed by user (non-global read/admin)
@@ -162,6 +163,26 @@ class Permissions
         return $this->getBillPermissions()
             ->where('user_id', $this->getUserId($user))
             ->pluck('bill_id');
+    }
+
+    /**
+     * Get the ids of all device groups the user can access
+     *
+     * @param User|int $user
+     * @return \Illuminate\Support\Collection
+     */
+    public function deviceGroupsForUser($user = null)
+    {
+        $user_id = $this->getUserId($user);
+
+        // if we don't have a map for this user yet, populate it.
+        if (!isset($this->deviceGroupMap[$user_id])) {
+            $this->deviceGroupMap[$user_id] = DB::table('device_group_device')
+                ->whereIn('device_id', $this->devicesForUser($user))
+                ->pluck('device_group_id');
+        }
+
+        return $this->deviceGroupMap[$user_id];
     }
 
     /**
