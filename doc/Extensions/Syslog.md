@@ -105,7 +105,7 @@ service syslog-ng restart
 
 Add the following to your LibreNMS `config.php` file to enable the Syslog extension:
 
-```ssh
+```php
 $config['enable_syslog'] = 1;
 ```
 
@@ -115,7 +115,7 @@ If you prefer rsyslog, here are some hints on how to get it working.
 
 Add the following to your rsyslog config somewhere (could be at the top of the file in the step below, could be in `rsyslog.conf` if you are using remote logs for something else on this host)
 
-```ssh
+```
 # Listen for syslog messages on UDP:514
 $ModLoad imudp
 $UDPServerRun 514
@@ -123,7 +123,7 @@ $UDPServerRun 514
 
 Create a file called something like `/etc/rsyslog.d/30-librenms.conf` containing:
 
-```ssh
+```
 # Feed syslog messages to librenms
 $ModLoad omprog
 
@@ -151,7 +151,7 @@ If your rsyslog server is recieving messages relayed by another syslog server, y
 
 Add the following to your LibreNMS `config.php` file to enable the Syslog extension:
 
-```ssh
+```php
 $config['enable_syslog'] = 1;
 ```
 
