@@ -43,7 +43,7 @@ class EdgeCosSuccessUserLoginTest extends LaravelTestCase
         SNMPv2-MIB::snmpTrapOID.0 ES3528MO-MIB::swAuthenticationSuccess";
 
         $message = "SNMP Trap: Authentication Success: {$device->displayName()}";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'auth', 3);
+        Log::shouldReceive('event')->once()->with($message, $device->device_id, 'auth', 3);
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ES3528MO-MIB::swAuthenticationSuccess trap');
@@ -58,7 +58,7 @@ class EdgeCosSuccessUserLoginTest extends LaravelTestCase
         SNMPv2-MIB::snmpTrapOID.0 ECS4210-MIB::swLoginSucceedTrap";
         
         $message = "SNMP Trap: Authentication Success: {$device->displayName()}";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'auth', 3);
+        Log::shouldReceive('event')->once()->with($message, $device->device_id, 'auth', 3);
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ECS4210-MIB::swLoginSucceedTrap trap');
