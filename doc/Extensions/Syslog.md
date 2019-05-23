@@ -154,6 +154,46 @@ Add the following to your LibreNMS `config.php` file to enable the Syslog extens
 ```ssh
 $config['enable_syslog'] = 1;
 ```
+
+#### logstash
+
+If you prefer logstash, and it is installed on the same server as LibreNMS, here are some hints on how to get it working.
+
+First, install the output-exec plugin for logstash:
+
+```bash
+/usr/share/logstash/bin/logstash-plugin install logstash-output-exec
+```
+
+Next, create a logstash configuration file (ex. /etc/logstash/conf.d/logstash-simple.conf), and add the following:
+
+```
+input {
+syslog {
+    port => 514
+  }
+}
+
+
+output {
+        exec {
+        command => "echo `echo %{host},,,,%{facility},,,,%{priority},,,,%{severity},,,,%{facility_label},,,,``date --date='%{timestamp}' +%Y-%m-%d%k:%M:%S``echo ',,,,%{message}'``echo ,,,,%{program} | sed 's/\x25\x7b\x70\x72\x6f\x67\x72\x61\x6d\x7d/%{facility_label}/'` | sed 's/,,,,/||/g' | /opt/librenms/syslog.php &"
+        }
+        elasticsearch {
+        hosts => ["10.10.10.10:9200"]
+        index => "syslog-%{+YYYY.MM.dd}"
+        }
+}
+```
+
+Replace 10.10.10.10 with your primary elasticsearch server IP, and set the incoming syslog port. Alternatively, if you already have a logstash config file that works except for the LibreNMS export, take only the "exec" section from output and add it.
+
+Add the following to your LibreNMS `config.php` file to enable the Syslog extension:
+
+```ssh
+$config['enable_syslog'] = 1;
+```
+
 #### Syslog Clean Up 
 Can be set inside of  `config.php`
 ```php
