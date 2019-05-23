@@ -72,6 +72,7 @@
         <div class="col-sm-9 col-sm-offset-3">
             <div class="checkbox">
                 <label class="checkbox-inline">
+                    <input type="hidden" value="0" name="can_modify_passwd">
                     <input type="checkbox" id="can_modify_passwd" name="can_modify_passwd" @if(old('can_modify_passwd', $user->can_modify_passwd)) checked @endif> @lang('Can Modify Password')
                 </label>
             </div>
