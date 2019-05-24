@@ -106,7 +106,7 @@ class QueueManager:
 
     def spawn_worker(self, thread_name, group):
         pt = threading.Thread(target=self._service_worker, name=thread_name,
-                              args=group)
+                              args=(group,))
         pt.daemon = True
         self._threads.append(pt)
         pt.start()
@@ -300,8 +300,8 @@ class PingQueueManager(TimedQueueManager):
             groups = self._db.query("SELECT DISTINCT (`poller_group`) FROM `devices`")
             for group in groups:
                 self.post_work('', group[0])
-        except pymysql.err.Error:
-            pass
+        except pymysql.err.Error as e:
+            critical("DB Exception ({})".format(e))
 
     def do_work(self, context, group):
         if self.lock(group, 'group', timeout=self.config.ping.frequency):
@@ -329,8 +329,8 @@ class ServicesQueueManager(TimedQueueManager):
                                      " LEFT JOIN `devices` USING (`device_id`) WHERE `disabled`=0")
             for device in devices:
                 self.post_work(device[0], device[1])
-        except pymysql.err.Error:
-            pass
+        except pymysql.err.Error as e:
+            critical("DB Exception ({})".format(e))
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=self.config.services.frequency):
@@ -419,8 +419,8 @@ class DiscoveryQueueManager(TimedQueueManager):
             devices = self._db.query("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
             for device in devices:
                 self.post_work(device[0], device[1])
-        except pymysql.err.Error:
-            pass
+        except pymysql.err.Error as e:
+            critical("DB Exception ({})".format(e))
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=LibreNMS.normalize_wait(self.config.discovery.frequency)):
