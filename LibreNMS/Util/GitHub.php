@@ -46,6 +46,7 @@ class GitHub
         'breaking change' => [],
         'device' => [],
         'webui' => [],
+        'snmp traps' => [],
         'api' => [],
         'alerting' => [],
         'security' => [],
@@ -168,7 +169,7 @@ class GitHub
                 // check valid labels in order
                 foreach ($valid_labels as $valid_label) {
                     if (in_array($valid_label, $labels) && !in_array('ignore changelog', $labels)) {
-                        $title = ucwords(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
+                        $title = ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
                         $this->changelog[$valid_label][] = "$title ([#{$pr['number']}]({$pr['html_url']})) - [{$pr['user']['login']}]({$pr['user']['html_url']})" . PHP_EOL;
                         break; // only put in the first found label
                     }
@@ -199,7 +200,7 @@ class GitHub
 
         foreach ($this->changelog as $section => $items) {
             if (!empty($items)) {
-                $tmp_markdown .= "#### " . ucfirst($section) . PHP_EOL;
+                $tmp_markdown .= "#### " . ucwords($section) . PHP_EOL;
                 $tmp_markdown .= '* ' . implode('* ', $items) . PHP_EOL;
             }
         }
