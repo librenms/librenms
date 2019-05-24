@@ -9,7 +9,7 @@ if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
 
     echo '<div class=infobox>Bill Deleted. Redirecting to Bills list.</div>';
 
-    echo "<meta http-equiv='Refresh' content=\"2; url='../../../bills/'\">";
+    echo '<meta http-equiv="refresh" content="2;URL=\'' . url('/bills/') . '\'" />';
 }
 
 if ($_POST['action'] == 'reset_bill' && ($_POST['confirm'] == 'rrd' || $_POST['confirm'] == 'mysql')) {
@@ -24,7 +24,7 @@ if ($_POST['action'] == 'reset_bill' && ($_POST['confirm'] == 'rrd' || $_POST['c
 
     echo '<div class=infobox>Bill Resetting. Redirecting to Bills list.</div>';
 
-    echo "<meta http-equiv='Refresh' content=\"2; url='bills/'\">";
+    echo '<meta http-equiv="refresh" content="2;URL=\'' . url('/bills/') . '\'" />';
 }
 
 if ($_POST['action'] == 'add_bill_port') {
