@@ -487,6 +487,8 @@ $config['overview_show_sysDescr'] = true;
 // Poller/Discovery Modules
 $config['enable_bgp'] = 1;
 // Enable BGP session collection and display
+$config['enable_mpls'] = 1;
+// Enable MPLS LSPs
 $config['enable_syslog'] = 0;
 // Enable Syslog
 $config['enable_inventory'] = 1;
@@ -802,6 +804,7 @@ $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
 $config['poller_modules']['loadbalancers']               = false;
 $config['poller_modules']['mef']                         = false;
+$config['poller_modules']['mpls']                        = true;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -844,6 +847,7 @@ $config['discovery_modules']['loadbalancers']        = false;
 $config['discovery_modules']['mef']                  = false;
 $config['discovery_modules']['wireless']             = true;
 $config['discovery_modules']['fdb-table']            = true;
+$config['discovery_modules']['mpls']                 = true;
 // Enable daily updates
 $config['update'] = 1;
 

@@ -262,6 +262,11 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             $routing_tabs[] = 'vrf';
         }
 
+        $device_routing_count['mpls'] = @dbFetchCell('SELECT COUNT(*) FROM `mpls_lsps` WHERE `device_id` = ?', array($device['device_id']));
+        if ($device_routing_count['mpls']) {
+            $routing_tabs[] = 'mpls';
+        }
+
         $device_routing_count['cisco-otv'] = $component_count['Cisco-OTV'];
         if ($device_routing_count['cisco-otv'] > 0) {
             $routing_tabs[] = 'cisco-otv';

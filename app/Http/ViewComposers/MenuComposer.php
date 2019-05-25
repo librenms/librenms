@@ -123,6 +123,16 @@ class MenuComposer
                 ];
             }
 
+            if ($routing_count['mpls']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'mpls',
+                        'icon' => 'tag',
+                        'text' => 'MPLS',
+                    ]
+                ];
+            }
+
             if ($routing_count['ospf']) {
                 $routing_menu[] = [
                     [
