@@ -88,7 +88,7 @@ if ($vars['view'] == 'lsp') {
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$lsp['mplsLspToAddr']]);
         $destination = $lsp['mplsLspToAddr'];
         if (is_array($host)) {
-            $destination = generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls'));
+            $destination = generate_device_link($host, 0, array('tab' => 'routing', 'proto' => 'mpls'));
         }
 
         echo "<tr bgcolor=$bg_colour>
