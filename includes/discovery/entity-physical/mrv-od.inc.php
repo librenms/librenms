@@ -330,7 +330,6 @@ foreach ($port_array as $nbsCmmcPort => $port_contents) {
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
-
         $entPhysicalIndex        = array_key_exists('entPhysicalIndex', $entry)        ? $entry['entPhysicalIndex']        : '';
         $entPhysicalDescr        = array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '';
         $entPhysicalClass        = array_key_exists('entPhysicalClass', $entry)        ? $entry['entPhysicalClass']        : '';
