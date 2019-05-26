@@ -1708,7 +1708,7 @@ function get_units_from_sensor($sensor)
         case 'state':
             return '#';
         case 'temperature':
-            return 'C';
+            return '°C';
         case 'voltage':
             return 'V';
         default:
