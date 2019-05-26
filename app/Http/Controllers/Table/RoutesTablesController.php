@@ -65,9 +65,12 @@ class RoutesTablesController extends TableController
      */
     protected function baseQuery($request)
     {
-        return InetCidrRoute::hasAccess($request->user())
-            ->with(['device'])
-            ->select('inetCidrRoute.*');
+        if ($request->device_id) {
+            return InetCidrRoute::hasAccess($request->user())
+                ->where('device_id', $request->device_id);
+        } else {
+            return InetCidrRoute::hasAccess($request->user());
+        }
     }
 
     /**

@@ -96,7 +96,10 @@ if ($options['f'] === 'ports_fdb') {
     $ret = lock_and_purge('ports_fdb', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
 }
-
+if ($options['f'] === 'inetCidrRoute') {
+    $ret = lock_and_purge('inetCidrRoute', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
+    exit($ret);
+}
 if ($options['f'] === 'eventlog') {
     $ret = lock_and_purge('eventlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
