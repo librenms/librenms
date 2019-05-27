@@ -72,7 +72,7 @@ if ($vars['view'] == 'lsp') {
         }
         if ($lsp['mplsLspOperState'] == 'inService') {
             $operstate_status_color = 'success';
-        } elseif ($lsp['mplsLspAdminState'] == 'inService' and $lsp['mplsLspOperState'] == 'outOfService') {
+        } elseif ($lsp['mplsLspAdminState'] == 'inService' && $lsp['mplsLspOperState'] == 'outOfService') {
             $operstate_status_color = 'danger';
         }
         if ($lsp['mplsLspConfiguredPaths'] + $lsp['mplsLspStandbyPaths'] == $lsp['mplsLspOperationalPaths']) {

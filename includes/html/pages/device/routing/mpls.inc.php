@@ -38,7 +38,7 @@ if ($vars['view'] == 'paths') {
 print_optionbar_end();
 
 echo '<div id="content">
-    <table  border="0" cellspacing="0" cellpadding="5" width="100%">';
+    <table  class="table table-condensed" style="border-collapse:collapse;" border="0" cellspacing="0" cellpadding="5" width="100%">';
 if ($vars['view'] == 'lsp') {
     echo '<tr><th><a title="Administrative name for this Labeled Switch Path">Name</a></th>
         <th><a title="Specifies the destination address of this LSP">Destination</a></th>
@@ -72,7 +72,7 @@ if ($vars['view'] == 'lsp') {
         }
         if ($lsp['mplsLspOperState'] == 'inService') {
             $operstate_status_color = 'success';
-        } elseif ($lsp['mplsLspAdminState'] == 'inService' and $lsp['mplsLspOperState'] == 'outOfService') {
+        } elseif ($lsp['mplsLspAdminState'] == 'inService' && $lsp['mplsLspOperState'] == 'outOfService') {
             $operstate_status_color = 'danger';
         }
         if ($lsp['mplsLspConfiguredPaths'] + $lsp['mplsLspStandbyPaths'] == $lsp['mplsLspOperationalPaths']) {
@@ -112,4 +112,25 @@ if ($vars['view'] == 'lsp') {
 } // endif lsp view
 
 if ($vars['view'] == 'paths') {
+    echo '<tr><th><a title="">LSP Name</a></th>
+        <th><a title="Specifies the destination address of this LSP">Destination</a></th>
+        <th><a title="">Path OID</a></th>
+        <th><a title="">Path Type</a></th>
+        <th><a title="The desired administrative state for this Path.">Admin State</a></th>
+        <th><a title="The current operational state of this Path.">Oper State</a></th>
+        <th><a title="The sysUpTime when this Path was last modified.">Last Change at</a></th>
+        <th><a title="">Bandwidth</a></th>
+        <th><a title="">Oper Bandwidth</a></th>
+        <th><a title="">State</a></th>
+        <th><a title="">Failcode</a></th>
+        <th><a title="">Fail Node</a></th>
+        <th><a title="">Metric</a></th>
+        <th><a title="">Oper Metric</a></th>
+        <th><a title="">TimeUp</a></th>
+        <th><a title="">TimeDown</a></th>
+        <th><a title="The number of state transitions (up -> down and down -> up) this Path has undergone.">Transitions</a></th>
+        </tr>';
+
+    $i = 0;
+
 }

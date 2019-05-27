@@ -27,6 +27,7 @@ use LibreNMS\Config;
 echo "\nMPLS LSPs: ";
 if (Config::get('enable_mpls')) {
     $lsps = dbFetchRows('SELECT * FROM `mpls_lsps` WHERE `device_id` = ?', [$device['device_id']]);
+    $paths = dbFetchRows('SELECT * FROM `mpls_lsp_paths` WHERE `device_id` = ?', [$device['device_id']]);
 
     if ($device['os'] == 'timos') {
         $mplsLspCache = snmpwalk_cache_multi_oid($device, 'vRtrMplsLspTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
@@ -60,7 +61,37 @@ if (Config::get('enable_mpls')) {
             dbUpdate($lsp, 'mpls_lsps', 'device_id = ? AND vrf_oid = ? AND lsp_oid = ?', [$device['device_id'], $oids[0], $oids[1]]);
             echo ".";
         }
-        unset($mplsLspCache);
+        echo "\nMPLS LSP Paths: ";
+        $mplsPathCache = snmpwalk_cache_multi_oid($device, 'vRtrMplsLspPathTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
+        $mplsPathCache = snmpwalk_cache_multi_oid($device, 'vRtrMplsLspPathLastChange', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
+        $mplsPathCache = snmpwalk_cache_multi_oid($device, 'vRtrMplsLspPathStatTable', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia');
+        foreach ($mplsPathCache as $key => $value) {
+            $oids = explode('.', $key);
+            $lsp_id = dbFetchCell('SELECT lsp_id from `mpls_lsps` WHERE device_id = ? AND vrf_oid = ? AND lsp_oid = ?', [$device['device_id'], $oids[0], $oids[1]]);
+            $path = [
+                'lsp_id' => $lsp_id,
+                'path_oid' => $oids[2],
+                'device_id' => $device['device_id'],
+                'mplsLspPathRowStatus' => $value['vRtrMplsLspPathRowStatus'],
+                'mplsLspPathLastChange' => round($value['vRtrMplsLspPathLastChange'] / 100),
+                'mplsLspPathType' => $value['vRtrMplsLspPathType'],
+                'mplsLspPathBandwidth' => $value['vRtrMplsLspPathBandwidth'],
+                'mplsLspPathOperBandwidth' => $value['vRtrMplsLspPathOperBandwidth'],
+                'mplsLspPathAdminState' => $value['vRtrMplsLspPathAdminState'],
+                'mplsLspPathOperState' => $value['vRtrMplsLspPathOperState'],
+                'mplsLspPathState' => $value['vRtrMplsLspPathState'],
+                'mplsLspPathFailCode' => $value['vRtrMplsLspPathFailCode'],
+                'mplsLspPathFailNodeAddr' => $value['vRtrMplsLspPathFailNodeAddr'],
+                'mplsLspPathMetric' => $value['vRtrMplsLspPathMetric'],
+                'mplsLspPathOperMetric' => $value['vRtrMplsLspPathOperMetric'],
+                'mplsLspPathTimeUp' => $value['vRtrMplsLspPathTimeUp'],
+                'mplsLspPathTimeDown' => $value['vRtrMplsLspPathTimeDown'],
+                'mplsLspPathTransitionCount' => $value['vRtrMplsLspPathTransitionCount'],
+            ];
+            dbUpdate($path, 'mpls_lsp_paths', 'device_id = ? AND lsp_id = ? AND path_oid = ?', [$device['device_id'], $lsp_id, $oids[2]]);
+            echo ".";
+        }
+        unset($mplsLspCache, $mplsPathCache);
     }
-    unset($lsps);
+    unset($lsps, $paths);
 }

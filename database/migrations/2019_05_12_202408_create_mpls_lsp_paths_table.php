@@ -14,8 +14,25 @@ class CreateMplsLspPathsTable extends Migration
     public function up()
     {
         Schema::create('mpls_lsp_paths', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
+            $table->increments('lsp_path_id');
+            $table->unsignedInteger('lsp_id');
+            $table->unsignedInteger('path_oid');
+            $table->unsignedInteger('device_id')->index('device_id');
+            $table->enum('mplsLspPathRowStatus', array('active','notInService','notReady','createAndGo','createAndWait','destroy'));
+            $table->bigInteger('mplsLspPathLastChange');
+            $table->enum('mplsLspPathType', array('other', 'primary', 'standby', 'secondary'));
+            $table->unsignedInteger('mplsLspPathBandwidth');
+            $table->unsignedInteger('mplsLspPathOperBandwidth');
+            $table->enum('mplsLspPathAdminState', array('noop', 'inService', 'outOfService'));
+            $table->enum('mplsLspPathOperState', array('unknown','inService','outOfService','transition'));
+            $table->enum('mplsLspPathState', array('unknown', 'active', 'inactive'));
+            $table->string('mplsLspPathFailCode', 64);
+            $table->string('mplsLspPathFailNodeAddr', 32);
+            $table->unsignedInteger('mplsLspPathMetric');
+            $table->unsignedInteger('mplsLspPathOperMetric');
+            $table->bigInteger('mplsLspPathTimeUp');
+            $table->bigInteger('mplsLspPathTimeDown');
+            $table->unsignedInteger('mplsLspPathTransitionCount');
         });
     }
 
