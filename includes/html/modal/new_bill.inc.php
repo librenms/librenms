@@ -12,6 +12,7 @@
  */
 
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 if (LegacyAuth::user()->hasGlobalAdmin()) {
     require 'includes/html/javascript-interfacepicker.inc.php';
@@ -72,11 +73,15 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                 </div>
 
 <?php
-
-    $bill_data['bill_type'] = 'cdr';
-    $quota = array('select_gb' => ' selected');
-    $cdr = array('select_mbps' => ' selected');
-    include 'includes/html/pages/bill/addoreditbill.inc.php';
+if (Config::get('billing.95th_default_agg') == 1) {
+    $bill_data['dir_95th'] = 'agg';
+} else {
+    $bill_data['dir_95th'] = 'in';
+}
+$bill_data['bill_type'] = 'cdr';
+$quota = array('select_gb' => ' selected');
+$cdr = array('select_mbps' => ' selected');
+include 'includes/html/pages/bill/addoreditbill.inc.php';
 ?>
                 <div class="form-group">
                   <div class="col-sm-offset-4 col-sm-4">

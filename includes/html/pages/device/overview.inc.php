@@ -2,25 +2,6 @@
 
 $overview = 1;
 
-$ports['total']    = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `disabled` = 0", array($device['device_id']));
-$ports['up']       = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifOperStatus` = 'up' AND `ifAdminStatus` = 'up' AND `disabled` = 0", array($device['device_id']));
-$ports['down']     = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `disabled` = 0", array($device['device_id']));
-$ports['disabled'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifAdminStatus` = 'down' AND `disabled` = 0", array($device['device_id']));
-
-$services = get_service_status($device['device_id']);
-$services['total'] = array_sum($services);
-
-if ($services[2]) {
-    $services_colour = $config['warn_colour'];
-} else {
-    $services_colour = $config['list_colour']['even'];
-}
-if ($ports['down']) {
-    $ports_colour = $config['warn_colour'];
-} else {
-    $ports_colour = $config['list_colour']['even'];
-}
-
 echo('
 <div class="container-fluid">
   <div class="row">
@@ -34,7 +15,7 @@ echo('
 require 'includes/html/dev-overview-data.inc.php';
 require 'overview/tracepath.inc.php';
 
-LibreNMS\Plugins::call('device_overview_container', array($device));
+echo LibreNMS\Plugins::call('device_overview_container', [$device]);
 
 require 'overview/ports.inc.php';
 

@@ -60,7 +60,7 @@ if ($device['os'] === 'vrp') {
     $('#nac-grid').bootgrid({
         ajax: true,
         rowCount: [25, 50, 100, -1],
-        url: "ajax/table/port-nac",
+        url: "<?php echo url('/ajax/table/port-nac'); ?>",
         post: function () {
             return {
                 device_id: <?php echo $device['device_id'] ?>

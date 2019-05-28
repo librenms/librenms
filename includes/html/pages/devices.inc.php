@@ -208,7 +208,7 @@ if ($format == "graph") {
             if (!$location_filter || $device['location'] == $location_filter) {
                 $graph_type = "device_" . $subformat;
 
-                if ($_SESSION['widescreen']) {
+                if (session('widescreen')) {
                     $width = 270;
                 } else {
                     $width = 315;
@@ -343,7 +343,7 @@ if ($format == "graph") {
                     group: '<?php echo mres($vars['group']); ?>',
                 };
             },
-            url: "ajax/table/device"
+            url: "<?php echo url('/ajax/table/device') ?>"
         });
 
         <?php

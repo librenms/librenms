@@ -58,7 +58,7 @@ class Handler extends ExceptionHandler
     protected function convertExceptionToArray(Exception $e)
     {
         // override the non-debug error output to clue in user on how to debug
-        if (config('app.debug') && !$this->isHttpException($e)) {
+        if (!config('app.debug') && !$this->isHttpException($e)) {
             return ['message' => 'Server Error: Set APP_DEBUG=true to see details.'];
         }
 

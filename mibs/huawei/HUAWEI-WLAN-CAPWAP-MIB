@@ -1,0 +1,414 @@
+-- ============================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The mib is used for capwap configuration.
+-- Reference: 
+-- Version: V1.04
+-- ============================================================================
+-- Module definition
+
+	HUAWEI-WLAN-CAPWAP-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			hwWlan
+				FROM HUAWEI-WLAN-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+				FROM SNMPv2-CONF
+			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
+			MODULE-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+			MacAddress, RowStatus, DateAndTime
+				FROM SNMPv2-TC;
+		--1.3.6.1.4.1.2011.6.139.9
+		hwWlanCapwap MODULE-IDENTITY
+			LAST-UPDATED "201610121406Z"		-- Oct 12, 2016 at 14:06 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+                                  "Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+				  "
+			DESCRIPTION 
+				"The MIB module defines the ap capwap operation." 
+		    REVISION "201610121406Z"		-- Oct 12, 2016 at 14:06 GMT
+			DESCRIPTION 
+				"Add capwap message-integrity psk switch."
+		    REVISION "201602151709Z"		-- Feb 15, 2016 at 17:09 GMT
+			DESCRIPTION 
+				"Add capwap message-integrity psk and sensitive-info psk."
+			REVISION "201511302009Z"		-- Nov 30, 2015 at 20:09 GMT
+			DESCRIPTION 
+				"Add capwap multi-source operation."
+			REVISION "201505111452Z"		-- May 11, 2015 at 14:52 GMT
+			DESCRIPTION 
+				"Add the description of mib nodes."
+			REVISION "201502021452Z"		-- February 2, 2015 at 14:52 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			::= { hwWlan 9 }
+
+--
+--Node definitions
+--
+
+		--1.3.6.1.4.1.2011.6.139.9.1
+		hwWlanCapwapSourceInterface OBJECT IDENTIFIER ::= { hwWlanCapwap 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.1.1
+		hwWlanCapwapSourceInterfaceValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the interface number when hwWlanCapwapSourceInterfaceMethod is set to vlanif(2) or loopback(3)."
+			::= { hwWlanCapwapSourceInterface 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.1.2
+		hwWlanCapwapSourceInterfaceMethod OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				default(1),
+				vlanif(2),
+				loopback(3),
+				ipaddress(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"operation method of capwap source interface.It can be set
+				default(1): use default setting 
+				vlanif(2): use vlanif interface
+				loopback(3): use loopback interface
+				ipaddress(4):user ip address
+				"
+			::= { hwWlanCapwapSourceInterface 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.1.3
+		hwWlanCapwapSourceIPv4Address OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"If hwWlanCapwapSourceInterfaceMethod is set to ipaddress(4), this object is used to identify the IP address of the source port."
+			::= { hwWlanCapwapSourceInterface 3 }
+
+		--1.3.6.1.4.1.2011.6.139.9.2
+		hwWlanCapwapSysPara OBJECT IDENTIFIER ::= { hwWlanCapwap 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.1
+		hwWlanCapwapDtlsSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1) ,
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the status of the global DTLS function. The default value is 1: enable 2: disable."
+			::= { hwWlanCapwapSysPara 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.2
+		hwWlanCapwapDtlsPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device"
+			::= { hwWlanCapwapSysPara 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.3
+		hwWlanCapwapDtlsDefaultPskSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1) ,
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.4
+		hwWlanCapwapIpv6Enable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.5
+		hwWlanCapwapInterControllerDtlsEncrpyt OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.6
+		hwWlanCapwapInterControllerDtlsPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.7
+		hwCapwapEchoInterval OBJECT-TYPE
+			SYNTAX Integer32 (3..300)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.8
+		hwCapwapEchoTimes OBJECT-TYPE
+			SYNTAX Integer32 (2..120)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.9
+		hwWlanCapwapControlPriorityLocal OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.10
+		hwWlanCapwapControlPriorityRemote OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 10 }
+        
+         --1.3.6.1.4.1.2011.6.139.9.2.11
+		hwWlanCapwapSensitiveInfoPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device"
+			::= { hwWlanCapwapSysPara 11 }  
+		
+		 --1.3.6.1.4.1.2011.6.139.9.2.12
+		hwWlanCapwapInterControllerSensitiveInfoPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 12 } 
+		
+		 --1.3.6.1.4.1.2011.6.139.9.2.13
+		hwWlanCapwapMessageIntegrityPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device"
+			::= { hwWlanCapwapSysPara 13 }  
+		
+		 --1.3.6.1.4.1.2011.6.139.9.2.14
+		hwWlanCapwapInterControllerMessageIntegrityPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 14 }  
+		
+		 --1.3.6.1.4.1.2011.6.139.9.2.15
+		hwWlanCapwapMessageIntegrityPskMandatoryMatchSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1) ,
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 15 }  
+			
+		 --1.3.6.1.4.1.2011.6.139.9.2.16
+		hwWlanCapwapMsgCheckSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 16 }  
+			
+         --1.3.6.1.4.1.2011.6.139.9.2.17
+		hwWlanCapwapInterControllerMsgCheckSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 17 }
+
+
+              --  1.3.6.1.4.1.2011.6.139.9.3
+		hwWlanCapwapSource OBJECT IDENTIFIER ::= { hwWlanCapwap 3 }
+		hwWlanCapwapSourceTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanCapwapSourceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanCapwapSource 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1
+		hwWlanCapwapSourceEntry OBJECT-TYPE
+			SYNTAX HwWlanCapwapSourceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanCapwapSourceIndex }
+			::= { hwWlanCapwapSourceTable 1 }
+
+		
+		HwWlanCapwapSourceEntry ::=
+			SEQUENCE { 
+				hwWlanCapwapSourceIndex
+					Integer32,
+				hwWlanCapwapSourceMethod
+					INTEGER,
+				hwWlanCapwapSourceValue
+					Integer32,
+                hwWlanCapwapSourceRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.1
+		hwWlanCapwapSourceIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"the index of capwap source interface."
+			::= { hwWlanCapwapSourceEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.2
+		hwWlanCapwapSourceMethod OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				vlanif(2),
+				loopback(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"operation method of capwap source interface.It can be set 
+				 vlanif(2): use vlanif interface
+				 loopback(3): use loopback interface."
+			::= { hwWlanCapwapSourceEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.3
+		hwWlanCapwapSourceValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"the value of capwap source interface."
+			::= { hwWlanCapwapSourceEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.4
+		hwWlanCapwapSourceRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Row status: mainly to support to add or delete the relationship of the interface and the capwap-source.
+				 createAndGo(4): add a relationship.
+		                 destroy(6): delete the relationship."
+
+			::= { hwWlanCapwapSourceEntry 4 }
+		-- 1.3.6.1.4.1.2011.6.139.9.4
+		hwWlanCapwapConformance OBJECT IDENTIFIER ::= { hwWlanCapwap 4 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.4.1
+		hwWlanCapwapCompliances OBJECT IDENTIFIER ::= { hwWlanCapwapConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.4.1.1
+		hwWlanCapwapCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE
+					MANDATORY-GROUPS { hwWlanCapwapSourceInterfaceGroup, hwWlanCapwapSysParaGroup }
+			::= { hwWlanCapwapCompliances 1 }
+
+                -- 1.3.6.1.4.1.2011.6.139.9.4.2
+		hwWlanCapwapObjectGroups OBJECT IDENTIFIER ::= { hwWlanCapwapConformance 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.4.2.1
+		hwWlanCapwapSourceInterfaceGroup OBJECT-GROUP
+			OBJECTS { hwWlanCapwapSourceInterfaceValue, hwWlanCapwapSourceInterfaceMethod, hwWlanCapwapSourceIPv4Address }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanCapwapObjectGroups 1 }
+
+                -- 1.3.6.1.4.1.2011.6.139.9.4.2.2
+		hwWlanCapwapSysParaGroup OBJECT-GROUP
+			OBJECTS { hwWlanCapwapDtlsSwitch, hwWlanCapwapDtlsPsk, hwWlanCapwapDtlsDefaultPskSwitch, hwWlanCapwapIpv6Enable, hwWlanCapwapInterControllerDtlsEncrpyt, 
+			hwWlanCapwapInterControllerDtlsPsk, hwCapwapEchoInterval, hwCapwapEchoTimes, hwWlanCapwapControlPriorityLocal, hwWlanCapwapControlPriorityRemote,
+			hwWlanCapwapSensitiveInfoPsk, hwWlanCapwapInterControllerSensitiveInfoPsk, hwWlanCapwapMessageIntegrityPsk, hwWlanCapwapInterControllerMessageIntegrityPsk,
+			hwWlanCapwapMessageIntegrityPskMandatoryMatchSwitch, hwWlanCapwapMsgCheckSwitch, hwWlanCapwapInterControllerMsgCheckSwitch }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanCapwapObjectGroups 2 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.4.2.3
+		hwWlanCapwapSourceGroup OBJECT-GROUP
+			OBJECTS {hwWlanCapwapSourceMethod,  hwWlanCapwapSourceValue, hwWlanCapwapSourceRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanCapwapObjectGroups 3 }
+
+	END
+--
+-- HUAWEI-WLAN-CAPWAP-MIB.mib
+--

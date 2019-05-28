@@ -116,12 +116,12 @@ class OS implements ProcessorDiscovery
             return null;
         }
 
-        if (!isset($this->cache[$oid])) {
+        if (!isset($this->cache['cache_oid'][$oid])) {
             $data = snmpwalk_cache_oid($this->getDevice(), $oid, array(), $mib, null, $snmpflags);
-            $this->cache[$oid] = array_map('current', $data);
+            $this->cache['cache_oid'][$oid] = array_map('current', $data);
         }
 
-        return $this->cache[$oid];
+        return $this->cache['cache_oid'][$oid];
     }
 
     /**
@@ -130,21 +130,22 @@ class OS implements ProcessorDiscovery
      * DO NOT use numeric oids with this function! The snmp result must contain only one oid.
      *
      * @param string $oid textual oid
-     * @param string $mib mib for this oid
+     * @param string $mib mib for this oid (optional)
+     * @param string $depth depth for snmpwalk_group (optional)
      * @return array array indexed by the snmp index with the value as the data returned by snmp
      */
-    public function getCacheTable($oid, $mib = null)
+    public function getCacheTable($oid, $mib = null, $depth = 1)
     {
         if (str_contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
             return null;
         }
 
-        if (!isset($this->cache[$oid])) {
-            $this->cache[$oid] = snmpwalk_group($this->getDevice(), $oid, $mib);
+        if (!isset($this->cache['group'][$depth][$oid])) {
+            $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDevice(), $oid, $mib, $depth);
         }
 
-        return $this->cache[$oid];
+        return $this->cache['group'][$depth][$oid];
     }
 
     /**
@@ -155,7 +156,7 @@ class OS implements ProcessorDiscovery
      */
     public function isCached($oid)
     {
-        return isset($this->cache[$oid]);
+        return isset($this->cache['cache_oid'][$oid]);
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 
-if ($ports['total']) {
+use LibreNMS\Util\ObjectCache;
+
+if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     echo '<div class="row">
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
@@ -45,6 +47,7 @@ if ($ports['total']) {
     echo '  </td>
         </tr>';
 
+    $ports = ObjectCache::portCounts(['total', 'up', 'down', 'disabled'], $device['device_id']);
     echo '
     <tr>
       <td><i class="fa fa-link fa-lg" style="color:black" aria-hidden="true"></i> '.$ports['total'].'</td>

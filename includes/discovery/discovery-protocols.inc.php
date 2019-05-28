@@ -90,7 +90,7 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
     
 
         foreach ($lldp_array as $key => $lldp) {
-            $local_port_ifName = $lldp_ports[$lldp_ports_num[$key]['mtxrNeighborInterfaceID']]['mtxrInterfaceStatsName'];
+            $local_port_ifName = $lldp_ports[hexdec($lldp_ports_num[$key]['mtxrNeighborInterfaceID'])]['mtxrInterfaceStatsName'];
             $local_port_id = find_port_id($local_port_ifName, null, $device['device_id']);
             $interface = get_port_by_id($local_port_id);
             if ($lldp['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress

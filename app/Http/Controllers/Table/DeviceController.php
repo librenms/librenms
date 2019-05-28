@@ -121,7 +121,7 @@ class DeviceController extends TableController
         return [
             'extra' => $this->getLabel($device),
             'status' => $device->statusName(),
-            'icon' => '<img src="' . $device->icon . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
+            'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
             'hostname' => $this->getHostname($device),
             'metrics' => $this->getMetrics($device),
             'hardware' => Rewrite::ciscoHardware($device),

@@ -84,6 +84,7 @@ if ($_POST['action'] == 'update_bill') {
             'bill_quota'  => (string)$bill_quota,
             'bill_cdr'    => (string)$bill_cdr,
             'bill_type'   => $_POST['bill_type'],
+            'dir_95th'    => $_POST['dir_95th'],
             'bill_custid' => $_POST['bill_custid'],
             'bill_ref'    => $_POST['bill_ref'],
             'bill_notes'  => $_POST['bill_notes'],

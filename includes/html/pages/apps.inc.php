@@ -230,6 +230,15 @@ $graphs['smart'] = array(
     'id231',
     'id233',
 );
+$graphs['mdadm'] = array(
+    'level',
+    'size',
+    'disc_count',
+    'hotspare_count',
+    'degraded',
+    'sync_speed',
+    'sync_completed',
+);
 $graphs['sdfsinfo'] = array(
     'volume',
     'blocks',
@@ -287,22 +296,24 @@ $link_array = array(
     'device' => $device['device_id'],
     'tab'    => 'apps',
 );
-foreach ($app_list as $app) {
+$apps = \LibreNMS\Util\ObjectCache::applications()->flatten()->sortBy('app_type');
+foreach ($apps as $app) {
     echo $sep;
-    if ($vars['app'] == $app['app_type']) {
+    if ($vars['app'] == $app->app_type) {
         echo "<span class='pagemenu-selected'>";
     }
-    echo generate_link(nicecase($app['app_type']), array('page' => 'apps', 'app' => $app['app_type']));
-    if ($vars['app'] == $app['app_type']) {
+    echo generate_link($app->displayName(), array('page' => 'apps', 'app' => $app->app_type));
+    if ($vars['app'] == $app->app_type) {
         echo '</span>';
     }
     $sep = ' | ';
 }
 echo '</div>';
 echo '<div class="panel-body">';
-if ($vars['app']) {
-    if (is_file('includes/html/pages/apps/'.mres($vars['app']).'.inc.php')) {
-        include 'includes/html/pages/apps/'.mres($vars['app']).'.inc.php';
+if (isset($vars['app'])) {
+    $app = basename($vars['app']);
+    if (is_file("includes/html/pages/apps/$app.inc.php")) {
+        include "includes/html/pages/apps/$app.inc.php";
     } else {
         include 'includes/html/pages/apps/default.inc.php';
     }
