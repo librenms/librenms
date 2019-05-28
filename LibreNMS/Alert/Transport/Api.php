@@ -45,18 +45,15 @@ class Api extends Transport
         $method = strtolower($method);
         $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
-        //get each line of key-values and process blades
+        //get each line of key-values and process the variables;
         foreach (preg_split("/\\r\\n|\\r|\\n/", $options) as $current_line) {
-            list($k, $v) = explode('=', $current_line, 2);
-            try {
-                // process the variables on the value
-                $value_processed = view(['template' => $v], $obj)->__toString();
-            } catch (\Exception $e) {
-                echo "Exception e";
-                var_dump($e);
+            list($u_key, $u_val) = explode('=', $current_line, 2);
+            foreach ($obj as $p_key => $p_val) {
+                $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
             }
+            
             //store the parameter in the array for HTTP query
-            $query[$k] = $value_processed;
+            $query[$u_key] = $u_val;
         }
 
         $client = new \GuzzleHttp\Client();
