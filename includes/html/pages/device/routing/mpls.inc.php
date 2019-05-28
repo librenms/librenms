@@ -38,7 +38,7 @@ if ($vars['view'] == 'paths') {
 print_optionbar_end();
 
 echo '<div id="content">
-    <table  class="table table-condensed" style="border-collapse:collapse;" border="0" cellspacing="0" cellpadding="5" width="100%">';
+    <table  border="0" cellspacing="0" cellpadding="5" width="100%">';
 if ($vars['view'] == 'lsp') {
     echo '<tr><th><a title="Administrative name for this Labeled Switch Path">Name</a></th>
         <th><a title="Specifies the destination address of this LSP">Destination</a></th>
@@ -56,9 +56,7 @@ if ($vars['view'] == 'lsp') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT * FROM `mpls_lsps` WHERE `device_id` = ?  ORDER BY `mplsLspName`', array($device['device_id'])) as $lsp) {
-        $vrf = dbFetchRow('SELECT * FROM `vrfs` WHERE device_id = ? AND `vrf_oid` = ?', array($device['device_id'], $lsp['vrf_oid']));
-
+    foreach (dbFetchRows('SELECT *, `vrf_name` FROM `mpls_lsps` AS l, `vrfs` AS v WHERE `l`.`vrf_oid` = `v`.`vrf_oid` AND `l`.`device_id` = `v`.`device_id` AND `l`.`device_id` = ?  ORDER BY `l`.`mplsLspName`', array($device['device_id'])) as $lsp) {
         if (!is_integer($i / 2)) {
             $bg_colour = $config['list_colour']['even'];
         } else {
@@ -94,7 +92,7 @@ if ($vars['view'] == 'lsp') {
         echo "<tr bgcolor=$bg_colour>
             <td>" . $lsp['mplsLspName'] . '</td>
             <td>' . $destination . '</td>
-            <td>' . $vrf['vrf_name'] . '</td>
+            <td>' . $lsp['vrf_name'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $lsp['mplsLspAdminState'] . '</td>
             <td><span class="label label-' . $operstate_status_color . '">' . $lsp['mplsLspOperState'] . '</td>
             <td>' . formatUptime($lsp['mplsLspLastChange']) . '</td>
@@ -112,25 +110,69 @@ if ($vars['view'] == 'lsp') {
 } // endif lsp view
 
 if ($vars['view'] == 'paths') {
-    echo '<tr><th><a title="">LSP Name</a></th>
-        <th><a title="Specifies the destination address of this LSP">Destination</a></th>
-        <th><a title="">Path OID</a></th>
-        <th><a title="">Path Type</a></th>
-        <th><a title="The desired administrative state for this Path.">Admin State</a></th>
-        <th><a title="The current operational state of this Path.">Oper State</a></th>
-        <th><a title="The sysUpTime when this Path was last modified.">Last Change at</a></th>
-        <th><a title="">Bandwidth</a></th>
-        <th><a title="">Oper Bandwidth</a></th>
-        <th><a title="">State</a></th>
-        <th><a title="">Failcode</a></th>
-        <th><a title="">Fail Node</a></th>
-        <th><a title="">Metric</a></th>
-        <th><a title="">Oper Metric</a></th>
-        <th><a title="">TimeUp</a></th>
-        <th><a title="">TimeDown</a></th>
-        <th><a title="The number of state transitions (up -> down and down -> up) this Path has undergone.">Transitions</a></th>
+    echo '<tr><th><a title="Administrative name for LSP this path belongs to">LSP Name</a></th>
+        <th><a title="The OID index of this path">Index</a></th>
+        <th><a title="This variable is an enum that represents the role this path is taking within this LSP.">Type</a></th>
+        <th><a title="The desired administrative state for this LSP Path.">Admin State</a></th>
+        <th><a title="The current operational state of this LSP Path.">Oper State</a></th>
+        <th><a title="The sysUpTime when this LSP Path was last modified.">Last Change at</a></th>
+        <th><a title="The number of transitions that have occurred for this LSP.">Transitions</a></th>
+        <th><a title="This value specifies the amount of bandwidth in megabits per seconds (Mbps) to be reserved for this LSP path. A value of zero (0) indicates that no bandwidth is reserved.">Bandwidth</a></th>
+        <th><a title="When make-before-break functionality for the LSP is enabled and if the path bandwidth is changed, the resources allocated to the existing LSP paths will not be released until a new path with the new bandwidth settings has been established. While a new path is being signaled, the administrative value and the operational values of the path bandwidth may differ.">Oper BW</a></th>
+        <th><a title="The current working state of this path within this LSP.">State</a></th>
+        <th><a title="This indicates the reason code for LSP path failure. A value of 0 indicates that no failure has occurred.">Failcode</a></th>
+        <th><a title="This indicates the name of the node in the LSP path at which the LSP path failed.">Fail Node</a></th>
+        <th><a title="This indicates the cost of the traffic engineered path returned by the IGP.">Metric</a></th>
+        <th><a title="This indicates the operational metric for the LSP path.">Oper Metric</a></th>
         </tr>';
 
     $i = 0;
 
-}
+    foreach (dbFetchRows('SELECT *, `mplsLspName` FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` WHERE `p`.`lsp_id` = `l`.`lsp_id` AND `p`.`device_id` = ?  ORDER BY `l`.`mplsLspName`', array($device['device_id'])) as $path) {
+        if (!is_integer($i / 2)) {
+            $bg_colour = $config['list_colour']['even'];
+        } else {
+            $bg_colour = $config['list_colour']['odd'];
+        }
+
+        $adminstate_status_color = $operstate_status_color = 'default';
+        $failcode_status_color = 'warning';
+
+        if ($path['mplsLspPathAdminState'] == 'inService') {
+            $adminstate_status_color = 'success';
+        }
+        if ($path['mplsLspPathFailCode'] == 'noError') {
+            $failcode_status_color = 'success';
+        }
+        if ($path['mplsLspPathOperState'] == 'inService') {
+            $operstate_status_color = 'success';
+        } elseif ($path['mplsLspPathAdminState'] == 'inService' && $path['mplsLspPathOperState'] == 'outOfService') {
+            $operstate_status_color = 'danger';
+        }
+       
+        $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$path['mplsLspPathFailNodeAddr']]);
+        $destination = $lsp['mplsLspPathFailNodeAddr'];
+        if (is_array($host)) {
+            $destination = generate_device_link($host, 0, array('tab' => 'routing', 'proto' => 'mpls'));
+        }
+        echo "<tr bgcolor=$bg_colour>
+            <td>" . $path['mplsLspName'] . '</td>
+            <td>' . $path['path_oid'] . '</td>
+            <td>' . $path['mplsLspPathType'] . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . $path['mplsLspPathAdminState'] . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . $path['mplsLspPathOperState'] . '</td>
+            <td>' . formatUptime($path['mplsLspPathLastChange']) . '</td>
+            <td>' . $path['mplsLspPathTransitionCount'] . '</td>
+            <td>' . $path['mplsLspPathBandwidth'] . '</td>
+            <td>' . $path['mplsLspPathOperBandwidth'] . '</td>
+            <td>' . $path['mplsLspPathState'] . '</td>
+            <td><span class="label label-' . $failcode_status_color . '">' . $path['mplsLspPathFailCode'] . '</td>
+            <td>' . $destination . '</td>
+            <td>' . $path['mplsLspPathMetric'] . '</td>
+            <td>' . $path['mplsLspPathOperMetric'] . '</td>';
+        echo '</tr>';
+
+        $i++;
+    }
+    echo '</table></div>';
+} // end lsp path view
