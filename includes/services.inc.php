@@ -1,6 +1,29 @@
 <?php
 
+/**
+ * services.inc.php
+ *
+ * Service monitoring subsystem.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ */
+
 use LibreNMS\RRD\RrdDefinition;
+use Log;
 
 function get_service_status($device = null)
 {
@@ -47,6 +70,31 @@ function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ign
 
     $insert = array('device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}');
     return dbInsert($insert, 'services');
+}
+
+//Gets text value of pluggin return code and map to a log severity
+
+function getStatusSeverity($old_status, $new_status)
+{
+    $status_text = array(0 => 'OK', 1 => 'Warning', 2 => 'Critical', 3 => 'Unknown');
+    $oldText = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Unknown';
+    $newText = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Unknown';
+
+    switch ($new_status) {
+        case 3:
+            $severity = 3;
+            break;
+        case 2:
+            $severity = 5;
+            break;
+        case 1:
+            $severity = 4;
+            break;
+        case 0:
+            $severity = 0;
+    }
+
+    return array ($oldText, $newText, $severity);
 }
 
 function service_get($device = null, $service = null)
@@ -184,16 +232,13 @@ function poll_service($service)
         $update['service_status'] = $new_status;
         $update['service_message'] = $msg;
 
-        // TODO: Put the 3 lines below in a function getStatus(int) ?
-        $status_text = array(0 => 'OK', 1 => 'Warning', 3 => 'Unknown');
-        $old_status_text = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Critical';
-        $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
+        list($oldStatusText, $newStatusText, $severity)  = getStatus($old_status, $new_status);
 
-        log_event(
-            "Service '{$service['service_type']}' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
+        Log::event(
+            "Service '{$service['service_type']}' changed status from $oldStatusText to $newStatusText - {$service['service_desc']} - $msg",
             $service['device_id'],
             'service',
-            4,
+            $severity,
             $service['service_id']
         );
     }
@@ -240,6 +285,11 @@ function check_service($command)
 
     // Create an array for our metrics.
     $metrics = array();
+
+    // Check to see if pluggin has returned status OK. If not and first run of service we do not want to poll
+    if ($status != 0 && is_null($service['service_ds'])) {
+        return array ($status, $response, $metrics);
+    }
 
     // Loop through the perf string extracting our metric data
     foreach ($perf_arr as $string) {
