@@ -2,7 +2,6 @@
 
 use LibreNMS\Config;
 
-
 function format_bytes_billing($value)
 {
     return format_number($value, Config::get('billing.base')).'B';
