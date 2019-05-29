@@ -200,16 +200,20 @@
         $('.ajax-select').change(function () {
             var $this = $(this);
             var value = $this.val();
-            console.log($this.data('pref'));
+            var pref = $this.data('pref');
             $.ajax({
                 url: '{{ route('preferences.store') }}',
                 dataType: 'json',
                 type: 'POST',
                 data: {
-                    pref: $this.data('pref'),
+                    pref: pref,
                     value: value
                 },
                 success: function () {
+                    if (pref === 'locale') {
+                        location.reload();
+                    }
+
                     $this.data('previous', value);
                     $this.closest('.form-group').addClass('has-success');
                     setTimeout(function () {
