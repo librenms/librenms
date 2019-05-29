@@ -108,6 +108,7 @@
 
 @yield('content')
 
+@yield('scripts')
 
 {!! Toastr::render() !!}
 
