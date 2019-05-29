@@ -351,7 +351,7 @@ if ($device['xdsl_count'] > '0') {
 if ($config['enable_ports_poe']) {
     // Code by OS device
 
-    if ($device['os'] == 'ios') {
+    if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
         echo 'cpeExtPsePortEntry';
         $port_stats_poe = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', array(), 'CISCO-POWER-ETHERNET-EXT-MIB');
         $port_ent_to_if = snmpwalk_cache_oid($device, 'portIfIndex', array(), 'CISCO-STACK-MIB');
@@ -394,10 +394,6 @@ if ($config['enable_ports_poe']) {
             [$group_id, $if_id] = explode(".", $key);
             $port_stats[$if_id] = array_merge($port_stats[$if_id], $value);
         }
-    } else {
-        //Any other device, generic polling
-        $port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
-        $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
     }
 }
 
