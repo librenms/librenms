@@ -64,11 +64,13 @@ class UserPreferencesController extends Controller
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
             'locale' => UserPref::getPref($user, 'locale') ?: 'en',
-            'locales' => [
-                'en' => 'English',
-                'ru' => 'русский',
-            ],
         ];
+
+        foreach (glob(resource_path('lang') . '/*', GLOB_ONLYDIR) as $locale) {
+            $locale = basename($locale);
+            $lang = __('preferences.lang', [], $locale);
+            $data['locales'][$locale] = ($lang == 'preferences.lang' ? $locale : $lang);
+        }
 
         if (Config::get('twofactor')) {
             $twofactor = UserPref::getPref($user, 'twofactor');
