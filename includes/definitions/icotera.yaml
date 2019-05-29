@@ -1,0 +1,24 @@
+os: icotera
+text: 'Icotera OS'
+type: network
+mib_dir:
+    - icotera
+ifname: true
+icon: icotera
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.29865.11
+poller_modules:
+    wireless: false
+    ipmi: false
+    applications: false
+    services: false
+    ntp: false
+    entity-physical: false
+discovery_modules:
+    cisco-vrf-lite: false
+    services: false
+    ntp: false
+    wireless: false
