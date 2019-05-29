@@ -51,7 +51,7 @@ class NotesController extends WidgetController
             'HTML.SafeIframe' => true,
             'URI.SafeIframeRegexp' => '%^(https?:)?//%',
         ];
-        $output = Html::display(nl2br($settings['notes']), $purifier_config);
+        $output = \LibreNMS\Util\Clean::html(nl2br($settings['notes']), $purifier_config);
 
         return $output;
     }

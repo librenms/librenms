@@ -1523,7 +1523,7 @@ function clean($value, $strip_tags = true)
  */
 function display($value, $purifier_config = [])
 {
-    return Html::display($value, $purifier_config);
+    return \LibreNMS\Util\Clean::html($value, $purifier_config);
 }
 
 /**
