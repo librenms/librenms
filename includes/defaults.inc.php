@@ -487,8 +487,6 @@ $config['overview_show_sysDescr'] = true;
 // Poller/Discovery Modules
 $config['enable_bgp'] = 1;
 // Enable BGP session collection and display
-$config['enable_mpls'] = 1;
-// Enable MPLS LSPs
 $config['enable_syslog'] = 0;
 // Enable Syslog
 $config['enable_inventory'] = 1;
