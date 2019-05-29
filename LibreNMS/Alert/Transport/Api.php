@@ -41,12 +41,17 @@ class Api extends Transport
 
     private function contactAPI($obj, $api, $options, $method, $auth)
     {
+        $request_opts = [];
+        $query = [];
+
         $method = strtolower($method);
         $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //get each line of key-values and process the variables;
         foreach (preg_split("/\\r\\n|\\r|\\n/", $options) as $current_line) {
             list($u_key, $u_val) = explode('=', $current_line, 2);
+
+            // Replace the values
             foreach ($obj as $p_key => $p_val) {
                 $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
             }
