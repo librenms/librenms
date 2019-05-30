@@ -72,7 +72,6 @@ if (count($sensors)) {
             <td class="col-md-4">'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
             <td class="col-md-4">'.overlib_link($link, $sensor_current, $overlib_content, $sensor_class).'</td>
             </tr>';
-
     }//end foreach
 
     echo '</table>';
