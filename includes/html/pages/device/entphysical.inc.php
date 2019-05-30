@@ -58,7 +58,8 @@ function printEntPhysical($device, $ent, $level, $class)
         }
 
         if ($ent['entPhysicalClass'] == 'sensor' && isset($sensor)) {
-            echo ' ('.trim($sensor['sensor_current'] . ' ' . get_units_from_sensor($sensor)) . ')';
+            echo ' ';
+            echo $sensor['sensor_class'] == 'state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
         }
 
         if (isset($link)) {
