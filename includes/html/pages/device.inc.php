@@ -36,8 +36,6 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     } else {
         if ($device['status'] == '0') {
             $alert_class = 'alert-danger';
-        } elseif ($device['ignore'] == '1') {
-            $alert_class = 'alert-warning';
         }
     }
 
