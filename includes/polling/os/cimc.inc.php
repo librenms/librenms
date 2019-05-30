@@ -18,8 +18,5 @@ if (!empty($data[1]['cucsComputeBoardModel'])) {
 if (!empty($data[1]['cucsComputeBoardSerial'])) {
     $serial = $data[1]['cucsComputeBoardSerial'];
 }
-
-preg_match('/(?<=Firmware Version).([^\s]+)/', $device['sysDescr'], $tv_matches);
-if (isset($tv_matches[1])) {
-    $version = $tv_matches[1];
-}
+$firmwaredata = explode(" ", $device['sysDescr']);
+$firmware = $firmwaredata[11];
