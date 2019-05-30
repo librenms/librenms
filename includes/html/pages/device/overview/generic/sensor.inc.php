@@ -65,21 +65,19 @@ if (count($sensors)) {
         $sensor_minigraph    = generate_lazy_graph_tag($graph_array);
 
         if ($graph_type == 'sensor_state') {
-            $state_current = get_state_label($sensor);
 
             echo '<tr>
                 <td class="col-md-4">'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
                 <td class="col-md-4">'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
-                <td class="col-md-4">'.overlib_link($link, $state_current, $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, get_state_label($sensor), $overlib_content, $sensor_class).'</td>
                 </tr>';
         } else {
-            $sensor_current = $sensor_class == 'runtime' ? formatUptime($sensor['sensor_current'] * 60, 'short') : $sensor['sensor_current'] . $sensor_unit;
-            $alarmed = ((!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) || (!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']));
+            $sensor['sensor_current'] = $sensor_class == 'runtime' ? formatUptime($sensor['sensor_current'] * 60, 'short') : $sensor['sensor_current'];
 
             echo '<tr>
                 <td class="col-md-4">'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
                 <td class="col-md-4">'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
-                <td class="col-md-4">'.overlib_link($link, '<span '.($alarmed ? "style='color: red'" : '').'>'.$sensor_current.'</span>', $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, get_sensor_label_color($sensor), $overlib_content, $sensor_class).'</td>
                 </tr>';
         }//end if
     }//end foreach

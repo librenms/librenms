@@ -3,7 +3,7 @@
 $sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND entPhysicalIndex_measured = 'ports' ORDER BY `sensor_type` ASC", array($device['device_id'],$port['ifIndex']));
 
 foreach ($sensors as $sensor) {
-    $unit = get_unit_for_sensor_class($sensor['sensor_class']);
+    $unit = get_units_from_sensor($sensor);
 
     if ($sensor['poller_type'] == 'ipmi') {
         $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);
@@ -14,8 +14,7 @@ foreach ($sensors as $sensor) {
     if ($graph_type == 'sensor_state') {
         $sensor_current = get_state_label($sensor);
     } else {
-        $current_label = get_sensor_label_color($sensor);
-        $sensor_current = "<span class='label $current_label'>" . trim(format_si($sensor['sensor_current']) . $unit). '</span>';
+        $sensor_current = get_sensor_label_color($sensor);
     }
 
     $sensor_limit = trim(format_si($sensor['sensor_limit']) . $unit);

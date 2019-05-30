@@ -18,8 +18,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     if ($graph_type == 'sensor_state') {
         $sensor_current = get_state_label($sensor);
     } else {
-        $current_label = get_sensor_label_color($sensor);
-        $sensor_current = "<span class='label $current_label'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
+        $sensor_current = get_sensor_label_color($sensor);
     }
 
     $sensor_limit = trim(format_si($sensor['sensor_limit']).$unit);
