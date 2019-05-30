@@ -74,31 +74,12 @@ if (count($sensors)) {
         $sensor_minigraph    = generate_lazy_graph_tag($graph_array);
 
         if (!empty($state_translation['0']['state_descr'])) {
-            $state_style = "";
-            switch ($state_translation['0']['state_generic_value']) {
-                case 0:
-                // OK
-                    $state_style = "class='label label-success'";
-                    break;
-                case 1:
-                // Warning
-                    $state_style = "class='label label-warning'";
-                    break;
-                case 2:
-                // Critical
-                    $state_style = "class='label label-danger'";
-                    break;
-                case 3:
-                // Unknown
-                default:
-                    $state_style = "class='label label-default'";
-                    break;
-            }
+            $state_current = get_state_label($state_translation[0]['state_generic_value'], $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")");
 
             echo '<tr>
                 <td class="col-md-4">'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
                 <td class="col-md-4">'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
-                <td class="col-md-4">'.overlib_link($link, '<span '.$state_style.'>'.$state_translation['0']['state_descr'].'</span>', $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, $state_current, $overlib_content, $sensor_class).'</td>
                 </tr>';
         } else {
             $sensor_current = $sensor_class == 'runtime' ? formatUptime($sensor['sensor_current'] * 60, 'short') : $sensor['sensor_current'] . $sensor_unit;
