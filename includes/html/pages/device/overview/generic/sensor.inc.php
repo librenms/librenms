@@ -1,9 +1,5 @@
 <?php
-if ($sensor_class == 'state') {
-    $sensors = dbFetchRows('SELECT `sensors`.*, `state_indexes`.`state_index_id` FROM `sensors` LEFT JOIN `sensors_to_state_indexes` ON sensors_to_state_indexes.sensor_id = sensors.sensor_id LEFT JOIN state_indexes ON state_indexes.state_index_id = sensors_to_state_indexes.state_index_id WHERE `sensor_class` = ? AND device_id = ? ORDER BY `group`, `sensor_type`, `sensor_descr`, `sensor_index`+0', array($sensor_class, $device['device_id']));
-} else {
-    $sensors = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `group`, `sensor_descr`, `sensor_oid`, `sensor_index`', array($sensor_class, $device['device_id']));
-}
+$sensors = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `group`, `sensor_descr`, `sensor_oid`, `sensor_index`', array($sensor_class, $device['device_id']));
 
 if (count($sensors)) {
     $icons = \App\Models\Sensor::getIconMap();
@@ -19,11 +15,6 @@ if (count($sensors)) {
         <table class="table table-hover table-condensed table-striped">';
     $group = '';
     foreach ($sensors as $sensor) {
-        $state_translation = array();
-        if (!empty($sensor['state_index_id'])) {
-            $state_translation = dbFetchRows('SELECT * FROM `state_translations` WHERE `state_index_id` = ? AND `state_value` = ? ', array($sensor['state_index_id'], $sensor['sensor_current']));
-        }
-
         if (!isset($sensor['sensor_current'])) {
             $sensor['sensor_current'] = 'NaN';
         }
@@ -73,8 +64,8 @@ if (count($sensors)) {
         $graph_array['from'] = $config['time']['day'];
         $sensor_minigraph    = generate_lazy_graph_tag($graph_array);
 
-        if (!empty($state_translation['0']['state_descr'])) {
-            $state_current = get_state_label($state_translation[0]['state_generic_value'], $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")");
+        if ($graph_type == 'sensor_state') {
+            $state_current = get_state_label($sensor);
 
             echo '<tr>
                 <td class="col-md-4">'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>

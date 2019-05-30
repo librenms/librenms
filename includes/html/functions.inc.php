@@ -1610,27 +1610,30 @@ function get_device_name($device)
  * Returns state generic label from value with optional text
  */
 
-function get_state_label($state_value, $state_text_param = null)
+function get_state_label($sensor)
 {
-    switch ($state_value) {
+    $state_translation = array();
+    $state_translation = dbFetchRows('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
+
+    switch ($state_translation[0]['state_generic_value']) {
         case 0:  // OK
-            $state_text = (is_null($state_text_param) ? "OK": $state_text_param);
+            $state_text = !empty($state_translation[0]['state_descr']) ? $state_translation[0]['state_descr'] : "OK";
             $state_label = "label-success";
             break;
         case 1:  // Warning
-            $state_text = (is_null($state_text_param) ? "Warning": $state_text_param);
+            $state_text = !empty($state_translation[0]['state_descr']) ? $state_translation[0]['state_descr'] : "Warning";
             $state_label = "label-warning";
             break;
         case 2:  // Critical
-            $state_text = (is_null($state_text_param) ? "Critical": $state_text_param);
+            $state_text = !empty($state_translation[0]['state_descr']) ? $state_translation[0]['state_descr'] : "Critical";
             $state_label = "label-danger";
             break;
-        case 3:// Unknown
+        case 3:  // Unknown
         default:
-            $state_text = (is_null($state_text_param) ? "Unknown": $state_text_param);
+            $state_text = !empty($state_translation[0]['state_descr']) ? $state_translation[0]['state_descr'] : "Unknown";
             $state_label = "label-default";
     }
-    $state = "<span class='label $state_label'>$state_text</span>";
+    $state = "<span class='label $state_label'>$state_text ({$sensor['sensor_current']})</span>";
     return $state;
 }
 
