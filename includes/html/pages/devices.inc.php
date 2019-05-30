@@ -318,6 +318,8 @@ if ($format == "graph") {
                         return row.uptime;
                     } else if (row.status == 'down') {
                         return "<span class='alert-status-small label-danger'></span><span>" + row.uptime + "</span>";
+                    } else if (row.status == 'ignore') {
+                        return "<span class='alert-status-small label-default'></span><span>" + row.uptime + "</span>";
                     } else {
                         return "<span class='alert-status-small label-success'></span><span>" + row.uptime + "</span>";
                     }
