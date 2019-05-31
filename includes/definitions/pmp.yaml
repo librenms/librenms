@@ -5,6 +5,24 @@ icon: cambium
 group: cambium
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+poller_modules:
+    applications: false
+    bgp-peers: false
+    ipmi: false
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+discover_modules:
+    applications: false
+    bgp-peers: false
+    ipmi: false
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
 discovery:
     -
         sysObjectID:
