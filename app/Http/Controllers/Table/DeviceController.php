@@ -144,7 +144,7 @@ class DeviceController extends TableController
         }
 
         if ($device->ignore) {
-            return $device->status ? 'label-warning' : 'label-default';
+            return 'label-default';
         }
 
         return $device->status ? 'label-success' : 'label-danger';

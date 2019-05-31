@@ -88,8 +88,8 @@
                 }
             });
 
-            @if(\LibreNMS\Authentication\LegacyAuth::get()->canManageUsers())
-            $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">@lang('Add User')</a></div>');
+            @if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
+                $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">@lang('Add User')</a></div>');
             @endif
 
             user_grid.css('display', 'table'); // done loading, show
