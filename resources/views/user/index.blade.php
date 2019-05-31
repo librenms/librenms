@@ -88,7 +88,7 @@
                 }
             });
 
-            @if(\LibreNMS\Authentication\LegacyAuth::get()->canManageUsers())
+            @if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
                 $('.actionBar').append('<div class="pull-left"><a href="users/create" type="button" class="btn btn-primary">@lang('Add User')</a></div>');
             @endif
 
