@@ -32,7 +32,7 @@ class DeviceGroup extends BaseModel
 {
     public $timestamps = false;
     protected $appends = ['patternSql'];
-    protected $fillable = ['name', 'desc', 'pattern', 'params'];
+    protected $fillable = ['name', 'desc', 'type', 'pattern', 'params'];
     protected $casts = ['params' => 'array'];
 
     // ---- Helper Functions ----
