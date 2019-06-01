@@ -397,7 +397,6 @@ class PollerQueueManager(QueueManager):
                     error('Polling device {} failed! {}'.format(device_id, e))
                     self.unlock(device_id)
             else:
-                info('Polling complete {}'.format(device_id))
                 self.unlock(device_id)
         else:
             debug('Tried to poll {}, but it is locked'.format(device_id))
