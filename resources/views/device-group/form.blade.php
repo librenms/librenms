@@ -30,8 +30,7 @@
 <div id="dynamic-dg-form" class="form-group @if($errors->has('pattern')) has-error @endif">
     <label for="pattern" class="control-label col-sm-3 text-nowrap">@lang('Define Rules')</label>
     <div class="col-sm-9">
-        <input type="text" class="form-control" id="pattern" name="pattern"
-               value="{{ old('pattern', $device_group->pattern) }}">
+        <div id="builder"></div>
         <span class="help-block">{{ $errors->first('pattern') }}</span>
     </div>
 </div>
@@ -58,4 +57,63 @@
     change_dg_type(document.getElementById('type'));
 
     init_select2('#devices', 'device', {multiple: true});
+
+    var builder = $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
+        $("[name$='_filter']").each(function () {
+            $(this).select2({
+                dropdownAutoWidth: true,
+                width: 'auto'
+            });
+        });
+    }).on('ruleToSQL.queryBuilder.filter', function (e, rule) {
+        if (rule.operator === 'regexp') {
+            e.value += ' \'' + rule.value + '\'';
+        }
+    }).queryBuilder({
+        plugins: [
+            'bt-tooltip-errors'
+            // 'not-group'
+        ],
+
+        filters: {!! $filters    !!},
+        operators: [
+            'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null',
+            {type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+            {type: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
+            {type: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
+        ],
+        lang: {
+            operators: {
+                regexp: 'regex',
+                not_regex: 'not regex'
+            }
+        },
+        sqlOperators: {
+            regexp: {op: 'REGEXP'},
+            not_regexp: {op: 'NOT REGEXP'}
+        },
+        sqlRuleOperator: {
+            'REGEXP': function (v) {
+                return {val: v, op: 'regexp'};
+            },
+            'NOT REGEXP': function (v) {
+                return {val: v, op: 'not_regexp'};
+            }
+        }
+    });
+
+    $('.device-group-form').submit(function (eventObj) {
+        $('<input />')
+            .attr('type', 'hidden')
+            .attr('name', 'pattern')
+            .attr('value', builder.getQuery())
+            .appendTo(this);
+        $('<input type="hidden" name="params" />')
+            .attr('value', builder.getQueryParameters())
+            .appendTo(this);
+        return true;
+    });
 </script>

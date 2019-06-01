@@ -6,7 +6,7 @@
     <div class="container">
         <div class="row">
             <form action="{{ route('device-groups.update', $device_group->id) }}" method="POST" role="form"
-                  class="form-horizontal col-md-8 col-md-offset-2">
+                  class="form-horizontal col-md-8 col-md-offset-2 device-group-form">
                 <legend>@lang('Edit Device Group'): {{ $device_group->name }}</legend>
                 {{ method_field('PUT') }}
 
@@ -22,4 +22,9 @@
             </form>
         </div>
     </div>
+@endsection
+
+@section('javascript')
+    <script src="{{ asset('js/sql-parser.min.js') }}"></script>
+    <script src="{{ asset('js/query-builder.standalone.min.js') }}"></script>
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
+use LibreNMS\Alerting\QueryBuilderFilter;
 use Toastr;
 
 class DeviceGroupController extends Controller
@@ -31,7 +32,10 @@ class DeviceGroupController extends Controller
     {
 //        $this->authorize('create', DeviceGroup::class);
 
-        return view('device-group.create', ['device_group' => new DeviceGroup()]);
+        return view('device-group.create', [
+            'device_group' => new DeviceGroup(),
+            'filters' => json_encode(new QueryBuilderFilter('alert')),
+        ]);
     }
 
     /**
@@ -50,6 +54,8 @@ class DeviceGroupController extends Controller
             'devices' => 'array',
             'devices.*' => 'integer',
         ]);
+
+        dd($request->all());
 
         $deviceGroup = DeviceGroup::create($request->all());
         Toastr::success(__('Device Group :name created', ['name' => $deviceGroup->name]));
@@ -81,6 +87,7 @@ class DeviceGroupController extends Controller
 
         return view('device-group.edit', [
             'device_group' => $deviceGroup,
+            'filters' => json_encode(new QueryBuilderFilter('alert')),
         ]);
     }
 
