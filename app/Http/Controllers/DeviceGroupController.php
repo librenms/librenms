@@ -18,7 +18,7 @@ class DeviceGroupController extends Controller
 //        $this->authorize('manage', DeviceGroup::class);
 
         return view('device-group.index', [
-            'device_groups' => DeviceGroup::orderBy('name')->get(),
+            'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
         ]);
     }
 
@@ -31,7 +31,7 @@ class DeviceGroupController extends Controller
     {
 //        $this->authorize('create', DeviceGroup::class);
 
-        return view('device-group.create');
+        return view('device-group.create', ['device_group' => new DeviceGroup()]);
     }
 
     /**
@@ -45,14 +45,16 @@ class DeviceGroupController extends Controller
 //        $this->authorize('create', DeviceGroup::class);
 
         $this->validate($request, [
-            'name' => 'required',
-            'type' => 'in:dynamic,static'
+            'name' => 'required|string',
+            'type' => 'in:dynamic,static',
+            'devices' => 'array',
+            'devices.*' => 'integer',
         ]);
 
         $deviceGroup = DeviceGroup::create($request->all());
         Toastr::success(__('Device Group :name created', ['name' => $deviceGroup->name]));
 
-        return redirect(route('device-group.index'));
+        return redirect(route('device-groups.index'));
 
     }
 
@@ -92,11 +94,21 @@ class DeviceGroupController extends Controller
     public function update(Request $request, DeviceGroup $deviceGroup)
     {
         $this->validate($request, [
-            'name' => 'required',
-            'type' => 'in:dynamic,static'
+            'name' => 'required|string',
+            'type' => 'in:dynamic,static',
+            'devices' => 'array',
+            'devices.*' => 'integer',
         ]);
 
-        $deviceGroup->fill($request->all());
+        $deviceGroup->fill($request->only(['name', 'desc', 'type']));
+
+        if ($deviceGroup->type == 'static') {
+            // save static relationships
+            $deviceGroup->devices()->sync($request->get('devices', []));
+        } else {
+            // update related devices for dynamic groups
+            // TODO
+        }
 
         if ($deviceGroup->isDirty()) {
             if ($deviceGroup->save()) {
@@ -108,7 +120,7 @@ class DeviceGroupController extends Controller
             Toastr::info(__('No changes made'));
         }
 
-        return redirect(route('device-group.index'));
+        return redirect(route('device-groups.index'));
     }
 
     /**
@@ -125,6 +137,6 @@ class DeviceGroupController extends Controller
 
         Toastr::success(__('Device Group :name deleted', ['name' => $deviceGroup->name]));
 
-        return redirect(route('device-group.index'));
+        return redirect(route('device-groups.index'));
     }
 }

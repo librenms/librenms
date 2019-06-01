@@ -14,7 +14,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <a type="button" class="btn btn-primary"
-                           href="{{ route('users.create') }}">@lang('New Device Group')</a>
+                           href="{{ route('device-groups.create') }}">@lang('New Device Group')</a>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -24,6 +24,7 @@
                             <th>@lang('Name')</th>
                             <th>@lang('Description')</th>
                             <th>@lang('Type')</th>
+                            <th>@lang('Devices')</th>
                             <th>@lang('Pattern')</th>
                             <th>@lang('Actions')</th>
                         </tr>
@@ -34,13 +35,16 @@
                                 <td>{{ $device_group->name }}</td>
                                 <td>{{ $device_group->desc }}</td>
                                 <td>{{ __(ucfirst($device_group->type)) }}</td>
+                                <td>
+                                    <a href="{{ url("/devices/group=$device_group->id") }}">{{ $device_group->devices_count }}</a>
+                                </td>
                                 <td>{{ $device_group->patternSql }}</td>
                                 <td>
                                     <a type="button" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
-                                       href="{{ route('device-group.edit', $device_group->id) }}">
+                                       href="{{ route('device-groups.edit', $device_group->id) }}">
                                         <i class="fa fa-pencil" aria-hidden="true"></i></a>
                                     <button type="button" class="btn btn-danger btn-sm" aria-label="@lang('Delete')"
-                                            onclick="delete_dg(this, '{{ $device_group->name }}', '{{ route('device-group.destroy', $device_group->id) }}')">
+                                            onclick="delete_dg(this, '{{ $device_group->name }}', '{{ route('device-groups.destroy', $device_group->id) }}')">
                                         <i
                                             class="fa fa-trash" aria-hidden="true"></i></button>
                                 </td>

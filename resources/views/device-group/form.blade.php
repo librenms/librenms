@@ -39,7 +39,7 @@
 <div id="static-dg-form" class="form-group @if($errors->has('devices')) has-error @endif" style="display: none">
     <label for="devices" class="control-label col-sm-3 text-nowrap">@lang('Select Devices')</label>
     <div class="col-sm-9">
-        <select class="form-control" id="devices" name="devices" multiple>
+        <select class="form-control" id="devices" name="devices[]" multiple>
             @foreach($device_group->devices as $device)
                 <option value="{{ $device->device_id }}" selected>{{ $device->displayName() }}</option>
             @endforeach
