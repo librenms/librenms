@@ -96,7 +96,7 @@ class UserController extends Controller
         $this->updateDashboard($user, $request->get('dashboard'));
 
         if ($user->save()) {
-            Toastr::success(__('User :username created', ['username', $user->username]));
+            Toastr::success(__('User :username created', ['username' => $user->username]));
             return redirect(route('users.index'));
         }
 
