@@ -75,7 +75,8 @@
             // 'not-group'
         ],
 
-        filters: {!! $filters    !!},
+        rules: {!! json_encode(old('rules') ? json_decode(old('rules')) : $device_group->rules) !!},
+        filters: {!! $filters !!},
         operators: [
             'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null',
             {type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
@@ -106,14 +107,16 @@
     });
 
     $('.device-group-form').submit(function (eventObj) {
-        $('<input />')
-            .attr('type', 'hidden')
-            .attr('name', 'pattern')
-            .attr('value', builder.getQuery())
+        if (!builder.queryBuilder('validate')) {
+            return false;
+        }
+
+        $('<input type="hidden" name="rules" />')
+            .attr('value', JSON.stringify(builder.queryBuilder('getRules')))
             .appendTo(this);
-        $('<input type="hidden" name="params" />')
-            .attr('value', builder.getQueryParameters())
-            .appendTo(this);
+        // $('<input type="hidden" name="params" />')
+        //     .attr('value', builder.getQueryParameters())
+        //     .appendTo(this);
         return true;
     });
 </script>

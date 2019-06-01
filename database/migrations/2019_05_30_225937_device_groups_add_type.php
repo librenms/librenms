@@ -16,6 +16,7 @@ class DeviceGroupsAddType extends Migration
         Schema::table('device_groups', function (Blueprint $table) {
             $table->string('desc')->nullable()->change();
             $table->string('type', 16)->default('dynamic')->after('desc');
+            $table->text('rules')->nullable()->after('type');
         });
     }
 
@@ -29,6 +30,7 @@ class DeviceGroupsAddType extends Migration
         Schema::table('device_groups', function (Blueprint $table) {
             $table->string('desc')->change();
             $table->dropColumn('type');
+            $table->dropColumn('rules');
         });
     }
 }

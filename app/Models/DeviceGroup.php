@@ -33,7 +33,7 @@ class DeviceGroup extends BaseModel
     public $timestamps = false;
     protected $appends = ['patternSql'];
     protected $fillable = ['name', 'desc', 'type', 'pattern', 'params'];
-    protected $casts = ['params' => 'array'];
+    protected $casts = ['params' => 'array', 'rules' => 'array'];
 
     // ---- Helper Functions ----
 
@@ -296,17 +296,6 @@ class DeviceGroup extends BaseModel
     }
 
     // ---- Define Relationships ----
-
-
-    public function alertSchedules()
-    {
-        return $this->morphToMany('App\Models\AlertSchedule', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
-    }
-
-    public function rules()
-    {
-        return $this->belongsToMany('App\Models\AlertRule', 'alert_group_map', 'group_id', 'rule_id');
-    }
 
     public function devices()
     {

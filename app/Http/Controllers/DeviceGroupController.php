@@ -34,7 +34,7 @@ class DeviceGroupController extends Controller
 
         return view('device-group.create', [
             'device_group' => new DeviceGroup(),
-            'filters' => json_encode(new QueryBuilderFilter('alert')),
+            'filters' => json_encode(new QueryBuilderFilter('group')),
         ]);
     }
 
@@ -49,15 +49,17 @@ class DeviceGroupController extends Controller
 //        $this->authorize('create', DeviceGroup::class);
 
         $this->validate($request, [
-            'name' => 'required|string',
+            'name' => 'required|string|unique:device_groups',
             'type' => 'in:dynamic,static',
             'devices' => 'array',
             'devices.*' => 'integer',
+            'rules' => 'json',
         ]);
 
-        dd($request->all());
+        $deviceGroup = DeviceGroup::make($request->only(['name', 'desc', 'type']));
+        $deviceGroup->rules = json_decode($request->rules);
+        $deviceGroup->save();
 
-        $deviceGroup = DeviceGroup::create($request->all());
         Toastr::success(__('Device Group :name created', ['name' => $deviceGroup->name]));
 
         return redirect(route('device-groups.index'));
@@ -87,7 +89,7 @@ class DeviceGroupController extends Controller
 
         return view('device-group.edit', [
             'device_group' => $deviceGroup,
-            'filters' => json_encode(new QueryBuilderFilter('alert')),
+            'filters' => json_encode(new QueryBuilderFilter('group')),
         ]);
     }
 
@@ -105,9 +107,11 @@ class DeviceGroupController extends Controller
             'type' => 'in:dynamic,static',
             'devices' => 'array',
             'devices.*' => 'integer',
+            'rules' => 'json',
         ]);
 
         $deviceGroup->fill($request->only(['name', 'desc', 'type']));
+        $deviceGroup->rules = json_decode($request->rules);
 
         if ($deviceGroup->type == 'static') {
             // save static relationships
