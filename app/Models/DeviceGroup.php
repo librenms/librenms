@@ -55,14 +55,24 @@ class DeviceGroup extends BaseModel
         }
 
         $device_group_ids = static::query()
-            ->where('type', 'dynamic')
+            ->with(['devices' => function ($query) {
+                $query->select('devices.device_id');
+            }])
+//            ->where('type', 'dynamic')
             ->get()
             ->filter(function ($device_group) use ($device) {
                 /** @var DeviceGroup $device_group */
-                return $device_group->getParser()
-                    ->toQuery()
-                    ->where('devices.device_id', $device->device_id)
-                    ->exists();
+                if ($device_group->type == 'dynamic') {
+                    return $device_group->getParser()
+                        ->toQuery()
+                        ->where('devices.device_id', $device->device_id)
+                        ->exists();
+                }
+
+                // for static, if this device is include, keep it.
+                return $device_group->devices
+                    ->where('device_id', $device->device_id)
+                    ->isNotEmpty();
             })->pluck('id');
 
         return $device->groups()->sync($device_group_ids);

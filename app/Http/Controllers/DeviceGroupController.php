@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DeviceGroup;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
@@ -51,15 +52,19 @@ class DeviceGroupController extends Controller
 
         $this->validate($request, [
             'name' => 'required|string|unique:device_groups',
-            'type' => 'in:dynamic,static',
-            'devices' => 'array',
+            'type' => 'required|in:dynamic,static',
+            'devices' => 'array|required_if:type,static',
             'devices.*' => 'integer',
-            'rules' => 'json',
+            'rules' => 'json|required_if:type,dynamic',
         ]);
 
         $deviceGroup = DeviceGroup::make($request->only(['name', 'desc', 'type']));
         $deviceGroup->rules = json_decode($request->rules);
         $deviceGroup->save();
+
+        if ($request->type == 'static') {
+            $deviceGroup->devices()->sync($request->devices);
+        }
 
         Toastr::success(__('Device Group :name created', ['name' => $deviceGroup->name]));
 
@@ -110,11 +115,17 @@ class DeviceGroupController extends Controller
     public function update(Request $request, DeviceGroup $deviceGroup)
     {
         $this->validate($request, [
-            'name' => 'required|string',
-            'type' => 'in:dynamic,static',
-            'devices' => 'array',
+            'name' => [
+                'required',
+                'string',
+//                Rule::exists('device_groups')->where(function ($query) use ($deviceGroup) {
+//                    $query->where('id', '!=', $deviceGroup->id);
+//                }),
+            ],
+            'type' => 'required|in:dynamic,static',
+            'devices' => 'array|required_if:type,static',
             'devices.*' => 'integer',
-            'rules' => 'json',
+            'rules' => 'json|required_if:type,dynamic',
         ]);
 
         $deviceGroup->fill($request->only(['name', 'desc', 'type']));

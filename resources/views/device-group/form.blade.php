@@ -15,7 +15,7 @@
 </div>
 
 <div class="form-group @if($errors->has('type')) has-error @endif">
-    <label for="level" class="control-label col-sm-3">@lang('Type')</label>
+    <label for="type" class="control-label col-sm-3">@lang('Type')</label>
     <div class="col-sm-9">
         <select class="form-control" id="type" name="type" onchange="change_dg_type(this)">
             <option value="dynamic"
@@ -106,6 +106,10 @@
     });
 
     $('.device-group-form').submit(function (eventObj) {
+        if ($('#type').val() === 'static') {
+            return true;
+        }
+
         if (!builder.queryBuilder('validate')) {
             return false;
         }
@@ -117,5 +121,8 @@
     });
 </script>
 <script>
-    builder.queryBuilder('setRules', {!! json_encode(old('rules') ? json_decode(old('rules')) : $device_group->rules) !!});
+    var rules = {!! json_encode(old('rules') ? json_decode(old('rules')) : $device_group->rules) !!};
+    if (rules) {
+        builder.queryBuilder('setRules', rules);
+    }
 </script>
