@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class DeviceGroupsAddType extends Migration
+class DeviceGroupsRewrite extends Migration
 {
     /**
      * Run the migrations.
@@ -17,6 +17,7 @@ class DeviceGroupsAddType extends Migration
             $table->string('desc')->nullable()->change();
             $table->string('type', 16)->default('dynamic')->after('desc');
             $table->text('rules')->nullable()->after('type');
+            $table->dropColumn('params');
         });
     }
 
@@ -31,6 +32,7 @@ class DeviceGroupsAddType extends Migration
             $table->string('desc')->change();
             $table->dropColumn('type');
             $table->dropColumn('rules');
+            $table->text('params')->after('pattern');
         });
     }
 }

@@ -347,7 +347,7 @@ function poll_device($device, $force_module = false)
         }
 
         // Update device_groups
-        UpdateGroupsForDevice($device['device_id']);
+        \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
 
         if (!$force_module && !empty($graphs)) {
             echo "Enabling graphs: ";

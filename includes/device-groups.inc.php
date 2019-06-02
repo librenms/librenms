@@ -289,40 +289,6 @@ function RunGroupMacros($rule, $x = 1)
     return $rule;
 }//end RunGroupMacros()
 
-
-/**
- * Update device-group relationship for the given device id
- * @param $device_id
- */
-function UpdateGroupsForDevice($device_id)
-{
-    d_echo("### Start Device Groups ###\n");
-    $queried_groups = QueryGroupsFromDevice($device_id);
-    $db_groups = GetGroupsFromDevice($device_id);
-
-    // compare the arrays to get the added and removed groups
-    $added_groups = array_diff($queried_groups, $db_groups);
-    $removed_groups = array_diff($db_groups, $queried_groups);
-
-    d_echo("Groups Added: ".implode(',', $added_groups).PHP_EOL);
-    d_echo("Groups Removed: ".implode(',', $removed_groups).PHP_EOL);
-
-    // insert new groups
-    $insert = array();
-    foreach ($added_groups as $group_id) {
-        $insert[] = array('device_id' => $device_id, 'device_group_id' => $group_id);
-    }
-    if (!empty($insert)) {
-        dbBulkInsert($insert, 'device_group_device');
-    }
-
-    // remove old groups
-    if (!empty($removed_groups)) {
-        dbDelete('device_group_device', '`device_id`=? AND `device_group_id` IN ' . dbGenPlaceholders(count($removed_groups)), array_merge([$device_id], $removed_groups));
-    }
-    d_echo("### End Device Groups ###\n");
-}
-
 /**
  * Update the device-group relationship for the given group id
  * @param $group_id

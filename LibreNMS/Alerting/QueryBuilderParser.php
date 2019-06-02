@@ -167,6 +167,10 @@ class QueryBuilderParser implements \JsonSerializable
         $split = array_chunk(preg_split('/(&&|\|\|)/', $query, -1, PREG_SPLIT_DELIM_CAPTURE), 2);
 
         foreach ($split as $chunk) {
+            if (count($chunk) < 2) {
+                continue; // likely the ending && or ||
+            }
+
             list($rule_text, $rule_operator) = $chunk;
             if (!isset($condition)) {
                 // only allow one condition.  Since old rules had no grouping, this should hold logically

@@ -88,6 +88,12 @@ class DeviceGroupController extends Controller
     {
 //        $this->authorize('edit', $deviceGroup);
 
+        // convert old rules on edit
+        if (is_null($deviceGroup->rules)) {
+            $query_builder = QueryBuilderFluentParser::fromOld($deviceGroup->pattern);
+            $deviceGroup->rules = $query_builder->toArray();
+        }
+
         return view('device-group.edit', [
             'device_group' => $deviceGroup,
             'filters' => json_encode(new QueryBuilderFilter('group')),
