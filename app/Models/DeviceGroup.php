@@ -40,12 +40,18 @@ class DeviceGroup extends BaseModel
      * Update the device groups for the given device or device_id
      *
      * @param Device|int $device
+     * @return array
      */
     public static function updateGroupsFor($device)
     {
         $device = ($device instanceof Device ? $device : Device::find($device));
         if (!$device instanceof Device) {
-            return; // could not load device
+            // could not load device
+            return [
+                "attached" => [],
+                "detached" => [],
+                "updated" => [],
+            ];
         }
 
         $device_group_ids = static::query()
@@ -59,7 +65,7 @@ class DeviceGroup extends BaseModel
                     ->exists();
             })->pluck('id');
 
-        $device->groups()->sync($device_group_ids);
+        return $device->groups()->sync($device_group_ids);
     }
 
     /**
