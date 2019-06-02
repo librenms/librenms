@@ -56,7 +56,7 @@ if ($entriesConfig !== null) {
 
         $type = $entry['type'];
         $oid = '.1.3.6.1.4.1.13576.10.1.100.1.1.3.' . $key;
-        $descr = array_key_exists('descr', $entry) ? $entry['descr'] : ($type . ' (' . $id . ')');
+        $descr = array_key_exists('descr', $entry) ? $entry['descr'] : ($type . ' (' . $key . ')');
 
         if ($type === 'state') {
             if (!$statesConfig || !array_key_exists('states', $entry) || !array_key_exists($entry['states'], $statesConfig)) {
@@ -113,9 +113,9 @@ if ($entriesConfig !== null) {
                 $limit = array_key_exists('high', $thresholds) ? $thresholds['high'] : null;
             }
 
-            $current = $oids[$id]['wioPlcDataWriteArea'] * $multiplier / $divisor;
+            $current = $oids[$key]['wioPlcDataWriteArea'] * $multiplier / $divisor;
 
-            discover_sensor($valid['sensor'], $type, $device, $oid, $id, 'wago-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', null, null, null);
+            discover_sensor($valid['sensor'], $type, $device, $oid, $key, 'wago-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', null, null, null);
 
             unset($divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current);
         }
