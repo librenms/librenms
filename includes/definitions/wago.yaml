@@ -1,0 +1,23 @@
+os: wago
+text: 'Wago controller'
+type: environment
+icon: wago
+discovery_modules:
+    ports-stack: false
+    entity-physical: false
+    cisco-vrf-lite: false
+    ipv6-addresses: false
+    discovery-protocols: false
+    bgp-peers: false
+    vlans: false
+    ucd-diskio: false
+    services: false
+    stp: false
+    ntp: false
+    wireless: false
+    fdb-table: false
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.13576
+mib_dir:
+    - wago

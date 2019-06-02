@@ -1,0 +1,2089 @@
+----------------------------------------------------------------------------------------------------------
+--  WagoKontakttechnik.mib
+--  Version: 2.01
+--  Date: 2012-03-26
+--  Author: WAGO Kontakttechnik GmbH & Co. KG  
+---------------------------------------------------------------------------------------------------------- 
+
+	WAGO-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			OBJECT-TYPE			
+				FROM RFC-1212			
+			TRAP-TYPE			
+				FROM RFC-1215			
+			enterprises, IpAddress			
+				FROM RFC1155-SMI;
+	
+	
+--
+-- Type definitions
+--
+	
+		DisplayString ::= OCTET STRING
+
+	
+--
+-- Node definitions
+--
+	
+--  1.3.6.1.4.1.13576
+		-- 1.3.6.1.4.1.13576
+		wago OBJECT IDENTIFIER ::= { enterprises 13576 }
+
+		
+--  1.3.6.1.4.1.13576.1
+		-- 1.3.6.1.4.1.13576.1
+		wagoCompany OBJECT IDENTIFIER ::= { wago 1 }
+
+		
+--  1.3.6.1.4.1.13576.1.1
+		-- 1.3.6.1.4.1.13576.1.1
+		wagoName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Registered name of the company"
+			DEFVAL { "WAGO Kontakttechnik GmbH & Co. KG" }
+			::= { wagoCompany 1 }
+
+		
+--  1.3.6.1.4.1.13576.1.2
+		-- 1.3.6.1.4.1.13576.1.2
+		wagoDescrition OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Description of company"
+			DEFVAL { "WAGO Kontakttechnik GmbH & Co. KG, Hansastr. 27, D-32423 Minden" }
+			::= { wagoCompany 2 }
+
+		
+--  1.3.6.1.4.1.13576.1.3
+		-- 1.3.6.1.4.1.13576.1.3
+		wagoURL OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"URL to webpage of company"
+			DEFVAL { "www.wago.com" }
+			::= { wagoCompany 3 }
+
+		
+--  1.3.6.1.4.1.13576.10
+		-- 1.3.6.1.4.1.13576.10
+		wagoIOProducts OBJECT IDENTIFIER ::= { wago 10 }
+
+		
+--  1.3.6.1.4.1.13576.10.1
+		-- 1.3.6.1.4.1.13576.10.1
+		wioCommon OBJECT IDENTIFIER ::= { wagoIOProducts 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.1
+		-- 1.3.6.1.4.1.13576.10.1.1
+		wioArticleName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Name of article"
+			DEFVAL { "750-841/000-000" }
+			::= { wioCommon 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.2
+		-- 1.3.6.1.4.1.13576.10.1.2
+		wioArticleDescription OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Description of article"
+			DEFVAL { "WAGO Ethernet(10/100MBit)-FBC" }
+			::= { wioCommon 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.3
+		-- 1.3.6.1.4.1.13576.10.1.3
+		wioSerialNumber OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Serialnumber of article"
+			DEFVAL { "SNxxxxxxxx-Txxxxxx-mac|0030DExxxxxx" }
+			::= { wioCommon 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.4
+		-- 1.3.6.1.4.1.13576.10.1.4
+		wioMacAddress OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"MAC-Address of article"
+			DEFVAL { "0030DExxxxxx" }
+			::= { wioCommon 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.5
+		-- 1.3.6.1.4.1.13576.10.1.5
+		wioURLDatasheet OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"URL to datasheet of article"
+			DEFVAL { "http://www.wago.com/wagoweb/documentation/navigate/nm0dc__e.htm#ethernet" }
+			::= { wioCommon 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.6
+		-- 1.3.6.1.4.1.13576.10.1.6
+		wioURLManual OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"URL to manual of article"
+			DEFVAL { "http://www.wago.com/wagoweb/documentation/navigate/nm0dc__e.htm#ethernet" }
+			::= { wioCommon 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.10.7
+		-- 1.3.6.1.4.1.13576.10.1.7
+		wioDeviceClass OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"device class of the article
+				wioDeviceClass = 10: Controller
+				wioDeviceClass = 20: Koppler 
+				wioDeviceClass = 30: Switch
+				wioDeviceClass = 40: Display
+				wioDeviceClass = 50: Sensor
+				wioDeviceClass = 60: Aktor "
+			::= { wioCommon 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.10.8
+		-- 1.3.6.1.4.1.13576.10.1.8
+		wioDeviceGroup OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"device group of the article
+				wioDeviceGroup = 10: 750
+				wioDeviceGroup = 20: Speedway
+				wioDeviceGroup = 30: 758
+				"
+			::= { wioCommon 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.10
+		-- 1.3.6.1.4.1.13576.10.1.10
+		wioVersion OBJECT IDENTIFIER ::= { wioCommon 10 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.10.1
+		-- 1.3.6.1.4.1.13576.10.1.10.1
+		wioFirmwareIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Index of firmwareversion"
+			::= { wioVersion 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.10.2
+		-- 1.3.6.1.4.1.13576.10.1.10.2
+		wioHardwareIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Index of hardwareversion"
+			::= { wioVersion 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.10.3
+		-- 1.3.6.1.4.1.13576.10.1.10.3
+		wioFwlIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Index of softwareversion from firmwareloader"
+			::= { wioVersion 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.10.4
+		-- 1.3.6.1.4.1.13576.10.1.10.4
+		wioFirmwareVersion OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Complete firmwarestring"
+			::= { wioVersion 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.11
+		-- 1.3.6.1.4.1.13576.10.1.11
+		wioRealTimeClock OBJECT IDENTIFIER ::= { wioCommon 11 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.11.1
+		-- 1.3.6.1.4.1.13576.10.1.11.1
+		wioRtcDateTime OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..35))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Date / time of coupler in UTC as string.
+				For writing date / time use the following string:
+				time 11:22:33 date 13-1-2007"
+			DEFVAL { "time xx:xx:xx date xx-xx-xxxx (UTC)" }
+			::= { wioRealTimeClock 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.11.2
+		-- 1.3.6.1.4.1.13576.10.1.11.2
+		wioRtcTime OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Date / time of coupler in UTC
+				as integer in seconds from 1970-01-01"
+			::= { wioRealTimeClock 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.11.3
+		-- 1.3.6.1.4.1.13576.10.1.11.3
+		wioTimezone OBJECT-TYPE
+			SYNTAX INTEGER (-12..12)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Actual timezone of article in hours 
+				(-12 - +12)"
+			DEFVAL { 0 }
+			::= { wioRealTimeClock 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.11.4
+		-- 1.3.6.1.4.1.13576.10.1.11.4
+		wioRtcHourMode OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Hour mode:
+				0 = 12h-Mode
+				1 = 24h-Mode"
+			DEFVAL { 0 }
+			::= { wioRealTimeClock 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.11.5
+		-- 1.3.6.1.4.1.13576.10.1.11.5
+		wioRtcBatteryStatus OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"RTC-Battery Status:
+				0 = ok
+				1 = battery empty"
+			DEFVAL { 1 }
+			::= { wioRealTimeClock 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.11.6
+		-- 1.3.6.1.4.1.13576.10.1.11.6
+		wioRtcDayLightSaving OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Timeoffset of 1 hour:
+				0 = not offset
+				1 = offset 1 hour (DayLightSaving)"
+			DEFVAL { 0 }
+			::= { wioRealTimeClock 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.12
+		-- 1.3.6.1.4.1.13576.10.1.12
+		wioEthernet OBJECT IDENTIFIER ::= { wioCommon 12 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.12.1
+		-- 1.3.6.1.4.1.13576.10.1.12.1
+		wioEthernetMode OBJECT-TYPE
+			SYNTAX INTEGER (0..2)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"IP-Configuration of Ethernetconnection:
+				0 = fix Ip-Address
+				1 = dynamic IP-Address over Bootp
+				2 = dynamic IP-Address over DHCP"
+			DEFVAL { 1 }
+			::= { wioEthernet 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.12.2
+		-- 1.3.6.1.4.1.13576.10.1.12.2
+		wioIp OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Actual IP-Address of coupler"
+			::= { wioEthernet 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.12.3
+		-- 1.3.6.1.4.1.13576.10.1.12.3
+		wioSubnetMask OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Actual Subnet-Mask of coupler"
+			::= { wioEthernet 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.12.4
+		-- 1.3.6.1.4.1.13576.10.1.12.4
+		wioGateway OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Actual Gateway-IP of coupler"
+			::= { wioEthernet 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.12.5
+		-- 1.3.6.1.4.1.13576.10.1.12.5
+		wioHostname OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Actual hostname of coupler"
+			::= { wioEthernet 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.12.6
+		-- 1.3.6.1.4.1.13576.10.1.12.6
+		wioDomainName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Actual domainname of coupler"
+			::= { wioEthernet 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.12.7
+		-- 1.3.6.1.4.1.13576.10.1.12.7
+		wioDnsServer1 OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"IP-Address of first DNS-Server"
+			::= { wioEthernet 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.12.8
+		-- 1.3.6.1.4.1.13576.10.1.12.8
+		wioDnsServer2 OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"IP-Address of second DNS-Server"
+			::= { wioEthernet 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.20
+		-- 1.3.6.1.4.1.13576.10.1.20
+		wioActualStatus OBJECT IDENTIFIER ::= { wioCommon 20 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.20.1
+		-- 1.3.6.1.4.1.13576.10.1.20.1
+		wioErrorGroup OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Errorgroup of actual error"
+			::= { wioActualStatus 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.20.2
+		-- 1.3.6.1.4.1.13576.10.1.20.2
+		wioErrorCode OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Errorcode of actual error"
+			::= { wioActualStatus 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.20.3
+		-- 1.3.6.1.4.1.13576.10.1.20.3
+		wioErrorArgument OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Errorargument of actual error"
+			::= { wioActualStatus 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.20.4
+		-- 1.3.6.1.4.1.13576.10.1.20.4
+		wioErrorDescription OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..63))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Actual error description"
+			::= { wioActualStatus 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30
+		-- 1.3.6.1.4.1.13576.10.1.30
+		wioPlcBrowser OBJECT IDENTIFIER ::= { wioCommon 30 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.1
+		-- 1.3.6.1.4.1.13576.10.1.30.1
+		wioProjectId OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"ID of Codesys-Project"
+			::= { wioPlcBrowser 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.2
+		-- 1.3.6.1.4.1.13576.10.1.30.2
+		wioProjectDate OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Date of Codesys-Project"
+			::= { wioPlcBrowser 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.3
+		-- 1.3.6.1.4.1.13576.10.1.30.3
+		wioProjectName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Name of Codesys-Project"
+			::= { wioPlcBrowser 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.4
+		-- 1.3.6.1.4.1.13576.10.1.30.4
+		wioProjectTitle OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Title of Codesys-Project"
+			::= { wioPlcBrowser 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.5
+		-- 1.3.6.1.4.1.13576.10.1.30.5
+		wioProjectVersion OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Version of Codesys-Project"
+			::= { wioPlcBrowser 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.6
+		-- 1.3.6.1.4.1.13576.10.1.30.6
+		wioProjectAuthor OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Author of Codesys-Project"
+			::= { wioPlcBrowser 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.7
+		-- 1.3.6.1.4.1.13576.10.1.30.7
+		wioProjectDescription OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Description of Codesys-Project"
+			::= { wioPlcBrowser 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.8
+		-- 1.3.6.1.4.1.13576.10.1.30.8
+		wioNumberOfIecTasks OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Number of IEC-Tasks in the Codesys-Project"
+			::= { wioPlcBrowser 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9
+		-- 1.3.6.1.4.1.13576.10.1.30.9
+		wioIecTaskTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WioIecTaskEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			::= { wioPlcBrowser 9 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1
+		wioIecTaskEntry OBJECT-TYPE
+			SYNTAX WioIecTaskEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			INDEX { wioIecTaskId }
+			::= { wioIecTaskTable 1 }
+
+		
+		WioIecTaskEntry ::=
+			SEQUENCE { 
+				wioIecTaskId
+					INTEGER,
+				wioIecTaskName
+					DisplayString,
+				wioIecTaskStatus
+					INTEGER,
+				wioIecTaskMode
+					INTEGER,
+				wioIecTaskPriority
+					INTEGER,
+				wioIecTaskInterval
+					INTEGER,
+				wioIecTaskEvent
+					INTEGER,
+				wioIecTaskCycleCount
+					INTEGER,
+				wioIecTaskCycleTime
+					INTEGER,
+				wioIecTaskCycleTimeMin
+					INTEGER,
+				wioIecTaskCycleTimeMax
+					INTEGER,
+				wioIecTaskCycleTimeAvg
+					INTEGER
+			 }
+
+--  1.3.6.1.4.1.13576.10.1.30.9.1.1
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.1
+		wioIecTaskId OBJECT-TYPE
+			SYNTAX INTEGER (1..29)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"ID of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.2
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.2
+		wioIecTaskName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Name of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.3
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.3
+		wioIecTaskStatus OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Status of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.4
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.4
+		wioIecTaskMode OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Mode of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.5
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.5
+		wioIecTaskPriority OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Priority of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.6
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.6
+		wioIecTaskInterval OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Interval of cyclic IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.7
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.7
+		wioIecTaskEvent OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Event for IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.8
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.8
+		wioIecTaskCycleCount OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Count of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.9
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.9
+		wioIecTaskCycleTime OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Last cycletime of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 9 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.10
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.10
+		wioIecTaskCycleTimeMin OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Minimal cycletime of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 10 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.11
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.11
+		wioIecTaskCycleTimeMax OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Maximal cycletime of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 11 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.30.9.1.12
+		-- 1.3.6.1.4.1.13576.10.1.30.9.1.12
+		wioIecTaskCycleTimeAvg OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Average cycletime of IEC-Task in the Codesys-Project"
+			::= { wioIecTaskEntry 12 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40
+		-- 1.3.6.1.4.1.13576.10.1.40
+		wioEthernetProtocols OBJECT IDENTIFIER ::= { wioCommon 40 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.1
+		-- 1.3.6.1.4.1.13576.10.1.40.1
+		wioHttp OBJECT IDENTIFIER ::= { wioEthernetProtocols 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.1.1
+		-- 1.3.6.1.4.1.13576.10.1.40.1.1
+		wioHttpEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / Disable the port of the webserver:
+				0 = port of webserver disable
+				1 = port of webserver enable"
+			DEFVAL { 1 }
+			::= { wioHttp 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.1.2
+		-- 1.3.6.1.4.1.13576.10.1.40.1.2
+		wioHttpAuthenticationEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / disable the authentication on the websides:
+				0 = authentication disabled
+				1 = authentication enable"
+			DEFVAL { 1 }
+			::= { wioHttp 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.1.3
+		-- 1.3.6.1.4.1.13576.10.1.40.1.3
+		wioHttpPort OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Port of the Http-Web-Server"
+			DEFVAL { 80 }
+			::= { wioHttp 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.2
+		-- 1.3.6.1.4.1.13576.10.1.40.2
+		wioFtp OBJECT IDENTIFIER ::= { wioEthernetProtocols 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.2.1
+		-- 1.3.6.1.4.1.13576.10.1.40.2.1
+		wioFtpEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / Disable the port of the ftpserver
+				0 = port of ftpserver disable
+				1 = port of ftpserver enable"
+			DEFVAL { 1 }
+			::= { wioFtp 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.3
+		-- 1.3.6.1.4.1.13576.10.1.40.3
+		wioSntp OBJECT IDENTIFIER ::= { wioEthernetProtocols 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.3.1
+		-- 1.3.6.1.4.1.13576.10.1.40.3.1
+		wioSntpEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / Disable the port of the SNTPserver
+				0 = port of SNTPserver disable
+				1 = port of SNTPserver enable"
+			DEFVAL { 1 }
+			::= { wioSntp 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.3.2
+		-- 1.3.6.1.4.1.13576.10.1.40.3.2
+		wioSntpServerAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"IP-Address of SNTP-Server"
+			DEFVAL { 0 }
+			::= { wioSntp 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.3.3
+		-- 1.3.6.1.4.1.13576.10.1.40.3.3
+		wioSntpClientIntervall OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Interval to pool SNTP-Manager"
+			DEFVAL { 0 }
+			::= { wioSntp 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.3.4
+		-- 1.3.6.1.4.1.13576.10.1.40.3.4
+		wioSntpClientTimeout OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Timeout to corrupt SNTP answer"
+			DEFVAL { 2000 }
+			::= { wioSntp 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.3.5
+		-- 1.3.6.1.4.1.13576.10.1.40.3.5
+		wioSntpClientDayLightSaving OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Timeoffset of 1 hour:
+				0 = not offset
+				1 = offset 1 hour (DayLightSaving)"
+			DEFVAL { 0 }
+			::= { wioSntp 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4
+		-- 1.3.6.1.4.1.13576.10.1.40.4
+		wioSnmp OBJECT IDENTIFIER ::= { wioEthernetProtocols 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.1
+		-- 1.3.6.1.4.1.13576.10.1.40.4.1
+		wioSnmpEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / Disable the port of the SNMPserver
+				0 = port of SNMPserver disable
+				1 = port of SNMPserver enable"
+			DEFVAL { 1 }
+			::= { wioSnmp 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.2
+		-- 1.3.6.1.4.1.13576.10.1.40.4.2
+		wioSnmpV1V2c OBJECT IDENTIFIER ::= { wioSnmp 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.2.1
+		-- 1.3.6.1.4.1.13576.10.1.40.4.2.1
+		wioSnmpEnableV1V2 OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / Disable the management for SNMP version 1 and version 2c
+				0 = disable
+				1 = enable"
+			::= { wioSnmpV1V2c 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.2.2
+		-- 1.3.6.1.4.1.13576.10.1.40.4.2.2
+		wioLocalCommunity OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				" "
+			::= { wioSnmpV1V2c 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.2.3
+		-- 1.3.6.1.4.1.13576.10.1.40.4.2.3
+		wioTrapReceiverV1V2Table OBJECT-TYPE
+			SYNTAX SEQUENCE OF WioTrapReceiverV1V2Entry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				" "
+			::= { wioSnmpV1V2c 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.2.3.1
+		-- 1.3.6.1.4.1.13576.10.1.40.4.2.3.1
+		wioTrapReceiverV1V2Entry OBJECT-TYPE
+			SYNTAX WioTrapReceiverV1V2Entry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				" "
+			INDEX { wioTrapReceiverIndex }
+			::= { wioTrapReceiverV1V2Table 1 }
+
+		
+		WioTrapReceiverV1V2Entry ::=
+			SEQUENCE { 
+				wioTrapReceiverIndex
+					INTEGER,
+				wioTrapReceiverIpAddress
+					IpAddress,
+				wioTrapReceiverCommunityName
+					DisplayString,
+				wioTrapReceiverTrapVersion
+					INTEGER
+			 }
+
+--  1.3.6.1.4.1.13576.10.1.40.4.2.3.1.1
+		-- 1.3.6.1.4.1.13576.10.1.40.4.2.3.1.1
+		wioTrapReceiverIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				" "
+			::= { wioTrapReceiverV1V2Entry 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.2.3.1.2
+		-- 1.3.6.1.4.1.13576.10.1.40.4.2.3.1.2
+		wioTrapReceiverIpAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				" "
+			::= { wioTrapReceiverV1V2Entry 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.2.3.1.3
+		-- 1.3.6.1.4.1.13576.10.1.40.4.2.3.1.3
+		wioTrapReceiverCommunityName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				" "
+			::= { wioTrapReceiverV1V2Entry 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.2.3.1.4
+		-- 1.3.6.1.4.1.13576.10.1.40.4.2.3.1.4
+		wioTrapReceiverTrapVersion OBJECT-TYPE
+			SYNTAX INTEGER (1..2)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				" "
+			::= { wioTrapReceiverV1V2Entry 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3
+		wioSnmpV3Usm OBJECT IDENTIFIER ::= { wioSnmp 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.1
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.1
+		wioSnmp1UserEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enables / Disables first SNMPv3 User"
+			DEFVAL { 1 }
+			::= { wioSnmpV3Usm 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.2
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.2
+		wioSnmp1AuthenticationTyp OBJECT-TYPE
+			SYNTAX INTEGER (0..2)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Athentication-Typ for first SNMPv3-user:
+				0 = no Authentication
+				1 = MD5 Authentication
+				2 = SHA1 Authentication"
+			DEFVAL { 1 }
+			::= { wioSnmpV3Usm 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.3
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.3
+		wioSnmp1AuthenticationName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Authentication name for first SNMPv3-user"
+			DEFVAL { "SecurityName" }
+			::= { wioSnmpV3Usm 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.4
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.4
+		wioSnmp1AuthenticationKey OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Authentication key for first SNMPv3-user"
+			DEFVAL { "AuthenticationKey" }
+			::= { wioSnmpV3Usm 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.5
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.5
+		wioSnmp1PrivacyEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Disable / Enable Data Encryption for first SNMPv3-user:
+				0 = no Encryption
+				1 = DES Encryption"
+			DEFVAL { 1 }
+			::= { wioSnmpV3Usm 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.6
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.6
+		wioSnmp1PrivacyKey OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Privacy key for SNMPv3 for first SNMPv3-user"
+			DEFVAL { "PrivacyKey" }
+			::= { wioSnmpV3Usm 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.7
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.7
+		wioSnmp1NotificationEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enables / Disables notification (SNMPv3-traps) with SNMPv3 User"
+			DEFVAL { 1 }
+			::= { wioSnmpV3Usm 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.8
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.8
+		wioSnmp1NotificationReceiverIP OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Receiver-IP-Address for notification (SNMPv3-traps) with SNMPv3 User"
+			DEFVAL { 'C0A80101'h }
+			::= { wioSnmpV3Usm 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.9
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.9
+		wioSnmp2UserEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enables / Disables second SNMPv3 User"
+			DEFVAL { 0 }
+			::= { wioSnmpV3Usm 9 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.10
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.10
+		wioSnmp2AuthenticationTyp OBJECT-TYPE
+			SYNTAX INTEGER (0..2)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Athentication-Typ for second SNMPv3-user:
+				0 = no Authentication
+				1 = MD5 Authentication
+				2 = SHA1 Authentication"
+			DEFVAL { 1 }
+			::= { wioSnmpV3Usm 10 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.11
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.11
+		wioSnmp2AuthenticationName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Authentication name for second SNMPv3-user"
+			DEFVAL { "SecurityName" }
+			::= { wioSnmpV3Usm 11 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.12
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.12
+		wioSnmp2AuthenticationKey OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Authentication key for second SNMPv3-user"
+			DEFVAL { "AuthenticationKey" }
+			::= { wioSnmpV3Usm 12 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.13
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.13
+		wioSnmp2PrivacyEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Privacy key for SNMPv3 for second SNMPv3-user"
+			DEFVAL { 1 }
+			::= { wioSnmpV3Usm 13 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.14
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.14
+		wioSnmp2PrivacyKey OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Privacy key for SNMPv3 for second SNMPv3-user"
+			DEFVAL { "PrivacyKey" }
+			::= { wioSnmpV3Usm 14 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.15
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.15
+		wioSnmp2NotificationEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enables / Disables notification (SNMPv3-traps) with SNMPv3 User"
+			DEFVAL { 0 }
+			::= { wioSnmpV3Usm 15 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.3.16
+		-- 1.3.6.1.4.1.13576.10.1.40.4.3.16
+		wioSnmp2NotificationReceiverIP OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Receiver-IP-Address for notification (SNMPv3-traps) with SNMPv3 User"
+			DEFVAL { '00000000'h }
+			::= { wioSnmpV3Usm 16 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4
+		wioTrapMessages OBJECT IDENTIFIER ::= { wioSnmp 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.1
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.1
+		wioTrapKbusError OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			DEFVAL { "Kbus Error" }
+			::= { wioTrapMessages 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.2
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.2
+		wioTrapPlcStart OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 2.SNMP-Trap"
+			DEFVAL { "Plc Start" }
+			::= { wioTrapMessages 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.3
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.3
+		wioTrapPlcStop OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 3.SNMP-Trap"
+			DEFVAL { "Plc Stop" }
+			::= { wioTrapMessages 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.4
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.4
+		wioTrapPlcReset OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 4.SNMP-Trap"
+			DEFVAL { "Plc Reset" }
+			::= { wioTrapMessages 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.5
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.5
+		wioTrapPlcSoftwareWatchdog OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 5.SNMP-Trap"
+			DEFVAL { "Plc Software Watchdog" }
+			::= { wioTrapMessages 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.6
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.6
+		wioTrapPlcDivideByZero OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 6.SNMP-Trap"
+			DEFVAL { "Plc Division By Zero" }
+			::= { wioTrapMessages 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.7
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.7
+		wioTrapPlcOnlineChange OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 7.SNMP-Trap"
+			DEFVAL { "Plc Online Change" }
+			::= { wioTrapMessages 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.8
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.8
+		wioTrapPlcDownload OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 8.SNMP-Trap"
+			DEFVAL { "Plc Download Programm" }
+			::= { wioTrapMessages 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.9
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.9
+		wioTrapPlcLogin OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 9.SNMP-Trap"
+			DEFVAL { "Plc Login" }
+			::= { wioTrapMessages 9 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.4.10
+		-- 1.3.6.1.4.1.13576.10.1.40.4.4.10
+		wioTrapPlcLogout OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 10.SNMP-Trap"
+			DEFVAL { "Plc Logout" }
+			::= { wioTrapMessages 10 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5
+		wioUserTrapMessages OBJECT IDENTIFIER ::= { wioSnmp 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.1
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.1
+		wioUserTrapMsg1 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.2
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.2
+		wioUserTrapMsg2 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.3
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.3
+		wioUserTrapMsg3 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.4
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.4
+		wioUserTrapMsg4 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.5
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.5
+		wioUserTrapMsg5 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.6
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.6
+		wioUserTrapMsg6 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.7
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.7
+		wioUserTrapMsg7 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.8
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.8
+		wioUserTrapMsg8 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.9
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.9
+		wioUserTrapMsg9 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 9 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.4.5.10
+		-- 1.3.6.1.4.1.13576.10.1.40.4.5.10
+		wioUserTrapMsg10 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..255))
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"String for 1.SNMP-Trap"
+			::= { wioUserTrapMessages 10 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.5
+		-- 1.3.6.1.4.1.13576.10.1.40.5
+		wioCoDeSys OBJECT IDENTIFIER ::= { wioEthernetProtocols 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.5.1
+		-- 1.3.6.1.4.1.13576.10.1.40.5.1
+		wioCoDeSysEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / Disable the port of the CoDeSysServer
+				0 = port of CoDeSysServer disable
+				1 = port of CoDeSysServer enable"
+			DEFVAL { 1 }
+			::= { wioCoDeSys 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6
+		-- 1.3.6.1.4.1.13576.10.1.40.6
+		wioModbus OBJECT IDENTIFIER ::= { wioEthernetProtocols 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.1
+		-- 1.3.6.1.4.1.13576.10.1.40.6.1
+		wioModbusTcpEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / Disable the port of the Modbus-TCP-Server
+				0 = port of Modbus-TCP-Server disable
+				1 = port of Modbus-TCP-Server enable"
+			DEFVAL { 1 }
+			::= { wioModbus 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.2
+		-- 1.3.6.1.4.1.13576.10.1.40.6.2
+		wioModbusUdbEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / Disable the port of the Modbus-UDP-Server
+				0 = port of Modbus-UDP-Server disable
+				1 = port of Modbus-UDP-Server enable"
+			DEFVAL { 1 }
+			::= { wioModbus 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.3
+		-- 1.3.6.1.4.1.13576.10.1.40.6.3
+		wioMaxConnections OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"The maximal count of modbus connections"
+			DEFVAL { 15 }
+			::= { wioModbus 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.4
+		-- 1.3.6.1.4.1.13576.10.1.40.6.4
+		wioConnectionTimeout OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Timeout of the modbus connection"
+			DEFVAL { 600 }
+			::= { wioModbus 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.5
+		-- 1.3.6.1.4.1.13576.10.1.40.6.5
+		wioModbusWatchdogMode OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Mode of the modbus watchdog"
+			DEFVAL { 0 }
+			::= { wioModbus 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.6
+		-- 1.3.6.1.4.1.13576.10.1.40.6.6
+		wioModbusWatchdogTime OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Timeout of the modbus watchdog"
+			DEFVAL { 100 }
+			::= { wioModbus 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.7
+		-- 1.3.6.1.4.1.13576.10.1.40.6.7
+		wioFreeModbusSockets OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Unused and free modbus connections"
+			DEFVAL { 15 }
+			::= { wioModbus 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.8
+		-- 1.3.6.1.4.1.13576.10.1.40.6.8
+		wioModbusConnectionTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WioModbusConnectionEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			::= { wioModbus 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.8.1
+		-- 1.3.6.1.4.1.13576.10.1.40.6.8.1
+		wioModbusConnectionEntry OBJECT-TYPE
+			SYNTAX WioModbusConnectionEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			INDEX { wioModbusConnectionIndex }
+			::= { wioModbusConnectionTable 1 }
+
+		
+		WioModbusConnectionEntry ::=
+			SEQUENCE { 
+				wioModbusConnectionIndex
+					INTEGER,
+				wioModbusConnectionIp
+					IpAddress,
+				wioModbusConnectionPort
+					INTEGER
+			 }
+
+--  1.3.6.1.4.1.13576.10.1.40.6.8.1.1
+		-- 1.3.6.1.4.1.13576.10.1.40.6.8.1.1
+		wioModbusConnectionIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..15)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Index of modbus connection"
+			::= { wioModbusConnectionEntry 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.8.1.2
+		-- 1.3.6.1.4.1.13576.10.1.40.6.8.1.2
+		wioModbusConnectionIp OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"IP-Address of modbus connection"
+			::= { wioModbusConnectionEntry 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.6.8.1.3
+		-- 1.3.6.1.4.1.13576.10.1.40.6.8.1.3
+		wioModbusConnectionPort OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Port of modbus connection"
+			::= { wioModbusConnectionEntry 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7
+		-- 1.3.6.1.4.1.13576.10.1.40.7
+		wioEthernetIp OBJECT IDENTIFIER ::= { wioEthernetProtocols 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7.1
+		-- 1.3.6.1.4.1.13576.10.1.40.7.1
+		wioEthernetIpEnable OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Enable / Disable the port of the EthernetIPServer
+				0 = port of EthernetIPServer disable
+				1 = port of EthernetIPServer enable"
+			DEFVAL { 0 }
+			::= { wioEthernetIp 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7.2
+		-- 1.3.6.1.4.1.13576.10.1.40.7.2
+		wioEthernetIpVariablesInputCount OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			::= { wioEthernetIp 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7.3
+		-- 1.3.6.1.4.1.13576.10.1.40.7.3
+		wioEthernetIpVariablesOutputCount OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			::= { wioEthernetIp 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7.4
+		-- 1.3.6.1.4.1.13576.10.1.40.7.4
+		wioEthernetIpVariablesPlcInputCount OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			::= { wioEthernetIp 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7.5
+		-- 1.3.6.1.4.1.13576.10.1.40.7.5
+		wioEthernetIpVariablesPlcInputOffset OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			::= { wioEthernetIp 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7.6
+		-- 1.3.6.1.4.1.13576.10.1.40.7.6
+		wioEthernetIpVariablesPlcOutputCount OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			::= { wioEthernetIp 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7.7
+		-- 1.3.6.1.4.1.13576.10.1.40.7.7
+		wioEthernetIpVariablesPlcOutputOffset OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			::= { wioEthernetIp 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7.8
+		-- 1.3.6.1.4.1.13576.10.1.40.7.8
+		wioEthernetIpRunIdleHeaderOrginatorToTarget OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			::= { wioEthernetIp 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.40.7.9
+		-- 1.3.6.1.4.1.13576.10.1.40.7.9
+		wioEthernetIpRunIdleHeaderTargetToOrginator OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			::= { wioEthernetIp 9 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50
+		-- 1.3.6.1.4.1.13576.10.1.50
+		wioProcessImage OBJECT IDENTIFIER ::= { wioCommon 50 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.1
+		-- 1.3.6.1.4.1.13576.10.1.50.1
+		wioModulCount OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Count of modules"
+			::= { wioProcessImage 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.2
+		-- 1.3.6.1.4.1.13576.10.1.50.2
+		wioAnalogOutLength OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Length of analog output process datas"
+			::= { wioProcessImage 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.3
+		-- 1.3.6.1.4.1.13576.10.1.50.3
+		wioAnalogInLength OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Length of analog input process datas"
+			::= { wioProcessImage 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.4
+		-- 1.3.6.1.4.1.13576.10.1.50.4
+		wioDigitalOutLength OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Length of digital output process datas"
+			::= { wioProcessImage 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.5
+		-- 1.3.6.1.4.1.13576.10.1.50.5
+		wioDigitalInLength OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Length of digital input process datas"
+			::= { wioProcessImage 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.6
+		-- 1.3.6.1.4.1.13576.10.1.50.6
+		wioDigitalOutOffset OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Offset of digital output process datas"
+			::= { wioProcessImage 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.7
+		-- 1.3.6.1.4.1.13576.10.1.50.7
+		wioDigitalInOffset OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Offset of digital input process datas"
+			::= { wioProcessImage 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8
+		-- 1.3.6.1.4.1.13576.10.1.50.8
+		wioModuleTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WioModuleEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			::= { wioProcessImage 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8.1
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1
+		wioModuleEntry OBJECT-TYPE
+			SYNTAX WioModuleEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			INDEX { wioModuleNumber }
+			::= { wioModuleTable 1 }
+
+		
+		WioModuleEntry ::=
+			SEQUENCE { 
+				wioModuleNumber
+					INTEGER,
+				wioModuleName
+					DisplayString,
+				wioModuleType
+					INTEGER,
+				wioModuleCount
+					INTEGER,
+				wioModuleAlternativeFormat
+					INTEGER,
+				wioModuleAnalogOutLength
+					INTEGER,
+				wioModuleAnalogInLength
+					INTEGER,
+				wioModuleDigitalOutLength
+					INTEGER,
+				wioModuleDigitalInLength
+					INTEGER
+			 }
+
+--  1.3.6.1.4.1.13576.10.1.50.8.1.1
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1.1
+		wioModuleNumber OBJECT-TYPE
+			SYNTAX INTEGER (1..249)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Number of module slot"
+			::= { wioModuleEntry 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8.1.2
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1.2
+		wioModuleName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Name of module"
+			::= { wioModuleEntry 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8.1.3
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1.3
+		wioModuleType OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Type of module"
+			::= { wioModuleEntry 3 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8.1.4
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1.4
+		wioModuleCount OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Count of module"
+			::= { wioModuleEntry 4 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8.1.5
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1.5
+		wioModuleAlternativeFormat OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Module in alternative format"
+			::= { wioModuleEntry 5 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8.1.6
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1.6
+		wioModuleAnalogOutLength OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Length of analog output datas of module (Bit)"
+			::= { wioModuleEntry 6 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8.1.7
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1.7
+		wioModuleAnalogInLength OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Length of analog input datas of module (Bit)"
+			::= { wioModuleEntry 7 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8.1.8
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1.8
+		wioModuleDigitalOutLength OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Length of digital output datas of module (Bit)"
+			::= { wioModuleEntry 8 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.50.8.1.9
+		-- 1.3.6.1.4.1.13576.10.1.50.8.1.9
+		wioModuleDigitalInLength OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Length of digital input datas of module (Bit)"
+			::= { wioModuleEntry 9 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.100
+		-- 1.3.6.1.4.1.13576.10.1.100
+		wioPlcData OBJECT IDENTIFIER ::= { wioCommon 100 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.100.1
+		-- 1.3.6.1.4.1.13576.10.1.100.1
+		wioPlcDataTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WioPlcDataEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			::= { wioPlcData 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.100.1.1
+		-- 1.3.6.1.4.1.13576.10.1.100.1.1
+		wioPlcDataEntry OBJECT-TYPE
+			SYNTAX WioPlcDataEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			INDEX { wioPlcDataIndex }
+			::= { wioPlcDataTable 1 }
+
+		
+		WioPlcDataEntry ::=
+			SEQUENCE { 
+				wioPlcDataIndex
+					INTEGER,
+				wioPlcDataReadArea
+					INTEGER,
+				wioPlcDataWriteArea
+					INTEGER
+			 }
+
+--  1.3.6.1.4.1.13576.10.1.100.1.1.1
+		-- 1.3.6.1.4.1.13576.10.1.100.1.1.1
+		wioPlcDataIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..255)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Number of plc data DWORD"
+			::= { wioPlcDataEntry 1 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.100.1.1.2
+		-- 1.3.6.1.4.1.13576.10.1.100.1.1.2
+		wioPlcDataReadArea OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS mandatory
+			DESCRIPTION
+				"Readable plc data (DWORD)"
+			::= { wioPlcDataEntry 2 }
+
+		
+--  1.3.6.1.4.1.13576.10.1.100.1.1.3
+		-- 1.3.6.1.4.1.13576.10.1.100.1.1.3
+		wioPlcDataWriteArea OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Write- / Readable plc data (DWORD)"
+			::= { wioPlcDataEntry 3 }
+
+		
+	
+--
+-- Trap definitions
+--
+	
+--  Trap definitions
+-- 
+		wioPlcKbusError TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapKbusError }
+			DESCRIPTION 
+				"Trap, if KBus state change to error"
+			::=  1
+
+		wioPlcStart TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapPlcStart }
+			DESCRIPTION 
+				"Trap, if PLC programm start"
+			::=  2
+
+		wioPlcStop TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapPlcStop }
+			DESCRIPTION 
+				"Trap, if PLC programm stop"
+			::=  3
+
+		wioPlcReset TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapPlcReset }
+			DESCRIPTION 
+				"Trap, if PLC programm reset"
+			::=  4
+
+		wioPlcSoftwareWatchdog TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapPlcSoftwareWatchdog }
+			DESCRIPTION 
+				"Trap, if PLC software watchdog is detected"
+			::=  5
+
+		wioPlcDivideByZero TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapPlcDivideByZero }
+			DESCRIPTION 
+				"Trap, if PLC software detect a division by zero"
+			::=  6
+
+		wioPlcOnlineChange TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapPlcOnlineChange }
+			DESCRIPTION 
+				"Trap, if PLC programm change online"
+			::=  7
+
+		wioPlcDownload TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapPlcDownload }
+			DESCRIPTION 
+				"Trap, if PLC new programm is downloading"
+			::=  8
+
+		wioPlcLogin TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapPlcLogin }
+			DESCRIPTION 
+				"Trap, if someone login to PLC"
+			::=  9
+
+		wioPlcLogout TRAP-TYPE 
+			ENTERPRISE wago
+			VARIABLES { wioTrapPlcLogout }
+			DESCRIPTION 
+				"Trap, if someone logout from PLC"
+			::=  10
+
+	
+	END
+
+--
+-- WAGO-MIB.my
+--

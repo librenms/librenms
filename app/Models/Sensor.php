@@ -34,6 +34,7 @@ class Sensor extends DeviceRelatedModel
         'temperature' => 'thermometer-three-quarters',
         'voltage' => 'bolt',
         'waterflow' => 'tint',
+        'concentration' => 'eyedropper',
     );
 
     // ---- Helper Functions ----

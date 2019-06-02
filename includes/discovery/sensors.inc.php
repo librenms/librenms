@@ -42,6 +42,10 @@ if ($device['os_group'] == 'printer') {
     include 'includes/discovery/sensors/state/printer.inc.php';
 }
 
+if ($device['os'] === 'wago') {
+    require 'includes/discovery/sensors/wago-sensor.inc.php';
+}
+
 $run_sensors = array(
     'airflow',
     'current',
@@ -69,6 +73,7 @@ $run_sensors = array(
     'ber',
     'eer',
     'waterflow',
+    'concentration',
 );
 
 // filter submodules

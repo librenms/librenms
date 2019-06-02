@@ -1691,6 +1691,7 @@ function get_unit_for_sensor_class($class)
         'temperature'          => '&deg;C',
         'voltage'              => 'V',
         'waterflow'            => 'l/m',
+        'concentration'        => 'ppm',
     );
 
     if (!array_key_exists($class, $units_by_classes)) {

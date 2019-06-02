@@ -425,6 +425,7 @@ function sensor_low_limit($class, $current)
         case 'ber':
         case 'eer':
         case 'waterflow':
+        case 'concentration':
     }//end switch
 
     if (is_numeric($limit)) {
@@ -474,6 +475,7 @@ function sensor_limit($class, $current)
         case 'frequency':
         case 'pressure':
         case 'cooling':
+        case 'concentration':
             $limit = $current * 1.05;
             break;
     }//end switch

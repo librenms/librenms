@@ -715,6 +715,93 @@ $config['ipmi']['type'][] = "open";
 
 [Distributed Poller](../Extensions/Distributed-Poller.md)
 
+### Wago data collection
+Wago Kontakttechnik's PFC is a programmable automation controller that can return data of up to 255 distinct sources. These sources may be of diverse type, such as sensors, contacts, relay I/O, ... Unfortunatelly, the MIB only defines a table with 255 numerical values without any indication of the type of each individual data.
+
+The data to be collected, its type and some additional settings (e.g. thresholds, multipliers, divisors or state values) are to be set from the configuration file. Data that are not defined in the configuration file are ignored.
+
+The settings must be defined in the `$config['os']['wago']['plc']` array.
+
+```php
+$config['os']['wago']['plc'] = [];
+
+// First rule
+$config['os']['wago']['plc'][] = [
+    // This rule is applied to the device which hostname matches the following regular expression
+    'regexp' => '/^wago\.cdta\.example\.com$/',
+    
+    // The 'states' table defines state translations to be referenced in the following 'entries' array
+    'states' => [
+        // First translation set
+        // key: name of the translation set
+        'wagoUserLight' => [
+            // Definition of the possible values for this state sensor
+            // key: is the retrieved value (numerical) from the device
+            // 'descr': (mandatory) The displayable text for the value
+            // 'generic': (mandatory) The LibreNMS state to map with this key (see [Sensor-State-Support])
+            // 'graph': (optional) The LibreNMS graph state (default: 0)
+            0 => [ 'descr' => 'Off',     'generic' => 0, ],
+            1 => [ 'descr' => 'On',      'generic' => 0, ],
+        ],
+        'wagoUserDoor' => [
+            0 => [ 'descr' => 'Closed',  'generic' => 0, ],
+            1 => [ 'descr' => 'Opened',  'generic' => 1, ],
+        ],
+    ], // STATES
+    
+    // The 'thresholds' table defines the optional thresholds and multiplier or divisor that may be assigned to a non-state sensor.
+    'thresholds' => [
+        // First thresholds set
+        // key: name of the set
+        // 'low': (optional) the low limit value
+        // 'low_warn': (optional) the low warning limit value
+        // 'high_warn': (optional) the high warning limit value
+        // 'high': (optional) the high limit value
+        // 'multiplier': (optional) the multiplier (scale) of the collected value (default: 1)
+        // 'divisor': (optional) the divisor (scale) of the collected value (default: 1)
+        'temperatureThr'   => [ 'low' => '0', 'low_warn' =>  5, 'high_warn' =>   35, 'high' =>   40, ],
+    ], // THRESHOLDS
+    
+    // The 'entries' table defines the settings for the individual counters.
+    'entries' => [
+        // The settings for the Wago PFC counter with index #1
+        // key: PFC counter index
+        // 'descr': (optional) The counter textual description
+        // 'type': (mandatory) The type of counter ('state', 'temperature', 'concentration', 'humidity')
+        // 'states': (mandatory, for type == 'state') reference to a previously state translation set
+        // 'thresholds': (optional, for type != 'state') reference to a previously thresholds set
+        1   => [ 'descr' => 'Light (state)',  'type' => 'state',         'states'     => 'wagoUserLight',    ],
+        2   => [ 'descr' => 'Door (state)',   'type' => 'state',         'states'     => 'wagoUserDoor',     ],
+        10  => [ 'descr' => 'Temperature #1', 'type' => 'temperature',   'thresholds' => 'temperatureThr',   ],
+        11  => [ 'descr' => 'Temperature #2', 'type' => 'temperature',   'thresholds' => 'temperatureThr',   ],
+    ], // ENTRIES
+];
+
+// Second rule: The rules are matched in their order of appearance
+$config['os']['wago']['plc'][] = [
+    // No regexp is defined: This rule is applied to all devices that have not matched a previous rule.
+    
+    'states' => [
+        'wagoUserAlarm' => [
+            0 => [ 'descr' => 'Normal',  'generic' => 0, ],
+            1 => [ 'descr' => 'Alarmed', 'generic' => 2, ],
+        ],
+    ], // STATES
+    
+    'thresholds' => [
+        'concentrationThr' => [                                 'high_warn' => 1000, 'high' => 2000, ],
+    ], // THRESHOLDS
+    
+    'entries' => [
+        1   => [ 'descr' => 'UPS (Alarm #1)',       'type' => 'state',         'states'     => 'wagoUserAlarm',    ],
+        2   => [ 'descr' => 'Cooler (Alarm #2)',    'type' => 'state',         'states'     => 'wagoUserAlarm',    ],
+        3   => [ 'descr' => 'Cooler (Alarm #1)',    'type' => 'state',         'states'     => 'wagoUserAlarm',    ],
+        10  => [ 'descr' => 'CO2 concentration #1', 'type' => 'concentration', 'thresholds' => 'concentrationThr', ],
+        11  => [ 'descr' => 'CO2 concentration #2', 'type' => 'concentration', 'thresholds' => 'concentrationThr', ],
+    ], // ENTRIES
+];
+```
+
 ## API Settings
 
 ### CORS Support
