@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use LibreNMS\Alerting\QueryBuilderFilter;
+use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Toastr;
 
 class DeviceGroupController extends Controller
@@ -114,12 +115,14 @@ class DeviceGroupController extends Controller
         $deviceGroup->rules = json_decode($request->rules);
 
         if ($deviceGroup->type == 'static') {
-            // save static relationships
-            $deviceGroup->devices()->sync($request->get('devices', []));
+            // get device_ids from input
+            $device_ids = $request->get('devices', []);
         } else {
-            // update related devices for dynamic groups
-            // TODO
+            // get device ids from query
+            $qp = QueryBuilderFluentParser::fromJSON($deviceGroup->rules);
+            $device_ids = $qp->toQuery()->distinct()->pluck('devices.device_id');
         }
+        $deviceGroup->devices()->sync($device_ids);
 
         if ($deviceGroup->isDirty()) {
             if ($deviceGroup->save()) {
