@@ -38,7 +38,7 @@
                                 <td>
                                     <a href="{{ url("/devices/group=$device_group->id") }}">{{ $device_group->devices_count }}</a>
                                 </td>
-                                <td>{{ $device_group->getParser()->toSql(false) }}</td>
+                                <td>{{ $device_group->type == 'dynamic' ? $device_group->getParser()->toSql(false) : '' }}</td>
                                 <td>
                                     <a type="button" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
                                        href="{{ route('device-groups.edit', $device_group->id) }}">
