@@ -1,4 +1,4 @@
-RAY-MIB DEFINITIONS ::= BEGIN
+RacomRay DEFINITIONS ::= BEGIN
     IMPORTS
     	enterprises, IpAddress, Gauge
         	FROM RFC1155-SMI
@@ -14,7 +14,7 @@ RAY-MIB DEFINITIONS ::= BEGIN
 		FROM SNMPv2-MIB;
 
 ray 	MODULE-IDENTITY
-    	LAST-UPDATED 	"201610040000Z"
+    	LAST-UPDATED 	"201810310000Z"
     	ORGANIZATION 	"Racom s.r.o"
     	CONTACT-INFO
 		    	"Racom s.r.o
@@ -24,8 +24,8 @@ ray 	MODULE-IDENTITY
 			Tel: +420 565 659 511
 			Fax: +420 565 659 512
 			E-mail: racom@racom.eu"
-    	DESCRIPTION	"The MIB module defines management objects for RAy product series. Revision 201610040000Z."
-    	REVISION 	"201610040000Z"
+    	DESCRIPTION	"The MIB module defines management objects for RAy product series. Revision 201810310000Z."
+    	REVISION 	"201810310000Z"
     	DESCRIPTION	"Latest version of this MIB module"
 	::= { racom 1 }
 
@@ -80,8 +80,10 @@ racom 		OBJECT IDENTIFIER ::= { enterprises 33555 }
 station		OBJECT IDENTIFIER ::= {ray 1}
 interface	OBJECT IDENTIFIER ::= {ray 2}
 statistic	OBJECT IDENTIFIER ::= {ray 3}
+switch		OBJECT IDENTIFIER ::= {ray 4}
 rayTraps 	OBJECT IDENTIFIER ::= {ray 10}
 ray2Traps 	OBJECT IDENTIFIER ::= {ray 11}
+ray3Traps 	OBJECT IDENTIFIER ::= {ray 12}
 
 -- station MIB
 
@@ -181,7 +183,7 @@ rfPowerStatus OBJECT-TYPE
 				}
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"RF Power amplifier OK/Failure."
+	DESCRIPTION	"RF Power amplifier OK/Failure. Not supported by RAy3."
 	::= { status 4 }
 
 searchModeDisabled OBJECT-TYPE
@@ -195,7 +197,7 @@ ethPeer	OBJECT-TYPE
 	SYNTAX		ServiceState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Peer station user Ethernet link status. Not supported by RAy2."
+	DESCRIPTION	"Peer station user Ethernet link status. Not supported by RAy2 and RAy3."
 	::= { status 6 }
 
 securePeerMode OBJECT-TYPE
@@ -224,14 +226,14 @@ eth1Link OBJECT-TYPE
 	SYNTAX		ServiceState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Ethernet 1 link status. Supported by RAy2 only."
+	DESCRIPTION	"Ethernet 1 link status. Supported by RAy2 and RAy3."
 	::= { status 9 }
 
 eth2Link OBJECT-TYPE
 	SYNTAX		ServiceState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Ethernet 2 link status. Supported by RAy2 only."
+	DESCRIPTION	"Ethernet 2 link status. Supported by RAy2 and RAy3."
 	::= { status 10 }
 
 
@@ -265,7 +267,7 @@ voltageSource OBJECT-TYPE
 				}
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Source of supply voltage. Supported by RAy2 only."
+	DESCRIPTION	"Source of supply voltage. Supported by RAy2 and RAy3."
 	::= { chassis 4 }
 
 
@@ -346,10 +348,15 @@ managementVlanId OBJECT-TYPE
 	::= { access 7 }
 
 wifiHAP OBJECT-TYPE
-        SYNTAX          OptionSetting
+        SYNTAX          INTEGER {
+				na (0),
+				disabled (1),
+                            	enabled-on-air-link-loss (2),
+                            	force-enabled (3)
+                        	}
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Management interface: WiFi Host Access Point."
+        DESCRIPTION     "Management interface: WiFi Host Access Point. Supported by RAy2 and RAy3."
         ::= { access 8 }
 
 
@@ -386,28 +393,28 @@ alarmTemperature OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Temperature alarm state. Supported by RAy2 only."
+	DESCRIPTION	"Temperature alarm state. Supported by RAy2 and RAy3."
 	::= { alarm 1 }
 
 alarmVoltageLow OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Low voltage alarm state. Supported by RAy2 only."
+	DESCRIPTION	"Low voltage alarm state. Supported by RAy2 and RAy3."
 	::= { alarm 2 }
 
 alarmVoltageHigh OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"High voltage alarm state. Supported by RAy2 only."
+	DESCRIPTION	"High voltage alarm state. Supported by RAy2 and RAy3."
 	::= { alarm 3 }
 
 alarmRss OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"RSS alarm state. Supported by RAy2 only."
+	DESCRIPTION	"RSS alarm state. Supported by RAy2 and RAy3."
 	::= { alarm 4 }
 
 alarmSnr OBJECT-TYPE
@@ -421,28 +428,28 @@ alarmBer OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"BER alarm state. Supported by RAy2 only."
+	DESCRIPTION	"BER alarm state. Supported by RAy2 and RAy3."
 	::= { alarm 6 }
 
 alarmPeerDisconnected OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Peer disconnect alarm state. Supported by RAy2 only."
+	DESCRIPTION	"Peer disconnect alarm state. Supported by RAy2 and RAy3."
 	::= { alarm 7 }
 
 alarmEth1Down OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Ethernet 1 Link Down alarm state. Supported by RAy2 only."
+	DESCRIPTION	"Ethernet 1 Link Down alarm state. Supported by RAy2 and RAy3."
 	::= { alarm 8 }
 
 alarmEth2Down OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Ethernet 2 Link Down alarm state. Supported by RAy2 only."
+	DESCRIPTION	"Ethernet 2 Link Down alarm state. Supported by RAy2 and RAy3."
 	::= { alarm 9 }
 
 alarmRfPowerFail OBJECT-TYPE
@@ -456,15 +463,22 @@ alarmNetBitrate OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Air Speed below Limit alarm state. Supported by RAy2 only."
+	DESCRIPTION	"Air Speed below Limit alarm state. Supported by RAy2 and RAy3."
 	::= { alarm 11 }
 
 alarmWifiOn OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"WiFi Host Access Oint on. Supported by RAy2 only."
+	DESCRIPTION	"WiFi Host Access Point on. Supported by RAy2 and RAy3."
 	::= { alarm 12 }
+
+alarmMse OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"MSE alarm state. Supported by RAy3 only."
+	::= { alarm 13 }
 
 
 -- interface mib
@@ -605,6 +619,28 @@ rfPowerCurrent OBJECT-TYPE
 	DESCRIPTION	"Current RF Power in dBm. Not supported by RAy10."
 	::= { ifRadio 17 }
 
+acm	OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"ACM option. Supported by RAy2 and RAy3."
+	::= { ifRadio 18 }
+
+atpc	OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"ATPC option. Supported by RAy2 and RAy3."
+	::= { ifRadio 19 }
+
+frequencyTable OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..128))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Current frequency table name. Supported by RAy2 and RAy3."
+	::= { ifRadio 20 }
+
+
 -- ifEth mib
 
 ifEthTable OBJECT-TYPE
@@ -629,7 +665,8 @@ IfEthEntry ::=
 		mdix		INTEGER,
 		autonego	OptionSetting,
 		pause		OptionSetting,
-		asymPause	OptionSetting
+		asymPause	OptionSetting,
+		flowControl 	OptionSetting
 		}
 		
 speed OBJECT-TYPE
@@ -671,15 +708,22 @@ pause OBJECT-TYPE
         SYNTAX          OptionSetting
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Ethernet pause."
+        DESCRIPTION     "Ethernet pause. Not supported by RAy3."
         ::= { ifEthEntry 5 }
 
 asymPause OBJECT-TYPE
         SYNTAX          OptionSetting
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Ethernet asymmetric pause."
+        DESCRIPTION     "Ethernet asymmetric pause. Not supported by RAy3."
         ::= { ifEthEntry 6 }
+
+flowControl OBJECT-TYPE
+        SYNTAX          OptionSetting
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Ethernet flow control. Supported by RAy3 only."
+        ::= { ifEthEntry 7 }
 
 prioritized OBJECT-TYPE
         SYNTAX          OptionSetting
@@ -862,7 +906,7 @@ snr OBJECT-TYPE
         SYNTAX          Integer32
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Receiving SNR indicator in decimal dB (39 -> 3,9)."
+        DESCRIPTION     "Receiving SNR indicator in decimal dB (39 -> 3,9). Not supported by RAy3."
         ::= { radio 2 }
 
 fecBlockCounter OBJECT-TYPE
@@ -928,6 +972,13 @@ ber OBJECT-TYPE
 	DESCRIPTION	"Bit Error Rate (BER) multiplied by 10^9. Not supported by RAy10."
 	::= { radio 11 }
 
+mse OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Receiving MSE indicator in decimal dB (-39 -> -3,9)."
+        ::= { radio 12 }
+
 -- statistic Ethernet mib
 
 ethInThroughput OBJECT-TYPE
@@ -948,15 +999,28 @@ eth2InThroughput OBJECT-TYPE
         SYNTAX          Integer32
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Input Ethernet 2 data port throughput in kbps. Supported by RAy2 only."
+        DESCRIPTION     "Input Ethernet 2 data port throughput in kbps. Supported by RAy2 and RAy3."
         ::= { ethernet 3 }
 
 eth2OutThroughput OBJECT-TYPE
         SYNTAX          Integer32
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Output Ethernet 2 data port throughput in kbps. Supported by RAy2 only."
+        DESCRIPTION     "Output Ethernet 2 data port throughput in kbps. Supported by RAy2 and RAy3."
         ::= { ethernet 4 }
+
+
+-- switch mib
+egressQueue		OBJECT IDENTIFIER ::= {switch 3}
+
+ -- switch egress mib
+
+speedGuard OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Speed guard feature on/off. Supported by RAy2 and RAy3."
+	::= { egressQueue 2 }
 
 
 -- definition  traps
@@ -1144,5 +1208,107 @@ tr2WifiOn NOTIFICATION-TYPE
     DESCRIPTION
             "WiFi Host Access Point is on. Supported by RAy2 only."
     ::= { ray2Traps 13 }
+
+
+-- RAy3 trap definitions
+
+ray3TrapsPrefix		OBJECT IDENTIFIER ::= { ray3Traps 0 }
+
+    	
+tr3TemperatureAlarm NOTIFICATION-TYPE
+    OBJECTS { 	temperatureModem,
+    		alarmTemperature }
+    STATUS  current
+    DESCRIPTION
+            "Temperature exceeded the threshold. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 1 }
+
+tr3VoltageLowAlarm NOTIFICATION-TYPE
+    OBJECTS { 	voltageUnit,
+    		alarmVoltageLow }
+    STATUS  current
+    DESCRIPTION
+            "Supply voltage below minimal threshold. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 2 }
+
+tr3VoltageHighAlarm NOTIFICATION-TYPE
+    OBJECTS { 	voltageUnit,
+    		alarmVoltageHigh }
+    STATUS  current
+    DESCRIPTION
+            "Supply voltage above maximal threshold. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 3 }
+
+tr3RssAlarm NOTIFICATION-TYPE
+    OBJECTS { 	rss,
+    		alarmRss }
+    STATUS  current
+    DESCRIPTION
+            "RSS exceeded the threshold. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 4 }
+
+tr3MseAlarm NOTIFICATION-TYPE
+    OBJECTS { 	mse,
+    		alarmMse }
+    STATUS  current
+    DESCRIPTION
+            "MSE exceeded the threshold. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 5 }
+
+tr3BerAlarm NOTIFICATION-TYPE
+    OBJECTS { 	ber,
+		alarmBer }
+    STATUS  current
+    DESCRIPTION
+            "BER exceeded the threshold. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 6 }
+
+tr3AirDisconnect NOTIFICATION-TYPE
+    OBJECTS { 	lineStatusII,
+    		alarmPeerDisconnected }
+    STATUS  current
+    DESCRIPTION
+            "Air line disconnected. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 7 }
+
+tr3AirConnect NOTIFICATION-TYPE
+    OBJECTS { 	lineStatusII,
+    		alarmPeerDisconnected }
+    STATUS  current
+    DESCRIPTION
+            "Air line connected after being disconnected. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 8 }
+
+tr3Eth1LinkDown NOTIFICATION-TYPE
+    OBJECTS { 	eth1Link,
+    		alarmEth1Down }
+    STATUS  current
+    DESCRIPTION
+            "Local station Ethernet 1 link Up/Down. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 9 }
+
+tr3Eth21LinkDown NOTIFICATION-TYPE
+    OBJECTS { 	eth2Link,
+    		alarmEth2Down }
+    STATUS  current
+    DESCRIPTION
+            "Local station Ethernet 2 link Up/Down. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 10 }
+
+tr3NetBitrate NOTIFICATION-TYPE
+    OBJECTS { 	netBitrate,
+    		alarmNetBitrate }
+    STATUS  current
+    DESCRIPTION
+            "Air speed below threshold. Supported by RAy3 only."
+    ::= { ray3TrapsPrefix 11 }
+
+tr3WifiOn NOTIFICATION-TYPE
+    OBJECTS { 	wifiHAP,
+    		alarmWifiOn }
+    STATUS  current
+    DESCRIPTION
+            "WiFi Host Access Point is on. Supported by RAy2 only."
+    ::= { ray3TrapsPrefix 12 }
 
 END
