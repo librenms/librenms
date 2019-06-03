@@ -178,12 +178,11 @@
                         </li>
                             <li role="presentation" class="divider"></li>
                         @endconfig
-
-                        @notconfig('navbar.manage_groups.hide')
-                        <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
-                                                                    aria-hidden="true"></i> @lang('Manage Groups')</a>
-                        </li>
-                        @endconfig
+                        @can('manage', \App\Models\DeviceGroup::class)
+                            <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
+                                                                        aria-hidden="true"></i> @lang('Manage Groups')
+                                </a></li>
+                        @endcan
                         <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> @lang('Device Dependencies')</a></li>
                         @if($show_vmwinfo)
                             <li><a href="{{ url('vminfo') }}"><i

@@ -11,6 +11,11 @@ use Toastr;
 
 class DeviceGroupController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(DeviceGroup::class, 'device_group');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +23,7 @@ class DeviceGroupController extends Controller
      */
     public function index()
     {
-//        $this->authorize('manage', DeviceGroup::class);
+        $this->authorize('manage', DeviceGroup::class);
 
         return view('device-group.index', [
             'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
@@ -32,8 +37,6 @@ class DeviceGroupController extends Controller
      */
     public function create()
     {
-//        $this->authorize('create', DeviceGroup::class);
-
         return view('device-group.create', [
             'device_group' => new DeviceGroup(),
             'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -48,8 +51,6 @@ class DeviceGroupController extends Controller
      */
     public function store(Request $request)
     {
-//        $this->authorize('create', DeviceGroup::class);
-
         $this->validate($request, [
             'name' => 'required|string|unique:device_groups',
             'type' => 'required|in:dynamic,static',
@@ -91,8 +92,6 @@ class DeviceGroupController extends Controller
      */
     public function edit(DeviceGroup $deviceGroup)
     {
-//        $this->authorize('edit', $deviceGroup);
-
         // convert old rules on edit
         if (is_null($deviceGroup->rules)) {
             $query_builder = QueryBuilderFluentParser::fromOld($deviceGroup->pattern);
@@ -162,8 +161,6 @@ class DeviceGroupController extends Controller
      */
     public function destroy(DeviceGroup $deviceGroup)
     {
-//        $this->authorize('delete', $deviceGroup);
-
         $deviceGroup->delete();
 
         Toastr::success(__('Device Group :name deleted', ['name' => $deviceGroup->name]));
