@@ -1534,6 +1534,10 @@ tr.search:nth-child(odd) {
   font-weight: bold;
 }
 
+.lib_overlib {
+    background-color: #fff;
+}
+
 .minigraph-image {
   margin: 2px;
 }
