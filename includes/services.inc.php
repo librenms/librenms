@@ -72,9 +72,7 @@ function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ign
     return dbInsert($insert, 'services');
 }
 
-//Gets text value of pluggin return code and map to a log severity
-
-function getStatusSeverity($old_status, $new_status)
+function getStatus($old_status, $new_status)
 {
     $status_text = array(0 => 'OK', 1 => 'Warning', 2 => 'Critical', 3 => 'Unknown');
     $oldText = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Unknown';
@@ -235,7 +233,7 @@ function poll_service($service)
         list($oldStatusText, $newStatusText, $severity)  = getStatus($old_status, $new_status);
 
         Log::event(
-            "Service '{$service['service_type']}' changed status from $oldStatusText to $newStatusText - {$service['service_desc']} - $msg",
+            "Service '{$service['service_type']}' changed status from $oldStatusText to $newStatusText - $msg",
             $service['device_id'],
             'service',
             $severity,
@@ -288,7 +286,7 @@ function check_service($command)
 
     // Check to see if pluggin has returned status OK. If not and first run of service we do not want to poll
     if ($status != 0 && is_null($service['service_ds'])) {
-        return array ($status, $response, $metrics);
+        return array ($status, trim($response), $metrics);
     }
 
     // Loop through the perf string extracting our metric data
