@@ -140,6 +140,10 @@
                                 <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Manage Groups</a></li>
                         @endconfig
                         <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> Device Dependencies</a></li>
+                        @if($show_vmwinfo)
+                            <li><a href="{{ url('vminfo') }}"><i
+                                        class="fa fa-cog fa-fw fa-lg"></i> @lang('Virtual Machines')</a></li>
+                        @endif
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i> Add Device</a></li>
                         <li><a href="{{ url('delhost') }}"><i class="fa fa-trash fa-fw fa-lg" aria-hidden="true"></i> Delete Device</a></li>
