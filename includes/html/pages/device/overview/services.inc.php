@@ -2,7 +2,7 @@
 
 use LibreNMS\Util\ObjectCache;
 
-if (ObjectCache::serviceCounts()['total'] > 0) {
+if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
     // Build the string.
     $break = '';
     $output = '';
@@ -24,7 +24,7 @@ if (ObjectCache::serviceCounts()['total'] > 0) {
         $break = ', ';
     }
 
-    $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical']);
+    $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']);
     ?>
         <div class="row">
             <div class="col-md-12">
