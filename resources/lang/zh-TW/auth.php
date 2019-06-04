@@ -14,6 +14,6 @@ return [
     */
 
     'failed' => '這些憑證與我們的記錄不符。',
-    'throttle' => '嘗試登入次數過多。請稍厚 :seconds 秒再試。',
+    'throttle' => '嘗試登入次數過多。請稍候 :seconds 秒再試。',
 
 ];
