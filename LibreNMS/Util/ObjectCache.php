@@ -193,19 +193,21 @@ class ObjectCache
      * @param array $fields array of counts to get. Valid options: total, ok, warning, critical, ignored, disabled
      * @return array
      */
-    public static function serviceCounts($fields = ['total'])
+    public static function serviceCounts($fields = ['total'], $device_id = 0)
     {
         $result = [];
         foreach ($fields as $field) {
-            $result[$field] = self::getServiceCount($field);
+            $result[$field] = self::getServiceCount($field, $device_id);
         }
         return $result;
     }
 
-    private static function getServiceCount($field)
+    private static function getServiceCount($field, $device_id)
     {
-        return Cache::remember("ObjectCache:service_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field) {
-            $query = Service::hasAccess(auth()->user());
+        return Cache::remember("ObjectCache:service_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
+            $query = Service::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+                $query->where('device_id', $device_id);
+            });;
             switch ($field) {
                 case 'ok':
                     return $query->isOk()->count();
