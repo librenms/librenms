@@ -207,7 +207,7 @@ class ObjectCache
         return Cache::remember("ObjectCache:service_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
             $query = Service::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
                 $query->where('device_id', $device_id);
-            });;
+            });
             switch ($field) {
                 case 'ok':
                     return $query->isOk()->count();
