@@ -252,7 +252,7 @@ class Url
 
     public static function overlibLink($url, $text, $contents, $class = null)
     {
-        $contents = "<div class=\'lib_overlib\'>" . $contents . '</div>';
+        $contents = "<div class=\'overlib-contents\'>" . $contents . '</div>';
         $contents = str_replace('"', "\'", $contents);
         if ($class === null) {
             $output = '<a href="' . $url . '"';
