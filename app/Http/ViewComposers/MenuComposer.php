@@ -33,6 +33,7 @@ use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
 use App\Models\User;
+use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Auth;
 use Illuminate\View\View;
@@ -68,6 +69,7 @@ class MenuComposer
         $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
             collect();
+        $vars['show_vmwinfo'] = Vminfo::hasAccess($user)->exists();
 
         // Service menu
         if (Config::get('show_services')) {
