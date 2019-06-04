@@ -16,49 +16,54 @@ $serial     = $data[0]['sysProductVersion'];
 unset($data, $oids);
 
 
-# active APM sessions
-$oids['apmAccessStatCurrentActiveSessions']         = 'F5-BIGIP-APM-MIB::apmAccessStatCurrentActiveSessions.0';
-$dataset['apmAccessStatCurrentActiveSessions']      = 'sessions';
-$type['apmAccessStatCurrentActiveSessions']         = 'GAUGE';
-$graphName['apmAccessStatCurrentActiveSessions']    = 'bigip_apm_sessions';
+$oids = [
+    'F5-BIGIP-APM-MIB::apmAccessStatCurrentActiveSessions.0',
+    'F5-BIGIP-SYSTEM-MIB::sysStatClientTotConns.0',
+    'F5-BIGIP-SYSTEM-MIB::sysStatServerTotConns.0',
+    'F5-BIGIP-SYSTEM-MIB::sysStatClientCurConns.0',
+    'F5-BIGIP-SYSTEM-MIB::sysStatServerCurConns.0'
+];
 
-# total client connections
-$oids['sysStatClientTotConns']                      = 'F5-BIGIP-SYSTEM-MIB::sysStatClientTotConns.0';
-$dataset['sysStatClientTotConns']                   = 'ClientTotConns';
-$type['sysStatClientTotConns']                      = 'COUNTER';
-$graphName['sysStatClientTotConns']                 = 'bigip_system_client_connection_rate';
-
-# total server connections
-$oids['sysStatServerTotConns']                      = 'F5-BIGIP-SYSTEM-MIB::sysStatServerTotConns.0';
-$dataset['sysStatServerTotConns']                   = 'ServerTotConns';
-$type['sysStatServerTotConns']                      = 'COUNTER';
-$graphName['sysStatServerTotConns']                 = 'bigip_system_server_connection_rate';
-
-# current client connections
-$oids['sysStatClientCurConns']                      = 'F5-BIGIP-SYSTEM-MIB::sysStatClientCurConns.0';
-$dataset['sysStatClientCurConns']                   = 'ClientCurConns';
-$type['sysStatClientCurConns']                      = 'GAUGE';
-$graphName['sysStatClientCurConns']                 = 'bigip_system_client_concurrent_connections';
-
-# current server connections
-$oids['sysStatServerCurConns']                      = 'F5-BIGIP-SYSTEM-MIB::sysStatServerCurConns.0';
-$dataset['sysStatServerCurConns']                   = 'ServerCurConns';
-$type['sysStatServerCurConns']                      = 'GAUGE';
-$graphName['sysStatServerCurConns']                 = 'bigip_system_server_concurrent_connections';
-
+$metadata = [
+    'apmAccessStatCurrentActiveSessions' => [
+        'dataset' => 'sessions',
+        'type' => 'GAUGE',
+        'name' => 'bigip_apm_sessions'
+    ],
+    'sysStatClientTotConns' => [
+        'dataset' => 'ClientTotConns',
+        'type' => 'COUNTER',
+        'name' => 'bigip_system_client_connection_rate'
+    ],
+    'sysStatServerTotConns' => [
+        'dataset' => 'ServerTotConns',
+        'type' => 'COUNTER',
+        'name' => 'bigip_system_server_connection_rate'
+    ],
+    'sysStatClientCurConns' => [
+        'dataset' => 'ClientCurConns',
+        'type' => 'GAUGE',
+        'name' => 'bigip_system_client_concurrent_connections'
+    ],
+    'sysStatServerCurConns' => [
+        'dataset' => 'ServerCurConns',
+        'type' => 'GAUGE',
+        'name' => 'bigip_system_server_concurrent_connections'
+    ],
+];
 
 $data = snmp_get_multi($device, $oids, '-OQUs');
 
-foreach ($oids as $key => $oid) {
-    $value[$key] = $data[0][$key];
-    if (is_numeric($value[$key])) {
-        $rrd_def = RrdDefinition::make()->addDataset($dataset[$key], $type[$key], 0);
-        $fields = array(
-                $dataset[$key] => $value[$key],
-        );
+foreach ($metadata as $key => $info) {
+    $value = $data[0][$key];
+    if (is_numeric($value)) {
+        $rrd_def = RrdDefinition::make()->addDataset($info['dataset'], $info['type'], 0);
+        $fields = [
+            $info['dataset'] => $value,
+        ];
         $tags = compact('rrd_def');
-        data_update($device, $graphName[$key], $tags, $fields);
-        $graphs[$graphName[$key]] = true;
+        data_update($device, $info['name'], $tags, $fields);
+        $graphs[$info['name']] = true;
     }
 }
 
@@ -84,4 +89,4 @@ if (is_numeric($data[0]['sysClientsslStatTotNativeConns']) && is_numeric($data[0
 }
 
 
-unset($data, $oids);
+unset($data, $oids, $metadata);
