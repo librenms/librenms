@@ -38,7 +38,7 @@ foreach ($datas as $type) {
     }
     echo '>';
 
-    echo generate_link($types[$type]['short'], $wireless_link_array, array('metric' => $type));
+    echo generate_link(__("wireless.$type.short"), $wireless_link_array, ['metric' => $type]);
 
     echo '</span>';
 }
@@ -47,9 +47,10 @@ print_optionbar_end();
 
 if ($vars['metric'] == 'overview') {
     foreach ($datas as $type) {
-        $text = $types[$type]['long'];
-        if (!empty($types[$type]['unit'])) {
-            $text .=  ' (' . $types[$type]['unit'] . ')';
+        $text = __("wireless.$type.long");
+        $unit = __("wireless.$type.unit");
+        if (!empty($unit)) {
+            $text .= " ($unit)";
         }
 
         $graph_title = generate_link($text, $wireless_link_array, array('metric' => $type));
@@ -58,7 +59,7 @@ if ($vars['metric'] == 'overview') {
         include $config['install_dir'] . '/includes/html/print-device-graph.php';
     }
 } elseif (isset($types[$vars['metric']])) {
-    $unit = $types[$vars['metric']]['unit'];
+    $unit = __('wireless.' . $vars['metric'] . '.unit');
     $factor = 1;
     if ($unit == 'MHz') {
         $unit = 'Hz';
