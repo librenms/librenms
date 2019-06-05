@@ -23,4 +23,3 @@ if (str_contains($applist, "Cisco Unified CCX Database")) {
 } elseif (str_contains($applist, "Connection System Agent")) {
     $features = "CUC";
 }
-
