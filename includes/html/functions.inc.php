@@ -1659,7 +1659,7 @@ function get_sensor_label_color($sensor)
         $label_style = "label-danger";
     }
 
-    $unit = get_units_from_sensor($sensor);
+    $unit = __('sensors.' . $sensor['sensor_class'] . '.unit');
 
     $sensor_current = "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
     return $sensor_current;

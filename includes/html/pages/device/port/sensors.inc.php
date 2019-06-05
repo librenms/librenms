@@ -3,7 +3,7 @@
 $sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND entPhysicalIndex_measured = 'ports' ORDER BY `sensor_type` ASC", array($device['device_id'],$port['ifIndex']));
 
 foreach ($sensors as $sensor) {
-    $unit = get_units_from_sensor($sensor);
+    $unit = __('sensors.' . $sensor['sensor_class'] . '.unit');
 
     if ($sensor['poller_type'] == 'ipmi') {
         $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);
