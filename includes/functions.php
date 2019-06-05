@@ -1812,7 +1812,7 @@ function hytera_h2f($number, $nd)
     $binpoint=substr($scibin, $exp);
     $intnumber=bindec("1".$binint);
 
-    $tmppoint = "";
+    $tmppoint = [];
     for ($i=0; $i<strlen($binpoint); $i++) {
         $tmppoint[]=substr($binpoint, $i, 1);
     }

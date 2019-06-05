@@ -31,14 +31,10 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     $component_count = $component->getComponentCount($device['device_id']);
 
     $alert_class = '';
-    if ($device['disabled'] == '1') {
+    if ($device['disabled'] == '1' || $device['ignore'] == '1') {
         $alert_class = 'alert-info';
-    } else {
-        if ($device['status'] == '0') {
-            $alert_class = 'alert-danger';
-        } elseif ($device['ignore'] == '1') {
-            $alert_class = 'alert-warning';
-        }
+    } elseif ($device['status'] == '0') {
+        $alert_class = 'alert-danger';
     }
 
     echo '<div class="panel panel-default">';
