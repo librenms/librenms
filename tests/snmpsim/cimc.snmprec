@@ -1,604 +1,171 @@
-{
-    "sensors": {
-        "discovery": {
-            "sensors": [
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "current",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.9.14.1.8.1",
-                    "sensor_index": "mb-input-current",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "MB Input Current",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 12,
-                    "sensor_limit": 18,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "power",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.9.14.1.4.1",
-                    "sensor_index": "mb-input-power",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "MB Input Power",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 176,
-                    "sensor_limit": 264,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.9.44.1.4.1",
-                    "sensor_index": "ambient.1",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "Rack Unit Ambient Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 19,
-                    "sensor_limit": 39,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 9,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.41.2.1.10.1",
-                    "sensor_index": "cpu.1",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "CPU 1 Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 39,
-                    "sensor_limit": 59,
-                    "sensor_limit_warn": 40,
-                    "sensor_limit_low": 29,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.41.2.1.10.2",
-                    "sensor_index": "cpu.2",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "CPU 2 Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 40,
-                    "sensor_limit": 60,
-                    "sensor_limit_warn": 40,
-                    "sensor_limit_low": 30,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.9.44.1.8.1",
-                    "sensor_index": "front.1",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "Rack Unit Front Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 19,
-                    "sensor_limit": 39,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 9,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.9.44.1.13.1",
-                    "sensor_index": "ioh1.1",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "IO Hub 1 Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 33,
-                    "sensor_limit": 53,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 23,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.9.44.1.17.1",
-                    "sensor_index": "ioh2.1",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "IO Hub 2 Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": 20,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": -10,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.30.12.1.6.1",
-                    "sensor_index": "mem.1",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "Memory 1 Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 28,
-                    "sensor_limit": 48,
-                    "sensor_limit_warn": 40,
-                    "sensor_limit_low": 18,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.30.12.1.6.2",
-                    "sensor_index": "mem.2",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "Memory 2 Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 27,
-                    "sensor_limit": 47,
-                    "sensor_limit_warn": 40,
-                    "sensor_limit_low": 17,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.30.12.1.6.3",
-                    "sensor_index": "mem.3",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "Memory 3 Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 28,
-                    "sensor_limit": 48,
-                    "sensor_limit_warn": 40,
-                    "sensor_limit_low": 18,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.30.12.1.6.4",
-                    "sensor_index": "mem.4",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "Memory 4 Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 28,
-                    "sensor_limit": 48,
-                    "sensor_limit_warn": 40,
-                    "sensor_limit_low": 18,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.9.44.1.21.1",
-                    "sensor_index": "rear.1",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "Rack Unit Rear Temperature",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 33,
-                    "sensor_limit": 53,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 23,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "voltage",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.9.9.719.1.9.14.1.12.1",
-                    "sensor_index": "mb-input-voltage",
-                    "sensor_type": "cimc",
-                    "sensor_descr": "MB Input Voltage",
-                    "group": "",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 12,
-                    "sensor_limit": 13.8,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 10.2,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                }
-            ],
-            "state_indexes": []
-        },
-        "poller": "matches discovery"
-    },
-    "os": {
-        "discovery": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.1682",
-                    "sysDescr": "Cisco Integrated Management Controller(Cisco IMC) [\n], Firmware Version 2.0(3d) Copyright (c) 2008-2014, Cisco Systems, Inc.",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "cimc",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.1682",
-                    "sysDescr": "Cisco Integrated Management Controller(Cisco IMC) [\n], Firmware Version 2.0(3d) Copyright (c) 2008-2014, Cisco Systems, Inc.",
-                    "sysContact": "<private>",
-                    "version": "2.0(3d)",
-                    "hardware": "UCSC-C220-M3S",
-                    "features": null,
-                    "os": "cimc",
-                    "type": "server",
-                    "serial": "<private>",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
-                }
-            ]
-        }
-    },
-    "ports": {
-        "discovery": {
-            "ports": [
-                {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
-                    "port_descr_circuit": null,
-                    "port_descr_speed": null,
-                    "port_descr_notes": null,
-                    "ifDescr": "bond0",
-                    "ifName": "bond0",
-                    "portName": null,
-                    "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
-                    "ifOperStatus_prev": null,
-                    "ifAdminStatus": null,
-                    "ifAdminStatus_prev": null,
-                    "ifDuplex": null,
-                    "ifMtu": null,
-                    "ifType": "ethernetCsmacd",
-                    "ifAlias": "bond0",
-                    "ifPhysAddress": null,
-                    "ifHardType": null,
-                    "ifLastChange": 0,
-                    "ifVlan": "",
-                    "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
-                    "ignore": 0,
-                    "disabled": 0,
-                    "detailed": 0,
-                    "deleted": 0,
-                    "pagpOperationMode": null,
-                    "pagpPortState": null,
-                    "pagpPartnerDeviceId": null,
-                    "pagpPartnerLearnMethod": null,
-                    "pagpPartnerIfIndex": null,
-                    "pagpPartnerGroupIfIndex": null,
-                    "pagpPartnerDeviceName": null,
-                    "pagpEthcOperationMode": null,
-                    "pagpDeviceId": null,
-                    "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": null,
-                    "ifInUcastPkts_prev": null,
-                    "ifInUcastPkts_delta": null,
-                    "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": null,
-                    "ifOutUcastPkts_prev": null,
-                    "ifOutUcastPkts_delta": null,
-                    "ifOutUcastPkts_rate": null,
-                    "ifInErrors": null,
-                    "ifInErrors_prev": null,
-                    "ifInErrors_delta": null,
-                    "ifInErrors_rate": null,
-                    "ifOutErrors": null,
-                    "ifOutErrors_prev": null,
-                    "ifOutErrors_delta": null,
-                    "ifOutErrors_rate": null,
-                    "ifInOctets": null,
-                    "ifInOctets_prev": null,
-                    "ifInOctets_delta": null,
-                    "ifInOctets_rate": null,
-                    "ifOutOctets": null,
-                    "ifOutOctets_prev": null,
-                    "ifOutOctets_delta": null,
-                    "ifOutOctets_rate": null,
-                    "poll_prev": null,
-                    "ifInNUcastPkts": null,
-                    "ifInNUcastPkts_prev": null,
-                    "ifInNUcastPkts_delta": null,
-                    "ifInNUcastPkts_rate": null,
-                    "ifOutNUcastPkts": null,
-                    "ifOutNUcastPkts_prev": null,
-                    "ifOutNUcastPkts_delta": null,
-                    "ifOutNUcastPkts_rate": null,
-                    "ifInDiscards": null,
-                    "ifInDiscards_prev": null,
-                    "ifInDiscards_delta": null,
-                    "ifInDiscards_rate": null,
-                    "ifOutDiscards": null,
-                    "ifOutDiscards_prev": null,
-                    "ifOutDiscards_delta": null,
-                    "ifOutDiscards_rate": null,
-                    "ifInUnknownProtos": null,
-                    "ifInUnknownProtos_prev": null,
-                    "ifInUnknownProtos_delta": null,
-                    "ifInUnknownProtos_rate": null,
-                    "ifInBroadcastPkts": null,
-                    "ifInBroadcastPkts_prev": null,
-                    "ifInBroadcastPkts_delta": null,
-                    "ifInBroadcastPkts_rate": null,
-                    "ifOutBroadcastPkts": null,
-                    "ifOutBroadcastPkts_prev": null,
-                    "ifOutBroadcastPkts_delta": null,
-                    "ifOutBroadcastPkts_rate": null,
-                    "ifInMulticastPkts": null,
-                    "ifInMulticastPkts_prev": null,
-                    "ifInMulticastPkts_delta": null,
-                    "ifInMulticastPkts_rate": null,
-                    "ifOutMulticastPkts": null,
-                    "ifOutMulticastPkts_prev": null,
-                    "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
-                }
-            ]
-        },
-        "poller": {
-            "ports": [
-                {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
-                    "port_descr_circuit": null,
-                    "port_descr_speed": null,
-                    "port_descr_notes": null,
-                    "ifDescr": "bond0",
-                    "ifName": "bond0",
-                    "portName": null,
-                    "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifConnectorPresent": "true",
-                    "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
-                    "ifAdminStatus": "up",
-                    "ifAdminStatus_prev": null,
-                    "ifDuplex": null,
-                    "ifMtu": 1500,
-                    "ifType": "ethernetCsmacd",
-                    "ifAlias": "bond0",
-                    "ifPhysAddress": null,
-                    "ifHardType": null,
-                    "ifLastChange": 0,
-                    "ifVlan": "",
-                    "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
-                    "ignore": 0,
-                    "disabled": 0,
-                    "detailed": 0,
-                    "deleted": 0,
-                    "pagpOperationMode": null,
-                    "pagpPortState": null,
-                    "pagpPartnerDeviceId": null,
-                    "pagpPartnerLearnMethod": null,
-                    "pagpPartnerIfIndex": null,
-                    "pagpPartnerGroupIfIndex": null,
-                    "pagpPartnerDeviceName": null,
-                    "pagpEthcOperationMode": null,
-                    "pagpDeviceId": null,
-                    "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": 8528664,
-                    "ifInUcastPkts_prev": 0,
-                    "ifInUcastPkts_delta": null,
-                    "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": 35548770,
-                    "ifOutUcastPkts_prev": 0,
-                    "ifOutUcastPkts_delta": null,
-                    "ifOutUcastPkts_rate": null,
-                    "ifInErrors": 0,
-                    "ifInErrors_prev": 0,
-                    "ifInErrors_delta": null,
-                    "ifInErrors_rate": null,
-                    "ifOutErrors": 0,
-                    "ifOutErrors_prev": 0,
-                    "ifOutErrors_delta": null,
-                    "ifOutErrors_rate": null,
-                    "ifInOctets": 621439478,
-                    "ifInOctets_prev": 0,
-                    "ifInOctets_delta": null,
-                    "ifInOctets_rate": null,
-                    "ifOutOctets": 2179077272,
-                    "ifOutOctets_prev": 0,
-                    "ifOutOctets_delta": null,
-                    "ifOutOctets_rate": null,
-                    "poll_prev": null,
-                    "ifInNUcastPkts": 0,
-                    "ifInNUcastPkts_prev": 0,
-                    "ifInNUcastPkts_delta": null,
-                    "ifInNUcastPkts_rate": null,
-                    "ifOutNUcastPkts": 0,
-                    "ifOutNUcastPkts_prev": 0,
-                    "ifOutNUcastPkts_delta": null,
-                    "ifOutNUcastPkts_rate": null,
-                    "ifInDiscards": 0,
-                    "ifInDiscards_prev": 0,
-                    "ifInDiscards_delta": null,
-                    "ifInDiscards_rate": null,
-                    "ifOutDiscards": 0,
-                    "ifOutDiscards_prev": 0,
-                    "ifOutDiscards_delta": null,
-                    "ifOutDiscards_rate": null,
-                    "ifInUnknownProtos": 0,
-                    "ifInUnknownProtos_prev": 0,
-                    "ifInUnknownProtos_delta": null,
-                    "ifInUnknownProtos_rate": null,
-                    "ifInBroadcastPkts": 0,
-                    "ifInBroadcastPkts_prev": 0,
-                    "ifInBroadcastPkts_delta": null,
-                    "ifInBroadcastPkts_rate": null,
-                    "ifOutBroadcastPkts": 0,
-                    "ifOutBroadcastPkts_prev": 0,
-                    "ifOutBroadcastPkts_delta": null,
-                    "ifOutBroadcastPkts_rate": null,
-                    "ifInMulticastPkts": 0,
-                    "ifInMulticastPkts_prev": 0,
-                    "ifInMulticastPkts_delta": null,
-                    "ifInMulticastPkts_rate": null,
-                    "ifOutMulticastPkts": 0,
-                    "ifOutMulticastPkts_prev": 0,
-                    "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
-                }
-            ]
-        }
-    }
-}
+1.3.6.1.2.1.1.1.0|4x|436973636f20496e7465677261746564204d616e6167656d656e7420436f6e74726f6c6c657228436973636f20494d4329205b5543532043323230204d34530a5d2c204669726d776172652056657273696f6e20332e302833612920436f707972696768742028632920323030382d323031362c20436973636f2053797374656d732c20496e632e
+1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.9.1.2178
+1.3.6.1.2.1.1.3.0|67|60475645
+1.3.6.1.2.1.1.4.0|4|<private>
+1.3.6.1.2.1.1.5.0|4|<private>
+1.3.6.1.2.1.1.6.0|4|<private>
+1.3.6.1.4.1.9.9.719.1.9.6.1.6.1|4|UCSC-C220-M4S
+1.3.6.1.4.1.9.9.719.1.9.6.1.14.1|4|FCH2126720R
+1.3.6.1.4.1.9.9.719.1.9.14.1.2.1|4|sys/rack-unit-1/board/power-stats
+1.3.6.1.4.1.9.9.719.1.9.14.1.3.1|4|power-stats
+1.3.6.1.4.1.9.9.719.1.9.14.1.4.1|2|176
+1.3.6.1.4.1.9.9.719.1.9.14.1.5.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.6.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.7.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.8.1|2|12
+1.3.6.1.4.1.9.9.719.1.9.14.1.9.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.10.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.11.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.12.1|2|12
+1.3.6.1.4.1.9.9.719.1.9.14.1.13.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.14.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.15.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.16.1|66|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.17.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.14.1.18.1|4|
+1.3.6.1.4.1.9.9.719.1.9.14.1.19.1|4x|07E2041711143A
+1.3.6.1.4.1.9.9.719.1.9.14.1.20.1|66|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.2.1|4|sys/rack-unit-1/board/temp-stats
+1.3.6.1.4.1.9.9.719.1.9.44.1.3.1|4|temp-stats
+1.3.6.1.4.1.9.9.719.1.9.44.1.4.1|2|19
+1.3.6.1.4.1.9.9.719.1.9.44.1.5.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.6.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.7.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.8.1|2|19
+1.3.6.1.4.1.9.9.719.1.9.44.1.9.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.10.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.11.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.12.1|66|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.13.1|2|33
+1.3.6.1.4.1.9.9.719.1.9.44.1.14.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.15.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.16.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.17.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.18.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.19.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.20.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.21.1|2|33
+1.3.6.1.4.1.9.9.719.1.9.44.1.22.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.23.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.24.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.25.1|2|0
+1.3.6.1.4.1.9.9.719.1.9.44.1.26.1|4|
+1.3.6.1.4.1.9.9.719.1.9.44.1.27.1|4x|07E2041711143A
+1.3.6.1.4.1.9.9.719.1.9.44.1.28.1|66|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.2.1|4|sys/rack-unit-1/memarray-1/mem-1/dimm-env-stats
+1.3.6.1.4.1.9.9.719.1.30.12.1.2.2|4|sys/rack-unit-1/memarray-1/mem-4/dimm-env-stats
+1.3.6.1.4.1.9.9.719.1.30.12.1.2.3|4|sys/rack-unit-1/memarray-1/mem-13/dimm-env-stats
+1.3.6.1.4.1.9.9.719.1.30.12.1.2.4|4|sys/rack-unit-1/memarray-1/mem-16/dimm-env-stats
+1.3.6.1.4.1.9.9.719.1.30.12.1.3.1|4|dimm_env_stats
+1.3.6.1.4.1.9.9.719.1.30.12.1.3.2|4|dimm_env_stats
+1.3.6.1.4.1.9.9.719.1.30.12.1.3.3|4|dimm_env_stats
+1.3.6.1.4.1.9.9.719.1.30.12.1.3.4|4|dimm_env_stats
+1.3.6.1.4.1.9.9.719.1.30.12.1.4.1|66|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.4.2|66|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.4.3|66|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.4.4|66|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.5.1|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.5.2|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.5.3|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.5.4|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.6.1|2|28
+1.3.6.1.4.1.9.9.719.1.30.12.1.6.2|2|27
+1.3.6.1.4.1.9.9.719.1.30.12.1.6.3|2|28
+1.3.6.1.4.1.9.9.719.1.30.12.1.6.4|2|28
+1.3.6.1.4.1.9.9.719.1.30.12.1.7.1|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.7.2|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.7.3|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.7.4|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.8.1|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.8.2|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.8.3|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.8.4|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.9.1|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.9.2|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.9.3|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.9.4|2|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.10.1|4|
+1.3.6.1.4.1.9.9.719.1.30.12.1.10.2|4|
+1.3.6.1.4.1.9.9.719.1.30.12.1.10.3|4|
+1.3.6.1.4.1.9.9.719.1.30.12.1.10.4|4|
+1.3.6.1.4.1.9.9.719.1.30.12.1.11.1|4x|07E2041711142F
+1.3.6.1.4.1.9.9.719.1.30.12.1.11.2|4x|07E2041710142F
+1.3.6.1.4.1.9.9.719.1.30.12.1.11.3|4x|07E2041710142F
+1.3.6.1.4.1.9.9.719.1.30.12.1.11.4|4x|07E2041710142F
+1.3.6.1.4.1.9.9.719.1.30.12.1.12.1|66|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.12.2|66|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.12.3|66|0
+1.3.6.1.4.1.9.9.719.1.30.12.1.12.4|66|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.2.1|4|sys/rack-unit-1/board/cpu-1/env-stats
+1.3.6.1.4.1.9.9.719.1.41.2.1.2.2|4|sys/rack-unit-1/board/cpu-2/env-stats
+1.3.6.1.4.1.9.9.719.1.41.2.1.3.1|4|env_stats
+1.3.6.1.4.1.9.9.719.1.41.2.1.3.2|4|env_stats
+1.3.6.1.4.1.9.9.719.1.41.2.1.4.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.4.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.5.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.5.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.6.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.6.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.7.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.7.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.8.1|66|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.8.2|66|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.9.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.9.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.10.1|2|39
+1.3.6.1.4.1.9.9.719.1.41.2.1.10.2|2|40
+1.3.6.1.4.1.9.9.719.1.41.2.1.11.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.11.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.12.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.12.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.13.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.13.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.14.1|4|
+1.3.6.1.4.1.9.9.719.1.41.2.1.14.2|4|
+1.3.6.1.4.1.9.9.719.1.41.2.1.15.1|4x|07E2041711142F
+1.3.6.1.4.1.9.9.719.1.41.2.1.15.2|4x|07E2041710142F
+1.3.6.1.4.1.9.9.719.1.41.2.1.16.1|66|0
+1.3.6.1.4.1.9.9.719.1.41.2.1.16.2|66|0
+1.3.6.1.4.1.9.9.719.1.41.9.1.2.1|4|sys/rack-unit-1/board/cpu-1
+1.3.6.1.4.1.9.9.719.1.41.9.1.2.2|4|sys/rack-unit-1/board/cpu-2
+1.3.6.1.4.1.9.9.719.1.41.9.1.3.1|4|cpu-1
+1.3.6.1.4.1.9.9.719.1.41.9.1.3.2|4|cpu-2
+1.3.6.1.4.1.9.9.719.1.41.9.1.4.1|2|179
+1.3.6.1.4.1.9.9.719.1.41.9.1.4.2|2|179
+1.3.6.1.4.1.9.9.719.1.41.9.1.5.1|66|8
+1.3.6.1.4.1.9.9.719.1.41.9.1.5.2|66|8
+1.3.6.1.4.1.9.9.719.1.41.9.1.6.1|66|8
+1.3.6.1.4.1.9.9.719.1.41.9.1.6.2|66|8
+1.3.6.1.4.1.9.9.719.1.41.9.1.7.1|66|0
+1.3.6.1.4.1.9.9.719.1.41.9.1.7.2|66|1
+1.3.6.1.4.1.9.9.719.1.41.9.1.8.1|4|Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+1.3.6.1.4.1.9.9.719.1.41.9.1.8.2|4|Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+1.3.6.1.4.1.9.9.719.1.41.9.1.9.1|2|1
+1.3.6.1.4.1.9.9.719.1.41.9.1.9.2|2|1
+1.3.6.1.4.1.9.9.719.1.41.9.1.10.1|2|1
+1.3.6.1.4.1.9.9.719.1.41.9.1.10.2|2|1
+1.3.6.1.4.1.9.9.719.1.41.9.1.11.1|2|1
+1.3.6.1.4.1.9.9.719.1.41.9.1.11.2|2|1
+1.3.6.1.4.1.9.9.719.1.41.9.1.12.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.9.1.12.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.9.1.13.1|2|10
+1.3.6.1.4.1.9.9.719.1.41.9.1.13.2|2|10
+1.3.6.1.4.1.9.9.719.1.41.9.1.14.1|4|unknown
+1.3.6.1.4.1.9.9.719.1.41.9.1.14.2|4|unknown
+1.3.6.1.4.1.9.9.719.1.41.9.1.15.1|4|Not Specified
+1.3.6.1.4.1.9.9.719.1.41.9.1.15.2|4|Not Specified
+1.3.6.1.4.1.9.9.719.1.41.9.1.16.1|4|CPU1
+1.3.6.1.4.1.9.9.719.1.41.9.1.16.2|4|CPU2
+1.3.6.1.4.1.9.9.719.1.41.9.1.17.1|2|2400
+1.3.6.1.4.1.9.9.719.1.41.9.1.17.2|2|2400
+1.3.6.1.4.1.9.9.719.1.41.9.1.18.1|66|0
+1.3.6.1.4.1.9.9.719.1.41.9.1.18.2|66|0
+1.3.6.1.4.1.9.9.719.1.41.9.1.19.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.9.1.19.2|2|0
+1.3.6.1.4.1.9.9.719.1.41.9.1.20.1|66|16
+1.3.6.1.4.1.9.9.719.1.41.9.1.20.2|66|16
+1.3.6.1.4.1.9.9.719.1.41.9.1.21.1|4|Intel(R) Corporation
+1.3.6.1.4.1.9.9.719.1.41.9.1.21.2|4|Intel(R) Corporation
+1.3.6.1.4.1.9.9.719.1.41.9.1.22.1|2|0
+1.3.6.1.4.1.9.9.719.1.41.9.1.22.2|2|0
+1.3.6.1.6.3.10.2.1.3.0|2|604753
