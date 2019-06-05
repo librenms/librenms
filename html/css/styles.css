@@ -348,6 +348,17 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   color: #555;
 }
 
+.graph-all-common {
+  display: block;
+  padding: 1px;
+  margin: 2px;
+  min-height:180px;
+  max-height:180px;
+  text-align: center;
+  float: left;
+  background-color: #fff;
+}
+
 .tablehead {
   font-weight: bold;
   font-size: 13px;
