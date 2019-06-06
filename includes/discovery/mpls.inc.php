@@ -25,7 +25,6 @@
 
 use LibreNMS\OS;
 
-echo "\nMPLS LSPs: ";
 if (!$os instanceof OS) {
     $os = OS::make($device);
 }
