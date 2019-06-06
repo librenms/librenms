@@ -867,6 +867,57 @@ migrations:
     - { Field: batch, Type: int(11), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+mpls_lsps:
+  Columns:
+    - { Field: lsp_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: vrf_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: lsp_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspLastChange, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspName, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: mplsLspAdminState, Type: 'enum(''noop'',''inService'',''outOfService'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspOperState, Type: 'enum(''unknown'',''inService'',''outOfService'',''transition'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspFromAddr, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: mplsLspToAddr, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: mplsLspType, Type: 'enum(''unknown'',''dynamic'',''static'',''bypassOnly'',''p2mpLsp'',''p2mpAuto'',''mplsTp'',''meshP2p'',''oneHopP2p'',''srTe'',''meshP2pSrTe'',''oneHopP2pSrTe'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspFastReroute, Type: 'enum(''true'',''false'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspAge, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspTimeDown, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspPrimaryTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspTransitions, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsLspLastTransition, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspConfiguredPaths, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsLspStandbyPaths, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsLspOperationalPaths, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [lsp_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+mpls_lsp_paths:
+  Columns:
+    - { Field: lsp_path_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: lsp_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: path_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathLastChange, Type: bigint(20), 'Null': false, Extra: '' }
+    - { Field: mplsLspPathType, Type: 'enum(''other'',''primary'',''standby'',''secondary'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathBandwidth, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathOperBandwidth, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathAdminState, Type: 'enum(''noop'',''inService'',''outOfService'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathOperState, Type: 'enum(''unknown'',''inService'',''outOfService'',''transition'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathState, Type: 'enum(''unknown'',''active'',''inactive'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathFailCode, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: mplsLspPathFailNodeAddr, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: mplsLspPathMetric, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathOperMetric, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspPathTimeDown, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspPathTransitionCount, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [lsp_path_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 munin_plugins:
   Columns:
     - { Field: mplug_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
