@@ -54,10 +54,10 @@ foreach ($ports as $port) {
         $graph_array['width']  = $width;
         $graph_array['height'] = 119;
         $graph =  generate_lazy_graph_tag($graph_array);
-
-        echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".$width_div.'px; max-width:'.$width_div."px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>";
+        
+        echo "<div class='graph-all-common' style='min-width: ".$width_div.'px;max-width:'.$width_div."px;'>";
         echo overlib_link($link, $graph, $overlib_content);
-        echo '</div>';
+        echo '</div>'; 
     }
 }
 
