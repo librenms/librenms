@@ -912,9 +912,9 @@ mpls_lsp_paths:
     - { Field: mplsLspPathFailNodeAddr, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: mplsLspPathMetric, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: mplsLspPathOperMetric, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: mplsLspPathTimeUp, Type: bigint(20), 'Null': false, Extra: '' }
-    - { Field: mplsLspPathTimeDown, Type: bigint(20), 'Null': false, Extra: '' }
-    - { Field: mplsLspPathTransitionCount, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspPathTimeDown, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspPathTransitionCount, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [lsp_path_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
