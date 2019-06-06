@@ -42,7 +42,6 @@ class ModuleModelObserver
         if (!$model::getEventDispatcher()->hasListeners('eloquent.created: ' . ltrim('\\', $model))) {
             $model::observe(new ModuleModelObserver());
         }
-
     }
 
     public function saving(Eloquent $model)
