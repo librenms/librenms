@@ -21,6 +21,7 @@ $type_text['cef']  = 'CEF';
 $type_text['ospf'] = 'OSPF';
 $type_text['vrf']  = 'VRFs';
 $type_text['cisco-otv']  = 'OTV';
+$type_text['mpls']  = 'MPLS';
 
 print_optionbar_start();
 

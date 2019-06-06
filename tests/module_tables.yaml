@@ -29,6 +29,15 @@ fdb-table:
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]
+mpls:
+    mpls_lsps:
+        excluded_fields: [lsp_id, device_id]
+        order_by: vrf_oid, lsp_oid
+    mpls_lsp_paths:
+        excluded_fields: [lsp_path_id, device_id, lsp_id]
+        joins:
+            - { left: mpls_lsp_paths.lsp_id, right: mpls_lsps.lsp_id, select: [vrf_oid, lsp_oid] }
+        order_by: vrf_oid, lsp_oid, path_oid
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
