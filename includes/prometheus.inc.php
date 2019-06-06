@@ -23,19 +23,19 @@ function prometheus_push($device, $measurement, $tags, $fields)
                 set_curl_proxy($ch);
                 $vals = "";
 
-								# Format Prometheus tags for inclusion with metrics in the body
-								#
-								$promtags = array('measurement="' . $measurement . '"');
+                # Format Prometheus tags for inclusion with metrics in the body
+                #
+                $promtags = array('measurement="' . $measurement . '"');
                 foreach ($tags as $t => $v) {
                     if ($v !== null) {
                         $promtags[] = $t . '="' . $v .'"';
                     }
                 }
-								$tagline = "{" . join(",", $promtags) . "}";
+                $tagline = "{" . join(",", $promtags) . "}";
 
 
-								# Output metrics with their tags
-								#
+                # Output metrics with their tags
+                #
                 foreach ($fields as $k => $v) {
                     if ($v !== null) {
                         $vals = $vals . "$k$tagline $v\n";
