@@ -8,7 +8,7 @@ $scale_min   = 0;
 $scale_rigid = true;
 
 require 'includes/html/graphs/common.inc.php';
-require 'smokeping_common.inc.php';
+require 'includes/html/graphs/device/smokeping_common.inc.php';
 
 $i         = 0;
 $pings     = $config['smokeping']['pings'];
