@@ -22,22 +22,27 @@ function prometheus_push($device, $measurement, $tags, $fields)
 
                 set_curl_proxy($ch);
                 $vals = "";
-                $promtags = "/measurement/".$measurement;
 
+								# Format Prometheus tags for inclusion with metrics in the body
+								#
+								$promtags = array('measurement="' . $measurement . '"');
+                foreach ($tags as $t => $v) {
+                    if ($v !== null) {
+                        $promtags[] = $t . '="' . $v .'"';
+                    }
+                }
+								$tagline = "{" . join(",", $promtags) . "}";
+
+
+								# Output metrics with their tags
+								#
                 foreach ($fields as $k => $v) {
                     if ($v !== null) {
-                        $vals = $vals . "$k $v\n";
+                        $vals = $vals . "$k$tagline $v\n";
                     }
                 }
                 
-                foreach ($tags as $t => $v) {
-                    if ($v !== null) {
-                        $v = urlencode(str_replace("/", "-", $v));
-                        $promtags = $promtags . "/$t/$v";
-                    }
-                }
-
-                $promurl = $config['prometheus']['url'].'/metrics/job/'.$config['prometheus']['job'].'/instance/'.$device['hostname'].$promtags;
+                $promurl = $config['prometheus']['url'].'/metrics/job/'.$config['prometheus']['job'].'/instance/'.$device['hostname'];
         
                 d_echo("\nPrometheus data:\n");
                 d_echo($measurement);
