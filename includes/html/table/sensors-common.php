@@ -94,7 +94,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
 
     $link = generate_url(array('page' => 'device', 'device' => $sensor['device_id'], 'tab' => $tab, 'metric' => $sensor['sensor_class']));
 
-    $overlib_content = '<div style="width: 580px;"><h2>'.$sensor['hostname'].' - '.$sensor['sensor_descr'].'</h1>';
+    $overlib_content = '<div style="width: 580px;"><span class="overlib-text">'.$sensor['hostname'].' - '.$sensor['sensor_descr'].'</span>';
     foreach (array('day', 'week', 'month', 'year') as $period) {
         $graph_array['from'] = $config['time'][$period];
         $overlib_content    .= str_replace('"', "\\'", generate_graph_tag($graph_array));
