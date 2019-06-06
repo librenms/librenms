@@ -32,12 +32,12 @@ function prometheus_push($device, $measurement, $tags, $fields)
                 
                 foreach ($tags as $t => $v) {
                     if ($v !== null) {
+                        $v = urlencode(str_replace("/", "-", $v));
                         $promtags = $promtags . "/$t/$v";
                     }
                 }
 
                 $promurl = $config['prometheus']['url'].'/metrics/job/'.$config['prometheus']['job'].'/instance/'.$device['hostname'].$promtags;
-                $promurl = str_replace(" ", "-", $promurl); // Prometheus doesn't handle tags with spaces in url
         
                 d_echo("\nPrometheus data:\n");
                 d_echo($measurement);
