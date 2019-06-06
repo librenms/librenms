@@ -1,8 +1,8 @@
 <?php
 /**
- * mpls.inc.php
+ * Keyable.php
  *
- * Discover MPLS LSPs
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,17 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  20169 Vitali Kari
- * @author     Vitali Kari <vitali.kari@gmail.com>
+ * @copyright  2019 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\OS;
+namespace LibreNMS\Interfaces\Models;
 
-echo "\nMPLS LSPs: ";
-if (!$os instanceof OS) {
-    $os = OS::make($device);
+interface Keyable
+{
+    /**
+     * Get a string that can identify a unique instance of this model
+     * @return string
+     */
+    public function getCompositeKey();
 }
-(new \LibreNMS\Modules\Mpls())->discover($os);

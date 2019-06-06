@@ -30,9 +30,9 @@ class CreateMplsLspPathsTable extends Migration
             $table->string('mplsLspPathFailNodeAddr', 32);
             $table->unsignedInteger('mplsLspPathMetric');
             $table->unsignedInteger('mplsLspPathOperMetric');
-            $table->bigInteger('mplsLspPathTimeUp');
-            $table->bigInteger('mplsLspPathTimeDown');
-            $table->unsignedInteger('mplsLspPathTransitionCount');
+            $table->bigInteger('mplsLspPathTimeUp')->nullable();
+            $table->bigInteger('mplsLspPathTimeDown')->nullable();
+            $table->unsignedInteger('mplsLspPathTransitionCount')->nullable();
         });
     }
 

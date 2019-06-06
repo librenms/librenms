@@ -1,8 +1,8 @@
 <?php
 /**
- * mpls.inc.php
+ * MplsPolling.php
  *
- * Discover MPLS LSPs
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,24 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  20169 Vitali Kari
- * @author     Vitali Kari <vitali.kari@gmail.com>
+ * @copyright  2019 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\OS;
+namespace LibreNMS\Interfaces\Polling;
 
-echo "\nMPLS LSPs: ";
-if (!$os instanceof OS) {
-    $os = OS::make($device);
+use Illuminate\Support\Collection;
+
+interface MplsPolling
+{
+    /**
+     * @return Collection MplsLsp objects
+     */
+    public function pollMplsLsps();
+
+    /**
+     * @param Collection $lsps collecton of synchronized lsp objects from pollMplsLsps()
+     * @return Collection MplsLspPath objects
+     */
+    public function pollMplsPaths($lsps);
 }
-(new \LibreNMS\Modules\Mpls())->discover($os);

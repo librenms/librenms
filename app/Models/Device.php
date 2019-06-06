@@ -569,6 +569,16 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Mempool', 'device_id');
     }
 
+    public function mplsLsps()
+    {
+        return $this->hasMany('App\Models\MplsLsp', 'device_id');
+    }
+
+    public function mplsLspPaths()
+    {
+        return $this->hasMany('App\Models\MplsLspPath', 'device_id');
+    }
+
     public function syslogs()
     {
         return $this->hasMany('App\Models\Syslog', 'device_id', 'device_id');
