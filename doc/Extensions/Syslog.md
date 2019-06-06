@@ -255,6 +255,27 @@ set system syslog host librenms.ip exclude-hostname
 set system syslog time-format
 ```
 
+#### Huawei VRP
+```config
+info-center loghost librenms.ip
+info-center timestamp debugging short-date without-timezone // Optional
+info-center timestamp log short-date // Optional
+info-center timestamp trap short-date // Optional
+//This is optional config, especially if the device is in public ip and you dont'want to get a lot of messages of ACL
+info-center filter-id bymodule-alias VTY ACL_DENY 
+info-center filter-id bymodule-alias SSH SSH_FAIL 
+info-center filter-id bymodule-alias SNMP SNMP_FAIL 
+info-center filter-id bymodule-alias SNMP SNMP_IPLOCK 
+info-center filter-id bymodule-alias SNMP SNMP_IPUNLOCK 
+info-center filter-id bymodule-alias HTTP ACL_DENY 
+```
+
+#### Huawei SmartAX (GPON OLT)
+```config
+loghost add librenms.ip librenms
+loghost activate name librenms
+```
+
 #### Allied Telesis Alliedware Plus
 ```config
 log date-format iso // Required so syslog-ng/LibreNMS can correctly interpret the log message formatting.
