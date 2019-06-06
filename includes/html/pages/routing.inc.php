@@ -21,6 +21,7 @@ $routing_count = \LibreNMS\Util\ObjectCache::routing();
 // $type_text['overview'] = "Overview";
 $type_text['bgp']  = 'BGP';
 $type_text['cef']  = 'CEF';
+$type_text['mpls']  = 'MPLS';
 $type_text['ospf'] = 'OSPF';
 $type_text['vrf']  = 'VRFs';
 $type_text['cisco-otv']  = 'OTV';
@@ -61,6 +62,7 @@ switch ($vars['protocol']) {
     case 'bgp':
     case 'vrf':
     case 'cef':
+    case 'mpls':
     case 'ospf':
     case 'cisco-otv':
         include 'includes/html/pages/routing/'.$vars['protocol'].'.inc.php';

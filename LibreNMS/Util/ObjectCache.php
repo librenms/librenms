@@ -38,6 +38,7 @@ use App\Models\Service;
 use App\Models\Toner;
 use App\Models\User;
 use App\Models\Vrf;
+use App\Models\Mpls;
 use Cache;
 
 class ObjectCache
@@ -62,6 +63,7 @@ class ObjectCache
             $user = auth()->user();
             return [
                 'vrf' => Vrf::hasAccess($user)->count(),
+                'mpls' => Mpls::hasAccess($user)->count(),
                 'ospf' => OspfInstance::hasAccess($user)->count(),
                 'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
                 'bgp' => BgpPeer::hasAccess($user)->count(),
