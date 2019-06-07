@@ -22,41 +22,41 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     }
 
     if (empty($untag)) {
-	# If $untag is empty, device is based on Junipers ELS software
-    	$untag       = snmpwalk_cache_oid($device, 'dot1qVlanStaticUntaggedPorts', array(), 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
-	$taganduntag = snmpwalk_cache_oid($device, 'dot1qVlanStaticEgressPorts', array(), 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
-	$vlan_tag    = snmpwalk_cache_oid($device, 'jnxL2aldVlanTag', array(), 'JUNIPER-L2ALD-MIB', null, ['-OQUs', '--hexOutputLength=0']);
+        # If $untag is empty, device is based on Junipers ELS software
+        $untag       = snmpwalk_cache_oid($device, 'dot1qVlanStaticUntaggedPorts', array(), 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
+        $taganduntag = snmpwalk_cache_oid($device, 'dot1qVlanStaticEgressPorts', array(), 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
+        $vlan_tag    = snmpwalk_cache_oid($device, 'jnxL2aldVlanTag', array(), 'JUNIPER-L2ALD-MIB', null, ['-OQUs', '--hexOutputLength=0']);
         $tmp_tag     = 'jnxL2aldVlanTag';
-	$tmp_name    = 'jnxL2aldVlanName'; 
-	$temp_vlan   = array();
-	foreach ($vlan_tag as $key => $value) {
-		$temp_vlan[$key] = $value['jnxL2aldVlanTag'];
-	}
-	#set all port vlan relationships to be tagged	
-	foreach ($taganduntag as $key => $taganduntag) {
-	    $vlan_index = array_search($key, $temp_vlan);
-	    $port_on_vlan = explode(',', $taganduntag['dot1qVlanStaticEgressPorts']);
-	    foreach ($port_on_vlan as $port) {
-                $tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 0;
-		unset($tagness_by_vlan_index[$vlan_index]['']);
-	    }
+        $tmp_name    = 'jnxL2aldVlanName';
+        $temp_vlan   = array();
+        foreach ($vlan_tag as $key => $value) {
+            $temp_vlan[$key] = $value['jnxL2aldVlanTag'];
         }
-	# correct all untagged ports to be untagged
-	foreach ($untag as $key => $untag) {
+        #set all port vlan relationships to be tagged
+        foreach ($taganduntag as $key => $taganduntag) {
+            $vlan_index = array_search($key, $temp_vlan);
+            $port_on_vlan = explode(',', $taganduntag['dot1qVlanStaticEgressPorts']);
+            foreach ($port_on_vlan as $port) {
+                $tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 0;
+                unset($tagness_by_vlan_index[$vlan_index]['']);
+            }
+        }
+        # correct all untagged ports to be untagged
+        foreach ($untag as $key => $untag) {
             $vlan_index = array_search($key, $temp_vlan);
             $port_on_vlan = explode(',', $untag['dot1qVlanStaticUntaggedPorts']);
             foreach ($port_on_vlan as $port) {
-		$tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 1;
-		unset($tagness_by_vlan_index[$vlan_index]['']);
+                $tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 1;
+                unset($tagness_by_vlan_index[$vlan_index]['']);
             }
-	}
+        }
     } else {
         foreach ($untag as $key => $tagness) {
-    	    $key = explode('.', $key);
+            $key = explode('.', $key);
             if ($tagness['jnxExVlanPortTagness'] == 2) {
                 $tagness_by_vlan_index[$key[0]][$base_to_index[$key[1]]]['tag'] = 1;
             } else {
-    	        $tagness_by_vlan_index[$key[0]][$base_to_index[$key[1]]]['tag'] = 0;
+                $tagness_by_vlan_index[$key[0]][$base_to_index[$key[1]]]['tag'] = 0;
             }
         }
     }
@@ -85,7 +85,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         }
         $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
         foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
-	        $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = $tag['tag'];
-	}
+            $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = $tag['tag'];
+        }
     }
 }
