@@ -66,3 +66,185 @@ modules:
                         - { value: 2, descr: chassisBreached, graph: 1, generic: 2 }
                         - { value: 3, descr: chassisBreachedPrior, graph: 1, generic: 1 }
                         - { value: 4, descr: chassisBreachSensorFailure, graph: 1, generic: 1 }
+                -
+                    oid: drsIOMCurrStatus
+                    value: drsIOMCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.2.{{ $index }}'
+                    descr: 'IOM Status'
+                    index: 'drsIOMCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: drsKVMCurrStatus
+                    value: drsKVMCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.3.{{ $index }}'
+                    descr: 'KVM Status'
+                    index: 'drsKVMCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: drsRedCurrStatus
+                    value: drsRedCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.4.{{ $index }}'
+                    descr: 'Redundancy Status'
+                    index: 'drsRedCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: drsPowerCurrStatus
+                    value: drsPowerCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.5.{{ $index }}'
+                    descr: 'Power Status'
+                    index: 'drsPowerCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: drsFanCurrStatus
+                    value: drsFanCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.6.{{ $index }}'
+                    descr: 'FAN Status'
+                    index: 'drsFanCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: drsBladeCurrStatus
+                    value: drsBladeCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.7.{{ $index }}'
+                    descr: 'Blade Status'
+                    index: 'drsBladeCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: drsTempCurrStatus
+                    value: drsTempCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.8.{{ $index }}'
+                    descr: 'Temperature Status'
+                    index: 'drsTempCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: drsCMCCurrStatus
+                    value: drsCMCCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.9.{{ $index }}'
+                    descr: 'CMC Status'
+                    index: 'drsCMCCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+
+        temperature:
+            data:
+                -
+                    oid: drsChassisFrontPanelAmbientTemperature
+                    value: drsChassisFrontPanelAmbientTemperature
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.10.{{ $index }}'
+                    index: 'drsChassisFrontPanelAmbientTemperature.{{ $index }}'
+                    descr: 'Chassis {{ $drsChassisIndex }} Front Panel Temperature'
+                -
+                    oid: drsCMCAmbientTemperature
+                    value: drsCMCAmbientTemperature
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.11.{{ $index }}'
+                    index: 'drsCMCAmbientTemperature.{{ $index }}'
+                    descr: 'CMC Ambient Temperature'
+                -
+                    oid: drsCMCProcessorTemperature
+                    value: drsCMCProcessorTemperature
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.12.{{ $index }}'
+                    index: 'drsCMCProcessorTemperature.{{ $index }}'
+                    descr: 'CMC Processor Temperature'
+        voltage:
+            data:
+                -
+                    oid: drsCMCPSUTable
+                    value: drsPSUVoltsReading
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.4.2.1.5.{{ $index }}'
+                    descr: 'Chassis {{ $drsPSUChassisIndex }} PS-{{ $drsPSUIndex }}'
+        current:
+            data:
+                -
+                    oid: drsCMCPowerTable
+                    value: drsAmpsReading
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.4.1.1.14.{{ $index }}'
+                    descr: 'Chassis {{ $drsChassisIndex }}'
+                -
+                    oid: drsCMCPSUTable
+                    value: drsPSUAmpsReading
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.4.2.1.6.{{ $index }}'
+                    descr: 'Chassis {{ $drsPSUChassisIndex }} PS-{{ $drsPSUIndex }}'
+        power:
+            data:
+                -
+                    oid: drsCMCPowerTable
+                    value: drsWattsReading
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.4.1.1.13.{{ $index }}'
+                    index: 'drsWattsReading.{{ $index }}'
+                    descr: 'Chassis {{ $drsChassisIndex }}'
+                -
+                    oid: drsCMCPowerTable
+                    value: drsWattsPeakUsage
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.4.1.1.8.{{ $index }}'
+                    index: 'drsWattsPeakUsage.{{ $index }}'
+                    descr: 'Chassis {{ $drsChassisIndex }} Peak Usage'
+                -
+                    oid: drsCMCPowerTable
+                    value: drsPotentialPower
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.4.1.1.2.{{ $index }}'
+                    index: 'drsPotentialPower.{{ $index }}'
+                    descr: 'Chassis {{ $drsChassisIndex }} Potential Power'
+                -
+                    oid: drsCMCPowerTable
+                    value: drsIdlePower
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.4.1.1.3.{{ $index }}'
+                    index: 'drsIdlePower.{{ $index }}'
+                    descr: 'Chassis {{ $drsChassisIndex }} Idle Power'
+                -
+                    oid: drsCMCPowerTable
+                    value: drsMaxPowerSpecification
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.4.1.1.4.{{ $index }}'
+                    index: 'drsMaxPowerSpecification.{{ $index }}'
+                    descr: 'Chassis {{ $drsChassisIndex }} Max Power'
+                -
+                    oid: drsCMCPowerTable
+                    value: drsPowerSurplus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.4.1.1.5.{{ $index }}'
+                    index: 'drsPowerSurplus.{{ $index }}'
+                    descr: 'Chassis {{ $drsChassisIndex }} Surplus Power'
