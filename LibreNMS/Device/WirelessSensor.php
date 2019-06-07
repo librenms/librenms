@@ -129,68 +129,125 @@ class WirelessSensor extends Sensor
      */
     public static function getTypes($valid = false, $device_id = null)
     {
-        // Add new types here translations/descriptions/units in resources/lang/<lang>/wireless.php
+        // Add new types here
         // FIXME I'm really bad with icons, someone please help!
-        static $types = [
-            'ap-count' => [
+        static $types = array(
+            'ap-count' => array(
+                'short' => 'APs',
+                'long' => 'AP Count',
+                'unit' => '',
                 'icon' => 'wifi',
-            ],
-            'clients' => [
+            ),
+            'clients' => array(
+                'short' => 'Clients',
+                'long' => 'Client Count',
+                'unit' => '',
                 'icon' => 'tablet',
-            ],
-            'quality' => [
+            ),
+            'quality' => array(
+                'short' => 'Quality',
+                'long' => 'Quality',
+                'unit' => '%',
                 'icon' => 'feed',
-            ],
-            'capacity' => [
+            ),
+            'capacity' => array(
+                'short' => 'Capacity',
+                'long' => 'Capacity',
+                'unit' => '%',
                 'icon' => 'feed',
-            ],
-            'utilization' => [
+            ),
+            'utilization' => array(
+                'short' => 'Utilization',
+                'long' => 'utilization',
+                'unit' => '%',
                 'icon' => 'percent',
-            ],
-            'rate' => [
+            ),
+            'rate' => array(
+                'short' => 'Rate',
+                'long' => 'TX/RX Rate',
+                'unit' => 'bps',
                 'icon' => 'tachometer',
-            ],
-            'ccq' => [
+            ),
+            'ccq' => array(
+                'short' => 'CCQ',
+                'long' => 'Client Connection Quality',
+                'unit' => '%',
                 'icon' => 'wifi',
-            ],
-            'snr' => [
+            ),
+            'snr' => array(
+                'short' => 'SNR',
+                'long' => 'Signal-to-Noise Ratio',
+                'unit' => 'dB',
                 'icon' => 'signal',
-            ],
-            'ssr' => [
+            ),
+            'ssr' => array(
+                'short' => 'SSR',
+                'long' => 'Signal Strength Ratio',
+                'unit' => 'dB',
                 'icon' => 'signal',
-            ],
-            'mse' => [
+            ),
+            'mse' => array(
+                'short' => 'MSE',
+                'long' => 'Mean Square Error',
+                'unit' => 'dB',
                 'icon' => 'signal',
-            ],
-            'xpi' => [
+            ),
+            'xpi' => array(
+                'short' => 'XPI',
+                'long' => 'Cross Polar Interference',
+                'unit' => 'dB',
                 'icon' => 'signal',
-            ],
-            'rssi' => [
+            ),
+            'rssi' => array(
+                'short' => 'RSSI',
+                'long' => 'Received Signal Strength Indicator',
+                'unit' => 'dBm',
                 'icon' => 'signal',
-            ],
-            'power' => [
+            ),
+            'power' => array(
+                'short' => 'Power/Signal',
+                'long' => 'TX/RX Power or Signal',
+                'unit' => 'dBm',
                 'icon' => 'bolt',
-            ],
-            'noise-floor' => [
+            ),
+            'noise-floor' => array(
+                'short' => 'Noise Floor',
+                'long' => 'Noise Floor',
+                'unit' => 'dBm/Hz',
                 'icon' => 'signal',
-            ],
-            'errors' => [
+            ),
+            'errors' => array(
+                'short' => 'Errors',
+                'long' => 'Errors',
+                'unit' => '',
                 'icon' => 'exclamation-triangle',
                 'type' => 'counter',
-            ],
-            'error-ratio' => [
+            ),
+            'error-ratio' => array(
+                'short' => 'Error Ratio',
+                'long' => 'Bit/Packet Error Ratio',
+                'unit' => '%',
                 'icon' => 'exclamation-triangle',
-            ],
-            'error-rate' => [
+            ),
+            'error-rate' => array(
+                'short' => 'BER',
+                'long' => 'Bit Error Rate',
+                'unit' => 'bps',
                 'icon' => 'exclamation-triangle',
-            ],
-            'frequency' => [
+            ),
+            'frequency' => array(
+                'short' => 'Frequency',
+                'long' => 'Frequency',
+                'unit' => 'MHz',
                 'icon' => 'line-chart',
-            ],
-            'distance' => [
+            ),
+            'distance' => array(
+                'short' => 'Distance',
+                'long' => 'Distance',
+                'unit' => 'km',
                 'icon' => 'space-shuttle',
-            ],
-        ];
+            ),
+        );
 
         if ($valid) {
             $sql = 'SELECT `sensor_class` FROM `wireless_sensors`';

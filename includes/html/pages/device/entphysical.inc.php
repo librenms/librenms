@@ -58,7 +58,7 @@ function printEntPhysical($device, $ent, $level, $class)
         }
 
         if ($ent['entPhysicalClass'] == 'sensor' && isset($sensor)) {
-            echo ' (' . trim($sensor['sensor_current'] . ' ' . __('sensors.' . $sensor['sensor_class'] . '.unit')) . ')';
+            echo ' ('.trim($sensor['sensor_current'] . ' ' . get_units_from_sensor($sensor)) . ')';
         }
 
         if (isset($link)) {

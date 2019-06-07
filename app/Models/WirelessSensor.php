@@ -34,7 +34,9 @@ class WirelessSensor extends DeviceRelatedModel
 
     public function classDescr()
     {
-        return __("wireless.$this->sensor_class.short");
+        return collect(collect(\LibreNMS\Device\WirelessSensor::getTypes())
+            ->get($this->sensor_class, []))
+            ->get('short', ucwords(str_replace('_', ' ', $this->sensor_class)));
     }
 
     public function icon()

@@ -617,7 +617,7 @@ class Sensor implements DiscoveryModule, PollerModule
         foreach ($sensors as $sensor) {
             $sensor_value = $data[$sensor['sensor_id']];
 
-            echo "  {$sensor['sensor_descr']}: $sensor_value " . __('sensors.' . $sensor['sensor_class'] . '.unit') . PHP_EOL;
+            echo "  {$sensor['sensor_descr']}: $sensor_value {$types[$sensor['sensor_class']]['unit']}\n";
 
             // update rrd and database
             $rrd_name = array(
