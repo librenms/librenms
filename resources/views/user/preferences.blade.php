@@ -220,9 +220,17 @@
                         $this.closest('.form-group').removeClass('has-success');
                     }, 2000);
                 },
-                error: function () {
+                error: function (data) {
                     $this.val($this.data('previous'));
                     $this.closest('.form-group').addClass('has-error');
+
+                    var json = data.responseJSON;
+                    var errors = [];
+                    for (var attrib in json) {
+                        errors.push(json[attrib]);
+                    }
+                    toastr.error('Error: ' + errors.join("<br />"));
+
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-error');
                     }, 2000);
