@@ -108,8 +108,7 @@ if ($vars['view'] == 'minigraphs') {
             <a href=\"'.generate_port_url($port).'\" onmouseover=\"return overlib('<div class=\'overlib-content\'>\
       	    <div class=\'overlib-text\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
             <span class=\'overlib-title\'>".$port['ifAlias']."</span>\
-            <img src=\'graph.php?type=".$graph_type.'&amp;id='.$port['port_id'].'&amp;from='.$from.'&amp;to='.$config['time']['now']."&amp;width=450&amp;heig\
-ht=150\'>\
+            <img src=\'graph.php?type=".$graph_type.'&amp;id='.$port['port_id'].'&amp;from='.$from.'&amp;to='.$config['time']['now']."&amp;width=450&amp;height=150\'>\
             </div>\
             ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >"."<img src='graph.php?type=".$graph_type.'&amp;id='.$port['port_id'].'&amp;from='.$from.'&amp;to='.$config['time']['now']."&amp;width=180&amp;height=45&amp;legend=no'>
             </a>
