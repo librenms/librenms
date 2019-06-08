@@ -101,7 +101,7 @@ if ($vars['view'] == 'minigraphs') {
     echo "<div style='display: block; clear: both; margin: auto; min-height: 500px;'>";
     unset($seperator);
 
-    // FIXME - FIX THIS. UGLY. 
+    // FIXME - FIX THIS. UGLY.
     foreach (dbFetchRows('select * from ports WHERE device_id = ? AND `disabled` = 0 ORDER BY ifIndex', array($device['device_id'])) as $port) {
         $port = cleanPort($port, $device);
         echo "<div class='minigraph-div'><div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>
