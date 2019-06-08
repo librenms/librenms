@@ -11,12 +11,12 @@ IMPORTS
     ifAlias, InterfaceIndex
         FROM IF-MIB
 
-    nbs, Unsigned64, WritableU64
+    nbs, WritableU64
         FROM NBS-MIB;
 
 nbsOtnpmMib  MODULE-IDENTITY
-    LAST-UPDATED  "201401230000Z"
-    ORGANIZATION  "NBS"
+    LAST-UPDATED "201610190000Z" -- October 19, 2016
+    ORGANIZATION "NBS"
     CONTACT-INFO
        "For technical support, please contact your service channel"
     DESCRIPTION
@@ -434,11 +434,11 @@ NbsOtnpmCurrentEntry ::= SEQUENCE {
     nbsOtnpmCurrentSes              Unsigned32,
     nbsOtnpmCurrentSesrSig          INTEGER,
     nbsOtnpmCurrentSesrExp          Integer32,
-    nbsOtnpmCurrentBbe              Unsigned64,
+    nbsOtnpmCurrentBbe              Counter64,
     nbsOtnpmCurrentBberSig          INTEGER,
     nbsOtnpmCurrentBberExp          Integer32,
     nbsOtnpmCurrentUas              Unsigned32,
-    nbsOtnpmCurrentFc               Unsigned64,
+    nbsOtnpmCurrentFc               Counter64,
     nbsOtnpmCurrentAlarmsSupported  NbsOtnAlarmMask,
     nbsOtnpmCurrentAlarmsRaised     NbsOtnAlarmMask,
     nbsOtnpmCurrentAlarmsChanged    NbsOtnAlarmMask
@@ -564,7 +564,7 @@ nbsOtnpmCurrentSesrExp OBJECT-TYPE
     ::= { nbsOtnpmCurrentEntry 15 }
 
 nbsOtnpmCurrentBbe   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -606,7 +606,7 @@ nbsOtnpmCurrentUas  OBJECT-TYPE
     ::= { nbsOtnpmCurrentEntry 19 }
 
 nbsOtnpmCurrentFc   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -685,11 +685,11 @@ NbsOtnpmHistoricEntry ::= SEQUENCE {
     nbsOtnpmHistoricSes             Unsigned32,
     nbsOtnpmHistoricSesrSig         INTEGER,
     nbsOtnpmHistoricSesrExp         Integer32,
-    nbsOtnpmHistoricBbe             Unsigned64,
+    nbsOtnpmHistoricBbe             Counter64,
     nbsOtnpmHistoricBberSig         INTEGER,
     nbsOtnpmHistoricBberExp         Integer32,
     nbsOtnpmHistoricUas             Unsigned32,
-    nbsOtnpmHistoricFc              Unsigned64,
+    nbsOtnpmHistoricFc              Counter64,
     nbsOtnpmHistoricAlarmsSupported NbsOtnAlarmMask,
     nbsOtnpmHistoricAlarmsRaised    NbsOtnAlarmMask,
     nbsOtnpmHistoricAlarmsChanged   NbsOtnAlarmMask
@@ -824,7 +824,7 @@ nbsOtnpmHistoricSesrExp OBJECT-TYPE
     ::= { nbsOtnpmHistoricEntry 15 }
 
 nbsOtnpmHistoricBbe   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -866,7 +866,7 @@ nbsOtnpmHistoricUas  OBJECT-TYPE
     ::= { nbsOtnpmHistoricEntry 19 }
 
 nbsOtnpmHistoricFc   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION

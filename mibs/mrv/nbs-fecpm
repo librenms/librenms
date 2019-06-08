@@ -6,12 +6,12 @@ IMPORTS
         FROM SNMPv2-SMI
     ifAlias, InterfaceIndex
         FROM IF-MIB
-    nbs, Unsigned64, WritableU64
+    nbs, WritableU64
         FROM NBS-MIB;
 
 nbsFecpmMib  MODULE-IDENTITY
-    LAST-UPDATED  "201307180000Z"
-    ORGANIZATION  "NBS"
+    LAST-UPDATED "201610190000Z" -- October 19, 2016
+    ORGANIZATION "NBS"
     CONTACT-INFO
        "For technical support, please contact your service channel"
     DESCRIPTION
@@ -245,11 +245,11 @@ NbsFecpmCurrentEntry ::= SEQUENCE {
     nbsFecpmCurrentInterval   INTEGER,
     nbsFecpmCurrentDate       INTEGER,
     nbsFecpmCurrentTime       INTEGER,
-    nbsFecpmCurrentBitErrCor  Unsigned64,
-    nbsFecpmCurrentByteErrCor Unsigned64,
-    nbsFecpmCurrentCorBit0to1 Unsigned64,
-    nbsFecpmCurrentCorBit1to0 Unsigned64,
-    nbsFecpmCurrentUncorWords Unsigned64
+    nbsFecpmCurrentBitErrCor  Counter64,
+    nbsFecpmCurrentByteErrCor Counter64,
+    nbsFecpmCurrentCorBit0to1 Counter64,
+    nbsFecpmCurrentCorBit1to0 Counter64,
+    nbsFecpmCurrentUncorWords Counter64
 }
 
 nbsFecpmCurrentIfIndex OBJECT-TYPE
@@ -290,7 +290,7 @@ nbsFecpmCurrentTime OBJECT-TYPE
     ::= { nbsFecpmCurrentEntry 6 }
 
 nbsFecpmCurrentBitErrCor OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -301,7 +301,7 @@ nbsFecpmCurrentBitErrCor OBJECT-TYPE
     ::= { nbsFecpmCurrentEntry 10 }
 
 nbsFecpmCurrentByteErrCor  OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -311,7 +311,7 @@ nbsFecpmCurrentByteErrCor  OBJECT-TYPE
     ::= { nbsFecpmCurrentEntry 12 }
 
 nbsFecpmCurrentCorBit0to1   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -323,7 +323,7 @@ nbsFecpmCurrentCorBit0to1   OBJECT-TYPE
     ::= { nbsFecpmCurrentEntry 14 }
 
 nbsFecpmCurrentCorBit1to0   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -335,7 +335,7 @@ nbsFecpmCurrentCorBit1to0   OBJECT-TYPE
     ::= { nbsFecpmCurrentEntry 16 }
 
 nbsFecpmCurrentUncorWords   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -380,11 +380,11 @@ NbsFecpmHistoricEntry ::= SEQUENCE {
     nbsFecpmHistoricSample     INTEGER,
     nbsFecpmHistoricDate       INTEGER,
     nbsFecpmHistoricTime       INTEGER,
-    nbsFecpmHistoricBitErrCor  Unsigned64,
-    nbsFecpmHistoricByteErrCor Unsigned64,
-    nbsFecpmHistoricCorBit0to1 Unsigned64,
-    nbsFecpmHistoricCorBit1to0 Unsigned64,
-    nbsFecpmHistoricUncorWords Unsigned64
+    nbsFecpmHistoricBitErrCor  Counter64,
+    nbsFecpmHistoricByteErrCor Counter64,
+    nbsFecpmHistoricCorBit0to1 Counter64,
+    nbsFecpmHistoricCorBit1to0 Counter64,
+    nbsFecpmHistoricUncorWords Counter64
 }
 
 nbsFecpmHistoricIfIndex OBJECT-TYPE
@@ -435,7 +435,7 @@ nbsFecpmHistoricTime OBJECT-TYPE
     ::= { nbsFecpmHistoricEntry 6 }
 
 nbsFecpmHistoricBitErrCor OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -446,7 +446,7 @@ nbsFecpmHistoricBitErrCor OBJECT-TYPE
     ::= { nbsFecpmHistoricEntry 10 }
 
 nbsFecpmHistoricByteErrCor  OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -456,7 +456,7 @@ nbsFecpmHistoricByteErrCor  OBJECT-TYPE
     ::= { nbsFecpmHistoricEntry 12 }
 
 nbsFecpmHistoricCorBit0to1   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -468,7 +468,7 @@ nbsFecpmHistoricCorBit0to1   OBJECT-TYPE
     ::= { nbsFecpmHistoricEntry 14 }
 
 nbsFecpmHistoricCorBit1to0   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -480,7 +480,7 @@ nbsFecpmHistoricCorBit1to0   OBJECT-TYPE
     ::= { nbsFecpmHistoricEntry 16 }
 
 nbsFecpmHistoricUncorWords   OBJECT-TYPE
-    SYNTAX          Unsigned64
+    SYNTAX          Counter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION

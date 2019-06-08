@@ -5,13 +5,15 @@ IMPORTS
         FROM SNMPv2-SMI
     DisplayString
         FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
     NbsCmmcChannelBand
         FROM NBS-CMMCENUM-MIB
     nbs, NbsTcMHz
         FROM NBS-MIB;
 
 nbsSffMib  MODULE-IDENTITY
-    LAST-UPDATED "201503190000Z"  -- March 19, 2015
+    LAST-UPDATED "201706060000Z" -- June 6, 2017
     ORGANIZATION  "NBS"
     CONTACT-INFO
         "For technical support, please contact your service channel"
@@ -80,7 +82,7 @@ nbsSffMsaEntry      OBJECT-TYPE
     ::= { nbsSffMsaTable 1 }
 
 NbsSffMsaEntry ::= SEQUENCE {
-    nbsSffMsaPhysicalIfIndex            INTEGER,
+    nbsSffMsaPhysicalIfIndex            InterfaceIndex,
     nbsSffMsaIdentifier                 INTEGER,
     nbsSffMsaExtIdentifier              INTEGER,
     nbsSffMsaOpticalConnector           INTEGER,
@@ -110,7 +112,7 @@ NbsSffMsaEntry ::= SEQUENCE {
 }
 
 nbsSffMsaPhysicalIfIndex  OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      InterfaceIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -2034,12 +2036,12 @@ nbsSffMsxEntry      OBJECT-TYPE
     ::= { nbsSffMsxTable 1 }
 
 NbsSffMsxEntry ::= SEQUENCE {
-    nbsSffMsxPhysicalIfIndex   INTEGER,
+    nbsSffMsxPhysicalIfIndex   InterfaceIndex,
     nbsSffMsxHasSgmiiPhy       INTEGER
 }
 
 nbsSffMsxPhysicalIfIndex  OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      InterfaceIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION

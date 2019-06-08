@@ -3,7 +3,7 @@ NBS-EFM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 
-    Unsigned32, Counter32, Counter64,
+    Counter32, Counter64,
     OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
         FROM SNMPv2-SMI
 
@@ -13,15 +13,15 @@ IMPORTS
     InterfaceIndex
         FROM IF-MIB
 
-    nbs, Unsigned16, Unsigned64
+    nbs, Unsigned16TC
         FROM NBS-MIB
 
     ;
 
 
 nbsEfmMib  MODULE-IDENTITY
-    LAST-UPDATED "201209260000Z"  -- Sep 26, 2012
-    ORGANIZATION  "NBS"
+    LAST-UPDATED "201610190000Z" -- October 19, 2016
+    ORGANIZATION "NBS"
     CONTACT-INFO
         "For technical support, please contact your service channel"
     DESCRIPTION
@@ -113,12 +113,12 @@ NbsEfmOamEntry ::= SEQUENCE {
     nbsEfmOamPeerIfIndex             InterfaceIndex,
     nbsEfmOamMode                    INTEGER,
     nbsEfmOamCfg                     OCTET STRING,
-    nbsEfmOamPduCfg                  Unsigned16,
+    nbsEfmOamPduCfg                  Unsigned16TC,
     nbsEfmOamFlagsField              OCTET STRING,
     nbsEfmOamState                   OCTET STRING,
     nbsEfmOamVendorOUI               OCTET STRING,
-    nbsEfmOamVendorDeviceId          Unsigned16,
-    nbsEfmOamVendorDeviceVersion     Unsigned16,
+    nbsEfmOamVendorDeviceId          Unsigned16TC,
+    nbsEfmOamVendorDeviceVersion     Unsigned16TC,
     nbsEfmOamPDUTx                   Counter32,
     nbsEfmOamPDURx                   Counter32,
     nbsEfmOamUnsupportedCodesRx      Counter32,
@@ -135,29 +135,29 @@ NbsEfmOamEntry ::= SEQUENCE {
     nbsEfmOamVariableResponseRx      Counter32,
     nbsEfmOamOrganizationSpecificTx  Counter32,
     nbsEfmOamOrganizationSpecificRx  Counter32,
-    nbsEfmOamErrSymPerCfgDuration    Unsigned64,
-    nbsEfmOamErrSymPerCfgThreshld    Unsigned32,
-    nbsEfmOamErrSymPerEvtTime        Unsigned16,
-    nbsEfmOamErrSymPerEvtWindow      Unsigned64,
-    nbsEfmOamErrSymPerEvtThreshld    Unsigned64,
+    nbsEfmOamErrSymPerCfgDuration    Counter64,
+    nbsEfmOamErrSymPerCfgThreshld    Counter32,
+    nbsEfmOamErrSymPerEvtTime        Unsigned16TC,
+    nbsEfmOamErrSymPerEvtWindow      Counter64,
+    nbsEfmOamErrSymPerEvtThreshld    Counter64,
     nbsEfmOamErrSymPerEvtCount       Counter64,
-    nbsEfmOamErrFrmCfgDuration       Unsigned32,
-    nbsEfmOamErrFrmCfgThreshld       Unsigned32,
-    nbsEfmOamErrFrmEvtTime           Unsigned16,
-    nbsEfmOamErrFrmEvtWindow         Unsigned16,
-    nbsEfmOamErrFrmEvtThreshld       Unsigned32,
+    nbsEfmOamErrFrmCfgDuration       Counter32,
+    nbsEfmOamErrFrmCfgThreshld       Counter32,
+    nbsEfmOamErrFrmEvtTime           Unsigned16TC,
+    nbsEfmOamErrFrmEvtWindow         Unsigned16TC,
+    nbsEfmOamErrFrmEvtThreshld       Counter32,
     nbsEfmOamErrFrmEvtCount          Counter64,
-    nbsEfmOamErrFrmPerCfgDuration    Unsigned32,
-    nbsEfmOamErrFrmPerCfgThreshld    Unsigned32,
-    nbsEfmOamErrFrmPerEvtTime        Unsigned16,
-    nbsEfmOamErrFrmPerEvtWindow      Unsigned32,
-    nbsEfmOamErrFrmPerEvtThreshld    Unsigned32,
+    nbsEfmOamErrFrmPerCfgDuration    Counter32,
+    nbsEfmOamErrFrmPerCfgThreshld    Counter32,
+    nbsEfmOamErrFrmPerEvtTime        Unsigned16TC,
+    nbsEfmOamErrFrmPerEvtWindow      Counter32,
+    nbsEfmOamErrFrmPerEvtThreshld    Counter32,
     nbsEfmOamErrFrmPerEvtCount       Counter64,
-    nbsEfmOamErrFrmSecSumCfgDuration Unsigned16,
-    nbsEfmOamErrFrmSecSumCfgThreshld Unsigned16,
-    nbsEfmOamErrFrmSecSumEvtTime     Unsigned16,
-    nbsEfmOamErrFrmSecSumEvtWindow   Unsigned16,
-    nbsEfmOamErrFrmSecSumEvtThreshld Unsigned16,
+    nbsEfmOamErrFrmSecSumCfgDuration Unsigned16TC,
+    nbsEfmOamErrFrmSecSumCfgThreshld Unsigned16TC,
+    nbsEfmOamErrFrmSecSumEvtTime     Unsigned16TC,
+    nbsEfmOamErrFrmSecSumEvtWindow   Unsigned16TC,
+    nbsEfmOamErrFrmSecSumEvtThreshld Unsigned16TC,
     nbsEfmOamErrFrmSecSumEvtCount    Counter32,
     nbsEfmOamFramesLostDueToOamError Counter32,
     nbsEfmOamAdminState              INTEGER,
@@ -256,7 +256,7 @@ nbsEfmOamCfg OBJECT-TYPE
     ::= { nbsEfmOamEntry 5 }
 
 nbsEfmOamPduCfg OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -336,7 +336,7 @@ nbsEfmOamVendorOUI  OBJECT-TYPE
     ::= { nbsEfmOamEntry 9 }
 
 nbsEfmOamVendorDeviceId OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -356,7 +356,7 @@ nbsEfmOamVendorDeviceId OBJECT-TYPE
     ::= { nbsEfmOamEntry 10 }
 
 nbsEfmOamVendorDeviceVersion  OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -647,7 +647,7 @@ nbsEfmOamOrganizationSpecificRx OBJECT-TYPE
     ::= { nbsEfmOamEntry 27 }
 
 nbsEfmOamErrSymPerCfgDuration OBJECT-TYPE
-    SYNTAX      Unsigned64
+    SYNTAX      Counter64
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -658,7 +658,7 @@ nbsEfmOamErrSymPerCfgDuration OBJECT-TYPE
     ::= { nbsEfmOamEntry 28 }
 
 nbsEfmOamErrSymPerCfgThreshld OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -669,7 +669,7 @@ nbsEfmOamErrSymPerCfgThreshld OBJECT-TYPE
     ::= { nbsEfmOamEntry 29 }
 
 nbsEfmOamErrSymPerEvtTime OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -686,7 +686,7 @@ nbsEfmOamErrSymPerEvtTime OBJECT-TYPE
     ::= {nbsEfmOamEntry  30 }
 
 nbsEfmOamErrSymPerEvtWindow OBJECT-TYPE
-    SYNTAX      Unsigned64
+    SYNTAX      Counter64
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -704,7 +704,7 @@ nbsEfmOamErrSymPerEvtWindow OBJECT-TYPE
     ::= {nbsEfmOamEntry  31 }
 
 nbsEfmOamErrSymPerEvtThreshld OBJECT-TYPE
-    SYNTAX      Unsigned64
+    SYNTAX      Counter64
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -739,7 +739,7 @@ nbsEfmOamErrSymPerEvtCount OBJECT-TYPE
     ::= {nbsEfmOamEntry  33 }
 
 nbsEfmOamErrFrmCfgDuration  OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -750,7 +750,7 @@ nbsEfmOamErrFrmCfgDuration  OBJECT-TYPE
     ::= { nbsEfmOamEntry 34 }
 
 nbsEfmOamErrFrmCfgThreshld OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -761,7 +761,7 @@ nbsEfmOamErrFrmCfgThreshld OBJECT-TYPE
     ::= { nbsEfmOamEntry 35 }
 
 nbsEfmOamErrFrmEvtTime  OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -777,7 +777,7 @@ nbsEfmOamErrFrmEvtTime  OBJECT-TYPE
     ::= {nbsEfmOamEntry  36 }
 
 nbsEfmOamErrFrmEvtWindow OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -795,7 +795,7 @@ nbsEfmOamErrFrmEvtWindow OBJECT-TYPE
     ::= {nbsEfmOamEntry  37 }
 
 nbsEfmOamErrFrmEvtThreshld OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -829,7 +829,7 @@ nbsEfmOamErrFrmEvtCount OBJECT-TYPE
     ::= {nbsEfmOamEntry  39 }
 
 nbsEfmOamErrFrmPerCfgDuration  OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -841,7 +841,7 @@ nbsEfmOamErrFrmPerCfgDuration  OBJECT-TYPE
     ::= {nbsEfmOamEntry  40 }
 
 nbsEfmOamErrFrmPerCfgThreshld OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -852,7 +852,7 @@ nbsEfmOamErrFrmPerCfgThreshld OBJECT-TYPE
     ::= {nbsEfmOamEntry  41 }
 
 nbsEfmOamErrFrmPerEvtTime OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -869,7 +869,7 @@ nbsEfmOamErrFrmPerEvtTime OBJECT-TYPE
     ::= {nbsEfmOamEntry  42 }
 
 nbsEfmOamErrFrmPerEvtWindow OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -886,7 +886,7 @@ nbsEfmOamErrFrmPerEvtWindow OBJECT-TYPE
     ::= {nbsEfmOamEntry  43 }
 
 nbsEfmOamErrFrmPerEvtThreshld OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -920,7 +920,7 @@ nbsEfmOamErrFrmPerEvtCount OBJECT-TYPE
     ::= {nbsEfmOamEntry  45 }
 
 nbsEfmOamErrFrmSecSumCfgDuration OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -931,7 +931,7 @@ nbsEfmOamErrFrmSecSumCfgDuration OBJECT-TYPE
     ::= {nbsEfmOamEntry  46 }
 
 nbsEfmOamErrFrmSecSumCfgThreshld OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -942,7 +942,7 @@ nbsEfmOamErrFrmSecSumCfgThreshld OBJECT-TYPE
     ::= {nbsEfmOamEntry  47 }
 
 nbsEfmOamErrFrmSecSumEvtTime  OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -959,7 +959,7 @@ nbsEfmOamErrFrmSecSumEvtTime  OBJECT-TYPE
     ::= {nbsEfmOamEntry  48 }
 
 nbsEfmOamErrFrmSecSumEvtWindow OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -976,7 +976,7 @@ nbsEfmOamErrFrmSecSumEvtWindow OBJECT-TYPE
     ::= {nbsEfmOamEntry  49 }
 
 nbsEfmOamErrFrmSecSumEvtThreshld OBJECT-TYPE
-    SYNTAX      Unsigned16
+    SYNTAX      Unsigned16TC
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
