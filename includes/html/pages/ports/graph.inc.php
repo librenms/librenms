@@ -57,7 +57,7 @@ foreach ($ports as $port) {
         
         echo "<div class='graph-all-common' style='min-width: ".$width_div.'px;max-width:'.$width_div."px;'>";
         echo overlib_link($link, $graph, $overlib_content);
-        echo '</div>'; 
+        echo '</div>';
     }
 }
 
