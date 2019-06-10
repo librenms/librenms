@@ -73,6 +73,7 @@ class StringHelpers
             'sdfsinfo' => 'SDFS info',
             'freeradius' => 'FreeRADIUS',
             'pi-hole' => 'pi-hole',
+            'raid-drp' => 'RAID, Device::RAID::Poller',
             'zfs' => 'ZFS',
         ];
 

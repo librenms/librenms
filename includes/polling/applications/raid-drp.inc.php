@@ -48,7 +48,13 @@ $stats_rrd_def = RrdDefinition::make()
 
 $array_keys=array_keys($raidinfo['arrays']);
 foreach ($array_keys as $array_name) {
-    //  Turn the status into a integer.
+    /*  Turn the status into a integer.
+     * Integer Status mapping
+     * 0 unknwon
+     * 1 bad
+     * 2 rebuilding
+     * 3 good
+    */
     $status=0;
     if (strcmp($raidinfo['arrays'][$array_name]['status'], 'good') == 0) {
         $status=3;
@@ -58,7 +64,15 @@ foreach ($array_keys as $array_name) {
         $status=1;
     }
 
-    // Turns the BBU status into a integer.
+    /* Turns the BBU status into a integer.
+     * Integer Status mapping
+     * 0 unknwon
+     * 1 na
+     * 2 notPresent
+     * 3 charging
+     * 4 failed
+     * 5 good
+     */
     $bbu_status=0;
     if (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'na') == 0) {
         $bbu_status=1;
@@ -68,10 +82,8 @@ foreach ($array_keys as $array_name) {
         $bbu_status=3;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'charging') == 0) {
         $bbu_status=4;
-    } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'unknown') == 0) {
-        $bbu_status=5;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'good') == 0) {
-        $bbu_status=6;
+        $bbu_status=5;
     }
 
     $good=count($raidinfo['arrays'][$array_name]['good']);
@@ -105,7 +117,7 @@ $component=new LibreNMS\Component();
 $components=$component->getComponents($device_id, $options);
 
 //delete portsactivity component if nothing is found
-if (empty($ports_keys)) {
+if (empty($array_keys)) {
     if (isset($components[$device_id])) {
         foreach ($components[$device_id] as $component_id => $_unused) {
                  $component->deleteComponent($component_id);
@@ -116,14 +128,14 @@ if (empty($ports_keys)) {
     if (isset($components[$device_id])) {
         $portsc = $components[$device_id];
     } else {
-        $portsc = $component->createComponent($device_id, 'portsactivity');
+        $portsc = $component->createComponent($device_id, 'raid-drp');
     }
 
     $id = $component->getFirstComponentID($portsc);
-    $portsc[$id]['label'] = 'Portsactivity';
-    $portsc[$id]['ports'] = json_encode($ports_keys);
+    $portsc[$id]['label'] = 'RAID-DRP';
+    $portsc[$id]['arrays'] = json_encode($array_keys);
 
     $component->setComponentPrefs($device_id, $portsc);
 }
 
-update_application($app, 'OK', data_flatten($ports));
+update_application($app, 'OK', data_flatten($raidinfo));
