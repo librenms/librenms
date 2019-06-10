@@ -8,7 +8,7 @@ $link_array = array(
     'page'   => 'device',
     'device' => $device['device_id'],
     'tab'    => 'apps',
-    'app'    => 'zfs',
+    'app'    => 'raid-drp',
 );
 
 print_optionbar_start();
