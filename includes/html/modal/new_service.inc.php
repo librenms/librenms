@@ -47,46 +47,46 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                             <span id="ajax_response">&nbsp;</span>
                         </div>
                     </div>
-                    <div class="form-service">
-                        <label for='stype' class='col-sm-3 col-lg-3 control-label'>Type: </label>
-                        <div class="col-sm-9 col-lg-9">
+                    <div class="form-service row">
+                        <label for='stype' class='col-sm-3 control-label'>Type: </label>
+                        <div class="col-sm-9">
                             <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
                                 <?php echo $stype?>
                             </select>
                         </div>
                     </div>
                     <div class='form-service row'>
-                        <label for='desc' class='col-sm-3 col-lg-3 control-label'>Description: </label>
-                        <div class='col-sm-9 col-lg-9'>
+                        <label for='desc' class='col-sm-3 control-label'>Description: </label>
+                        <div class='col-sm-9'>
                             <textarea id='desc' name='desc' class='form-control'></textarea>
                         </div>
                     </div>
                     <div class="form-service row">
-                        <label for='ip' class='col-sm-3 col-lg-3 control-label'>IP Address: </label>
-                        <div class="col-sm-9 col-lg-9">
+                        <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
+                        <div class="col-sm-9">
                             <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device['hostname']?>'/>
                         </div>
                     </div>
                     <div class="form-service row">
-                        <label for='param' class='col-sm-3 col-lg-3 control-label'>Parameters: </label>
-                        <div class="col-sm-9 col-log 9">
+                        <label for='param' class='col-sm-3 control-label'>Parameters: </label>
+                        <div class="col-sm-9">
                            <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
                         </div>
                     </div>
                     <div class="form-service row">
-                        <label for='ignore' class='col-sm-3 col-lg-3 control-label'>Ignore: </label>
-                        <div class="col-sm-9 col-lg-9">
+                        <label for='ignore' class='col-sm-3 control-label'>Ignore: </label>
+                        <div class="col-sm-9">
                             <input type='checkbox' id='ignore' name='ignore'>
                         </div>
                     </div>
                     <div class="form-service row">
-                        <label for='disabled' class='col-sm-3  col-lg-3 control-label'>Disabled: </label>
-                        <div class="col-sm-9 col-lg-9">
+                        <label for='disabled' class='col-sm-3 control-label'>Disabled: </label>
+                        <div class="col-sm-9">
                             <input type='checkbox' id='disabled' name='disabled'>
                         </div>
                     </div>
-                    <div class="form-service">
-                        <div class="col-sm-offset-3 col-lg-offset-3 col-sm-9 col-lg-9">
+                    <div class="form-service row">
+                        <div class="col-sm-offset-3 col-sm-9">
                             <button class="btn btn-success btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button>
                         </div>
                     </div>

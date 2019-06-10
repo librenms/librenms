@@ -37,7 +37,7 @@ if (is_numeric($service_id) && $service_id > 0) {
     }
 } else {
     // Need to add.
-    $service_id = add_service($device_id, $type, $desc, $ip, $param, $ignore);
+    $service_id = add_service($device_id, $type, $desc, $ip, $param, $ignore, $disabled);
     if ($service_id == false) {
         $status = array('status' =>1, 'message' => 'ERROR: Failed to add Service: <i>'.$type.'</i>');
     } else {
