@@ -580,7 +580,7 @@ function generate_sensor_url($sensor, $vars = array())
     return generate_url(array('page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => Config::get('time.day')), $vars);
 }//end generate_sensor_url()
 
- 
+
 function generate_port_url($port, $vars = array())
 {
     return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
@@ -1671,4 +1671,39 @@ function get_unit_for_sensor_class($class)
     }
 
     return $units_by_classes[$class];
+}
+
+/**
+ * Takes a Device::RAID::Poller name such as "mirror/foo" and turns it into "mirror_foo"
+ * @param $name
+ * @return string Safe to use for RRD name.
+ */
+function raid_drp_name_to_rrd($name)
+{
+    return preg_replace('[\ \\\/\(\)\[\]]', '_', $name);
+}
+
+/**
+ * Get the RAID arrays for a device... just requires the device ID
+ * an empty return means RAID DRP is not in use or there are currently no pools
+ * @param $device_id
+ * @return array
+ */
+function get_raid_drp_arrays($device_id)
+{
+    $options=array(
+        'filter' => array(
+             'type' => array('=', 'raid-drp'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $fetched=$component->getComponents($device_id, $options);
+
+    if (isset($zfsc[$device_id])) {
+        $id = $fetched->getFirstComponentID($zfsc, $device_id);
+        return json_decode($fetched[$device_id][$id]['pools']);
+    }
+
+    return array();
 }

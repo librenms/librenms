@@ -90,7 +90,9 @@ foreach ($array_keys as $array_name) {
     $bad=count($raidinfo['arrays'][$array_name]['bad']);
     $spare=count($raidinfo['arrays'][$array_name]['spare']);
 
-    $rrd_name = array('app', $name, $app_id, );
+    $rrd_name=preg_replace('[\ \\\/\(\)\[\]]', '_', $array_name);
+
+    $rrd_name = array('app', $name, $app_id, $rrd_name);
     $fields = array(
         'status'=>$status,
         'good'=>$good,
@@ -116,26 +118,29 @@ $options=array(
 $component=new LibreNMS\Component();
 $components=$component->getComponents($device_id, $options);
 
-//delete portsactivity component if nothing is found
+//delete component if nothing is found
 if (empty($array_keys)) {
     if (isset($components[$device_id])) {
         foreach ($components[$device_id] as $component_id => $_unused) {
                  $component->deleteComponent($component_id);
         }
     }
-//add portsactivity component if found
+//add adds/update component if found
 } else {
     if (isset($components[$device_id])) {
-        $portsc = $components[$device_id];
+        $update = $components[$device_id];
     } else {
-        $portsc = $component->createComponent($device_id, 'raid-drp');
+        $update = $component->createComponent($device_id, 'raid-drp');
     }
 
-    $id = $component->getFirstComponentID($portsc);
-    $portsc[$id]['label'] = 'RAID-DRP';
-    $portsc[$id]['arrays'] = json_encode($array_keys);
+    // Make sure we don't readd it, just in a different order.
+    sort($array_keys);
 
-    $component->setComponentPrefs($device_id, $portsc);
+    $id = $component->getFirstComponentID($update);
+    $update[$id]['label'] = 'RAID-DRP';
+    $update[$id]['arrays'] = json_encode($array_keys);
+
+    $component->setComponentPrefs($device_id, $updae);
 }
 
 update_application($app, 'OK', data_flatten($raidinfo));
