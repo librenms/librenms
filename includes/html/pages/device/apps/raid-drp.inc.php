@@ -2,7 +2,7 @@
 
 global $config;
 
-$pools=get_raid_drp_arrays($device['device_id']);
+$raid_arrays=get_raid_drp_arrays($device['device_id']);
 
 $link_array = array(
     'page'   => 'device',
@@ -14,32 +14,35 @@ $link_array = array(
 print_optionbar_start();
 
 echo 'Arrays:';
-$pool_int=0;
-while (isset($pools[$pool_int])) {
-    $pool=$pools[$pool_int];
-    $label=$pool;
+$raid_int=0;
+while (isset($raid_arrays[$raid_int])) {
+    $name=$pools[$raid_int];
+    $label=$name;
 
-    if ($vars['pool'] == $pool) {
+    if ($vars['array'] == $name) {
         $label='>>'.$pool.'<<';
     }
 
-    $pool_int++;
+    $raid_int++;
 
     $append='';
-    if (isset($pools[$pool_int])) {
+    if (isset($raid_arrays[$raid_int])) {
         $append=', ';
     }
 
-    echo generate_link($label, $link_array, array('pool'=>$pool)).$append;
+    echo generate_link($label, $link_array, array('array'=>$name)).$append;
 }
 
 print_optionbar_end();
 
-if (!isset($vars['array'])) {
+if (isset($vars['array'])) {
     $graphs = array(
         'raid_drp_status' => 'Array Status',
         'raid_drp_bbu' => 'Array BBU Status',
         'raid_drp_drives' => 'Array Drive Count',
+    );
+} else {
+    $graphs = array(
     );
 }
 
