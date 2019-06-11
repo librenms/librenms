@@ -7,16 +7,15 @@ services:
 env:
   global:
     - APP_ENV=testing
-    - DBTEST=1
 matrix:
   fast_finish: true
   include:
-  - php: 7.3
-    env: SKIP_STYLE_CHECK=1
-  - php: 7.2
-    env: SKIP_UNIT_CHECK=1 BROWSER_TEST=1 CHROME_HEADLESS=1
-  - php: 7.1
-    env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
+    - php: '7.3'
+      env: SKIP_STYLE_CHECK=1
+    - php: '7.2'
+      env: SKIP_UNIT_CHECK=1 BROWSER_TEST=1 CHROME_HEADLESS=1
+    - php: '7.1'
+      env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
 
 cache:
   directories:
@@ -40,7 +39,7 @@ after_failure:
 
 before_script:
   - test -z "$BROWSER_TEST" || php artisan dusk:update `google-chrome --version | grep -oE "[0-9]+" | head -n 1`
-  - test -z "$BROWSER_TEST" || php artisan serve --env=dusk.testing  2>/dev/null &
+  - test -z "$BROWSER_TEST" || DBTEST=1 php artisan serve --env=dusk.testing  2>/dev/null &
 
 script:
   - set -e
