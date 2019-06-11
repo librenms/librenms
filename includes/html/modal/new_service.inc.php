@@ -43,7 +43,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                     <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
                     <input type="hidden" name="type" id="type" value="create-service">
                     <div class="form-service">
-                        <div class="col-sm-12 col-lg-12">
+                        <div class="col-sm-12">
                             <span id="ajax_response">&nbsp;</span>
                         </div>
                     </div>
