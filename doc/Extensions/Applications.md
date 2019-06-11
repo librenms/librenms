@@ -69,7 +69,7 @@ The unix-agent does not have a discovery module, only a poller module. That poll
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, SNMP extend, Agent
 1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
 1. [Proxmox](#proxmox) - SNMP extend
-1. [RAID, Device::RAID::Poller](#RAID, Device::RAID::Poller) - SNMP extend
+1. [RAID, Device::RAID::Poller](#raid-drp) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
 1. [SMART](#smart) - SNMP extend
@@ -960,13 +960,13 @@ snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 
 6. Restart snmpd on your host
 
-### RAID, Device::RAID::Poller
+### RAID-DRP
 ##### SNMP Extend
 1. Install
    [Device::RAID::Poller](https://github.com/VVelox/Device-RAID-Poller)
    onto the machine in question.
    
-  CentOS:
+CentOS:
 
 ```
 yum install cpan
@@ -994,8 +994,7 @@ cpan Device::RAID::Poller
 extend raid-drp /usr/local/bin/sudo /usr/local/bin/check_raid -p
 ```
 
-	If you need to use sudo with it, be use to also set it up
-	akin to below.
+If you need to use sudo with it, be use to also set it up akin to below.
 
 ```
 snmpd ALL = NOPASSWD: /usr/local/bin/check_raid
