@@ -39,7 +39,7 @@ after_failure:
 
 before_script:
   - test -z "$BROWSER_TEST" || php artisan dusk:update `google-chrome --version | grep -oE "[0-9]+" | head -n 1`
-  - test -z "$BROWSER_TEST" || DBTEST=1 php artisan serve --env=dusk.testing  2>/dev/null &
+  - test -z "$BROWSER_TEST" || DBTEST=1 php artisan serve --env=dusk.testing
 
 script:
   - set -e
