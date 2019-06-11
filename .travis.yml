@@ -6,8 +6,8 @@ services:
   - mysql
 env:
   global:
-    APP_ENV=testing
-    DBTEST=1
+    - APP_ENV=testing
+    - DBTEST=1
 matrix:
   fast_finish: true
   include:
