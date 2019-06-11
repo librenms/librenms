@@ -1700,9 +1700,9 @@ function get_raid_drp_arrays($device_id)
     $component=new LibreNMS\Component();
     $fetched=$component->getComponents($device_id, $options);
 
-    if (isset($zfsc[$device_id])) {
-        $id = $fetched->getFirstComponentID($zfsc, $device_id);
-        return json_decode($fetched[$device_id][$id]['pools']);
+    if (isset($fetched[$device_id])) {
+        $id = $component->getFirstComponentID($fetched, $device_id);
+        return json_decode($fetched[$device_id][$id]['arrays']);
     }
 
     return array();

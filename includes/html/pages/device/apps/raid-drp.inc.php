@@ -20,7 +20,7 @@ while (isset($raid_arrays[$raid_int])) {
     $label=$name;
 
     if ($vars['array'] == $name) {
-        $label='>>'.$pool.'<<';
+        $label='>>'.$name.'<<';
     }
 
     $raid_int++;
@@ -54,8 +54,8 @@ foreach ($graphs as $key => $text) {
     $graph_array['id']     = $app['app_id'];
     $graph_array['type']   = 'application_'.$key;
 
-    if (isset($vars['pool'])) {
-        $graph_array['pool']=$vars['pool'];
+    if (isset($vars['array'])) {
+        $graph_array['array']=$vars['array'];
     }
 
 
