@@ -69,7 +69,7 @@ The unix-agent does not have a discovery module, only a poller module. That poll
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, SNMP extend, Agent
 1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
 1. [Proxmox](#proxmox) - SNMP extend
-1. [RAID, Device::RAID::Poller](#raid-drp) - SNMP extend
+1. [RAID, Device::RAID::Poller](#RAID, Device::RAID::Poller) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
 1. [SMART](#smart) - SNMP extend
@@ -966,21 +966,21 @@ snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
    [Device::RAID::Poller](https://github.com/VVelox/Device-RAID-Poller)
    onto the machine in question.
    
-   CentOS:
+  CentOS:
 
 ```
 yum install cpan
 cpan Module::Build Module::List Device::RAID::Poller
 ```
 
-	Debian:
+Debian:
 	
 ```
 apt install perl perl-base perl-modules make
 cpan Module::Build Module::List Device::RAID::Poller
 ```
 
-	FreeBSD:
+FreeBSD:
 	
 ```
 pkg install perl5 p5-JSON p5-Error-Helper
