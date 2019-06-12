@@ -48,7 +48,7 @@
                     "sensor_index": "hwBattStringRemainCapacityPercent.1",
                     "sensor_type": "huawei-smu",
                     "sensor_descr": "Remaining battery capacity",
-                    "group": "",
+                    "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 100,

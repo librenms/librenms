@@ -544,7 +544,7 @@
                     "sensor_index": "0",
                     "sensor_type": "productStatusGlobalStatus",
                     "sensor_descr": "Current Status",
-                    "group": "",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
