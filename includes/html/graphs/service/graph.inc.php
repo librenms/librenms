@@ -11,9 +11,10 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Service\Service;
+
 // Get a list of all services for this device.
-require_once 'includes/services.inc.php';
-$services = service_get($device['device_id']);
+$services = Service::serviceGet($device['device_id']);
 
 // Determine which key is the service we want to show.
 if (isset($vars['id'])) {

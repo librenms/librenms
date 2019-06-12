@@ -13,6 +13,7 @@
  */
 
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Service\Service;
 
 if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
@@ -35,7 +36,7 @@ if (is_numeric($service_id) && $service_id > 0) {
     }
 } else {
     // Need to add.
-    $service_id = add_service($device_id, $type, $desc, $ip, $param);
+    $service_id = Service::addService($device_id, $type, $desc, $ip, $param);
     if ($service_id == false) {
         $status = array('status' =>1, 'message' => 'ERROR: Failed to add Service: <i>'.$type.'</i>');
     } else {

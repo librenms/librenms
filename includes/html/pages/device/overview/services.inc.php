@@ -1,12 +1,13 @@
 <?php
 
 use LibreNMS\Util\ObjectCache;
+use LibreNMS\Service\Service;
 
 if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
     // Build the string.
     $break = '';
     $output = '';
-    foreach (service_get($device['device_id']) as $data) {
+    foreach (Service::serviceGet($device['device_id']) as $data) {
         if ($data['service_status'] == '0') {
             // Ok
             $status = 'green';

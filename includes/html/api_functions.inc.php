@@ -17,6 +17,7 @@ use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Service\Service;
 
 function authToken(\Slim\Route $route)
 {
@@ -2352,9 +2353,10 @@ function add_service_for_host()
     $service_desc = $data['desc'] ? mres($data['desc']) : '';
     $service_param = $data['param'] ? mres($data['param']) : '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
+    $service_disabled = $data['disabled'] ? true : false;
 
     // Set the service
-    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore);
+    $service_id = Service::addService($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore, (int)$service_disabled);
     if ($service_id != false) {
         api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
     } else {
