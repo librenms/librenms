@@ -32,7 +32,7 @@ class DeviceGroupsRewrite extends Migration
             $table->string('desc')->change();
             $table->dropColumn('type');
             $table->dropColumn('rules');
-            $table->text('params')->after('pattern');
+            $table->text('params')->nullable()->after('pattern');
         });
     }
 }
