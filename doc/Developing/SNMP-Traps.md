@@ -5,18 +5,9 @@ path: blob/master/doc/
 
 You must to have working snmptrapd. See [SNMP TRAP HANDLER](../Extensions/SNMP-Trap-Handler.md) 
 
-If you are adding trap handler for new OS, where are you using OS MIBs then you need to add MIB dir to your snmptrapd service, if it's using only MIBs from directory `/opt/librenms/mibs`.
+Make sure the MIB is loaded fro the trap you are adding. Edit `/etc/systemd/system/snmptrapd.service.d/mibs.conf` to add it then restart snmprtrapd.
 
-```
-ExecStart=/usr/sbin/snmptrapd -f -M /opt/librenms/mibs -m ALL
-```
-
-`snmptrapd -M` option is not recursive, so you need to specify each directory individually. For example for cisco MIBs you need to specify:
-
-```
-ExecStart=/usr/sbin/snmptrapd -f -m ALL -M /opt/librenms/mibs:/opt/librenms/mibs/cisco
-```
-
+`MIBDIRS` option is not recursive, so you need to specify each directory individually.
 
 Create a new class in `LibreNMS\Snmptrap\Handlers` that implements the
 `LibreNMS\Interfaces\SnmptrapHandler` interface. For example:
@@ -26,7 +17,7 @@ Create a new class in `LibreNMS\Snmptrap\Handlers` that implements the
 /**
  * ColdBoot.php
  *
- * -Description-
+ * Handles the SNMPv2-MIB::coldStart trap
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
