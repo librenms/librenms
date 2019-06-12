@@ -167,7 +167,7 @@ class QueryBuilderParser implements \JsonSerializable
         $split = array_chunk(preg_split('/(&&|\|\|)/', $query, -1, PREG_SPLIT_DELIM_CAPTURE), 2);
 
         foreach ($split as $chunk) {
-            if (count($chunk) < 2) {
+            if (count($chunk) < 2 && empty($chunk[0])) {
                 continue; // likely the ending && or ||
             }
 
@@ -185,11 +185,12 @@ class QueryBuilderParser implements \JsonSerializable
             if (is_null($value)) {
                 $value = '1';
             } else {
-                $value = trim($value, '"');
-
                 // value is a field, mark it with backticks
                 if (starts_with($value, '%')) {
                     $value = '`' . ltrim($value, '%') . '`';
+                } else {
+                    // but if it has quotes just remove the %
+                    $value = ltrim(trim($value, '"'), '%');
                 }
 
                 // replace regex placeholder, don't think we can safely convert to like operators

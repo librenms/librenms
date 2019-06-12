@@ -112,5 +112,17 @@
         {"condition":"OR","rules":[{"id":"ports.ifOutErrors_rate","field":"ports.ifOutErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"},{"id":"ports.ifInErrors_rate","field":"ports.ifInErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"}],"valid":true},
         "ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100",
         "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100)"
+    ],
+    [
+        "%devices.hostname = %devices.sysName &&",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"`devices.sysName`"}],"valid":true},
+        "devices.hostname = devices.sysName",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname = devices.sysName"
+    ],
+    [
+        "%devices.hostname ~ \"%router\" &&",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"regex","value":"router"}],"valid":true},
+        "devices.hostname REGEXP \"router\"",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname REGEXP \"router\""
     ]
 ]
