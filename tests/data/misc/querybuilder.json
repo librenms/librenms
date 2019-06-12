@@ -88,14 +88,14 @@
         {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
         "macros.device_up = 1",
         "SELECT * FROM devices WHERE (devices.device_id = ?) AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1",
-        ["select * from `devices` where `notmacros`.`device_up` = ?", ["1"]]
+        ["select * from `devices` where (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = ?", ["1"]]
     ],
     [
         "%sensors.sensor_current > %sensors.sensor_limit",
         {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"greater","value":"`sensors.sensor_limit`"}],"valid":true},
         "sensors.sensor_current > sensors.sensor_limit",
         "SELECT * FROM devices,sensors WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id) AND sensors.sensor_current > sensors.sensor_limit",
-        ["select * from `devices` left join `sensors` on `devices`.`device_id` = `sensors`.`device_id` where `sensors`.`sensor_current` > `sensors.sensor_limit`", []]
+        ["select * from `devices` left join `sensors` on `devices`.`device_id` = `sensors`.`device_id` where `sensors`.`sensor_current` > sensors.sensor_limit", []]
     ],
     [
         "%devices.hostname ~ \"@ocal@\" ",
@@ -109,14 +109,14 @@
         {"condition":"AND","rules":[{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
         "macros.state_sensor_critical = 1",
         "SELECT * FROM devices,sensors,sensors_to_state_indexes,state_indexes,state_translations WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id AND sensors.sensor_id = sensors_to_state_indexes.sensor_id AND sensors_to_state_indexes.state_index_id = state_indexes.state_index_id AND state_indexes.state_index_id = state_translations.state_index_id) AND (sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = 1",
-        ["select * from `devices` left join `sensors` on `devices`.`device_id` = `sensors`.`device_id` left join `sensors_to_state_indexes` on `sensors`.`sensor_id` = `sensors_to_state_indexes`.`sensor_id` left join `state_indexes` on `sensors_to_state_indexes`.`state_index_id` = `state_indexes`.`state_index_id` left join `state_translations` on `state_indexes`.`state_index_id` = `state_translations`.`state_index_id` where `notmacros`.`state_sensor_critical` = ?", ["1"]]
+        ["select * from `devices` left join `sensors` on `devices`.`device_id` = `sensors`.`device_id` left join `sensors_to_state_indexes` on `sensors`.`sensor_id` = `sensors_to_state_indexes`.`sensor_id` left join `state_indexes` on `sensors_to_state_indexes`.`state_index_id` = `state_indexes`.`state_index_id` left join `state_translations` on `state_indexes`.`state_index_id` = `state_translations`.`state_index_id` where (sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = ?", ["1"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"},{"condition":"OR","rules":[{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge12"},{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge13"}]},{"id":"ports.ifInOctets_delta","field":"ports.ifInOctets_delta","type":"integer","input":"number","operator":"greater","value":"42"}],"valid":true},
         "macros.device = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42",
         "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (devices.disabled = 0 && devices.ignore = 0) = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42",
-        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where `notmacros`.`device` = ? AND (`ports`.`ifName` = ? OR `ports`.`ifName` = ?) AND `ports`.`ifInOctets_delta` > ?", ["1","Ge12","Ge13","42"]]
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where (devices.disabled = 0 && devices.ignore = 0) = ? AND (`ports`.`ifName` = ? OR `ports`.`ifName` = ?) AND `ports`.`ifInOctets_delta` > ?", ["1","Ge12","Ge13","42"]]
     ],
     [
         "%bills.bill_name = \"Neil's Bill\"",
@@ -137,7 +137,7 @@
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"`devices.sysName`"}],"valid":true},
         "devices.hostname = devices.sysName",
         "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname = devices.sysName",
-        ["select * from `devices` where `devices`.`hostname` = `devices`.`sysName`", []]
+        ["select * from `devices` where `devices`.`hostname` = devices.sysName", []]
     ],
     [
         "%devices.hostname ~ \"%router\" &&",
@@ -145,5 +145,12 @@
         "devices.hostname REGEXP \"router\"",
         "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname REGEXP \"router\"",
         ["select * from `devices` where `devices`.`hostname` REGEXP ?", ["router"]]
+    ],
+    [
+        "syslog.timestamp > %macros.past_5m && syslog.msg ~ \"@Port Down@\"",
+        {"condition":"AND","rules":[{"id":"syslog.timestamp","field":"syslog.timestamp","type":"datetime","input":"text","operator":"greater","value":"`macros.past_5m`"},{"id":"syslog.msg","field":"syslog.msg","type":"string","input":"text","operator":"regex","value":".*Port Down.*"}],"valid":true},
+        "syslog.timestamp > macros.past_5m AND syslog.msg REGEXP \".*Port Down.*\"",
+        "SELECT * FROM devices,syslog WHERE (devices.device_id = ? AND devices.device_id = syslog.device_id) AND syslog.timestamp > (DATE_SUB(NOW(),INTERVAL 5 MINUTE)) AND syslog.msg REGEXP \".*Port Down.*\"",
+        ["select * from `devices` left join `syslog` on `devices`.`device_id` = `syslog`.`device_id` where `syslog`.`timestamp` > (DATE_SUB(NOW(),INTERVAL 5 MINUTE)) AND `syslog`.`msg` REGEXP ?", [".*Port Down.*"]]
     ]
 ]

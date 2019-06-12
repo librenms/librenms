@@ -27,6 +27,7 @@ namespace LibreNMS\Alerting;
 
 use DB;
 use Illuminate\Database\Query\Builder;
+use Log;
 
 class QueryBuilderFluentParser extends QueryBuilderParser
 {
@@ -78,9 +79,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      */
     protected function parseRuleToQuery($query, $rule, $condition = 'AND')
     {
-        $field = $rule['field'];
-        $op = $rule['operator'];
-        $value = (!is_array($rule['value']) && starts_with($rule['value'], '`') && ends_with($rule['value'], '`')) ? DB::raw($rule['value']) : $rule['value'];
+        list($field, $op, $value) = $this->expandRule($rule);
 
         switch ($op) {
             case 'equal':
@@ -116,13 +115,36 @@ class QueryBuilderFluentParser extends QueryBuilderParser
                 if ($values !== false) {
                     return $query->whereIn($field, $values, $condition, $op == 'not_in');
                 }
-                \Log::error('Could not parse in values, use comma or space delimiters');
+                Log::error('Could not parse in values, use comma or space delimiters');
                 break;
             default:
-                \Log::error('Unhandled QueryBuilderFluentParser operation: ' . $op);
+                Log::error('Unhandled QueryBuilderFluentParser operation: ' . $op);
         }
 
         return $query;
+    }
+
+    /**
+     * Extract field, operator and value from the rule and expand macros and raw values
+     *
+     * @param array $rule
+     * @return array [field, operator, value]
+     */
+    protected function expandRule($rule)
+    {
+        $field = $rule['field'];
+        if (starts_with($field, 'macros.')) {
+            $field = DB::raw($this->expandMacro($field));
+        }
+
+        $op = $rule['operator'];
+
+        $value = $rule['value'];
+        if (!is_array($value) && starts_with($value, '`') && ends_with($value, '`')) {
+            $value = DB::raw($this->expandMacro(trim($value, '`')));
+        }
+
+        return [$field, $op, $value];
     }
 
     /**
