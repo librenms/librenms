@@ -128,6 +128,9 @@ if (empty($found_dbs)) {
         $pgc = $component->createComponent($device_id, 'postgres');
     }
 
+    // Make sure we don't readd it, just in a different order.
+    sort($found_dbs);
+
     $id = $component->getFirstComponentID($pgc);
     $pgc[$id]['label'] = 'Postgres';
     $pgc[$id]['databases'] = json_encode($found_dbs);

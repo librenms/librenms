@@ -1,6 +1,6 @@
 <?php
 $unit_text     = 'Sync completed (%)';
-$unitlen       = 10;
+$unitlen       = 20;
 $bigdescrlen   = 15;
 $smalldescrlen = 15;
 

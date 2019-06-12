@@ -238,7 +238,10 @@ class Service:
         info("Poller group {}. Using Python {} and {} locks and queues"
              .format('0 (default)' if self.config.group == [0] else self.config.group, python_version(),
                      'redis' if isinstance(self._lm, LibreNMS.RedisLock) else 'internal'))
-        info("Maintenance tasks will be run every {}".format(timedelta(seconds=self.config.update_frequency)))
+        if self.config.update_enabled:
+            info("Maintenance tasks will be run every {}".format(timedelta(seconds=self.config.update_frequency)))
+        else:
+            warning("Maintenance tasks are disabled.")
 
         # Main dispatcher loop
         try:

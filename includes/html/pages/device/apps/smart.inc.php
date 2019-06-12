@@ -37,10 +37,12 @@ if (isset($vars['disk'])) {
         'smart_other'       => 'Other',
         'smart_tests_status'=> 'S.M.A.R.T self-tests results',
         'smart_tests_ran'   => 'S.M.A.R.T self-tests run count',
+        'smart_runtime'     => 'Power On Hours',
     );
 } else {
     $graphs = array(
         'smart_id5'=>'ID# 5, Reallocated Sectors Count',
+        'smart_id9'=>'ID# 9, Power On Hours',
         'smart_id10'=>'ID# 10, Spin Retry Count',
         'smart_id173'=>'ID# 173, SSD Wear Leveller Worst Case Erase Count',
         'smart_id177'=>'ID# 177, SSD Wear Leveling Count',
