@@ -26,6 +26,7 @@
 namespace App\Models;
 
 use LibreNMS\Alerting\QueryBuilderFluentParser;
+use Log;
 use Permissions;
 
 class DeviceGroup extends BaseModel
@@ -58,15 +59,19 @@ class DeviceGroup extends BaseModel
             ->with(['devices' => function ($query) {
                 $query->select('devices.device_id');
             }])
-//            ->where('type', 'dynamic')
             ->get()
             ->filter(function ($device_group) use ($device) {
                 /** @var DeviceGroup $device_group */
                 if ($device_group->type == 'dynamic') {
-                    return $device_group->getParser()
-                        ->toQuery()
-                        ->where('devices.device_id', $device->device_id)
-                        ->exists();
+                    try {
+                        return $device_group->getParser()
+                            ->toQuery()
+                            ->where('devices.device_id', $device->device_id)
+                            ->exists();
+                    } catch (\Illuminate\Database\QueryException $e) {
+                        Log::error("Device Group '$device_group->name' generates invalid query: " . $e->getMessage());
+                        return false;
+                    }
                 }
 
                 // for static, if this device is include, keep it.
