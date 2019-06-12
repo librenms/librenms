@@ -11,10 +11,10 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Service\Service;
+use LibreNMS\Service\ServiceDB;
 
 // Get a list of all services for this device.
-$services = Service::serviceGet($device['device_id']);
+$services = ServiceDB::serviceGet($device['device_id']);
 
 // Determine which key is the service we want to show.
 if (isset($vars['id'])) {

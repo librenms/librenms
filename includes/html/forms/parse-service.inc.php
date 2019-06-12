@@ -13,7 +13,7 @@
  */
 
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Service\Service;
+use LibreNMS\Service\ServiceDB;
 
 if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
@@ -22,7 +22,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 $service_id = $vars['service_id'];
 
 if (is_numeric($service_id) && $service_id > 0) {
-    $service = Service::serviceGet(null, $service_id);
+    $service = ServiceDB::serviceGet(null, $service_id);
 
     $output = array(
         'stype'     => $service[0]['service_type'],

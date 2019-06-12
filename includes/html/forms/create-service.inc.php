@@ -13,7 +13,7 @@
  */
 
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Service\Service;
+use LibreNMS\Service\ServiceDB;
 
 if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
@@ -29,14 +29,14 @@ $device_id = $vars['device_id'];
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
     $update = array('service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param);
-    if (is_numeric(edit_service($update, $service_id))) {
+    if (is_numeric(ServiceDB::editService($update, $service_id))) {
         $status = array('status' =>0, 'message' => 'Modified Service: <i>'.$service_id.': '.$type.'</i>');
     } else {
         $status = array('status' =>1, 'message' => 'ERROR: Failed to modify service: <i>'.$service_id.'</i>');
     }
 } else {
     // Need to add.
-    $service_id = Service::addService($device_id, $type, $desc, $ip, $param);
+    $service_id = ServiceDB::addService($device_id, $type, $desc, $ip, $param);
     if ($service_id == false) {
         $status = array('status' =>1, 'message' => 'ERROR: Failed to add Service: <i>'.$type.'</i>');
     } else {

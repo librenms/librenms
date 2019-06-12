@@ -1,7 +1,7 @@
 <?php
 
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Service\Service;
+use LibreNMS\Service\ServiceDB;
 
 $no_refresh = true;
 
@@ -12,7 +12,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
         if (LegacyAuth::user()->hasGlobalAdmin()) {
             $updated = '1';
 
-            $service_id = Service::addService($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);
+            $service_id = ServiceDB::addService($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);
             if ($service_id) {
                 $message       .= $message_break.'Service added ('.$service_id.')!';
                 $message_break .= '<br />';
