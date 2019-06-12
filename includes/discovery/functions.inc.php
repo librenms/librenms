@@ -1075,7 +1075,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);
 
                     // process the group
-                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache);
+                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache) ?: null;
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
