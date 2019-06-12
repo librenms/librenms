@@ -13,8 +13,6 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-include_once '/opt/librenms/includes/services.inc.php';
-
 if (LegacyAuth::user()->hasGlobalAdmin()) {
     // Build the types list.
     $dir = $config['nagios_plugins'];
