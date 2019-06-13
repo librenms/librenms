@@ -1,22 +1,22 @@
 <div class="form-group @if($errors->has('name')) has-error @endif">
-    <label for="name" class="control-label col-sm-3 text-nowrap">@lang('Name')</label>
-    <div class="col-sm-9">
+    <label for="name" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Name')</label>
+    <div class="col-sm-9 col-md-10">
         <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $device_group->name) }}">
         <span class="help-block">{{ $errors->first('name') }}</span>
     </div>
 </div>
 
 <div class="form-group @if($errors->has('desc')) has-error @endif">
-    <label for="desc" class="control-label col-sm-3 text-nowrap">@lang('Description')</label>
-    <div class="col-sm-9">
+    <label for="desc" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Description')</label>
+    <div class="col-sm-9 col-md-10">
         <input type="text" class="form-control" id="desc" name="desc" value="{{ old('desc', $device_group->desc) }}">
         <span class="help-block">{{ $errors->first('desc') }}</span>
     </div>
 </div>
 
 <div class="form-group @if($errors->has('type')) has-error @endif">
-    <label for="type" class="control-label col-sm-3">@lang('Type')</label>
-    <div class="col-sm-9">
+    <label for="type" class="control-label col-sm-3 col-md-2">@lang('Type')</label>
+    <div class="col-sm-9 col-md-10">
         <select class="form-control" id="type" name="type" onchange="change_dg_type(this)">
             <option value="dynamic"
                     @if(old('type', $device_group->type) == 'dynamic') selected @endif>@lang('Dynamic')</option>
@@ -28,16 +28,16 @@
 </div>
 
 <div id="dynamic-dg-form" class="form-group @if($errors->has('pattern')) has-error @endif">
-    <label for="pattern" class="control-label col-sm-3 text-nowrap">@lang('Define Rules')</label>
-    <div class="col-sm-9">
+    <label for="pattern" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Define Rules')</label>
+    <div class="col-sm-9 col-md-10">
         <div id="builder"></div>
         <span class="help-block">{{ $errors->first('pattern') }}</span>
     </div>
 </div>
 
 <div id="static-dg-form" class="form-group @if($errors->has('devices')) has-error @endif" style="display: none">
-    <label for="devices" class="control-label col-sm-3 text-nowrap">@lang('Select Devices')</label>
-    <div class="col-sm-9">
+    <label for="devices" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Select Devices')</label>
+    <div class="col-sm-9 col-md-10">
         <select class="form-control" id="devices" name="devices[]" multiple>
             @foreach($device_group->devices as $device)
                 <option value="{{ $device->device_id }}" selected>{{ $device->displayName() }}</option>

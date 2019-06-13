@@ -117,9 +117,9 @@ class DeviceGroupController extends Controller
             'name' => [
                 'required',
                 'string',
-//                Rule::exists('device_groups')->where(function ($query) use ($deviceGroup) {
-//                    $query->where('id', '!=', $deviceGroup->id);
-//                }),
+                Rule::unique('device_groups')->where(function ($query) use ($deviceGroup) {
+                    $query->where('id', '!=', $deviceGroup->id);
+                }),
             ],
             'type' => 'required|in:dynamic,static',
             'devices' => 'array|required_if:type,static',
@@ -128,13 +128,13 @@ class DeviceGroupController extends Controller
         ]);
 
         $deviceGroup->fill($request->only(['name', 'desc', 'type']));
-        $deviceGroup->rules = json_decode($request->rules);
 
         if ($deviceGroup->type == 'static') {
             // get device_ids from input
             $device_ids = $request->get('devices', []);
         } else {
             // get device ids from query
+            $deviceGroup->rules = json_decode($request->rules);
             $qp = QueryBuilderFluentParser::fromJSON($deviceGroup->rules);
             $device_ids = $qp->toQuery()->distinct()->pluck('devices.device_id');
         }
