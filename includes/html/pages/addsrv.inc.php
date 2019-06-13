@@ -19,7 +19,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
             }
         }
     }
-    foreach (list_available_services() as $current_service) {
+    foreach (ServiceDB::listServices() as $current_service) {
         $servicesform .= "<option value='$current_service'>$current_service</option>";
     }
 

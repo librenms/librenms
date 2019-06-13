@@ -14,7 +14,7 @@
 use LibreNMS\Service\ServiceDB;
 
 // Get a list of all services for this device.
-$services = ServiceDB::serviceGet($device['device_id']);
+$services = ServiceDB::findService($device['device_id']);
 
 // Determine which key is the service we want to show.
 if (isset($vars['id'])) {

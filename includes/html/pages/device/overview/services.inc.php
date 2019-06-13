@@ -7,7 +7,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
     // Build the string.
     $break = '';
     $output = '';
-    foreach (ServiceDB::serviceGet($device['device_id']) as $data) {
+    foreach (ServiceDB::findService($device['device_id']) as $data) {
         if ($data['service_status'] == '0') {
             // Ok
             $status = 'green';

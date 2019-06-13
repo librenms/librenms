@@ -13,6 +13,9 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Service\ServicePoll;
+use Log;
+
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
@@ -75,7 +78,8 @@ foreach (dbFetchRows($sql) as $service) {
                 array($service['service_id'])
             );
         }
-        poll_service($service);
+        $poll = new ServicePoll();
+        $poll->servicePoll($service);
         $polled_services++;
     } else {
         d_echo("\nService check - ".$service['service_id']."\nSkipping service check because device "
@@ -89,7 +93,7 @@ foreach (dbFetchRows($sql) as $service) {
                 '`service_id` = ?',
                 array($service['service_id'])
             );
-            log_event(
+            Log::event(
                 "Service check - {$service['service_desc']} ({$service['service_id']}) - 
                 Skipping service check because device {$service['hostname']} is down due to icmp",
                 $service['device_id'],

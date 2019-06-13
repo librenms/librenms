@@ -2343,8 +2343,8 @@ function add_service_for_host()
     }
 
     // Check if service type exists
-    if (!in_array($data['type'], list_available_services())) {
-        api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
+    if (!in_array($data['type'], $serviceList = ServiceDB::listServices())) {
+        api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', $serviceList));
     }
 
     // Get parameters

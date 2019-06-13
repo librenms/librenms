@@ -25,71 +25,89 @@
 
 use LibreNMS\Config;
 
-global $config;
+Class DiscoverService
+{
 
-//Walk tcpListenerProcess and udpEndpointProcess
-$oidsTcp = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4', '-Osqn'));
-$oidsUdp = trim(snmp_walk($device, '.1.3.6.1.2.1.7.7.1.8', '-Osqn'));
-$oids = $oidsTcp . $oidsUdp;
+    global $config;
 
-foreach (explode("\n", $oids) as $data) {
-    $data = trim($data);
-    if ($data) {
-        list($oid, $tcpstatus) = explode(' ', $data);
-        $split_oid = explode('.', $oid);
+    public function __construct()
+    {
+        //Walk tcpListenerProcess and udpEndpointProcess
+        $oidsTcp = trim(snmp_walk($device, '.1.3.6.1.2.1.6.20.1.4', '-Osqn'));
+        $oidsUdp = trim(snmp_walk($device, '.1.3.6.1.2.1.7.7.1.8', '-Osqn'));
+        $oids = $oidsTcp . $oidsUdp;
 
-        //Skip discovery for protocols bound to localhost
-        $ipVersion = $split_oid[12];
-        if ($ipVersion == 4) {
-            $listenV4 = implode(".", [$split_oid[13], $split_oid[14], $split_oid[15], $split_oid[16]]);
-            if ($listenV4 == "127.0.0.1") {
-                continue;
-            }
-        } else {
-            for ($i = 13, $arrayV6 = []; $i < 29; $i++) {
-                $arrayV6[] = $split_oid[$i];
-            }
-            $listenV6 = implode($arrayV6);
-            if ($listenV6 == "0000000000000001") {
-                continue;
-            }
-        }
+        foreach (explode("\n", $oids) as $data) {
+            $data = trim($data);
+            if ($data) {
+                list($oid, $tcpstatus) = explode(' ', $data);
+                $split_oid = explode('.', $oid);
 
-        //Determine layer4 protocol, don't add duplicates
-        $proto = $split_oid[7];
-        switch ($proto) {
-            case 6:
-                $protoName = 'tcp';
-                $port  = $split_oid[(count($split_oid) - 1)];
-                settype($port, 'integer');
-                $tcpServices[] = $port;
-                if (1 !== count(array_keys($tcpServices, $port))) {
-                    continue 2;
-                }
-                break;
-            case 7:
-                $protoName = 'udp';
+                //Skip discovery for protocols bound to localhost
+                $ipVersion = $split_oid[12];
                 if ($ipVersion == 4) {
-                    $port = $split_oid[17];
+                    $listenV4 = implode(".", [$split_oid[13], $split_oid[14], $split_oid[15], $split_oid[16]]);
+                    if ($listenV4 == "127.0.0.1") {
+                        continue;
+                    }
                 } else {
-                    $port = $split_oid[29];
+                    for ($i = 13, $arrayV6 = []; $i < 29; $i++) {
+                        $arrayV6[] = $split_oid[$i];
+                    }
+                    $listenV6 = implode($arrayV6);
+                    if ($listenV6 == "0000000000000001") {
+                        continue;
+                    }
                 }
-                $udpServices[] = $port;
-                settype($port, 'integer');
-                if (1 !== count(array_keys($udpServices, $port))) {
-                    continue 2;
+
+                //Determine layer4 protocol, don't add duplicates
+                $proto = $split_oid[7];
+                switch ($proto) {
+                    case 6:
+                        $protoName = 'tcp';
+                        $port  = $split_oid[(count($split_oid) - 1)];
+                        settype($port, 'integer');
+                        $tcpServices[] = $port;
+                        if (1 !== count(array_keys($tcpServices, $port))) {
+                            continue 2;
+                        }
+                        break;
+                    case 7:
+                        $protoName = 'udp';
+                        if ($ipVersion == 4) {
+                            $port = $split_oid[17];
+                        } else {
+                            $port = $split_oid[29];
+                        }
+                        $udpServices[] = $port;
+                        settype($port, 'integer');
+                        if (1 !== count(array_keys($udpServices, $port))) {
+                            continue 2;
+                        }
+                        break;
                 }
-                break;
-        }
 
 
-        //Only run discovery for service if it exists in /etc/services,
-        //is unique per protocol, and there is a pluggin or script for the service
-        $service = getservbyport($port, $protoName);
-        $check_pluggin = $config['nagios_plugins'] . "/check_" . $service;
-        $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($service).'.inc.php';
-        if (($service) && (is_file($check_pluggin) || is_file($check_script))) {
-            discover_service($device, $service);
+                //Only run discovery for service if it exists in /etc/services,
+                //is unique per protocol, and there is a pluggin or script for the service
+                $service = getservbyport($port, $protoName);
+                $check_pluggin = $config['nagios_plugins'] . "/check_" . $service;
+                $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($service).'.inc.php';
+                if (($service) && (is_file($check_pluggin) || is_file($check_script)) && Self::serviceUnique($service, $device)) {
+                    ServiceDB::addService($device, $service, "(Auto discovered) $service", $device->hostname);
+                    Log::event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
+                    echo '+';
+                }
+            }
         }
+    }
+
+    //Checks to see if service already exists for device.
+    private static fuction serviceUnique($service, $device) {
+        $unique = false;
+        if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service, $device['device_id']))) {
+            $unique = true;
+        }
+        return $unique;
     }
 }

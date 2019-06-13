@@ -22,7 +22,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 $service_id = $vars['service_id'];
 
 if (is_numeric($service_id) && $service_id > 0) {
-    $service = ServiceDB::serviceGet(null, $service_id);
+    $service = ServiceDB::findService(null, $service_id);
 
     $output = array(
         'stype'     => $service[0]['service_type'],

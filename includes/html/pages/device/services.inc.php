@@ -21,7 +21,7 @@ use LibreNMS\Service\ServiceDB;
 $pagetitle[] = 'Services';
 
 require_once 'includes/services.inc.php';
-$services = ServiceDB::serviceGet($device['device_id']);
+$services = ServiceDB::findService($device['device_id']);
 
 require_once 'includes/html/modal/new_service.inc.php';
 require_once 'includes/html/modal/delete_service.inc.php';

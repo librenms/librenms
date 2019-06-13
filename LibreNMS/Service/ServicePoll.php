@@ -17,8 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @package     LibreNMS
+ * @link        http://librenms.org
+ * @copyright   2019, KanREN Inc
+ * @author      Heath Barnhart <hbarnhart@kanren.net>
  */
 
 use LibreNMS\RRD\RrdDefinition;
@@ -27,9 +29,15 @@ use Log;
 
 Class ServicePoll
 {
+
+    global $config;
+
+    /**
+     * Makes a service poll for a device
+     * @param array $service Array of service attributes.
+    **/
     function __construct($service)
     {
-        global $config;
 
         $update = array();
         $old_status = $service['service_status'];
@@ -52,7 +60,7 @@ Class ServicePoll
         // Some debugging
         d_echo("\nNagios Service - $service_id\n");
         // the check_service function runs $check_cmd through escapeshellcmd, so
-        list($new_status, $msg, $perf) = check_service($check_cmd);
+        list($new_status, $msg, $perf) = Self::checkService($check_cmd);
         d_echo("Response: $msg\n");
 
         // If we have performance data we will store it.
@@ -122,7 +130,15 @@ Class ServicePoll
         return true;
     }
 
-    function check_service($command)
+    /**
+     * Runs the Nagios Plugins and custom scripts, then formats results
+     * If the plugin's response code is not OK and then it skips the check
+     * and returns the response code.
+     *
+     * @param string $command The Nagios plugin or script to execute
+     * @return mixed Returns the formated values and responses.
+    **/
+    static function checkService($command)
     {
         // This array is used to test for valid UOM's to be used for graphing.
         // Valid values from: https://nagios-plugins.org/doc/guidelines.html#AEN200
