@@ -14,7 +14,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <a type="button" class="btn btn-primary"
-                           href="{{ route('device-groups.create') }}">@lang('New Device Group')</a>
+                           href="{{ route('device-groups.create') }}"><i
+                                class="fa fa-plus"></i> @lang('New Device Group')</a>
                     </div>
                 </div>
                 <div class="table-responsive">
