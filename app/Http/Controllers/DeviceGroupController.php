@@ -69,8 +69,7 @@ class DeviceGroupController extends Controller
 
         Toastr::success(__('Device Group :name created', ['name' => $deviceGroup->name]));
 
-        return redirect(route('device-groups.index'));
-
+        return redirect()->route('device-groups.index');
     }
 
     /**
@@ -129,28 +128,32 @@ class DeviceGroupController extends Controller
 
         $deviceGroup->fill($request->only(['name', 'desc', 'type']));
 
+        $devices_updated = false;
         if ($deviceGroup->type == 'static') {
-            // get device_ids from input
-            $device_ids = $request->get('devices', []);
+            // sync device_ids from input
+            $devices_updated = array_sum($deviceGroup->devices()->sync($request->get('devices', [])));
         } else {
-            // get device ids from query
             $deviceGroup->rules = json_decode($request->rules);
-            $qp = QueryBuilderFluentParser::fromJSON($deviceGroup->rules);
-            $device_ids = $qp->toQuery()->distinct()->pluck('devices.device_id');
         }
-        $deviceGroup->devices()->sync($device_ids);
 
-        if ($deviceGroup->isDirty()) {
-            if ($deviceGroup->save()) {
-                Toastr::success(__('Device Group :name updated', ['name' => $deviceGroup->name]));
-            } else {
-                Toastr::error(__('Failed to save'));
+        if ($deviceGroup->isDirty() || $devices_updated) {
+            try {
+                if ($deviceGroup->save() || $devices_updated) {
+                    Toastr::success(__('Device Group :name updated', ['name' => $deviceGroup->name]));
+                } else {
+                    Toastr::error(__('Failed to save'));
+                    return redirect()->back()->withInput();
+                }
+            } catch (\Illuminate\Database\QueryException $e) {
+                return redirect()->back()->withInput()->withErrors([
+                    'rules' => __('Rules resulted in invalid query: ') . $e->getMessage()
+                ]);
             }
         } else {
             Toastr::info(__('No changes made'));
         }
 
-        return redirect(route('device-groups.index'));
+        return redirect()->route('device-groups.index');
     }
 
     /**
@@ -165,6 +168,6 @@ class DeviceGroupController extends Controller
 
         Toastr::success(__('Device Group :name deleted', ['name' => $deviceGroup->name]));
 
-        return redirect(route('device-groups.index'));
+        return redirect()->route('device-groups.index');
     }
 }

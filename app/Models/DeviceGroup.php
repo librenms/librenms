@@ -35,7 +35,33 @@ class DeviceGroup extends BaseModel
     protected $fillable = ['name', 'desc', 'type'];
     protected $casts = ['rules' => 'array'];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (DeviceGroup $deviceGroup) {
+            $deviceGroup->devices()->detach();
+        });
+
+        static::saving(function (DeviceGroup $deviceGroup) {
+            if ($deviceGroup->isDirty('rules')) {
+                $deviceGroup->updateDevices();
+            }
+        });
+    }
+
     // ---- Helper Functions ----
+
+    /**
+     * Update devices included in this group (dynamic only)
+     */
+    public function updateDevices()
+    {
+        if ($this->type == 'dynamic') {
+            $this->devices()->sync(QueryBuilderFluentParser::fromJSON($this->rules)->toQuery()
+                ->distinct()->pluck('devices.device_id'));
+        }
+    }
 
     /**
      * Update the device groups for the given device or device_id

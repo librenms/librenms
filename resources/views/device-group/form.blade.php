@@ -27,11 +27,11 @@
     </div>
 </div>
 
-<div id="dynamic-dg-form" class="form-group @if($errors->has('pattern')) has-error @endif">
+<div id="dynamic-dg-form" class="form-group @if($errors->has('rules')) has-error @endif">
     <label for="pattern" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Define Rules')</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder"></div>
-        <span class="help-block">{{ $errors->first('pattern') }}</span>
+        <span class="help-block">{{ $errors->first('rules') }}</span>
     </div>
 </div>
 
