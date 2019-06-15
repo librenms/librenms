@@ -6,7 +6,7 @@ $librenms_dir = realpath(__DIR__ . '/..');
 
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
-} elseif (!file_exists("config.php") && !file_exists("{$librenms_dir}/config.php")) {
+} elseif (!file_exists("{$librenms_dir}/config.php")) {
     $allowed_vars = array('stage','build-ok','dbhost','dbuser','dbpass','dbname','dbport','dbsocket','add_user','add_pass','add_email');
     foreach ($allowed_vars as $allowed) {
         if (isset($_POST[$allowed])) {
@@ -18,7 +18,7 @@ if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
 $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
-if ((file_exists('config.php') || file_exists("{$librenms_dir}/config.php")) && $stage != 6) {
+if (file_exists("{$librenms_dir}/config.php") && $stage != 6) {
     unset($_SESSION['stage']);
     header("Location: /");
     exit;
