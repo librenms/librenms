@@ -80,7 +80,7 @@ if ($stage == 4) {
     }
 } elseif ($stage == 6) {
     // If we get here then let's do some final checks.
-    if (!file_exists("config.php") && !file_exists("{$librenms_dir}/config.php")) {
+    if (!file_exists("{$librenms_dir}/config.php")) {
         // config.php file doesn't exist. go back to that stage
         $msg = "config.php still doesn't exist";
         $stage = 5;
@@ -394,7 +394,7 @@ $config_file = <<<"EOD"
 #\$config\['update'\] = 0;  # uncomment to completely disable updates
 EOD;
 
-if (!file_exists("config.php") && !file_exists("{$librenms_dir}/config.php")) {
+if (!file_exists("{$librenms_dir}/config.php")) {
     $conf = fopen("config.php", 'w');
     if ($conf != false) {
         if (fwrite($conf, "<?php\n") === false) {
