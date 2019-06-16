@@ -959,9 +959,6 @@ $config['leaflet']['tile_url']                          = "{s}.tile.openstreetma
 // General GUI options
 $config['gui']['network-map']['style']                  = 'new';//old is also valid
 
-// Navbar variables
-$config['navbar']['manage_groups']['hide']              = 0;
-
 // Show errored ports in the summary table on the dashboard
 $config['summary_errors']                               = 0;
 
