@@ -180,7 +180,7 @@ if ($format == "graph") {
     }
     if (!empty($vars['group'])) {
         $where .= " AND ( ";
-        foreach (GetDevicesFromGroup($vars['group']) as $dev) {
+        foreach (DB::table('device_group_device')->where('device_group_id', $vars['group'])->pluck('device_id') as $dev) {
             $where .= "device_id = ? OR ";
             $sql_param[] = $dev;
         }
