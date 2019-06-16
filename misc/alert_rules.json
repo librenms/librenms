@@ -399,5 +399,25 @@
    {
     "rule": "%applications.app_type='portactivity' && %applications_metrics.imaps_total_from>'0'",
     "name": "IRCD Connections From"
+   },
+   {
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_failed_raid>'0'",
+    "name": "Failed RAID array found"
+   },
+   {
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_rebuilding_raid>'0'",
+    "name": "Rebuilding RAID array found"
+   },
+   {
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_failed_bbu>'0'",
+    "name": "Failed BBU found"
+   },
+   {
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_charging_bbu>'0'",
+    "name": "Charging BBU found"
+   },
+   {
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_notPresent_bbu>'0'",
+    "name": "Missing BBU found"
    }
   ]
