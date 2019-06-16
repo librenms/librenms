@@ -171,13 +171,13 @@ class QueryBuilderParser implements \JsonSerializable
                 continue; // likely the ending && or ||
             }
 
-            list($rule_text, $rule_operator) = $chunk;
+            @list($rule_text, $rule_operator) = $chunk;
             if (!isset($condition)) {
                 // only allow one condition.  Since old rules had no grouping, this should hold logically
                 $condition = ($rule_operator == '||' ? 'OR' : 'AND');
             }
 
-            list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
+            @list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
             $field = ltrim($field, '%');
 
             // for rules missing values just use '= 1'
