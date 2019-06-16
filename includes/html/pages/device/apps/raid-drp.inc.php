@@ -67,6 +67,11 @@ foreach ($graphs as $key => $text) {
     <div class="row">';
     include 'includes/html/print-graphrow.inc.php';
     echo '</div>';
+    if (strcmp($key, 'raid_drp_status') == 0) {
+        echo '3=Good, 2=Rebuilding, 1=Bad, 0=Unknown';
+    } elseif (strcmp($key, 'raid_drp_bbu') == 0) {
+        echo '5=Good, 4=charging, 3=failed, 2=notPrsent, 1=N/A, 0=Unknown';
+    }
     echo '</div>';
     echo '</div>';
 }
