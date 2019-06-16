@@ -35,7 +35,7 @@ $stats_rrd_def = RrdDefinition::make()
     ->addDataset('bbu_charging', 'GAUGE', 0)
     ->addDataset('bbu_na', 'GAUGE', 0)
     ->addDataset('good_arrays', 'GAUGE', 0)
-    ->addDataset('bbu_notPresen', 'GAUGE', 0)
+    ->addDataset('bbu_notPresent', 'GAUGE', 0)
     ->addDataset('rebuilding_arrays', 'GAUGE', 0)
     ->addDataset('bad_arrays', 'GAUGE', 0)
     ->addDataset('bad_drives', 'GAUGE', 0)
@@ -45,6 +45,11 @@ $stats_rrd_def = RrdDefinition::make()
 //
 // update the RRD files for each found array
 //
+$has_failed_raid=0;
+$has_rebuilding_raid=0;
+$has_failed_bbu=0;
+$has_charging_bbu=0;
+$has_notPresent_bbu=0;
 
 $array_keys=array_keys($raidinfo['arrays']);
 foreach ($array_keys as $array_name) {
@@ -59,8 +64,10 @@ foreach ($array_keys as $array_name) {
     if (strcmp($raidinfo['arrays'][$array_name]['status'], 'good') == 0) {
         $status=3;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['status'], 'rebuilding') == 0) {
+        $has_rebuilding_raid=1;
         $status=2;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['status'], 'bad') == 0) {
+        $has_failed_raid=1;
         $status=1;
     }
 
@@ -76,11 +83,14 @@ foreach ($array_keys as $array_name) {
     $bbu_status=0;
     if (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'na') == 0) {
         $bbu_status=1;
-    } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'notPrsent') == 0) {
+    } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'notPresent') == 0) {
+        $has_notPresent_bbu=1;
         $bbu_status=2;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'failed') == 0) {
+        $has_failed_bbu=1;
         $bbu_status=3;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'charging') == 0) {
+        $has_charging_bbu=0;
         $bbu_status=4;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'good') == 0) {
         $bbu_status=5;
@@ -143,4 +153,9 @@ if (empty($array_keys)) {
     $component->setComponentPrefs($device_id, $updae);
 }
 
+$raidinfo['has_failed_raid']=$has_failed_raid;
+$raidinfo['has_rebuilding_raid']=$has_rebuilding_raid;
+$raidinfo['has_failed_bbu']=$has_failed_bbu;
+$raidinfo['has_charging_bbu']=$has_charging_bbu;
+$raidinfo['has_notPresent_bbu']=$has_notPresent_bbu;
 update_application($app, 'OK', data_flatten($raidinfo));
