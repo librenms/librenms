@@ -196,8 +196,11 @@ if (empty($array_keys)) {
 }
 
 $raidinfo['has_failed_raid']=$has_failed_raid;
+$raidinfo['has_unknown_raid']=$$has_unknown_raid;
 $raidinfo['has_rebuilding_raid']=$has_rebuilding_raid;
 $raidinfo['has_failed_bbu']=$has_failed_bbu;
+$raidinfo['has_unknown_bbu']=$has_unknown_bbu;
 $raidinfo['has_charging_bbu']=$has_charging_bbu;
 $raidinfo['has_notPresent_bbu']=$has_notPresent_bbu;
+$raidinfo['has_bad_drives']=$total_bad_drives;
 update_application($app, 'OK', data_flatten($raidinfo));
