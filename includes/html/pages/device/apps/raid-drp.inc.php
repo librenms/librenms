@@ -37,9 +37,9 @@ print_optionbar_end();
 
 if (isset($vars['array'])) {
     $graphs = array(
-        'raid_drp_status' => 'Array Status',
-        'raid_drp_bbu' => 'Array BBU Status',
-        'raid_drp_drives' => 'Array Drive Count',
+        'raid-drp_status' => 'Array Status',
+        'raid-drp_bbu' => 'Array BBU Status',
+        'raid-drp_drives' => 'Array Drive Count',
     );
 } else {
     $graphs = array(
@@ -67,9 +67,9 @@ foreach ($graphs as $key => $text) {
     <div class="row">';
     include 'includes/html/print-graphrow.inc.php';
     echo '</div>';
-    if (strcmp($key, 'raid_drp_status') == 0) {
+    if (strcmp($key, 'raid-drp_status') == 0) {
         echo '3=Good, 2=Rebuilding, 1=Bad, 0=Unknown';
-    } elseif (strcmp($key, 'raid_drp_bbu') == 0) {
+    } elseif (strcmp($key, 'raid-drp_bbu') == 0) {
         echo '5=Good, 4=charging, 3=failed, 2=notPrsent, 1=N/A, 0=Unknown';
     }
     echo '</div>';
