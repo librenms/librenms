@@ -45,5 +45,5 @@ alerts will resume. Click this icon to un-acknowledge the alert.
 
 #### Notes
 
-This column will allow you access to the acknowledge/unacknowledge
-notes for this alert. ![alert notes](img/notes.png)
+![alert notes](img/notes.png) This column will allow you access to the
+acknowledge/unacknowledge notes for this alert.
