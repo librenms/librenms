@@ -3,9 +3,9 @@ path: blob/master/doc/
 
 # Creating snmp trap handlers
 
-You must to have working snmptrapd. See [SNMP TRAP HANDLER](../Extensions/SNMP-Trap-Handler.md) 
+You must have a working snmptrapd installation. See [SNMP TRAP HANDLER](../Extensions/SNMP-Trap-Handler.md) 
 
-Make sure the MIB is loaded fro the trap you are adding. Edit `/etc/systemd/system/snmptrapd.service.d/mibs.conf` to add it then restart snmprtrapd.
+Make sure the MIB is loaded from the trap you are adding. Edit `/etc/systemd/system/snmptrapd.service.d/mibs.conf` to add it then restart snmptrapd.
 
 `MIBDIRS` option is not recursive, so you need to specify each directory individually.
 
@@ -70,7 +70,7 @@ where number on the end of the row `Log::event` means color of the eventlog:
 5 red 
 ```
 
-Register the mapping in the `config/snmptraps.php` file. Make sure to use the full trap oid and correct class.
+Register the mapping in the `config/snmptraps.php` file. Make sure to use the full trap OID and correct class.
 
 ```php
 'SNMPv2-MIB::coldStart' => \LibreNMS\Snmptrap\Handlers\ColdBoot::class,
@@ -99,7 +99,7 @@ $trap->getOidData('IF-MIB::ifDescr.114');
 ```
 
 getOidData() requires the full name including any additional index.
-You can use these functions to search the oid keys.
+You can use these functions to search the OID keys.
 
 ```php
 $trap->findOid('ifDescr');  // returns the first oid key that contains the string
@@ -108,7 +108,7 @@ $trap->findOids('ifDescr'); // returns all oid keys containing the string
 
 #### Advanced
 
-If the above isn't adequate, you can get the entire trap text
+If the above isn't adequate, you can get the entire trap text.
 
 ```php
 $trap->getRaw();
