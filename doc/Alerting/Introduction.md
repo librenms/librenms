@@ -31,10 +31,13 @@ what these are here.
 #### ACK
 
 This column provides you visibility on the status of the alert:
+
 ![ack alert](img/ack.png) This alert is currently active and sending
 alerts. Click this icon to acknowledge the alert.
+
 ![unack alert](img/unack.png) This alert is currently acknowledged
 until the alert clears. Click this icon to un-acknowledge the alert.
+
 ![unack alert until fault worsens](img/nunack.png) This alert is
 currently acknowledged until the alert worsens or gets
 better, at which stage it will be automatically unacknowledged and
