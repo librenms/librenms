@@ -164,4 +164,6 @@ if (empty($array_keys)) {
     $component->setComponentPrefs($device_id, $updae);
 }
 
+// Contains lots of non-numeric data the turns into zeros
+unset($raidinfo['arrays']);
 update_application($app, 'OK', data_flatten($raidinfo));
