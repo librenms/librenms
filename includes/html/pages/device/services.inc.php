@@ -113,8 +113,8 @@ if (count($services) > '0') {
             $graphs = json_decode($service['service_ds'], true);
             foreach ($graphs as $k => $v) {
                 $graph_array['device'] = $device['device_id'];
-                $graph_array['type'] = 'device_service';
-                $graph_array['service'] = $service['service_id'];
+                $graph_array['type'] = 'service_graph';
+                $graph_array['id'] = $service['service_id'];
                 $graph_array['ds'] = $k;
 
                 echo '<tr>';

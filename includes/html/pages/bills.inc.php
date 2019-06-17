@@ -64,7 +64,7 @@ if ($_POST['addbill'] == 'yes') {
         'rate_95th_in'      => 0,
         'rate_95th_out'     => 0,
         'rate_95th'         => 0,
-        'dir_95th'          => 'in',
+        'dir_95th'          => $_POST['dir_95th'],
         'total_data'        => 0,
         'total_data_in'     => 0,
         'total_data_out'    => 0,

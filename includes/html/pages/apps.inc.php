@@ -215,6 +215,7 @@ $graphs['bind']      = array(
 );
 $graphs['smart'] = array(
     'id5',
+    'id9',
     'id10',
     'id173',
     'id183',
@@ -229,6 +230,15 @@ $graphs['smart'] = array(
     'id199',
     'id231',
     'id233',
+);
+$graphs['mdadm'] = array(
+    'level',
+    'size',
+    'disc_count',
+    'hotspare_count',
+    'degraded',
+    'sync_speed',
+    'sync_completed',
 );
 $graphs['sdfsinfo'] = array(
     'volume',

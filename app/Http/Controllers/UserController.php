@@ -30,15 +30,18 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
-use Hash;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use Toastr;
+use URL;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('deny-demo');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -93,7 +96,7 @@ class UserController extends Controller
         $this->updateDashboard($user, $request->get('dashboard'));
 
         if ($user->save()) {
-            Toastr::success(__('User :username created', ['username', $user->username]));
+            Toastr::success(__('User :username created', ['username' => $user->username]));
             return redirect(route('users.index'));
         }
 
@@ -159,9 +162,8 @@ class UserController extends Controller
         }
 
         $user->fill($request->all());
-        $user->can_modify_passwd = $request->get('can_modify_passwd'); // checkboxes are missing when unchecked
 
-        if ($this->updateDashboard($user, $request->get('dashboard'))) {
+        if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
             Toastr::success(__('Updated dashboard for :username', ['username' => $user->username]));
         }
 
@@ -174,7 +176,7 @@ class UserController extends Controller
             }
         }
 
-        return redirect(route('users.index'));
+        return redirect(route(str_contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
     }
 
     /**

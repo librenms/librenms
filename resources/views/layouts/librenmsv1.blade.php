@@ -8,14 +8,14 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @if(!LibreNMS\Config::get('favicon', false))
-        <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
-        <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32">
-        <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16">
-        <link rel="manifest" href="images/manifest.json">
-        <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
-        <link rel="shortcut icon" href="images/favicon.ico">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" href="{{ asset('images/favicon-32x32.png') }}" sizes="32x32">
+        <link rel="icon" type="image/png" href="{{ asset('images/favicon-16x16.png') }}" sizes="16x16">
+        <link rel="manifest" href="{{ asset('images/manifest.json') }}">
+        <link rel="mask-icon" href="{{ asset('images/safari-pinned-tab.svg') }}" color="#5bbad5">
+        <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="msapplication-config" content="images/browserconfig.xml">
+        <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
         <meta name="theme-color" content="#ffffff">
     @else
         <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}" />
@@ -40,38 +40,45 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190123" rel="stylesheet" type="text/css" />
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190603" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/' . LibreNMS\Config::get('site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
     @endforeach
     @yield('css')
 
-    <script src="js/polyfill.min.js"></script>
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/bootstrap-hover-dropdown.min.js"></script>
-    <script src="js/bootstrap-switch.min.js"></script>
-    <script src="js/hogan-2.0.0.js"></script>
-    <script src="js/jquery.cycle2.min.js"></script>
-    <script src="js/moment.min.js"></script>
-    <script src="js/bootstrap-datetimepicker.min.js"></script>
-    <script src="js/typeahead.bundle.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
-    <script src="js/tagmanager.js"></script>
-    <script src="js/mktree.js"></script>
-    <script src="js/jquery.bootgrid.min.js"></script>
-    <script src="js/handlebars.min.js"></script>
-    <script src="js/pace.min.js"></script>
-    <script src="js/qrcode.min.js"></script>
+    <script src="{{ asset('js/polyfill.min.js') }}"></script>
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-hover-dropdown.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-switch.min.js') }}"></script>
+    <script src="{{ asset('js/hogan-2.0.0.js') }}"></script>
+    <script src="{{ asset('js/jquery.cycle2.min.js') }}"></script>
+    <script src="{{ asset('js/moment.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-datetimepicker.min.js') }}"></script>
+    <script src="{{ asset('js/typeahead.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
+    <script src="{{ asset('js/tagmanager.js') }}"></script>
+    <script src="{{ asset('js/mktree.js') }}"></script>
+    <script src="{{ asset('js/jquery.bootgrid.min.js') }}"></script>
+    <script src="{{ asset('js/handlebars.min.js') }}"></script>
+    <script src="{{ asset('js/pace.min.js') }}"></script>
+    <script src="{{ asset('js/qrcode.min.js') }}"></script>
     @if(LibreNMS\Config::get('enable_lazy_load', true))
-        <script src="js/jquery.lazyload.min.js"></script>
-        <script src="js/lazyload.js"></script>
+        <script src="{{ asset('js/jquery.lazyload.min.js') }}"></script>
+        <script src="{{ asset('js/lazyload.js') }}"></script>
     @endif
     <script src="{{ asset('js/select2.min.js') }}"></script>
-    <script src="{{ asset('js/librenms.js?ver=20190123') }}"></script>
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        var ajax_url = "{{ url('/ajax') }}";
+    </script>
+    <script src="{{ asset('js/librenms.js?ver=20190514') }}"></script>
     <script type="text/javascript">
-
         <!-- Begin
         function popUp(URL)
         {
@@ -80,16 +87,10 @@
             eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');");
         }
         // End -->
-
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
     </script>
-    <script type="text/javascript" src="js/overlib_mini.js"></script>
-    <script type="text/javascript" src="js/toastr.min.js"></script>
-    <script type="text/javascript" src="js/boot.js"></script>
+    <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/toastr.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/boot.js') }}"></script>
     @yield('javascript')
 </head>
 <body>
@@ -107,6 +108,7 @@
 
 @yield('content')
 
+@yield('scripts')
 
 {!! Toastr::render() !!}
 

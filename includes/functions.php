@@ -377,7 +377,7 @@ function getLogo($device)
  */
 function getLogoTag($device, $class = null)
 {
-    $tag = '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"';
+    $tag = '<img src="' . url(getLogo($device)) . '" title="' . getImageTitle($device) . '"';
     if (isset($class)) {
         $tag .= " class=\"$class\" ";
     }
@@ -1812,7 +1812,7 @@ function hytera_h2f($number, $nd)
     $binpoint=substr($scibin, $exp);
     $intnumber=bindec("1".$binint);
 
-    $tmppoint = "";
+    $tmppoint = [];
     for ($i=0; $i<strlen($binpoint); $i++) {
         $tmppoint[]=substr($binpoint, $i, 1);
     }

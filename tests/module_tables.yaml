@@ -29,6 +29,15 @@ fdb-table:
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]
+mpls:
+    mpls_lsps:
+        excluded_fields: [lsp_id, device_id]
+        order_by: vrf_oid, lsp_oid
+    mpls_lsp_paths:
+        excluded_fields: [lsp_path_id, device_id, lsp_id]
+        joins:
+            - { left: mpls_lsp_paths.lsp_id, right: mpls_lsps.lsp_id, select: [vrf_oid, lsp_oid] }
+        order_by: vrf_oid, lsp_oid, path_oid
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
@@ -85,3 +94,10 @@ vrf:
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]
+cisco-mac-accounting:
+    mac_accounting:
+        excluded_fields: [ma_id, port_id, poll_time, poll_prev, poll_period, cipMacHCSwitchedBytes_input_rate, cipMacHCSwitchedBytes_output_rate, cipMacHCSwitchedPkts_input_rate, cipMacHCSwitchedPkts_output_rate]
+        joins:
+            - { left: mac_accounting.port_id, right: ports.port_id, select: [ifIndex] }
+        custom_where: WHERE ports.device_id=?
+        order_by: ports.ifIndex, mac

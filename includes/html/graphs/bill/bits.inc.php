@@ -3,7 +3,7 @@
 $datefrom = date('YmdHis', $vars['from']);
 $dateto   = date('YmdHis', $vars['to']);
 
-$rates = getRates($vars['id'], $datefrom, $dateto);
+$rates = getRates($vars['id'], $datefrom, $dateto, $vars['dir']);
 
 $ports = dbFetchRows('SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D WHERE B.bill_id = ? AND P.port_id = B.port_id AND D.device_id = P.device_id', array($vars['id']));
 

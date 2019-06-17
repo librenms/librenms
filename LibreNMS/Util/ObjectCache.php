@@ -35,8 +35,10 @@ use App\Models\Port;
 use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
+use App\Models\Toner;
 use App\Models\User;
 use App\Models\Vrf;
+use App\Models\Mpls;
 use Cache;
 
 class ObjectCache
@@ -61,6 +63,7 @@ class ObjectCache
             $user = auth()->user();
             return [
                 'vrf' => Vrf::hasAccess($user)->count(),
+                'mpls' => Mpls::hasAccess($user)->count(),
                 'ospf' => OspfInstance::hasAccess($user)->count(),
                 'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
                 'bgp' => BgpPeer::hasAccess($user)->count(),
@@ -95,6 +98,17 @@ class ObjectCache
                     'descr' => $sensor_model->classDescr()
                 ];
             }
+
+            if (Toner::hasAccess(auth()->user())->exists()) {
+                $sensor_menu[3] = [
+                    [
+                        'class' => 'toner',
+                        'icon' => 'print',
+                        'descr' => __('Toner')
+                    ]
+                ];
+            }
+
             ksort($sensor_menu); // ensure menu order
             return $sensor_menu;
         });
@@ -122,19 +136,19 @@ class ObjectCache
             });
             switch ($field) {
                 case 'down':
-                    return $query->isNotDeleted()->isDown()->count();
+                    return $query->isDown()->count();
                 case 'up':
-                    return $query->isNotDeleted()->isUp()->count();
+                    return $query->isUp()->count();
                 case 'ignored':
-                    return $query->isNotDeleted()->isIgnored()->count();
+                    return $query->isIgnored()->count();
                 case 'shutdown':
-                    return $query->isNotDeleted()->isShutdown()->count();
+                    return $query->isShutdown()->count();
                 case 'disabled':
-                    return $query->isNotDeleted()->isDisabled()->count();
+                    return $query->isDisabled()->count();
                 case 'deleted':
                     return $query->isDeleted()->count();
                 case 'errored':
-                    return $query->isNotDeleted()->hasErrors()->count();
+                    return $query->hasErrors()->count();
                 case 'pseudowire':
                     return Pseudowire::hasAccess(auth()->user())->count();
                 case 'total':
@@ -181,19 +195,21 @@ class ObjectCache
      * @param array $fields array of counts to get. Valid options: total, ok, warning, critical, ignored, disabled
      * @return array
      */
-    public static function serviceCounts($fields = ['total'])
+    public static function serviceCounts($fields = ['total'], $device_id = 0)
     {
         $result = [];
         foreach ($fields as $field) {
-            $result[$field] = self::getServiceCount($field);
+            $result[$field] = self::getServiceCount($field, $device_id);
         }
         return $result;
     }
 
-    private static function getServiceCount($field)
+    private static function getServiceCount($field, $device_id)
     {
-        return Cache::remember("ObjectCache:service_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field) {
-            $query = Service::hasAccess(auth()->user());
+        return Cache::remember("ObjectCache:service_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
+            $query = Service::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+                $query->where('device_id', $device_id);
+            });
             switch ($field) {
                 case 'ok':
                     return $query->isOk()->count();

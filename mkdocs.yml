@@ -70,7 +70,7 @@ nav:
       - Extensions/RRDCached.md
       - Sub-directory Support: Extensions/Sub-Directory.md
       - Extensions/Varnish.md
-      - Poller Service (BETA): Extensions/Poller-Service.md
+      - Dispatcher Service (RC): Extensions/Dispatcher-Service.md
       - Extensions/RRDTune.md
       - Extensions/IRC-Bot.md
       - Extensions/IRC-Bot-Extensions.md
