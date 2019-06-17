@@ -108,7 +108,7 @@ $trap->findOids('ifDescr'); // returns all oid keys containing the string
 
 #### Advanced
 
-If the above isn't adequate, you can get the entire trap text.
+If the above isn't adequate, you can get the entire trap text:
 
 ```php
 $trap->getRaw();
