@@ -25,11 +25,10 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Alerting\QueryBuilderFluentParser;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 
-class QueryBuilderTest extends LaravelTestCase
+class QueryBuilderTest extends TestCase
 {
     private $data_file = 'tests/data/misc/querybuilder.json';
 
@@ -49,19 +48,14 @@ class QueryBuilderTest extends LaravelTestCase
      * @param string $display
      * @param string $sql
      */
-    public function testQueryConversion($legacy, $builder, $display, $sql, $query)
+    public function testQueryConversion($legacy, $builder, $display, $sql)
     {
         if (!empty($legacy)) {
             // some rules don't have a legacy representation
             $this->assertEquals($builder, QueryBuilderParser::fromOld($legacy)->toArray());
         }
-        $qb = QueryBuilderFluentParser::fromJson($builder);
-        $this->assertEquals($display, $qb->toSql(false));
-        $this->assertEquals($sql, $qb->toSql());
-
-        $qbq = $qb->toQuery();
-        $this->assertEquals($query[0], $qbq->toSql(), 'Fluent SQL does not match');
-        $this->assertEquals($query[1], $qbq->getBindings(), 'Fluent bindings do not match');
+        $this->assertEquals($display, QueryBuilderParser::fromJson($builder)->toSql(false));
+        $this->assertEquals($sql, QueryBuilderParser::fromJson($builder)->toSql());
     }
 
     public function loadQueryData()

@@ -347,13 +347,7 @@ function poll_device($device, $force_module = false)
         }
 
         // Update device_groups
-        d_echo("### Start Device Groups ###\n");
-
-        $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
-        d_echo("Groups Added: " . implode(',', $group_changes['attached']) . PHP_EOL);
-        d_echo("Groups Removed: " . implode(',', $group_changes['detached']) . PHP_EOL);
-
-        d_echo("### End Device Groups ###\n");
+        UpdateGroupsForDevice($device['device_id']);
 
         if (!$force_module && !empty($graphs)) {
             echo "Enabling graphs: ";

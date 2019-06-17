@@ -115,8 +115,11 @@ if (defined('SHOW_SETTINGS')) {
       <select class="form-control" name="group">';
     $common_output[] = '<option value=""' . ($current_group == '' ? ' selected' : '') . '>any group</option>';
 
-    foreach (\App\Models\DeviceGroup::orderBy('name')->get(['id', 'name', 'desc']) as $group) {
-        $common_output[] = "<option value=\"$group->id\"" . (is_numeric($current_group) && $current_group == $group->id ? ' selected' : '') . ">" . $group->name . " - " . $group->desc . "</option>";
+    $device_groups = GetDeviceGroups();
+    $common_output[] = "<!-- " . print_r($device_groups, true) . " -->";
+    foreach ($device_groups as $group) {
+        $group_id = $group['id'];
+        $common_output[] = "<option value=\"$group_id\"" . (is_numeric($current_group) && $current_group == $group_id ? ' selected' : '') . ">" . $group['name'] . " - " . $group['description'] . "</option>";
     }
     $common_output[] = '
       </select>
