@@ -160,23 +160,27 @@ if (isset($options['t'])) {
         'applications' => [
             "discovery" => [
                 "applications" => [
-                    "app_type" => $options['a'],
-                    "app_state" => "UNKNOWN",
-                    "discovered" => "1",
-                    "app_state_prev" => null,
-                    "app_status" => "",
-                    "app_instance" => "",
+                    '0' => [
+                        "app_type" => $options['a'],
+                        "app_state" => "UNKNOWN",
+                        "discovered" => "1",
+                        "app_state_prev" => null,
+                        "app_status" => "",
+                        "app_instance" => "",
+                    ],
                 ],
                 "application_metrics" => [],
             ],
             "poller" => [
                 "applications" => [
-                    "app_type" => $options['a'],
-                    "app_state" => "OK",
-                    "discovered" => "1",
-                    "app_state_prev" => "UNKNOWN",
-                    "app_status" => "",
-                    "app_instance" => "",
+                    '0' => [
+                        "app_type" => $options['a'],
+                        "app_state" => "OK",
+                        "discovered" => "1",
+                        "app_state_prev" => "UNKNOWN",
+                        "app_status" => "",
+                        "app_instance" => "",
+                    ],
                 ],
                 "application_metrics" => [],
             ],
