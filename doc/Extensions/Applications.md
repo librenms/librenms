@@ -922,7 +922,7 @@ This script uses `rec_control get-all` to collect stats.
 ###### SNMP Extend
 1. Copy the BASH script to the desired host.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-dnsdist -O /etc/snmp/powerdns-dnsdist   
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-dnsdist -O /etc/snmp/powerdns-dnsdist
 ```
 
 2. Make the script executable (chmod +x /etc/snmp/powerdns-dnsdist)
@@ -950,7 +950,7 @@ The application should be auto-discovered as described at the top of the page. I
 
 5. Note: if your snmpd doesn't run as root, you might have to invoke the script using sudo and modify the "extend" line
 ```
-extend proxmox /usr/bin/sudo /usr/local/bin/proxmox 
+extend proxmox /usr/bin/sudo /usr/local/bin/proxmox
 ```
 
 after, edit your sudo users (usually `visudo`) and add at the bottom:
@@ -961,11 +961,13 @@ snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 6. Restart snmpd on your host
 
 ### RAID-DRP
+
 ##### SNMP Extend
+
 1. Install
    [Device::RAID::Poller](https://github.com/VVelox/Device-RAID-Poller)
    onto the machine in question.
-   
+
 CentOS:
 
 ```
@@ -974,19 +976,19 @@ cpan Module::Build Module::List Device::RAID::Poller
 ```
 
 Debian:
-	
+
 ```
 apt install perl perl-base perl-modules make
 cpan Module::Build Module::List Device::RAID::Poller
 ```
 
 FreeBSD:
-	
+
 ```
 pkg install perl5 p5-JSON p5-Error-Helper
 cpan Device::RAID::Poller
 ```
-   
+
 2. Add the extend in question to sndmpd.conf in a manner similar to as
    below.
 
