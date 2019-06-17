@@ -8,7 +8,7 @@ $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 15;
 
-$rrd_filename = rrd_name($device['hostname'], array('app', $name, $app['app_id'])));
+$rrd_filename = rrd_name($device['hostname'], array('app', $name, $app['app_id']));
 
 
 $rrd_list=array();
