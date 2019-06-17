@@ -413,38 +413,38 @@
     "name": "IRCD Connections From"
    },
    {
-    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_failed_raid>'0'",
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.stats_bad_arrays>'0'",
     "name": "Failed RAID array found",
     "default": true
    },
    {
-    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_rebuilding_raid>'0'",
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.stats_rebuilding_arrays>'0'",
     "name": "Rebuilding RAID array found"
    },
    {
-    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_unknown_raid>'0'",
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.stats_unknown_arrays>'0'",
     "name": "Unknown RAID array found",
     "default": true
    },
    {
-    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_failed_bbu>'0'",
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.stats_bbu_failed>'0'",
     "name": "Failed BBU found",
     "default": true
    },
    {
-    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_charging_bbu>'0'",
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.stats_bbu_charging>'0'",
     "name": "Charging BBU found"
    },
    {
-    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_notPresent_bbu>'0'",
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.stats_bbu_notPresent>'0'",
     "name": "Missing BBU found"
    },
    {
-    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_unknown_bbu>'0'",
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.stats_bbu_unknown>'0'",
     "name": "Unknown BBU found"
    },
    {
-    "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_bad_drives>'0'",
+    "rule": "%applications.app_type='raid-drp' && %applications_metrics.stats_bad_drives>'0'",
     "name": "Bad drives found",
     "default": true
    }

@@ -45,21 +45,6 @@ $stats_rrd_def = RrdDefinition::make()
 //
 // update the RRD files for each found array
 //
-$has_unknown_raid=0;
-$has_failed_raid=0;
-$has_rebuilding_raid=0;
-$has_good_raid=0;
-$has_failed_bbu=0;
-$has_charging_bbu=0;
-$has_notPresent_bbu=0;
-$has_unknown_bbu=0;
-$has_na_bbu=0;
-$has_good_bbu=0;
-$total_arrays=0;
-$total_good_drives=0;
-$total_bad_drives=0;
-$total_spare_drives=0;
-
 $array_keys=array_keys($raidinfo['arrays']);
 foreach ($array_keys as $array_name) {
     /*  Turn the status into a integer.
@@ -71,16 +56,11 @@ foreach ($array_keys as $array_name) {
     */
     $status=0;
     if (strcmp($raidinfo['arrays'][$array_name]['status'], 'good') == 0) {
-        $has_good_raid++;
         $status=3;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['status'], 'rebuilding') == 0) {
-        $has_rebuilding_raid++;
         $status=2;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['status'], 'bad') == 0) {
-        $has_failed_raid++;
         $status=1;
-    } else {
-        $has_unknown_raid++;
     }
 
     /* Turns the BBU status into a integer.
@@ -94,19 +74,14 @@ foreach ($array_keys as $array_name) {
      */
     $bbu_status=0;
     if (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'na') == 0) {
-        $has_na_bbu++;
         $bbu_status=1;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'notPresent') == 0) {
-        $has_notPresent_bbu++;
         $bbu_status=2;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'failed') == 0) {
-        $has_failed_bbu++;
         $bbu_status=3;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'charging') == 0) {
-        $has_charging_bbu++;
         $bbu_status=4;
     } elseif (strcmp($raidinfo['arrays'][$array_name]['BBUstatus'], 'good') == 0) {
-        $has_good_bbu++;
         $bbu_status=5;
     } else {
         $has_unknown_bbu++;
@@ -115,10 +90,6 @@ foreach ($array_keys as $array_name) {
     $good=count($raidinfo['arrays'][$array_name]['good']);
     $bad=count($raidinfo['arrays'][$array_name]['bad']);
     $spare=count($raidinfo['arrays'][$array_name]['spare']);
-
-    $total_good_drives=$total_good_drives+$good;
-    $total_bad_drives=$total_bad_drives+$bad;
-    $total_spare_drives=$total_spare_drives+$spare;
 
     $rrd_name=preg_replace('[\ \\\/\(\)\[\]]', '_', $array_name);
 
@@ -132,8 +103,6 @@ foreach ($array_keys as $array_name) {
     );
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $array_rrd_def, 'rrd_name' => $rrd_name);
     data_update($device, 'app', $tags, $fields);
-
-    $total_arrays++;
 }
 
 $rrd_name = array('app', $name, $app_id);
@@ -195,12 +164,4 @@ if (empty($array_keys)) {
     $component->setComponentPrefs($device_id, $updae);
 }
 
-$raidinfo['has_failed_raid']=$has_failed_raid;
-$raidinfo['has_unknown_raid']=$$has_unknown_raid;
-$raidinfo['has_rebuilding_raid']=$has_rebuilding_raid;
-$raidinfo['has_failed_bbu']=$has_failed_bbu;
-$raidinfo['has_unknown_bbu']=$has_unknown_bbu;
-$raidinfo['has_charging_bbu']=$has_charging_bbu;
-$raidinfo['has_notPresent_bbu']=$has_notPresent_bbu;
-$raidinfo['has_bad_drives']=$total_bad_drives;
 update_application($app, 'OK', data_flatten($raidinfo));

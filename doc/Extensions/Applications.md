@@ -1009,16 +1009,16 @@ snmpd ALL = NOPASSWD: /usr/local/bin/check_raid
 The following easy to use metrics are provided by this module. Alerts
 are provided for each, but only default enabled for major issues.
 
-| Metric              | Description                  | Good |  Default |
-|---------------------|------------------------------|------|----------|
-| has_failed_raid     | Failed array count.          | 0    |  true    |
-| has_unknown_raid    | Unknown array count.         | 0    |  true    |
-| has_rebuilding_raid | Rebuilding array count.      | 0    |  false   |
-| has_failed_bbu      | Failed BBU count.            | 0    |  true    |
-| has_unknown_bbu     | Unknown BBU count.           | 0    |  false   |
-| has_charging_bbu    | Charing BBU count.           | 0    |  false   |
-| has_notPresent_bbu  | Arrays with out a BBU count. | 0    |  false   |
-| has_bad_drives      | Total number of bad drives.  | 0    |  true    |
+| Metric                  | Description                  | Good |  Default |
+|-------------------------|------------------------------|------|----------|
+| stats_bad_arrays        | Failed array count.          | 0    |  true    |
+| stats_unknown_arrays    | Unknown array count.         | 0    |  true    |
+| stats_rebuilding_arrays | Rebuilding array count.      | 0    |  false   |
+| stats_bbu_failed        | Failed BBU count.            | 0    |  true    |
+| stats_bbu_unknown       | Unknown BBU count.           | 0    |  false   |
+| stats_bbu_charging      | Charging BBU count.          | 0    |  false   |
+| stats_bbu_notPresent    | Arrays with out a BBU count. | 0    |  false   |
+| stats_bad_drives        | Total number of bad drives.  | 0    |  true    |
 
 
 ### Raspberry PI
