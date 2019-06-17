@@ -411,7 +411,8 @@
    },
    {
     "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_unknown_raid>'0'",
-    "name": "Unknown RAID array found"
+    "name": "Unknown RAID array found",
+    "default": true
    },
    {
     "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_failed_bbu>'0'",
