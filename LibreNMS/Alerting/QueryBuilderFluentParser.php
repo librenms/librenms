@@ -54,21 +54,20 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     /**
      * @param Builder $query
      * @param array $rule
-     * @param string $condition AND or OR
+     * @param string $parent_condition AND or OR  (for root, this should be null)
      * @return Builder
      */
-    protected function parseGroupToQuery($query, $rule, $condition = 'AND')
+    protected function parseGroupToQuery($query, $rule, $parent_condition = null)
     {
-        foreach ($rule['rules'] as $group_rule) {
-            if (array_key_exists('condition', $group_rule)) {
-                $query->where(function ($query) use ($group_rule) {
-                    $this->parseGroupToQuery($query, $group_rule, $group_rule['condition']);
-                }, null, null, $condition);
-            } else {
-                $this->parseRuleToQuery($query, $group_rule, $condition);
+        return $query->where(function ($query) use ($rule, $parent_condition) {
+            foreach ($rule['rules'] as $group_rule) {
+                if (array_key_exists('condition', $group_rule)) {
+                    $this->parseGroupToQuery($query, $group_rule, $rule['condition']);
+                } else {
+                    $this->parseRuleToQuery($query, $group_rule, $rule['condition']);
+                }
             }
-        }
-        return $query;
+        }, null, null, $parent_condition ?? $rule['condition']);
     }
 
     /**
@@ -77,7 +76,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      * @param string $condition AND or OR
      * @return Builder
      */
-    protected function parseRuleToQuery($query, $rule, $condition = 'AND')
+    protected function parseRuleToQuery($query, $rule, $condition)
     {
         list($field, $op, $value) = $this->expandRule($rule);
 
