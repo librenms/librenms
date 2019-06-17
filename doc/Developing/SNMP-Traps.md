@@ -3,9 +3,11 @@ path: blob/master/doc/
 
 # Creating snmp trap handlers
 
-You must to have working snmptrapd. See [SNMP TRAP HANDLER](../Extensions/SNMP-Trap-Handler.md) 
+You must to have working snmptrapd. See [SNMP TRAP HANDLER](../Extensions/SNMP-Trap-Handler.md)
 
-Make sure the MIB is loaded fro the trap you are adding. Edit `/etc/systemd/system/snmptrapd.service.d/mibs.conf` to add it then restart snmprtrapd.
+Make sure the MIB is loaded fro the trap you are adding. Edit
+`/etc/systemd/system/snmptrapd.service.d/mibs.conf` to add it then
+restart snmprtrapd.
 
 `MIBDIRS` option is not recursive, so you need to specify each directory individually.
 
@@ -62,15 +64,17 @@ class ColdBoot implements SnmptrapHandler
 ```
 
 where number on the end of the row `Log::event` means color of the eventlog:
+
 ```
 1 green
 2 cyan
 3 blue
 4 yellow
-5 red 
+5 red
 ```
 
-Register the mapping in the `config/snmptraps.php` file. Make sure to use the full trap oid and correct class.
+Register the mapping in the `config/snmptraps.php` file. Make sure to
+use the full trap oid and correct class.
 
 ```php
 'SNMPv2-MIB::coldStart' => \LibreNMS\Snmptrap\Handlers\ColdBoot::class,
@@ -79,7 +83,6 @@ Register the mapping in the `config/snmptraps.php` file. Make sure to use the fu
 The handle function inside your new class will receive a LibreNMS/Snmptrap/Trap
 object containing the parsed trap.  It is common to update the database and create
 event log entries within the handle function.
-
 
 ### Getting information from the Trap
 
