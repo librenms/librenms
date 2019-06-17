@@ -432,7 +432,7 @@
    },
    {
     "rule": "%applications.app_type='raid-drp' && %applications_metrics.has_bad_drives>'0'",
-    "name": "Bad drives found"
+    "name": "Bad drives found",
     "default": true
    }
   ]
