@@ -278,6 +278,11 @@ $graphs['asterisk'] = array(
     'channels',
     'sip',
 );
+$graphs['raid-drp'] = array(
+    'array_stats',
+    'bbu_stats',
+    'drive_stats',
+);
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
