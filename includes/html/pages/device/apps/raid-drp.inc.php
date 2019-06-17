@@ -75,7 +75,7 @@ foreach ($graphs as $key => $text) {
     if (strcmp($key, 'raid-drp_status') == 0) {
         echo '3=Good, 2=Rebuilding, 1=Bad, 0=Unknown';
     } elseif (strcmp($key, 'raid-drp_bbu') == 0) {
-        echo '5=Good, 4=charging, 3=failed, 2=notPrsent, 1=N/A, 0=Unknown';
+        echo '5=Good, 4=Charging, 3=Failed, 2=Not Present, 1=N/A, 0=Unknown';
     }
     echo '</div>';
     echo '</div>';
