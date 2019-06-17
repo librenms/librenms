@@ -13,7 +13,9 @@ $link_array = array(
 
 print_optionbar_start();
 
-echo 'Arrays:';
+echo generate_link('Overview', $link_array);
+echo ' | Arrays:';
+
 $raid_int=0;
 while (isset($raid_arrays[$raid_int])) {
     $name=$pools[$raid_int];
@@ -43,6 +45,9 @@ if (isset($vars['array'])) {
     );
 } else {
     $graphs = array(
+        'raid-drp_array_stats' => 'Arrays',
+        'raid-drp_bbu_stats' => 'BBUs',
+        'raid-drp_drive_stats' => 'Drives',
     );
 }
 
