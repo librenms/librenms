@@ -14,7 +14,7 @@ $link_array = array(
 print_optionbar_start();
 
 echo generate_link('Overview', $link_array);
-echo ' | Arrays:';
+echo '| Arrays:';
 
 $raid_int=0;
 while (isset($raid_arrays[$raid_int])) {
