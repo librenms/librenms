@@ -3,12 +3,12 @@ path: blob/master/doc/
 
 # Creating snmp trap handlers
 
-You must to have working snmptrapd. See
+You must have a working snmptrapd. See
 [SNMP TRAP HANDLER](../Extensions/SNMP-Trap-Handler.md)
 
-Make sure the MIB is loaded fro the trap you are adding. Edit
+Make sure the MIB is loaded from the trap you are adding. Edit
 `/etc/systemd/system/snmptrapd.service.d/mibs.conf` to add it then
-restart snmprtrapd.
+restart snmptrapd.
 
 `MIBDIRS` option is not recursive, so you need to specify each directory individually.
 
@@ -75,7 +75,7 @@ where number on the end of the row `Log::event` means color of the eventlog:
 ```
 
 Register the mapping in the `config/snmptraps.php` file. Make sure to
-use the full trap oid and correct class.
+use the full trap OID and correct class.
 
 ```php
 'SNMPv2-MIB::coldStart' => \LibreNMS\Snmptrap\Handlers\ColdBoot::class,
