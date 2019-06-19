@@ -1,6 +1,6 @@
 os: zxdsl
 text: 'ZXDSL'
-type: dslam
+type: network
 icon: zte
 group: zte
 over:
