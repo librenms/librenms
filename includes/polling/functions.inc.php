@@ -354,7 +354,7 @@ function poll_device($device, $force_module = false)
         d_echo("Groups Added: " . implode(',', $group_changes['attached']) . PHP_EOL);
         d_echo("Groups Removed: " . implode(',', $group_changes['detached']) . PHP_EOL);
 
-        echo "### End Device Groups, runtime: " . round(microtime(true) - $dg_start, 3) . " ### \n\n";
+        echo "### End Device Groups, runtime: " . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
 
         if (!$force_module && !empty($graphs)) {
             echo "Enabling graphs: ";
