@@ -362,9 +362,9 @@ if ($format == "graph") {
             "<div class='form-group'><select name='features' id='features' class='form-control'></select></div>" +
             "<div class='form-group'><select name='location' id='location' class='form-control'></select></div>" +
             "<div class='form-group'><select name='type' id='device-type' class='form-control'></select></div>" +
-            "<input type='submit' class='btn btn-default' value='Search'>" +
-            "<a href='<?php echo generate_url($vars) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'>Update URL</a>" +
-            "<a href='<?php echo generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
+            "<input type='submit' class='btn btn-success' value='Search'>" +
+            "<a href='<?php echo generate_url($vars) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-warning'>Update URL</a>" +
+            "<a href='<?php echo generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>' title='Reset criteria to default.' class='btn btn-danger'>Reset</a>" +
             "</form>" +
             "</div>"
         );
