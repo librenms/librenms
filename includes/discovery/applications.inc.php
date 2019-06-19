@@ -45,6 +45,7 @@ if ($results) {
     $applications['mailq'] = 'postfix';
     $applications['osupdate'] = 'os-updates';
     $applications['phpfpmsp'] = 'php-fpm';
+    $applications['opcache'] = 'php-opcache';
     $applications['postfixdetailed'] = 'postfix';
 }
 
