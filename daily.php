@@ -302,8 +302,6 @@ if ($options['f'] === 'refresh_device_groups') {
                 $deviceGroup->save();
             }
         });
-
-
     } catch (LockException $e) {
         echo $e->getMessage() . PHP_EOL;
         exit(-1);
