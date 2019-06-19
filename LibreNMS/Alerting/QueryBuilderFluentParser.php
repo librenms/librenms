@@ -152,14 +152,37 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      */
     protected function joinTables($query)
     {
+        if (empty($this->builder['joins'])) {
+            $this->generateJoins();
+        }
+
+        foreach ($this->builder['joins'] as $join) {
+            list($rightTable, $left, $right) = $join;
+            $query->leftJoin($rightTable, $left, $right);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Generate the joins for this rule and store them in the rule.
+     * This is an expensive operation.
+     *
+     * @return $this
+     */
+    public function generateJoins()
+    {
+        $joins = [];
         foreach ($this->generateGlue() as $glue) {
             list($left, $right) = explode(' = ', $glue, 2);
             if (str_contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
                 list($rightTable, $rightKey) = explode('.', $right);
-                $query->leftJoin($rightTable, $left, $right);
+                $joins[] = [$rightTable, $left, $right];
             }
         }
 
-        return $query;
+        $this->builder['joins'] = $joins;
+
+        return $this;
     }
 }
