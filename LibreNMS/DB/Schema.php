@@ -214,7 +214,7 @@ class Schema
                 return [$table, $target];
             }
 
-            $table_relations = $relationships[$table];
+            $table_relations = $relationships[$table] ?? [];
             d_echo("Searching $table: " . json_encode($table_relations) . PHP_EOL);
 
             if (!empty($table_relations)) {
