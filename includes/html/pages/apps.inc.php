@@ -144,6 +144,12 @@ $graphs['exim-stats'] = array(
 $graphs['php-fpm'] = array(
     'stats'
 );
+$graphs['php-opcache'] = array(
+    'memory',
+    'interned',
+    'keys',
+    'hits'
+);
 $graphs['nvidia'] = array(
     'sm',
     'mem',
