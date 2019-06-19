@@ -69,6 +69,7 @@ class StringHelpers
             'fbsd-nfs-client' => 'FreeBSD NFS Client',
             'fbsd-nfs-server' => 'FreeBSD NFS Server',
             'php-fpm' => 'PHP-FPM',
+            'php-opcache' => 'PHP-Opcache',
             'opengridscheduler' => 'Open Grid Scheduler',
             'sdfsinfo' => 'SDFS info',
             'freeradius' => 'FreeRADIUS',
