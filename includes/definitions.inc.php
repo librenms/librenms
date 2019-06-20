@@ -650,3 +650,6 @@ $config['ipmi_unit']['Watts']     = 'power';
 $config['ipmi_unit']['Amps']      = 'current';
 $config['ipmi_unit']['percent']   = 'load';
 $config['ipmi_unit']['discrete']  = '';
+# TELTONIKA
+$config['graph_types']['device']['rutos_2xx_mobileDataUsage'] = ['section' => 'network', 'order' => 0, 'descr' => 'Mobile Data Usage'];
+
