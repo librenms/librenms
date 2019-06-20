@@ -545,6 +545,9 @@ $config['graph_types']['device']['topvision_cmtotal'] = ['section' => 'cmts', 'o
 $config['graph_types']['device']['topvision_cmreg'] = ['section' => 'cmts', 'order' => 1, 'descr' => 'Cable Modem Registered'];
 $config['graph_types']['device']['topvision_cmoffline'] = ['section' => 'cmts', 'order' => 2, 'descr' => 'Cable Modem Offline'];
 
+// Teltonika RUT2XX Graph
+$config['graph_types']['device']['rutos_2xx_mobileDataUsage'] = ['section' => 'network', 'order' => 0, 'descr' => 'Mobile Data Usage'];
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
