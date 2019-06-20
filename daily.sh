@@ -262,6 +262,7 @@ main () {
                 # Cleanups
                 local options=("refresh_alert_rules"
                                "refresh_os_cache"
+                               "refresh_device_groups"
                                "recalculate_device_dependencies"
                                "syslog"
                                "eventlog"

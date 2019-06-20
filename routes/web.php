@@ -22,7 +22,10 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     });
 
     // pages
+    Route::resource('device-groups', 'DeviceGroupController');
     Route::get('locations', 'LocationController@index');
+    Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
+    Route::resource('users', 'UserController');
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'pollers/tab=log/');
@@ -31,15 +34,13 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::group(['prefix' => '2fa', 'namespace' => 'Auth'], function () {
         Route::get('', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
         Route::post('', 'TwoFactorController@verifyTwoFactor')->name('2fa.verify');
-        Route::post('add', 'TwoFactorController@create');
+        Route::post('add', 'TwoFactorController@create')->name('2fa.add');
         Route::post('cancel', 'TwoFactorController@cancelAdd')->name('2fa.cancel');
         Route::post('remove', 'TwoFactorController@destroy')->name('2fa.remove');
 
         Route::post('{user}/unlock', 'TwoFactorManagementController@unlock')->name('2fa.unlock');
         Route::delete('{user}', 'TwoFactorManagementController@destroy')->name('2fa.delete');
     });
-
-    Route::resource('users', 'UserController');
 
     // Ajax routes
     Route::group(['prefix' => 'ajax'], function () {

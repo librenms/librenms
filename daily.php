@@ -7,6 +7,7 @@
  */
 
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\LockException;
@@ -281,6 +282,26 @@ if ($options['f'] === 'refresh_alert_rules') {
                 }
             }
         }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
+    }
+}
+
+if ($options['f'] === 'refresh_device_groups') {
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('refresh_device_groups', 0, 86000);
+        }
+
+        echo 'Refreshing device group table relationships' . PHP_EOL;
+        DeviceGroup::all()->each(function ($deviceGroup) {
+            if ($deviceGroup->type == 'dynamic') {
+                /** @var DeviceGroup $deviceGroup */
+                $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
+                $deviceGroup->save();
+            }
+        });
     } catch (LockException $e) {
         echo $e->getMessage() . PHP_EOL;
         exit(-1);

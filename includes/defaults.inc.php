@@ -802,6 +802,7 @@ $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
 $config['poller_modules']['loadbalancers']               = false;
 $config['poller_modules']['mef']                         = false;
+$config['poller_modules']['mpls']                        = true;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -844,6 +845,7 @@ $config['discovery_modules']['loadbalancers']        = false;
 $config['discovery_modules']['mef']                  = false;
 $config['discovery_modules']['wireless']             = true;
 $config['discovery_modules']['fdb-table']            = true;
+$config['discovery_modules']['mpls']                 = true;
 // Enable daily updates
 $config['update'] = 1;
 
@@ -956,9 +958,6 @@ $config['leaflet']['tile_url']                          = "{s}.tile.openstreetma
 
 // General GUI options
 $config['gui']['network-map']['style']                  = 'new';//old is also valid
-
-// Navbar variables
-$config['navbar']['manage_groups']['hide']              = 0;
 
 // Show errored ports in the summary table on the dashboard
 $config['summary_errors']                               = 0;

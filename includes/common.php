@@ -1523,7 +1523,7 @@ function clean($value, $strip_tags = true)
  */
 function display($value, $purifier_config = [])
 {
-    return Html::display($value, $purifier_config);
+    return \LibreNMS\Util\Clean::html($value, $purifier_config);
 }
 
 /**
@@ -1832,22 +1832,4 @@ function check_file_permissions($file, $mask)
 function array_by_column($array, $column)
 {
     return array_combine(array_column($array, $column), $array);
-}
-
-/**
- * Get all consecutive pairs of values in an array.
- * [1,2,3,4] -> [[1,2],[2,3],[3,4]]
- *
- * @param array $array
- * @return array
- */
-function array_pairs($array)
-{
-    $pairs = [];
-
-    for ($i = 1; $i < count($array); $i++) {
-        $pairs[] = [$array[$i -1], $array[$i]];
-    }
-
-    return $pairs;
 }

@@ -108,8 +108,8 @@ class ServiceConfig:
         self.billing.enabled = config.get('service_billing_enabled', True)
         self.billing.frequency = config.get('service_billing_frequency', ServiceConfig.billing.frequency)
         self.billing.calculate = config.get('service_billing_calculate_frequency', ServiceConfig.billing.calculate)
-        self.alerting.enabled = config.get('service_ping_enabled', True)
-        self.alerting.frequency = config.get('service_billing_frequency', ServiceConfig.alerting.frequency)
+        self.alerting.enabled = config.get('service_alerting_enabled', True)
+        self.alerting.frequency = config.get('service_alerting_frequency', ServiceConfig.alerting.frequency)
         self.ping.enabled = config.get('service_ping_enabled', False)
         self.ping.frequency = config.get('ping_rrd_step', ServiceConfig.billing.calculate)
         self.down_retry = config.get('service_poller_down_retry', ServiceConfig.down_retry)
@@ -238,7 +238,10 @@ class Service:
         info("Poller group {}. Using Python {} and {} locks and queues"
              .format('0 (default)' if self.config.group == [0] else self.config.group, python_version(),
                      'redis' if isinstance(self._lm, LibreNMS.RedisLock) else 'internal'))
-        info("Maintenance tasks will be run every {}".format(timedelta(seconds=self.config.update_frequency)))
+        if self.config.update_enabled:
+            info("Maintenance tasks will be run every {}".format(timedelta(seconds=self.config.update_frequency)))
+        else:
+            warning("Maintenance tasks are disabled.")
 
         # Main dispatcher loop
         try:

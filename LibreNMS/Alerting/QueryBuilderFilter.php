@@ -65,6 +65,10 @@ class QueryBuilderFilter implements \JsonSerializable
         foreach ($macros as $key => $value) {
             $field = 'macros.' . $key;
 
+            if (preg_match('/^past_\d+m$/', $key)) {
+                continue; // don't include the time based macros, they don't work like that
+            }
+
             if (ends_with($key, '_usage_perc')) {
                 $this->filter[$field] = [
                     'id' => $field,
@@ -155,7 +159,6 @@ class QueryBuilderFilter implements \JsonSerializable
         // binary, blob
         return null;
     }
-
 
     /**
      * Specify data which should be serialized to JSON

@@ -1676,46 +1676,6 @@ function return_number($value)
     return $value;
 }
 
-function get_units_from_sensor($sensor)
-{
-    switch ($sensor['sensor_class']) {
-        case 'airflow':
-            return 'cfm';
-        case 'current':
-            return 'A';
-        case 'dbm':
-        case 'signal':
-            return 'dBm';
-        case 'fanspeed':
-            return 'rpm';
-        case 'frequency':
-            return 'Hz';
-        case 'charge':
-        case 'humidity':
-        case 'load':
-            return '%';
-        case 'cooling':
-        case 'power':
-            return 'W';
-        case 'power_consumed':
-            return 'kWh';
-        case 'pressure':
-            return 'kPa';
-        case 'runtime':
-            return 'Min';
-        case 'snr':
-            return 'SNR';
-        case 'state':
-            return '#';
-        case 'temperature':
-            return 'C';
-        case 'voltage':
-            return 'V';
-        default:
-            return '';
-    }
-}
-
 function parse_entity_state($state, $value)
 {
     $data = array(

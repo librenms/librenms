@@ -39,6 +39,25 @@
         <option <?php echo $cdr['select_gbps'] ?> value="Gbps">Gigabits per second (Gbps)</option>
       </select>
     </div>
+    <label class="col-sm-4 control-label" for="dir_95th">95th Calculation</label>
+    <div class="col-sm-8">
+      <label class="radio-inline">
+       <input type="radio" name="dir_95th" id="dir_95th_inout" value="in"
+            <?php
+            if ($bill_data['dir_95th'] == 'in' || $bill_data['dir_95th'] == 'out') {
+                 echo "checked";
+            }
+            ?> /> Max In/Out
+       </label>
+      <label class="radio-inline">
+       <input type="radio" name="dir_95th" id="dir_95th_agg" value="agg"
+            <?php
+            if ($bill_data['dir_95th'] == 'agg') {
+                 echo "checked";
+            }
+            ?> /> Aggregate
+       </label>
+    </div>
   </div>
   <div id="quotaDiv">
     <label class="col-sm-4 control-label" for="bill_quota">Quota</label>
