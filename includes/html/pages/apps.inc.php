@@ -231,6 +231,10 @@ $graphs['smart'] = array(
     'id231',
     'id233',
 );
+$graphs['certificate'] = array(
+    'age',
+    'remaining_days',
+);
 $graphs['mdadm'] = array(
     'level',
     'size',

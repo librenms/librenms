@@ -1444,6 +1444,33 @@ function get_postgres_databases($device_id)
 }
 
 /**
+ * Get all certificate names from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @return array list of certificate names
+ */
+function get_domains_with_certificates($device, $app_id)
+{
+    $certificates = array();
+
+    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'certificate', $app_id);
+
+    foreach (glob($pattern) as $rrd) {
+        $filename = basename($rrd, '.rrd');
+
+        list(,,, $cert_name) = explode("-", $filename, 4);
+
+        if ($cert_name) {
+            array_push($certificates, $cert_name);
+        }
+    }
+
+    return $certificates;
+}
+
+/**
  * Get all mdadm arrays from the collected
  * rrd files.
  *
