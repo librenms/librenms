@@ -15,10 +15,10 @@ if (session('widescreen')) {
 }
 
 if (!is_numeric($vars['from'])) {
-    $vars['from'] = $config['time']['day'];
+    $vars['from'] = strtotime($vars['from']) ?: Config::get('time.day');
 }
 if (!is_numeric($vars['to'])) {
-    $vars['to']   = $config['time']['now'];
+    $vars['to'] = strtotime($vars['to']) ?: Config::get('time.now');
 }
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
