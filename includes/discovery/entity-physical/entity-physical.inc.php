@@ -117,6 +117,7 @@ if ($device['os'] == 'saf-cfm') {
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
+    unset($ifIndex);
     if ($device['os'] == 'junos') {
         // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values
         // are made up here.
@@ -190,6 +191,17 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalIsFRU        = $entry['entPhysicalIsFRU'];
         $entPhysicalAlias        = $entry['entPhysicalAlias'];
         $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
+        if (array_key_exists('1', $entry) && array_key_exists('entAliasMappingIdentifier', $entry['1'])) {
+            $ifIndex = $entry['1']['entAliasMappingIdentifier'];
+        
+            if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
+                unset($ifIndex);
+            } else {
+                $ifIndex_array = explode('.', $ifIndex);
+                $ifIndex       = $ifIndex_array[1];
+                unset($ifIndex_array);
+            }
+        }
     } else {
         $entPhysicalDescr        = array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '';
         $entPhysicalContainedIn  = array_key_exists('entPhysicalContainedIn', $entry)  ? $entry['entPhysicalContainedIn']  : '';
@@ -210,14 +222,13 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
 
     if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {
         $ifIndex = $entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'];
-    }
-
-    if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
-        unset($ifIndex);
-    } else {
-        $ifIndex_array = explode('.', $ifIndex);
-        $ifIndex       = $ifIndex_array[1];
-        unset($ifIndex_array);
+        if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
+            unset($ifIndex);
+        } else {
+            $ifIndex_array = explode('.', $ifIndex);
+            $ifIndex       = $ifIndex_array[1];
+            unset($ifIndex_array);
+        }
     }
 
     // List of real names for cisco entities
