@@ -152,7 +152,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      */
     protected function joinTables($query)
     {
-        if (empty($this->builder['joins'])) {
+        if (!isset($this->builder['joins'])) {
             $this->generateJoins();
         }
 
