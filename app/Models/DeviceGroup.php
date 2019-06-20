@@ -46,6 +46,11 @@ class DeviceGroup extends BaseModel
         static::saving(function (DeviceGroup $deviceGroup) {
             if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
+            }
+        });
+
+        static::saved(function (DeviceGroup $deviceGroup) {
+            if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->updateDevices();
             }
         });
