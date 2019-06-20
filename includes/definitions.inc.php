@@ -545,6 +545,9 @@ $config['graph_types']['device']['topvision_cmtotal'] = ['section' => 'cmts', 'o
 $config['graph_types']['device']['topvision_cmreg'] = ['section' => 'cmts', 'order' => 1, 'descr' => 'Cable Modem Registered'];
 $config['graph_types']['device']['topvision_cmoffline'] = ['section' => 'cmts', 'order' => 2, 'descr' => 'Cable Modem Offline'];
 
+# TELTONIKA Graph
+$config['graph_types']['device']['rutos_2xx_mobileDataUsage'] = ['section' => 'network', 'order' => 0, 'descr' => 'Mobile Data Usage'];
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
@@ -650,6 +653,3 @@ $config['ipmi_unit']['Watts']     = 'power';
 $config['ipmi_unit']['Amps']      = 'current';
 $config['ipmi_unit']['percent']   = 'load';
 $config['ipmi_unit']['discrete']  = '';
-# TELTONIKA
-$config['graph_types']['device']['rutos_2xx_mobileDataUsage'] = ['section' => 'network', 'order' => 0, 'descr' => 'Mobile Data Usage'];
-
