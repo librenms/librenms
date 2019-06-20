@@ -9,11 +9,14 @@ Route: `/api/v0/bgp`
 
 Input:
 
-  - hostname = Either the devices hostname or id.
+- hostname = Either the devices hostname or id.
+
 **OR**
-  - asn = The ASN you would like to filter by
+
+- asn = The ASN you would like to filter by
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?hostname=host.example.com
@@ -44,7 +47,7 @@ Output:
             "bgpPeerInUpdateElapsedTime": "0",
             "context_name": ""
         },
-	...
+    ...
     ],
     "count": 100
 }
@@ -61,11 +64,13 @@ Input:
 -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp/4
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -101,15 +106,17 @@ Route: `/api/v0/routing/bgp/cbgp`
 
 Input:
 
-  - hostname = Either the devices hostname or id
+- hostname = Either the devices hostname or id
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/bgp/cbgp
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/bgp/cbgp?hostname=host.example.com
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -156,11 +163,13 @@ Input:
 -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -177,6 +186,7 @@ Output:
     ],
     "count": 55
 }
+
 ```
 ### `get_network_ip_addresses`
 
@@ -184,18 +194,20 @@ Get all IPv4 and IPv6 addresses for particular network.
 
 Route: `/api/v0/resources/ip/networks/:id/ip`
 
-  - id must be integer
+- id must be integer
 
 Input:
 
 -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/55/ip
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -224,11 +236,13 @@ Input:
 -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -250,18 +264,20 @@ List the current IPSec tunnels which are active.
 
 Route: `/api/v0/routing/ipsec/data/:hostname`
 
-  - hostname can be either the device hostname or id
+- hostname can be either the device hostname or id
 
 Input:
 
   -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/ipsec/data/localhost
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -279,6 +295,7 @@ Output:
     ]
 }
 ```
+
 > Please note, this will only show active VPN sessions not all configured.
 
 ### `list_ospf`
@@ -289,15 +306,17 @@ Route: `/api/v0/ospf`
 
 Input:
 
-  - hostname = Either the devices hostname or id.
+- hostname = Either the devices hostname or id.
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf?hostname=host.example.com
 ```
 
 Output:
+
 ```json
 {
  "status": "ok",
@@ -332,9 +351,11 @@ Route: `/api/v0/routing/vrf`
 
 Input:
 
-  - hostname = Either the devices hostname or id
+- hostname = Either the devices hostname or id
+
 **OR**
-  - vrfname = The VRF name you would like to filter by
+
+- vrfname = The VRF name you would like to filter by
 
 Example:
 ```curl
@@ -344,6 +365,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -373,11 +395,13 @@ Input:
 -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf/2
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",

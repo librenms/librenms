@@ -12,11 +12,13 @@ Input (JSON):
   -
 
 Examples:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroups
 ```
 
 Output:
+
 ```json
 [
     {
@@ -41,18 +43,23 @@ List all devices matching the group provided.
 
 Route: `/api/v0/devicegroups/:name`
 
-  - name Is the name of the device group which can be obtained using [`get_devicegroups`](#function-get_devicegroups). Please ensure that the name is urlencoded if it needs to be (i.e Linux Servers would need to be urlencoded.
+- name Is the name of the device group which can be obtained using
+  [`get_devicegroups`](#function-get_devicegroups). Please ensure that
+  the name is urlencoded if it needs to be (i.e Linux Servers would
+  need to be urlencoded.
 
 Input (JSON):
 
-  - full: set to any value to return all data for the devices in a given group
+- full: set to any value to return all data for the devices in a given group
 
 Examples:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroups/LinuxServers
 ```
 
 Output:
+
 ```json
 [
      {
