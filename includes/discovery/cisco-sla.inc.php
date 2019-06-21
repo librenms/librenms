@@ -84,7 +84,7 @@ if (Config::get('enable_sla') && $device['os_group'] == 'cisco') {
 
     // Mark all remaining SLAs as deleted
     foreach ($existing_slas as $existing_sla) {
-        dbUpdate(array(‘deleted’ => 1), 'slas', 'sla_id = ?', [$existing_sla]);
+        dbUpdate(['deleted' => 1], 'slas', 'sla_id = ?', [$existing_sla]);
         echo '-';
     }
 
