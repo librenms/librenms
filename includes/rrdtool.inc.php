@@ -103,7 +103,7 @@ function rrdtool_graph($graph_file, $options)
     /** @var Proc $rrd_sync_process */
 
     if (rrdtool_initialize(false)) {
-        $now_timestamp = date('Y-m-d H:i:s', time());  // timestamp
+        $now_timestamp = date('Y-m-d H:i:s');  // timestamp
         $watermark_font = ' --font WATERMARK:8:Times'; // Watermark size and font
         $watermark_text = ' --watermark "Created by LibreNMS @ '.$now_timestamp.'"'; // watermark text
         $options .= $watermark_font.$watermark_text; // concatenate with the existing options passed
