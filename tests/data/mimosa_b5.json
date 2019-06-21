@@ -2158,7 +2158,7 @@
                     "sensor_index": "0",
                     "sensor_type": "mimosaSatelliteStrength",
                     "sensor_descr": "Satellite Strength",
-                    "group": "",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
