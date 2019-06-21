@@ -191,8 +191,9 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalIsFRU        = $entry['entPhysicalIsFRU'];
         $entPhysicalAlias        = $entry['entPhysicalAlias'];
         $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
-        
-        //VRP devices seems to use Logical '1' instead of '0' like the default code checks. 
+
+        //VRP devices seems to use LogicalEntity '1' instead of '0' like the default code checks.
+        //Standard code is still run after anyway.
         if (array_key_exists('1', $entry) && array_key_exists('entAliasMappingIdentifier', $entry['1'])) {
             $ifIndex = $entry['1']['entAliasMappingIdentifier'];
             if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
