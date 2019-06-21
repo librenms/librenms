@@ -59,7 +59,7 @@ class Application extends DeviceRelatedModel
         'opengridscheduler' => 'Open Grid Scheduler',
         'os-updates' => 'OS Updates',
         'php-fpm' => 'PHP-FPM',
-        'php-opcache' => 'PHP-Opcache',
+        'php-opcache' => 'PHP-OPcache',
         'pi-hole' => 'Pi-hole',
         'powerdns' => 'PowerDNS',
         'powerdns-dnsdist' => 'PowerDNS dnsdist',
