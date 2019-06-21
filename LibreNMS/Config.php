@@ -84,9 +84,6 @@ class Config
         $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
         self::set('alert.macros.rule', $macros);
 
-        // variable definitions (remove me)
-        require $install_dir . '/includes/vmware_guestid.inc.php';
-
         // Load user config
         @include $install_dir . '/config.php';
 
