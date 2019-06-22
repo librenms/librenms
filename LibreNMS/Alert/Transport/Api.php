@@ -126,8 +126,7 @@ class Api extends Transport
             ],
             'validation' => [
                 'api-method' => 'in:GET,POST',
-                'api-url' => 'required|url',
-                'api-options' => 'required|string'
+                'api-url' => 'required|url'
             ]
         ];
     }
