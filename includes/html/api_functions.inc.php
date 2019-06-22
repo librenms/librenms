@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use App\Models\Device;
+use App\Models\DeviceGroup;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
@@ -826,7 +828,7 @@ function list_available_health_graphs()
                 'name' => 'device_'.$graph['sensor_class'],
             );
         }
-        $device = \App\Models\Device::find($device_id);
+        $device = Device::find($device_id);
 
         if ($device) {
             if ($device->processors()->count() > 0) {
@@ -1820,21 +1822,24 @@ function get_device_groups()
 {
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
-    $status   = 'error';
-    $code     = 404;
-    $hostname = $router['hostname'];
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
-        $groups = GetGroupsFromDevice($device_id, 1);
+
+    if (!empty($router['hostname'])) {
+        $device = ctype_digit($router['hostname']) ? Device::find($router['hostname']) : Device::findByHostname($router['hostname']);
+        if (is_null($device)) {
+            api_error(404, 'Device not found');
+        }
+        $query = $device->groups();
     } else {
-        $groups = GetDeviceGroups();
+        $query = DeviceGroup::query();
     }
-    if (empty($groups)) {
+
+    $groups = $query->orderBy('name')->get();
+
+    if ($groups->isEmpty()) {
         api_error(404, 'No device groups found');
     }
 
-    api_success($groups, 'groups', 'Found ' . count($groups) . ' device groups');
+    api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' device groups');
 }
 
 function get_devices_by_group()
@@ -1842,19 +1847,25 @@ function get_devices_by_group()
     check_is_read();
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
-    $name     = urldecode($router['name']);
-    $devices  = array();
-    $full     = $_GET['full'];
-    if (empty($name)) {
+
+    if (empty($router['name'])) {
         api_error(400, 'No device group name provided');
     }
-    $group_id = dbFetchCell("SELECT `id` FROM `device_groups` WHERE `name`=?", array($name));
-    $devices = GetDevicesFromGroup($group_id, true, $full);
-    if (empty($devices)) {
+    $name = urldecode($router['name']);
+
+    $device_group = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (empty($device_group)) {
+        api_error(404, 'Device group not found');
+    }
+
+    $devices = $device_group->devices()->get(empty($_GET['full']) ? ['devices.device_id'] : ['*']);
+
+    if ($devices->isEmpty()) {
         api_error(404, 'No devices found in group ' . $name);
     }
 
-    api_success($devices, 'devices');
+    api_success($devices->makeHidden('pivot')->toArray(), 'devices');
 }
 
 
@@ -2050,7 +2061,7 @@ function get_fdb()
     }
     check_device_permission($device_id);
 
-    $device = \App\Models\Device::find($device_id);
+    $device = Device::find($device_id);
     if ($device) {
         $fdb = $device->portsFdb;
         api_success($fdb, 'ports_fdb');

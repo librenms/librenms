@@ -37,12 +37,6 @@ use Session;
 
 class UserPreferencesController extends Controller
 {
-    private $valid_prefs = [
-        'dashboard' => 'required|integer',
-        'add_schedule_note_to_device' => 'required|integer',
-        'locale' => 'required|in:en,ru',
-    ];
-
     public function __construct()
     {
         $this->middleware('deny-demo');
@@ -64,10 +58,7 @@ class UserPreferencesController extends Controller
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
             'locale' => UserPref::getPref($user, 'locale') ?: 'en',
-            'locales' => [
-                'en' => 'English',
-                'ru' => 'русский',
-            ],
+            'locales' => $this->getValidLocales(),
         ];
 
         if (Config::get('twofactor')) {
@@ -88,14 +79,23 @@ class UserPreferencesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
+        $valid_prefs = [
+            'dashboard' => 'required|integer',
+            'add_schedule_note_to_device' => 'required|integer',
+            'locale' => [
+                'required',
+                Rule::in(array_keys($this->getValidLocales())),
+            ],
+        ];
+
         $this->validate($request, [
-            'pref' => ['required', Rule::in(array_keys($this->valid_prefs))],
-            'value' => $this->valid_prefs[$request->pref] ?? 'required|integer',
+            'pref' => ['required', Rule::in(array_keys($valid_prefs))],
+            'value' => $valid_prefs[$request->pref] ?? 'required|integer',
         ]);
 
         UserPref::setPref($request->user(), $request->pref, $request->value);
@@ -105,5 +105,17 @@ class UserPreferencesController extends Controller
         }
 
         return response()->json(['status' => 'success']);
+    }
+
+    private function getValidLocales()
+    {
+        return array_reduce(glob(resource_path('lang') . '/*', GLOB_ONLYDIR), function ($locales, $locale) {
+            {
+                $locale = basename($locale);
+                $lang = __('preferences.lang', [], $locale);
+                $locales[$locale] = ($lang == 'preferences.lang' ? $locale : $lang);
+                return $locales;
+            }
+        }, []);
     }
 }

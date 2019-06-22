@@ -200,25 +200,37 @@
         $('.ajax-select').change(function () {
             var $this = $(this);
             var value = $this.val();
-            console.log($this.data('pref'));
+            var pref = $this.data('pref');
             $.ajax({
                 url: '{{ route('preferences.store') }}',
                 dataType: 'json',
                 type: 'POST',
                 data: {
-                    pref: $this.data('pref'),
+                    pref: pref,
                     value: value
                 },
                 success: function () {
+                    if (pref === 'locale') {
+                        location.reload();
+                    }
+
                     $this.data('previous', value);
                     $this.closest('.form-group').addClass('has-success');
                     setTimeout(function () {
                         $this.closest('.form-group').removeClass('has-success');
                     }, 2000);
                 },
-                error: function () {
+                error: function (data) {
                     $this.val($this.data('previous'));
                     $this.closest('.form-group').addClass('has-error');
+
+                    var json = data.responseJSON;
+                    var errors = [];
+                    for (var attrib in json) {
+                        errors.push(json[attrib]);
+                    }
+                    toastr.error('Error: ' + errors.join("<br />"));
+
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-error');
                     }, 2000);

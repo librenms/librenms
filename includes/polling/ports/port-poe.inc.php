@@ -59,24 +59,4 @@ if (($device['os'] == 'vrp')) {
         data_update($device, 'poe', $tags, $fields);
         echo 'PoE(IOS) ';
     }//end if
-} else {
-    //This is the legacy code, to be tested against devices. This code looks terribly broken. There is
-    //most probably no device that can show anything out of this ...
-
-    if ($this_port['dot3StatsIndex'] && $port['ifType'] == 'ethernetCsmacd') {
-        $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].':'.$port['cpeExtPsePortPwrAvailable'].':'.
-            $port['cpeExtPsePortPwrConsumption'].':'.$port['cpeExtPsePortMaxPwrDrawn'];
-
-        $fields = array(
-                'PortPwrAllocated'   => $port['cpeExtPsePortPwrAllocated'],
-                'PortPwrAvailable'   => $port['cpeExtPsePortPwrAvailable'],
-                'PortConsumption'    => $port['cpeExtPsePortPwrConsumption'],
-                'PortMaxPwrDrawn'    => $port['cpeExtPsePortMaxPwrDrawn'],
-                   );
-
-        $tags = compact('ifName', 'rrd_name', 'rrd_def');
-        data_update($device, 'poe', $tags, $fields);
-
-        echo 'PoE(generic) ';
-    }//end if
 }

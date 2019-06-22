@@ -382,29 +382,20 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
 function sensor_low_limit($class, $current)
 {
-    $limit = null;
-
+    // matching an empty case executes code until a break is reached
     switch ($class) {
         case 'temperature':
             $limit = $current - 10;
             break;
         case 'voltage':
-                $limit = $current * 0.85;
+            $limit = $current * 0.85;
             break;
         case 'humidity':
             $limit = 30;
             break;
-        case 'count':
-        case 'current':
-            $limit = null;
-            break;
         case 'fanspeed':
             $limit = $current * 0.80;
             break;
-        case 'power':
-            $limit = null;
-            break;
-        case 'power_consumed':
         case 'power_factor':
             $limit = -1;
             break;
@@ -412,34 +403,24 @@ function sensor_low_limit($class, $current)
             $limit = -80;
             break;
         case 'airflow':
-        case 'dbm':
         case 'snr':
         case 'frequency':
         case 'pressure':
         case 'cooling':
             $limit = $current * 0.95;
             break;
-        case 'delay':
-        case 'quality_factor':
-        case 'chromatic_dispersion':
-        case 'ber':
-        case 'eer':
-        case 'waterflow':
+        default:
+            return null;
     }//end switch
 
-    if (is_numeric($limit)) {
-        return round($limit, 11);
-    }
-
-    return $limit;
+    return round($limit, 11);
 }
 
 //end sensor_low_limit()
 
 function sensor_limit($class, $current)
 {
-    $limit = null;
-
+    // matching an empty case executes code until a break is reached
     switch ($class) {
         case 'temperature':
             $limit = $current + 20;
@@ -450,17 +431,11 @@ function sensor_limit($class, $current)
         case 'humidity':
             $limit = 70;
             break;
-        case 'count':
-        case 'current':
-        case 'power':
-            $limit = $current * 1.50;
-            break;
-        case 'power_consumed':
-        case 'power_factor':
-            $limit = 1;
-            break;
         case 'fanspeed':
             $limit = $current * 1.80;
+            break;
+        case 'power_factor':
+            $limit = 1;
             break;
         case 'signal':
             $limit = -30;
@@ -469,20 +444,17 @@ function sensor_limit($class, $current)
             $limit = 80;
             break;
         case 'airflow':
-        case 'dbm':
         case 'snr':
         case 'frequency':
         case 'pressure':
         case 'cooling':
             $limit = $current * 1.05;
             break;
+        default:
+            return null;
     }//end switch
 
-    if (is_numeric($limit)) {
-        return round($limit, 11);
-    }
-
-    return $limit;
+    return round($limit, 11);
 }
 
 //end sensor_limit()
@@ -1075,7 +1047,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);
 
                     // process the group
-                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache);
+                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache) ?: null;
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
@@ -1093,7 +1065,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     }
 
                     echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit".PHP_EOL;
-                    $entPhysicalIndex = str_replace('{{ $index }}', $index, $data['entPhysicalIndex']) ?: null;
+                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
                     $sensor_name = $device['os'];

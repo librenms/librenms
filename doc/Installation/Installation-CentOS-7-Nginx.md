@@ -20,7 +20,21 @@ path: blob/master/doc/
 #### Download LibreNMS
 
     cd /opt
-    composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
+    git clone https://github.com/librenms/librenms.git
+    
+#### Set permissions
+
+    chown -R librenms:librenms /opt/librenms
+    chmod 770 /opt/librenms
+    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    chgrp apache /var/lib/php/session/
+
+#### Install PHP dependencies
+
+    su - librenms
+    ./scripts/composer_wrapper.php install --no-dev
+    exit
 
 ## DB Server ##
 
@@ -193,13 +207,6 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
 
     cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
-
-### Set permissions
-
-    chown -R librenms:librenms /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
-    chgrp apache /var/lib/php/session/
 
 ## Web installer ##
 
