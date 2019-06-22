@@ -1616,15 +1616,15 @@ function get_state_label($sensor)
 
     switch ($state_translation['state_generic_value']) {
         case 0:  // OK
-            $state_text = !empty($state_translation['state_descr']) ? $state_translation['state_descr'] : "OK";
+            $state_text = $state_translation['state_descr'] ?: "OK";
             $state_label = "label-success";
             break;
         case 1:  // Warning
-            $state_text = !empty($state_translation['state_descr']) ? $state_translation['state_descr'] : "Warning";
+            $state_text = $state_translation['state_descr'] ?: "Warning";
             $state_label = "label-warning";
             break;
         case 2:  // Critical
-            $state_text = !empty($state_translation['state_descr']) ? $state_translation['state_descr'] : "Critical";
+            $state_text = $state_translation['state_descr'] ?: "Critical";
             $state_label = "label-danger";
             break;
         case 3:  // Unknown
