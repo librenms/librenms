@@ -348,8 +348,6 @@ class Device extends BaseModel
     {
         if ($this->disabled == 1) {
             return 'disabled';
-        } elseif ($this->ignore == 1) {
-            return 'ignore';
         } elseif ($this->status == 0) {
             return 'down';
         } else {
