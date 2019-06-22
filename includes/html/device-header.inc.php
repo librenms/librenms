@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 echo getLogoTag($device, 'device-icon-header pull-left') .'
 <div class="pull-left" style="margin-top: 5px;">';
 
@@ -17,22 +19,22 @@ echo '
 
 
 if ($device['snmp_disable']) {
-    $graphs = $config['os']['ping']['over'];
-} elseif (isset($config['os'][$device['os']]['over'])) {
-    $graphs = $config['os'][$device['os']]['over'];
-} elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
-    $graphs = $config['os'][$device['os_group']]['over'];
+    $graphs = Config::get('os.ping.over');
+} elseif (Config::has("os.{$device['os']}.over")) {
+    $graphs = Config::get("os.{$device['os']}.over");
+} elseif (isset($device['os_group']) && Config::has("os.{$device['os_group']}.over")) {
+    $graphs = Config::get("os.{$device['os_group']}.over");
 } else {
-    $graphs = $config['os']['default']['over'];
+    $graphs = Config::get('os.default.over');
 }
 
 $graph_array                = array();
 $graph_array['height']      = '100';
 $graph_array['width']       = '310';
-$graph_array['to']          = $config['time']['now'];
+$graph_array['to'] = Config::get('time.now');
 $graph_array['device']      = $device['device_id'];
 $graph_array['type']        = 'device_bits';
-$graph_array['from']        = $config['time']['day'];
+$graph_array['from'] = Config::get('time.day');
 $graph_array['legend']      = 'no';
 $graph_array['popup_title'] = $descr;
 
@@ -40,7 +42,7 @@ $graph_array['height'] = '45';
 $graph_array['width']  = '150';
 $graph_array['bg']     = 'FFFFFF00';
 
-if (device_permitted($device['device_id']) || $config['allow_unauth_graphs']) {
+if (device_permitted($device['device_id']) || Config::get('allow_unauth_graphs')) {
     echo '<div class="pull-right">';
     foreach ($graphs as $entry) {
         if ($entry['graph']) {

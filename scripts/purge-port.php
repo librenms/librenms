@@ -46,7 +46,7 @@ if ($opt['f']) {
 }
 
 if (! $port_id && ! $port_id_file || ($port_id && $port_id_file)) {
-    print $console_color->convert($config['project_name_version'].' Port purge tool
+    print $console_color->convert(\LibreNMS\Config::get('project_name_version') . ' Port purge tool
     -p <port_id>  Purge single port by it\'s port-id
     -f <file>     Purge a list of ports, read port-ids from <file>, one on each line.
                   A filename of - means reading from STDIN.

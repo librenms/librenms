@@ -82,14 +82,15 @@ Artisan::command('device:add
         $additional['ping_fallback'] = 1;
     }
 
-    global $config;
-
     if ($this->option('community')) {
-        array_unshift($config['snmp']['community'], $this->option('community'));
+        $community_config = \LibreNMS\Config::get('snmp.community');
+        array_unshift($community_config, $this->option('community'));
+        \LibreNMS\Config::set('snmp.community', $community_config);
     }
     $auth = $this->option('auth-password');
     $priv = $this->option('privacy-password');
-    array_unshift($config['snmp']['v3'], [
+    $v3_config = \LibreNMS\Config::get('snmp.v3');
+    array_unshift($v3_config, [
         'authlevel'  => ($auth ? 'auth' : 'noAuth') . (($priv && $auth) ? 'Priv' : 'NoPriv'),
         'authname'   => $this->option('security-name'),
         'authpass'   => $this->option('auth-password'),
@@ -97,6 +98,7 @@ Artisan::command('device:add
         'cryptopass' => $this->option('privacy-password'),
         'cryptoalgo' => $this->option('privacy-protocol'),
     ]);
+    \LibreNMS\Config::set('snmp.v3', $v3_config);
 
     try {
         $init_modules = [];

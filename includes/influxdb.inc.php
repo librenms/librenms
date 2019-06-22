@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 /*
  * LibreNMS
  *
@@ -14,33 +16,31 @@
 
 function influxdb_connect()
 {
-    global $config;
-
     $influxdb_cred = '';
-    if (!empty($config['influxdb']['username']) && !empty($config['influxdb']['password'])) {
-        $influxdb_cred = $config['influxdb']['username'].':'.$config['influxdb']['password'].'@';
+    if (!empty(Config::get('influxdb.username')) && !empty(Config::get('influxdb.password'))) {
+        $influxdb_cred = Config::get('influxdb.username') . ':' . Config::get('influxdb.password') . '@';
         d_echo('Using authentication for InfluxDB');
     }
-    $influxdb_url = $influxdb_cred.$config['influxdb']['host'].':'.$config['influxdb']['port'].'/'.$config['influxdb']['db'];
-    d_echo($config['influxdb']['transport'] . " transport being used");
-    if ($config['influxdb']['transport'] == 'http') {
+    $influxdb_url = $influxdb_cred . Config::get('influxdb.host') . ':' . Config::get('influxdb.port') . '/' . Config::get('influxdb.db');
+    d_echo(Config::get('influxdb.transport') . " transport being used");
+    if (Config::get('influxdb.transport') == 'http') {
         $influxdb_conn = 'influxdb';
-    } elseif ($config['influxdb']['transport'] == 'https') {
+    } elseif (Config::get('influxdb.transport') == 'https') {
         $influxdb_conn = 'https+influxdb';
-    } elseif ($config['influxdb']['transport'] == 'udp') {
+    } elseif (Config::get('influxdb.transport') == 'udp') {
         $influxdb_conn = 'udp+influxdb';
     } else {
         echo 'InfluxDB support enabled but no valid transport details provided';
         return false;
     }
 
-    $db = \InfluxDB\Client::fromDSN($influxdb_conn.'://'.$influxdb_url, $config['influxdb']['timeout'], $config['influxdb']['verifySSL']);
+    $db = \InfluxDB\Client::fromDSN($influxdb_conn . '://' . $influxdb_url, Config::get('influxdb.timeout'), Config::get('influxdb.verifySSL'));
     return($db);
 }// end influxdb_connect
 
 function influx_update($device, $measurement, $tags, $fields)
 {
-    global $influxdb, $config;
+    global $influxdb;
     if ($influxdb !== false) {
         $tmp_fields = array();
         $tmp_tags['hostname'] = $device['hostname'];
@@ -67,7 +67,7 @@ function influx_update($device, $measurement, $tags, $fields)
         d_echo($tmp_fields);
         d_echo("\nEND\n");
 
-        if ($config['noinfluxdb'] !== true) {
+        if (Config::get('noinfluxdb') !== true) {
             $points = array(
                 new InfluxDB\Point(
                     $measurement,

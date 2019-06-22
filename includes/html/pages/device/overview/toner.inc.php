@@ -30,10 +30,10 @@ foreach ($supplies as $type => $supply) {
             $graph_array = [
                 'height' => 100,
                 'width' => 210,
-                'to' => $config['time']['now'],
+                'to' => \LibreNMS\Config::get('time.now'),
                 'id' => $toner['toner_id'],
                 'type' => $graph_type,
-                'from' => $config['time']['day'],
+                'from' => \LibreNMS\Config::get('time.day'),
                 'legend' => 'no',
             ];
 

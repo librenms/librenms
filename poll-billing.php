@@ -136,7 +136,14 @@ $poller_end  = microtime(true);
 $poller_run  = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
-dbInsert(array('type' => 'pollbill', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => 0, 'poller' => $config['distributed_poller_name'] ), 'perf_times');
+dbInsert([
+    'type' => 'pollbill',
+    'doing' => $doing,
+    'start' => $poller_start,
+    'duration' => $poller_time,
+    'devices' => 0,
+    'poller' => \LibreNMS\Config::get('distributed_poller_name')
+], 'perf_times');
 if ($poller_time > 300) {
     logfile("BILLING: polling took longer than 5 minutes ($poller_time seconds)!");
 }

@@ -4,7 +4,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
-if ($config['enable_bgp']) {
+if (\LibreNMS\Config::get('enable_bgp')) {
     $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', array($device['device_id']));
 
     if (!empty($peers)) {
@@ -200,8 +200,8 @@ if ($config['enable_bgp']) {
 
             // --- Send event log notices ---
             if ($peer_data['bgpPeerFsmEstablishedTime']) {
-                if (!(is_array($config['alerts']['bgp']['whitelist'])
-                        && !in_array($peer['bgpPeerRemoteAs'], $config['alerts']['bgp']['whitelist']))
+                if (!(is_array(\LibreNMS\Config::get('alerts.bgp.whitelist'))
+                        && !in_array($peer['bgpPeerRemoteAs'], \LibreNMS\Config::get('alerts.bgp.whitelist')))
                     && ($peer_data['bgpPeerFsmEstablishedTime'] < $peer['bgpPeerFsmEstablishedTime']
                         || $peer_data['bgpPeerState'] != $peer['bgpPeerState'])
                 ) {

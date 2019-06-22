@@ -16,7 +16,7 @@ if (is_array($ipmi_rows)) {
         echo 'Fetching IPMI sensor data...';
 
         $cmd = [Config::get('ipmitool', 'ipmitool')];
-        if ($config['own_hostname'] != $device['hostname'] || $ipmi['host'] != 'localhost') {
+        if (Config::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
             array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
         }
 
@@ -34,8 +34,9 @@ if (is_array($ipmi_rows)) {
         foreach (explode("\n", $results) as $row) {
             list($desc, $value, $type, $status) = explode(',', $row);
             $desc = trim($desc, ' ');
-            $ipmi_sensor[$desc][$config['ipmi_unit'][$type]]['value'] = $value;
-            $ipmi_sensor[$desc][$config['ipmi_unit'][$type]]['unit'] = $type;
+            $ipmi_unit_type = Config::get("ipmi_unit.$type");
+            $ipmi_sensor[$desc][$ipmi_unit_type]['value'] = $value;
+            $ipmi_sensor[$desc][$ipmi_unit_type]['unit'] = $type;
         }
 
         foreach ($ipmi_rows as $ipmisensors) {

@@ -369,12 +369,20 @@ $config['network_map_legend'] = array(
     '90'           => '#d12300',
     '95'           => '#cc0000',
     '100'          => '#cc0000',
-    'di.edge'      => '#dddddd88',
-    'di.border'    => '#cccccc',
-    'di.node'      => '#eeeeee',
-    'dn.edge'      => '#ff777788',
-    'dn.border'    => '#ff5555',
-    'dn.node'      => '#ffdddd',
+    [
+        'di' => [
+            'edge' => '#dddddd88',
+            'border' => '#cccccc',
+            'node' => '#eeeeee',
+        ]
+    ],
+    [
+        'dn' => [
+            'edge' => '#ff777788',
+            'border' => '#ff5555',
+            'node' => '#ffdddd',
+        ]
+    ]
 );
 
 // Default mini graph time options:

@@ -13,7 +13,7 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device[
         ->addDataset('used', 'GAUGE', 0)
         ->addDataset('free', 'GAUGE', 0);
 
-    $file = $config['install_dir'].'/includes/polling/storage/'. $mib .'.inc.php';
+    $file = \LibreNMS\Config::get('install_dir') . '/includes/polling/storage/' . $mib . '.inc.php';
     if (is_file($file)) {
         include $file;
     }
