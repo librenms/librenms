@@ -194,15 +194,8 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
 
         //VRP devices seems to use LogicalEntity '1' instead of '0' like the default code checks.
         //Standard code is still run after anyway.
-        if (array_key_exists('1', $entry) && array_key_exists('entAliasMappingIdentifier', $entry['1'])) {
-            $ifIndex = $entry['1']['entAliasMappingIdentifier'];
-            if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
-                unset($ifIndex);
-            } else {
-                $ifIndex_array = explode('.', $ifIndex);
-                $ifIndex       = $ifIndex_array[1];
-                unset($ifIndex_array);
-            }
+        if (isset($entry['1']['entAliasMappingIdentifier'])) {
+            $ifIndex = preg_replace('/ifIndex\.(\d+).*/', '$1', $entry['1']['entAliasMappingIdentifier']);
         }
     } else {
         $entPhysicalDescr        = array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '';
