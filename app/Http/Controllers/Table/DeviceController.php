@@ -140,7 +140,7 @@ class DeviceController extends TableController
     private function getLabel($device)
     {
         if ($device->disabled) {
-            return 'label-default';
+            return 'blackbg';
         }
 
         if ($device->ignore) {
