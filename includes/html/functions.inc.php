@@ -1612,29 +1612,27 @@ function get_device_name($device)
 
 function get_state_label($sensor)
 {
-    $state_translation = array();
-    $state_translation = dbFetchRows('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
+    $state_translation = dbFetchRow('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
 
-    switch ($state_translation[0]['state_generic_value']) {
+    switch ($state_translation['state_generic_value']) {
         case 0:  // OK
-            $state_text = !empty($state_translation[0]['state_descr']) ? $state_translation[0]['state_descr'] : "OK";
+            $state_text = !empty($state_translation['state_descr']) ? $state_translation['state_descr'] : "OK";
             $state_label = "label-success";
             break;
         case 1:  // Warning
-            $state_text = !empty($state_translation[0]['state_descr']) ? $state_translation[0]['state_descr'] : "Warning";
+            $state_text = !empty($state_translation['state_descr']) ? $state_translation['state_descr'] : "Warning";
             $state_label = "label-warning";
             break;
         case 2:  // Critical
-            $state_text = !empty($state_translation[0]['state_descr']) ? $state_translation[0]['state_descr'] : "Critical";
+            $state_text = !empty($state_translation['state_descr']) ? $state_translation['state_descr'] : "Critical";
             $state_label = "label-danger";
             break;
         case 3:  // Unknown
         default:
-            $state_text = !empty($state_translation[0]['state_descr']) ? $state_translation[0]['state_descr'] : "Unknown";
+            $state_text = !empty($state_translation['state_descr']) ? $state_translation['state_descr'] : "Unknown";
             $state_label = "label-default";
     }
-    $state = "<span class='label $state_label'>$state_text ({$sensor['sensor_current']})</span>";
-    return $state;
+    return "<span class='label $state_label'>$state_text ({$sensor['sensor_current']})</span>";
 }
 
 /**
@@ -1658,9 +1656,6 @@ function get_sensor_label_color($sensor)
     if (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
         $label_style = "label-danger";
     }
-
     $unit = __('sensors.' . $sensor['sensor_class'] . '.unit');
-
-    $sensor_current = "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
-    return $sensor_current;
+    return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
 }
