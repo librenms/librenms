@@ -61,6 +61,7 @@ The unix-agent does not have a discovery module, only a poller module. That poll
 1. [Open Grid Scheduler](#opengridscheduler) - SNMP extend
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
+1. [PHP-OPcache](#php-opcache) - SNMP extend
 1. [Pi-hole](#pi-hole) - SNMP extend
 1. [Portactivity](#portactivity) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
@@ -766,6 +767,24 @@ extend phpfpmsp /etc/snmp/phpfpmsp
 6. Restart snmpd on your host
 
 It is worth noting that this only monitors a single pool. If you want to monitor multiple pools, this won't do it.
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
+### PHP-OPCACHE
+#### SNMP Extend
+1. Copy the PHP script, opcache.php, to the desired host (needs to be surved true your website).
+In this example the www root of LibreNMS is used, change as disire
+`wget https://github.com/librenms/librenms-agent/raw/master/snmp/opcache.php -O /opt/librenms/html/`
+
+2. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+In this axample localhost is used, asuming its pointed to the same LibreNMS www root.
+```
+extend phpopcache /usr/bin/curl --silent http://localhost/opcache.php
+```
+
+3. Restart snmpd on your host
+
+It is worth noting that you whant to protect this file for open vieuw for outsiders
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
