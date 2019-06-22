@@ -1,7 +1,9 @@
 <?php
-$hardware = trim(snmp_get($device, '1.3.6.1.4.1.48690.1.7.0', '-OQv', '', ''), '"');
-$version = trim(snmp_get($device, '1.3.6.1.4.1.48690.2.14.0', '-OQv', '', ''), '"');
-$serial = trim(snmp_get($device, '1.3.6.1.4.1.48690.1.5.0', '-OQv', '', ''), '"');
+$rutos_2xx_tmp = snmp_get_multi_oid($device, ['RouterName.0', 'ModemSerial.0', 'FirmwareVersion.0'], '-OUQs', 'TELTONIKA-MIB');
+$hardware = $rutos_2xx_tmp['RouterName.0'];
+$serial   = $rutos_2xx_tmp['ModemSerial.0'];
+$version  = $rutos_2xx_tmp['FirmwareVersion.0'];
+
 
 use LibreNMS\RRD\RrdDefinition;
 

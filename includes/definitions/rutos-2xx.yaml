@@ -6,11 +6,11 @@ icon: teltonika
 ifXmcbc: true
 ifname: true
 mib_dir:
-  - rutos-2xx
+  - teltonika
 over:
   - { graph: device_processor, text: "Processor Usage" }
   - { graph: device_ucd_memory, text: "Memory Usage" }
-  - { graph: device_storage, text: "Storage Usage" }
+  - { graph: device_signal, text: 'Mobile Signal' }
 processor_stacked: true
 discovery:
   - sysObjectID:
