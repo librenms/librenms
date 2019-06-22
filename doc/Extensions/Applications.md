@@ -784,7 +784,7 @@ extend phpopcache /usr/bin/curl --silent http://localhost/opcache.php
 
 3. Restart snmpd on your host
 
-It is worth noting that you whant to protect this file for open vieuw for outsiders
+It is worth noting that you whant to protect this file for open vieuw for outsiders and set it in a other part then libreNMS install, as off the premissions warning and can by exident be removed if u use the script `./scripts/github-remove -d` 
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
