@@ -314,12 +314,14 @@ if ($format == "graph") {
                     return "<span>" + row.hostname + "</span>";
                 },
                 "uptime": function (column, row) {
-                    if (isNaN(row.uptime.charAt(0))) {
-                        return row.uptime;
-                    } else if (row.status == 'down') {
+                    if (row.status == 'down') {
                         return "<span class='alert-status-small label-danger'></span><span>" + row.uptime + "</span>";
-                    } else {
+                    } else if(row.status == 'up') {
                         return "<span class='alert-status-small label-success'></span><span>" + row.uptime + "</span>";
+                    } else if(row.status == 'disabled') {
+                        return '';
+                    } else {
+                        return row.uptime;
                     }
                 },
             },
