@@ -33,6 +33,8 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class EdgeCosFailedUserLoginTest extends LaravelTestCase
 {
+    use DatabaseTransactions;
+
     public function test3528Series()
     {
         $device = factory(Device::class)->create();
