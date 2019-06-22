@@ -811,10 +811,8 @@ function discover_entity_physical(&$valid, $device, $entPhysicalIndex, $entPhysi
                 'entPhysicalIsFRU'        => $entPhysicalIsFRU,
                 'entPhysicalAlias'        => $entPhysicalAlias,
                 'entPhysicalAssetID'      => $entPhysicalAssetID,
+                'ifIndex'                 => $ifIndex,
             );
-            if (!empty($ifIndex)) {
-                $update_data['ifIndex'] = $ifIndex;
-            }
             dbUpdate($update_data, 'entPhysical', '`device_id`=? AND `entPhysicalIndex`=?', array($device['device_id'], $entPhysicalIndex));
         }//end if
         $valid[$entPhysicalIndex] = 1;
