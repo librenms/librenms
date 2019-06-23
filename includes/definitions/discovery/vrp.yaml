@@ -21,6 +21,7 @@ modules:
             data:
                 - oid:
                     - entPhysicalName
+                    - hwEntityAdminStatus
                     - hwStackPortTable
         temperature:
             data:
