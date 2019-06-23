@@ -1632,7 +1632,7 @@ function get_state_label($sensor)
             $state_text = !empty($state_translation['state_descr']) ? $state_translation['state_descr'] : "Unknown";
             $state_label = "label-default";
     }
-    return "<span class='label $state_label'>$state_text ({$sensor['sensor_current']})</span>";
+    return "<span class='label $state_label'>$state_text</span>";
 }
 
 /**
