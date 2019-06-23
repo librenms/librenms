@@ -1,6 +1,5 @@
 os: rutos-2xx
 type: network
-group: unix
 text: "Teltonika RutOS"
 icon: teltonika
 ifXmcbc: true
