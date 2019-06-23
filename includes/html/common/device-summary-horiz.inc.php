@@ -12,7 +12,7 @@ $temp_output = '
       <th><span class="red">Down</span></th>
       <th><span class="grey">Ignored</span></th>
       <th><span class="black">Disabled</span></th>
-      '.($config['summary_errors'] ? '<th>Errored</th>' : '').'
+      ' . (\LibreNMS\Config::get('summary_errors') ? '<th>Errored</th>' : '') . '
     </tr>
   </thead>
   <tbody>
@@ -23,7 +23,7 @@ $temp_output = '
       <td><a href="devices/state=down/format=list_detail/"><span class="red"> '.$devices['down'].'</span></a></td>
       <td><a href="devices/ignore=1/format=list_detail/"><span class="grey"> '.$devices['ignored'].'</span></a></td>
       <td><a href="devices/disabled=1/format=list_detail/"><span class="black"> '.$devices['disabled'].'</span></a></td>
-      '.($config['summary_errors'] ? '<td>-</td>' : '').'
+      ' . (\LibreNMS\Config::get('summary_errors') ? '<td>-</td>' : '') . '
     </tr>
     <tr>
       <td><a href="ports/">Ports</a></td>
@@ -32,9 +32,9 @@ $temp_output = '
       <td><a href="ports/format=list_detail/state=down/"><span class="red"> '.$ports['down'].'</span></a></td>
       <td><a href="ports/format=list_detail/ignore=1/"><span class="grey"> '.$ports['ignored'].'</span></a></td>
       <td><a href="ports/format=list_detail/state=admindown/"><span class="black"> '.$ports['shutdown'].'</span></a></td>
-      '.($config['summary_errors'] ? '<td><a href="ports/format=list_detail/errors=1/"><span class="black"> '.$ports['errored'].'</span></a></td>' : '').'
+      ' . (\LibreNMS\Config::get('summary_errors') ? '<td><a href="ports/format=list_detail/errors=1/"><span class="black"> ' . $ports['errored'] . '</span></a></td>' : '') . '
     </tr>';
-if ($config['show_services']) {
+if (\LibreNMS\Config::get('show_services')) {
     $temp_output .= '
     <tr>
       <td><a href="services/">Services</a></td>
@@ -43,7 +43,7 @@ if ($config['show_services']) {
       <td><a href="services/state=critical/view=details/"><span class="red"> '.$services['down'].'</span></a></td>
       <td><a href="services/ignore=1/view=details/"><span class="grey"> '.$services['ignored'].'</span></a></td>
       <td><a href="services/disabled=1/view=details/"><span class="black"> '.$services['disabled'].'</span></a></td>
-      '.($config['summary_errors'] ? '<td>-</td>' : '').'
+      ' . (\LibreNMS\Config::get('summary_errors') ? '<td>-</td>' : '') . '
     </tr>';
 }
 $temp_output .= '

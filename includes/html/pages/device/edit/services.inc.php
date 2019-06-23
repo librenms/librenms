@@ -16,7 +16,7 @@ if (LegacyAuth::user()->hasGlobalRead()) {
     }
 
     // Build the types list.
-    foreach (scandir($config['nagios_plugins']) as $file) {
+    foreach (scandir(\LibreNMS\Config::get('nagios_plugins')) as $file) {
         if (substr($file, 0, 6) === 'check_') {
             $check_name = substr($file, 6);
             $servicesform .= "<option value='$check_name'>$check_name</option>";

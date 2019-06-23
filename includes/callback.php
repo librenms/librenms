@@ -116,7 +116,7 @@ if ($enabled == 1) {
 
     $post = curl_init();
     set_curl_proxy($post);
-    curl_setopt($post, CURLOPT_URL, $config['callback_post']);
+    curl_setopt($post, CURLOPT_URL, \LibreNMS\Config::get('callback_post'));
     curl_setopt($post, CURLOPT_POST, count($submit));
     curl_setopt($post, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($post, CURLOPT_RETURNTRANSFER, 1);
@@ -127,7 +127,7 @@ if ($enabled == 1) {
 
     $clear = curl_init();
     set_curl_proxy($clear);
-    curl_setopt($clear, CURLOPT_URL, $config['callback_clear']);
+    curl_setopt($clear, CURLOPT_URL, \LibreNMS\Config::get('callback_clear'));
     curl_setopt($clear, CURLOPT_POST, count($clear));
     curl_setopt($clear, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($clear, CURLOPT_RETURNTRANSFER, 1);

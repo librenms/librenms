@@ -29,8 +29,6 @@ foreach ($components as $k => $v) {
 }
 $components = $keep;
 
-global $config;
-
 if (is_file('includes/html/pages/device/loadbalancer/'.mres($vars['subtype']).'.inc.php')) {
     include 'includes/html/pages/device/loadbalancer/'.mres($vars['subtype']).'.inc.php';
 } else {

@@ -14,9 +14,9 @@ if (count_mib_mempools($device) > 0) {
 // FIXME css alternating colours
 foreach ($mempools as $mempool) {
     if (!is_integer($i / 2)) {
-        $row_colour = $config['list_colour']['even'];
+        $row_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
-        $row_colour = $config['list_colour']['odd'];
+        $row_colour = \LibreNMS\Config::get('list_colour.odd');
     }
 
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
@@ -29,11 +29,11 @@ foreach ($mempools as $mempool) {
         $val = $mempool['mempool_id'];
     }
     $mempool_url = 'graphs/'.$id.'='.$val.'/type='.$graph_type.'/';
-    $mini_url    = 'graph.php?'.$id.'='.$val.'&amp;type='.$graph_type.'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=80&amp;height=20&amp;bg=f4f4f4';
+    $mini_url = 'graph.php?' . $id . '=' . $val . '&amp;type=' . $graph_type . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . '&amp;width=80&amp;height=20&amp;bg=f4f4f4';
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname'].' - '.$text_descr;
-    $mempool_popup .= "</div><img src=\'graph.php?'.$id.'=".$val.'&amp;type='.$graph_type.'&amp;from='.$config['time']['month'].'&amp;to='.$config['time']['now']."&amp;width=400&amp;height=125\'>";
-    $mempool_popup .= "', RIGHT".$config['overlib_defaults'].');" onmouseout="return nd();"';
+    $mempool_popup .= "</div><img src=\'graph.php?'.$id.'=" . $val . '&amp;type=' . $graph_type . '&amp;from=' . \LibreNMS\Config::get('time.month') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=400&amp;height=125\'>";
+    $mempool_popup .= "', RIGHT" . \LibreNMS\Config::get('overlib_defaults') . ');" onmouseout="return nd();"';
 
     $total = formatStorage($mempool['mempool_total']);
     $used  = formatStorage($mempool['mempool_used']);

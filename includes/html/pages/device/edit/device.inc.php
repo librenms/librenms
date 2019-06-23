@@ -81,7 +81,7 @@ if ($_POST['editing']) {
     </div>
     <div class="col-md-1 col-md-offset-2">
         <?php
-        if ($config['enable_clear_discovery'] == 1  && !$device['snmp_disable']) {
+        if (\LibreNMS\Config::get('enable_clear_discovery') == 1 && !$device['snmp_disable']) {
         ?>
             <button type="submit" id="rediscover" data-device_id="<?php echo($device['device_id']); ?>" class="btn btn-primary" name="rediscover"><i class="fa fa-retweet"></i> Rediscover device</button>
         <?php
@@ -114,7 +114,7 @@ if ($_POST['editing']) {
                 <?php
                 $unknown = 1;
 
-                foreach ($config['device_types'] as $type) {
+                foreach (\LibreNMS\Config::get('device_types') as $type) {
                     echo('          <option value="'.$type['type'].'"');
                     if ($device_model->type == $type['type']) {
                         echo(' selected="1"');

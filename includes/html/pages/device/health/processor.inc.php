@@ -20,14 +20,14 @@ foreach ($processors as $proc) {
         $val = $proc['processor_id'];
     }
     $proc_url = 'graphs/'.$id.'='.$val.'/type='.$graph_type.'/';
-    $base_url = 'graph.php?'.$id.'='.$val.'&amp;type='.$graph_type.'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'];
+    $base_url = 'graph.php?' . $id . '=' . $val . '&amp;type=' . $graph_type . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
     $mini_url = $base_url.'&amp;width=80&amp;height=20&amp;bg=f4f4f4';
 
     $text_descr = rewrite_entity_descr($proc['processor_descr']);
 
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname'].' - '.$text_descr;
     $proc_popup .= "</div><img src=\'".$base_url."&amp;width=400&amp;height=125\'>";
-    $proc_popup .= "', RIGHT".$config['overlib_defaults'].');" onmouseout="return nd();"';
+    $proc_popup .= "', RIGHT" . \LibreNMS\Config::get('overlib_defaults') . ');" onmouseout="return nd();"';
     $percent = round($proc['processor_usage']);
 
     $graph_array[$id] = $val;

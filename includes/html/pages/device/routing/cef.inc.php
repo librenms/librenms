@@ -54,9 +54,9 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
     $entity = dbFetchRow('SELECT * FROM `entPhysical` WHERE device_id = ? AND `entPhysicalIndex` = ?', array($device['device_id'], $cef['entPhysicalIndex']));
 
     if (!is_integer($i / 2)) {
-        $bg_colour = $config['list_colour']['even'];
+        $bg_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
-        $bg_colour = $config['list_colour']['odd'];
+        $bg_colour = \LibreNMS\Config::get('list_colour.odd');
     }
 
     $interval = ($cef['updated'] - $cef['updated_prev']);
@@ -115,7 +115,7 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
     if ($vars['view'] == 'graphs') {
         $graph_array['height'] = '100';
         $graph_array['width']  = '215';
-        $graph_array['to']     = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['id']     = $cef['cef_switching_id'];
         $graph_array['type']   = 'cefswitching_graph';
 
