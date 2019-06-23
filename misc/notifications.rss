@@ -63,10 +63,5 @@
     <description>Version two of the LibreNMS python dispatcher service is merged. This code now requires Redis 5.x and redis-py 3.x to operate (if using distributed polling). If you are using the dispatcher service with Redis and have not updated, polling will stop functioning.</description>
     <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
   </item>
-   <item>
-    <title>Update of Api Transport (Breaking change if you use current Api Transport)</title>
-    <description>The API Transport configuration was updated to allow more flexible and secure definition of the POST/GET parameters. It is also possible to perform Basic Auth on the service. If you use Api Transport today, be aware that you must update the URL and parameters definition. If you don't update them, the Api Transport will not behave correctly and you may miss alerts via this transport</description>
-    <pubDate>Sat, 1 June 2019 00:00:00 +0000</pubDate>
-  </item>
 </channel>
 </rss>
