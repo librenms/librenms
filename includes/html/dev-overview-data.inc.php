@@ -12,7 +12,7 @@ echo "<div class='row'>
           <div class='panel panel-default panel-condensed device-overview'>
             <div class='panel-heading'>";
 
-if ($config['overview_show_sysDescr']) {
+if (Config::get('overview_show_sysDescr')) {
     echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
     echo Config::get('overview_show_sysDescr', true) ? $device['sysDescr'] : 'System';
     echo '</strong>';
@@ -34,7 +34,7 @@ if ($device['features']) {
     $device['features'] = '('.$device['features'].')';
 }
 
-$device['os_text'] = $config['os'][$device['os']]['text'];
+$device['os_text'] = Config::get("os.{$device['os']}.text");
 
 echo '<div class="row">
         <div class="col-sm-4">System Name</div>
@@ -43,7 +43,7 @@ echo '<div class="row">
 
 if (!empty($device['ip'])) {
      echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>{$device['ip']}</div></div>";
-} elseif ($config['force_ip_to_sysname'] === true) {
+} elseif (Config::get('force_ip_to_sysname') === true) {
     try {
         $ip = IP::parse($device['hostname']);
         echo "<div class='row'><div class='col-sm-4'>IP Address</div><div class='col-sm-8'>$ip</div></div>";

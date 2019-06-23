@@ -13,7 +13,7 @@
  * the source code distribution for details.
  */
 
-if (is_module_enabled('poller', 'mib')) {
+if (\LibreNMS\Config::get("poller_modules.mib")) {
 ?>
 
 <h4>MIB associations for all devices</h4>

@@ -25,7 +25,7 @@ DAILY_SCRIPT=$(readlink -f "$0")
 LIBRENMS_DIR=$(dirname "$DAILY_SCRIPT")
 COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php --no-interaction"
 
-# set log_file, using librenms $config['log_dir'], if set
+# set log_file, using librenms 'log_dir' config setting, if set
 # otherwise we default to <LibreNMS Install Directory>/logs
 LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
 

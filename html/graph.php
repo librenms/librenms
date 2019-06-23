@@ -26,7 +26,7 @@ set_debug(isset($_GET['debug']));
 
 rrdtool_initialize(false);
 
-require $config['install_dir'] . '/includes/html/graphs/graph.inc.php';
+require \LibreNMS\Config::get('install_dir') . '/includes/html/graphs/graph.inc.php';
 
 rrdtool_close();
 

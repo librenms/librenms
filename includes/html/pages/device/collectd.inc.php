@@ -93,9 +93,9 @@ foreach ($pinsts as &$instance) {
         foreach ($typeinstances as &$tinst) {
             $i++;
             if (!is_integer($i / 2)) {
-                $row_colour = $config['list_colour']['even'];
+                $row_colour = \LibreNMS\Config::get('list_colour.even');
             } else {
-                $row_colour = $config['list_colour']['odd'];
+                $row_colour = \LibreNMS\Config::get('list_colour.odd');
             }
 
             echo '<div style="background-color: '.$row_colour.';">';

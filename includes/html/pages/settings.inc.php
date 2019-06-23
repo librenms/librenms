@@ -103,11 +103,11 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
             return $r;
         }
 
-        echo '<div class="table-responsive">' . a2t($config) . '</div>';
+        echo '<div class="table-responsive">' . a2t(\LibreNMS\Config::getAll()) . '</div>';
 
         if ($debug && LegacyAuth::user()->hasGlobalAdmin()) {
             echo("<pre>");
-            print_r($config);
+            print_r(\LibreNMS\Config::getAll());
             echo("</pre>");
         }
     }

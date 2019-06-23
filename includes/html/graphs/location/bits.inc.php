@@ -8,16 +8,16 @@ $i = 1;
 foreach ($devices as $device) {
     foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0', array($device['device_id'])) as $int) {
         $ignore = 0;
-        if (is_array($config['device_traffic_iftype'])) {
-            foreach ($config['device_traffic_iftype'] as $iftype) {
+        if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
+            foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
                 if (preg_match($iftype.'i', $int['ifType'])) {
                     $ignore = 1;
                 }
             }
         }
 
-        if (is_array($config['device_traffic_descr'])) {
-            foreach ($config['device_traffic_descr'] as $ifdescr) {
+        if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
+            foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
                 if (preg_match($ifdescr.'i', $int['ifDescr']) || preg_match($ifdescr.'i', $int['ifName'])) {
                     $ignore = 1;
                 }

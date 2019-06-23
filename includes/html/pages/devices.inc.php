@@ -71,7 +71,11 @@ foreach (get_graph_subtypes($type) as $avail_type) {
     } else {
         $is_selected = '';
     }
-    $headeroptions .= '<option value="' . generate_url($vars, array('format' => 'graph_' . $avail_type, 'from' => $vars['from'] ?: $config['time']['day'], 'to' => $vars['to'] ?: $config['time']['now'])) . '" ' . $is_selected . '>' . $display_type . '</option>';
+    $headeroptions .= '<option value="' . generate_url($vars, [
+            'format' => 'graph_' . $avail_type,
+            'from' => $vars['from'] ?: \LibreNMS\Config::get('time.day'),
+            'to' => $vars['to'] ?: \LibreNMS\Config::get('time.now')
+        ]) . '" ' . $is_selected . '>' . $display_type . '</option>';
 }
 $headeroptions .= '</select>';
 
@@ -96,12 +100,12 @@ $no_refresh = $format == "list";
 
 if ($format == "graph") {
     if (empty($vars['from'])) {
-        $graph_array['from'] = $config['time']['day'];
+        $graph_array['from'] = \LibreNMS\Config::get('time.day');
     } else {
         $graph_array['from'] = $vars['from'];
     }
     if (empty($vars['to'])) {
-        $graph_array['to'] = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
     } else {
         $graph_array['to'] = $vars['to'];
     }
@@ -199,9 +203,9 @@ if ($format == "graph") {
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
         if (is_integer($row / 2)) {
-            $row_colour = $config['list_colour']['even'];
+            $row_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
-            $row_colour = $config['list_colour']['odd'];
+            $row_colour = \LibreNMS\Config::get('list_colour.odd');
         }
 
         if (device_permitted($device['device_id'])) {

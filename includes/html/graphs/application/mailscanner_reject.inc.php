@@ -17,13 +17,13 @@ $i = 0;
 $x = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    $max_colours = count($config['graph_colours'][$colours]);
+    $max_colours = count(Config::get("graph_colours.$colours"));
     foreach ($array as $ds => $var) {
         $x = (($x <= $max_colours) ? $x : 0);
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $var['descr'];
         $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $config['graph_colours'][$colours][$x];
+        $rrd_list[$i]['colour'] = \LibreNMS\Config::get("graph_colours.$colours.$x");
         $i++;
         $x++;
     }

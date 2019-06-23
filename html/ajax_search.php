@@ -88,7 +88,7 @@ if (isset($_REQUEST['search'])) {
                         'device_ports'    => $num_ports,
                         'device_image'    => getIcon($result),
                         'device_hardware' => $result['hardware'],
-                        'device_os'       => $config['os'][$result['os']]['text'],
+                        'device_os' => \LibreNMS\Config::getOsSetting($result['os'], 'text'),
                         'version'         => $result['version'],
                         'location'        => $result['location'],
                     );
@@ -243,7 +243,7 @@ if (isset($_REQUEST['search'])) {
                         'colours'         => $highlight_colour,
                         'device_image'    => getIcon($result),
                         'device_hardware' => $result['hardware'],
-                        'device_os'       => $config['os'][$result['os']]['text'],
+                        'device_os' => \LibreNMS\Config::getOsSetting($result['os'], 'text'),
                         'version'         => $result['version'],
                         'location'        => $result['location'],
                     );
@@ -289,7 +289,7 @@ if (isset($_REQUEST['search'])) {
                         'colours'         => $highlight_colour,
                         'device_image'    => getIcon($result),
                         'device_hardware' => $result['hardware'],
-                        'device_os'       => $config['os'][$result['os']]['text'],
+                        'device_os' => \LibreNMS\Config::getOsSetting($result['os'], 'text'),
                         'version'         => $result['version'],
                         'location'        => $result['location'],
                         'plugin'          => $result['mplug_type'],

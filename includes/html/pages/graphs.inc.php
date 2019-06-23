@@ -40,8 +40,8 @@ if (is_file("includes/html/graphs/".$type."/auth.inc.php")) {
 if (!$auth) {
     require 'includes/html/error-no-perm.inc.php';
 } else {
-    if (isset($config['graph_types'][$type][$subtype]['descr'])) {
-        $title .= " :: " . $config['graph_types'][$type][$subtype]['descr'];
+    if (Config::has("graph_types.$type.$subtype.descr")) {
+        $title .= " :: " . Config::get("graph_types.$type.$subtype.descr");
     } elseif ($type == "device" && $subtype == "collectd") {
         $title .= " :: " . nicecase($subtype) . " :: " . $vars['c_plugin'];
         if (isset($vars['c_plugin_instance'])) {
@@ -59,7 +59,7 @@ if (!$auth) {
     $graph_array['height'] = "60";
     $graph_array['width'] = $thumb_width;
     $graph_array['legend'] = "no";
-    $graph_array['to'] = $config['time']['now'];
+    $graph_array['to'] = Config::get('time.now');
 
     print_optionbar_start();
     echo $title;
@@ -83,12 +83,12 @@ if (!$auth) {
     print_optionbar_end();
 
 
-    $thumb_array = $config['graphs']['row']['normal'];
+    $thumb_array = Config::get('graphs.row.normal');
 
     echo '<table width=100% class="thumbnail_graph_table"><tr>';
 
     foreach ($thumb_array as $period => $text) {
-        $graph_array['from']   = $config['time'][$period];
+        $graph_array['from'] = Config::get("time.$period");
 
         $link_array = $vars;
         $link_array['from'] = $graph_array['from'];
@@ -107,7 +107,7 @@ if (!$auth) {
     echo('</tr></table>');
 
     $graph_array = $vars;
-    $graph_array['height'] = $config['webui']['min_graph_height'];
+    $graph_array['height'] = Config::get('webui.min_graph_height');
     $graph_array['width']  = $graph_width;
 
     if ($_SESSION['screen_width']) {
@@ -168,14 +168,14 @@ if (!$auth) {
     }
     echo("</center></div>");
 
-    if (isset($config['graph_descr'][$vars['type']])) {
+    if (Config::has('graph_descr.' . $vars['type'])) {
         print_optionbar_start();
         echo('<div style="float: left; width: 30px;">
             <div style="margin: auto auto;">
             <i class="fa fa-info-circle fa-lg icon-theme" aria-hidden="true"></i>
             </div>
             </div>');
-        echo($config['graph_descr'][$vars['type']]);
+        echo(Config::get('graph_descr.' . $vars['type']));
         print_optionbar_end();
     }
 

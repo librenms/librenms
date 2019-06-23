@@ -31,13 +31,11 @@ function string_to_oid($string)
 
 function prep_snmp_setting($device, $setting)
 {
-    global $config;
-
     if (isset($device[$setting]) && is_numeric($device[$setting]) && $device[$setting] > 0) {
         return $device[$setting];
-    } elseif (isset($config['snmp'][$setting])) {
-        return $config['snmp'][$setting];
     }
+
+    return Config::get("snmp.$setting");
 }//end prep_snmp_setting()
 
 /**
@@ -46,31 +44,30 @@ function prep_snmp_setting($device, $setting)
  */
 function get_mib_dir($device)
 {
-    global $config;
     $extra = array();
 
-    if (file_exists($config['mib_dir'] . '/' . $device['os'])) {
-        $extra[] = $config['mib_dir'] . '/' . $device['os'];
+    if (file_exists(Config::get('mib_dir') . '/' . $device['os'])) {
+        $extra[] = Config::get('mib_dir') . '/' . $device['os'];
     }
 
     if (isset($device['os_group'])) {
-        if (file_exists($config['mib_dir'] . '/' . $device['os_group'])) {
-            $extra[] = $config['mib_dir'] . '/' . $device['os_group'];
+        if (file_exists(Config::get('mib_dir') . '/' . $device['os_group'])) {
+            $extra[] = Config::get('mib_dir') . '/' . $device['os_group'];
         }
 
-        if (isset($config['os_groups'][$device['os_group']]['mib_dir'])) {
-            if (is_array($config['os_groups'][$device['os_group']]['mib_dir'])) {
-                foreach ($config['os_groups'][$device['os_group']]['mib_dir'] as $k => $dir) {
-                    $extra[] = $config['mib_dir'] . '/' . $dir;
+        if ($group_mibdir = Config::get("os_groups.{$device['os_group']}.mib_dir")) {
+            if (is_array($group_mibdir)) {
+                foreach ($group_mibdir as $k => $dir) {
+                    $extra[] = Config::get('mib_dir') . '/' . $dir;
                 }
             }
         }
     }
 
-    if (isset($config['os'][$device['os']]['mib_dir'])) {
-        if (is_array($config['os'][$device['os']]['mib_dir'])) {
-            foreach ($config['os'][$device['os']]['mib_dir'] as $k => $dir) {
-                $extra[] = $config['mib_dir'] . '/' . $dir;
+    if ($os_mibdir = Config::get("os.{$device['os']}.mib_dir")) {
+        if (is_array($os_mibdir)) {
+            foreach ($os_mibdir as $k => $dir) {
+                $extra[] = Config::get('mib_dir') . '/' . $dir;
             }
         }
     }
@@ -83,7 +80,7 @@ function get_mib_dir($device)
  * If null return the default mib dir
  * If $mibdir is empty '', return an empty string
  *
- * @param string $mibdir should be the name of the directory within $config['mib_dir']
+ * @param string $mibdir should be the name of the directory within \LibreNMS\Config::get('mib_dir')
  * @param array $device
  * @return string The option string starting with -M
  */
@@ -116,8 +113,7 @@ function mibdir($mibdir = null, $device = [])
  */
 function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
-    global $config;
-    $snmpcmd  = [$config['snmpget']];
+    $snmpcmd = [Config::get('snmpget')];
     return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
 } // end gen_snmpget_cmd()
 
@@ -133,11 +129,10 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
  */
 function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
-    global $config;
-    if ($device['snmpver'] == 'v1' || (isset($device['os'], $config['os'][$device['os']]['nobulk']) && $config['os'][$device['os']]['nobulk'])) {
-        $snmpcmd = [$config['snmpwalk']];
+    if ($device['snmpver'] == 'v1' || (isset($device['os']) && Config::getOsSetting($device['os'], 'nobulk'))) {
+        $snmpcmd = [Config::get('snmpwalk')];
     } else {
-        $snmpcmd = [$config['snmpbulkwalk']];
+        $snmpcmd = [Config::get('snmpbulkwalk')];
         $max_repeaters = get_device_max_repeaters($device);
         if ($max_repeaters > 0) {
             $snmpcmd[] = "-Cr$max_repeaters";
@@ -1386,14 +1381,12 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
  */
 function get_device_max_repeaters($device)
 {
-    global $config;
-
     $max_repeaters = $device['snmp_max_repeaters'];
 
     if (isset($max_repeaters) && $max_repeaters > 0) {
         return $max_repeaters;
-    } elseif (isset($config['snmp']['max_repeaters']) && $config['snmp']['max_repeaters'] > 0) {
-        return $config['snmp']['max_repeaters'];
+    } elseif (Config::get('snmp.max_repeaters') > 0) {
+        return Config::get('snmp.max_repeaters');
     } else {
         return false;
     }

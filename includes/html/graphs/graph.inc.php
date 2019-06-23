@@ -36,16 +36,16 @@ $period = ($to - $from);
 $base64_output = '';
 $prev_from = ($from - $period);
 
-$graphfile = $config['temp_dir'].'/'.strgen();
+$graphfile = Config::get('temp_dir') . '/' . strgen();
 
-require $config['install_dir']."/includes/html/graphs/$type/auth.inc.php";
+require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
 if ($auth && is_custom_graph($type, $subtype, $device)) {
-    include($config['install_dir'] . "/includes/html/graphs/custom.inc.php");
+    include(Config::get('install_dir') . "/includes/html/graphs/custom.inc.php");
 } elseif ($auth && is_mib_graph($type, $subtype)) {
-    include $config['install_dir']."/includes/html/graphs/$type/mib.inc.php";
-} elseif ($auth && is_file($config['install_dir']."/includes/html/graphs/$type/$subtype.inc.php")) {
-    include $config['install_dir']."/includes/html/graphs/$type/$subtype.inc.php";
+    include Config::get('install_dir') . "/includes/html/graphs/$type/mib.inc.php";
+} elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
+    include Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
 } else {
     graph_error("$type*$subtype ");
     // Graph Template Missing");
@@ -53,7 +53,7 @@ if ($auth && is_custom_graph($type, $subtype, $device)) {
 
 function graph_error($string)
 {
-    global $vars, $config, $debug, $graphfile;
+    global $vars, $debug, $graphfile;
 
     $vars['bg'] = 'FFBBBB';
 
@@ -133,7 +133,7 @@ if ($error_msg) {
             if (is_file($graphfile)) {
                 if (!$debug) {
                     set_image_type();
-                    if ($config['trim_tobias'] && $graph_type !== 'svg') {
+                    if (Config::get('trim_tobias') && $graph_type !== 'svg') {
                         list($w, $h, $type, $attr) = getimagesize($graphfile);
                         $src_im                    = imagecreatefrompng($graphfile);
                         $src_x = '0';
