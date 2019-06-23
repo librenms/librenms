@@ -337,6 +337,16 @@ class Config
     }
 
     /**
+     * Get the full configuration array
+     * @return array
+     */
+    public static function getAll()
+    {
+        global $config;
+        return $config;
+    }
+
+    /**
      * merge the database config with the global config
      * Global config overrides db
      */

@@ -28,11 +28,11 @@ foreach ($rrd_list as $rrd) {
     if ($rrd['colour']) {
         $colour = $rrd['colour'];
     } else {
-        if (!$config['graph_colours'][$colours][$colour_iter]) {
+        if (!\LibreNMS\Config::get("graph_colours.$colours.$colour_iter")) {
             $colour_iter = 0;
         }
 
-        $colour = $config['graph_colours'][$colours][$colour_iter];
+        $colour = \LibreNMS\Config::get("graph_colours.$colours.$colour_iter");
         $colour_iter++;
     }
 

@@ -10,7 +10,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
         Config::set('rancid_configs', array(Config::get('rancid_configs')));
     }
 
-    if (isset(Config::get('rancid_configs')[0])) {
+    if (Config::has('rancid_configs.0')) {
         foreach (Config::get('rancid_configs') as $configs) {
             if ($configs[(strlen($configs) - 1)] != '/') {
                 $configs .= '/';
@@ -56,7 +56,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                     echo '<span class="pagemenu-selected">';
                 }
 
-                $linktext = 'r'.$svnlog['rev'].' <small>'.date(Config::get('dateformat')['byminute'], strtotime($svnlog['date'])).'</small>';
+                $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), strtotime($svnlog['date'])) . '</small>';
                 echo generate_link($linktext, array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']));
 
                 if ($vars['rev'] == $svnlog['rev']) {
@@ -89,7 +89,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                     echo '<span class="pagemenu-selected">';
                 }
 
-                $linktext = 'r'.$gitlog['rev'].' <small>'.date(Config::get('dateformat')['byminute'], $gitlog['date']).'</small>';
+                $linktext = 'r' . $gitlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), $gitlog['date']) . '</small>';
                 echo generate_link($linktext, array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $gitlog['rev']));
 
                 if ($vars['rev'] == $gitlog['rev']) {
@@ -149,11 +149,11 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
 
             $text = join("\n", $lines);
         }
-    } elseif (Config::get('oxidized')['enabled'] === true && isset(Config::get('oxidized')['url'])) {
+    } elseif (Config::get('oxidized.enabled') === true && Config::has('oxidized.url')) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
-        $node_info = json_decode(file_get_contents(Config::get('oxidized')['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
+        $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json'), true);
 
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
@@ -167,12 +167,12 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
 
             // Try Oxidized again with new hostname, if it has changed
             if ($oxidized_hostname != $device['hostname']) {
-                $node_info = json_decode(file_get_contents(Config::get('oxidized')['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
+                $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json'), true);
             }
         }
 
-        if (Config::get('oxidized')['features']['versioning'] === true) { // fetch a list of versions
-            $config_versions = json_decode(file_get_contents(Config::get('oxidized')['url'].'/node/version?node_full='.(isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname).'&format=json'), true);
+        if (Config::get('oxidized.features.versioning') === true) { // fetch a list of versions
+            $config_versions = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json'), true);
         }
 
         $config_total = 1;
@@ -186,7 +186,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                 list($oid,$date,$version) = explode('|', mres($_POST['config']));
                 $current_config = array('oid'=>$oid, 'date'=>$date, 'version'=>$version);
             } else { // no version selected
-                $current_config = array('oid'=>$config_versions[0]['oid'], 'date'=>$current_config[0]['date'], 'version'=>$config_total);
+                $current_config = ['oid' => $config_versions[0]['oid'], 'date' => $config_versions[0]['date'], 'version' => $config_total];
             }
 
             // populate previous_version
@@ -210,7 +210,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
             }
 
             if (isset($previous_config)) {
-                $url = Config::get('oxidized')['url'].'/node/version/diffs?node='.$oxidized_hostname;
+                $url = Config::get('oxidized.url') . '/node/version/diffs?node=' . $oxidized_hostname;
                 if (!empty($node_info['group'])) {
                     $url .= '&group='.$node_info['group'];
                 }
@@ -219,10 +219,10 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                 $text = file_get_contents($url); // fetch diff
             } else {
                 // fetch current_version
-                $text = file_get_contents(Config::get('oxidized')['url'].'/node/version/view?node='.$oxidized_hostname.(!empty($node_info['group']) ? '&group='.$node_info['group'] : '').'&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&format=text');
+                $text = file_get_contents(Config::get('oxidized.url') . '/node/version/view?node=' . $oxidized_hostname . (!empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . $current_config['oid'] . '&date=' . urlencode($current_config['date']) . '&num=' . $current_config['version'] . '&format=text');
             }
         } else {  // just fetch the only version
-            $text = file_get_contents(Config::get('oxidized')['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$oxidized_hostname);
+            $text = file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . (!empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname);
         }
 
         if (is_array($node_info) || $config_total > 1) {

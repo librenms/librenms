@@ -7,7 +7,6 @@ $options['type'] = 'Cisco-OTV';
 $components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];
 
-global $config;
 ?>
 <div class="panel panel-default" id="overlays">
     <div class="panel-heading">
@@ -63,7 +62,7 @@ $graph_array = array();
 $graph_array['device'] = $device['device_id'];
 $graph_array['height'] = '100';
 $graph_array['width']  = '215';
-$graph_array['to']     = $config['time']['now'];
+$graph_array['to'] = \LibreNMS\Config::get('time.now');
 $graph_array['type']   = 'device_cisco-otv-vlan';
 require 'includes/html/print-graphrow.inc.php';
 
@@ -82,7 +81,7 @@ $graph_array = array();
 $graph_array['device'] = $device['device_id'];
 $graph_array['height'] = '100';
 $graph_array['width']  = '215';
-$graph_array['to']     = $config['time']['now'];
+$graph_array['to'] = \LibreNMS\Config::get('time.now');
 $graph_array['type']   = 'device_cisco-otv-mac';
 require 'includes/html/print-graphrow.inc.php';
 

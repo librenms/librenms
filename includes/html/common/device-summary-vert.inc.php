@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\Config;
+
 require_once 'includes/html/object-cache.inc.php';
 
 $temp_output = '
@@ -11,7 +14,7 @@ $temp_output = '
       <th><a href="ports/">Ports</a></th>
 ';
 
-if ($config['show_services']) {
+if (Config::get('show_services')) {
     $temp_output .= '
       <th><a href="services/">Services</a></th>
 ';
@@ -26,7 +29,7 @@ $temp_output .= '
       <td><a href="devices/format=list_detail/state=up/"><span class="green">'. $devices['up'] .'</span></a></td>
       <td><a href="ports/format=list_detail/state=up/"><span class="green">'. $ports['up'] .'</span></a></td>
 ';
-if ($config['show_services']) {
+if (Config::get('show_services')) {
     $temp_output .= '
       <td><a href="services/view=details/state=ok/"><span class="green">'. $services['up'] .'</span></a></td>
 ';
@@ -40,7 +43,7 @@ $temp_output .= '
       <td><a href="ports/format=list_detail/state=down/"><span class="red">'. $ports['down'] .'</span></a></td>
 ';
 
-if ($config['show_services']) {
+if (Config::get('show_services')) {
     $temp_output .= '
       <td><a href="services/view=details/state=critical/"><span class="red">'. $services['down'] .'</span></a></td>
 ';
@@ -54,7 +57,7 @@ $temp_output .= '
       <td><a href="ports/format=list_detail/ignore=1/"><span class="grey">'. $ports['ignored'] .'</span></a></td>
 ';
 
-if ($config['show_services']) {
+if (Config::get('show_services')) {
     $temp_output .= '
       <td><a href="services/view=details/ignore=1/"><span class="grey">'. $services['ignored'] .'</span></a></td>
 ';
@@ -68,13 +71,13 @@ $temp_output .= '
       <td><a href="ports/format=list_detail/state=admindown/"><span class="black">'. $ports['shutdown'] .'</span></a></td>
 ';
 
-if ($config['show_services']) {
+if (Config::get('show_services')) {
     $temp_output .= '
       <td><a href="services/view=details/disabled=1/"><span class="black">'. $services['disabled'] .'</span></a></td>
 ';
 }
 
-if ($config['summary_errors']) {
+if (Config::get('summary_errors')) {
     $temp_output .= '
     </tr>
     <tr>
@@ -82,7 +85,7 @@ if ($config['summary_errors']) {
       <td>-</td>
       <td><a href="ports/format=list_detail/errors=1/"><span class="black"> '.$ports['errored'].'</span></a></td>
 ';
-    if ($config['show_services']) {
+    if (Config::get('show_services')) {
         $temp_output .= '
       <td>-</td>
 ';
@@ -97,7 +100,7 @@ $temp_output .= '
       <td><a href="ports/"><span>'. $ports['count'] .'</span></a></td>
 ';
 
-if ($config['show_services']) {
+if (Config::get('show_services')) {
     $temp_output .= '
       <td><a href="services/"><span>'. $services['count'] .'</span></a></td>
 ';

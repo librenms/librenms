@@ -67,8 +67,8 @@ foreach (dbFetchRows($sql, $param) as $drive) {
 
     $graph_array['type']        = $graph_type;
     $graph_array['id']          = $drive['storage_id'];
-    $graph_array['from']        = $config['time']['day'];
-    $graph_array['to']          = $config['time']['now'];
+    $graph_array['from'] = \LibreNMS\Config::get('time.day');
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['height']      = '20';
     $graph_array['width']       = '80';
     $graph_array_zoom           = $graph_array;
@@ -89,7 +89,7 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     if ($vars['view'] == 'graphs') {
         $graph_array['height'] = '100';
         $graph_array['width']  = '216';
-        $graph_array['to']     = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['id']     = $drive['storage_id'];
         $graph_array['type']   = $graph_type;
 

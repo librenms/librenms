@@ -23,12 +23,12 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (file_exists($config['install_dir'] . '/config.php')) {
+if (file_exists(\LibreNMS\Config::get('install_dir') . '/config.php')) {
     echo("This should only be called during install");
     exit;
 }
 $init_modules = ['nodb'];
-require $config['install_dir'] . '/includes/init.php';
+require \LibreNMS\Config::get('install_dir') . '/includes/init.php';
 
 header("Content-type: text/plain");
 header('X-Accel-Buffering: no');

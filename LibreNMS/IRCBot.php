@@ -68,10 +68,9 @@ class IRCBot
 
     public function __construct()
     {
-        global $config;
         $this->log('Setting up IRC-Bot..');
 
-        $this->config = $config;
+        $this->config = Config::getAll();
         $this->debug  = $this->config['irc_debug'];
         $this->config['irc_authtime'] = $this->config['irc_authtime'] ? $this->config['irc_authtime'] : 3;
         $this->max_retry              = $this->config['irc_maxretry'];
@@ -623,15 +622,9 @@ class IRCBot
     private function _reload()
     {
         if ($this->user['level'] == 10) {
-            global $config;
-            $config = array();
-            $config['install_dir'] = $this->config['install_dir'];
-            chdir($config['install_dir']);
-            include 'includes/defaults.inc.php';
-            include 'config.php';
-            include 'includes/definitions.inc.php';
+            $new_config = Config::load();
             $this->respond('Reloading configuration & defaults');
-            if ($config != $this->config) {
+            if ($new_config != $this->config) {
                 return $this->__construct();
             }
         } else {

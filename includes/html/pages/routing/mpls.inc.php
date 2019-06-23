@@ -59,9 +59,9 @@ if ($vars['view'] == 'lsp') {
         $device = device_by_id_cache($lsp['device_id']);
 
         if (!is_integer($i / 2)) {
-            $bg_colour = $config['list_colour']['even'];
+            $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
-            $bg_colour = $config['list_colour']['odd'];
+            $bg_colour = \LibreNMS\Config::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = $path_status_color = 'default';
@@ -134,9 +134,9 @@ if ($vars['view'] == 'paths') {
     foreach (dbFetchRows('SELECT *, `mplsLspName` FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` WHERE `p`.`lsp_id` = `l`.`lsp_id` ORDER BY `p`.`device_id`, `l`.`mplsLspName`') as $path) {
         $device = device_by_id_cache($path['device_id']);
         if (!is_integer($i / 2)) {
-            $bg_colour = $config['list_colour']['even'];
+            $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
-            $bg_colour = $config['list_colour']['odd'];
+            $bg_colour = \LibreNMS\Config::get('list_colour.odd');
         }
 
         $adminstate_status_color = $operstate_status_color = 'default';

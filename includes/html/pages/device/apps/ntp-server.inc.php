@@ -1,7 +1,5 @@
 <?php
 
-global $config;
-
 $graphs = array(
     'ntp-server_stats'   => 'NTPD Server - Statistics',
     'ntp-server_freq'    => 'NTPD Server - Frequency',
@@ -16,7 +14,7 @@ foreach ($graphs as $key => $text) {
     $graph_type            = $key;
     $graph_array['height'] = '100';
     $graph_array['width']  = '215';
-    $graph_array['to']     = $config['time']['now'];
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['id']     = $app['app_id'];
     $graph_array['type']   = 'application_'.$key;
 
