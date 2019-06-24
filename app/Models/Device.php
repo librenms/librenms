@@ -341,27 +341,6 @@ class Device extends BaseModel
         $this->save();
     }
 
-    /**
-     * @return string
-     */
-    public function statusName()
-    {
-        if ($this->disabled == 1) {
-            return 'disabled';
-        } elseif ($this->ignore == 1) {
-            return 'ignore';
-        } elseif ($this->status == 0) {
-            return 'down';
-        } else {
-            $warning_time = \LibreNMS\Config::get('uptime_warning', 84600);
-            if ($this->uptime < $warning_time && $this->uptime != 0) {
-                return 'warn';
-            }
-
-            return 'up';
-        }
-    }
-
     // ---- Accessors/Mutators ----
 
     public function getIconAttribute($icon)
