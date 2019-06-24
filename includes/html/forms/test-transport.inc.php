@@ -23,7 +23,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 $transport = $vars['transport'] ?: null;
 $transport_id = $vars['transport_id'] ?: null;
 
-require_once $config['install_dir'].'/includes/alerts.inc.php';
+require_once Config::get('install_dir') . '/includes/alerts.inc.php';
 $tmp = array(dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location_id from devices order by device_id asc limit 1'));
 $tmp['contacts'] = GetContacts($tmp);
 $obj = array(
@@ -33,7 +33,7 @@ $obj = array(
     "version" => $tmp[0]['version'],
     "hardware" => $tmp[0]['hardware'],
     "location" => $tmp[0]['location'],
-    "title"     => "Testing transport from ".$config['project_name'],
+    "title" => "Testing transport from " . Config::get('project_name'),
     "elapsed"   => "11s",
     "id"        => "000",
     "faults"    => false,

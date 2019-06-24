@@ -17,7 +17,7 @@ $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);
-echo $config['project_name_version']." Poller\n";
+echo Config::get('base_url') . " Poller\n";
 
 $options = getopt('h:m:i:n:r::d::v::a::f::q');
 
@@ -102,11 +102,11 @@ EOH;
 }
 
 if (isset($options['r'])) {
-    $config['norrd'] = true;
+    Config::set('norrd', true);
 }
 
 if (isset($options['f'])) {
-    $config['noinfluxdb'] = true;
+    Config::set('noinfluxdb', true);
 }
 
 if (isset($options['p'])) {
@@ -114,22 +114,22 @@ if (isset($options['p'])) {
 }
 
 if (isset($options['g'])) {
-    $config['nographite'] = true;
+    Config::set('nographite', true);
 }
 
-if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
+if (Config::get('base_url') !== true && Config::get('influxdb.enable') === true) {
     $influxdb = influxdb_connect();
 } else {
     $influxdb = false;
 }
 
-if ($config['nographite'] !== true && $config['graphite']['enable'] === true) {
-    $graphite = fsockopen($config['graphite']['host'], $config['graphite']['port']);
+if (Config::get('base_url') !== true && Config::get('graphite.enable') === true) {
+    $graphite = fsockopen(Config::get('graphite.host'), Config::get('graphite.port'));
     if ($graphite !== false) {
-        echo "Connection made to {$config['graphite']['host']} for Graphite support\n";
+        echo "Connection made to " . Config::get('graphite.host') . " for Graphite support\n";
     } else {
-        echo "Connection to {$config['graphite']['host']} has failed, Graphite support disabled\n";
-        $config['nographite'] = true;
+        echo "Connection to " . Config::get('graphite.host') . " has failed, Graphite support disabled\n";
+        Config::set('nographite', true);
     }
 } else {
     $graphite = false;
@@ -179,11 +179,11 @@ if ($polled_devices) {
         'start' => $poller_start,
         'duration' => $poller_time,
         'devices' => $polled_devices,
-        'poller' => $config['distributed_poller_name']
+        'poller' => Config::get('base_url')
     ), 'perf_times');
 }
 
-$string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $polled_devices devices polled in $poller_time secs";
+$string = $argv[0] . " $doing " . date(Config::get('dateformat.compact')) . " - $polled_devices devices polled in $poller_time secs";
 d_echo("$string\n");
 
 if (!isset($options['q'])) {
@@ -192,7 +192,7 @@ if (!isset($options['q'])) {
 
 logfile($string);
 rrdtool_close();
-unset($config);
+
 // Remove this for testing
 // print_r(get_defined_vars());
 

@@ -52,7 +52,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `S`.`schedule_id`, `S`.`recurring`, DATE_FORMAT(NOW(), '".$config['dateformat']['mysql']['compact']."') AS now, DATE_FORMAT(`S`.`start`, '".$config['dateformat']['mysql']['compact']."') AS `start`, DATE_FORMAT(`S`.`end`, '".$config['dateformat']['mysql']['compact']."') AS `end`,  DATE_FORMAT(`S`.`start_recurring_dt`, '".$config['dateformat']['mysql']['date']."') AS `start_recurring_dt`, DATE_FORMAT(`S`.`end_recurring_dt`, '".$config['dateformat']['mysql']['date']."') AS `end_recurring_dt`, `S`.`start_recurring_hr`, `S`.`end_recurring_hr`, `S`.`recurring_day`, `S`.`title` $sql";
+$sql = "SELECT `S`.`schedule_id`, `S`.`recurring`, DATE_FORMAT(NOW(), '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') AS now, DATE_FORMAT(`S`.`start`, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') AS `start`, DATE_FORMAT(`S`.`end`, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') AS `end`,  DATE_FORMAT(`S`.`start_recurring_dt`, '" . \LibreNMS\Config::get('dateformat.mysql.date') . "') AS `start_recurring_dt`, DATE_FORMAT(`S`.`end_recurring_dt`, '" . \LibreNMS\Config::get('dateformat.mysql.date') . "') AS `end_recurring_dt`, `S`.`start_recurring_hr`, `S`.`end_recurring_hr`, `S`.`recurring_day`, `S`.`title` $sql";
 
 foreach (dbFetchRows($sql, $param) as $schedule) {
     $status = 0;

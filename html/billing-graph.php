@@ -36,7 +36,7 @@ if (isset($_GET['ave'])) {
     $urlargs['ave'] = $_GET['ave'];
 }
 
-$url = "{$config['base_url']}graph.php?";
+$url = Config::get('base_url') . 'graph.php?';
 $i = 0;
 foreach ($urlargs as $name => $value) {
     if ($i++ > 0) {

@@ -64,7 +64,7 @@ if ($vars['view'] == 'incoming') {
         foreach ($smokeping_files['in'][$device['hostname']] as $src => $host) {
             $hostname = str_replace('.rrd', '', $host);
             $host     = device_by_name($src);
-            if ($config['smokeping']['integration'] === true) {
+            if (\LibreNMS\Config::get('smokeping.integration') === true) {
                 $dest = device_by_name(str_replace("_", ".", $hostname));
             } else {
                 $dest = $host;

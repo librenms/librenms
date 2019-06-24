@@ -46,12 +46,12 @@ if (!isset($multiplier)) {
 }
 
 foreach ($rrd_list as $rrd) {
-    if (!$config['graph_colours'][$colours_in][$iter] || !$config['graph_colours'][$colours_out][$iter]) {
+    if (!\LibreNMS\Config::get("graph_colours.$colours_in.$iter") || !\LibreNMS\Config::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
     }
 
-    $colour_in = $config['graph_colours'][$colours_in][$iter];
-    $colour_out = $config['graph_colours'][$colours_out][$iter];
+    $colour_in = \LibreNMS\Config::get("graph_colours.$colours_in.$iter");
+    $colour_out = \LibreNMS\Config::get("graph_colours.$colours_out.$iter");
 
     if (!$nodetails) {
         if (isset($rrd['descr_in'])) {

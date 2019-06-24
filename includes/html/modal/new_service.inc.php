@@ -15,7 +15,7 @@ use LibreNMS\Authentication\LegacyAuth;
 
 if (LegacyAuth::user()->hasGlobalAdmin()) {
     // Build the types list.
-    $dir = $config['nagios_plugins'];
+    $dir = \LibreNMS\Config::get('nagios_plugins');
     if (file_exists($dir) && is_dir($dir)) {
         $files = scandir($dir);
         $dir .= DIRECTORY_SEPARATOR;

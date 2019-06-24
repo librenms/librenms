@@ -1,13 +1,16 @@
 source: Developing/os/Initial-Detection.md
 path: blob/master/doc/
 
-This document will provide the information you should need to add basic detection for a new OS.
+This document will provide the information you should need to add
+basic detection for a new OS.
 
 ### Discovery
 
-Discovery is now all done by yaml files, you do not and should not create a php file for discovery.
+Discovery is now all done by yaml files, you do not and should not
+create a php file for discovery.
 
-Create the new OS file which should be called `includes/definitions/pulse.yaml`. Here is a working example:
+Create the new OS file which should be called
+`includes/definitions/pulse.yaml`. Here is a working example:
 
 ```yaml
 os: pulse
@@ -23,17 +26,24 @@ discovery:
         - .1.3.6.1.4.1.12532.
 ```
 
-`over`: This is a list of the graphs which will be shown within the device header bar (mini graphs top right).
+`over`: This is a list of the graphs which will be shown within the
+device header bar (mini graphs top right).
 
-`discovery`: Here we are detecting this new OS using sysObjectID, this is the preferred method for detection. 
-Other options are available:
+`discovery`: Here we are detecting this new OS using sysObjectID, this
+is the preferred method for detection.  Other options are available:
 
- - `sysObjectID` The preferred operator. Checks if the sysObjectID starts with one of the strings under this item
- - `sysDescr` Use this in addition to sysObjectID if required. Check that the sysDescr contains one of the strings under this item
- - `sysObjectID_regex` Please avoid use of this. Checks if the sysObjectID matches one of the regex statements under this item
- - `sysDescr_regex` Please avoid use of this. Checks if the sysDescr matches one of the regex statements under this item
- - `snmpget` Do not use this unless none of the other methods work. Fetch an oid and compare it against a value.
- - `_except` You can add this to any of the above to exclude that element. As an example:
+- `sysObjectID` The preferred operator. Checks if the sysObjectID
+  starts with one of the strings under this item
+- `sysDescr` Use this in addition to sysObjectID if required. Check
+  that the sysDescr contains one of the strings under this item
+- `sysObjectID_regex` Please avoid use of this. Checks if the
+  sysObjectID matches one of the regex statements under this item
+- `sysDescr_regex` Please avoid use of this. Checks if the sysDescr
+  matches one of the regex statements under this item
+- `snmpget` Do not use this unless none of the other methods
+  work. Fetch an oid and compare it against a value.
+- `_except` You can add this to any of the above to exclude that
+  element. As an example:
 
 ```yaml
 discovery:
@@ -44,11 +54,11 @@ discovery:
           - 'Not some pulse'
 ```
 
-`group`: You can group certain OS' together by using group, for instance ios, nx-os, iosxr are all within a group 
-called cisco.
+`group`: You can group certain OS' together by using group, for
+instance ios, nx-os, iosxr are all within a group called cisco.
 
-`bad_ifXEntry`: This is a list of models for which to tell LibreNMS that the device doesn't support ifXEntry and to 
- ignore it:
+`bad_ifXEntry`: This is a list of models for which to tell LibreNMS
+that the device doesn't support ifXEntry and to ignore it:
  
 ```yaml
  bad_ifXEntry:
@@ -57,7 +67,8 @@ called cisco.
      - cisco2811
 ```
 
-`mib_dir`: You can use this to specify the additional directories to look in for MIBs:
+`mib_dir`: You can use this to specify the additional directories to
+look in for MIBs:
 
 ```yaml
 mib_dir:
@@ -65,7 +76,9 @@ mib_dir:
     - cisco
 ```
 
-`poller_modules`: This is a list of poller modules to either enable (1) or disable (0). Check `includes/defaults.inc.php` to see which modules are enabled/disabled by default.
+`poller_modules`: This is a list of poller modules to either enable
+(1) or disable (0). Check `includes/defaults.inc.php` to see which
+modules are enabled/disabled by default.
 
 ```yaml
 poller_modules:
@@ -73,7 +86,9 @@ poller_modules:
     cisco-ace-loadbalancer: false
 ```
 
-`discovery_modules`: This is the list of discovery modules to either enable (1) or disable (0). Check `includes/defaults.inc.php` to see which modules are enabled/disabled by default.
+`discovery_modules`: This is the list of discovery modules to either
+enable (1) or disable (0). Check `includes/defaults.inc.php` to see
+which modules are enabled/disabled by default.
 
 ```yaml
 discovery_modules:
@@ -84,7 +99,9 @@ discovery_modules:
 
 
 ##### Discovery Logic
+
 YAML is converted to an array in PHP.  Consider the following YAML:
+
 ```yaml
 discovery: 
   - sysObjectID: foo
@@ -93,7 +110,9 @@ discovery:
     sysObjectID: bar
 
 ```
+
 This is how the discovery array would look in PHP:
+
 ```php
 [
      [
@@ -116,16 +135,19 @@ The logic for the discovery is as follows:
 3. One of the third level items (foo, [snafu,exodar], bar) must match
 
 So, considering the example:
- - `sysObjectID: foo, sysDescr: ANYTHING` matches
- - `sysObjectID: bar, sysDescr: ANYTHING` does not match
- - `sysObjectID: bar, sysDescr: exodar` matches 
- - `sysObjectID: bar, sysDescr: snafu` matches 
+
+- `sysObjectID: foo, sysDescr: ANYTHING` matches
+- `sysObjectID: bar, sysDescr: ANYTHING` does not match
+- `sysObjectID: bar, sysDescr: exodar` matches 
+- `sysObjectID: bar, sysDescr: snafu` matches 
 
 #### Discovery helpers
+
 Within the discovery code base if you are using php then the following helpers are available:
 
-`$device['sysObjectID]`: This will contain the full numerical sysObjectID for this device.
-`$device['sysDescr']`: This will contain the full sysDescr for this device.
+- `$device['sysObjectID]`: This will contain the full numerical
+  sysObjectID for this device.
+- `$device['sysDescr']`: This will contain the full sysDescr for this device.
 
 ### Poller
 
@@ -159,18 +181,21 @@ It is highly recommended to use SVG images where possible, these scale and provi
 with HiDPI screens. If you can't find SVG images then please use png.
 
 Create an SVG image of the icon and logo.  Legacy PNG bitmaps are also supported but look bad on HiDPI.
-- A vector image should not contain padding.  
+
+- A vector image should not contain padding.
 - The file should not be larger than 20 Kb. Simplify paths to reduce large files.
 - Use plain SVG without gzip compression.
 - The SVG root element must not contain length and width attributes, only viewBox.
 
 ##### Icon
+
 - Save the icon SVG to `html/images/os/$os.svg`.
 - Icons should look good when viewed at 32x32 px.
 - Square icons are preferred to full logos with text.
 - Remove small ornaments that are almost not visible when displayed with 32px width (e.g. ® or ™).
 
 ##### Logo
+
 - Save the logo SVG to `html/images/logos/$os.svg`.
 - Logos can be any dimension, but often are wide and contain the company name.
 - If a logo is not present, the icon will be used.
@@ -187,23 +212,30 @@ Hints for [Inkscape](https://inkscape.org/):
 - Use `File -> Save As -> Plain SVG` to save the final image.
 
 By optimizing the SVG you can shrink the file size in some cases to less than 20 %.
-[SVG Optimizer](https://github.com/svg/svgo) does a great job. There is also an [online version](https://jakearchibald.github.io/svgomg/).
+[SVG Optimizer](https://github.com/svg/svgo) does a great job. There
+is also an [online version](https://jakearchibald.github.io/svgomg/).
 
 #### The final check
 
 Discovery
+
 ```bash
 ./discovery.php -d -h HOSTNAME
 ```
 
 Polling
+
 ```bash
 ./poller.php -h HOSTNAME
 ```
 
 At this step we should see all the values retrieved in LibreNMS.
 
-Note: If you have made a number of changes to either the OS's Discovery files, it's possible earlier edits have been cached. As such, if you do not get expected behaviour when completing the final check above, try removing the cache file first:
+Note: If you have made a number of changes to either the OS's
+Discovery files, it's possible earlier edits have been cached. As
+such, if you do not get expected behaviour when completing the final
+check above, try removing the cache file first:
+
 ```bash
 rm -f cache/os_defs.cache
 ```
