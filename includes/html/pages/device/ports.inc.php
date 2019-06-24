@@ -9,7 +9,7 @@ if ($vars['view'] == 'graphs' || $vars['view'] == 'minigraphs') {
 }
 
 if (!$vars['view']) {
-    $vars['view'] = trim($config['ports_page_default'], '/');
+    $vars['view'] = trim(\LibreNMS\Config::get('ports_page_default'), '/');
 }
 
 $link_array = array(
@@ -59,7 +59,7 @@ $graph_types = array(
     'errors'    => 'Errors',
 );
 
-if ($config['enable_ports_etherlike']) {
+if (\LibreNMS\Config::get('enable_ports_etherlike')) {
     $graph_types['etherlike'] = 'Etherlike';
 }
 
@@ -104,15 +104,13 @@ if ($vars['view'] == 'minigraphs') {
     // FIXME - FIX THIS. UGLY.
     foreach (dbFetchRows('select * from ports WHERE device_id = ? AND `disabled` = 0 ORDER BY ifIndex', array($device['device_id'])) as $port) {
         $port = cleanPort($port, $device);
-        echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
-            <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>
-            <a href="'.generate_port_url($port)."\" onmouseover=\"return overlib('\
-            <div style=\'background-color: #ffffff;\'>\
-            <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555;\'>".$device['hostname'].' - '.$port['ifDescr'].'</div>\
-            '.$port['ifAlias']." \
-            <img src=\'graph.php?type=".$graph_type.'&amp;id='.$port['port_id'].'&amp;from='.$from.'&amp;to='.$config['time']['now']."&amp;width=450&amp;height=150\'>\
+        echo "<div class='minigraph-div'><div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>
+            <a href=\"'.generate_port_url($port).'\" onmouseover=\"return overlib('<div class=\'overlib-content\'>\
+      	    <div class=\'overlib-text\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
+            <span class=\'overlib-title\'>".$port['ifAlias']."</span>\
+            <img src=\'graph.php?type=".$graph_type.'&amp;id='.$port['port_id'].'&amp;from='.$from.'&amp;to='.\LibreNMS\Config::get('time.now')."&amp;width=450&amp;height=150\'>\
             </div>\
-            ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >"."<img src='graph.php?type=".$graph_type.'&amp;id='.$port['port_id'].'&amp;from='.$from.'&amp;to='.$config['time']['now']."&amp;width=180&amp;height=45&amp;legend=no'>
+            ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >" . "<img src='graph.php?type=" . $graph_type . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=180&amp;height=45&amp;legend=no'>
             </a>
             <div style='font-size: 9px;'>".substr(short_port_descr($port['ifAlias']), 0, 32).'</div>
             </div>';

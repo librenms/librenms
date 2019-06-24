@@ -43,7 +43,7 @@ if (set_debug(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
-if (!defined('TEST') && $config['alert']['disable'] != 'true') {
+if (!defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {
     echo 'Start: '.date('r')."\r\n";
     echo "ClearStaleAlerts():" . PHP_EOL;
     $alerts->clearStaleAlerts();

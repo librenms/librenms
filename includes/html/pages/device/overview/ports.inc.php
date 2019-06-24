@@ -23,10 +23,10 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
         }
     }
 
-    $graph_array['to']     = $config['time']['now'];
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['device'] = $device['device_id'];
     $graph_array['type']   = 'device_bits';
-    $graph_array['from']   = $config['time']['day'];
+    $graph_array['from'] = \LibreNMS\Config::get('time.day');
     $graph_array['legend'] = 'no';
     $graph = generate_lazy_graph_tag($graph_array);
 

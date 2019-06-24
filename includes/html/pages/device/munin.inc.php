@@ -1,6 +1,6 @@
 <?php
 
-// Graphs are printed in the order they exist in $config['graph_types']
+// Graphs are printed in the order they exist in \LibreNMS\Config::get('graph_types')
 $link_array = array(
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -50,7 +50,7 @@ print_optionbar_end();
 
 $graph_enable = $graph_enable[$vars['group']];
 
-// foreach ($config['graph_types']['device'] as $graph => $entry)
+// foreach (\LibreNMS\Config::get('graph_types.device') as $graph => $entry)
 foreach ($graph_enable as $graph => $entry) {
     $graph_array = array();
     if ($graph_enable[$graph]) {
@@ -60,7 +60,7 @@ foreach ($graph_enable as $graph => $entry) {
             $graph_array['device'] = $device['device_id'];
             $graph_array['plugin'] = $entry['plugin'];
         } else {
-            $graph_title         = $config['graph_types']['device'][$graph]['descr'];
+            $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr");
             $graph_array['type'] = 'device_'.$graph;
         }
 

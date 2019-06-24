@@ -10,9 +10,9 @@ $row = 0;
 foreach ($vlans as $vlan) {
     $row++;
     if (is_integer($row / 2)) {
-        $row_colour = $config['list_colour']['even'];
+        $row_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
-        $row_colour = $config['list_colour']['odd'];
+        $row_colour = \LibreNMS\Config::get('list_colour.odd');
     }
 
     echo '<tr bgcolor="'.$row_colour.'">';

@@ -17,6 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+use LibreNMS\Config;
+
 require 'includes/html/collectd/config.php';
 require 'includes/html/collectd/functions.php';
 require 'includes/html/collectd/definitions.php';
@@ -52,14 +54,12 @@ function makeTextBlock($text, $fontfile, $fontsize, $width)
  */
 function error($code, $code_msg, $title, $msg)
 {
-    global $config;
-
     header(sprintf('HTTP/1.0 %d %s', $code, $code_msg));
     header('Pragma: no-cache');
     header('Expires: Mon, 01 Jan 2008 00:00:00 CET');
     header('Content-Type: image/png');
-    $w = ($config['rrd_width'] + 81);
-    $h = ($config['rrd_height'] + 79);
+    $w = (Config::get('rrd_width') + 81);
+    $h = (Config::get('rrd_height') + 79);
 
     $png     = imagecreate($w, $h);
     $c_bkgnd = imagecolorallocate($png, 240, 240, 240);
@@ -92,9 +92,9 @@ function error($code, $code_msg, $title, $msg)
 
     imagestring($png, 4, ceil(($w - strlen($title) * imagefontwidth(4)) / 2), 10, $title, $c_txt);
     imagestring($png, 5, 60, 35, sprintf('%s [%d]', $code_msg, $code), $c_etxt);
-    if (function_exists('imagettfbbox') && is_file($config['error_font'])) {
+    if (function_exists('imagettfbbox') && is_file(Config::get('error_font'))) {
         // Detailled error message
-        $errorfont = $config['error_font'];
+        $errorfont = Config::get('error_font');
         $fmt_msg = makeTextBlock($msg, $errorfont, 10, ($w - 86));
         $fmtbox  = imagettfbbox(12, 0, $errorfont, $fmt_msg);
         imagettftext($png, 10, 0, 55, (35 + 3 + imagefontwidth(5) - $fmtbox[7] + $fmtbox[1]), $c_txt, $errorfont, $fmt_msg);
@@ -169,9 +169,9 @@ $tinst = read_var('c_type_instance', $_GET, '');
 
 $graph_identifier = $host.'/'.$plugin.(strlen($pinst) ? '-'.$pinst : '').'/'.$type.(strlen($tinst) ? '-'.$tinst : '-*');
 
-$timespan    = read_var('timespan', $_GET, $config['timespan'][0]['name']);
+$timespan = read_var('timespan', $_GET, Config::get('timespan.0.name'));
 $timespan_ok = false;
-foreach ($config['timespan'] as &$ts) {
+foreach (Config::get('timespan') as &$ts) {
     if ($ts['name'] == $timespan) {
         $timespan_ok = true;
     }
@@ -244,9 +244,9 @@ if ($height < '99') {
 }
 
 if ($width <= '300') {
-    $rrd_cmd .= ' --font LEGEND:7:'.$config['mono_font'].' --font AXIS:6:'.$config['mono_font'].' ';
+    $rrd_cmd .= ' --font LEGEND:7:' . Config::get('mono_font') . ' --font AXIS:6:' . Config::get('mono_font') . ' ';
 } else {
-    $rrd_cmd .= ' --font LEGEND:8:'.$config['mono_font'].' --font AXIS:7:'.$config['mono_font'].' ';
+    $rrd_cmd .= ' --font LEGEND:8:' . Config::get('mono_font') . ' --font AXIS:7:' . Config::get('mono_font') . ' ';
 }
 
 if (isset($_GET['debug'])) {

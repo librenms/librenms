@@ -8,9 +8,9 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
         $state_translation = dbFetchRows('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
     }
     if (!is_integer($row / 2)) {
-        $row_colour = $config['list_colour']['even'];
+        $row_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
-        $row_colour = $config['list_colour']['odd'];
+        $row_colour = \LibreNMS\Config::get('list_colour.odd');
     }
 
     if ($sensor['poller_type'] == "ipmi") {

@@ -31,7 +31,7 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                             $graph_array['height'] = '100';
                             $graph_array['width'] = '215';
                             $graph_array['legend'] = 'no';
-                            $graph_array['to'] = $config['time']['now'];
+                            $graph_array['to'] = \LibreNMS\Config::get('time.now');
                             $graph_array['type'] = 'device_bigip_gtm_wide_requests';
                             $graph_array['id'] = $vars['wideid'];
                             require 'includes/html/print-graphrow.inc.php';
@@ -50,7 +50,7 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                             $graph_array['height'] = '100';
                             $graph_array['width'] = '215';
                             $graph_array['legend'] = 'no';
-                            $graph_array['to'] = $config['time']['now'];
+                            $graph_array['to'] = \LibreNMS\Config::get('time.now');
                             $graph_array['type'] = 'device_bigip_gtm_wide_resolved';
                             $graph_array['id'] = $vars['wideid'];
                             require 'includes/html/print-graphrow.inc.php';
@@ -68,7 +68,7 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                             $graph_array['height'] = '100';
                             $graph_array['width'] = '215';
                             $graph_array['legend'] = 'no';
-                            $graph_array['to'] = $config['time']['now'];
+                            $graph_array['to'] = \LibreNMS\Config::get('time.now');
                             $graph_array['type'] = 'device_bigip_gtm_wide_dropped';
                             $graph_array['id'] = $vars['wideid'];
                             require 'includes/html/print-graphrow.inc.php';

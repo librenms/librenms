@@ -34,10 +34,10 @@ use App\Models\Device;
 use App\Models\DevicePerf;
 use LibreNMS\Alert\Template;
 use LibreNMS\Alert\AlertData;
+use LibreNMS\Alert\AlertDB;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Alert\AlertUtil;
-use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
 use PHPMailer\PHPMailer\PHPMailer;
 use LibreNMS\Util\Time;
@@ -264,12 +264,11 @@ class RunAlerts
      */
     public function issueAlert($alert)
     {
-        global $config;
         if (dbFetchCell('SELECT attrib_value FROM devices_attribs WHERE attrib_type = "disable_notify" && device_id = ?', array($alert['device_id'])) == '1') {
             return true;
         }
 
-        if ($config['alert']['fixed-contacts'] == false) {
+        if (Config::get('alert.fixed-contacts') == false) {
             if (empty($alert['query'])) {
                 $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
             }
@@ -392,7 +391,6 @@ class RunAlerts
      */
     public function __construct()
     {
-        global $config;
         foreach ($this->loadAlerts('alerts.state != 2 && alerts.open = 1') as $alert) {
             $noiss            = false;
             $noacc            = false;
@@ -403,7 +401,7 @@ class RunAlerts
                 $rextra['recovery'] = true;
             }
 
-            $chk              = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', array($alert['device_id'], $alert['rule_id']));
+            $chk = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', array($alert['device_id'], $alert['rule_id']));
 
             if ($chk['alerted'] == $alert['state']) {
                 $noiss = true;
@@ -412,7 +410,7 @@ class RunAlerts
             if (!empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
                 if (!empty($rextra['delay'])) {
-                    if ((time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $config['alert']['tolerance_window']) < $rextra['delay'])) {
+                    if ((time() - strtotime($alert['time_logged']) + Config::get('alert.tolerance_window')) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + Config::get('alert.tolerance_window')) < $rextra['delay'])) {
                         continue;
                     } else {
                         $alert['details']['delay'] = time();
@@ -430,12 +428,12 @@ class RunAlerts
                 }
             } else {
                 // This is the new way
-                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay']) {
+                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + Config::get('alert.tolerance_window')) < $rextra['delay']) {
                     continue;
                 }
 
                 if (!empty($rextra['interval'])) {
-                    if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $config['alert']['tolerance_window']) < $rextra['interval']) {
+                    if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + Config::get('alert.tolerance_window')) < $rextra['interval']) {
                         continue;
                     } else {
                         $alert['details']['interval'] = time();

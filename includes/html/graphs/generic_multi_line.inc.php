@@ -34,10 +34,10 @@ foreach ($rrd_list as $rrd) {
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (!$config['graph_colours'][$colours][$iter]) {
+        if (!\LibreNMS\Config::get("graph_colours.$colours.$iter")) {
             $iter = 0;
         }
-        $colour = $config['graph_colours'][$colours][$iter];
+        $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
         $iter++;
     }
 

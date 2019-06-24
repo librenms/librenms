@@ -34,7 +34,7 @@
  *
  * To save lots of redundant queries to the LDAP server and speed up the
  * libreNMS WebUI, all information is cached within the PHP $_SESSION as
- * long as specified in $config['auth_ldap_cache_ttl'] (Default: 300s).
+ * long as specified in the 'auth_ldap_cache_ttl' setting (Default: 300s).
  */
 
 namespace LibreNMS\Authentication;

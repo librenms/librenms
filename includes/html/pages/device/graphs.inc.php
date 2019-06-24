@@ -1,6 +1,6 @@
 <?php
 
-// Graphs are printed in the order they exist in $config['graph_types']
+// Graphs are printed in the order they exist in \LibreNMS\Config::get('graph_types')
 $link_array = array(
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -16,7 +16,7 @@ print_optionbar_start();
 echo "<span style='font-weight: bold;'>Graphs</span> &#187; ";
 
 foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', array($device['device_id'])) as $graph) {
-    $section = $config['graph_types']['device'][$graph['graph']]['section'];
+    $section = \LibreNMS\Config::get("graph_types.device.{$graph['graph']}.section");
     if ($section != '') {
         $graph_enable[$section][$graph['graph']] = $graph['graph'];
     }
@@ -55,7 +55,7 @@ $graph_enable = $graph_enable[$vars['group']];
 foreach ($graph_enable as $graph => $entry) {
     $graph_array = array();
     if ($graph_enable[$graph]) {
-        $graph_title         = $config['graph_types']['device'][$graph]['descr'];
+        $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr");
         $graph_array['type'] = 'device_'.$graph;
 
         include 'includes/html/print-device-graph.php';
