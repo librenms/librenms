@@ -3,8 +3,8 @@ path: blob/master/doc/
 
 ### `get_all_ports`
 
-Get info for all ports on all devices.
-Strongly recommend that you use the `columns` parameter to avoid pulling too much data.
+Get info for all ports on all devices. Strongly recommend that you use
+the `columns` parameter to avoid pulling too much data.
 
 Route: `/api/v0/ports`
 
@@ -12,10 +12,10 @@ Route: `/api/v0/ports`
 
 Input:
 
-  - columns: Comma separated list of columns you want returned.
-
+- columns: Comma separated list of columns you want returned.
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports?columns=ifName%2Cport_id
 ```
@@ -50,13 +50,14 @@ Get all info for a particular port.
 
 Route: `/api/v0/ports/:portid`
 
-  - portid must be an integer
+- portid must be an integer
 
 Input:
 
   -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323
 ```
@@ -152,13 +153,14 @@ Get all IP info (v4 and v6) for a given port id.
 
 Route: `/api/v0/ports/:portid/ip`
 
-  - portid must be an integer
+- portid must be an integer
 
 Input:
 
   -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323/ip
 ```

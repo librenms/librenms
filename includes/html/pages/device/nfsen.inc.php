@@ -11,8 +11,8 @@ $link_array = array(
 echo generate_link('General', $link_array, array('nfsen' => 'general'));
 
 $printedChannel=false;
-$nfsenHostname=str_replace('.', $config['nfsen_split_char'], $device['hostname']);
-foreach ($config['nfsen_rrds'] as $nfsenDir) {
+$nfsenHostname = str_replace('.', \LibreNMS\Config::get('nfsen_split_char'), $device['hostname']);
+foreach ((array)\LibreNMS\Config::get('nfsen_rrds', []) as $nfsenDir) {
     $hostDir=$nfsenDir.'/'.$nfsenHostname.'/';
     if (is_dir($hostDir)) {
         $nfsenRRDchannelGlob=$hostDir.'*.rrd';

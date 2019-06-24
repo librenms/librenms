@@ -35,7 +35,7 @@ $config['leaflet']['default_lng'] = 14.1115485;
  
 $pagetitle[] = 'Geographical Map';
 
-if ($config['map']['engine'] == 'leaflet') {
+if (\LibreNMS\Config::get('map.engine') == 'leaflet') {
     require_once 'includes/html/common/worldmap.inc.php';
     echo implode('', $common_output);
 }

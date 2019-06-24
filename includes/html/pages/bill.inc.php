@@ -47,8 +47,8 @@ if (bill_permitted($bill_id)) {
         $bill_color = '#0000cc';
     }
 
-    $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '".$config['dateformat']['mysql']['date']."')");
-    $totext   = dbFetchCell("SELECT DATE_FORMAT($dateto, '".$config['dateformat']['mysql']['date']."')");
+    $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . \LibreNMS\Config::get('dateformat.mysql.date') . "')");
+    $totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . \LibreNMS\Config::get('dateformat.mysql.date') . "')");
     $unixfrom = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
     $unixto   = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
 
@@ -229,7 +229,7 @@ if ($vars['view'] == 'accurate') {
     $li .= "$type'>";
 
     $di  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
-    $di .= '&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'];
+    $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
     $di .= '&amp;x=1190&amp;y=250';
     $di .= "$type'>";
 
@@ -247,7 +247,7 @@ if ($vars['view'] == 'accurate') {
     $li .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
 
     $di  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
-    $di .= '&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'];
+    $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
     $di .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
 
     $mi  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;

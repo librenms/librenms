@@ -7,7 +7,7 @@ $no_refresh = true;
   
   // This needs more verification. Is it already added? Does it exist?
   // Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
-  $base = $config['billing']['base'];
+$base = \LibreNMS\Config::get('billing.base');
   
 if ($bill_data['bill_type'] == 'quota') {
     $data      = $bill_data['bill_quota'];

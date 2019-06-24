@@ -33,7 +33,7 @@ if (Config::get('api.cors.enabled') === true) {
     $app->add($cors);
 }
 
-require $config['install_dir'] . '/includes/html/api_functions.inc.php';
+require Config::get('install_dir') . '/includes/html/api_functions.inc.php';
 $app->setName('api');
 
 $app->notFound(function () use ($app) {

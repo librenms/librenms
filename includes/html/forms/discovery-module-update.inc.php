@@ -25,7 +25,7 @@ if (!isset($module) && validate_device_id($device['device_id']) === false) {
         $state = 0;
     }
 
-    if (isset($attribs['discover_'.$module]) && $attribs['discover_'.$module] != $config['discover_modules'][$module]) {
+    if (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] != \LibreNMS\Config::get("discover_modules.$module")) {
         del_dev_attrib($device, $module);
     } else {
         set_dev_attrib($device, $module, $state);

@@ -25,14 +25,14 @@ if (set_debug(isset($options['d']))) {
 }
 
 if (isset($options['f'])) {
-    $config['noinfluxdb'] = true;
+    \LibreNMS\Config::set('noinfluxdb', true);
 }
 
 if (isset($options['p'])) {
     $prometheus = false;
 }
 
-if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
+if (\LibreNMS\Config::get('noinfluxdb') !== true && \LibreNMS\Config::get('influxdb.enable') === true) {
     $influxdb = influxdb_connect();
 } else {
     $influxdb = false;
@@ -110,7 +110,7 @@ $poller_run  = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
 
-$string = $argv[0]." ".date($config['dateformat']['compact'])
+$string = $argv[0] . " " . date(\LibreNMS\Config::get('dateformat.compact'))
     ." - $polled_services services polled in $poller_time secs";
 d_echo("$string\n");
 

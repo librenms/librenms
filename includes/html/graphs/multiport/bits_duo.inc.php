@@ -5,7 +5,7 @@ if ($_GET['legend']) {
 }
 
 $rrd_options  = "--alt-autoscale-max -E --start $from --end ".($to - 150)." --width $width --height $height ";
-$rrd_options .= $config['rrdgraph_def_text'].' -c FONT#'.$config['rrdgraph_def_text_color'];
+$rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . \LibreNMS\Config::get('rrdgraph_def_text_color');
 if ($height < '99') {
     $rrd_options .= ' --only-graph';
 }
@@ -129,5 +129,5 @@ if ($legend == 'no') {
 }//end if
 
 if ($width <= '300') {
-    $rrd_options .= ' --font LEGEND:7:'.$config['mono_font'].' --font AXIS:6:'.$config['mono_font'].' --font-render-mode normal';
+    $rrd_options .= ' --font LEGEND:7:' . \LibreNMS\Config::get('mono_font') . ' --font AXIS:6:' . \LibreNMS\Config::get('mono_font') . ' --font-render-mode normal';
 }

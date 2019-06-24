@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use App\Models\Device;
+use App\Models\DeviceGroup;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
@@ -122,8 +124,7 @@ function check_is_read()
 
 function check_not_demo()
 {
-    global $config;
-    if ($config['api_demo'] == 1) {
+    if (Config::get('api_demo') == 1) {
         api_error(500, 'This feature isn\'t available in the demo');
     }
 }
@@ -131,7 +132,6 @@ function check_not_demo()
 function get_graph_by_port_hostname()
 {
     // This will return a graph for a given port by the ifName
-    global $config;
     $app          = \Slim\Slim::getInstance();
     $router       = $app->router()->getCurrentRoute()->getParams();
     $hostname     = $router['hostname'];
@@ -208,7 +208,6 @@ function get_port_stats_by_port_hostname()
 function get_graph_generic_by_hostname()
 {
     // This will return a graph type given a device id.
-    global $config;
     $app          = \Slim\Slim::getInstance();
     $router       = $app->router()->getCurrentRoute()->getParams();
     $hostname     = $router['hostname'];
@@ -377,7 +376,6 @@ function add_device()
 
     // This will add a device using the data passed encoded with json
     // FIXME: Execution flow through this function could be improved
-    global $config;
     $data = json_decode(file_get_contents('php://input'), true);
 
     $additional = array();
@@ -391,7 +389,7 @@ function add_device()
     }
 
     $hostname     = $data['hostname'];
-    $port         = $data['port'] ? mres($data['port']) : $config['snmp']['port'];
+    $port = $data['port'] ? mres($data['port']) : Config::get('snmp.port');
     $transport    = $data['transport'] ? mres($data['transport']) : 'udp';
     $poller_group = $data['poller_group'] ? mres($data['poller_group']) : 0;
     $force_add    = $data['force_add'] ? true : false;
@@ -405,7 +403,7 @@ function add_device()
         );
     } elseif ($data['version'] == 'v1' || $data['version'] == 'v2c') {
         if ($data['community']) {
-            $config['snmp']['community'] = array($data['community']);
+            Config::set('snmp.community', [$data['community']]);
         }
 
         $snmpver = mres($data['version']);
@@ -419,7 +417,9 @@ function add_device()
             'cryptoalgo' => mres($data['cryptoalgo']),
         );
 
-        array_unshift($config['snmp']['v3'], $v3);
+        $v3_config = Config::get('snmp.v3');
+        array_unshift($v3_config, $v3);
+        Config::set('snmp.v3', $v3_config);
         $snmpver = 'v3';
     } else {
         api_error(400, 'You haven\'t specified an SNMP version to use');
@@ -439,7 +439,6 @@ function del_device()
     check_is_admin();
 
     // This will add a device using the data passed encoded with json
-    global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
@@ -502,12 +501,11 @@ function get_vlans()
 
 function show_endpoints()
 {
-    global $config;
     $app    = \Slim\Slim::getInstance();
     $routes = $app->router()->getNamedRoutes();
     $output = array();
     foreach ($routes as $route) {
-        $output[$route->getName()] = $config['base_url'].$route->getPattern();
+        $output[$route->getName()] = Config::get('base_url') . $route->getPattern();
     }
 
     $app->response->setStatus('200');
@@ -633,7 +631,6 @@ function list_ospf()
 function get_graph_by_portgroup()
 {
     check_is_read();
-    global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $group  = $router['group'] ?: '';
@@ -767,7 +764,6 @@ function delete_components()
 
 function get_graphs()
 {
-    global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
@@ -786,7 +782,7 @@ function get_graphs()
         'name' => 'device_ping_perf',
     );
     foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', array($device_id)) as $graph) {
-        $desc     = $config['graph_types']['device'][$graph['graph']]['descr'];
+        $desc = Config::get("graph_types.device.{$graph['graph']}.descr");
         $graphs[] = array(
             'desc' => $desc,
             'name' => 'device_'.$graph['graph'],
@@ -827,7 +823,7 @@ function list_available_health_graphs()
                 'name' => 'device_'.$graph['sensor_class'],
             );
         }
-        $device = \App\Models\Device::find($device_id);
+        $device = Device::find($device_id);
 
         if ($device) {
             if ($device->processors()->count() > 0) {
@@ -1245,7 +1241,6 @@ function unmute_alert()
 
 function get_inventory()
 {
-    global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
 
@@ -1281,14 +1276,13 @@ function get_inventory()
 function list_oxidized()
 {
     check_is_read();
-    global $config;
     $app = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
 
     $hostname = $router['hostname'];
     $devices = array();
-    $device_types = "'".implode("','", $config['oxidized']['ignore_types'])."'";
-    $device_os    = "'".implode("','", $config['oxidized']['ignore_os'])."'";
+    $device_types = "'" . implode("','", Config::get('oxidized.ignore_types')) . "'";
+    $device_os = "'" . implode("','", Config::get('oxidized.ignore_os')) . "'";
 
     $sql = '';
     $params = array();
@@ -1302,12 +1296,12 @@ function list_oxidized()
         $device['ip'] = inet6_ntop($device['ip']);
 
         // Pre-populate the group with the default
-        if ($config['oxidized']['group_support'] === true && !empty($config['oxidized']['default_group'])) {
-            $device['group'] = $config['oxidized']['default_group'];
+        if (Config::get('oxidized.group_support') === true && !empty(Config::get('oxidized.default_group'))) {
+            $device['group'] = Config::get('oxidized.default_group');
         }
-        foreach ($config['oxidized']['maps'] as $maps_column => $maps) {
+        foreach (Config::get('oxidized.maps') as $maps_column => $maps) {
             // Based on Oxidized group support we can apply groups by setting group_support to true
-            if ($maps_column == "group" && (!isset($config['oxidized']['group_support']) or $config['oxidized']['group_support'] !== true)) {
+            if ($maps_column == "group" && Config::get('oxidized.group_support', true) !== true) {
                 continue;
             }
 
@@ -1346,7 +1340,6 @@ function list_oxidized()
 
 function list_bills()
 {
-    global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
 
@@ -1421,7 +1414,6 @@ function list_bills()
 
 function get_bill_graph()
 {
-    global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = mres($router['bill_id']);
@@ -1447,7 +1439,6 @@ function get_bill_graph()
 
 function get_bill_graphdata()
 {
-    global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = mres($router['bill_id']);
@@ -1476,7 +1467,6 @@ function get_bill_graphdata()
 
 function get_bill_history()
 {
-    global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = mres($router['bill_id']);
@@ -1495,8 +1485,6 @@ function get_bill_history()
 
 function get_bill_history_graph()
 {
-    global $config;
-
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = mres($router['bill_id']);
@@ -1539,8 +1527,6 @@ function get_bill_history_graph()
 
 function get_bill_history_graphdata()
 {
-    global $config;
-
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = mres($router['bill_id']);
@@ -1754,7 +1740,6 @@ function create_edit_bill()
 function update_device()
 {
     check_is_admin();
-    global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
@@ -1796,7 +1781,6 @@ function update_device()
 function rename_device()
 {
     check_is_admin();
-    global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
@@ -1821,21 +1805,24 @@ function get_device_groups()
 {
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
-    $status   = 'error';
-    $code     = 404;
-    $hostname = $router['hostname'];
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
-        $groups = GetGroupsFromDevice($device_id, 1);
+
+    if (!empty($router['hostname'])) {
+        $device = ctype_digit($router['hostname']) ? Device::find($router['hostname']) : Device::findByHostname($router['hostname']);
+        if (is_null($device)) {
+            api_error(404, 'Device not found');
+        }
+        $query = $device->groups();
     } else {
-        $groups = GetDeviceGroups();
+        $query = DeviceGroup::query();
     }
-    if (empty($groups)) {
+
+    $groups = $query->orderBy('name')->get();
+
+    if ($groups->isEmpty()) {
         api_error(404, 'No device groups found');
     }
 
-    api_success($groups, 'groups', 'Found ' . count($groups) . ' device groups');
+    api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' device groups');
 }
 
 function get_devices_by_group()
@@ -1843,19 +1830,25 @@ function get_devices_by_group()
     check_is_read();
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
-    $name     = urldecode($router['name']);
-    $devices  = array();
-    $full     = $_GET['full'];
-    if (empty($name)) {
+
+    if (empty($router['name'])) {
         api_error(400, 'No device group name provided');
     }
-    $group_id = dbFetchCell("SELECT `id` FROM `device_groups` WHERE `name`=?", array($name));
-    $devices = GetDevicesFromGroup($group_id, true, $full);
-    if (empty($devices)) {
+    $name = urldecode($router['name']);
+
+    $device_group = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (empty($device_group)) {
+        api_error(404, 'Device group not found');
+    }
+
+    $devices = $device_group->devices()->get(empty($_GET['full']) ? ['devices.device_id'] : ['*']);
+
+    if ($devices->isEmpty()) {
         api_error(404, 'No devices found in group ' . $name);
     }
 
-    api_success($devices, 'devices');
+    api_success($devices->makeHidden('pivot')->toArray(), 'devices');
 }
 
 
@@ -2051,7 +2044,7 @@ function get_fdb()
     }
     check_device_permission($device_id);
 
-    $device = \App\Models\Device::find($device_id);
+    $device = Device::find($device_id);
     if ($device) {
         $fdb = $device->portsFdb;
         api_success($fdb, 'ports_fdb');
@@ -2176,7 +2169,6 @@ function list_arp()
 function list_services()
 {
     check_is_read();
-    global $config;
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $services = array();
@@ -2294,10 +2286,8 @@ function list_logs()
 
 function validate_column_list($columns, $tableName)
 {
-    global $config;
-
     $column_names = explode(',', $columns);
-    $db_schema = Symfony\Component\Yaml\Yaml::parse(file_get_contents($config['install_dir'] . '/misc/db_schema.yaml'));
+    $db_schema = Symfony\Component\Yaml\Yaml::parse(file_get_contents(Config::get('install_dir') . '/misc/db_schema.yaml'));
     $valid_columns = array_column($db_schema[$tableName]['Columns'], 'Field');
     $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
 
@@ -2316,7 +2306,6 @@ function validate_column_list($columns, $tableName)
 
 function add_service_for_host()
 {
-    global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];

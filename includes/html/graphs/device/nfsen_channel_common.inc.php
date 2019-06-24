@@ -2,15 +2,11 @@
 
 $simple_rrd = true;
 
-if (!is_array($config['nfsen_rrds'])) {
-    $config['nfsen_rrds'] = array($config['nfsen_rrds']);
-}
-
-foreach ($config['nfsen_rrds'] as $nfsenrrds) {
+foreach ((array)\LibreNMS\Config::get('nfsen_rrds', []) as $nfsenrrds) {
     $nfsenrrds = rtrim($nfsenrrds, '/') . '/';
 
-    if ($config['nfsen_split_char']) {
-        $nfsenHostname=str_replace('.', $config['nfsen_split_char'], $device['hostname']);
+    if (\LibreNMS\Config::get('nfsen_split_char')) {
+        $nfsenHostname = str_replace('.', \LibreNMS\Config::get('nfsen_split_char'), $device['hostname']);
     } else {
         $nfsenHostname=$device['hostname'];
     }

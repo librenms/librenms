@@ -22,7 +22,7 @@ $components = $components[$device['device_id']];
 include "includes/html/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'LTM Vitrual Servers       Now      Avg      Max\\n'";
-$colours = array_merge($config['graph_colours']['mixed'], $config['graph_colours']['manycolours']);
+$colours = array_merge(\LibreNMS\Config::get('graph_colours.mixed'), \LibreNMS\Config::get('graph_colours.manycolours'));
 $colcount = 0;
 $count = 0;
 
