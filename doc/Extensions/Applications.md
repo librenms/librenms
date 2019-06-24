@@ -22,6 +22,32 @@ application discovery module is enabled by default for most \*nix
 operating systems, but in some cases you will need to manually enable
 the application discovery module.
 
+### SUDO
+
+One majoy thing to keep in mind when using SNMP extends is on my
+systems these run as a unprivlidged user. In these situations you need
+to use sudo.
+
+To test if you need to see if you need to, first check to see what
+user snmpd is running as. Then test you run it as that user with out
+issue. For example if snmpd is running as 'Debian-snmp' and we want
+to run the extend for proxmox, we would do `sudo -u Debian-snmp
+/usr/local/bin/proxmox` and make sure it runs as expected.
+
+If it does not work, then you will need to use sudo with the
+extend. And for the example above, that would mean adding the line
+below to the sudoers file.
+
+```
+Debian-snmp ALL = NOPASSWD: /usr/local/bin/proxmox
+```
+
+And we would then just add sudo to snmpd.conf like below for it.
+
+```
+extend proxmox /usr/bin/sudo /usr/local/bin/proxmox
+```
+
 ## Enable the application discovery module
 
 1. Edit the device for which you want to add this support
