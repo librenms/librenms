@@ -18,7 +18,7 @@ echo '| Arrays:';
 
 $raid_int=0;
 while (isset($raid_arrays[$raid_int])) {
-    $name=$pools[$raid_int];
+    $name=$raid_arrays[$raid_int];
     $label=$name;
 
     if ($vars['array'] == $name) {
