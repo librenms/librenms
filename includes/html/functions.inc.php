@@ -1678,3 +1678,154 @@ function get_unit_for_sensor_class($class)
 
     return $units_by_classes[$class];
 }
+
+/**
+ * Rounds down to the closest number divisible by 5.
+ */
+function lowest_five($number)
+{
+    return floor($number / 5) * 5;
+}
+
+/**
+ * Rounds down to the nearest 5 minutes if using seconds.
+ */
+function lowest_five_minutes($time)
+{
+    return $time - ($time % 300);
+}
+
+/**
+ * @params int
+ * @return string
+ *
+ * This returns the subpath for working with nfdump.
+ *
+ * 1 value is taken and that is a unix time stamp. It will be then be rounded
+ * off to the lowest five minutes earlier.
+ *
+ * The return string will be a path partial you can use with nfdump to tell it what
+ * file or range of files to use.
+ *
+ * Below ie a explanation of the layouts as taken from the NfSen config file.
+ *  0             no hierachy levels - flat layout - compatible with pre NfSen version
+ *  1 %Y/%m/%d    year/month/day
+ *  2 %Y/%m/%d/%H year/month/day/hour
+ *  3 %Y/%W/%u    year/week_of_year/day_of_week
+ *  4 %Y/%W/%u/%H year/week_of_year/day_of_week/hour
+ *  5 %Y/%j       year/day-of-year
+ *  6 %Y/%j/%H    year/day-of-year/hour
+ *  7 %Y-%m-%d    year-month-day
+ *  8 %Y-%m-%d/%H year-month-day/hour
+ */
+function time_to_nfsen_subpath($time)
+{
+    $time=lowest_five_minutes($time);
+    $layout=Config::get('nfsen_subdirlayout');
+
+    if ($layout == 0) {
+        return 'nfcapd.'.date('YmdHi', $time);
+    } elseif ($layout == 1) {
+        return date('Y\/m\/d\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 2) {
+        return date('Y\/m\/d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 3) {
+        return date('Y\/W\/w\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 4) {
+        return date('Y\/W\/w\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 5) {
+        return date('Y\/z\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 6) {
+        return date('Y\/z\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 7) {
+        return date('Y\-m\-d\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 8) {
+        return date('Y\-m\-d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    }
+}
+
+/**
+ * @params string hostname
+ * @return array
+ *
+ * Returns a list of channels/rrds for a specified hostname. The
+ * keys for the string are channel names and the values are is the
+ * path to the RRD for the channel.
+*/
+function nfsen_channel_rrds($hostname)
+{
+    $channels=array();
+
+    // If we don't have a hostname, return a empty array... nothing has no rrds
+    if (!isset($hostname)) {
+        return $channels;
+    }
+
+    // Turn the hostname into the one used in nfsen.
+    $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
+
+    // If there is no nfsen_rrds set, check to see if nfsen_base
+    // is set and built the path off of that.
+    if (is_null(Config::get('nfsen_rrds'))) {
+        $nfsen_rrd_dirs=Config::get('nfsen_rrds');
+    } else {
+        // If we don't have this, then return a empty array as it
+        // obviously is not in use and does not have any.
+        if (!is_null(Config::get('nfsen_base'))) {
+            return $channels;
+        }
+        $nfsen_rrd_dirs=array(
+                              Config::get('nfsen_base').'/profiles-stat/live/',
+                              Config::get('nfsen_base').'/profiles-stat/'
+                              );
+    }
+
+    foreach ($nfsen_rrd_dirs as $nfsen_dir) {
+        $host_dir=$nfsen_dir.'/'.$nfsen_hostname.'/';
+
+        if (is_dir($host_dir)) {
+            $nfsen_RRD_channel_glob=$host_dir.'*.rrd';
+            foreach (glob($nfsen_RRD_channel_glob) as $nfsen_RRD) {
+                $channel = str_replace(array($host_dir, '.rrd'), '', $nfsen_RRD);
+
+                $channels[$channel]=$nfsen_dir.$channel.'.rrd';
+            }
+        }
+    }
+
+    return $channels;
+}
+/**
+ * @params string hostname
+ * @return string
+ *
+ * Takes a hostname and transforms it to the name
+ * used by nfsen.
+*/
+function nfsen_hostname($hostname)
+{
+    $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
+
+    if (!is_null(Config::get('nfsen_suffix'))) {
+        $nfsen_hostname=str_replace(Config::get('nfsen_suffix'), '', $nfsen_hostname);
+    }
+    return $nfsen_hostname;
+}
+
+/**
+ * @params string hostname
+ * @return string
+ *
+ * Takes a hostname and returns the path to the nfsen
+ * live dir.
+*/
+function nfsen_live_dir($hostname)
+{
+    $hostname=nfsen_hostname($hostname);
+
+    foreach (Config::get('nfsen_base') as $base_dir) {
+        if (file_exists($base_dir) && is_dir($base_dir)) {
+            return $base_dir.'/profiles-data/live/'.$hostname;
+        }
+    }
+}
