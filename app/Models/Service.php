@@ -3,11 +3,34 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Service extends DeviceRelatedModel
+class Service extends DeviceRelatedModel implements Keyable
 {
     public $timestamps = false;
     protected $primaryKey = 'service_id';
+
+    protected $fillable = [
+        'service_id',
+        'device_id',
+        'service_ip',
+        'service_type',
+        'service_desc',
+        'service_param',
+        'service_ignore',
+        'service_status',
+        'service_changed',
+        'service_message',
+        'service_disabled',
+        'service_ds',
+    ];
+
+    // ---- Helper Functions ----
+
+    public function getCompositeKey()
+    {
+        return $this->service_id . '-' . $this->device_id;
+    }
 
     // ---- Query Scopes ----
 
