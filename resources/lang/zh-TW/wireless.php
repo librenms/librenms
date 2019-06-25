@@ -12,7 +12,7 @@ return [
     */
 
     'ap-count' => [
-        'short' => 'APs',
+        'short' => 'AP 數量',
         'long' => 'AP 數量',
         'unit' => '',
     ],
@@ -62,8 +62,8 @@ return [
         'unit' => 'dB',
     ],
     'noise-floor' => [
-        'short' => 'Noise Floor',
-        'long' => 'Noise Floor',
+        'short' => '背景雜訊',
+        'long' => '背景雜訊',
         'unit' => 'dBm/Hz',
     ],
     'power' => [
