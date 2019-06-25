@@ -964,9 +964,9 @@ snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 
 ##### SNMP Extend
 
-1. Install
-   [Device::RAID::Poller](https://github.com/VVelox/Device-RAID-Poller)
-   onto the machine in question.
+1: Install 
+[Device::RAID::Poller](https://github.com/VVelox/Device-RAID-Poller)
+onto the machine in question.
 
 CentOS:
 
@@ -989,8 +989,8 @@ pkg install perl5 p5-JSON p5-Error-Helper
 cpan Device::RAID::Poller
 ```
 
-2. Add the extend in question to sndmpd.conf in a manner similar to as
-   below.
+2: Add the extend in question to sndmpd.conf in a manner similar to as
+below.
 
 ```
 extend raid-drp /usr/local/bin/sudo /usr/local/bin/check_raid -p
@@ -1002,7 +1002,7 @@ If you need to use sudo with it, be use to also set it up akin to below.
 snmpd ALL = NOPASSWD: /usr/local/bin/check_raid
 ```
 
-3. Enable the RAID-DRP app for the device in question in LibreNMS.
+3: Enable the RAID-DRP app for the device in question in LibreNMS.
 
 ##### Metrics
 
