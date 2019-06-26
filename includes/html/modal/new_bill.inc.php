@@ -44,12 +44,18 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                         <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
                             <option value=''>Select a device</option>
                             <?php
-                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
-                            foreach ($devices as $device) {
-                                $selected = $device['device_id'] == $port_device_id ? " selected" : "";
-                                echo "<option value='${device['device_id']}' $selected>${device['hostname']}</option>\n";
-                            }
-                                ?>
+                              $display_field = 'hostname';
+
+                              if (\LibreNMS\Config::get('force_ip_to_sysname') === true) {
+                                  $display_field = 'sysName';
+                              }
+
+                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY ?', array($display_field));
+                              foreach ($devices as $device) {
+                                  $selected = $device['device_id'] == $port_device_id ? " selected" : "";
+                                  echo "<option value='${device['device_id']}' $selected>".format_hostname($device)."</option>\n";
+                              }
+                            ?>
                         </select>
                     </div>
                 </div>
