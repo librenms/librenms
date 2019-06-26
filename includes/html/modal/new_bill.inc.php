@@ -50,7 +50,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                                   $display_field = 'sysName';
                               }
 
-                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY ?', array($display_field));
+                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY ?', array($sort_field));
                               foreach ($devices as $device) {
                                   $selected = $device['device_id'] == $port_device_id ? " selected" : "";
                                   echo "<option value='${device['device_id']}' $selected>".format_hostname($device)."</option>\n";
