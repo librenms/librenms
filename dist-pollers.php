@@ -47,8 +47,8 @@ if (isset($options['l'])) {
         echo 'Poller '.$options['u']." has been removed\n";
     }
 } elseif (isset($options['r'])) {
-    if (dbInsert(['poller_name' => Config::get('base_url'), 'last_polled' => '0000-00-00 00:00:00', 'devices' => 0, 'time_taken' => 0], 'pollers') >= 0) {
-        echo 'Poller ' . Config::get('base_url') . " has been registered\n";
+    if (dbInsert(['poller_name' => Config::get('distributed_poller_name'), 'last_polled' => '0000-00-00 00:00:00', 'devices' => 0, 'time_taken' => 0], 'pollers') >= 0) {
+        echo 'Poller ' . Config::get('distributed_poller_name') . " has been registered\n";
     }
 } else {
     echo "-l pollers | groups List registered pollers or poller groups\n";
