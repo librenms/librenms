@@ -47,6 +47,7 @@ Artisan::command('device:add
     {--P|ping-only : ' . __('Add a ping only device') . '}
     {--o|os=ping : ' . __('Ping only: specify OS') . '}
     {--w|hardware= : ' . __('Ping only: specify hardware') . '}
+    {--s|sysName= : ' . __('Ping only: specify sysName') . '}
 ', function () {
     /** @var \Illuminate\Console\Command $this */
     // Value Checks
@@ -75,6 +76,7 @@ Artisan::command('device:add
     $additional = [
         'os' => $this->option('os'),
         'hardware' => $this->option('hardware'),
+        'sysName' => $this->option('sysName'),
     ];
     if ($this->option('ping-only')) {
         $additional['snmp_disable'] = 1;
