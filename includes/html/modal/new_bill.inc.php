@@ -47,7 +47,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                               $sort_field = 'hostname';
 
                               if (\LibreNMS\Config::get('force_ip_to_sysname') === true) {
-                                  $display_field = 'sysName';
+                                  $sort_field = 'sysName';
                               }
 
                               $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY ?', array($sort_field));
