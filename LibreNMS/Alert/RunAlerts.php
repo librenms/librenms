@@ -30,16 +30,8 @@
 
 namespace LibreNMS\Alert;
 
-use App\Models\Device;
 use App\Models\DevicePerf;
-use LibreNMS\Alert\Template;
-use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDB;
-use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
-use PHPMailer\PHPMailer\PHPMailer;
 use LibreNMS\Util\Time;
 use Log;
 
@@ -389,7 +381,7 @@ class RunAlerts
      * Run all alerts
      * @return void
      */
-    public function __construct()
+    public function runAlerts()
     {
         foreach ($this->loadAlerts('alerts.state != 2 && alerts.open = 1') as $alert) {
             $noiss            = false;
@@ -407,10 +399,11 @@ class RunAlerts
                 $noiss = true;
             }
 
+            $tolerence_window = Config::get('alert.tolerance_window');
             if (!empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
                 if (!empty($rextra['delay'])) {
-                    if ((time() - strtotime($alert['time_logged']) + Config::get('alert.tolerance_window')) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + Config::get('alert.tolerance_window')) < $rextra['delay'])) {
+                    if ((time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $tolerence_window) < $rextra['delay'])) {
                         continue;
                     } else {
                         $alert['details']['delay'] = time();
@@ -428,12 +421,12 @@ class RunAlerts
                 }
             } else {
                 // This is the new way
-                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + Config::get('alert.tolerance_window')) < $rextra['delay']) {
+                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay']) {
                     continue;
                 }
 
                 if (!empty($rextra['interval'])) {
-                    if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + Config::get('alert.tolerance_window')) < $rextra['interval']) {
+                    if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $tolerence_window) < $rextra['interval']) {
                         continue;
                     } else {
                         $alert['details']['interval'] = time();

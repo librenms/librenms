@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Alert;
 
-use LibreNMS\Config;
 use App\Models\Device;
-use PHPMailer\PHPMailer\PHPMailer;
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class AlertUtil
 {
@@ -163,12 +163,13 @@ class AlertUtil
         }
 
         # Copy all email alerts to default contact if configured.
-        if (!isset($tmp_contacts[Config::get('alert.default_mail')]) && (Config::get('alert.default_copy'))) {
-            $tmp_contacts[Config::get('alert.default_mail')] = '';
+        $default_mail = Config::get('alert.default_mail');
+        if (!isset($tmp_contacts[$default_mail]) && Config::get('alert.default_copy')) {
+            $tmp_contacts[$default_mail] = '';
         }
         # Send email to default contact if no other contact found
-        if ((count($tmp_contacts) == 0) && (Config::get('alert.default_if_none')) && (!empty(Config::get('alert.default_mail')))) {
-            $tmp_contacts[Config::get('alert.default_mail')] = '';
+        if (empty($tmp_contacts) && Config::get('alert.default_if_none') && $default_mail) {
+            $tmp_contacts[$default_mail] = '';
         }
 
         return $tmp_contacts;
@@ -193,7 +194,7 @@ class AlertUtil
      */
     public static function isMaintenance($device_id)
     {
-        $device = \App\Models\Device::find($device_id);
+        $device = Device::find($device_id);
         return !is_null($device) && $device->isUnderMaintenance();
     }
 
