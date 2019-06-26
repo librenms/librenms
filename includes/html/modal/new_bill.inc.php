@@ -44,7 +44,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                         <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
                             <option value=''>Select a device</option>
                             <?php
-                              $display_field = 'hostname';
+                              $sort_field = 'hostname';
 
                               if (\LibreNMS\Config::get('force_ip_to_sysname') === true) {
                                   $display_field = 'sysName';
