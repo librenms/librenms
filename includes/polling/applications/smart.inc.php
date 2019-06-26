@@ -40,9 +40,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('conveyance', 'GAUGE', 0)
     ->addDataset('selective', 'GAUGE', 0);
 
+$int=0;
 $metrics = array();
 
-$int=0;
 while (isset($lines[$int])) {
     list($disk, $id5, $id10, $id173, $id177, $id183, $id184, $id187, $id188, $id190, $id194,
         $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
