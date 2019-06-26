@@ -42,7 +42,6 @@ $rrd_def = RrdDefinition::make()
 
 $int=0;
 $metrics = array();
-
 while (isset($lines[$int])) {
     list($disk, $id5, $id10, $id173, $id177, $id183, $id184, $id187, $id188, $id190, $id194,
         $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
@@ -135,7 +134,6 @@ while (isset($lines[$int])) {
 
 
 # smart enhancement id9
-
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
     ->addDataset('id9', 'GAUGE', 0);
@@ -144,17 +142,11 @@ $int=0;
 while (isset($lines[$int])) {
     list($disk, , , , , , , , , , , , , , , , , , , , , , , , , $id9)=explode(",", $lines[$int]);
 
-    if (is_int($id9)) {
-        $id=null;
-    }
-
     $rrd_name = array('app', $name.'_id9', $app_id, $disk);
 
-    $fields = array(
-        'id9'=>$id9
-    );
-
-    $metrics[$disk] = array_merge($metrics[$disk], $fields);
+    $fields = ['id9' => $id9];
+    $metrics[$disk]['id9'] = $id9;
+    
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
     data_update($device, 'app', $tags, $fields);
 
