@@ -29,6 +29,7 @@ use App\Models\Ipv4Address;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\LaravelTestCase;
+use Log;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class EdgeCosFailedUserLoginTest extends LaravelTestCase
