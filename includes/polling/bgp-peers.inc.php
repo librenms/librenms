@@ -103,7 +103,11 @@ if (\LibreNMS\Config::get('enable_bgp')) {
 
                         $peer_data = [];
                         $peer_data['bgpPeerState'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgConnState'];
-                        $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperLastEvent']; // not exactly the same
+                        if ($bgpPeers[$vrfOid][$address]['tBgpPeerNgShutdown'] == '1') {
+                            $peer_data['bgpPeerAdminStatus'] = 'adminShutdown';
+                        } else {
+                            $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperLastEvent'];
+                        }
                         $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsRcvd'];  // That are actually only octets available,
                         $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent']; // not messages
                         $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
