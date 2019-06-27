@@ -213,7 +213,7 @@ A big thank you to the following 28 contributors this last month:
 * Add 'software-properties-common' ([#10092](https://github.com/librenms/librenms/pull/10092)) - [LeoWinterDE](https://github.com/LeoWinterDE)
 
 
-##1.51
+## 1.51
 *(2019-04-29)*
 
 A big thank you to the following 29 contributors this last month:
@@ -332,7 +332,7 @@ A big thank you to the following 29 contributors this last month:
 * Update json error message to show how to debug. ([#9998](https://github.com/librenms/librenms/pull/9998)) - [murrant](https://github.com/murrant)
 
 
-##1.50
+## 1.50
 *(2019-03-31)*
 
 A big thank you to the following 31 contributors this last month:
@@ -487,7 +487,7 @@ A big thank you to the following 31 contributors this last month:
 * Added resources/sensors api call to list all sensors ([#9837](https://github.com/librenms/librenms/pull/9837)) - [zombah](https://github.com/zombah)
 
 
-##1.49
+## 1.49
 *(2019-03-03)*
 
 A big thank you to the following 36 contributors this last month:
@@ -626,7 +626,7 @@ A big thank you to the following 36 contributors this last month:
 * Fix alert log api ([#9792](https://github.com/librenms/librenms/pull/9792)) - [murrant](https://github.com/murrant)
 
 
-##1.49
+## 1.49
 *(2019-03-03)*
 
 A big thank you to the following 36 contributors this last month:
@@ -752,7 +752,7 @@ A big thank you to the following 36 contributors this last month:
 * Fix alert log api ([#9792](https://github.com/librenms/librenms/pull/9792)) - [murrant](https://github.com/murrant)
 
 
-##1.48
+## 1.48
 *(2019-01-28)*
 
 A big thank you to the following 31 contributors this last month:
@@ -889,7 +889,7 @@ A big thank you to the following 31 contributors this last month:
 * Reference config options for new beta poller service ([#9644](https://github.com/librenms/librenms/pull/9644)) - [Swashy](https://github.com/Swashy)
 
 
-##1.47
+## 1.47
 *(2018-12-30)*
 
 A big thank you to the following 28 contributors this last month:
@@ -1006,7 +1006,7 @@ A big thank you to the following 28 contributors this last month:
 * Escape SNMP & IPMI shell commands ([#9537](https://github.com/librenms/librenms/pull/9537)) - [murrant](https://github.com/murrant)
 
 
-##1.46
+## 1.46
 *(2018-12-02)*
 
 A big thank you to the following 38 contributors this last month:
@@ -1121,7 +1121,7 @@ A big thank you to the following 38 contributors this last month:
 * Added list_links and get_link api calls ([#9444](https://github.com/librenms/librenms/pull/9444)) - [zombah](https://github.com/zombah)
 
 
-##1.45
+## 1.45
 *(2018-10-28)*
 
 A big thank you to the following 25 contributors this last month:
@@ -1202,7 +1202,7 @@ A big thank you to the following 25 contributors this last month:
 #### Security
 * Attempt to escape services commands properly. ([#9269](https://github.com/librenms/librenms/pull/9269)) - [murrant](https://github.com/murrant)
 
-##1.44
+## 1.44
 *(2018-10-17)*
 
 A big thank you to the following 31 contributors this last month:
@@ -1365,7 +1365,7 @@ A big thank you to the following 31 contributors this last month:
 #### Security
 * Sanitize data in dashboard add/edit/delete ([#9171](https://github.com/librenms/librenms/pull/9171)) - [murrant](https://github.com/murrant)
 
-###1.43
+### 1.43
 *(2018-08-30)*
 
 A big thank you to the following 29 contributors this last month:
@@ -1499,7 +1499,7 @@ A big thank you to the following 29 contributors this last month:
 #### Breaking Changes
 * Fixed slack options not showing in the WebUI. This will cause a loss of options ([#9107](https://github.com/librenms/librenms/pull/9107)) - [laf](https://github.com/laf) 
 
-##1.42
+## 1.42
 *(2018-08-02)*
 
 A big thank you to the following 25 contributors this last month:
@@ -1598,7 +1598,7 @@ A big thank you to the following 25 contributors this last month:
 * Add sysDescr and hardware for oxidized overrides ([#8885](https://github.com/librenms/librenms/pull/8885)) - [empi89](https://github.com/empi89)
 * Fix api list devices query for normal users ([#8881](https://github.com/librenms/librenms/pull/8881)) - [murrant](https://github.com/murrant)
 
-##1.41
+## 1.41
 *(2018-06-30)*
 
 A big thank you to the following 23 contributors this last month:
@@ -1672,7 +1672,7 @@ A big thank you to the following 23 contributors this last month:
 * Add if label docs to os settings ([#8779](https://github.com/librenms/librenms/pull/8779)) - [murrant](https://github.com/murrant)
 * Added OpsGenie integration ([#8786](https://github.com/librenms/librenms/pull/8786)) - [serhatcan](https://github.com/serhatcan)
 
-##1.40
+## 1.40
 *(2018-05-30)*
 
 A big thank you to the following 24 contributors this last month:
