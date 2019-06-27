@@ -2,6 +2,10 @@
 
 @section('form')
     <div class="form-group row">
+        <label for="title-{{ $id }}" class="control-label">@lang('Widget title')</label>
+        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Custom title')" value="{{ $title }}">
+    </div>
+    <div class="form-group row">
         <label for="acknowledged-{{ $id }}" class="control-label">@lang('Show acknowledged'):</label>
         <select class="form-control" name="acknowledged" id="acknowledged-{{ $id }}">
             <option value="">@lang('not filtered')</option>
