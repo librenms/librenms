@@ -40,6 +40,9 @@ class Dummy extends Transport
 
     public static function configTemplate()
     {
-        return [];
+        return [
+            'validation' => [],
+            'config' => [],
+        ];
     }
 }

@@ -112,18 +112,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
 
     $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
-    if ($graph_type == 'sensor_state') {
-        // If we have a state, let's display a label with textual state translation
-        $state_translation = array();
-        $state_translation = dbFetchRows('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
-
-        //$current_label = get_state_label_color($sensor);
-        $sensor_current = get_state_label($state_translation['0']['state_generic_value'], (!empty($state_translation['0']['state_descr'])) ? $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")" : $sensor['sensor_current']);
-    } else {
-        // we have another sensor
-        $current_label = get_sensor_label_color($sensor);
-        $sensor_current = "<span class='label $current_label'>".format_si($sensor['sensor_current']).$unit."</span>";
-    }
+    $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
 
     $response[] = array(
         'hostname'         => generate_device_link($sensor),

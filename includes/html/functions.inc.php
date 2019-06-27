@@ -1589,92 +1589,52 @@ function get_device_name($device)
  * Returns state generic label from value with optional text
  */
 
-function get_state_label($state_value, $state_text_param = null)
+function get_state_label($sensor)
 {
-    switch ($state_value) {
+    $state_translation = dbFetchRow('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
+
+    switch ($state_translation['state_generic_value']) {
         case 0:  // OK
-            $state_text = (is_null($state_text_param) ? "OK": $state_text_param);
+            $state_text = $state_translation['state_descr'] ?: "OK";
             $state_label = "label-success";
             break;
         case 1:  // Warning
-            $state_text = (is_null($state_text_param) ? "Warning": $state_text_param);
+            $state_text = $state_translation['state_descr'] ?: "Warning";
             $state_label = "label-warning";
             break;
         case 2:  // Critical
-            $state_text = (is_null($state_text_param) ? "Critical": $state_text_param);
+            $state_text = $state_translation['state_descr'] ?: "Critical";
             $state_label = "label-danger";
             break;
-        case 3:// Unknown
+        case 3:  // Unknown
         default:
-            $state_text = (is_null($state_text_param) ? "Unknown": $state_text_param);
+            $state_text = $state_translation['state_descr'] ?: "Unknown";
             $state_label = "label-default";
     }
-    $state = "<span class='label $state_label'>$state_text</span>";
-    return $state;
+    return "<span class='label $state_label'>$state_text</span>";
 }
 
 /**
- * Get state label color
+ * Get sensor label and state color
  */
 function get_sensor_label_color($sensor)
 {
-    $current_label_color = "label-success";
+    $label_style = "label-success";
     if (is_null($sensor)) {
         return "label-unknown";
     }
     if (!is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
-        $current_label_color = "label-warning";
+        $label_style = "label-warning";
     }
     if (!is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
-        $current_label_color = "label-warning";
+        $label_style = "label-warning";
     }
     if (!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
-        $current_label_color = "label-danger";
+        $label_style = "label-danger";
     }
     if (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
-        $current_label_color = "label-danger";
+        $label_style = "label-danger";
     }
-
-    return $current_label_color;
-}
-
-/**
- * Get the unit for the sensor class given as parameter
- * @param $class
- * @return string The unit
- */
-function get_unit_for_sensor_class($class)
-{
-    $units_by_classes = array(
-        'ber'                  => '',
-        'charge'               => '%',
-        'chromatic_dispersion' => 'ps/nm',
-        'cooling'              => 'W',
-        'count'                => '',
-        'current'              => 'A',
-        'dbm'                  => 'dBm',
-        'delay'                => 's',
-        'eer'                  => '',
-        'fanspeed'             => 'rpm',
-        'frequency'            => 'Hz',
-        'humidity'             => '%',
-        'load'                 => '%',
-        'power'                => 'W',
-        'power_consumed'       => 'kWh',
-        'power_factor'         => '',
-        'pressure'             => 'kPa',
-        'quality_factor'       => 'dB',
-        'signal'               => 'dBm',
-        'snr'                  => 'dB',
-        'state'                => '',
-        'temperature'          => '&deg;C',
-        'voltage'              => 'V',
-        'waterflow'            => 'l/m',
-    );
-
-    if (!array_key_exists($class, $units_by_classes)) {
-        return '';
-    }
-
-    return $units_by_classes[$class];
+    $unit = __('sensors.' . $sensor['sensor_class'] . '.unit');
+    return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
 }
