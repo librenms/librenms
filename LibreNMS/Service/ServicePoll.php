@@ -25,12 +25,11 @@
 
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Service\ServiceDB;
+use LibreNMS\Config;
 use Log;
 
 Class ServicePoll
 {
-
-    global $config;
 
     /**
      * Makes a service poll for a device
@@ -45,14 +44,14 @@ Class ServicePoll
 
         // if we have a script for this check, use it.
         // TODO convert individual scripts into classes, maybe similar to snmp trap handlers.
-        $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($service['service_type']).'.inc.php';
+        $check_script = Cnfig::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
         if (is_file($check_script)) {
             include $check_script;
         }
 
         // If we do not have a cmd from the check script, build one.
         if ($check_cmd == "") {
-            $check_cmd = $config['nagios_plugins'] . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
+            $check_cmd = Config::get('nagios_plugins') . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
             $check_cmd .= " " . $service['service_param'];
         }
 
