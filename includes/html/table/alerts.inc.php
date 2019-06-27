@@ -14,6 +14,7 @@
 */
 
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 $where = ' `devices`.`disabled` = 0';
 
@@ -155,7 +156,11 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $severity .= ' <strong>-</strong>';
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
+    if (Config::get('alert_sysname')) {
+        $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<br />' . $alert['sysName'] . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
+    } else {
+        $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
+    }
 
     switch ($severity) {
         case 'critical':
