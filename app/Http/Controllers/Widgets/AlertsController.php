@@ -32,6 +32,7 @@ class AlertsController extends WidgetController
 {
     protected $title = 'Alerts';
     protected $defaults = [
+        'title' => null,
         'device' => null,
         'acknowledged' => null,
         'fired' => null,
