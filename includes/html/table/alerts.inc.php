@@ -203,6 +203,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(array('page' => 'alert-rules')) . '">' . htmlentities($alert['name']) . '</a></i>',
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
         'hostname' => $hostname,
+        'location' => $alert['location'],
         'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],
