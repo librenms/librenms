@@ -138,7 +138,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     } elseif ((int)$alert['state'] === 1 || (int)$alert['state'] === 3 || (int)$alert['state'] === 4) {
         if ((int)$alert['state'] === 3) {
             $msg = '<i class="fa fa-angle-double-down" style="font-size:20px;" aria-hidden="true" title="Status got worse"></i>';
-        } elseif ((int)$alert['state'] === 4) {
+         } elseif ((int)$alert['state'] === 4) {
             $msg = '<i class="fa fa-angle-double-up" style="font-size:20px;" aria-hidden="true" title="Status got better"></i>';
         }
     } elseif ((int)$alert['state'] === 2) {
@@ -203,7 +203,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(array('page' => 'alert-rules')) . '">' . htmlentities($alert['name']) . '</a></i>',
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
         'hostname' => $hostname,
-        'location' => $alert['location'],
+        'location' => generate_link($alert['location'], array('page' => 'devices', 'location' => $alert['location'])),
         'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],
