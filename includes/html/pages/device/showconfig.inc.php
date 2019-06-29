@@ -318,7 +318,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
     if (!empty($text)) {
         if (isset($previous_config)) {
             $language = 'diff';
-        } else if ($device['os'] == 'pfsense') {
+        } elseif ($device['os'] == 'pfsense') {
             $language = 'xml';
         } else {
             $language = 'ios';
