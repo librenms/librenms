@@ -323,7 +323,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
         } else {
             $language = 'ios';
         }
-        $geshi = new GeSHi($text, $language);
+        $geshi = new GeSHi(htmlspecialchars_decode($text), $language);
         $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
         // $geshi->set_line_style('color: #999999');
