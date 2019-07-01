@@ -30,7 +30,7 @@ use LibreNMS\DB\Eloquent;
 class Version
 {
     // Update this on release
-    const VERSION = '1.52';
+    const VERSION = '1.53';
 
     protected $is_git_install = false;
 
