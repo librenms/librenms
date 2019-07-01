@@ -138,7 +138,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     } elseif ((int)$alert['state'] === 1 || (int)$alert['state'] === 3 || (int)$alert['state'] === 4) {
         if ((int)$alert['state'] === 3) {
             $msg = '<i class="fa fa-angle-double-down" style="font-size:20px;" aria-hidden="true" title="Status got worse"></i>';
-         } elseif ((int)$alert['state'] === 4) {
+        } elseif ((int)$alert['state'] === 4) {
             $msg = '<i class="fa fa-angle-double-up" style="font-size:20px;" aria-hidden="true" title="Status got better"></i>';
         }
     } elseif ((int)$alert['state'] === 2) {
