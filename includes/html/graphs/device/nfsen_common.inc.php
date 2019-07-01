@@ -2,13 +2,7 @@
 
 $simple_rrd = true;
 
-
-$nfsen_rrds_array=\LibreNMS\Config::get('nfsen_rrds');
-if (!is_array($nfsen_rrds_array)) {
-    $nfsen_rrds_array = array(\LibreNMS\Config::get('nfsen_rrds'));
-}
-
-foreach ($nfsen_rrds_array as $nfsenrrds) {
+foreach ((array)\LibreNMS\Config::get('nfsen_rrds', []) as $nfsenrrds) {
     if ($nfsenrrds[(strlen($nfsenrrds) - 1)] != '/') {
         $nfsenrrds .= '/';
     }
