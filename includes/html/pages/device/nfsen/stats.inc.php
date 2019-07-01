@@ -8,10 +8,7 @@ echo 'Top N:
 <select name="topN" id="topN" size=1>
 ';
 
-$option_default=\LibreNMS\Config::get('nfsen_top_default');
-if (isset($vars['topN'])) {
-    $option_default=$vars['topN'];
-}
+$option_default = $vars['topN'] ?? \LibreNMS\Config::get('nfsen_top_default');
 
 $option_int=0;
 foreach (\LibreNMS\Config::get('nfsen_top_N') as $option) {
@@ -27,11 +24,6 @@ echo '
 During the last:
 <select name="lastN" id="lastN" size=1>
 ';
-
-$option_default=\LibreNMS\Config::get('nfsen_last_default');
-if (isset($vars['lastN'])) {
-    $option_default=$vars['lastN'];
-}
 
 $option_keys=array_keys(\LibreNMS\Config::get('nfsen_lasts'));
 $options=\LibreNMS\Config::get('nfsen_lasts');
@@ -49,10 +41,7 @@ echo '
 <select name="stattype" id="StatTypeSelector" size=1>
 ';
 
-$option_default=\LibreNMS\Config::get('nfsen_stat_default');
-if (isset($vars['stattype'])) {
-    $option_default=$vars['stattype'];
-}
+$option_default = $vars['stattype'] ?? \LibreNMS\Config::get('nfsen_stats_default');
 
 $stat_types=array(
     'record'=>'Flow Records',
