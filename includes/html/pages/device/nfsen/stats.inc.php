@@ -151,8 +151,8 @@ if (isset($vars['process'])) {
         $stat_type=$vars['stattype'];
     }
 
-    $current_time=lowest_five_minutes(time() - 300);
-    $last_time=lowest_five_minutes($current_time - $lastN - 300);
+    $current_time=lowest_time(time() - 300);
+    $last_time=lowest_time($current_time - $lastN - 300);
 
     $command=\LibreNMS\Config::get('nfdump').' -M '.nfsen_live_dir($device['hostname']).' -T -R '.
              time_to_nfsen_subpath($last_time).':'.time_to_nfsen_subpath($current_time).

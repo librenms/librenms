@@ -34,7 +34,7 @@ function var_eq($v, $t)
 /**
  * Get the value of $vars[$v], if it exists
  * @param string $v Name of the var to get
- * @return string|boolean The value of $vars[$v] if it exists, false if it does not exist
+ * @return string|boolean The value of $vars[$v] if it exists, false if it does not existhttps://static1.e621.net/data/23/6f/236f42f64c81fc264f927e64978ef7f6.jpg
  */
 function var_get($v)
 {
@@ -572,7 +572,7 @@ function generate_sensor_url($sensor, $vars = array())
     return generate_url(array('page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => Config::get('time.day')), $vars);
 }//end generate_sensor_url()
 
- 
+
 function generate_port_url($port, $vars = array())
 {
     return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
@@ -1680,19 +1680,21 @@ function get_unit_for_sensor_class($class)
 }
 
 /**
- * Rounds down to the closest number divisible by 5.
+ * @params int unix time
+ * @params int seconds
+ * @return int
+ *
+ * Rounds down to the nearest interval.
+ *
+ * The first argument is required and it is the unix time being
+ * rounded down.
+ *
+ * The second value is the time interval. If not specified, it
+ * defaults to 300, or 5 minutes.
  */
-function lowest_five($number)
+function lowest_time($time, $seconds = 300)
 {
-    return floor($number / 5) * 5;
-}
-
-/**
- * Rounds down to the nearest 5 minutes if using seconds.
- */
-function lowest_five_minutes($time)
-{
-    return $time - ($time % 300);
+    return $time - ($time % $seconds);
 }
 
 /**
@@ -1720,7 +1722,7 @@ function lowest_five_minutes($time)
  */
 function time_to_nfsen_subpath($time)
 {
-    $time=lowest_five_minutes($time);
+    $time=lowest_time($time);
     $layout=Config::get('nfsen_subdirlayout');
 
     if ($layout == 0) {
