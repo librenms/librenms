@@ -1748,57 +1748,6 @@ function time_to_nfsen_subpath($time)
 
 /**
  * @params string hostname
- * @return array
- *
- * Returns a list of channels/rrds for a specified hostname. The
- * keys for the string are channel names and the values are is the
- * path to the RRD for the channel.
-*/
-function nfsen_channel_rrds($hostname)
-{
-    $channels=array();
-
-    // If we don't have a hostname, return a empty array... nothing has no rrds
-    if (!isset($hostname)) {
-        return $channels;
-    }
-
-    // Turn the hostname into the one used in nfsen.
-    $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
-
-    // If there is no nfsen_rrds set, check to see if nfsen_base
-    // is set and built the path off of that.
-    if (is_null(Config::get('nfsen_rrds'))) {
-        $nfsen_rrd_dirs=Config::get('nfsen_rrds');
-    } else {
-        // If we don't have this, then return a empty array as it
-        // obviously is not in use and does not have any.
-        if (!is_null(Config::get('nfsen_base'))) {
-            return $channels;
-        }
-        $nfsen_rrd_dirs=array(
-                              Config::get('nfsen_base').'/profiles-stat/live/',
-                              Config::get('nfsen_base').'/profiles-stat/'
-                              );
-    }
-
-    foreach ($nfsen_rrd_dirs as $nfsen_dir) {
-        $host_dir=$nfsen_dir.'/'.$nfsen_hostname.'/';
-
-        if (is_dir($host_dir)) {
-            $nfsen_RRD_channel_glob=$host_dir.'*.rrd';
-            foreach (glob($nfsen_RRD_channel_glob) as $nfsen_RRD) {
-                $channel = str_replace(array($host_dir, '.rrd'), '', $nfsen_RRD);
-
-                $channels[$channel]=$nfsen_dir.$channel.'.rrd';
-            }
-        }
-    }
-
-    return $channels;
-}
-/**
- * @params string hostname
  * @return string
  *
  * Takes a hostname and transforms it to the name
