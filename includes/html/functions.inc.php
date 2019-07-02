@@ -34,7 +34,7 @@ function var_eq($v, $t)
 /**
  * Get the value of $vars[$v], if it exists
  * @param string $v Name of the var to get
- * @return string|boolean The value of $vars[$v] if it exists, false if it does not existhttps://static1.e621.net/data/23/6f/236f42f64c81fc264f927e64978ef7f6.jpg
+ * @return string|boolean The value of $vars[$v] if it exists, false if it does not exist
  */
 function var_get($v)
 {
