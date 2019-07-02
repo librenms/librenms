@@ -1143,7 +1143,7 @@ function version_info($remote = false)
         Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
     )), 1, 1)));
     $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec(
-        Config::get('snmpget', 'snmpget') . ' --version 2>&1'
+        Config::get('snmpget', 'snmpget') . ' -V 2>&1'
     )));
 
     return $output;
