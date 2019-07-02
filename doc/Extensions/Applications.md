@@ -790,7 +790,13 @@ The application should be auto-discovered as described at the top of the page. I
 ### Portactivity
 #### SNMP Extend
 
-1. Install the Perl module Parse::Netstat.
+1. Install the Perl module Parse::Netstat and optionally JSON when you want to use -P flag.
+
+##### Ubuntu 18
+```
+apt install libparse-netstat-perl
+apt install libjson-perl
+```
 
 2. Copy the Perl script to the desired host (the host must be added to LibreNMS devices)
 ```
