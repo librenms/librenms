@@ -1616,8 +1616,11 @@ function get_state_label($sensor)
 
 /**
  * Get sensor label and state color
+ * @param array $sensor
+ * @param string $type sensors or wireless
+ * @return string
  */
-function get_sensor_label_color($sensor)
+function get_sensor_label_color($sensor, $type = 'sensors')
 {
     $label_style = "label-success";
     if (is_null($sensor)) {
@@ -1635,6 +1638,6 @@ function get_sensor_label_color($sensor)
     if (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
         $label_style = "label-danger";
     }
-    $unit = __('sensors.' . $sensor['sensor_class'] . '.unit');
+    $unit = __("$type.{$sensor['sensor_class']}.unit");
     return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
 }
