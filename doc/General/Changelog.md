@@ -1,3 +1,133 @@
+## 1.53
+*(2019-07-01)*
+
+A big thank you to the following 28 contributors this last month:
+
+  - murrant (32)
+  - jozefrebjak (4)
+  - SourceDoctor (4)
+  - jasoncheng7115 (4)
+  - PipoCanaja (4)
+  - ckforum (3)
+  - VVelox (3)
+  - vitalisator (3)
+  - djamp42 (3)
+  - martijn-schmidt (3)
+  - llarian0 (2)
+  - JoshWeepie (2)
+  - kkrumm1 (2)
+  - TheGreatDoc (1)
+  - funzoneq (1)
+  - CirnoT (1)
+  - TheMysteriousX (1)
+  - Marlinc (1)
+  - daniviga (1)
+  - rkislov (1)
+  - StackOverBuffer (1)
+  - janyksteenbeek (1)
+  - p4k8 (1)
+  - Cormoran96 (1)
+  - tvcabomz (1)
+  - SniperVegeta (1)
+  - N-Mi (1)
+  - mjducharme (1)
+
+#### Feature
+* Allow sysName to be specified in lnms device:add for ping only ([#10381](https://github.com/librenms/librenms/pull/10381)) - [murrant](https://github.com/murrant)
+* Rewritten device groups (including static) ([#10295](https://github.com/librenms/librenms/pull/10295)) - [murrant](https://github.com/murrant)
+* Add MPLS Support ([#10263](https://github.com/librenms/librenms/pull/10263)) - [vitalisator](https://github.com/vitalisator)
+* Added aggregate config option to Billing 95th percentile calculations ([#10202](https://github.com/librenms/librenms/pull/10202)) - [llarian0](https://github.com/llarian0)
+
+#### Device
+* Create sensors.php and wireless.php for zh-TW ([#10368](https://github.com/librenms/librenms/pull/10368)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Nokia bgp admin status fix ([#10370](https://github.com/librenms/librenms/pull/10370)) - [vitalisator](https://github.com/vitalisator)
+* WIP - Added VRP SFPs thresholds and map entPhysical to ifIndexes ([#10355](https://github.com/librenms/librenms/pull/10355)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Aruba IAP: Fix Radio State Sensor ([#10335](https://github.com/librenms/librenms/pull/10335)) - [kkrumm1](https://github.com/kkrumm1)
+* Add raisecom os version, hardware and serial data ([#10336](https://github.com/librenms/librenms/pull/10336)) - [vitalisator](https://github.com/vitalisator)
+* Add power sensor for eaton ups ([#10306](https://github.com/librenms/librenms/pull/10306)) - [StackOverBuffer](https://github.com/StackOverBuffer)
+* Support for Fibernet XMUX4+ ([#10331](https://github.com/librenms/librenms/pull/10331)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Extend the Dell drac module to report CMC status and sensors ([#10310](https://github.com/librenms/librenms/pull/10310)) - [daniviga](https://github.com/daniviga)
+* Cisco UCOS Version and Feature Fix ([#10307](https://github.com/librenms/librenms/pull/10307)) - [djamp42](https://github.com/djamp42)
+* Add Ipoman power consumption support ([#10244](https://github.com/librenms/librenms/pull/10244)) - [Marlinc](https://github.com/Marlinc)
+* CIMC Version Fix ([#10284](https://github.com/librenms/librenms/pull/10284)) - [djamp42](https://github.com/djamp42)
+* Add a 'session' sensor for PanOS, SRX5800 Flow Accounting ([#8857](https://github.com/librenms/librenms/pull/8857)) - [TheMysteriousX](https://github.com/TheMysteriousX)
+* Convert OS mrv-od to yaml, discover more sensors, discover entity-physical ([#10266](https://github.com/librenms/librenms/pull/10266)) - [martijn-schmidt](https://github.com/martijn-schmidt)
+* Icotera support for 6400 and 6800 series. ([#9755](https://github.com/librenms/librenms/pull/9755)) - [funzoneq](https://github.com/funzoneq)
+* Added detection and sensors for Huawei SMU device ([#10267](https://github.com/librenms/librenms/pull/10267)) - [jozefrebjak](https://github.com/jozefrebjak)
+
+#### Webui
+* Use sensor labels for overview/inventory pages, refactor some html-page related code ([#10287](https://github.com/librenms/librenms/pull/10287)) - [martijn-schmidt](https://github.com/martijn-schmidt)
+* Add custom title to alert widget ([#10373](https://github.com/librenms/librenms/pull/10373)) - [djamp42](https://github.com/djamp42)
+* Add 2 css class graph - minigraph for bg color and other ([#10318](https://github.com/librenms/librenms/pull/10318)) - [ckforum](https://github.com/ckforum)
+* Improve UI of filter menu ([#10348](https://github.com/librenms/librenms/pull/10348)) - [JoshWeepie](https://github.com/JoshWeepie)
+* Sort Device Applications in Optionbar alphabetic ([#10324](https://github.com/librenms/librenms/pull/10324)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Update VMWare guest IDs ([#10338](https://github.com/librenms/librenms/pull/10338)) - [murrant](https://github.com/murrant)
+* Fix language select for new languages ([#10323](https://github.com/librenms/librenms/pull/10323)) - [murrant](https://github.com/murrant)
+* Fix smokeping graphs ([#10317](https://github.com/librenms/librenms/pull/10317)) - [murrant](https://github.com/murrant)
+* Change \<h2\>\</h1\> ? by span and class like the other ([#10305](https://github.com/librenms/librenms/pull/10305)) - [ckforum](https://github.com/ckforum)
+* Add overlib link css class for changing background color - Update Url.php ([#10300](https://github.com/librenms/librenms/pull/10300)) - [ckforum](https://github.com/ckforum)
+* WEB UI Changed color of Non Unicast Packets ([#10289](https://github.com/librenms/librenms/pull/10289)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Restore vminfo menu ([#10303](https://github.com/librenms/librenms/pull/10303)) - [murrant](https://github.com/murrant)
+* Fix global service count showing on device overview ([#10301](https://github.com/librenms/librenms/pull/10301)) - [murrant](https://github.com/murrant)
+* User Management: use url helpers ([#10288](https://github.com/librenms/librenms/pull/10288)) - [murrant](https://github.com/murrant)
+* Only allow mysql auth type to add users ([#10283](https://github.com/librenms/librenms/pull/10283)) - [murrant](https://github.com/murrant)
+* Don't show warning when ignored device is online (pingable) ([#10286](https://github.com/librenms/librenms/pull/10286)) - [CirnoT](https://github.com/CirnoT)
+* Store language select name in translation files ([#10272](https://github.com/librenms/librenms/pull/10272)) - [murrant](https://github.com/murrant)
+* Fixed Quick Graphs bug w/ Aggregate 95th code ([#10269](https://github.com/librenms/librenms/pull/10269)) - [llarian0](https://github.com/llarian0)
+
+#### Graphs
+* Fix atuc chan curr tx rate/atur chan curr tx rate ([#10383](https://github.com/librenms/librenms/pull/10383)) - [SniperVegeta](https://github.com/SniperVegeta)
+* Support relative time for graphs again ([#10359](https://github.com/librenms/librenms/pull/10359)) - [murrant](https://github.com/murrant)
+* Mdadm rrd graph fix ([#10312](https://github.com/librenms/librenms/pull/10312)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Removed broken POE graphing code ([#10188](https://github.com/librenms/librenms/pull/10188)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Applications
+* Sort arrays before storing them in a component ([#10329](https://github.com/librenms/librenms/pull/10329)) - [VVelox](https://github.com/VVelox)
+* Smart application database update fix ([#10378](https://github.com/librenms/librenms/pull/10378)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix an issue where the order may be random when adding values to the UPS-APC RRD ([#10375](https://github.com/librenms/librenms/pull/10375)) - [VVelox](https://github.com/VVelox)
+* Enhance smart to show power_on_hours also ([#10261](https://github.com/librenms/librenms/pull/10261)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Alerting
+* Fix Dummy alert transport ([#10379](https://github.com/librenms/librenms/pull/10379)) - [murrant](https://github.com/murrant)
+* Don't include time macros in field list ([#10299](https://github.com/librenms/librenms/pull/10299)) - [murrant](https://github.com/murrant)
+
+#### Security
+* Sanitize graph input ([#10276](https://github.com/librenms/librenms/pull/10276)) - [murrant](https://github.com/murrant)
+* Sanitize report name in pdf.php ([#10270](https://github.com/librenms/librenms/pull/10270)) - [murrant](https://github.com/murrant)
+
+#### Bug
+* Fix broken updates ([#10380](https://github.com/librenms/librenms/pull/10380)) - [murrant](https://github.com/murrant)
+* Fix mysql bug in cisco-sla module ([#10357](https://github.com/librenms/librenms/pull/10357)) - [tvcabomz](https://github.com/tvcabomz)
+* Check correct path for config in the installer ([#10333](https://github.com/librenms/librenms/pull/10333)) - [janyksteenbeek](https://github.com/janyksteenbeek)
+* Fix hytera_h2f bug ([#10281](https://github.com/librenms/librenms/pull/10281)) - [murrant](https://github.com/murrant)
+* Fix for RouterOS LLDP discovery ([#10265](https://github.com/librenms/librenms/pull/10265)) - [mjducharme](https://github.com/mjducharme)
+
+#### Documentation
+* Fix markdown in Changelog ([#10387](https://github.com/librenms/librenms/pull/10387)) - [N-Mi](https://github.com/N-Mi)
+* Update and fix link for Migrating from Observium ([#10377](https://github.com/librenms/librenms/pull/10377)) - [kkrumm1](https://github.com/kkrumm1)
+* Go through making lots of the docs more lint happy ([#10342](https://github.com/librenms/librenms/pull/10342)) - [VVelox](https://github.com/VVelox)
+* Remove guessed limits for some health sensors, documentation for sensor classes ([#10327](https://github.com/librenms/librenms/pull/10327)) - [martijn-schmidt](https://github.com/martijn-schmidt)
+* Fix multiple typos in SNMP Trap doc ([#10343](https://github.com/librenms/librenms/pull/10343)) - [JoshWeepie](https://github.com/JoshWeepie)
+* Split install steps into git clone and composer install ([#10249](https://github.com/librenms/librenms/pull/10249)) - [murrant](https://github.com/murrant)
+* Example SNMP Trap handler class ([#10311](https://github.com/librenms/librenms/pull/10311)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added configs of huawei devices into syslog.md ([#10309](https://github.com/librenms/librenms/pull/10309)) - [jozefrebjak](https://github.com/jozefrebjak)
+
+#### Translation
+* Update zh-TW ([#10391](https://github.com/librenms/librenms/pull/10391)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Update zh-TW ([#10361](https://github.com/librenms/librenms/pull/10361)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* French language support ([#10277](https://github.com/librenms/librenms/pull/10277)) - [Cormoran96](https://github.com/Cormoran96)
+* Traditional Chinese language support ([#10178](https://github.com/librenms/librenms/pull/10178)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Russian language update ([#10319](https://github.com/librenms/librenms/pull/10319)) - [rkislov](https://github.com/rkislov)
+* Ukrainian language support ([#10328](https://github.com/librenms/librenms/pull/10328)) - [p4k8](https://github.com/p4k8)
+* Enable menu translation ([#10298](https://github.com/librenms/librenms/pull/10298)) - [murrant](https://github.com/murrant)
+
+#### Misc
+* Use Config class instead of global ([#10339](https://github.com/librenms/librenms/pull/10339)) - [murrant](https://github.com/murrant)
+* Update dependencies ([#10325](https://github.com/librenms/librenms/pull/10325)) - [murrant](https://github.com/murrant)
+* Warn maintenance tasks are disabled ([#10273](https://github.com/librenms/librenms/pull/10273)) - [murrant](https://github.com/murrant)
+* Dispatcher Service: Remove duplicate polling complete message ([#10290](https://github.com/librenms/librenms/pull/10290)) - [murrant](https://github.com/murrant)
+
+
 ## 1.52
 *(2019-05-27)*
 
@@ -213,7 +343,7 @@ A big thank you to the following 28 contributors this last month:
 * Add 'software-properties-common' ([#10092](https://github.com/librenms/librenms/pull/10092)) - [LeoWinterDE](https://github.com/LeoWinterDE)
 
 
-##1.51
+## 1.51
 *(2019-04-29)*
 
 A big thank you to the following 29 contributors this last month:
@@ -332,7 +462,7 @@ A big thank you to the following 29 contributors this last month:
 * Update json error message to show how to debug. ([#9998](https://github.com/librenms/librenms/pull/9998)) - [murrant](https://github.com/murrant)
 
 
-##1.50
+## 1.50
 *(2019-03-31)*
 
 A big thank you to the following 31 contributors this last month:
@@ -381,7 +511,7 @@ A big thank you to the following 31 contributors this last month:
 * Fixed device missing from traps/new Log::event() ([#9963](https://github.com/librenms/librenms/pull/9963)) - [murrant](https://github.com/murrant)
 * Fixed Cisco OTV (array)cast issue creating empty adj. ([#9968](https://github.com/librenms/librenms/pull/9968)) - [PipoCanaja](https://github.com/PipoCanaja)
 * Improved support for Dantel Webmon ([#9977](https://github.com/librenms/librenms/pull/9977)) - [PipoCanaja](https://github.com/PipoCanaja)
-* Fixed inconsistent <h3> closed by </div> ([#9982](https://github.com/librenms/librenms/pull/9982)) - [amigne](https://github.com/amigne)
+* Fixed inconsistent \<h3\> closed by \</div\> ([#9982](https://github.com/librenms/librenms/pull/9982)) - [amigne](https://github.com/amigne)
 * Fixed install not connecting to DB ([#9984](https://github.com/librenms/librenms/pull/9984)) - [murrant](https://github.com/murrant)
 * Fixed mysql table engine validation ([#9989](https://github.com/librenms/librenms/pull/9989)) - [murrant](https://github.com/murrant)
 * Fixed device list down devices that have never been polled ([#9994](https://github.com/librenms/librenms/pull/9994)) - [murrant](https://github.com/murrant)
@@ -447,7 +577,7 @@ A big thank you to the following 31 contributors this last month:
 #### Webui
 * Allowed more characters in graph legend for interface names ([#9926](https://github.com/librenms/librenms/pull/9926)) - [PipoCanaja](https://github.com/PipoCanaja)
 * Corrected active_count for Alert icon color ([#9933](https://github.com/librenms/librenms/pull/9933)) - [PipoCanaja](https://github.com/PipoCanaja)
-* Fixed inconsistent <h3> closed by </div> ([#9982](https://github.com/librenms/librenms/pull/9982)) - [amigne](https://github.com/amigne)
+* Fixed inconsistent \<h3\> closed by \</div\> ([#9982](https://github.com/librenms/librenms/pull/9982)) - [amigne](https://github.com/amigne)
 * Fixed world map when location has been deleted that a device still references ([#9997](https://github.com/librenms/librenms/pull/9997)) - [murrant](https://github.com/murrant)
 * Improved Health limits display ([#10007](https://github.com/librenms/librenms/pull/10007)) - [amigne](https://github.com/amigne)
 * Added Panduit Eagle-I (was Sinetica) support ([#10014](https://github.com/librenms/librenms/pull/10014)) - [PipoCanaja](https://github.com/PipoCanaja)
@@ -487,7 +617,7 @@ A big thank you to the following 31 contributors this last month:
 * Added resources/sensors api call to list all sensors ([#9837](https://github.com/librenms/librenms/pull/9837)) - [zombah](https://github.com/zombah)
 
 
-##1.49
+## 1.49
 *(2019-03-03)*
 
 A big thank you to the following 36 contributors this last month:
@@ -626,7 +756,7 @@ A big thank you to the following 36 contributors this last month:
 * Fix alert log api ([#9792](https://github.com/librenms/librenms/pull/9792)) - [murrant](https://github.com/murrant)
 
 
-##1.49
+## 1.49
 *(2019-03-03)*
 
 A big thank you to the following 36 contributors this last month:
@@ -752,7 +882,7 @@ A big thank you to the following 36 contributors this last month:
 * Fix alert log api ([#9792](https://github.com/librenms/librenms/pull/9792)) - [murrant](https://github.com/murrant)
 
 
-##1.48
+## 1.48
 *(2019-01-28)*
 
 A big thank you to the following 31 contributors this last month:
@@ -889,7 +1019,7 @@ A big thank you to the following 31 contributors this last month:
 * Reference config options for new beta poller service ([#9644](https://github.com/librenms/librenms/pull/9644)) - [Swashy](https://github.com/Swashy)
 
 
-##1.47
+## 1.47
 *(2018-12-30)*
 
 A big thank you to the following 28 contributors this last month:
@@ -1006,7 +1136,7 @@ A big thank you to the following 28 contributors this last month:
 * Escape SNMP & IPMI shell commands ([#9537](https://github.com/librenms/librenms/pull/9537)) - [murrant](https://github.com/murrant)
 
 
-##1.46
+## 1.46
 *(2018-12-02)*
 
 A big thank you to the following 38 contributors this last month:
@@ -1121,7 +1251,7 @@ A big thank you to the following 38 contributors this last month:
 * Added list_links and get_link api calls ([#9444](https://github.com/librenms/librenms/pull/9444)) - [zombah](https://github.com/zombah)
 
 
-##1.45
+## 1.45
 *(2018-10-28)*
 
 A big thank you to the following 25 contributors this last month:
@@ -1202,7 +1332,7 @@ A big thank you to the following 25 contributors this last month:
 #### Security
 * Attempt to escape services commands properly. ([#9269](https://github.com/librenms/librenms/pull/9269)) - [murrant](https://github.com/murrant)
 
-##1.44
+## 1.44
 *(2018-10-17)*
 
 A big thank you to the following 31 contributors this last month:
@@ -1365,7 +1495,7 @@ A big thank you to the following 31 contributors this last month:
 #### Security
 * Sanitize data in dashboard add/edit/delete ([#9171](https://github.com/librenms/librenms/pull/9171)) - [murrant](https://github.com/murrant)
 
-###1.43
+### 1.43
 *(2018-08-30)*
 
 A big thank you to the following 29 contributors this last month:
@@ -1499,7 +1629,7 @@ A big thank you to the following 29 contributors this last month:
 #### Breaking Changes
 * Fixed slack options not showing in the WebUI. This will cause a loss of options ([#9107](https://github.com/librenms/librenms/pull/9107)) - [laf](https://github.com/laf) 
 
-##1.42
+## 1.42
 *(2018-08-02)*
 
 A big thank you to the following 25 contributors this last month:
@@ -1598,7 +1728,7 @@ A big thank you to the following 25 contributors this last month:
 * Add sysDescr and hardware for oxidized overrides ([#8885](https://github.com/librenms/librenms/pull/8885)) - [empi89](https://github.com/empi89)
 * Fix api list devices query for normal users ([#8881](https://github.com/librenms/librenms/pull/8881)) - [murrant](https://github.com/murrant)
 
-##1.41
+## 1.41
 *(2018-06-30)*
 
 A big thank you to the following 23 contributors this last month:
@@ -1672,7 +1802,7 @@ A big thank you to the following 23 contributors this last month:
 * Add if label docs to os settings ([#8779](https://github.com/librenms/librenms/pull/8779)) - [murrant](https://github.com/murrant)
 * Added OpsGenie integration ([#8786](https://github.com/librenms/librenms/pull/8786)) - [serhatcan](https://github.com/serhatcan)
 
-##1.40
+## 1.40
 *(2018-05-30)*
 
 A big thank you to the following 24 contributors this last month:
