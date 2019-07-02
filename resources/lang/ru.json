@@ -1,4 +1,5 @@
 {
+    "Shutdown": "Shutdown",
     "The :attribute must a valid IP address\/network or hostname.": ":attribute должен быть правильным IP адресом\/подсетью или именем устройства.",
     "Never polled": "Никогда не опрашивался",
     "This indicates the most likely endpoint switchport": "Это указывает на наиболее вероятый порт устройства",
