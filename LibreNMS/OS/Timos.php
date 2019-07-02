@@ -29,6 +29,9 @@ namespace LibreNMS\OS;
 
 use App\Models\MplsLsp;
 use App\Models\MplsLspPath;
+use App\Models\MplsSdp;
+use App\Models\MplsService;
+use App\Models\MplsSdpBind;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Polling\MplsPolling;
@@ -105,6 +108,109 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         return $paths;
     }
 
+    /**
+     * @return Collection MplsSdp objects
+     */
+    public function discoverMplsSdps()
+    {
+        $mplsSdpCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpInfoTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUst');
+
+        $sdps = collect();
+        foreach ($mplsSdpCache as $key => $value) {
+            if ((!empty($value['sdpFarEndInetAddress'])) && ($value['sdpFarEndInetAddressType'] == 'ipv4')) {
+                $ip = long2ip(hexdec(str_replace(' ', '', $value['sdpFarEndInetAddress'])));
+            } else {
+                #Fixme implement ipv6 conversion
+                $ip = $value['sdpFarEndInetAddress'];
+            }
+            $sdps->push(new MplsSdp([
+                'sdp_oid' => $value['sdpId'],
+                'device_id' => $this->getDeviceId(),
+                'sdpRowStatus' => $value['sdpRowStatus'],
+                'sdpDelivery' => $value['sdpDelivery'],
+                'sdpDescription' => $value['sdpDescription'],
+                'sdpAdminStatus' => $value['sdpAdminStatus'],
+                'sdpOperStatus' => $value['sdpOperStatus'],
+                'sdpAdminPathMtu' => $value['sdpAdminPathMtu'],
+                'sdpOperPathMtu' => $value['sdpOperPathMtu'],
+                'sdpLastMgmtChange' => round($value['sdpLastMgmtChange'] / 100),
+                'sdpLastStatusChange' => round($value['sdpLastStatusChange'] / 100),
+                'sdpActiveLspType' => $value['sdpActiveLspType'],
+                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'],
+                'sdpFarEndInetAddress' => $ip,
+            ]));
+        }
+
+        return $sdps;
+    }
+
+    /**
+     * @return Collection MplsService objects
+     */
+    public function discoverMplsServices()
+    {
+        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDevice(), 'svcBaseInfoTable', [], 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
+        $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDevice(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
+
+        $svcs = collect();
+        foreach ($mplsSvcCache as $key => $value) {
+            $svcs->push(new MplsService([
+                'svc_oid' => $value['svcId'],
+                'device_id' => $this->getDeviceId(),
+                'svcRowStatus' => $value['svcRowStatus'],
+                'svcType' => $value['svcType'],
+                'svcCustId' => $value['svcCustId'],
+                'svcAdminStatus' => $value['svcAdminStatus'],
+                'svcOperStatus' => $value['svcOperStatus'],
+                'svcDescription' => $value['svcDescription'],
+                'svcMtu' => $value['svcMtu'],
+                'svcNumSaps' => $value['svcNumSaps'],
+                'svcNumSdps' => $value['svcNumSdps'],
+                'svcLastMgmtChange' => $value['svcLastMgmtChange'],
+                'svcLastStatusChange' => $value['svcLastStatusChange'],
+                'svcVRouterId' => $value['svcVRouterId'],
+                'svcTlsMacLearning' => $value['svcTlsMacLearning'],
+                'svcTlsStpAdminStatus' => $value['svcTlsStpAdminStatus'],
+                'svcTlsStpOperStatus' => $value['svcTlsStpOperStatus'],
+                'svcTlsFdbTableSize' => $value['svcTlsFdbTableSize'],
+                'svcTlsFdbNumEntries' => $value['svcTlsFdbNumEntries'],
+            ]));
+        }
+        return $svcs;
+    }
+
+    /**
+     * @return Collection MplsSdpBind objects
+     */
+    public function discoverMplsSdpBinds()
+    {
+        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
+        $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
+
+        $binds = collect();
+        foreach ($mplsBindCache as $key => $value) {
+            $bind_id = str_replace(' ', '', $value['sdpBindId']);
+            $sdp_oid = hexdec(substr($bind_id, 0, 8));
+            $svc_oid = hexdec(substr($bind_id, 9, 16));
+            $binds->push(new MplsSdpBind([
+                'sdp_oid' => $sdp_oid,
+                'svc_oid' => $svc_oid,
+                'device_id' => $this->getDeviceId(),
+                'sdpBindRowStatus' => $value['sdpBindRowStatus'],
+                'sdpBindAdminStatus' => $value['sdpBindAdminStatus'],
+                'sdpBindOperStatus' => $value['sdpBindOperStatus'],
+                'sdpBindLastMgmtChange' => round($value['sdpBindLastMgmtChange'] / 100),
+                'sdpBindLastStatusChange' => round($value['sdpBindLastStatusChange'] / 100),
+                'sdpBindType' => $value['sdpBindType'],
+                'sdpBindVcType' => $value['sdpBindVcType'],
+                'sdpBindBaseStatsIngFwdPackets' => $value['sdpBindBaseStatsIngressForwardedPackets'],
+                'sdpBindBaseStatsIngFwdOctets' => $value['sdpBindBaseStatsIngFwdOctets'],
+                'sdpBindBaseStatsEgrFwdPackets' => $value['sdpBindBaseStatsEgressForwardedPackets'],
+                'sdpBindBaseStatsEgrFwdOctets' => $value['sdpBindBaseStatsEgressForwardedOctets'],
+            ]));
+        }
+        return $binds;
+    }
 
     /**
      * @return Collection MplsLsp objects
@@ -187,5 +293,29 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         }
 
         return $paths;
+    }
+
+    /**
+     * @return Collection MplsSdp objects
+     */
+    public function pollMplsSdps()
+    {
+        return $sdps;
+    }
+
+    /**
+     * @return Collection MplsService objects
+     */
+    public function pollMplsServices()
+    {
+        return $svcs;
+    }
+
+    /**
+     * @return Collection MplsSDpBind objects
+     */
+    public function pollMplsSdpBinds()
+    {
+        return $binds;
     }
 }

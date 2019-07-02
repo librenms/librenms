@@ -55,6 +55,18 @@ class Mpls implements Module
             ModuleModelObserver::observe('\App\Models\MplsLspPath');
             $this->syncModels($os->getDeviceModel(), 'mplsLspPaths', $os->discoverMplsPaths($lsps));
 
+            echo "\nMPLS SDPs: ";
+            ModuleModelObserver::observe('\App\Models\MplsSdp');
+            $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->discoverMplsSdps());
+
+            echo "\nMPLS Services: ";
+            ModuleModelObserver::observe('\App\Models\MplsService');
+            $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->discoverMplsServices());
+
+            echo "\nMPLS SDP Bindings: ";
+            ModuleModelObserver::observe('\App\Models\MplsSdpBind');
+            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->discoverMplsSdpBinds());
+
             echo PHP_EOL;
         }
     }
@@ -77,6 +89,14 @@ class Mpls implements Module
             ModuleModelObserver::observe('\App\Models\MplsLspPath');
             $this->syncModels($os->getDeviceModel(), 'mplsLspPaths', $os->pollMplsPaths($lsps));
 
+            echo "\nMPLS SDPs: ";
+            ModuleModelObserver::observe('\App\Models\MplsSdp');
+            $sdps = $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->pollMplsSdps());
+
+            //echo "\nMPLS Virtual Circuits: ";
+            //ModuleModelObserver::observe('\App\Models\MplsSdpVc');
+            //$this->syncModels($os->getDeviceModel(), 'mplsSdpVcs', $os->pollMplsVcs($lsps));
+
             echo PHP_EOL;
         }
     }
@@ -91,5 +111,8 @@ class Mpls implements Module
     {
         $os->getDeviceModel()->mplsLsps()->delete();
         $os->getDeviceModel()->mplsLspPaths()->delete();
+        $os->getDeviceModel()->mplsSdps()->delete();
+        $os->getDeviceModel()->mplsServices()->delete();
+        $os->getDeviceModel()->mplsSdpBinds()->delete();
     }
 }

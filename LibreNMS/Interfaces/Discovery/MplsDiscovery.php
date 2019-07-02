@@ -1,6 +1,6 @@
 <?php
 /**
- * MplisDiscovery.php
+ * MplsDiscovery.php
  *
  * -Description-
  *
@@ -39,4 +39,19 @@ interface MplsDiscovery
      * @return Collection MplsLspPath objects
      */
     public function discoverMplsPaths($lsps);
+
+    /**
+     * @return Collection MplsSdp objects
+     */
+    public function discoverMplsSdps();
+
+    /**
+     * @return Collection MplsService objects
+     */
+    public function discoverMplsServices();
+
+    /**
+     * @return Collection MplsSdpBind objects
+     */
+    public function discoverMplsSdpBinds();
 }
