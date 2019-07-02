@@ -58,10 +58,10 @@ if (is_array($fan)) {
     foreach ($fan as $oid => $array) {
         $state = current($array);
         $split_oid = explode('.', $oid);
-        $tray = $split_oid[(count($split_oid) - 2)];
-        $fan = $split_oid[(count($split_oid) - 1)];
-        $current_oid = ".1.3.6.1.4.1.2272.1.101.1.1.4.1.4.$tray.$fan";
-        $descr =  "VOSS Tray $tray Fan $fan";
+        $tray_num = $split_oid[(count($split_oid) - 2)];
+        $fan_num = $split_oid[(count($split_oid) - 1)];
+        $current_oid = ".1.3.6.1.4.1.2272.1.101.1.1.4.1.4.$tray_num.$fan_num";
+        $descr =  "VOSS Tray $tray_num Fan $fan_num";
 
         $state_name = 'rcVossSystemFanInfoOperStatus';
         $states = [
@@ -72,8 +72,8 @@ if (is_array($fan)) {
         ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcVossSystemFanInfoOperStatus.$tray.$fan", $state_name, $descr, 1, 1, null, null, 3, 3, $state);
-        create_sensor_to_state_index($device, $state_name, "rcVossSystemFanInfoOperStatus.$tray.$fan");
+        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcVossSystemFanInfoOperStatus.$tray_num.$fan_num", $state_name, $descr, 1, 1, null, null, 3, 3, $state);
+        create_sensor_to_state_index($device, $state_name, "rcVossSystemFanInfoOperStatus.$tray_num.$fan_num");
     }
 }
 
