@@ -36,6 +36,7 @@ class EventlogController extends TableController
     {
         return [
             'device' => 'nullable|int',
+            'device_group' => 'nullable|int',
             'eventtype' => 'nullable|string',
         ];
     }
@@ -61,7 +62,11 @@ class EventlogController extends TableController
      */
     public function baseQuery($request)
     {
-        return Eventlog::hasAccess($request->user())->with('device');
+        return Eventlog::hasAccess($request->user())
+            ->with('device')
+            ->when($request->device_group, function ($query) use ($request) {
+                $query->inDeviceGroup($request->device_group);
+            });
     }
 
     public function formatItem($eventlog)
