@@ -1,0 +1,362 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+    SIAE-CARRIER-AGGRL1-MIB  
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32, IpAddress
+        FROM SNMPv2-SMI
+             InterfaceIndexOrZero
+        FROM IF-MIB
+             RowStatus
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB;
+
+    carrierAggr MODULE-IDENTITY
+        LAST-UPDATED "201608230000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Carrier hybrid aggregation management for SIAE equipments.
+            "
+        REVISION "201608230000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00.
+            "
+    ::= { siaeMib 104 }
+
+----------------------------------------------------------------------------------
+--  Hybrid Radio LAG MIB
+----------------------------------------------------------------------------------
+--
+--  This MIB manage the configuration and the status of a a carrier belonging to 
+--  an hybrid radio aggregation. SNMP manager must create an instance of 
+--  Sensor Table and attach it to an Radio-interface (ifIndex in ifTable).
+--  Now SNMP manager must create an instance of Actuator Table and attach it to
+--  an LAN-interface (ifIndex in ifTable). After enabling admin status of both 
+--  sensor and actuator, the carrier path is enabled. 
+--  Every interface (Radio or Lan) that can be used in this feature, have the 
+--  needed capabilities in "sm_ifext.mib". The number of Radio-interfaces is
+--  related to the link-configuration (1+0, 2+0,...) too; so the related 
+--  capabilities could dynamically change according to link-configuration.
+--  When a carrier path is enabled, alarms are detected and notified to N.E. 
+--  aggregator. A further feature can be enabled: the hitless-Radio-Lag. It offers 
+--  the possibility to notify (to N.E. aggregator) whether a radio is working 
+--  in a "Good Zone"-ACM, a "Hitless-Zone"-ACM or a "Bad-Zone"-ACM.
+--  Such a trigger is used to dynamically exclude/include a carrier path from/in 
+--  an aggregation without loss of frames. 
+----------------------------------------------------------------------------------
+
+------ Beginning -------------------------------------------------------------
+
+    -- MIB objects
+
+    carrierAggrMibVersion OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+    ::= {carrierAggr 1}
+    
+
+-------  Begin of carrierAggrSensorTable
+--
+    carrierAggrSensorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  CarrierAggrSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Radio(s) interface(s) that can be associated 
+             to an entry of carrierAggrActuatorTable."
+    ::= {carrierAggr 2}
+    
+    carrierAggrSensorEntry OBJECT-TYPE
+        SYNTAX      CarrierAggrSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A row in the carrierAggrSensorTable."
+             
+        INDEX       {carrierAggrSensorIndex}
+    ::= {carrierAggrSensorTable 1}
+
+    CarrierAggrSensorEntry  ::=
+        SEQUENCE  
+        {
+            carrierAggrSensorIndex             INTEGER,
+            carrierAggrSensorRowstatus         RowStatus,
+            carrierAggrSensorAdminStatus       INTEGER,
+            carrierAggrSensorIfIndex           InterfaceIndexOrZero,
+            carrierAggrSensorHitlessCapability BITS,
+            carrierAggrSensorHitlessBehaviour  INTEGER,
+            carrierAggrSensorHitlessMode       INTEGER,
+            carrierAggrSensorHitlessProfile    INTEGER,
+            carrierAggrSensorHitlessStatus     INTEGER
+        }
+
+    carrierAggrSensorIndex OBJECT-TYPE
+        SYNTAX      INTEGER    (1..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the index of carrierAggrSensorTable."
+    ::= {carrierAggrSensorEntry 1}
+   
+    carrierAggrSensorRowstatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this sensor entry.
+
+             An entry may not exist in the active state unless all
+             objects in the entry have an appropriate value: SensorIfIndex
+             must be set to a valid ifIndex number. Otherwise, the error
+             inconsistentValue is returned on the attempt to set active this 
+             row.
+
+             When this object is set to notInService changes may be made to
+             carrierAggrSensorIfIndex.
+             Other objects can be changed when carrierAggrSensorRowStatus is
+             set to active.
+
+             A sensor can not be deleted if there is any Actuator (see table
+             carrierAggrActuatorTable) associated with it.
+            "
+    ::= { carrierAggrSensorEntry 2 }
+
+    carrierAggrSensorAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                                down (1),
+                                up   (2)
+                             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Administative status of the sensor.
+             The value down(1) turns off all actuators associated with
+             this sensor.
+            "
+        DEFVAL      { down }
+    ::= { carrierAggrSensorEntry 3 }
+
+    carrierAggrSensorIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object accepts a greater than zero value to identify an
+             interface in ifTable. Some parameters of the radio associated to
+             this interface is monitored and a notification is sent 
+             to all connected actuators.
+            "
+        ::= { carrierAggrSensorEntry 4 }
+
+    carrierAggrSensorHitlessCapability OBJECT-TYPE
+        SYNTAX      BITS {
+                          hitlessAvailable(0) 
+                         }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This capability is related to 
+            HITLESS Behaviour carrierAggrSensorHitlessBehaviour."
+    ::= {carrierAggrSensorEntry 5}
+
+    carrierAggrSensorHitlessBehaviour OBJECT-TYPE
+        SYNTAX      INTEGER  { disable (1),
+                               enable  (2)
+                             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "The hitless behaviour. When enabled, data related to the current ACM zone 
+            is notified to an external N.E. aggregator, so it can dynamically 
+            exclude/include the data-flow without loss of frames. 
+            It can be enabled only if carrierAggrSensorHitlessCapability is available"
+        DEFVAL  {disable}
+    ::= {carrierAggrSensorEntry 6}
+
+    carrierAggrSensorHitlessMode OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                                auto   (1),
+                                manual (2)
+                             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "The policy to select the hitless profile (i.e. the lowest one under 
+            which a N.E. aggregator excludes the carrier from an existing aggregation).
+            auto(1): Tx Lower Profile + 1 is selected;
+            manual(2): the value set in carrierAggrSensorHitlessProfile is selected. 
+           "
+        DEFVAL  { auto }
+    ::= {carrierAggrSensorEntry 7}
+
+    carrierAggrSensorHitlessProfile OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "The hitless profile in case of carrierHyAggrHitlessBehaviour  
+              set as enabled and carrierHyAggrHitlessMode set as manual.
+             "
+        DEFVAL  { 1 }
+    ::= {carrierAggrSensorEntry 8}
+
+    carrierAggrSensorHitlessStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                                goodZone    (1),
+                                hitlessZone (2),
+                                badZone     (3)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The working zone of the radio link."
+    ::= {carrierAggrSensorEntry 9}
+
+   -- 
+   -------  End of carrierAggrSensorTable
+
+-------  Begin of carrierAggrActuatorTable
+--
+    carrierAggrActuatorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CarrierAggrActuatorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Lan(s) interface that can be associated
+             to an entry of carrierAggrSensorTable."
+        ::= {carrierAggr 3}
+
+    carrierAggrActuatorEntry OBJECT-TYPE
+        SYNTAX      CarrierAggrActuatorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A row in the carrierAggrActuatorTable."
+        INDEX       { carrierAggrActuatorIndex }
+        ::= { carrierAggrActuatorTable 1 }
+
+    CarrierAggrActuatorEntry  ::=
+        SEQUENCE
+        {
+            carrierAggrActuatorIndex       INTEGER,
+            carrierAggrActuatorRowStatus   RowStatus,
+            carrierAggrActuatorAdminStatus INTEGER,
+            carrierAggrActuatorIfIndex     InterfaceIndexOrZero,
+            carrierAggrActuatorSensorIndex Integer32,
+            carrierAggrActuatorConcIpAddr  IpAddress
+        }
+
+    carrierAggrActuatorIndex  OBJECT-TYPE
+        SYNTAX      INTEGER    (1..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the carrier aggr Actuator inside the
+             Network Element."
+    ::= { carrierAggrActuatorEntry 1 }
+
+    carrierAggrActuatorRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this entry.
+
+             An entry may not exist in the active state unless all objects in
+             the entry have an appropriate value: carrierAggrActuatorIfIndex
+             must be set to a valid ifIndex number and carrierAggrActuatorSensorIndex
+             must be set to a valid sensor, Otherwise, the error inconsistentValue
+             is returned on the attempt to set active this row.
+
+             When set to notInService changes may be made to carrierAggrActuatorIfIndex
+             and carrierAggrActuatorSensorIndex. Other objects can be changed 
+             when carrierAggrActuatorRowStatus is set to active.
+            "
+    ::= { carrierAggrActuatorEntry 2 }
+
+    carrierAggrActuatorAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                                down (1),
+                                up   (2)
+                             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Administative status of the actuator. The value down(1) turns it off. 
+             Other actuators associated with the same sensor remain active."
+        DEFVAL      { down }
+    ::= { carrierAggrActuatorEntry 3 }
+
+    carrierAggrActuatorIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object accepts a greater than zero value to identify an
+             interface in ifTable. The notify received from the connected 
+             sensor is forwarded to the remote aggregator to signal some
+             anomalies on this aggregated flow.
+            "
+    ::= { carrierAggrActuatorEntry 4 }
+
+    carrierAggrActuatorSensorIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "This object connects this actuator to a sensor.
+             "
+    ::= { carrierAggrActuatorEntry 5 }
+
+    carrierAggrActuatorConcIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "This object is used to contain 
+               the Ip address of the equipment connected with this Lan
+               (the concatenator unit)"
+    ::= { carrierAggrActuatorEntry 6 }
+
+
+--
+-------  End of carrierAggrActuatorTable
+
+------ End group -----------------------------------------------------------------
+
+---------------------------------- End  -------------------------------------
+
+
+
+END
+
+
+

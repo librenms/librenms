@@ -40,6 +40,7 @@ try:
     import sys
     import threading
     import time
+    from optparse import OptionParser
 
 except:
     print "ERROR: missing one or more of the following python modules:"
@@ -85,6 +86,7 @@ except:
     sys.exit(2)
 
 discovery_path = config['install_dir'] + '/discovery.php'
+log_dir = config['log_dir']
 db_username = config['db_user']
 db_password = config['db_pass']
 db_port = int(config['db_port'])
@@ -186,14 +188,19 @@ discovered_devices = 0
 
 """
     Take the amount of threads we want to run in parallel from the commandline
-    if None are given or the argument was garbage, fall back to default of 16
+    if None are given or the argument was garbage, fall back to default of 1
 """
+usage = "usage: %prog [options] <workers> (Default: 1 Do not set too high)"
+description = "Spawn multiple discovery.php processes in parallel."
+parser = OptionParser(usage=usage, description=description)
+parser.add_option('-d', '--debug', action='store_true', default=False,
+                  help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
+(options, args) = parser.parse_args()
+
+debug = options.debug
 try:
-    amount_of_workers = int(sys.argv[1])
-    if amount_of_workers == 0:
-        print "ERROR: 0 threads is not a valid value"
-        sys.exit(2)
-except:
+    amount_of_workers = int(args[0])
+except (IndexError, ValueError):
     amount_of_workers = 1
 
 devices_list = []
@@ -304,8 +311,11 @@ def poll_worker():
 # EOC5
             try:
                 start_time = time.time()
-                command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (discovery_path, device_id)
+
+                output = "-d >> %s/discover_device_%s.log" % (log_dir, device_id) if debug else ">> /dev/null"
+                command = "/usr/bin/env php %s -h %s %s 2>&1" % (discovery_path, device_id, output)
                 subprocess.check_call(command, shell=True)
+
                 elapsed_time = int(time.time() - start_time)
                 print_queue.put([threading.current_thread().name, device_id, elapsed_time])
             except (KeyboardInterrupt, SystemExit):

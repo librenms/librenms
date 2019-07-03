@@ -1,0 +1,12 @@
+os: webmon
+text: 'Dantel Webmon'
+type: environment
+icon: dantel
+mib_dir: 
+    - dantel
+over:
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_humidity, text: Humidity }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.994.3.4

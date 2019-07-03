@@ -1,0 +1,377 @@
+IDKT-F2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    Counter32                   FROM SNMPv2-SMI
+    OBJECT-GROUP                FROM SNMPv2-CONF
+    dkt                         FROM DKT-MIB
+    MacAddress                  FROM SNMPv2-TC;
+
+f2MIB MODULE-IDENTITY
+    LAST-UPDATED  "201504210000Z"
+    ORGANIZATION "DKT A/S"
+    CONTACT-INFO
+        "postal:  DKT A/S
+                  Fanoevej 6
+                  DK-4060 Kirke Saaby
+                  Denmark
+
+         email:   info@dktcomega.com"
+    DESCRIPTION   "DKT 797xx series MIB."
+    ::= { dkt 15 }
+
+f2SwitchEngine OBJECT IDENTIFIER ::= { f2MIB 1 }
+
+f2IGMPSnooping OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Starts/stops IGMP snooping, input parameter 0 = stops IGMP snooping, 1 = starts IGMP snooping. Per Default IGMP snooping is disabled."
+    ::= { f2SwitchEngine 1 }
+
+f2MTU OBJECT-TYPE
+    SYNTAX      INTEGER (0..8960)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set and get MTU. The following values are valid: 3072, 4096, 6144, 8960 (3k, 4k, 6k and 8960 bytes)"
+    ::= { f2SwitchEngine 2 }
+
+f2FWDTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F2FWDMacAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Get learned MAC addresses from LAN side of switch engine"
+    ::= { f2SwitchEngine 3 }
+
+f2FWDMacAddressEntry OBJECT-TYPE
+    SYNTAX      F2FWDMacAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Learned MAC address from LAN side of switch engine"
+    ::= { f2FWDTable 1 }
+
+F2FWDMacAddressEntry ::= SEQUENCE {
+    F2FWDMacAddress OCTET STRING
+}
+
+F2FWDMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MAC address from LAN"
+    ::= { f2FWDMacAddressEntry 1 }
+
+f2Ports OBJECT IDENTIFIER ::= { f2MIB 2 }
+
+f2CPUPort OBJECT IDENTIFIER ::= { f2Ports 1 }
+
+f2CPUPortAutoNegotiation OBJECT-TYPE
+    SYNTAX      INTEGER (0..10)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays auto negotiation state for the port."
+    ::= { f2CPUPort 1 }
+
+f2CPUPortSpeedMode OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays the speed and duplex mode on the port."
+    ::= { f2CPUPort 2 }
+
+
+f2CPUPortLinkStatus OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the Link status for the port"
+    ::= { f2CPUPort 3 }
+
+
+f2CPUPortFlowControl OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays flow control status for the port. Values: 0: No flow control, 1: Rx flow control, 2: Tx flow control, 3: Rx and Tx flow control"
+    ::= { f2CPUPort 4 }
+
+
+f2CPUPortEnable OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status for CPU port. Always 1 for enabled."
+    ::= { f2CPUPort 5 }
+
+
+f2WANPort OBJECT IDENTIFIER ::= { f2Ports 2 }
+
+f2WANPortAutoNegotiation OBJECT-TYPE
+    SYNTAX      INTEGER (0..10)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays auto negotiation state for the port."
+    ::= { f2WANPort 1 }
+
+f2WANPortSpeedMode OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD)"
+    ::= { f2WANPort 2 }
+
+
+f2WANPortLinkStatus OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the Link status for the port"
+    ::= { f2WANPort 3 }
+
+
+f2WANPortFlowControl OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays flow control status for the port. Values: 0: No flow control, 1: Rx flow control, 2: Tx flow control, 3: Rx and Tx flow control"
+    ::= { f2WANPort 4 }
+
+
+f2WANPortEnable OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status for WAN port. Always 1 for enabled."
+    ::= { f2WANPort 5 }
+
+
+
+f2LAN1Port OBJECT IDENTIFIER ::= { f2Ports 3 }
+
+f2LAN1PortAutoNegotiation OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays auto negotiation state for the port."
+    ::= { f2LAN1Port 1 }
+
+f2LAN1PortSpeedMode OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD)"
+    ::= { f2LAN1Port 2 }
+
+
+f2LAN1PortLinkStatus OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the Link status for the port"
+    ::= { f2LAN1Port 3 }
+
+
+f2LAN1PortFlowControl OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays flow control status for the port. Values: 0: No flow control, 1: Rx flow control, 2: Tx flow control, 3: Rx and Tx flow control"
+    ::= { f2LAN1Port 4 }
+
+
+f2LAN1PortEnable OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables/Disables LAN1 port. Set to 1 for Enabled set to 0 for Disabled."
+    ::= { f2LAN1Port 5 }
+
+
+
+f2LAN2Port OBJECT IDENTIFIER ::= { f2Ports 4 }
+
+f2LAN2PortAutoNegotiation OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays auto negotiation state for the port."
+    ::= { f2LAN2Port 1 }
+
+f2LAN2PortSpeedMode OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD)"
+    ::= { f2LAN2Port 2 }
+
+
+f2LAN2PortLinkStatus OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the Link status for the port"
+    ::= { f2LAN2Port 3 }
+
+
+f2LAN2PortFlowControl OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays flow control status for the port. Values: 0: No flow control, 1: Rx flow control, 2: Tx flow control, 3: Rx and Tx flow control"
+    ::= { f2LAN2Port 4 }
+
+
+f2LAN2PortEnable OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables/Disables LAN2 port. Set to 1 for Enabled set to 0 for Disabled."
+    ::= { f2LAN2Port 5 }
+
+
+
+f2LAN3Port OBJECT IDENTIFIER ::= { f2Ports 5 }
+
+f2LAN3PortAutoNegotiation OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays auto negotiation state for the port."
+    ::= { f2LAN3Port 1 }
+
+f2LAN3PortSpeedMode OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD)"
+    ::= { f2LAN3Port 2 }
+
+
+f2LAN3PortLinkStatus OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the Link status for the port"
+    ::= { f2LAN3Port 3 }
+
+
+f2LAN3PortFlowControl OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays flow control status for the port. Values: 0: No flow control, 1: Rx flow control, 2: Tx flow control, 3: Rx and Tx flow control"
+    ::= { f2LAN3Port 4 }
+
+
+f2LAN3PortEnable OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables/Disables LAN3 port. Set to 1 for Enabled set to 0 for Disabled."
+    ::= { f2LAN3Port 5 }
+
+
+f2LAN4Port OBJECT IDENTIFIER ::= { f2Ports 6 }
+
+f2LAN4PortAutoNegotiation OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays auto negotiation state for the port."
+    ::= { f2LAN4Port 1 }
+
+f2LAN4PortSpeedMode OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Displays the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD)"
+    ::= { f2LAN4Port 2 }
+
+
+f2LAN4PortLinkStatus OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the Link status for the port"
+    ::= { f2LAN4Port 3 }
+
+
+f2LAN4PortFlowControl OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays flow control status for the port. Values: 0: No flow control, 1: Rx flow control, 2: Tx flow control, 3: Rx and Tx flow control"
+    ::= { f2LAN4Port 4 }
+
+
+f2LAN4PortEnable OBJECT-TYPE
+    SYNTAX      INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables/Disables LAN4 port. Set to 1 for Enabled set to 0 for Disabled."
+    ::= { f2LAN4Port 5 }
+
+
+
+
+f2ModuleGroup OBJECT-GROUP
+        OBJECTS {
+                f2SwitchEngine,
+                f2IGMPSnooping,
+                f2MTU,
+                f2Ports,
+                f2CPUPort,
+                f2CPUPortAutoNegotiation, f2CPUPortSpeedMode, f2CPUPortLinkStatus, f2CPUPortFlowControl, f2CPUPortEnable, 
+                f2WANPort,
+                f2WANPortAutoNegotiation, f2WANPortSpeedMode, f2WANPortLinkStatus, f2WANPortFlowControl, f2WANPortEnable, 
+                f2LAN1Port,
+                f2LAN1PortAutoNegotiation, f2LAN1PortSpeedMode, f2LAN1PortLinkStatus, f2LAN1PortFlowControl, f2LAN1PortEnable, 
+                f2LAN2Port,
+                f2LAN2PortAutoNegotiation, f2LAN2PortSpeedMode, f2LAN2PortLinkStatus, f2LAN2PortFlowControl, f2LAN2PortEnable, 
+                f2LAN3Port,
+                f2LAN3PortAutoNegotiation, f2LAN3PortSpeedMode, f2LAN3PortLinkStatus, f2LAN3PortFlowControl, f2LAN3PortEnable, 
+                f2LAN4Port,
+                f2LAN4PortAutoNegotiation, f2LAN4PortSpeedMode, f2LAN4PortLinkStatus, f2LAN4PortFlowControl, f2LAN4PortEnable
+        }
+    STATUS current
+    DESCRIPTION
+        "The objects are related to the DKT 797xx series module, MIB rev 09."
+    ::= { f2MIB 3 }
+
+
+END

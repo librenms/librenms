@@ -5,7 +5,7 @@ modules:
             data:
                 -
                     oid: upsBaseBatteryStatus
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.2.1.1.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.1.1.{{ $index }}'
                     descr: 'Battery Status'
                     index: 'upsBaseBatteryStatus.{{ $index }}'
                     states:
@@ -14,7 +14,7 @@ modules:
                         - { value: 3, descr: Low, graph: 1, generic: 2 }
                 -
                     oid: upsAdvanceBatteryReplaceIndicator
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.2.2.5.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.5.{{ $index }}'
                     descr: 'Battery Replace Indicator'
                     index: 'upsAdvanceBatteryReplaceIndicator.{{ $index }}'
                     states:
@@ -22,7 +22,7 @@ modules:
                         - { value: 2, descr: Replace, graph: 1, generic: 2 }
                 -
                     oid: upsAdvanceInputLineFailCause
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.3.2.5.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.3.2.5.{{ $index }}'
                     descr: 'Input Line Cause'
                     index: 'upsAdvanceInputLineFailCause.{{ $index }}'
                     states:
@@ -32,7 +32,7 @@ modules:
                         - { value: 4, descr: 'Self Test', graph: 1, generic: 1 }
                 -
                     oid: upsAdvanceInputStatus
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.3.2.6.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.3.2.6.{{ $index }}'
                     descr: 'Input Status'
                     index: 'upsAdvanceInputStatus.{{ $index }}'
                     states:
@@ -43,7 +43,7 @@ modules:
                         - { value: 5, descr: 'Blackout', graph: 1, generic: 2 }
                 -
                     oid: upsBaseOutputStatus
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.4.1.1.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.4.1.1.{{ $index }}'
                     descr: 'Output Status'
                     index: 'upsBaseOutputStatus.{{ $index }}'
                     states:
@@ -58,32 +58,32 @@ modules:
             data:
                 -
                     oid: upsAdvanceBatteryCapacity
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.2.2.1.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.1.{{ $index }}'
                     index: 'upsAdvanceBatteryCapacity.{{ $index }}'
                     descr: 'Battery Capacity'
         current:
             data:
                 -
                     oid: upsAdvanceOutputCurrent
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.4.2.4.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.4.2.4.{{ $index }}'
                     index: 'upsAdvanceOutputCurrent.{{ $index }}'
                     descr: 'Output'
         voltage:
             data:
                 -
                     oid: upsAdvanceBatteryVoltage
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.2.2.2.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.2.{{ $index }}'
                     index: 'upsAdvanceBatteryVoltage.{{ $index }}'
                     descr: 'Battery Voltage'
                 -
                     oid: upsAdvanceInputLineVoltage
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.3.2.1.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.3.2.1.{{ $index }}'
                     index: 'upsAdvanceInputLineVoltage.{{ $index }}'
                     descr: 'Input Line Voltage'
                     divisor: 10
                 -
                     oid: upsAdvanceOutputVoltage
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.4.2.1.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.4.2.1.{{ $index }}'
                     index: 'upsAdvanceOutputVoltage.{{ $index }}'
                     descr: 'Output Voltage'
                     divisor: 10
@@ -91,14 +91,22 @@ modules:
             data:
                 -
                     oid: upsAdvanceBatteryTemperature
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.2.2.3.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.3.{{ $index }}'
                     index: 'upsAdvanceBatteryTemperature.{{ $index }}'
                     descr: 'Battery Temperature'
+                -
+                    oid: envirTemperature
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.4.2.1.{{ $index }}'
+                    index: 'envirTemperature.{{ $index }}'
+                    descr: 'Environment Sensor Temperature'
+                    user_func: fahrenheit_to_celsius
+                    divisor: 10
+
         runtime:
             data:
                 -
                     oid: upsAdvanceBatteryRunTimeRemaining
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.2.2.4.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.4.{{ $index }}'
                     index: 'upsAdvanceBatteryRunTimeRemaining.{{ $index }}'
                     descr: 'Battery Runtime'
                     divisor: 6000
@@ -106,13 +114,20 @@ modules:
             data:
                 -
                     oid: upsAdvanceInputFrequency
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.3.2.4.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.3.2.4.{{ $index }}'
                     index: 'upsAdvanceInputFrequency.{{ $index }}'
                     descr: 'Input'
                     divisor: 10
                 -
                     oid: upsAdvanceOutputFrequency
-                    num_oid: .1.3.6.1.4.1.3808.1.1.1.4.2.2.
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.4.2.2.{{ $index }}'
                     index: 'upsAdvanceOutputFrequency.{{ $index }}'
                     descr: 'Output'
                     divisor: 10
+        humidity:
+            data:
+                -
+                    oid: envirHumidity
+                    num_oid:  '.1.3.6.1.4.1.3808.1.1.4.3.1.{{ $index }}'
+                    index: 'envirHumidity.{{ $index }}'
+                    descr: 'Environment Sensor Humidity'

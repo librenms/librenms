@@ -1,11 +1,11 @@
 -- =================================================================
--- Copyright (C) 2004 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: The HUAWEI-TCP-MIB provides information about TCP. 
 --              Now only trap for MD5 authentication failures is provided 
 --              
 -- Reference:
--- Version:     V1.0
+-- Version:     V1.01
 -- History:
 --              xujin,2004.6.26,publish 
 -- =================================================================
@@ -27,22 +27,33 @@
     
 
         hwTCP MODULE-IDENTITY 
-            LAST-UPDATED "200406260000Z"        -- June 26, 2004 at 00:00 GMT
+            LAST-UPDATED "201708170908Z"        -- Aug 18, 2017 at 00:00 GMT
             ORGANIZATION 
-                "Huawei Technologies co.,Ltd."
+                "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                " R&D BeiJing, Huawei Technologies co.,Ltd.
-                Huawei Bld.,NO.3 Xinxi Rd., 
-                Shang-Di Information Industry Base,
-                Hai-Dian District Beijing P.R. China
-                Zip:100085 
-                Http://www.huawei.com                       
-                E-mail:support@huawei.com "
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com"
             DESCRIPTION 
                 "The HUAWEI-TCP-MIB provides information about TCP. 
                 Now only trap for MD5 authentication failures is provided,
                 which include local address, local port, remote address, remote 
-                port. When MD5 authentication fail, the trap will send."
+                port. When MD5 authentication fails, the trap will send."
+                
+              REVISION     "201708170908Z"
+                            DESCRIPTION  
+                            "
+                            Modify the description.
+                            "     
+
+                REVISION     "200406090908Z"
+                            DESCRIPTION  
+                            "
+                            V1.00, Inital version.
+                            "     
             ::= { hwDatacomm 34 }
 
         
@@ -72,8 +83,8 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "This variable indicates which VPN the tcp connection belong to.
-                If the tcp connection belong to public net, this variable is null."
+                "This variable indicates which VPN the TCP connection belongs to.
+                If the TCP connection belongs to public net, this variable is null."
             ::= { hwTCPObjects 2 }
 
         
@@ -85,10 +96,9 @@
                 hwTCPVrfName }
             STATUS current
             DESCRIPTION 
-                "This trap indicates that the MD5 authentication fails.
-                the information include local address ,port ,
-                remote address, port and protocol.
-                When MD5 authentication fail, this trap will be sent."
+                "This trap indicates that MD5 authentication failed.
+The trap information includes the local address, local port number, remote address, remote port number, and protocol type.
+When MD5 authentication fails, this trap will be sent to the information center and displayed on the screen."
             ::= { hwTCPTraps 1 }
 
         
@@ -103,7 +113,7 @@
             STATUS current
             DESCRIPTION 
                 "The compliance statement for entities which 
-                implement the Huawei TCP mib."
+                implement the Huawei TCP MIB."
             MODULE -- this module
                 MANDATORY-GROUPS { hwTCPTrapGroup, hwTCPForTrapGroup }
             ::= { hwTCPCompliances 1 }

@@ -1,13 +1,19 @@
 -- =================================================================
--- Copyright (C) 2006 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:HUAWEI DHCP SNOOPING MIB
 -- Reference:
--- Version: V1.00
+-- Version: V2.06
 -- History:
 --    wangcheng 60005987 initial    16/02/2006
 --  hexiaoqin 60020960 modified   25/12/2006
---      wangcheng 64651    modified   1/3/2007
+--      wangcheng 64651    modified   1/3/2007  
+--      modified by huangjun 2009-12-08
+--      modified by xiazhaolin 2013-06-19
+--      modified by huangxiaomin 221241 2014/01/27
+--      modified by caojingyun 00273809 2014/07/18
+--      modified by liangyun 00353956 2016/10/11
+--      modified by liangyun 00353956 2016/10/28 
 -- =================================================================
     
     HUAWEI-DHCP-SNOOPING-MIB DEFINITIONS ::= BEGIN
@@ -15,17 +21,23 @@
         IMPORTS
             hwDatacomm            
                 FROM HUAWEI-MIB
-            MODULE-IDENTITY, IpAddress, OBJECT-TYPE        
-                FROM SNMPv2-SMI    
+            NOTIFICATION-GROUP,OBJECT-GROUP,MODULE-COMPLIANCE        
+                FROM SNMPv2-CONF
+            MODULE-IDENTITY, IpAddress, OBJECT-TYPE,
+            NOTIFICATION-TYPE,Integer32,Counter32                 
+               FROM SNMPv2-SMI    
             InterfaceIndexOrZero
                 FROM IF-MIB
             VlanId     
                 FROM Q-BRIDGE-MIB
+            VlanIdOrNone     
+                FROM Q-BRIDGE-MIB
             EnabledStatus
                 FROM P-BRIDGE-MIB                                             
-            RowStatus,MacAddress,DisplayString            
+            RowStatus,MacAddress,DisplayString,TEXTUAL-CONVENTION            
                 FROM SNMPv2-TC;
-                
+            
+                    
 --
 -- Textual conventions                
 --
@@ -34,16 +46,16 @@
         STATUS      current
         DESCRIPTION
                 "A 12-bit VLAN ID used in the VLAN Tag header.
-                 When the value is 0, it means do not belong to a vlan."
+                 When the value is 0, it means do not belong to a VLAN."
         SYNTAX      Integer32(0..4094)   
 
      HWMatchMode ::= TEXTUAL-CONVENTION
             STATUS current
             DESCRIPTION 
                 " 
-                The vlan mode of Dhcp  packets matched in the snooping bind table.
-                pvlan(1),
-                cvlan(2),
+                The VLAN mode of DHCP  packets matched in the snooping bind table.
+                PVLAN(1),
+                CVLAN(2),
                 all(3)
                 "
             SYNTAX INTEGER
@@ -70,18 +82,33 @@
 -- Module Identifier                
 --
     hwDhcpSnpMib MODULE-IDENTITY 
-        LAST-UPDATED "200609161800Z"            -- Sep 16th, 2006 at 18:00 GMT
+        LAST-UPDATED "201708170000Z"            -- Aug 17th, 2017 at 16:47 GMT
         ORGANIZATION 
-            "Huawei Technologies co., Ltd."
+             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
-            " R&D NanJing, Huawei Technologies co.,Ltd.
-            Huihong Bld.,NO.91 Baixia Rd., 
-            Bai-Xia District NanJing P.R. China
-            Zip:210001 
-            Http://www.huawei.com                                       
-            E-mail:support@huawei.com "
+"Huawei Industrial Base  Bantian, Longgang   Shenzhen 518129   People's Republic of China   Website: http://www.huawei.com   Email: support@huawei.com "
+
+       DESCRIPTION
+            "Change the DHCP Snooping Conformance."
+       REVISION "201708170000Z" 	
+       DESCRIPTION
+            "Modify the description of hwDhcpSnpChaddrAlarm."
+       REVISION "201610280000Z" 
+	
+       DESCRIPTION
+            "Change the DHCP Snooping Conformance."
+       REVISION "201610110000Z" 
+       DESCRIPTION
+            "This MIB describes objects used for DHCP Snooping."
+       REVISION "201407180000Z"      
+       DESCRIPTION 
+            "This MIB describes objects used for DHCP Snooping."
+       REVISION "201401270000Z"         -- Jan 1st, 2014 at 20:00 GMT
+       DESCRIPTION
+            "This revision adds MIB trap of bridge domain."
+        REVISION "201306191800Z"            -- Sep 19th, 2013 at 18:00 GMT
         DESCRIPTION 
-            "This MIB describes objects used for Dhcp Snooping,including
+            "This MIB describes objects used for DHCP Snooping,including
             configuring snooping,creating snooping bind table and collecting
             false packets' statistic information. When the system is attacked,
             some traps will be given."
@@ -110,8 +137,7 @@
         STATUS current
         DESCRIPTION
             "The Global Snooping. Enable this before you want to enable
-             the port,vlan,other interfaces snooping. "
-        DEFVAL { disable }
+             the port,vlan,other interfaces snooping,default is disable. "
         ::= { hwDhcpSnpObjects 1 }
     
     
@@ -124,18 +150,16 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "Whether to check the rate of Dhcp packets received. "
-        DEFVAL { disable }
+            "Whether to check the rate of DHCP packets received,default is disabling. "
         ::= { hwDhcpSnpObjects 2 }
     
             
     hwDhcpPktRate     OBJECT-TYPE
-        SYNTAX     Integer32(1..100)
+        SYNTAX     Integer32(1..1000)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The area of Dhcp packets received rate. "
-        DEFVAL { 100 }
+            "The area of Dhcp packets received rate,default is 100. "
         ::= { hwDhcpSnpObjects 3 }    
     
             
@@ -144,10 +168,9 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The threshold of the Dhcp packets rate Alarm. When the actual rate
+            "The threshold of the DHCP packets rate Alarm. When the actual rate
              beyond the maximum rate configured and reach this threshold once, 
-             there will be a notification can be sent at the same time. "
-        DEFVAL { 100 }
+             there will be a notification can be sent at the same time,default is 100. "
         ::= { hwDhcpSnpObjects 4 }
     
             
@@ -160,9 +183,8 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "Whether to send the Dhcp packets rate alarm when the actual rate beyond
-             the maximum rate configured and reach the rate threshold. "
-        DEFVAL { disable }
+            "Whether to send the DHCP packets rate alarm when the actual rate beyond
+             the maximum rate configured and reach the rate threshold,default is disabling. "
         ::= { hwDhcpSnpObjects 5 }
     
     
@@ -175,9 +197,8 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "How to deal with the Arp packets that do not match the Dhcp snooping 
-             bind table in global view. "
-        DEFVAL { forward }
+            "How to deal with the ARP packets that do not match the DHCP snooping 
+             bind table in global view,default is forward. "
         ::= { hwDhcpSnpObjects 6 }        
     
     
@@ -190,9 +211,8 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "How to deal with the Ip packets that do not match the Dhcp snooping 
-             bind table in global view. "
-        DEFVAL { forward }
+            "How to deal with the Ip packets that do not match the DHCP snooping 
+             bind table in global view,default is forward. "
         ::= { hwDhcpSnpObjects 7 }        
     
     
@@ -201,7 +221,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "Autosave file name. Make sure the disk name have been given, and the file
+            "Auto save file name. Make sure the disk name have been given, and the file
              must be named with '.tbl' postfixally. "
         ::= { hwDhcpSnpObjects 8 }
     
@@ -215,8 +235,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "Whether to save snooping bind table . "
-        DEFVAL { disable }
+            "Whether to save snooping bind table,default is disabling . "
         ::= { hwDhcpSnpObjects 9 }    
        
         
@@ -225,17 +244,16 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "Dhcp snooping global threshold. "
-        DEFVAL { 100 }
+            "DHCP snooping global threshold,default is disabling. "
         ::= { hwDhcpSnpObjects 10 }    
-    
+               
     
     hwDhcpPktRateDiscardNum OBJECT-TYPE
         SYNTAX     Counter32
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "Dhcp packets that discarded for the rate limit. "
+            "DHCP packets that discarded for the rate limit. "
         ::= { hwDhcpSnpObjects 11 }
     
     
@@ -245,7 +263,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The snooping configuration table. "
+                "The DHCP snooping configuration table. "
             ::= { hwDhcpSnpObjects 13 }
     
            
@@ -261,7 +279,7 @@
     HWDhcpSnpCfgEntry ::=
             SEQUENCE {
                 hwDhcpSnpIfIndex            InterfaceIndexOrZero,
-                hwDhcpSnpVlanIndex            VlanId,
+                hwDhcpSnpVlanIndex            VlanIdOrNone,
                 hwDhcpSnpVsiIndex              Integer32,
                 hwDhcpSnpEnable                INTEGER,
                 hwDhcpTrusted                INTEGER,
@@ -303,14 +321,14 @@
             SYNTAX  InterfaceIndexOrZero
             MAX-ACCESS not-accessible
             STATUS current
-            DESCRIPTION "The Ifindex."
+            DESCRIPTION "The interface index."
             ::= { hwDhcpSnpCfgEntry 1 }
            
     hwDhcpSnpVlanIndex OBJECT-TYPE
-            SYNTAX  VlanId
+            SYNTAX  VlanIdOrNone
             MAX-ACCESS not-accessible
             STATUS current
-            DESCRIPTION " The VLAN-ID or other identifier refering to this VLAN."
+            DESCRIPTION " The VLAN-ID or other identifier referring to this VLAN."
             ::= { hwDhcpSnpCfgEntry 2 } 
     
     hwDhcpSnpVsiIndex OBJECT-TYPE
@@ -330,7 +348,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "Whether to enable snooping on this interface/vlan. "
+                "Whether to enable snooping on this interface/VLAN. "
             DEFVAL { disable }    
             ::= { hwDhcpSnpCfgEntry 5 }
     
@@ -344,8 +362,8 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "This interface/vlan is trusted or untrusted. 
-                 When enabled the snooping, it turns to untrusted as default until be changed."    
+                "This interface/VLAN is trusted or distrusted. 
+                 When enabled the snooping, it turns to distrusted as default until be changed."    
             ::= { hwDhcpSnpCfgEntry 6 }
             
     hwDhcpOption82Insert OBJECT-TYPE
@@ -357,7 +375,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "Whether to insert Option82 to Dhcp packets. "
+                "Whether to insert Option82 to DHCP packets. "
             DEFVAL { disable }    
             ::= { hwDhcpSnpCfgEntry 7 }
     
@@ -371,7 +389,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "Whether to rebuild the Option82 in Dhcp packets. "
+                "Whether to rebuild the Option82 in DHCP packets. "
             DEFVAL { disable }    
             ::= { hwDhcpSnpCfgEntry 8 }        
     
@@ -385,7 +403,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "Whether to enable check Chaddr in Dhcp packets with source mac-address in ethernet frame. "
+                "Whether to enable check Chaddr in DHCP packets with source Mac-address in Ethernet frame. "
             DEFVAL { disable }    
             ::= { hwDhcpSnpCfgEntry 9 }
     
@@ -395,7 +413,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "The threshold of Chaddr check alarm. A trap can be sent when the chaddr-false Dhcp 
+                "The threshold of Chaddr check alarm. A trap can be sent when the chaddr-false DHCP 
                  packets count beyond it."
             DEFVAL { 100 }    
             ::= { hwDhcpSnpCfgEntry 10 }
@@ -424,7 +442,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "Whether to enable check Arp packets with the snooping bind table. "
+                "Whether to enable check ARP packets with the snooping bind table. "
             DEFVAL { disable }    
             ::= { hwDhcpSnpCfgEntry 12 }
             
@@ -435,12 +453,12 @@
             forward(0),
             discard(1)
             }
-        MAX-ACCESS read-create
+        MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "How to deal with the Arp packets that do not match the Dhcp snooping 
-             bind table in port/vlan view. "
-        DEFVAL { forward }
+            "How to deal with the ARP packets that do not match the DHCP snooping 
+             bind table in port/VLAN view. "
+        DEFVAL { discard }
         ::= { hwDhcpSnpCfgEntry 13 }
            
            
@@ -449,7 +467,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "The threshold of Arp check alarm. A trap can be sent when the false Arp 
+                "The threshold of ARP check alarm. A trap can be sent when the false ARP 
                  packets discarded count beyond it. "
             DEFVAL { 100 }    
             ::= { hwDhcpSnpCfgEntry 14 }
@@ -489,12 +507,12 @@
             forward(0),
             discard(1)
             }
-        MAX-ACCESS read-create
+        MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "How to deal with the Ip packets that do not match the Dhcp snooping 
-             bind table in port/vlan view. "
-        DEFVAL { forward }
+            "How to deal with the Ip packets that do not match the DHCP snooping 
+             bind table in port/VLAN view. "
+        DEFVAL { discard }
         ::= { hwDhcpSnpCfgEntry 17 }
     
            
@@ -503,7 +521,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "The threshold of Ip check alarm. A trap can be sent when the false Ip 
+                "The threshold of IP check alarm. A trap can be sent when the false IP 
                  packets count beyond it. "
             DEFVAL { 100 }    
             ::= { hwDhcpSnpCfgEntry 18 }
@@ -518,7 +536,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "Whether to send Ip trap when its count beyond the threshold. "
+                "Whether to send IP trap when its count beyond the threshold. "
             DEFVAL { disable }    
             ::= { hwDhcpSnpCfgEntry 19 }
     
@@ -528,8 +546,8 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "The threshold of Dhcp reply packets check alarm. A trap can be sent when the Dhcp 
-                 reply packets count on untrusted interface/vlan beyond it. "
+                "The threshold of DHCP reply packets check alarm. A trap can be sent when the DHCP 
+                 reply packets count on untrusted interface/VLAN beyond it. "
             DEFVAL { 100 }    
             ::= { hwDhcpSnpCfgEntry 20 }
     
@@ -543,7 +561,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION 
-                "Whether to send untrusted Dhcp reply trap when its count beyond the threshold. "
+                "Whether to send distrust DHCP reply trap when its count beyond the threshold. "
             DEFVAL { disable }    
             ::= { hwDhcpSnpCfgEntry 21 }
             
@@ -557,7 +575,7 @@
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "Whether to check Dhcp request packets with the snooping bind table. "
+            "Whether to check DHCP request packets with the snooping bind table. "
         DEFVAL { disable }
         ::= { hwDhcpSnpCfgEntry 22 }    
     
@@ -567,7 +585,7 @@
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The threshold of Dhcp request packets checking alarm with the snooping bind table. "
+            "The threshold of DHCP request packets checking alarm with the snooping bind table. "
         DEFVAL { 100 }
         ::= { hwDhcpSnpCfgEntry 23 }    
     
@@ -590,9 +608,9 @@
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            " Setting the vlan mode of the dhcp packets matched in the bind table.
-            pvlan(1),
-            cvlan(2),
+            " Setting the VLAN mode of the dhcp packets matched in the bind table.
+            PVLAN(1),
+            CVLAN(2),
             all(3)
             "
         DEFVAL { 1 }
@@ -610,7 +628,7 @@
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "Check items of Dynamic DHCP snooping binding table by ip address or mac-address or interface. "
+            "Check items of Dynamic DHCP snooping binding table by IP address or Mac-address or interface. "
         DEFVAL { ipMacInterface }
         ::= { hwDhcpSnpCfgEntry 26 }          
 
@@ -651,7 +669,7 @@
                MAX-ACCESS read-create
                STATUS current
                DESCRIPTION 
-                   "The snooping configuration table rowstatus."
+                   "The snooping configuration table row status."
                ::= { hwDhcpSnpCfgEntry 30 }                    
 
 -- begin add for dhcprateAnddhcpoption82            
@@ -664,7 +682,7 @@
         ::= { hwDhcpSnpCfgEntry 31 }      
         
     hwDhcpPktIfRate OBJECT-TYPE
-        SYNTAX     Integer32(1..100)
+        SYNTAX     Integer32(1..1000)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -719,8 +737,8 @@
             STATUS current
             DESCRIPTION
                 "The snooping bind table.You must give out 
-                (1)one of the ifIndex, vlanId and vsiId at least 
-                (2)the mac-address,ip-address,static type
+                (1)one of the interface index, VLANID and VSIID at least 
+                (2)the Mac-address,ip-address,static type
                 if you want to create a static bind row of the table,
                 dynamic can not be created."
             ::= { hwDhcpSnpObjects 14 }
@@ -751,7 +769,7 @@
                 hwDhcpSnpBindMac             MacAddress,
                 hwDhcpSnpBindIp                IpAddress,
                 hwDhcpSnpBindStatus            INTEGER,
-                hwDhcpSnpBindLease            Counter32,
+                hwDhcpSnpBindLease            Integer32,
                 hwDhcpSnpBindRowStatus        RowStatus
                 }
     
@@ -760,7 +778,7 @@
                MAX-ACCESS not-accessible
                STATUS current
                DESCRIPTION 
-                   "Index: the Ip of the bind table."
+                   "Index: the IP of the bind table."
                ::= { hwDhcpSnpBindEntry 1 }
                
     hwDhcpSnpBindPVlanIndex OBJECT-TYPE
@@ -768,7 +786,7 @@
                MAX-ACCESS not-accessible
                STATUS current
                DESCRIPTION 
-                   "Index: the P-Vlan of the bind table."
+                   "Index: the P-VLAN of the bind table."
                ::= { hwDhcpSnpBindEntry 2 }
                
     hwDhcpSnpBindCVlanIndex OBJECT-TYPE
@@ -776,7 +794,7 @@
                MAX-ACCESS not-accessible
                STATUS current
                DESCRIPTION 
-                   "Index: the C-Vlan of the bind table."
+                   "Index: the C-VLAN of the bind table."
                ::= { hwDhcpSnpBindEntry 3 }
                
     hwDhcpSnpBindVRFIdIndex OBJECT-TYPE
@@ -792,39 +810,39 @@
                MAX-ACCESS not-accessible
                STATUS current
                DESCRIPTION 
-                   "Index: the Vsi of the bind table."
+                   "Index: the VSI of the bind table."
                ::= { hwDhcpSnpBindEntry 5 }                                                       
     
     
     hwDhcpSnpBindIfDescr OBJECT-TYPE
                SYNTAX  DisplayString (SIZE (0..47))
-               MAX-ACCESS read-create
+               MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The description of the interfaces that binded."
+                   "The description of the interfaces that bound."
                ::= { hwDhcpSnpBindEntry 6 }
     
     
     hwDhcpSnpBindPVlanId OBJECT-TYPE
                SYNTAX  VlanId
-               MAX-ACCESS read-create
+               MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The pvlan Id."
+                   "The PVLAN Id."
                ::= { hwDhcpSnpBindEntry 7 }
                
     hwDhcpSnpBindCVlanId OBJECT-TYPE
                SYNTAX  VlanId
-               MAX-ACCESS read-create
+               MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The cvlan Id."
+                   "The CVLAN Id."
                ::= { hwDhcpSnpBindEntry 8 }           
                
                
     hwDhcpSnpBindVRFId OBJECT-TYPE
                SYNTAX  Integer32 (0..1000)
-               MAX-ACCESS read-create
+               MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
                    "The VRFID for L3VPN."
@@ -832,15 +850,15 @@
                
     hwDhcpSnpBindVsiId OBJECT-TYPE
                SYNTAX  Integer32 (0..4095|65535)
-               MAX-ACCESS read-create
+               MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The Vsi for L2VPN."
+                   "The VSI for L2VPN."
                ::= { hwDhcpSnpBindEntry 10 }    
           
     hwDhcpSnpBindMac OBJECT-TYPE
                SYNTAX  MacAddress
-               MAX-ACCESS read-create
+               MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
                     "Mac-address bind. Value of hwDhcpSnpBindMac is optional, if you did not specify 
@@ -851,7 +869,7 @@
            
     hwDhcpSnpBindIp OBJECT-TYPE
                SYNTAX  IpAddress
-               MAX-ACCESS read-create
+               MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
                    "Ip-address bind."
@@ -864,7 +882,7 @@
                    dynamic(1),
                    static(2)
                    }
-               MAX-ACCESS read-create
+               MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
                    "The bind status:dynamic(1) or static(2)."
@@ -872,8 +890,8 @@
     
           
     hwDhcpSnpBindLease OBJECT-TYPE
-               SYNTAX  Counter32
-               MAX-ACCESS read-create
+               SYNTAX  Integer32
+               MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
                    "The time of the dynamic bind lease to be end."
@@ -885,7 +903,7 @@
                MAX-ACCESS read-create
                STATUS current
                DESCRIPTION 
-                   "The snooping bind table rowstatus."
+                   "The snooping bind table row status."
                ::= { hwDhcpSnpBindEntry 18 }                     
     
 
@@ -911,7 +929,7 @@
     HWDhcpSnpFalsePktStatisticEntry ::=
             SEQUENCE { 
                 hwDhcpSnpStatisticIfDescr        DisplayString,
-                hwDhcpSnpStatisticVlanId        VlanId,    
+                hwDhcpSnpStatisticVlanId        VlanIdOrNone,    
                 hwChaddrNomatchSrcMacDhcpPktNum     Counter32,
                 hwArpNomatchSnpBindTblPktNum    Counter32,
                 hwIpNomatchSnpBindTblPktNum        Counter32,
@@ -935,11 +953,11 @@
                ::= { hwDhcpSnpFalsePktStatisticEntry 1 }
     
     hwDhcpSnpStatisticVlanId OBJECT-TYPE
-               SYNTAX  VlanId
+               SYNTAX  VlanIdOrNone
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The vlan Id."
+                   "The VLAN Id."
                ::= { hwDhcpSnpFalsePktStatisticEntry 2 }
           
     hwChaddrNomatchSrcMacDhcpPktNum OBJECT-TYPE
@@ -947,8 +965,7 @@
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The false packets(chaddr in Dhcp packets is not same with source mac-address in
-                   ethernet frame) count."
+                   "This object indicates that the number of received DHCP packets in which the source MAC address carried in the CHADDR field is incorrect exceeds the configured threshold. An attacker may attack a target by continuously changing its MAC address."
                ::= { hwDhcpSnpFalsePktStatisticEntry 3 }
     
           
@@ -957,7 +974,7 @@
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The false Arp packets match in snooping bind table count."
+                   "The false ARP packets match in snooping bind table count."
                ::= { hwDhcpSnpFalsePktStatisticEntry 4 }
     
            
@@ -966,7 +983,7 @@
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The false Ip packets do not match snooping bind table count."
+                   "The false IP packets do not match snooping bind table count."
                ::= { hwDhcpSnpFalsePktStatisticEntry 5 }
     
     
@@ -975,7 +992,7 @@
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The Dhcp request packets do not match the snooping bind table."
+                   "The DHCP request packets do not match the snooping bind table."
                ::= { hwDhcpSnpFalsePktStatisticEntry 6 }      
     
           
@@ -984,7 +1001,7 @@
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The untrusted port Dhcp reply packets count."
+                   "The distrusted port DHCP reply packets count."
                ::= { hwDhcpSnpFalsePktStatisticEntry 7 } 
                
     hwDhcpSnpStatisticVsiId OBJECT-TYPE
@@ -992,7 +1009,7 @@
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The Vsi for L2VPN."
+                   "The VSI for L2VPN."
                ::= { hwDhcpSnpFalsePktStatisticEntry 8 }          
 
     hwSnpBindingItemNum OBJECT-TYPE
@@ -1027,7 +1044,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                " The DHCP Snooping CAR table for control of the traffic. The CAR is based on IP and Mac, but configured with interface and vlan."
+                " The DHCP Snooping CAR table for control of the traffic. The CAR is based on IP and Mac, but configured with interface and VLAN."
             ::= { hwDhcpSnpObjects 16 }
     
 
@@ -1124,9 +1141,9 @@
                MAX-ACCESS read-create
                STATUS current
                DESCRIPTION 
-                   "The DHCP Snooping CAR table rowstatus."
+                   "The DHCP Snooping CAR table row status."
                ::= { hwDhcpSnpCarCfgEntry 50 } 
-               
+                                                   
 -- begin add for dhcprateAnddhcpoption82        
     hwDhcpSnpGlobalOption82Format OBJECT-TYPE
         SYNTAX     INTEGER
@@ -1137,8 +1154,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The format type of Option82. "
-        DEFVAL { hex }
+            "The format type of Option82,default is hex. "
         ::= { hwDhcpSnpObjects 17 }
         
      hwDhcpSnpGlobalOption82PacketFormat OBJECT-TYPE
@@ -1150,8 +1166,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The format mode of Option82. "
-        DEFVAL { extended }
+            "The format mode of Option82,default is extended. "
         ::= { hwDhcpSnpObjects 18 }        
     
      hwDhcpSnpGlobalOption82RemoteId OBJECT-TYPE
@@ -1167,8 +1182,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "Config Option82 global remote ID as system name. "
-        DEFVAL { disabled }
+            "Config Option82 global remote ID as system name,default is disabled. "
         ::= { hwDhcpSnpObjects 20 }
         
     hwDhcpSnpGlobalOption82CircuitId OBJECT-TYPE
@@ -1238,11 +1252,195 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-                "The content of the option when the format is userdefined."
+                "The content of the option when the format is user defined."
         ::= { hwDhcpSnpGlobalOption82PktFormatEntry 3 } 
                          
                 		
---  end add for dhcprateAnddhcpoption82                             
+--  end add for dhcprateAnddhcpoption82   
+
+    hwDhcpSnpStaticBindTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWDhcpSnpStaticBindEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The snooping static bind table."
+            ::= { hwDhcpSnpObjects 23 }
+    
+          
+    hwDhcpSnpStaticBindEntry OBJECT-TYPE
+            SYNTAX HWDhcpSnpStaticBindEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the snooping static bind table."
+            INDEX { hwDhcpSnpStaticBindIpIndex, hwDhcpSnpStaticBindMacIndex, hwDhcpSnpStaticBindPVlanIndex, 
+                hwDhcpSnpStaticBindCVlanIndex, hwDhcpSnpStaticBindIfIndex }
+            ::= { hwDhcpSnpStaticBindTable 1 }
+            
+    HWDhcpSnpStaticBindEntry ::=
+            SEQUENCE { 
+                hwDhcpSnpStaticBindIpIndex              IpAddress,
+                hwDhcpSnpStaticBindMacIndex            MacAddress,                
+                hwDhcpSnpStaticBindPVlanIndex              VlanId,
+                hwDhcpSnpStaticBindCVlanIndex              VlanId,
+                hwDhcpSnpStaticBindIfIndex   InterfaceIndexOrZero,
+                hwDhcpSnpStaticBindRowStatus             RowStatus
+                }
+    
+    hwDhcpSnpStaticBindIpIndex OBJECT-TYPE
+               SYNTAX  IpAddress
+               MAX-ACCESS not-accessible
+               STATUS current
+               DESCRIPTION 
+                   "Index: the IP of the bind table."
+               ::= { hwDhcpSnpStaticBindEntry 1 }
+               
+    hwDhcpSnpStaticBindMacIndex OBJECT-TYPE
+               SYNTAX  MacAddress
+               MAX-ACCESS not-accessible
+               STATUS current
+               DESCRIPTION 
+                   "Index: the MAC of the bind table."
+               ::= { hwDhcpSnpStaticBindEntry 2 }
+
+    hwDhcpSnpStaticBindPVlanIndex OBJECT-TYPE
+               SYNTAX  VlanId
+               MAX-ACCESS not-accessible
+               STATUS current
+               DESCRIPTION 
+                   "Index: the P-VLAN of the bind table."
+               ::= { hwDhcpSnpStaticBindEntry 3 }
+               
+    hwDhcpSnpStaticBindCVlanIndex OBJECT-TYPE
+               SYNTAX  VlanId
+               MAX-ACCESS not-accessible
+               STATUS current
+               DESCRIPTION 
+                   "Index: the C-VLAN of the bind table."
+               ::= { hwDhcpSnpStaticBindEntry 4 }
+                   
+    hwDhcpSnpStaticBindIfIndex OBJECT-TYPE
+               SYNTAX  InterfaceIndexOrZero
+               MAX-ACCESS not-accessible
+               STATUS current
+               DESCRIPTION 
+                   "Index: the interface index of the bind table."
+               ::= { hwDhcpSnpStaticBindEntry 5 }
+
+           
+    hwDhcpSnpStaticBindRowStatus  OBJECT-TYPE
+               SYNTAX  RowStatus
+               MAX-ACCESS read-create
+               STATUS current
+               DESCRIPTION 
+                   "The static snooping bind table row status."
+               ::= { hwDhcpSnpStaticBindEntry 20 }                     
+   
+   
+    hwDhcpSnpServerDetectStatus OBJECT-TYPE
+              SYNTAX EnabledStatus
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+              "This object indicates whether detection against the pseudo DHCP server is enabled.
+                 The default value is disabled(2)."
+              ::= { hwDhcpSnpObjects 24 }
+
+        hwDhcpSnpBdFalsePktTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDhcpSnpBdFalsePktEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "The false packets statistic information table."
+           ::= { hwDhcpSnpObjects 25 }
+           
+    hwDhcpSnpBdFalsePktEntry OBJECT-TYPE
+           SYNTAX HwDhcpSnpBdFalsePktEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+           "An entry in the snooping false packets statistic information table."
+           INDEX { hwDhcpSnpBdIndex }
+           ::= { hwDhcpSnpBdFalsePktTable 1 }
+
+    HwDhcpSnpBdFalsePktEntry ::=
+            SEQUENCE {
+                hwDhcpSnpBdIndex         Integer32,
+                hwBdNomatchSnpBindTblDhcpPktNum    Counter32,
+                hwBdChaddrNomatchSrcMacDhcpPktNum     Counter32,
+                hwBdArpNomatchSnpBindTblPktNum    Counter32,
+                hwBdIpNomatchSnpBindTblPktNum        Counter32,
+                hwBdUntrustedReplyPktNum        Counter32,
+                hwBdSnpBindingItemNum                 Counter32,
+                hwBdSnpCfgMaxUserNum               Counter32
+                }
+    
+    hwDhcpSnpBdIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..32768)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Bridge-domain ID."
+           ::= { hwDhcpSnpBdFalsePktEntry 1 }
+              
+    hwBdNomatchSnpBindTblDhcpPktNum OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "The DHCP request packets do not match the snooping bind table of the bridge domain."
+          ::= { hwDhcpSnpBdFalsePktEntry 2 }
+     
+     hwBdChaddrNomatchSrcMacDhcpPktNum OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "The false packets(chaddr in DHCP packets is not same with source Mac-address in
+                   Ethernet frame) count of the bridge domain."
+          ::= { hwDhcpSnpBdFalsePktEntry 3 }
+    
+    hwBdArpNomatchSnpBindTblPktNum OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "The false ARP packets match in snooping bind table count of the bridge domain."
+          ::= { hwDhcpSnpBdFalsePktEntry 4 }
+    
+    hwBdIpNomatchSnpBindTblPktNum OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "The false IP packets do not match snooping bind table count of the bridge domain."
+          ::= { hwDhcpSnpBdFalsePktEntry 5 }
+    
+    hwBdUntrustedReplyPktNum OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "The distrusted port DHCP reply packets count of the bridge domain."
+          ::= { hwDhcpSnpBdFalsePktEntry 6 }
+  
+    hwBdSnpBindingItemNum OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "The number of current binding-table items of the bridge domain."
+          ::= { hwDhcpSnpBdFalsePktEntry 7 }
+
+    hwBdSnpCfgMaxUserNum OBJECT-TYPE
+          SYNTAX Counter32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "The limitation of the user number of the bridge domain."
+          ::= { hwDhcpSnpBdFalsePktEntry 8 }
+              
+                          
 --
 -- Traps Identifier
 --
@@ -1253,7 +1451,7 @@
             OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwChaddrNomatchSrcMacDhcpPktNum } 
             STATUS current     
             DESCRIPTION 
-                "CHADDR in Dhcp packets do not match source mac-address in Ethernet frame. "
+                "This object indicates that the ARP packet does not match the binding table."
             ::= { hwDhcpSnpTraps 1 }
                   
     hwArpNomatchSnpBindTblPktAlarm NOTIFICATION-TYPE
@@ -1296,11 +1494,148 @@
             STATUS current     
             DESCRIPTION 
                 "The number of the binding items exceeds the threshold of user-limit on the interface."
-            ::= {hwDhcpSnpTraps 7 }              
-       
+            ::= {hwDhcpSnpTraps 7 }     
+	             
+   hwSnpUserNumberAlarmIf NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of DHCP user on the interface exceeds alarm threshold."
+            ::= {hwDhcpSnpTraps 8 }
+    hwSnpUserNumberAlarmIfResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of DHCP user on the interface descends to alarm threshold."
+            ::= {hwDhcpSnpTraps 9 }                
+    hwSnpUserNumberAlarmVlan NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticVlanId,hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of DHCP user on the vlan exceeds alarm threshold."
+            ::= {hwDhcpSnpTraps 10 }   
+    hwSnpUserNumberAlarmVlanResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticVlanId,hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of DHCP user on the vlan descends to alarm threshold."
+            ::= {hwDhcpSnpTraps 11 }
+    hwSnpUserNumberAlarmGlobal NOTIFICATION-TYPE
+            OBJECTS { hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of DHCP global user  exceeds alarm threshold."
+            ::= {hwDhcpSnpTraps 12 }
+    hwSnpUserNumberAlarmGlobalResume NOTIFICATION-TYPE
+            OBJECTS { hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of DHCP global user descends to alarm threshold."
+            ::= {hwDhcpSnpTraps 13 }           
+    hwNdSnpUserNumberAlarmIf NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of ND user on the interface exceeds alarm threshold."
+            ::= {hwDhcpSnpTraps 14 }
+    hwNdSnpUserNumberAlarmIfResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of ND user on the interface descends to alarm threshold."
+            ::= {hwDhcpSnpTraps 15 }            
+    hwNdSnpUserNumberAlarmGlobal NOTIFICATION-TYPE
+            OBJECTS { hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of ND global user exceeds alarm threshold."
+            ::= {hwDhcpSnpTraps 16 }
+    hwNdSnpUserNumberAlarmGlobalResume NOTIFICATION-TYPE
+            OBJECTS { hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of ND global user descends to alarm threshold."
+            ::= {hwDhcpSnpTraps 17 }
+   hwBdNomatchSnpBindTblDhcpPktAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBdNomatchSnpBindTblDhcpPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "There are Dhcp request packets do not match the snooping bind table on the bridge domain."
+            ::= {hwDhcpSnpTraps 18 }
+    hwBdDhcpSnpChaddrAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBdChaddrNomatchSrcMacDhcpPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "CHADDR in Dhcp packets do not match source Mac-address in Ethernet frame on the bridge domain."
+            ::= { hwDhcpSnpTraps 19 }                 
+    hwBdArpNomatchSnpBindTblPktAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBdArpNomatchSnpBindTblPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "Arp packets do not match the snooping bind table on the bridge domain."
+            ::= { hwDhcpSnpTraps 20 }                
+    hwBdIpNomatchSnpBindTblPktAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBdIpNomatchSnpBindTblPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "Ip packets do not match the snooping bind table on the bridge domain."
+            ::= { hwDhcpSnpTraps 21 }                 
+    hwBdUntrustedReplyPktAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBdUntrustedReplyPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "Untrusted ports have received the Dhcp reply packets on the bridge domain."
+            ::= { hwDhcpSnpTraps 22 } 
+    hwBdSnpUserNumberAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBdSnpBindingItemNum,hwBdSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of the binding items exceeds the threshold of user-limit on the bridge domain."
+            ::= {hwDhcpSnpTraps 23 }
+       hwDhcpSnpChaddrAlarmResume NOTIFICATION-TYPE
+             OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwChaddrNomatchSrcMacDhcpPktNum }
+             STATUS current
+            DESCRIPTION
+               "The number of the discarded DHCP packets in which the CHADDR field is inconsistent with the source MAC address descends to the threshold on the interface."
+            ::= { hwDhcpSnpTraps 24 }
+    hwArpNomatchSnpBindTblPktAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwArpNomatchSnpBindTblPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of the discarded ARP packets that do not match the binding table descends to the threshold on the interface."
+            ::= { hwDhcpSnpTraps 25 }    
+    hwIpNomatchSnpBindTblPktAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwIpNomatchSnpBindTblPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of the discarded IP packets that do not match the binding table descends to the threshold on the interface."
+            ::= { hwDhcpSnpTraps 26 } 
+    hwUntrustedReplyPktAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwUntrustedReplyPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of the discarded DHCP reply packets on the untrusted interface descends to the threshold."
+            ::= { hwDhcpSnpTraps 27 }  
+    hwNomatchSnpBindTblDhcpPktAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwNomatchSnpBindTblDhcpPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of the discarded DHCP request packets that do not match the binding table descends to the threshold on the interface."
+            ::= { hwDhcpSnpTraps 28 }    
+    hwSnpUserNumberAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwSnpBindingItemNum,hwSnpCfgMaxUserNum } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of the binding items descends to the threshold of user-limit on the interface."
+            ::= { hwDhcpSnpTraps 29 } 
+            
     
-    hwDhcpSnpMibGroups OBJECT IDENTIFIER ::= { hwDhcpSnpMib 3 }
+    hwDhcpSnpCompliance OBJECT IDENTIFIER ::= { hwDhcpSnpMib 3 }
     
+    
+	
+    hwDhcpSnpMibGroups OBJECT IDENTIFIER ::= { hwDhcpSnpCompliance 1 }
+             
     hwDhcpSnpCfgGroup OBJECT-GROUP
             OBJECTS { hwDhcpSnpGlobal, hwDhcpPktRateCheck, hwDhcpPktRate, hwDhcpPktRateAlarmThreshold, 
             hwDhcpPktRateAlarmEnable, hwDhcpSnpBindTblNomatchedArpGlobalAction, hwDhcpSnpBindTblNomatchedIpGlobalAction,
@@ -1317,7 +1652,7 @@
                     hwDhcpSnpCarEnable,hwDhcpSnpCarCir,hwDhcpSnpCarPir,hwDhcpSnpCaCbs,hwDhcpSnpCarPbs,hwDhcpSnpCarYellow,hwDhcpSnpCarRed,
                     hwDhcpSnpGlobalOption82Format,hwDhcpSnpGlobalOption82PacketFormat,hwDhcpSnpGlobalOption82RemoteId,hwDhcpSnpGlobalOption82RemoteIdSysName,hwDhcpSnpGlobalOption82CircuitId,
                     hwDhcpSnpGlobalOption82PktFormat,hwDhcpSnpGlobalOption82DefString,
-                    hwDhcpSnpCarRowStatus                   }
+                    hwDhcpSnpCarRowStatus, hwDhcpSnpServerDetectStatus}
 
              STATUS current
             DESCRIPTION 
@@ -1346,11 +1681,38 @@
             
     hwDhcpSnpTrapGroup NOTIFICATION-GROUP
             NOTIFICATIONS { hwDhcpSnpChaddrAlarm, hwArpNomatchSnpBindTblPktAlarm, hwIpNomatchSnpBindTblPktAlarm,
-            hwUntrustedReplyPktAlarm, hwNomatchSnpBindTblDhcpPktAlarm, hwDhcpPktRateAlarm, hwSnpUserNumberAlarm}
+            hwUntrustedReplyPktAlarm, hwNomatchSnpBindTblDhcpPktAlarm, hwDhcpPktRateAlarm, hwSnpUserNumberAlarm,
+            hwSnpUserNumberAlarmIf, hwSnpUserNumberAlarmIfResume, hwSnpUserNumberAlarmVlan, hwSnpUserNumberAlarmVlanResume,
+            hwSnpUserNumberAlarmGlobal, hwSnpUserNumberAlarmGlobalResume, hwNdSnpUserNumberAlarmIf, hwNdSnpUserNumberAlarmIfResume,
+            hwNdSnpUserNumberAlarmGlobal, hwNdSnpUserNumberAlarmGlobalResume, hwBdNomatchSnpBindTblDhcpPktAlarm, hwBdDhcpSnpChaddrAlarm,
+            hwBdArpNomatchSnpBindTblPktAlarm, hwBdIpNomatchSnpBindTblPktAlarm, hwBdUntrustedReplyPktAlarm, hwBdSnpUserNumberAlarm,
+            hwDhcpSnpChaddrAlarmResume, hwArpNomatchSnpBindTblPktAlarmResume, hwIpNomatchSnpBindTblPktAlarmResume,
+            hwUntrustedReplyPktAlarmResume, hwNomatchSnpBindTblDhcpPktAlarmResume, hwSnpUserNumberAlarmResume}
             STATUS current
             DESCRIPTION 
                 "The DHCPSNP's Notification group."
             ::= { hwDhcpSnpMibGroups 4 } 
-                                                                               
+
+    hwDhcpSnpBdStatisticGroup OBJECT-GROUP
+            OBJECTS { hwBdNomatchSnpBindTblDhcpPktNum,hwBdChaddrNomatchSrcMacDhcpPktNum,
+                hwBdArpNomatchSnpBindTblPktNum,hwBdIpNomatchSnpBindTblPktNum,hwBdUntrustedReplyPktNum,hwBdSnpBindingItemNum, 
+                hwBdSnpCfgMaxUserNum }
+            STATUS current
+            DESCRIPTION 
+                "The DHCPSNP's Statistic group on the bridge domain ."
+            ::= { hwDhcpSnpMibGroups 5 }
+
+    hwDhcpSnpCompliances OBJECT IDENTIFIER ::= { hwDhcpSnpCompliance 2 }
+	
+        hwDhcpSnpMibCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                this module."
+
+               MODULE    
+               MANDATORY-GROUPS    { hwDhcpSnpCfgGroup, hwDhcpSnpBindGroup, hwDhcpSnpStatisticGroup, hwDhcpSnpTrapGroup}  
+                                               
+              ::= { hwDhcpSnpCompliances 1 }                                                                           
 
         END

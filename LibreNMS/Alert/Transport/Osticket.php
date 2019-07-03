@@ -11,18 +11,26 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
+use LibreNMS\Config;
 
-class Osticket implements Transport
+class Osticket extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        global $config;
+        if (!empty($this->config)) {
+            $opts['url'] = $this->config['os-url'];
+            $opts['token'] = $this->config['os-token'];
+        }
+        return $this->contactOsticket($obj, $opts);
+    }
 
+    public function contactOsticket($obj, $opts)
+    {
         $url   = $opts['url'];
         $token = $opts['token'];
 
-        foreach (parse_email($config['email_from']) as $from => $from_name) {
+        foreach (parse_email(Config::get('email_from')) as $from => $from_name) {
             $email = $from_name . ' <' . $from . '>';
             break;
         }
@@ -54,5 +62,29 @@ class Osticket implements Transport
         }
 
         return true;
+    }
+    
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'API URL',
+                    'name' => 'os-url',
+                    'descr' => 'osTicket API URL',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'API Token',
+                    'name' => 'os-token',
+                    'descr' => 'osTicket API Token',
+                    'type' => 'text'
+                ]
+            ],
+            'validation' => [
+                'os-url' => 'required|url',
+                'os-token' => 'required|string'
+            ]
+        ];
     }
 }

@@ -1,4 +1,5 @@
 source: Support/Remote-Monitoring-VPN.md
+path: blob/master/doc/
 # Remote monitoring using tinc VPN
 
 This article describes how to use tinc to connect several remote sites and their subnets to your central monitoring server. This will let you connect to devices on remote private IP ranges through one gateway on each site, routing them securely back to your LibreNMS installation.

@@ -1,4 +1,5 @@
 source: Install Validation.md
+path: blob/master/doc/
 
 # Install validation
 

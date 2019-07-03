@@ -1,4 +1,5 @@
 source: Extensions/Plugin-System.md
+path: blob/master/doc/
 # Developing for the Plugin System
 
 > This will most likely be deprecated in favour of adding the possible extensions to the core code base.

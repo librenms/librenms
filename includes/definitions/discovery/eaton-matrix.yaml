@@ -1,0 +1,155 @@
+mib: TELECOM-MIB
+modules:
+    sensors:
+        current:
+            data:
+                -
+                    oid: matInvTable
+                    value: matInvOutputCurrent
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.7.{{ $index }}"
+                    descr: "Inverter {{ $index }} Output"
+                    index: "matInvOutputCurrent.{{ $index }}"
+                -
+                    oid: matStsTable
+                    value: matStsOutputCurrent
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.12.{{ $index }}"
+                    descr: "STS Output"
+                    index: "matStsOutputCurrent.{{ $index }}"
+        voltage:
+            data:
+                -
+                    oid: matStsTable
+                    value: matStsMainInputVoltage
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.7.{{ $index }}"
+                    divisor: 10
+                    descr: "STS Input - Mains"
+                    index: "matStsMainInputVoltage.{{ $index }}"
+                    high_limit: matStsMainHighLossVoltage
+                    low_limit: matStsMainLowLossVoltage
+                -
+                    oid: matStsTable
+                    value: matStsInvInputVoltage
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.9.{{ $index }}"
+                    divisor: 10
+                    descr: "STS Input - Inverter"
+                    index: "matStsInvInputVoltage.{{ $index }}"
+                    high_limit: matStsInvHighLossVoltage
+                    low_limit: matStsInvLosLossVoltage
+                -
+                    oid: matStsTable
+                    value: matStsOutputVoltage
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.11.{{ $index }}"
+                    divisor: 10
+                    descr: "STS Output"
+                    index: "matStsOutputVoltage.{{ $index }}"
+                -
+                    oid: matInvTable
+                    value: matInvBatteryVoltage
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.8.{{ $index }}"
+                    descr: "Inverter {{ $index }} Input"
+                    index: "matInvBatteryVoltage.{{ $index }}"
+                    divisor: 10
+                -
+                    oid: matInvTable
+                    value: matInvOutputVoltage
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.6.{{ $index }}"
+                    descr: "Inverter {{ $index }} Output"
+                    index: "matInvOutputVoltage.{{ $index }}"
+                    divisor: 10
+                    high_limit: matConfInvOutputVoltHighLoss
+                    low_limit: matConfInvOutputVoltLowLoss
+
+        power:
+            data:
+                -
+                    oid: matStsOutputPower
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.13.{{ $index }}"
+                    index: "matStsOutputPower.{{ $index }}"
+                    descr: "STS Output Power"
+                -
+                    oid: matInvTable
+                    value: matInvOutputPower
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.10.{{ $index }}"
+                    descr: "Inverter {{ $index }} Output Power"
+                    index: "matInvOutputPower.{{ $index }}"
+                    high_limit: matConfInvOutputPower
+
+        temperature:
+            data:      
+                -
+                    oid: matStsTemperature
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.16.{{ $index }}"
+                    index: "matStsTemperature.{{ $index }}"
+                    descr: STS Temperature
+                    divisor: 10
+                -
+                    oid: matConTemperature
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.1.4.{{ $index }}"
+                    index: "matConTemperature.{{ $index }}"
+                    descr: Controller Temperature
+                    divisor: 10
+                -
+                    oid: matInvTable
+                    value: matInvTemperature
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.13.{{ $index }}"
+                    descr: "Inverter {{ $index }} Temperature"
+                    index: "matInvTemperature.{{ $index }}"
+                    divisor: 10
+
+        state:
+            data:
+                -
+                    oid: matInvTable
+                    value: matInvOnOffStatus
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.26.{{ $index }}"
+                    descr: "Inverter {{ $index }} Status ({{ $matInvSerialNum }})"
+                    index: "{{ $index }}"
+                    state_name: matInvOnOff
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: "Off" }
+                        - { value: 2, generic: 0, graph: 0, descr: "On" }
+                -
+                    oid: matConfStsPriority
+                    value: matConfStsPriority
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.5.15.{{ $index }}"
+                    descr: "STS Priority"
+                    index: "{{ $index }}"
+                    state_name: matConfStsPriority
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: "Inverter" }
+                        - { value: 2, generic: 0, graph: 0, descr: "Mains" }
+                -
+                    oid: matStsMbsStatus
+                    value: matStsMbsStatus
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.17.{{ $index }}"
+                    descr: "MBS Switch"
+                    index: "{{ $index }}"
+                    state_name: matStsMbsStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: "Normal" }
+                        - { value: 2, generic: 1, graph: 0, descr: "Manual - Inverted Power" }
+                        - { value: 3, generic: 2, graph: 0, descr: "Bypass - Inverted Power" }
+                        - { value: 4, generic: 1, graph: 0, descr: "Manual - Mains Power" }
+                        - { value: 5, generic: 2, graph: 0, descr: "Bypass - Mains Power" }
+                        - { value: 6, generic: 3, graph: 0, descr: "MBS Switch Error" }
+                -
+                    oid: matStsTable
+                    value: matStsStatus
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.18.{{ $index }}"
+                    descr: "STS Status ({{ $matStsSerialNum }})"
+                    index: "{{ $index }}"
+                    state_name: matStsStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: "Online" }
+                        - { value: 2, generic: 2, graph: 0, descr: "Offline" }
+                -
+                    oid: matStsRunningMode
+                    value: matStsRunningMode
+                    num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.19.{{ $index }}"
+                    descr: "STS Running Mode"
+                    index: "{{ $index }}"
+                    state_name: matStsRunningMode
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: "Inverter" }
+                        - { value: 2, generic: 0, graph: 0, descr: "Mains" }
+                        - { value: 3, generic: 2, graph: 0, descr: "No Output" }

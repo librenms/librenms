@@ -1,0 +1,78 @@
+mib: BCN-HA-MIB:BCN-DHCPV4-MIB:BCN-DNS-MIB:BCN-NTP-MIB
+modules:
+    sensors:
+      state:
+        data:
+        -
+          oid: BCN-HA-MIB:bcnHaServiceStatus
+          value: bcnHaSerOperState
+          num_oid: '.1.3.6.1.4.1.13315.3.1.5.2.1.1.{{ $index }}'
+          descr: HA Status
+          group: HA Cluster Status
+          index: 'bcnHaSerOperState.{{ $index }}'
+          state_name: bcnHaSerOperState
+          states:
+              - { value:  1, generic: 0, graph: 0, descr: 'standalone' }
+              - { value:  2, generic: 0, graph: 0, descr: 'active' }
+              - { value:  3, generic: 0, graph: 0, descr: 'passive' }
+              - { value:  4, generic: 1, graph: 0, descr: 'stopped' }
+              - { value:  5, generic: 1, graph: 0, descr: 'stopping' }
+              - { value:  6, generic: 0, graph: 0, descr: 'becomingActive' }
+              - { value:  7, generic: 0, graph: 0, descr: 'becomingPassive' }
+              - { value:  8, generic: 2, graph: 0, descr: 'fault' }
+        -
+          oid: BCN-HA-MIB:bcnHaServiceStatus
+          value: bcnHaSerReplicationState
+          num_oid: '.1.3.6.1.4.1.13315.3.1.5.2.1.2.{{ $index }}'
+          descr: Replication Status
+          group: HA Cluster Status
+          index: 'bcnHaSerReplicationState.{{ $index }}'
+          state_name: bcnHaSerReplicationState
+          states:
+              - { value:  1, generic: 0, graph: 0, descr: 'notConfigured' }
+              - { value:  2, generic: 1, graph: 0, descr: 'replicating' }
+              - { value:  3, generic: 0, graph: 0, descr: 'synchronized' }
+        -
+          oid: BCN-DHCPV4-MIB:bcnDhcpv4ServiceStatus
+          value: bcnDhcpv4SerOperState
+          num_oid: '.1.3.6.1.4.1.13315.3.1.1.2.1.1.{{ $index }}'
+          descr: DHCP Status
+          group: HA Services Status
+          index: 'bcnDhcpv4SerOperState.{{ $index }}'
+          state_name: bcnDhcpv4SerOperState
+          states:
+              - { value:  1, generic: 0, graph: 0, descr: 'running' }
+              - { value:  2, generic: 0, graph: 0, descr: 'notRunning' }
+              - { value:  3, generic: 1, graph: 0, descr: 'starting' }
+              - { value:  4, generic: 1, graph: 0, descr: 'stopping' }
+              - { value:  5, generic: 2, graph: 0, descr: 'stopped' }
+              - { value:  6, generic: 2, graph: 0, descr: 'fault' }
+        -
+          oid: BCN-DNS-MIB:bcnDnsServiceStatus
+          value: bcnDnsSerOperState
+          num_oid: '.1.3.6.1.4.1.13315.3.1.2.2.1.1.{{ $index }}'
+          descr: DNS Status
+          group: HA Services Status
+          index: 'bcnDnsSerOperState.{{ $index }}'
+          state_name: bcnDnsSerOperState
+          states:
+              - { value:  1, generic: 0, graph: 0, descr: 'running' }
+              - { value:  2, generic: 0, graph: 0, descr: 'notRunning' }
+              - { value:  3, generic: 1, graph: 0, descr: 'starting' }
+              - { value:  4, generic: 1, graph: 0, descr: 'stopping' }
+              - { value:  5, generic: 2, graph: 0, descr: 'stopped' }
+        -
+          oid: BCN-NTP-MIB:bcnNtpServiceStatus
+          value: bcnNtpSerOperState
+          num_oid: '.1.3.6.1.4.1.13315.3.1.2.2.1.1.{{ $index }}'
+          descr: NTP Status
+          group: HA Services Status
+          index: 'bcnNtpSerOperState.{{ $index }}'
+          state_name: bcnNtpSerOperState
+          states:
+              - { value:  1, generic: 0, graph: 0, descr: 'running' }
+              - { value:  2, generic: 0, graph: 0, descr: 'notRunning' }
+              - { value:  3, generic: 1, graph: 0, descr: 'starting' }
+              - { value:  4, generic: 1, graph: 0, descr: 'stopping' }
+              - { value:  5, generic: 2, graph: 0, descr: 'stopped' }
+

@@ -1,9 +1,11 @@
 os: dell-ups
 text: 'Dell UPS'
 type: power
+rfc1628_compat: true
 icon: dell
 over:
     - { graph: device_current, text: Current }
+    - { graph: sensor_runtime, text: Runtime }
 mib_dir:
     - dell
 discovery:

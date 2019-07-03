@@ -9,13 +9,19 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $ipmi['user']     = get_dev_attrib($device, 'ipmi_username');
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
 
+    $cmd = [Config::get('ipmitool', 'ipmitool')];
     if (Config::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
-        $remote = " -H ".$ipmi['host']." -U '".$ipmi['user']."' -P '".$ipmi['password']."' -L USER";
+        array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
     }
 
-    foreach (Config::get('ipmi.type', array()) as $ipmi_type) {
-        $results = external_exec(Config::get('ipmitool')." -I $ipmi_type".$remote.' sensor 2>/dev/null|sort|sed \'/discrete/d\'');
-        if ($results != '') {
+    foreach (Config::get('ipmi.type', []) as $ipmi_type) {
+        $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
+
+        array_filter($results, function ($line) {
+            return !str_contains($line, 'discrete');
+        });
+
+        if (!empty($results)) {
             set_dev_attrib($device, 'ipmi_type', $ipmi_type);
             echo "$ipmi_type ";
             break;
@@ -24,7 +30,8 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 
     $index = 0;
 
-    foreach (explode("\n", $results) as $sensor) {
+    sort($results);
+    foreach ($results as $sensor) {
         // BB +1.1V IOH     | 1.089      | Volts      | ok    | na        | 1.027     | 1.054     | 1.146     | 1.177     | na
         $values = array_map('trim', explode('|', $sensor));
         list($desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable) = $values;

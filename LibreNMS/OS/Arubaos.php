@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -35,6 +36,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 
 class Arubaos extends OS implements
+    WirelessApCountDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessFrequencyPolling,
@@ -50,10 +52,58 @@ class Arubaos extends OS implements
      */
     public function discoverWirelessClients()
     {
-        $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated
-        return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Clients')
-        );
+        $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2.0'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0
+        return [
+            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Client Count')
+        ];
+    }
+
+    /**
+     * Discover wireless AP counts. Type is ap-count.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessApCount()
+    {
+        $mib = 'WLSX-SWITCH-MIB';
+        $data = $this->getCacheTable('wlsxSwitchTotalNumAccessPoints', $mib);
+        $sensors = [];
+
+        foreach ($data as $key => $value) {
+            $oid = snmp_translate($mib.'::'.$key, 'ALL', 'arubaos', '-On', null);
+            $value = intval($value);
+
+            $low_warn_const = 1; // Default warning threshold = 1 down AP
+            $low_limit_const = 10; // Default critical threshold = 10 down APs
+
+            // Calculate default thresholds based on current AP count
+            $low_warn = $value - $low_warn_const;
+            $low_limit = $value - $low_limit_const;
+
+            // For small current AP counts, set thresholds differently:
+            // If AP count is less than twice the default critical threshold,
+            // then set the critical threshold to roughly half the current AP count.
+            if ($value < $low_limit_const * 2) {
+                $low_limit = round($value / 2, 0, PHP_ROUND_HALF_DOWN);
+            }
+            // If AP count is less than the default warning hreshold,
+            // then don't bother setting thresholds.
+            if ($value <= $low_warn_const) {
+                $low_warn = null;
+                $low_limit = null;
+            }
+
+            // If AP count is less than twice the default warning threshold,
+            // then set the critical threshold to zero.
+            if ($value > 0  && $value <= $low_warn_const * 2) {
+                $low_limit = 0;
+            }
+
+            $sensors[] = new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'arubaos', 1, 'AP Count', $value, 1, 1, 'sum', null, null, $low_limit, null, $low_warn);
+        }
+
+        return $sensors;
     }
 
     /**
@@ -99,18 +149,15 @@ class Arubaos extends OS implements
 
     private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
     {
-        $data = snmpwalk_cache_oid_num($this->getDevice(), $oid, array(), 'AI-AP-MIB');
+        $data = snmpwalk_cache_numerical_oid($this->getDevice(), $oid, [], 'AI-AP-MIB');
 
-        $sensors = array();
-        foreach ($data as $oid => $entry) {
-            $oid_parts = explode('.', $oid);
-            $index = end($oid_parts);
-            $tmp_index = "$oid.$index";
+        $sensors = [];
+        foreach ($data as $index => $entry) {
+            $value = reset($entry);
+            $oid = key($entry);
 
             if ($type == 'frequency') {
-                $current = WirelessSensor::channelToFrequency($this->decodeChannel($entry[$oid]));
-            } else {
-                $current = $entry[$oid];
+                $value = WirelessSensor::channelToFrequency($this->decodeChannel($value));
             }
 
             $sensors[] = new WirelessSensor(
@@ -118,9 +165,9 @@ class Arubaos extends OS implements
                 $this->getDeviceId(),
                 $oid,
                 'arubaos-iap',
-                $tmp_index,
+                $oid,
                 sprintf($desc, $index),
-                $current
+                $value
             );
         }
 
@@ -148,6 +195,6 @@ class Arubaos extends OS implements
      */
     public function pollWirelessFrequency(array $sensors)
     {
-        return $this->pollWirelessChannelAsFrequency($sensors, array($this, 'decodeChannel'));
+        return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }
 }

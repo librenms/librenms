@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
  
-$dell_rpdu_data = snmp_get_multi_oid($device, 'rPDUIdentSerialNumberD.1 rPDUIdentModelNumberD.1 rPDUIdentHardwareRevD.1 rPDUIdentFirmwareRevD.1', '-OUQs', 'DellrPDU-MIB');
+$dell_rpdu_data = snmp_get_multi_oid($device, ['rPDUIdentSerialNumberD.1', 'rPDUIdentModelNumberD.1', 'rPDUIdentHardwareRevD.1', 'rPDUIdentFirmwareRevD.1'], '-OUQs', 'DellrPDU-MIB');
 
 $hardware = $dell_rpdu_data['rPDUIdentModelNumberD.1'] . ' ' . $dell_rpdu_data['rPDUIdentHardwareRevD.1'] ;
 $serial = $dell_rpdu_data['rPDUIdentSerialNumberD.1'];

@@ -1,0 +1,107 @@
+NSCRTV-ROOT DEFINITIONS ::= BEGIN
+-- *****************************************************************************
+--                                附录B 根节点MIB
+-- *****************************************************************************
+
+IMPORTS
+     enterprises
+          FROM RFC1155-SMI;
+          
+nscrtvRoot  OBJECT IDENTIFIER ::= { enterprises 17409 }
+
+--     DESCRIPTION
+--     "nscrtvRoot定义全国广播电视标准化技术委员会MIB根节点。"
+
+nscrtvHFCemsTree  OBJECT IDENTIFIER  ::= { nscrtvRoot 1 }
+
+--     DESCRIPTION
+--     "nscrtvHFCemsTree定义HFC网络设备管理系统MIB根节点,"
+--     "所有HFC网络设备管理系统的MIB均应在该节点下定义。"
+
+propertyIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 1}
+
+--     DESCRIPTION
+--     "属性(Property)MIB的分支节点标识。"
+--     "见附录C。"
+
+alarmsIdent   OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 2}
+
+--     DESCRIPTION
+--     "告警(Alarms)MIB的分支节点标识。"
+--     "见附录D。"
+
+commonIdent   OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 3}
+
+--     DESCRIPTION
+--     "公用(Common)MIB的分支节点标识。"
+--     "见附录E。"
+
+tvmodIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 4}
+
+--     DESCRIPTION
+--     "模拟电视调制器(TV Modulator)MIB的分支节点标识。"
+--     "见附录F。"
+
+qammodIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 5}
+
+--     DESCRIPTION
+--     "QAM调制器(QAM Modulator)MIB的分支节点标识。"
+--     "见附录G。"
+
+otdIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 6}
+
+--     DESCRIPTION
+--     "直接调制光发送机MIB的分支节点标识。"
+--     "见附录H。"
+
+otxIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 7}
+
+--     DESCRIPTION
+--     "外调制光发送机MIB的分支节点标识。"
+--     "见附录I。"
+
+uporIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 8}
+
+--     DESCRIPTION
+--     "上行光接收机(UpStream Optical Receiver)MIB的分支节点标识。"
+--     "见附录J。"
+
+dorIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 9}
+
+--     DESCRIPTION
+--     "下行光接收机（DownStream Optical Receiver）MIB的分支节点标识符。"
+--    "见附录K。"
+
+fnIdent  OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 10}
+
+--     DESCRIPTION
+--     "光节点(Fiber Node)MIB的分支节点标识符。"
+--     "见附录L。"
+
+oaIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 11}
+
+--     DESCRIPTION
+--     "光放大器(Optical Amplifier)MIB的分支节点标识符。"
+--     "见附录M。"
+
+addIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 12}
+
+--     DESCRIPTION
+--     "双向射频放大器(Amplifier of Dual Direction)MIB的分支节点标识。"
+--     "见附录N。"
+
+cacIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 13}
+
+--     DESCRIPTION
+--     "可寻址终端控制器(Controlled Access-Controller)MIB的分支节点标识。"
+--     "见附录O。"
+
+lineIdent OBJECT IDENTIFIER ::= { nscrtvHFCemsTree 14}
+
+--     DESCRIPTION
+--     "线路(Line)MIB的分支节点标识。"
+--     "见附录P。"
+
+
+-- *****************************************************************************
+END

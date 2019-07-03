@@ -1,4 +1,5 @@
 source: General/CODE_OF_CONDUCT.md
+path: blob/master/doc/
 
 ## Our Pledge
 

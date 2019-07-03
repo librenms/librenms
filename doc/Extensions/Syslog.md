@@ -1,4 +1,5 @@
 source: Extensions/Syslog.md
+path: blob/master/doc/
 # Setting up syslog support
 
 This document will explain how to send syslog data to LibreNMS.
@@ -104,7 +105,7 @@ service syslog-ng restart
 
 Add the following to your LibreNMS `config.php` file to enable the Syslog extension:
 
-```ssh
+```php
 $config['enable_syslog'] = 1;
 ```
 
@@ -114,7 +115,7 @@ If you prefer rsyslog, here are some hints on how to get it working.
 
 Add the following to your rsyslog config somewhere (could be at the top of the file in the step below, could be in `rsyslog.conf` if you are using remote logs for something else on this host)
 
-```ssh
+```
 # Listen for syslog messages on UDP:514
 $ModLoad imudp
 $UDPServerRun 514
@@ -122,7 +123,7 @@ $UDPServerRun 514
 
 Create a file called something like `/etc/rsyslog.d/30-librenms.conf` containing:
 
-```ssh
+```
 # Feed syslog messages to librenms
 $ModLoad omprog
 
@@ -150,9 +151,49 @@ If your rsyslog server is recieving messages relayed by another syslog server, y
 
 Add the following to your LibreNMS `config.php` file to enable the Syslog extension:
 
+```php
+$config['enable_syslog'] = 1;
+```
+
+#### logstash
+
+If you prefer logstash, and it is installed on the same server as LibreNMS, here are some hints on how to get it working.
+
+First, install the output-exec plugin for logstash:
+
+```bash
+/usr/share/logstash/bin/logstash-plugin install logstash-output-exec
+```
+
+Next, create a logstash configuration file (ex. /etc/logstash/conf.d/logstash-simple.conf), and add the following:
+
+```
+input {
+syslog {
+    port => 514
+  }
+}
+
+
+output {
+        exec {
+        command => "echo `echo %{host},,,,%{facility},,,,%{priority},,,,%{severity},,,,%{facility_label},,,,``date --date='%{timestamp}' '+%Y-%m-%d %H:%M:%S'``echo ',,,,%{message}'``echo ,,,,%{program} | sed 's/\x25\x7b\x70\x72\x6f\x67\x72\x61\x6d\x7d/%{facility_label}/'` | sed 's/,,,,/||/g' | /opt/librenms/syslog.php &"
+        }
+        elasticsearch {
+        hosts => ["10.10.10.10:9200"]
+        index => "syslog-%{+YYYY.MM.dd}"
+        }
+}
+```
+
+Replace 10.10.10.10 with your primary elasticsearch server IP, and set the incoming syslog port. Alternatively, if you already have a logstash config file that works except for the LibreNMS export, take only the "exec" section from output and add it.
+
+Add the following to your LibreNMS `config.php` file to enable the Syslog extension:
+
 ```ssh
 $config['enable_syslog'] = 1;
 ```
+
 #### Syslog Clean Up 
 Can be set inside of  `config.php`
 ```php
@@ -202,6 +243,50 @@ logging librenms.ip
 logging server librenms.ip 5 use-vrf default facility local6
 ```
 
+#### Juniper Junos
+```config
+set system syslog host librenms.ip authorization any
+set system syslog host librenms.ip daemon any
+set system syslog host librenms.ip kernel any
+set system syslog host librenms.ip user any
+set system syslog host librenms.ip change-log any
+set system syslog host librenms.ip source-address <management ip>
+set system syslog host librenms.ip exclude-hostname
+set system syslog time-format
+```
+
+#### Huawei VRP
+```config
+info-center loghost librenms.ip
+info-center timestamp debugging short-date without-timezone // Optional
+info-center timestamp log short-date // Optional
+info-center timestamp trap short-date // Optional
+//This is optional config, especially if the device is in public ip and you dont'want to get a lot of messages of ACL
+info-center filter-id bymodule-alias VTY ACL_DENY 
+info-center filter-id bymodule-alias SSH SSH_FAIL 
+info-center filter-id bymodule-alias SNMP SNMP_FAIL 
+info-center filter-id bymodule-alias SNMP SNMP_IPLOCK 
+info-center filter-id bymodule-alias SNMP SNMP_IPUNLOCK 
+info-center filter-id bymodule-alias HTTP ACL_DENY 
+```
+
+#### Huawei SmartAX (GPON OLT)
+```config
+loghost add librenms.ip librenms
+loghost activate name librenms
+```
+
+#### Allied Telesis Alliedware Plus
+```config
+log date-format iso // Required so syslog-ng/LibreNMS can correctly interpret the log message formatting.
+log host x.x.x.x
+log host x.x.x.x level <errors> // Required. A log-level must be specified for syslog messages to send. 
+log host x.x.x.x level notices program imish // Useful for seeing all commands executed by users.
+log host x.x.x.x level notices program imi // Required for Oxidized Syslog hook log message.  
+log host source <eth0>
+```
+
+
 If you have permitted udp and tcp 514 through any firewall then that should be all you need. Logs should start appearing and displayed within the LibreNMS web UI.
 
 ### Windows
@@ -247,4 +332,36 @@ $config['os']['nxos']['syslog_hook'][] = Array('regex' => '/%VSHD-5-VSHD_SYSLOG_
 #### Cisco IOSXR
 ```ssh
 $config['os']['iosxr']['syslog_hook'][] = Array('regex' => '/%GBL-CONFIG-6-DB_COMMIT/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+
+#### Juniper Junos
+```ssh
+$config['os']['junos']['syslog_hook'][] = Array('regex' => '/UI_COMMIT:/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+#### Juniper ScreenOS
+```ssh
+$config['os']['screenos']['syslog_hook'][] = Array('regex' => '/System configuration saved/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+
+#### Allied Telesis Alliedware Plus
+**Note:** At least software version 5.4.8-2.1 is required. `log host x.x.x.x level notices program imi` may also be required depending on configuration. This is to ensure the syslog hook log message gets sent to the syslog server. 
+
+```ssh
+$config['os']['awplus']['syslog_hook'][] = Array('regex' => '/IMI.+.Startup-config saved on/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+
+### Configuration Options
+
+#### Matching syslogs to hosts with different names
+
+In some cases, you may get logs that aren't being associated with the device in LibreNMS. For example, in LibreNMS the device is known as "ne-core-01", and that's how DNS resolves. However, the received syslogs are for "loopback.core-nw". 
+
+To fix this issue, you can configure LibreNMS to translate the incoming syslog hostname into another hostname, so that the logs get associated with the correct device.
+
+Example:
+```ssh
+$config['syslog_xlate'] = array(
+        'loopback0.core7k1.noc.net' => 'n7k1-core7k1',
+        'loopback0.core7k2.noc.net' => 'n7k2-core7k2'
+);
 ```

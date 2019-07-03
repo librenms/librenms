@@ -9,4 +9,4 @@ mib_dir:
     - nimble
 discovery:
     - sysDescr:
-        -  Nimble Storage
+        -  'Nimble Storage'

@@ -27,9 +27,18 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use App\Models\PortsNac;
+use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 
-class Vrp extends OS implements ProcessorDiscovery
+class Vrp extends OS implements
+    ProcessorDiscovery,
+    NacPolling,
+    WirelessApCountDiscovery,
+    WirelessClientsDiscovery
 {
     /**
      * Discover processors.
@@ -76,5 +85,95 @@ class Vrp extends OS implements ProcessorDiscovery
         }
 
         return $processors;
+    }
+
+    /**
+    * Discover the Network Access Control informations (dot1X etc etc)
+    *
+    */
+    public function pollNac()
+    {
+        $nac = collect();
+        // We collect the first table
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'hwAccessTable', [], 'HUAWEI-AAA-MIB');
+
+        if (!empty($portAuthSessionEntry)) {
+            // If it is not empty, lets add the Extended table
+            $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'hwAccessExtTable', $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
+            // We cache a port_ifName -> port_id map
+            $ifName_map = $this->getDeviceModel()->ports()->pluck('port_id', 'ifName');
+
+            // update the DB
+            foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
+                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
+                $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
+                if ($port_id <=0) {
+                    continue; //this would happen for an SSH session for instance
+                }
+                $nac->put($mac_address, new PortsNac([
+                    'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0),
+                    'mac_address' => $mac_address,
+                    'auth_id' => $authId,
+                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'],
+                    'username' => ''.$portAuthSessionEntryParameters['hwAccessUserName'],
+                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'],
+                    'authz_by' => ''.$portAuthSessionEntryParameters['hwAccessType'],
+                    'authz_status' => ''.$portAuthSessionEntryParameters['hwAccessAuthorizetype'],
+                    'host_mode' => is_null($portAuthSessionEntryParameters['hwAccessAuthType'])?'default':$portAuthSessionEntryParameters['hwAccessAuthType'],
+                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'],
+                    'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'],
+                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'],
+                    'method' => ''.$portAuthSessionEntryParameters['hwAccessAuthtype'],
+                    'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'],
+                ]));
+            }
+        }
+        return $nac;
+    }
+
+    public function discoverWirelessApCount()
+    {
+        $sensors = array();
+        $ap_number = snmpwalk_cache_oid($this->getDevice(), 'hwWlanCurJointApNum.0', array(), 'HUAWEI-WLAN-GLOBAL-MIB');
+
+        $sensors[] = new WirelessSensor(
+            'ap-count',
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.2011.6.139.12.1.2.1.0',
+            'vrp-ap-count',
+            'ap-count',
+            'AP Count',
+            $ap_number[0]['hwWlanCurJointApNum']
+        );
+        return $sensors;
+    }
+
+    public function discoverWirelessClients()
+    {
+        $sensors = array();
+        $total_oids = array();
+
+        $vapInfoTable = $this->getCacheTable('hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB', 3);
+        
+        foreach ($vapInfoTable as $a_index => $ap) {
+            //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
+            $a_index_oid = implode(".", array_map("hexdec", explode(":", $a_index)));
+            foreach ($ap as $r_index => $radio) {
+                foreach ($radio as $s_index => $ssid) {
+                    $oid = '.1.3.6.1.4.1.2011.6.139.17.1.1.1.9.' . $a_index_oid . '.' . $r_index . '.' . $s_index ;
+                    $total_oids[] = $oid;
+                    $sensors[] = new WirelessSensor(
+                        'clients',
+                        $this->getDeviceId(),
+                        $oid,
+                        'vrp',
+                        $a_index_oid . '.' . $r_index . '.' . $s_index,
+                        'Radio:' . $r_index . ' SSID:' . $ssid['hwWlanVapProfileName'],
+                        $ssid['hwWlanVapStaOnlineCnt']
+                    );
+                }
+            }
+        }
+        return $sensors;
     }
 }

@@ -39,8 +39,11 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
 
         $date_updated = str_replace('-', '', str_replace(':', '', str_replace(' ', '', $check['updated'])));
 
+        // Send the current dir_95th to the getRates function so it knows to aggregate or return the max in/out value and highest direction
+        $dir_95th = $bill['dir_95th'];
+
         if ($period > 0 && $dateto > $date_updated) {
-            $rate_data    = getRates($bill['bill_id'], $datefrom, $dateto);
+            $rate_data    = getRates($bill['bill_id'], $datefrom, $dateto, $dir_95th);
             $rate_95th    = $rate_data['rate_95th'];
             $dir_95th     = $rate_data['dir_95th'];
             $total_data   = $rate_data['total_data'];

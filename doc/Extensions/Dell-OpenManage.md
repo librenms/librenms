@@ -1,4 +1,5 @@
 source: Extensions/Dell-OpenManage.md
+path: blob/master/doc/
 
 # Dell OpenManage Support
 -----------------------

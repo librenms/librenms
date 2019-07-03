@@ -1,0 +1,3308 @@
+-- Alpha Innovations S.A.
+-- General MIB for Energy Site Monitoring
+--
+-- { iso org(3) dod(6) internet(1) private(4) enterprises(1) atsa(26854) }
+-- ==============================================================================================
+SITE-MONITORING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+
+   siteMonitoringMIB   MODULE-IDENTITY
+   LAST-UPDATED "201705161600Z"
+    ORGANIZATION "Alpha Innovations"
+   CONTACT-INFO "  Jean-Philippe Vanhulst
+        Postal:     Alpha Innovations
+                    Rue Alexander Fleming 1
+                    B-1348 Louvain-la-Neuve
+                    Belgium
+        phone       +32 10 438 382
+        e-mail      mail@alphainnovations.eu"
+
+   DESCRIPTION "Alpha Innovations SNMP corporate naming convention
+   Organises the SNMP OIDs according to the
+   design centres that generate the different MIBs"
+   REVISION "201705161600Z"
+   DESCRIPTION "This revision is the fourth release of the MIB"
+
+::= { atsaCorporate 1 }
+atsa              OBJECT IDENTIFIER ::= { enterprises 26854 }
+atsaCorporate     OBJECT IDENTIFIER ::= { atsa 1 }
+atsaUs            OBJECT IDENTIFIER ::= { atsa 2 }
+atsaEu            OBJECT IDENTIFIER ::= { atsa 3 }
+atsaEuDevices     OBJECT IDENTIFIER ::= { atsaEu 1 }
+siteMonitoring        OBJECT IDENTIFIER ::= { atsaEu 2 }
+
+siteV1   OBJECT IDENTIFIER ::= {siteMonitoring 1}
+siteV1GlobalStatus      OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "A textual string (alarms, normal or unknown) containing the status of the Site"
+              ::={siteV1 1 }
+
+siteV1GlobalAlarmSeverityType  OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "The alarm severity type (critical, major, minor, warning, none, disabled) of the Site"
+              ::= { siteV1 2 }
+
+siteV1GlobalAlarmSeverityLevel  OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "The alarm severity level (0-9) of the Site"
+              ::= { siteV1 3 }
+
+siteV1GlobalAlarmSeverityTypeInt  OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "The alarm severity type as integer (critical=4, major=3, minor=2, warning=1, none=0) of the Site"
+              ::= { siteV1 4 }
+
+siteV1Description     OBJECT IDENTIFIER ::= { siteV1 10 }
+siteV1DescriptionNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Site Description table"
+              ::= { siteV1Description 1 }
+siteV1DescriptionTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF SiteV1DescriptionEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Description table of the Site"
+              ::= { siteV1Description 2 }
+siteV1DescriptionEntry      OBJECT-TYPE
+              SYNTAX          SiteV1DescriptionEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A Description entry"
+              INDEX {siteV1DescriptionIndex}
+              ::= { siteV1DescriptionTable 1 }
+SiteV1DescriptionEntry ::=
+              SEQUENCE{
+              siteV1DescriptionIndex    Unsigned32,
+              siteV1DescriptionName     DisplayString,
+              siteV1DescriptionValue    DisplayString,
+              siteV1DescriptionEntryStatus RowStatus
+              }
+siteV1DescriptionIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "Description Index"
+              ::= { siteV1DescriptionEntry 1 }
+siteV1DescriptionName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Description Name"
+              ::= { siteV1DescriptionEntry 2 }
+siteV1DescriptionValue      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "Description Value"
+              ::= { siteV1DescriptionEntry 3 }
+siteV1DescriptionEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry"
+              ::= { siteV1DescriptionEntry 4 }
+siteV1DescriptionList         OBJECT IDENTIFIER ::= { siteV1Description 3 }
+siteV1DescDescriptionSiteNumber     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The identification number of the site"
+              ::= { siteV1DescriptionList 1}
+siteV1DescDescriptionSiteName     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The name of the site"
+              ::= { siteV1DescriptionList 2}
+siteV1DescDescriptionShortDescription     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "A short description of the site"
+              ::= { siteV1DescriptionList 3}
+siteV1DescDescriptionInfo     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Some more information about the site"
+              ::= { siteV1DescriptionList 4}
+siteV1DescDescriptionDescription     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "A free text zone to write a system description"
+              ::= { siteV1DescriptionList 5}
+siteV1DescDescriptionReference     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "A free text zone to write the customer reference of the system"
+              ::= { siteV1DescriptionList 6}
+siteV1DescDescriptionContactName     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Contact Name"
+              ::= { siteV1DescriptionList 7}
+siteV1DescDescriptionPhoneNumber     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Phone Number"
+              ::= { siteV1DescriptionList 8}
+siteV1DescDescriptionStreet     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Street part of the site address"
+              ::= { siteV1DescriptionList 11}
+siteV1DescDescriptionCity     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "City part of the site address"
+              ::= { siteV1DescriptionList 12}
+siteV1DescDescriptionProvince     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Province part of the site address"
+              ::= { siteV1DescriptionList 13}
+siteV1DescDescriptionPostalCode     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Postal Code part of the site address"
+              ::= { siteV1DescriptionList 14}
+siteV1DescDescriptionRegion     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Region part of the site address"
+              ::= { siteV1DescriptionList 15}
+siteV1DescDescriptionCountry     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Country part of the site address"
+              ::= { siteV1DescriptionList 16}
+siteV1DescDescriptionGroup1     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Group Level 1 (For Armada Clustering)"
+              ::= { siteV1DescriptionList 21}
+siteV1DescDescriptionGroup2     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Group Level 2 (For Armada Clustering)"
+              ::= { siteV1DescriptionList 22}
+siteV1DescDescriptionGroup3     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Group Level 3 (For Armada Clustering)"
+              ::= { siteV1DescriptionList 23}
+siteV1DescDescriptionGroup4     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Group Level 4 (For Armada Clustering)"
+              ::= { siteV1DescriptionList 24}
+siteV1DescDescriptionGroup5     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Group Level 5 (For Armada Clustering)"
+              ::= { siteV1DescriptionList 25}
+siteV1DescDescriptionLatitude     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The latitude of the site"
+              ::= { siteV1DescriptionList 31}
+siteV1DescDescriptionLongitude     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The longitude of the site"
+              ::= { siteV1DescriptionList 32}
+siteV1DescDescriptionAltitude     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The altitude of the site"
+              ::= { siteV1DescriptionList 33}
+siteV1DescControllerSoftwareRevision     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The software revision of Comp@s (read only)"
+              ::= { siteV1DescriptionList 91}
+siteV1DescControllerOperatingSystemRevision     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The operating system of Comp@s (read only)"
+              ::= { siteV1DescriptionList 92}
+siteV1DescControllerCPU     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Information about the CPU"
+              ::= { siteV1DescriptionList 93}
+siteV1DescControllerCard     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Information about the hardware system containing Compas"
+              ::= { siteV1DescriptionList 94}
+siteV1DescControllerStarterVersion     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Information about the starter component of Compas"
+              ::= { siteV1DescriptionList 100}
+siteV1DescControllerFactoryCompasVersion     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Information about the revision of Compas in Factory folder"
+              ::= { siteV1DescriptionList 105}
+siteV1DescControllerUserCompasVersion     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Information about the revision of Compas in user folder"
+              ::= { siteV1DescriptionList 106}
+siteV1DescControllerFactoryFTPServerVersion     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Information about the revision of Ftp Server in Factory folder"
+              ::= { siteV1DescriptionList 110}
+siteV1DescControllerUserFTPServerVersion     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Information about the revision of Ftp Server in Factory folder"
+              ::= { siteV1DescriptionList 111}
+siteV1Alarm          OBJECT IDENTIFIER ::= { siteV1 11 }
+siteV1AlarmNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Site Alarm table"
+              ::= { siteV1Alarm 1 }
+siteV1AlarmTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF SiteV1AlarmEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Alarm entries"
+              ::= { siteV1Alarm 2 }
+siteV1AlarmEntry      OBJECT-TYPE
+              SYNTAX          SiteV1AlarmEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "An alarm entry"
+              INDEX {siteV1AlarmIndex}
+              ::= { siteV1AlarmTable 1 }
+SiteV1AlarmEntry ::=
+             SEQUENCE{
+             siteV1AlarmIndex         Unsigned32,
+             siteV1AlarmName          DisplayString,
+             siteV1AlarmActive        DisplayString,
+             siteV1AlarmSeverityType  DisplayString,
+             siteV1AlarmSeverityLevel DisplayString,
+             siteV1AlarmStartTime      DisplayString,
+             siteV1AlarmStopTime       DisplayString,
+              siteV1AlarmEntryStatus  RowStatus
+             }
+siteV1AlarmIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "Alarm Index"
+              ::= { siteV1AlarmEntry 1 }
+siteV1AlarmName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Alarm Name"
+              ::= { siteV1AlarmEntry 2 }
+siteV1AlarmActive   OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Is the Alarm active ? 'true' for active, 'false' for not-active"
+              ::= { siteV1AlarmEntry 3 }
+siteV1AlarmSeverityType      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The alarm severity type (major, minor, warning, none, disabled) of this alarm entry"
+              ::= { siteV1AlarmEntry 4 }
+siteV1AlarmSeverityLevel      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The alarm severity level (0-9) of this alarm entry"
+              ::= { siteV1AlarmEntry 5 }
+siteV1AlarmStartTime      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The last start time of this alarm entry (null if never active)"
+              ::= { siteV1AlarmEntry 6 }
+siteV1AlarmStopTime      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The last stop time of this alarm entry (null if alarm active)"
+              ::= { siteV1AlarmEntry 7 }
+siteV1AlarmEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only for MIB compliance "
+              ::= { siteV1AlarmEntry 8 }
+siteV1AlarmSummary      OBJECT-TYPE
+              SYNTAX BITS{
+                  inventoryCANBusFail (0),          -- Alarm : CAN Bus Failure
+                  inventoryCANBusAddressingError (1),          -- Alarm : CAN Bus Addressing Error
+                  inventoryMissingCANBusNodeIDs (2),          -- Alarm : Missing CAN Bus Node IDs
+                  inventoryRunningCANLSSDeviceDetection (3),          -- Alarm : Running CAN LSS Device Detection
+                  inventoryRunningCANFirmwareUpgrade (4),          -- Alarm : Running CAN Firmware Upgrade
+                  controllerControllerRebootRequired (10),          -- Alarm : Controller Reboot Required
+                  controllerLastConfChangesUnsaved (14),          -- Alarm : Last Configuration Changes Unsaved
+                  xMLXMLHeartbeatPostFail (20)          -- Alarm : XML Heartbeat Post Failure
+              }
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Summary bit vector with all the alarms state of the Site. A '1' means alarm active, '0' means not active. Unimplemented alarms are always '0'."
+              ::= { siteV1Alarm 3 }
+siteV1Event          OBJECT IDENTIFIER ::= { siteV1 12 }
+siteV1EventNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Event Table related to the Site"
+              ::= { siteV1Event 1 }
+siteV1EventTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF SiteV1EventEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Event table related to the Site"
+              ::= { siteV1Event 2 }
+siteV1EventEntry      OBJECT-TYPE
+              SYNTAX          SiteV1EventEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "."
+              INDEX {siteV1EventIndex}
+              ::= { siteV1EventTable 1 }
+SiteV1EventEntry ::=
+             SEQUENCE{
+             siteV1EventIndex           Unsigned32,
+             siteV1EventId              Unsigned32,
+             siteV1EventName            DisplayString,
+             siteV1EventDateTime        DisplayString,
+             siteV1EventSeverityType    DisplayString,
+             siteV1EventSeverityLevel   DisplayString,
+              siteV1EventEntryStatus    RowStatus
+             }
+siteV1EventIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "Event Index"
+              ::= { siteV1EventEntry 1 }
+siteV1EventId      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Event Index"
+              ::= { siteV1EventEntry 2 }
+siteV1EventName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Event Name"
+              ::= { siteV1EventEntry 3 }
+siteV1EventDateTime      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The date and time of the event"
+              ::= { siteV1EventEntry 4 }
+siteV1EventSeverityType      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The event severity type ('major', 'minor', 'warning' or 'none')"
+              ::= { siteV1EventEntry 5 }
+siteV1EventSeverityLevel      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The event severity level (0-9)"
+              ::= { siteV1EventEntry 6 }
+siteV1EventEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry"
+              ::= { siteV1EventEntry 7 }
+siteV1Data            OBJECT IDENTIFIER ::= { siteV1 13 }
+siteV1DataNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Data Table related to the Site"
+              ::= { siteV1Data 1 }
+siteV1DataTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF SiteV1DataEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Data entries"
+              ::= { siteV1Data 2 }
+siteV1DataEntry      OBJECT-TYPE
+              SYNTAX          SiteV1DataEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A data entry"
+              INDEX {siteV1DataIndex}
+              ::= { siteV1DataTable 1 }
+SiteV1DataEntry ::=
+             SEQUENCE{
+             siteV1DataIndex       Unsigned32,
+             siteV1DataName        DisplayString,
+             siteV1DataValue       DisplayString,
+              siteV1DataEntryStatus  RowStatus
+             }
+siteV1DataIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The data index"
+              ::= { siteV1DataEntry 1 }
+
+siteV1DataName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The data name"
+              ::= { siteV1DataEntry 2 }
+siteV1DataValue     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The data value"
+              ::= { siteV1DataEntry 3 }
+siteV1DataEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only present for compliance"
+              ::= { siteV1DataEntry 4 }
+siteV1DataList         OBJECT IDENTIFIER ::= { siteV1Data 3 }
+siteV1DataNetworkCurrentIPAddress     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the actual IP address of the Comp@s platform. If the Ethernet cable is not correctly connected, the address will be 0.0.0.0."
+              ::= { siteV1DataList 1}
+siteV1DataNetworkCurrentIPMask     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the actual IP address of the Comp@s platform. If the Ethernet cable is not correctly connected, the address will be 0.0.0.0."
+              ::= { siteV1DataList 2}
+siteV1DataNetworkCurrentMACAddress     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the MAC address of IP interface."
+              ::= { siteV1DataList 3}
+siteV1DataControllerLicensedOptions     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the options of the actual license."
+              ::= { siteV1DataList 11}
+siteV1DataTimeDateAndTimeLocal     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the local time of the monitoring."
+              ::= { siteV1DataList 21}
+siteV1DataTimeDateAndTimeUTC     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the UTC time of the monitoring."
+              ::= { siteV1DataList 22}
+siteV1DataControllerMonitoringMemoryUsed     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is actual amount of RAM memory used by the application."
+              ::= { siteV1DataList 31}
+siteV1DataControllerCPUPercentageUsage     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is actual percentage of CPU used"
+              ::= { siteV1DataList 32}
+siteV1DataControllerFreeFlashMemorySpace     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is free flash memory available on the Comp@s card, in Megabytes"
+              ::= { siteV1DataList 33}
+siteV1DataControllerFTPServerStatus     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Status of the FTP Server. Compatible only with version >= 2.26.X.X. The configuration is available at controller -> FTP Server page."
+              ::= { siteV1DataList 35}
+siteV1DataDataRecordsTotalFifoSizeOfSecondRecords     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { siteV1DataList 41}
+siteV1DataDataRecordsTotalFifoSizeOfMinuteRecords     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { siteV1DataList 42}
+siteV1DataDataRecordsTotalFifoSizeOfHourRecords     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { siteV1DataList 43}
+siteV1DataDataRecordsTotalFifoSizeOfDayRecords     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { siteV1DataList 44}
+siteV1DataInventoryCANBusNodeIDs     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The coma separated list of the node ids present on the CAN bus."
+              ::= { siteV1DataList 51}
+siteV1DataCloudLinkCloudLinkState     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Cloud Link State"
+              ::= { siteV1DataList 166}
+siteV1Config          OBJECT IDENTIFIER ::= { siteV1 15 }
+siteV1ConfigNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Config table related to the Site"
+              ::= { siteV1Config 1 }
+siteV1ConfigTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF SiteV1ConfigEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Config entries related to the Site"
+              ::= { siteV1Config 2 }
+siteV1ConfigEntry      OBJECT-TYPE
+              SYNTAX          SiteV1ConfigEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A Config entry"
+              INDEX {siteV1ConfigIndex}
+              ::= { siteV1ConfigTable 1 }
+SiteV1ConfigEntry ::=
+             SEQUENCE{
+             siteV1ConfigIndex       Unsigned32,
+             siteV1ConfigName        DisplayString,
+             siteV1ConfigValue       DisplayString,
+              siteV1ConfigEntryStatus  RowStatus
+             }
+siteV1ConfigIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Config entry Index"
+              ::= { siteV1ConfigEntry 1 }
+siteV1ConfigName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The Config entry name"
+              ::= { siteV1ConfigEntry 2 }
+siteV1ConfigValue     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The Config entry value"
+              ::= { siteV1ConfigEntry 3 }
+siteV1ConfigEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only for compliance"
+              ::= { siteV1ConfigEntry 4 }
+siteV1ConfigList         OBJECT IDENTIFIER ::= { siteV1Config 3 }
+siteV1CfgNetworkDHCPEnabled     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The monitoring will try to get an IP with the DHCP protocol if this parameter is set to True. By default, this parameter is set to False."
+              ::= { siteV1ConfigList 1}
+siteV1CfgNetworkIPAddressIfStatic     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The static IP address of the monitoring. This configuration parameter is not used if the DHCP is enabled. The default IP is 192.168.45.2."
+              ::= { siteV1ConfigList 2}
+siteV1CfgNetworkSubnetMaskIfStatic     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The static Subnet Mask of the monitoring. This configuration parameter is not used if the DHCP is enabled. The default mask is 255.255.255.0."
+              ::= { siteV1ConfigList 3}
+siteV1CfgNetworkDefaultGatewayIfStatic     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The static Default Gateway of the monitoring. This configuration parameter is not used if DHCP is enabled. This is only useful if the monitoring have to use a gateway, this is generally not necessary. The default gateway is 192.168.45.1."
+              ::= { siteV1ConfigList 4}
+siteV1CfgNetworkDNSIfStatic     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The static DNS of the monitoring. This configuration parameter is used to resolve URI and server name. This is not necessary if you are only IP address as target server. The default DNS server is 192.168.45.1."
+              ::= { siteV1ConfigList 5}
+siteV1CfgNetworkMaxTransmissionUnit     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Specifies the TCP/IP MTU for the network interface"
+              ::= { siteV1ConfigList 8}
+siteV1CfgTimeSNTPTimeServer     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The address of the server acting as SNTP timer server. If this server is not valid, the monitoring cannot update automatically his time. You can use several time server by usin a coma separator without space."
+              ::= { siteV1ConfigList 11}
+siteV1CfgTimeTimeZoneName     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The Time Zone of the site"
+              ::= { siteV1ConfigList 14}
+siteV1CfgTimeSNTPTimeRefresh     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Set the time between synchronisation with the SNTP server (max 1000 hours, by default 178)"
+              ::= { siteV1ConfigList 15}
+siteV1CfgTimeSNTPTimeRecoveryRefresh     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Set the time to wait before retry if a synchronisation fail (max 1000 hours, by default 24)"
+              ::= { siteV1ConfigList 16}
+siteV1CfgWebServerWebServerSecurityEnabled     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is a True/False parameter used to activate or deactivate the access control to the web server."
+              ::= { siteV1ConfigList 22}
+siteV1CfgWebServerWebServerPort     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is an unsigned integer parameter used to configure the port at which the web server is accessible. By default, the port is 80. If you change this port, you must be sure that the traffic is allowed by your switches and routers on this port."
+              ::= { siteV1ConfigList 23}
+siteV1CfgWebServerWebAuthenticationMethod     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The web access security can be managed with 3 authentication methods: Basic Access, Digest Access or Basic with Radius."
+              ::= { siteV1ConfigList 24}
+siteV1CfgWebServerHttpsWebServerPort     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is a port number to activate or deactivate the https web server - 0 or 443 by default"
+              ::= { siteV1ConfigList 26}
+siteV1CfgWebServerDefaultPage     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The default page displayed on logon (dashboard, site, summary, alarm_event, ...)"
+              ::= { siteV1ConfigList 31}
+siteV1CfgXMLXMLEventPostingActivated     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is a True/False parameter used to activate or deactivate the XML event posting."
+              ::= { siteV1ConfigList 41}
+siteV1CfgXMLXMLEventPostingRefreshTime     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The minimal time in second between to calculation of the XML events to send. By default, this is done every two seconds."
+              ::= { siteV1ConfigList 42}
+siteV1CfgXMLXMLEventPostingTimeout     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The timeout in millisecond when trying to post XML data to a Web Server."
+              ::= { siteV1ConfigList 43}
+siteV1CfgXMLXMLEventPostingToSecOnlyIfPrimFail     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "If this parameter is set to true, the events will be sent to secondary only if primary server is not available. If this parameter is set to false, all the events will be sent to primary and secondary server"
+              ::= { siteV1ConfigList 45}
+siteV1CfgXMLXMLTablesToPostOnXMLEvent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The list of the tables to send when an event is generated. (description,alarm,data,config,control). This allows to have armada database updated on event."
+              ::= { siteV1ConfigList 46}
+siteV1CfgXMLXMLHeartbeatTime     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the time between 2 XML Post of heartbeat. If set to 0, no heartbeat."
+              ::= { siteV1ConfigList 51}
+siteV1CfgSNMPSNMPActivated     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is a True/False parameter used to activate or deactivate the SNMP agent."
+              ::= { siteV1ConfigList 61}
+siteV1CfgSNMPSNMPTrapVersion     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Traps/Notification can be sent with SNMP V1, V2c or V3 format."
+              ::= { siteV1ConfigList 63}
+siteV1CfgSNMPSNMPGETMinSecurityLevel     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "4 choices are available: No Authentication, V1 Community, V2c Community or V3."
+              ::= { siteV1ConfigList 64}
+siteV1CfgSNMPSNMPSETMinSecurityLevel     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "4 choices are available: No Authentication, V1 Community, V2c Community or V3."
+              ::= { siteV1ConfigList 65}
+siteV1CfgSNMPSNMPV3AuthAlgorithm     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "3 choices are available: MD5, SHA, Any"
+              ::= { siteV1ConfigList 66}
+siteV1CfgSNMPSNMPV3PrivacyAlgorithm     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "3 choices are available: DES, AES, 3DES"
+              ::= { siteV1ConfigList 67}
+siteV1CfgSNMPSNMPV3PrivacyPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The global SNMP V3 Encryption Password. This one is common for all the users to avoid complexity"
+              ::= { siteV1ConfigList 68}
+siteV1CfgSNMPSNMPV3EngineID     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The SNMP V3 Local Engine ID string"
+              ::= { siteV1ConfigList 69}
+siteV1CfgSNMPSNMPV3TrapAuthAlgorithm     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "2 choices are available: MD5, SHA"
+              ::= { siteV1ConfigList 72}
+siteV1CfgSNMPSNMPV3TrapPrivacyAlgorithm     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "3 choices are available: DES, AES, 3DES"
+              ::= { siteV1ConfigList 73}
+siteV1CfgSNMPSNMPV3TrapUsername     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The SNMP V3 Trap UserName used for all the SNMP V3 traps"
+              ::= { siteV1ConfigList 74}
+siteV1CfgSNMPSNMPV3TrapAuthPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The SNMP V3 Trap Authentication Password"
+              ::= { siteV1ConfigList 75}
+siteV1CfgSNMPSNMPV3TrapPrivacyPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The SNMP V3 Trap Privacy Password"
+              ::= { siteV1ConfigList 76}
+siteV1CfgSNMPSiteDescriptionIdsIncludedInTraps     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "List of site Description Elements to send on traps. (to have the site reference and the city in each trap for example). The list is separated with ';'"
+              ::= { siteV1ConfigList 77}
+siteV1CfgGenericGenerateEventOnConfChanges     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is a True/False parameter used to activate or deactivate the tracking of configuration changes"
+              ::= { siteV1ConfigList 81}
+siteV1CfgDataRecordsAutoArchivePeriodDataRecord     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Period in hour to auto save records (when detailled and long duration records are needed). 0 means disabled."
+              ::= { siteV1ConfigList 82}
+siteV1CfgGenericGenerateEventOnControlExecution     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is a True/False parameter used to activate or deactivate the tracking of control execution"
+              ::= { siteV1ConfigList 83}
+siteV1CfgGenericGenerateEventOnAlarmAcknowledge     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is a True/False parameter used to activate or deactivate the tracking of alarm acknowledgment"
+              ::= { siteV1ConfigList 84}
+siteV1CfgInventoryRequiredCANBusNodeIDs     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is a coma separated list with the required CAN bus node ids"
+              ::= { siteV1ConfigList 91}
+siteV1CfgInventoryLSSCANidrange     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "By default 50-80, means up to 50 Can Nodes like rectifiers with CAN Id 50 to 80. To support up to 100 rectifiers, change it to 1-100."
+              ::= { siteV1ConfigList 92}
+siteV1CfgInventorySystemNodesDefinition     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "dc3(30-100)"
+              ::= { siteV1ConfigList 93}
+siteV1CfgInventoryLSSCANOpenSavedConf     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { siteV1ConfigList 95}
+siteV1CfgUsersAdministratorLoginPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the login and the password of the administrator. It is saved with a special syntax. First the login in clear, followed of 2 points, followed of the MD5 hashed password. If you change the login:password by entering a non hashed password, this last is automatically hashed."
+              ::= { siteV1ConfigList 101}
+siteV1CfgUsersUser1LoginPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the login and the password of the user number 1."
+              ::= { siteV1ConfigList 102}
+siteV1CfgUsersUser2LoginPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the login and the password of the user number 2."
+              ::= { siteV1ConfigList 103}
+siteV1CfgUsersUser3LoginPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the login and the password of the user number 3."
+              ::= { siteV1ConfigList 104}
+siteV1CfgUsersUser4LoginPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the login and the password of the user number 4."
+              ::= { siteV1ConfigList 105}
+siteV1CfgUsersUser5LoginPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the login and the password of the user number 5."
+              ::= { siteV1ConfigList 106}
+siteV1CfgRadiusAuthenticationRadiusServer     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Radius Server address. If you have a secondary server, you could use a coma to separate it."
+              ::= { siteV1ConfigList 111}
+siteV1CfgRadiusAuthenticationRadiusPort     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Radius Port. If you have a secondary server, you could use a coma to separate it."
+              ::= { siteV1ConfigList 112}
+siteV1CfgRadiusAuthenticationRadiusSecret     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Radius PassPhrase"
+              ::= { siteV1ConfigList 113}
+siteV1CfgEmailEnableEmailFeature     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Enable/Disable the email feature"
+              ::= { siteV1ConfigList 120}
+siteV1CfgEmailSmtpServer     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Smtp Server. If you are using a domain name, make sure you configured the network Dns (CF5)"
+              ::= { siteV1ConfigList 121}
+siteV1CfgEmailSmtpDomain     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Smtp Domain. (Required by some servers.)"
+              ::= { siteV1ConfigList 122}
+siteV1CfgEmailSmtpUserLoginPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Smtp Login and Password. The password is encrypted. To enter a new login and password, enter login:password and validate, the password will be encrypted."
+              ::= { siteV1ConfigList 123}
+siteV1CfgEmailMailSender     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Mail Sender (The 'From' of the emails you will receive)"
+              ::= { siteV1ConfigList 130}
+siteV1CfgEmailMailRecipients     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Mail Recipients, separated with semicolon ';'"
+              ::= { siteV1ConfigList 131}
+siteV1CfgEmailMinimalSeverityTypeToSendMail     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the minimal severity of the event to send a Summary Mail"
+              ::= { siteV1ConfigList 135}
+siteV1CfgControllerAutomaticReboot     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Cron rules used in order to restart automatically the controller. Before rebooting configuration, events and data records are saved."
+              ::= { siteV1ConfigList 150}
+siteV1CfgCloudLinkCloudEnabled     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Enable Cloud Connection"
+              ::= { siteV1ConfigList 161}
+siteV1CfgCloudLinkCloudServer     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Cloud Server"
+              ::= { siteV1ConfigList 162}
+siteV1CfgCloudLinkCloudPort     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Cloud Port"
+              ::= { siteV1ConfigList 163}
+siteV1CfgCloudLinkCloudCredential     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Enter Credential of your AlphaCloud account in order to connect. You have to enter username:password in order to save your credential."
+              ::= { siteV1ConfigList 164}
+siteV1CfgCloudLinkCloudCluster     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Cloud Cluster"
+              ::= { siteV1ConfigList 165}
+siteV1CfgInventoryRS485ExtensionsConf     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The configuration string for RS485 Extensions"
+              ::= { siteV1ConfigList 210}
+siteV1CfgInventoryEthernetExtensionsConf     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The configuration string for Ethernet Extensions"
+              ::= { siteV1ConfigList 220}
+siteV1CfgScriptingEnabledscripts     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This parameter enable all CompasLua Scripting capabilities. You can control scripts in Files -> Files manager > scripting tab."
+              ::= { siteV1ConfigList 250}
+siteV1CfgScriptingNumberofErrorsbeforetriggeringalarm     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Number of errors before triggering the scripting error alarm. When number of error is higher than this parameter, the alarm is triggered. If 0 is set, the alarm is deactivated"
+              ::= { siteV1ConfigList 251}
+siteV1CfgGenericReadAccessUserNumbers     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The list of the user numbers which have read access to this equipment. The user numbers are coma separated. The accepted user id are 1,2,3,4 and 5. Ex: 1,3,4"
+              ::= { siteV1ConfigList 521}
+siteV1CfgGenericWriteAccessUserNumbers     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The list of the user numbers which have write access to this equipment. This means that these users can modify the configuration element, the alarm settings and use the control elements. The user numbers are coma separated.  The accepted user ids are 1,2,3,4 and 5. Ex: 1,3,4"
+              ::= { siteV1ConfigList 522}
+siteV1CfgGenericEventTableLength     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The maximum length of the table. The value must be comprised between 10 and 4000"
+              ::= { siteV1ConfigList 601}
+siteV1CfgSNMPSNMPTrapTargetsIP     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "One or multiple target IP to send traps, coma separated. Ex: 130.145.23.1, 130.23.12.45"
+              ::= { siteV1ConfigList 611}
+siteV1CfgSNMPMinimalEventSeverityForTraps     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the minimal severity of the event to send a SNMP trap"
+              ::= { siteV1ConfigList 612}
+siteV1CfgXMLXMLEventsPrimPostURL     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the first URL at which the events related to this equipment must be posted. The XML ETSI standard is used in the posted data content."
+              ::= { siteV1ConfigList 651}
+siteV1CfgXMLXMLEventsPrimPostLogin     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The login which must be used when posting events to the primary server"
+              ::= { siteV1ConfigList 652}
+siteV1CfgXMLXMLEventsPrimPostPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The password which must be used when posting events to the primary server"
+              ::= { siteV1ConfigList 653}
+siteV1CfgXMLXMLEventsSecPostURL     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the second URL at which the events related to this equipment must be posted. The XML ETSI standard is used in the posted data content. This allows having redundancy with the management server."
+              ::= { siteV1ConfigList 661}
+siteV1CfgXMLXMLEventsSecPostLogin     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The login which must be used when posting events to the secondary server"
+              ::= { siteV1ConfigList 662}
+siteV1CfgXMLXMLEventsSecPostPassword     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The password which must be used when posting events to the secondary server"
+              ::= { siteV1ConfigList 663}
+siteV1CfgPLCNumberOfPLCData     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The number of PLC data. Every equipment can manage up to 30 user programmable data. Data elements are automatically added in the data table. Configuration parameters are added to set the PLC Data Name and the PLC Data Mathematical calculation. In order to use these functionalities, you need a license with the 'PLC' module"
+              ::= { siteV1ConfigList 901}
+siteV1CfgPLCNumberOfPLCAlarm     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The number of PLC alarm. Every equipment can manage up to 30 user programmable alarms. Alarm elements are automatically added in the alarm table. The alarm parameters are added to set the PLC Alarm Name and the PLC Alarm Boolean condition. In order to use these functionalities, you need a licence with the 'PLC' module"
+              ::= { siteV1ConfigList 902}
+siteV1Control          OBJECT IDENTIFIER ::= { siteV1 16 }
+siteV1ControlNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Control table related to the Site"
+              ::= { siteV1Control 1 }
+siteV1ControlTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF SiteV1ControlEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Control entries related to the Site"
+              ::= { siteV1Control 2 }
+siteV1ControlEntry      OBJECT-TYPE
+              SYNTAX          SiteV1ControlEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A Control entry"
+              INDEX {siteV1ControlIndex}
+              ::= { siteV1ControlTable 1 }
+SiteV1ControlEntry ::=
+             SEQUENCE{
+             siteV1ControlIndex       Unsigned32,
+             siteV1ControlName        DisplayString,
+             siteV1ControlValue       DisplayString,
+              siteV1ControlEntryStatus  RowStatus
+             }
+siteV1ControlIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Control entry Index"
+              ::= { siteV1ControlEntry 1 }
+siteV1ControlName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The Control entry name"
+              ::= { siteV1ControlEntry 2 }
+siteV1ControlValue     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The Control entry value"
+              ::= { siteV1ControlEntry 3 }
+siteV1ControlEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only for compliance"
+              ::= { siteV1ControlEntry 4 }
+siteV1ControlList         OBJECT IDENTIFIER ::= { siteV1Control 3 }
+siteV1CtrlControllerRebootController     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will reboot the monitoring. Events and Records will be saved."
+              ::= { siteV1ControlList 1}
+siteV1CtrlControllerSaveConfAndRebootController     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will first save the actual configuration and will reboot the monitoring after."
+              ::= { siteV1ControlList 2}
+siteV1CtrlControllerRebootControllerWithoutSavingRecords     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will reboot the monitoring without saving records"
+              ::= { siteV1ControlList 3}
+siteV1CtrlNetworkApplyNetworkConf     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will reconfigure the ethernet according to the Network Configuration. If you change the IP address in the config table without using this command after, the configuration is not applied."
+              ::= { siteV1ControlList 6}
+siteV1CtrlTimeForceSNTPTimeRefresh     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will force the monitoring to try to refresh his time with the configured SNTP Time Server."
+              ::= { siteV1ControlList 11}
+siteV1CtrlTimeSetLocalTime     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a date and time to this control element allows to manually change the local time of the monitoring. The syntax of the date and the time is: 2007-11-19T13:02:34"
+              ::= { siteV1ControlList 12}
+siteV1CtrlTimeSetUTCTime     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a date and time to this control element allows to manually change the UTC time of the monitoring. The syntax of the date and the time is: 2007-11-19T13:02:34"
+              ::= { siteV1ControlList 13}
+siteV1CtrlTimeResetUptime     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will reset the uptime of the monitoring."
+              ::= { siteV1ControlList 14}
+siteV1CtrlControllerCleanandSaveXMLUserConf     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will remove the configuration sections related to missing equipments, than save all the configuration of all the connected equipment in a XML format. This file is read when the monitoring is starting in order to configure the monitoring. This file is also accessible trough the FTP server or can be downloaded trough the web interface."
+              ::= { siteV1ControlList 20}
+siteV1CtrlControllerSaveXMLUserConf     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will save all the configuration of all the connected (or previously connected) equipment in a XML format. This file is read when the monitoring is starting in order to configure the monitoring. This file is also accessible trough the FTP server or can be downloaded trough the web interface."
+              ::= { siteV1ControlList 21}
+siteV1CtrlControllerSaveInventory     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will save save the inventory in a XML format. This file is read when the monitoring is starting in order to configure the monitoring. This file is also accessible trough the FTP server or can be downloaded trough the web interface."
+              ::= { siteV1ControlList 22}
+siteV1CtrlDataRecordsSaveDataRecords     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will force the monitoring to save all the data records. This is useful if you want to unpower the Comp@s monitoring. This function is called automatically everyday."
+              ::= { siteV1ControlList 33}
+siteV1CtrlDataRecordsExportDataRecordsinCSV     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will force the monitoring to save all the CVS records files. The CSV files are stored in the records folder."
+              ::= { siteV1ControlList 34}
+siteV1CtrlDataRecordsArchiveDataRecords     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will force the monitoring to save all the data records. This is useful if you want to unpower the Comp@s monitoring. This function is called automatically everyday."
+              ::= { siteV1ControlList 35}
+siteV1CtrlDataRecordsDeleteAllDataRecords     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will force the monitoring to save all the data records. This is useful if you want to unpower the Comp@s monitoring. This function is called automatically everyday."
+              ::= { siteV1ControlList 36}
+siteV1CtrlControllerEmulateRecords     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { siteV1ControlList 40}
+siteV1CtrlControllerReloadTranslations     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will reload all the csv translation files"
+              ::= { siteV1ControlList 41}
+siteV1CtrlControllerReloadLicense     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a '1' to this control element will reload the license file"
+              ::= { siteV1ControlList 51}
+siteV1CtrlControllerManageFTPServer     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This Control is used to manage the FTP Server"
+              ::= { siteV1ControlList 55}
+siteV1CtrlInventoryRemoveAbsentEquipments     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { siteV1ControlList 61}
+siteV1CtrlInventoryResetCANBusNode     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Writing a valid CAN bus node id to this control element will reset the correspondent device."
+              ::= { siteV1ControlList 81}
+siteV1CtrlInventorySaveCANOpenLSSConf     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { siteV1ControlList 82}
+siteV1CtrlInventoryStartNewInventory     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { siteV1ControlList 83}
+siteV1CtrlInventoryUpgradeNodeFirmware     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element is used to start the firmware upgrade of a CAN bus Node. You need to upload first the firmware trough ftp in the /user/firmware path. Then you need to write the id number of the CAN Node, followed by a coma, followed by the file name. Example : '101,SOFT_0000030_01.txt'."
+              ::= { siteV1ControlList 91}
+siteV1CtrlInventoryCancelFirmwareUpgrade     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element is used to cancel the running firmware upgrade of a CAN bus Node."
+              ::= { siteV1ControlList 92}
+siteV1CtrlFilesFlashBinary     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element is used to start a binary flash update. You need to upload first the firmware trough ftp in the /user/firmware path."
+              ::= { siteV1ControlList 103}
+siteV1CtrlFilesDownloadFileFromUrl     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element is used to download a file wiht HTTP get, the argument is an url. The file is saved in the upload folder"
+              ::= { siteV1ControlList 110}
+siteV1CtrlFilesDeleteUserUploadedFile     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element is used to delete a file in the user-upload folder. This is riskless as these files are not used, they are temporary files. "
+              ::= { siteV1ControlList 111}
+siteV1CtrlFilesMoveUserUploadedFile     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element is used to copy a file from the user-upload folder to another one. Be aware of what your are doing !"
+              ::= { siteV1ControlList 112}
+siteV1CtrlFilesExtractZipFileinuserupload     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element is used to delete a file in the user-upload folder. This is riskless as these files are not used, they are temporary files. "
+              ::= { siteV1ControlList 113}
+siteV1CtrlEmailSendSummaryEmail     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element is used to force the sending of a summary to the configured mail address"
+              ::= { siteV1ControlList 120}
+siteV1CtrlScriptingControlLuaScript     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element is used to control the lua scripting system. Available command are: enable[Enable Lua Capabilities], disable[Disable Lua Capabilities], restart[Restart All Lua Capabilities], refresh[Read the folder script (if you added a file when system is running)], enable filename[enable filename.lua located in folder user/scripts], disable filename[disable filename.lua located in folder user/scripts], restart filename : Restart fileName[file must be enabled], reseterrors[Reset all errors counters], reseterrors filename[Reset errors from filename"
+              ::= { siteV1ControlList 250}
+siteV1CtrlControllerAdvancedFunctionGenericCommandExecution     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control is used to perform advanced operation."
+              ::= { siteV1ControlList 300}
+siteV1CtrlGenericClearMyEvents     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "By writing '1' to this control element, all the events of this equipment will be cleared."
+              ::= { siteV1ControlList 501}
+siteV1CtrlGenericClearAllEvents     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "By writing '1' to this control element, all the events of this equipment and all the events of all the sub-equipments will be cleared."
+              ::= { siteV1ControlList 502}
+siteV1CtrlGenericAddEvent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element adds an event of severity none. The event name is the text written to this control element"
+              ::= { siteV1ControlList 511}
+siteV1CtrlGenericAddMajorEvent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element adds an event of severity major. The event name is the text written to this control element"
+              ::= { siteV1ControlList 512}
+siteV1CtrlGenericResetDefaultNamesAndGroups     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element resets all the element Names, Groups and Subgroups to default values for this equipment"
+              ::= { siteV1ControlList 521}
+siteV1CtrlGenericResetDefaultNamesAndGroupsRecursive     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element resets all the element Names, Groups and Subgroups to default values for this equipment and all sub equipments"
+              ::= { siteV1ControlList 522}
+siteV1Notifications           OBJECT IDENTIFIER ::= { siteV1 18 }
+siteV1NotificationPrefix      OBJECT IDENTIFIER ::= { siteV1Notifications 0 }
+siteV1NotificationOfEvent NOTIFICATION-TYPE
+          OBJECTS {
+          siteV1EventId,
+          siteV1EventName,
+          siteV1EventDateTime,
+          siteV1EventSeverityType,
+          siteV1EventSeverityLevel,
+          siteV1AlarmSummary
+          }
+          STATUS current
+          DESCRIPTION  "Notification generated when a new event appears"
+          ::= { siteV1NotificationPrefix 1 }
+
+siteV1Compliance OBJECT IDENTIFIER ::= { siteV1 19}
+siteV1ComplianceGroups OBJECT IDENTIFIER ::={ siteV1Compliance 1}
+siteV1FullCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION " The compliance statement for SNMPV2 entities which implement the SNMPV2 MIB. "
+    MODULE
+        MANDATORY-GROUPS { siteV1GlobalGroup, siteV1NotificationGroup }
+    ::= { siteV1Compliance 2 }
+
+siteV1GlobalGroup OBJECT-GROUP
+     OBJECTS{siteV1GlobalStatus, siteV1GlobalAlarmSeverityType, siteV1GlobalAlarmSeverityLevel, siteV1GlobalAlarmSeverityTypeInt, siteV1DescriptionNumber, siteV1DescriptionName, siteV1DescriptionValue, siteV1DescriptionEntryStatus, siteV1DescDescriptionSiteNumber, siteV1DescDescriptionSiteName, siteV1DescDescriptionShortDescription, siteV1DescDescriptionInfo, siteV1DescDescriptionDescription, siteV1DescDescriptionReference, siteV1DescDescriptionContactName, siteV1DescDescriptionPhoneNumber, siteV1DescDescriptionStreet, siteV1DescDescriptionCity, siteV1DescDescriptionProvince, siteV1DescDescriptionPostalCode, siteV1DescDescriptionRegion, siteV1DescDescriptionCountry, siteV1DescDescriptionGroup1, siteV1DescDescriptionGroup2, siteV1DescDescriptionGroup3, siteV1DescDescriptionGroup4, siteV1DescDescriptionGroup5, siteV1DescDescriptionLatitude, siteV1DescDescriptionLongitude, siteV1DescDescriptionAltitude, siteV1DescControllerSoftwareRevision, siteV1DescControllerOperatingSystemRevision, siteV1DescControllerCPU, siteV1DescControllerCard, siteV1DescControllerStarterVersion, siteV1DescControllerFactoryCompasVersion, siteV1DescControllerUserCompasVersion, siteV1DescControllerFactoryFTPServerVersion, siteV1DescControllerUserFTPServerVersion, siteV1AlarmNumber, siteV1AlarmName, siteV1AlarmActive, siteV1AlarmSeverityType, siteV1AlarmSeverityLevel, siteV1AlarmStartTime, siteV1AlarmStopTime, siteV1AlarmEntryStatus, siteV1AlarmSummary, siteV1EventNumber, siteV1EventId, siteV1EventName, siteV1EventDateTime, siteV1EventSeverityType, siteV1EventSeverityLevel, siteV1EventEntryStatus, siteV1DataNumber, siteV1DataName, siteV1DataValue, siteV1DataEntryStatus, siteV1DataNetworkCurrentIPAddress, siteV1DataNetworkCurrentIPMask, siteV1DataNetworkCurrentMACAddress, siteV1DataControllerLicensedOptions, siteV1DataTimeDateAndTimeLocal, siteV1DataTimeDateAndTimeUTC, siteV1DataControllerMonitoringMemoryUsed, siteV1DataControllerCPUPercentageUsage, siteV1DataControllerFreeFlashMemorySpace, siteV1DataControllerFTPServerStatus, siteV1DataDataRecordsTotalFifoSizeOfSecondRecords, siteV1DataDataRecordsTotalFifoSizeOfMinuteRecords, siteV1DataDataRecordsTotalFifoSizeOfHourRecords, siteV1DataDataRecordsTotalFifoSizeOfDayRecords, siteV1DataInventoryCANBusNodeIDs, siteV1DataCloudLinkCloudLinkState, siteV1ConfigNumber, siteV1ConfigName, siteV1ConfigValue, siteV1ConfigEntryStatus, siteV1CfgNetworkDHCPEnabled, siteV1CfgNetworkIPAddressIfStatic, siteV1CfgNetworkSubnetMaskIfStatic, siteV1CfgNetworkDefaultGatewayIfStatic, siteV1CfgNetworkDNSIfStatic, siteV1CfgNetworkMaxTransmissionUnit, siteV1CfgTimeSNTPTimeServer, siteV1CfgTimeTimeZoneName, siteV1CfgTimeSNTPTimeRefresh, siteV1CfgTimeSNTPTimeRecoveryRefresh, siteV1CfgWebServerWebServerSecurityEnabled, siteV1CfgWebServerWebServerPort, siteV1CfgWebServerWebAuthenticationMethod, siteV1CfgWebServerHttpsWebServerPort, siteV1CfgWebServerDefaultPage, siteV1CfgXMLXMLEventPostingActivated, siteV1CfgXMLXMLEventPostingRefreshTime, siteV1CfgXMLXMLEventPostingTimeout, siteV1CfgXMLXMLEventPostingToSecOnlyIfPrimFail, siteV1CfgXMLXMLTablesToPostOnXMLEvent, siteV1CfgXMLXMLHeartbeatTime, siteV1CfgSNMPSNMPActivated, siteV1CfgSNMPSNMPTrapVersion, siteV1CfgSNMPSNMPGETMinSecurityLevel, siteV1CfgSNMPSNMPSETMinSecurityLevel, siteV1CfgSNMPSNMPV3AuthAlgorithm, siteV1CfgSNMPSNMPV3PrivacyAlgorithm, siteV1CfgSNMPSNMPV3PrivacyPassword, siteV1CfgSNMPSNMPV3EngineID, siteV1CfgSNMPSNMPV3TrapAuthAlgorithm, siteV1CfgSNMPSNMPV3TrapPrivacyAlgorithm, siteV1CfgSNMPSNMPV3TrapUsername, siteV1CfgSNMPSNMPV3TrapAuthPassword, siteV1CfgSNMPSNMPV3TrapPrivacyPassword, siteV1CfgSNMPSiteDescriptionIdsIncludedInTraps, siteV1CfgGenericGenerateEventOnConfChanges, siteV1CfgDataRecordsAutoArchivePeriodDataRecord, siteV1CfgGenericGenerateEventOnControlExecution, siteV1CfgGenericGenerateEventOnAlarmAcknowledge, siteV1CfgInventoryRequiredCANBusNodeIDs, siteV1CfgInventoryLSSCANidrange, siteV1CfgInventorySystemNodesDefinition, siteV1CfgInventoryLSSCANOpenSavedConf, siteV1CfgUsersAdministratorLoginPassword, siteV1CfgUsersUser1LoginPassword, siteV1CfgUsersUser2LoginPassword, siteV1CfgUsersUser3LoginPassword, siteV1CfgUsersUser4LoginPassword, siteV1CfgUsersUser5LoginPassword, siteV1CfgRadiusAuthenticationRadiusServer, siteV1CfgRadiusAuthenticationRadiusPort, siteV1CfgRadiusAuthenticationRadiusSecret, siteV1CfgEmailEnableEmailFeature, siteV1CfgEmailSmtpServer, siteV1CfgEmailSmtpDomain, siteV1CfgEmailSmtpUserLoginPassword, siteV1CfgEmailMailSender, siteV1CfgEmailMailRecipients, siteV1CfgEmailMinimalSeverityTypeToSendMail, siteV1CfgControllerAutomaticReboot, siteV1CfgCloudLinkCloudEnabled, siteV1CfgCloudLinkCloudServer, siteV1CfgCloudLinkCloudPort, siteV1CfgCloudLinkCloudCredential, siteV1CfgCloudLinkCloudCluster, siteV1CfgInventoryRS485ExtensionsConf, siteV1CfgInventoryEthernetExtensionsConf, siteV1CfgScriptingEnabledscripts, siteV1CfgScriptingNumberofErrorsbeforetriggeringalarm, siteV1CfgGenericReadAccessUserNumbers, siteV1CfgGenericWriteAccessUserNumbers, siteV1CfgGenericEventTableLength, siteV1CfgSNMPSNMPTrapTargetsIP, siteV1CfgSNMPMinimalEventSeverityForTraps, siteV1CfgXMLXMLEventsPrimPostURL, siteV1CfgXMLXMLEventsPrimPostLogin, siteV1CfgXMLXMLEventsPrimPostPassword, siteV1CfgXMLXMLEventsSecPostURL, siteV1CfgXMLXMLEventsSecPostLogin, siteV1CfgXMLXMLEventsSecPostPassword, siteV1CfgPLCNumberOfPLCData, siteV1CfgPLCNumberOfPLCAlarm, siteV1ControlNumber, siteV1ControlName, siteV1ControlValue, siteV1ControlEntryStatus, siteV1CtrlControllerRebootController, siteV1CtrlControllerSaveConfAndRebootController, siteV1CtrlControllerRebootControllerWithoutSavingRecords, siteV1CtrlNetworkApplyNetworkConf, siteV1CtrlTimeForceSNTPTimeRefresh, siteV1CtrlTimeSetLocalTime, siteV1CtrlTimeSetUTCTime, siteV1CtrlTimeResetUptime, siteV1CtrlControllerCleanandSaveXMLUserConf, siteV1CtrlControllerSaveXMLUserConf, siteV1CtrlControllerSaveInventory, siteV1CtrlDataRecordsSaveDataRecords, siteV1CtrlDataRecordsExportDataRecordsinCSV, siteV1CtrlDataRecordsArchiveDataRecords, siteV1CtrlDataRecordsDeleteAllDataRecords, siteV1CtrlControllerEmulateRecords, siteV1CtrlControllerReloadTranslations, siteV1CtrlControllerReloadLicense, siteV1CtrlControllerManageFTPServer, siteV1CtrlInventoryRemoveAbsentEquipments, siteV1CtrlInventoryResetCANBusNode, siteV1CtrlInventorySaveCANOpenLSSConf, siteV1CtrlInventoryStartNewInventory, siteV1CtrlInventoryUpgradeNodeFirmware, siteV1CtrlInventoryCancelFirmwareUpgrade, siteV1CtrlFilesFlashBinary, siteV1CtrlFilesDownloadFileFromUrl, siteV1CtrlFilesDeleteUserUploadedFile, siteV1CtrlFilesMoveUserUploadedFile, siteV1CtrlFilesExtractZipFileinuserupload, siteV1CtrlEmailSendSummaryEmail, siteV1CtrlScriptingControlLuaScript, siteV1CtrlControllerAdvancedFunctionGenericCommandExecution, siteV1CtrlGenericClearMyEvents, siteV1CtrlGenericClearAllEvents, siteV1CtrlGenericAddEvent, siteV1CtrlGenericAddMajorEvent, siteV1CtrlGenericResetDefaultNamesAndGroups, siteV1CtrlGenericResetDefaultNamesAndGroupsRecursive}
+     STATUS       current
+     DESCRIPTION  "text"
+     ::= { siteV1ComplianceGroups 1 }
+
+siteV1NotificationGroup NOTIFICATION-GROUP
+     NOTIFICATIONS {siteV1NotificationOfEvent}
+     STATUS       current
+     DESCRIPTION  "text"
+     ::= { siteV1ComplianceGroups 2 }
+
+
+
+energySystems   OBJECT IDENTIFIER ::= { siteV1 20 }
+es1   OBJECT IDENTIFIER ::= {energySystems 1}
+es1GlobalStatus      OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "A textual string (alarms, normal or unknown) containing the status of the Energy System"
+              ::={es1 1 }
+
+es1GlobalAlarmSeverityType  OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "The alarm severity type (critical, major, minor, warning, none, disabled) of the Energy System"
+              ::= { es1 2 }
+
+es1GlobalAlarmSeverityLevel  OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "The alarm severity level (0-9) of the Energy System"
+              ::= { es1 3 }
+
+es1GlobalAlarmSeverityTypeInt  OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "The alarm severity type as integer (critical=4, major=3, minor=2, warning=1, none=0) of the Energy System"
+              ::= { es1 4 }
+
+es1Description     OBJECT IDENTIFIER ::= { es1 10 }
+es1DescriptionNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Energy System Description table"
+              ::= { es1Description 1 }
+es1DescriptionTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1DescriptionEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Description table of the Energy System"
+              ::= { es1Description 2 }
+es1DescriptionEntry      OBJECT-TYPE
+              SYNTAX          Es1DescriptionEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A Description entry"
+              INDEX {es1DescriptionIndex}
+              ::= { es1DescriptionTable 1 }
+Es1DescriptionEntry ::=
+              SEQUENCE{
+              es1DescriptionIndex    Unsigned32,
+              es1DescriptionName     DisplayString,
+              es1DescriptionValue    DisplayString,
+              es1DescriptionEntryStatus RowStatus
+              }
+es1DescriptionIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "Description Index"
+              ::= { es1DescriptionEntry 1 }
+es1DescriptionName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Description Name"
+              ::= { es1DescriptionEntry 2 }
+es1DescriptionValue      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "Description Value"
+              ::= { es1DescriptionEntry 3 }
+es1DescriptionEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry"
+              ::= { es1DescriptionEntry 4 }
+es1DescriptionList         OBJECT IDENTIFIER ::= { es1Description 3 }
+es1DescDescriptionDescription     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "A free text zone to write a system description"
+              ::= { es1DescriptionList 1}
+es1DescDescriptionReference     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "A free text zone to write the customer reference of the system"
+              ::= { es1DescriptionList 2}
+es1Alarm          OBJECT IDENTIFIER ::= { es1 11 }
+es1AlarmNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Energy System Alarm table"
+              ::= { es1Alarm 1 }
+es1AlarmTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1AlarmEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Alarm entries"
+              ::= { es1Alarm 2 }
+es1AlarmEntry      OBJECT-TYPE
+              SYNTAX          Es1AlarmEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "An alarm entry"
+              INDEX {es1AlarmIndex}
+              ::= { es1AlarmTable 1 }
+Es1AlarmEntry ::=
+             SEQUENCE{
+             es1AlarmIndex         Unsigned32,
+             es1AlarmName          DisplayString,
+             es1AlarmActive        DisplayString,
+             es1AlarmSeverityType  DisplayString,
+             es1AlarmSeverityLevel DisplayString,
+             es1AlarmStartTime      DisplayString,
+             es1AlarmStopTime       DisplayString,
+              es1AlarmEntryStatus  RowStatus
+             }
+es1AlarmIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "Alarm Index"
+              ::= { es1AlarmEntry 1 }
+es1AlarmName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Alarm Name"
+              ::= { es1AlarmEntry 2 }
+es1AlarmActive   OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Is the Alarm active ? 'true' for active, 'false' for not-active"
+              ::= { es1AlarmEntry 3 }
+es1AlarmSeverityType      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The alarm severity type (major, minor, warning, none, disabled) of this alarm entry"
+              ::= { es1AlarmEntry 4 }
+es1AlarmSeverityLevel      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The alarm severity level (0-9) of this alarm entry"
+              ::= { es1AlarmEntry 5 }
+es1AlarmStartTime      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The last start time of this alarm entry (null if never active)"
+              ::= { es1AlarmEntry 6 }
+es1AlarmStopTime      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The last stop time of this alarm entry (null if alarm active)"
+              ::= { es1AlarmEntry 7 }
+es1AlarmEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only for MIB compliance "
+              ::= { es1AlarmEntry 8 }
+es1AlarmSummary      OBJECT-TYPE
+              SYNTAX BITS{
+                  none (0)
+              }
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Summary bit vector with all the alarms state of the Energy System. A '1' means alarm active, '0' means not active. Unimplemented alarms are always '0'."
+              ::= { es1Alarm 3 }
+es1Event          OBJECT IDENTIFIER ::= { es1 12 }
+es1EventNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Event Table related to the Energy System"
+              ::= { es1Event 1 }
+es1EventTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1EventEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Event table related to the Energy System"
+              ::= { es1Event 2 }
+es1EventEntry      OBJECT-TYPE
+              SYNTAX          Es1EventEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "."
+              INDEX {es1EventIndex}
+              ::= { es1EventTable 1 }
+Es1EventEntry ::=
+             SEQUENCE{
+             es1EventIndex           Unsigned32,
+             es1EventId              Unsigned32,
+             es1EventName            DisplayString,
+             es1EventDateTime        DisplayString,
+             es1EventSeverityType    DisplayString,
+             es1EventSeverityLevel   DisplayString,
+              es1EventEntryStatus    RowStatus
+             }
+es1EventIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "Event Index"
+              ::= { es1EventEntry 1 }
+es1EventId      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Event Index"
+              ::= { es1EventEntry 2 }
+es1EventName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Event Name"
+              ::= { es1EventEntry 3 }
+es1EventDateTime      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The date and time of the event"
+              ::= { es1EventEntry 4 }
+es1EventSeverityType      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The event severity type ('major', 'minor', 'warning' or 'none')"
+              ::= { es1EventEntry 5 }
+es1EventSeverityLevel      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The event severity level (0-9)"
+              ::= { es1EventEntry 6 }
+es1EventEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry"
+              ::= { es1EventEntry 7 }
+es1Data            OBJECT IDENTIFIER ::= { es1 13 }
+es1DataNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Data Table related to the Energy System"
+              ::= { es1Data 1 }
+es1Config          OBJECT IDENTIFIER ::= { es1 15 }
+es1ConfigNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Config table related to the Energy System"
+              ::= { es1Config 1 }
+es1ConfigTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1ConfigEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Config entries related to the Energy System"
+              ::= { es1Config 2 }
+es1ConfigEntry      OBJECT-TYPE
+              SYNTAX          Es1ConfigEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A Config entry"
+              INDEX {es1ConfigIndex}
+              ::= { es1ConfigTable 1 }
+Es1ConfigEntry ::=
+             SEQUENCE{
+             es1ConfigIndex       Unsigned32,
+             es1ConfigName        DisplayString,
+             es1ConfigValue       DisplayString,
+              es1ConfigEntryStatus  RowStatus
+             }
+es1ConfigIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Config entry Index"
+              ::= { es1ConfigEntry 1 }
+es1ConfigName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The Config entry name"
+              ::= { es1ConfigEntry 2 }
+es1ConfigValue     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The Config entry value"
+              ::= { es1ConfigEntry 3 }
+es1ConfigEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only for compliance"
+              ::= { es1ConfigEntry 4 }
+es1ConfigList         OBJECT IDENTIFIER ::= { es1Config 3 }
+es1CfgEnergyMeterNumberOfGenericPulseEnergyCounter     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { es1ConfigList 100}
+es1Control          OBJECT IDENTIFIER ::= { es1 16 }
+es1ControlNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Control table related to the Energy System"
+              ::= { es1Control 1 }
+es1ControlTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1ControlEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Control entries related to the Energy System"
+              ::= { es1Control 2 }
+es1ControlEntry      OBJECT-TYPE
+              SYNTAX          Es1ControlEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A Control entry"
+              INDEX {es1ControlIndex}
+              ::= { es1ControlTable 1 }
+Es1ControlEntry ::=
+             SEQUENCE{
+             es1ControlIndex       Unsigned32,
+             es1ControlName        DisplayString,
+             es1ControlValue       DisplayString,
+              es1ControlEntryStatus  RowStatus
+             }
+es1ControlIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Control entry Index"
+              ::= { es1ControlEntry 1 }
+es1ControlName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The Control entry name"
+              ::= { es1ControlEntry 2 }
+es1ControlValue     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The Control entry value"
+              ::= { es1ControlEntry 3 }
+es1ControlEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only for compliance"
+              ::= { es1ControlEntry 4 }
+es1ControlList         OBJECT IDENTIFIER ::= { es1Control 3 }
+es1CtrlGenericClearMyEvents     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "By writing '1' to this control element, all the events of this equipment will be cleared."
+              ::= { es1ControlList 501}
+es1CtrlGenericClearAllEvents     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "By writing '1' to this control element, all the events of this equipment and all the events of all the sub-equipments will be cleared."
+              ::= { es1ControlList 502}
+es1CtrlGenericAddEvent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element adds an event of severity none. The event name is the text written to this control element"
+              ::= { es1ControlList 511}
+es1CtrlGenericAddMajorEvent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element adds an event of severity major. The event name is the text written to this control element"
+              ::= { es1ControlList 512}
+es1CtrlGenericResetDefaultNamesAndGroups     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element resets all the element Names, Groups and Subgroups to default values for this equipment"
+              ::= { es1ControlList 521}
+es1CtrlGenericResetDefaultNamesAndGroupsRecursive     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element resets all the element Names, Groups and Subgroups to default values for this equipment and all sub equipments"
+              ::= { es1ControlList 522}
+es1Notifications           OBJECT IDENTIFIER ::= { es1 18 }
+es1NotificationPrefix      OBJECT IDENTIFIER ::= { es1Notifications 0 }
+es1NotificationOfEvent NOTIFICATION-TYPE
+          OBJECTS {
+          es1EventId,
+          es1EventName,
+          es1EventDateTime,
+          es1EventSeverityType,
+          es1EventSeverityLevel,
+          es1AlarmSummary
+          }
+          STATUS current
+          DESCRIPTION  "Notification generated when a new event appears"
+          ::= { es1NotificationPrefix 1 }
+
+es1Compliance OBJECT IDENTIFIER ::= { es1 19}
+es1ComplianceGroups OBJECT IDENTIFIER ::={ es1Compliance 1}
+es1FullCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION " The compliance statement for SNMPV2 entities which implement the SNMPV2 MIB. "
+    MODULE
+        MANDATORY-GROUPS { es1GlobalGroup, es1NotificationGroup }
+    ::= { es1Compliance 2 }
+
+es1GlobalGroup OBJECT-GROUP
+     OBJECTS{es1GlobalStatus, es1GlobalAlarmSeverityType, es1GlobalAlarmSeverityLevel, es1GlobalAlarmSeverityTypeInt, es1DescriptionNumber, es1DescriptionName, es1DescriptionValue, es1DescriptionEntryStatus, es1DescDescriptionDescription, es1DescDescriptionReference, es1AlarmNumber, es1AlarmName, es1AlarmActive, es1AlarmSeverityType, es1AlarmSeverityLevel, es1AlarmStartTime, es1AlarmStopTime, es1AlarmEntryStatus, es1AlarmSummary, es1EventNumber, es1EventId, es1EventName, es1EventDateTime, es1EventSeverityType, es1EventSeverityLevel, es1EventEntryStatus, es1DataNumber, es1ConfigNumber, es1ConfigName, es1ConfigValue, es1ConfigEntryStatus, es1CfgEnergyMeterNumberOfGenericPulseEnergyCounter, es1ControlNumber, es1ControlName, es1ControlValue, es1ControlEntryStatus, es1CtrlGenericClearMyEvents, es1CtrlGenericClearAllEvents, es1CtrlGenericAddEvent, es1CtrlGenericAddMajorEvent, es1CtrlGenericResetDefaultNamesAndGroups, es1CtrlGenericResetDefaultNamesAndGroupsRecursive}
+     STATUS       current
+     DESCRIPTION  "text"
+     ::= { es1ComplianceGroups 1 }
+
+es1NotificationGroup NOTIFICATION-GROUP
+     NOTIFICATIONS {es1NotificationOfEvent}
+     STATUS       current
+     DESCRIPTION  "text"
+     ::= { es1ComplianceGroups 2 }
+
+
+
+es1DCSystems   OBJECT IDENTIFIER ::= { es1 20 }
+es1dc1   OBJECT IDENTIFIER ::= {es1DCSystems 1}
+es1dc1GlobalStatus      OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "A textual string (alarms, normal or unknown) containing the status of the DC System"
+              ::={es1dc1 1 }
+
+es1dc1GlobalAlarmSeverityType  OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "The alarm severity type (critical, major, minor, warning, none, disabled) of the DC System"
+              ::= { es1dc1 2 }
+
+es1dc1GlobalAlarmSeverityLevel  OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "The alarm severity level (0-9) of the DC System"
+              ::= { es1dc1 3 }
+
+es1dc1GlobalAlarmSeverityTypeInt  OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "The alarm severity type as integer (critical=4, major=3, minor=2, warning=1, none=0) of the DC System"
+              ::= { es1dc1 4 }
+
+es1dc1Description     OBJECT IDENTIFIER ::= { es1dc1 10 }
+es1dc1DescriptionNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the DC System Description table"
+              ::= { es1dc1Description 1 }
+es1dc1DescriptionTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1dc1DescriptionEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Description table of the DC System"
+              ::= { es1dc1Description 2 }
+es1dc1DescriptionEntry      OBJECT-TYPE
+              SYNTAX          Es1dc1DescriptionEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A Description entry"
+              INDEX {es1dc1DescriptionIndex}
+              ::= { es1dc1DescriptionTable 1 }
+Es1dc1DescriptionEntry ::=
+              SEQUENCE{
+              es1dc1DescriptionIndex    Unsigned32,
+              es1dc1DescriptionName     DisplayString,
+              es1dc1DescriptionValue    DisplayString,
+              es1dc1DescriptionEntryStatus RowStatus
+              }
+es1dc1DescriptionIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "Description Index"
+              ::= { es1dc1DescriptionEntry 1 }
+es1dc1DescriptionName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Description Name"
+              ::= { es1dc1DescriptionEntry 2 }
+es1dc1DescriptionValue      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "Description Value"
+              ::= { es1dc1DescriptionEntry 3 }
+es1dc1DescriptionEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry"
+              ::= { es1dc1DescriptionEntry 4 }
+es1dc1DescriptionList         OBJECT IDENTIFIER ::= { es1dc1Description 3 }
+es1dc1DescDescriptionDescription     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "A free text zone to write a system description"
+              ::= { es1dc1DescriptionList 1}
+es1dc1DescDescriptionReference     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "A free text zone to write the customer reference of the system"
+              ::= { es1dc1DescriptionList 2}
+es1dc1DescDescriptionProductName     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The product name of the DC system monitoring"
+              ::= { es1dc1DescriptionList 11}
+es1dc1DescDescriptionHardwareReference     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The hardware reference of the DC system monitoring"
+              ::= { es1dc1DescriptionList 12}
+es1dc1DescDescriptionSoftwareReference     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The software reference of the DC system monitoring"
+              ::= { es1dc1DescriptionList 14}
+es1dc1DescDescriptionSerialNumber     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The serial number of the DC system monitoring"
+              ::= { es1dc1DescriptionList 16}
+es1dc1DescDescriptionManufacturingDate     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The production date of the DC system monitoring"
+              ::= { es1dc1DescriptionList 18}
+es1dc1DescDescriptionDistributionModuleProductName     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The product name of the Electronic Distribution/LVD Module"
+              ::= { es1dc1DescriptionList 31}
+es1dc1DescDescriptionDistributionModuleHardwareReference     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The hardware reference of the Electronic Distribution/LVD Module"
+              ::= { es1dc1DescriptionList 32}
+es1dc1DescDescriptionDistributionModuleSoftwareReference     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The software reference of the Electronic Distribution/LVD Module"
+              ::= { es1dc1DescriptionList 34}
+es1dc1DescDescriptionDistributionModuleSerialNumber     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The serial number of the Electronic Distribution/LVD Module"
+              ::= { es1dc1DescriptionList 36}
+es1dc1DescDescriptionDistributionModuleManufacturingDate     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The manufacturing date of the Electronic Distribution/LVD Module"
+              ::= { es1dc1DescriptionList 38}
+es1dc1Alarm          OBJECT IDENTIFIER ::= { es1dc1 11 }
+es1dc1AlarmNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the DC System Alarm table"
+              ::= { es1dc1Alarm 1 }
+es1dc1AlarmTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1dc1AlarmEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Alarm entries"
+              ::= { es1dc1Alarm 2 }
+es1dc1AlarmEntry      OBJECT-TYPE
+              SYNTAX          Es1dc1AlarmEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "An alarm entry"
+              INDEX {es1dc1AlarmIndex}
+              ::= { es1dc1AlarmTable 1 }
+Es1dc1AlarmEntry ::=
+             SEQUENCE{
+             es1dc1AlarmIndex         Unsigned32,
+             es1dc1AlarmName          DisplayString,
+             es1dc1AlarmActive        DisplayString,
+             es1dc1AlarmSeverityType  DisplayString,
+             es1dc1AlarmSeverityLevel DisplayString,
+             es1dc1AlarmStartTime      DisplayString,
+             es1dc1AlarmStopTime       DisplayString,
+              es1dc1AlarmEntryStatus  RowStatus
+             }
+es1dc1AlarmIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "Alarm Index"
+              ::= { es1dc1AlarmEntry 1 }
+es1dc1AlarmName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Alarm Name"
+              ::= { es1dc1AlarmEntry 2 }
+es1dc1AlarmActive   OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Is the Alarm active ? 'true' for active, 'false' for not-active"
+              ::= { es1dc1AlarmEntry 3 }
+es1dc1AlarmSeverityType      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The alarm severity type (major, minor, warning, none, disabled) of this alarm entry"
+              ::= { es1dc1AlarmEntry 4 }
+es1dc1AlarmSeverityLevel      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The alarm severity level (0-9) of this alarm entry"
+              ::= { es1dc1AlarmEntry 5 }
+es1dc1AlarmStartTime      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The last start time of this alarm entry (null if never active)"
+              ::= { es1dc1AlarmEntry 6 }
+es1dc1AlarmStopTime      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The last stop time of this alarm entry (null if alarm active)"
+              ::= { es1dc1AlarmEntry 7 }
+es1dc1AlarmEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only for MIB compliance "
+              ::= { es1dc1AlarmEntry 8 }
+es1dc1AlarmSummary      OBJECT-TYPE
+              SYNTAX BITS{
+                  dCBusDCBusExtraLow (0),          -- Alarm : DC Bus Extra Low
+                  dCBusDCBusLow (1),          -- Alarm : DC Bus Low
+                  dCBusDCBusHigh (2),          -- Alarm : DC Bus High
+                  dCBusDCBusExtraHigh (3),          -- Alarm : DC Bus Extra High
+                  dCBusDCBusVoltageSenseFail (4),          -- Alarm : DC Bus Voltage Sense Failure
+                  aCBusMainsFail (5),          -- Alarm : Mains Failure
+                  aCBusMainsPartialFail (6),          -- Alarm : Mains Partial Failure
+                  aCBusMainsLow (7),          -- Alarm : Mains Low
+                  rectifiersOneRectifierFail (9),          -- Alarm : One Rectifier Failure
+                  rectifiersMoreThanOneRectifierFail (10),          -- Alarm : More Than One Rectifier Failure
+                  rectifiersMissingRectifiers (11),          -- Alarm : Missing Rectifiers
+                  batBatLastTestFailed (12),          -- Alarm : Battery Last Test Failed
+                  batBatOnDischarge (13),          -- Alarm : Battery On Discharge
+                  lVDBatLVDRelOpen (16),          -- Alarm : Battery LVD Relay Open
+                  batBatTempTooHigh (17),          -- Alarm : Battery Temperature Too High
+                  batBatTempTooLow (18),          -- Alarm : Battery Temperature Too Low
+                  batBatTempSensorFail (19),          -- Alarm : Battery Temperature Sensor Fail
+                  sensorsAmbientTempTooHigh (20),          -- Alarm : Ambient Temperature Too High
+                  sensorsAmbientTempTooLow (21),          -- Alarm : Ambient Temperature Too Low
+                  sensorsAmbientTempSensorFail (22),          -- Alarm : Ambient Temperature Sensor Fail
+                  digInputsDistributionBreakerOpen (24),          -- Alarm : Distribution Breaker Open
+                  digInputsBatBreakerOpen (25),          -- Alarm : Battery Breaker Open
+                  digInputsDigInput1 (26),          -- Alarm : Digital Input 1
+                  digInputsDigInput2 (27),          -- Alarm : Digital Input 2
+                  digInputsDigInput3 (28),          -- Alarm : Digital Input 3
+                  digInputsDigInput4 (29)          -- Alarm : Digital Input 4
+              }
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Summary bit vector with all the alarms state of the DC System. A '1' means alarm active, '0' means not active. Unimplemented alarms are always '0'."
+              ::= { es1dc1Alarm 3 }
+es1dc1Event          OBJECT IDENTIFIER ::= { es1dc1 12 }
+es1dc1EventNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Event Table related to the DC System"
+              ::= { es1dc1Event 1 }
+es1dc1EventTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1dc1EventEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Event table related to the DC System"
+              ::= { es1dc1Event 2 }
+es1dc1EventEntry      OBJECT-TYPE
+              SYNTAX          Es1dc1EventEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "."
+              INDEX {es1dc1EventIndex}
+              ::= { es1dc1EventTable 1 }
+Es1dc1EventEntry ::=
+             SEQUENCE{
+             es1dc1EventIndex           Unsigned32,
+             es1dc1EventId              Unsigned32,
+             es1dc1EventName            DisplayString,
+             es1dc1EventDateTime        DisplayString,
+             es1dc1EventSeverityType    DisplayString,
+             es1dc1EventSeverityLevel   DisplayString,
+              es1dc1EventEntryStatus    RowStatus
+             }
+es1dc1EventIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "Event Index"
+              ::= { es1dc1EventEntry 1 }
+es1dc1EventId      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Event Index"
+              ::= { es1dc1EventEntry 2 }
+es1dc1EventName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Event Name"
+              ::= { es1dc1EventEntry 3 }
+es1dc1EventDateTime      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The date and time of the event"
+              ::= { es1dc1EventEntry 4 }
+es1dc1EventSeverityType      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The event severity type ('major', 'minor', 'warning' or 'none')"
+              ::= { es1dc1EventEntry 5 }
+es1dc1EventSeverityLevel      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The event severity level (0-9)"
+              ::= { es1dc1EventEntry 6 }
+es1dc1EventEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry"
+              ::= { es1dc1EventEntry 7 }
+es1dc1Data            OBJECT IDENTIFIER ::= { es1dc1 13 }
+es1dc1DataNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Data Table related to the DC System"
+              ::= { es1dc1Data 1 }
+es1dc1DataTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1dc1DataEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Data entries"
+              ::= { es1dc1Data 2 }
+es1dc1DataEntry      OBJECT-TYPE
+              SYNTAX          Es1dc1DataEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A data entry"
+              INDEX {es1dc1DataIndex}
+              ::= { es1dc1DataTable 1 }
+Es1dc1DataEntry ::=
+             SEQUENCE{
+             es1dc1DataIndex       Unsigned32,
+             es1dc1DataName        DisplayString,
+             es1dc1DataValue       DisplayString,
+              es1dc1DataEntryStatus  RowStatus
+             }
+es1dc1DataIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The data index"
+              ::= { es1dc1DataEntry 1 }
+
+es1dc1DataName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The data name"
+              ::= { es1dc1DataEntry 2 }
+es1dc1DataValue     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The data value"
+              ::= { es1dc1DataEntry 3 }
+es1dc1DataEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only present for compliance"
+              ::= { es1dc1DataEntry 4 }
+es1dc1DataList         OBJECT IDENTIFIER ::= { es1dc1Data 3 }
+es1dc1DataSystemDCMode     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The DC system can have 5 values: 'Float'(0), 'Equalize'(1), 'Battery Test'(2), 'Ac Failure'(3) or 'Safe'(5)"
+              ::= { es1dc1DataList 1}
+es1dc1DataSystemPreviousDCMode     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The previous value of the DC Mode : 'Float'(0), 'Equalize'(1), 'Battery Test'(2), 'Ac Failure'(3) or 'Safe'(5)"
+              ::= { es1dc1DataList 2}
+es1dc1DataSystemNiMHChargeMode     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { es1dc1DataList 5}
+es1dc1DataDCBusBusVoltage     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The DC bus voltage in volt."
+              ::= { es1dc1DataList 11}
+es1dc1DataSystemRatioDeliveredOnAvailablePower     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the ratio of the delivered power divided by the installed power, in %."
+              ::= { es1dc1DataList 12}
+es1dc1DataACBusMinutesSinceLastACFailBegin     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of minute since the last AC Failure begin"
+              ::= { es1dc1DataList 13}
+es1dc1DataACBusMinutesSinceLastACFailEnd     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of minute since the last AC Failure end"
+              ::= { es1dc1DataList 14}
+es1dc1DataRectifiersRectifiersOutPower     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The sum of the delivered rectifier power"
+              ::= { es1dc1DataList 21}
+es1dc1DataRectifiersRectifiersOutCurrent     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The sum of the delivered rectifier current"
+              ::= { es1dc1DataList 22}
+es1dc1DataRectifiersRectifiersOutPowerMax     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The sum of the deliverable rectifier power"
+              ::= { es1dc1DataList 23}
+es1dc1DataRectifiersRectifiersOutCurrentMax     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The sum of the deliverable rectifier current"
+              ::= { es1dc1DataList 24}
+es1dc1DataRectifiersNumberOfRectifierMax     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The maximum possible number of rectifier in this dc system"
+              ::= { es1dc1DataList 31}
+es1dc1DataRectifiersNumberOfPresentRectifier     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The actual number of present rectifier in this dc system"
+              ::= { es1dc1DataList 32}
+es1dc1DataRectifiersNumberOfAbsentRectifier     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The actual number of absent rectifier in this dc system"
+              ::= { es1dc1DataList 33}
+es1dc1DataRectifiersNumberOfActiveRectifier     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The actual number of active rectifier in this dc system. An active rectifier is a rectifier which is present, DC OK, AC OK and not in remote off."
+              ::= { es1dc1DataList 34}
+es1dc1DataRectifiersNumberOfACFailRectifier     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The actual number or rectifier in AC Failure."
+              ::= { es1dc1DataList 35}
+es1dc1DataRectifiersNumberOfDCFailRectifier     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The actual number or rectifier with DC Failure."
+              ::= { es1dc1DataList 36}
+es1dc1DataRectifiersNumberOfRemoteOffRectifier     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The actual number or rectifier in remote off."
+              ::= { es1dc1DataList 37}
+es1dc1DataRectifiersNumberOfOverTempRectifier     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The actual number or rectifier in Over Temperature."
+              ::= { es1dc1DataList 38}
+es1dc1DataLoadLoadPower     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Estimation of the load power consumption"
+              ::= { es1dc1DataList 51}
+es1dc1DataLoadLoadCurrent     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Estimation of the load current consumption"
+              ::= { es1dc1DataList 52}
+es1dc1DataBatBatInputCurrent     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Measurement of the battery input current. A negative value means that the battery is discharging"
+              ::= { es1dc1DataList 61}
+es1dc1DataBatBatInputPower     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Measurement of the battery input power. A negative value means that the battery is discharging"
+              ::= { es1dc1DataList 62}
+es1dc1DataBatBatTemp     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The battery temperature"
+              ::= { es1dc1DataList 71}
+es1dc1DataBatBatTestState     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is about the result of the last battery test. 10 values are possible : 'Never Tested'(0), 'Success'(1), 'On Going'(2), 'Failed: Timeout'(3), 'Failed: Vbus Too Low'(4), 'Failed: Load Too Low'(5), 'Failed: Ac Failure'(6), 'Failed: Canceled' (7), 'Failed: Lvd Opened'(8), 'Failed: No Battery'(9)"
+              ::= { es1dc1DataList 72}
+es1dc1DataBatLastBatTestDischargedCapacityRatio     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the battery capacity, in percent, discharged during the last battery test. This value is updated at the end of the battery test."
+              ::= { es1dc1DataList 73}
+es1dc1DataBatLastBatTestDischargedCapacity     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the battery capacity, in ampere hour, discharged during the last battery test. This value is updated at the end of the battery test."
+              ::= { es1dc1DataList 74}
+es1dc1DataBatLastBatTestFinalVoltage     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the bus voltage at the end of the last battery test. This value is updated at the end of the battery test."
+              ::= { es1dc1DataList 75}
+es1dc1DataBatBatTestDuration     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The duration of the last battery test. This value is updated at the end of the battery test. This value can't be higher than 1440 minutes (24 hours)."
+              ::= { es1dc1DataList 76}
+es1dc1DataBatPreviousBatTestDischargedCapacityRatio     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the battery capacity, in percent, discharged during the previous battery test. This value is shifted at the end of the battery test."
+              ::= { es1dc1DataList 77}
+es1dc1DataBatPreviousBatTestDischargedCapacity     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the battery capacity, in ampere hour, discharged during the previous battery test. This value is shifted at the end of the battery test."
+              ::= { es1dc1DataList 78}
+es1dc1DataBatPreviousBatTestFinalVoltage     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "This is the bus voltage at the end of the previous battery test. This value is shifted at the end of the battery test."
+              ::= { es1dc1DataList 79}
+es1dc1DataBatPreviousBatTestDuration     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The duration of the previous battery test. This value is shifted at the end of the battery test. This value can't be higher than 1440 minutes (24 hours)."
+              ::= { es1dc1DataList 80}
+es1dc1DataBatPreviousBatTestState     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The result of the previous battery test - 10 values are possible: 'Never Tested'(0), 'Success'(1), 'On Going'(2), 'Failed: Timeout'(3), 'Failed: Vbus Too Low'(4), 'Failed: Load Too Low'(5), 'Failed: Ac Failure'(6), 'Failed: Canceled', 'Failed: Lvd Opened'(8), 'Failed: No Battery'(9)"
+              ::= { es1dc1DataList 81}
+es1dc1DataBatMinutesSinceLastTestBat     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of minute since the end of last battery test"
+              ::= { es1dc1DataList 82}
+es1dc1DataBatNextScheduledBatTest     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The date and time of the next time the scheduled battery test will run"
+              ::= { es1dc1DataList 84}
+es1dc1DataBatBatChargeCapacity     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The battery charge capacity, calculated by integration of the current."
+              ::= { es1dc1DataList 91}
+es1dc1DataBatCalculatedAutonomy     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Calculation of the remaining autonomy. This value can change following the load of your system and the maximal depth of dicharge configuration (CF39)."
+              ::= { es1dc1DataList 92}
+es1dc1DataBatBatCurrentIntegration     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Actual value of the integration of the current, in Ampere * hour"
+              ::= { es1dc1DataList 94}
+es1dc1DataLVDLVDState     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Actual state of the LVD"
+              ::= { es1dc1DataList 101}
+es1dc1DataRelsRel1State     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Actual state of the Relay 1"
+              ::= { es1dc1DataList 111}
+es1dc1DataRelsRel2State     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Actual state of the Relay 2"
+              ::= { es1dc1DataList 112}
+es1dc1DataRelsRel3State     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Actual state of the Relay 3"
+              ::= { es1dc1DataList 113}
+es1dc1DataRelsRel4State     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Actual state of the Relay 3"
+              ::= { es1dc1DataList 114}
+es1dc1DataSmartEnergyEfficiencyOptimizedNumberOfRectifier     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The optimal number of ON rectifier for Efficiency Optimization "
+              ::= { es1dc1DataList 121}
+es1dc1DataSmartEnergySystemLossWithoutOptimisation     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Estimation of the losses without optimisation"
+              ::= { es1dc1DataList 122}
+es1dc1DataSmartEnergySystemLossWithOptimisation     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Estimation of the losses with optimisation"
+              ::= { es1dc1DataList 123}
+es1dc1DataSmartEnergyRectifierModelUsedForCalculation     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The rectifier model used"
+              ::= { es1dc1DataList 124}
+es1dc1DataSmartEnergySmartEnergySavings     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "Estimation of the losses with optimisation"
+              ::= { es1dc1DataList 125}
+es1dc1DataSensorsAmbientTemp     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The ambiant temperature (second temperature sense)"
+              ::= { es1dc1DataList 151}
+es1dc1DataSensorsPulseCounter4     OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The counter value of the digital input 4."
+              ::= { es1dc1DataList 204}
+es1dc1Config          OBJECT IDENTIFIER ::= { es1dc1 15 }
+es1dc1ConfigNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Config table related to the DC System"
+              ::= { es1dc1Config 1 }
+es1dc1ConfigTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1dc1ConfigEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Config entries related to the DC System"
+              ::= { es1dc1Config 2 }
+es1dc1ConfigEntry      OBJECT-TYPE
+              SYNTAX          Es1dc1ConfigEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A Config entry"
+              INDEX {es1dc1ConfigIndex}
+              ::= { es1dc1ConfigTable 1 }
+Es1dc1ConfigEntry ::=
+             SEQUENCE{
+             es1dc1ConfigIndex       Unsigned32,
+             es1dc1ConfigName        DisplayString,
+             es1dc1ConfigValue       DisplayString,
+              es1dc1ConfigEntryStatus  RowStatus
+             }
+es1dc1ConfigIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Config entry Index"
+              ::= { es1dc1ConfigEntry 1 }
+es1dc1ConfigName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The Config entry name"
+              ::= { es1dc1ConfigEntry 2 }
+es1dc1ConfigValue     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The Config entry value"
+              ::= { es1dc1ConfigEntry 3 }
+es1dc1ConfigEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only for compliance"
+              ::= { es1dc1ConfigEntry 4 }
+es1dc1ConfigList         OBJECT IDENTIFIER ::= { es1dc1Config 3 }
+es1dc1CfgDCBusDCBusFloatVoltageat25degC     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The floating dc bus voltage of the system at 25 Celsius degree"
+              ::= { es1dc1ConfigList 1}
+es1dc1CfgDCBusDCBusVoltageExtraLow     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The bus voltage under which the alarm 'DC Bus Voltage Extra Low' is set."
+              ::= { es1dc1ConfigList 2}
+es1dc1CfgDCBusDCBusVoltageExtraLowHysteresis     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The voltage hysteresis on the alarm 'DC Bus Voltage Extra Low'."
+              ::= { es1dc1ConfigList 3}
+es1dc1CfgDCBusDCBusVoltageLow     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The bus voltage under which the alarm 'DC Bus Voltage Low' is set."
+              ::= { es1dc1ConfigList 4}
+es1dc1CfgDCBusDCBusVoltageLowHysteresis     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The voltage hysteresis on the alarm 'DC Bus Voltage Low"
+              ::= { es1dc1ConfigList 5}
+es1dc1CfgDCBusDCBusVoltageHigh     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The bus voltage over which the alarm 'DC Bus Voltage High' is set."
+              ::= { es1dc1ConfigList 6}
+es1dc1CfgDCBusDCBusVoltageHighHysteresis     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The voltage hysteresis on the alarm 'DC Bus Voltage High"
+              ::= { es1dc1ConfigList 7}
+es1dc1CfgDCBusDCBusVoltageExtraHigh     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The bus voltage over which the alarm 'DC Bus Voltage Extra High' is set."
+              ::= { es1dc1ConfigList 8}
+es1dc1CfgDCBusDCBusVoltageExtraHighHysteresis     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The voltage hysteresis on the alarm 'DC Bus Voltage Extra High"
+              ::= { es1dc1ConfigList 9}
+es1dc1CfgLVDLVDDisconnectVoltage     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The dc bus voltage under which the battery must be disconnected of the bus. This allows preserving the battery life. The load will be unpowered. This value has to be lower than the Battery test end voltage (CF70)"
+              ::= { es1dc1ConfigList 10}
+es1dc1CfgLVDLVDDisconnectDelay     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The delay in second before disconnecting the battery if the dc bus voltage is under the configured disconnected voltage. This avoids disconnection during a low bus transient."
+              ::= { es1dc1ConfigList 11}
+es1dc1CfgBatTempCompensationSlope     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The slope of the battery temperature compensation in mv/degree. For a 48V system, -72mV/degree is often used."
+              ::= { es1dc1ConfigList 21}
+es1dc1CfgBatMaxPosTempCompensation     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The maximal allowed positive compensation."
+              ::= { es1dc1ConfigList 22}
+es1dc1CfgBatMaxNegTempCompensation     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The maximal allowed negative compensation."
+              ::= { es1dc1ConfigList 23}
+es1dc1CfgRectifiersMinimalNumberOfPresentRectifiers     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The minimal number of rectifier which must be present. If there is less present rectifiers, the alarm 'Missing Rectifiers' is set."
+              ::= { es1dc1ConfigList 25}
+es1dc1CfgRectifiersRectifierModel     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The rectifier model"
+              ::= { es1dc1ConfigList 26}
+es1dc1CfgRectifiersForcedRemoteOffRectifers     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "A list of rectifier which are forced in remote off. The id of the rectifier must be coma separated. Ex: 1,3 will maintain rectifier 1 and 3 off."
+              ::= { es1dc1ConfigList 27}
+es1dc1CfgBatBatChargeCurrentLimit     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The maximal battery current when the battery is charging. The monitoring regulates the bus voltage in order to satisfy this condition. This parameter is often equal to the nominal battery capacity divided by 10."
+              ::= { es1dc1ConfigList 31}
+es1dc1CfgBatBatStringCapacity     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The battery capacity in Ah."
+              ::= { es1dc1ConfigList 32}
+es1dc1CfgBatBatTempLow     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The temperature under which the alarm 'Battery Temperature Too Low' must be set."
+              ::= { es1dc1ConfigList 33}
+es1dc1CfgBatBatTempHigh     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The temperature over which the alarm 'Battery Temperature Too High' must be set."
+              ::= { es1dc1ConfigList 34}
+es1dc1CfgBatBatTempHysteresis     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The hysteresis on the 'Battery Temperature Too High' and 'Battery Temperature Too Low' alarms."
+              ::= { es1dc1ConfigList 35}
+es1dc1CfgBatMinimalCurrentForDischargingAlarm     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The minimal discharging current to set the 'Battery On Discharge' alarm."
+              ::= { es1dc1ConfigList 36}
+es1dc1CfgBatCurrentHysteresisForDischargingAlarm     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The hysteresis on the 'Battery On Discharge' alarm."
+              ::= { es1dc1ConfigList 37}
+es1dc1CfgBatPeukertNumber     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The Peukert number relates to the internal resistance of a battery and provides an indication of the excpected capacity. The ideal number is 1. This value can be calculated with the formula: (ln(t2)-ln(t1))/(ln(i1)-ln(i2)) where tx is the autonomy in hours at a constant discharge current of ix Amps. Often, we use t1 = 1h and t2 = 10h"
+              ::= { es1dc1ConfigList 38}
+es1dc1CfgBatMaxDepthOfDischargeforAutonomyEstimation     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "It is generally recommended to discharge maximum 60% of the battery capacity to enhance battery lifetime. By default, 100% is used for autonomy calculation. This parameter can also be used to take into account the age of the battery"
+              ::= { es1dc1ConfigList 39}
+es1dc1CfgBatBoostAutomatic     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The boost mode must be automatically after the fact that during a mains failure, the bus voltage went under the configured 'Boost Activation Low Voltage'. This allows charging the battery faster."
+              ::= { es1dc1ConfigList 51}
+es1dc1CfgBatBoostActivationLowVoltage     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The voltage under which the boost mode can be activated."
+              ::= { es1dc1ConfigList 52}
+es1dc1CfgBatBoostTerminationVoltage     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The voltage over which the system must go back to floating mode."
+              ::= { es1dc1ConfigList 53}
+es1dc1CfgBatBoostTerminationCurrent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The battery charging current under which the system must go back to floating mode."
+              ::= { es1dc1ConfigList 54}
+es1dc1CfgBatBoostTerminationTime     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The time in minute after which the system must go back in floating mode."
+              ::= { es1dc1ConfigList 55}
+es1dc1CfgBatBatTestType     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Type of the battery test: <br> Capacity based: The battery must give the requested capacity before falling lower than a value <br>Time Based: The battery must sustain a defined load during a defined time."
+              ::= { es1dc1ConfigList 69}
+es1dc1CfgBatBatTestEndVoltage     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The voltage at which any battery test must be stopped. This value has to be higher than the LVD Disconnect voltage (CF10)"
+              ::= { es1dc1ConfigList 70}
+es1dc1CfgBatBatTestDischargeRatio     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The ratio of the battery capacity to discharge. If 30 is set, 30% of the battery will be discharged during the test"
+              ::= { es1dc1ConfigList 71}
+es1dc1CfgBatBatTestInterval     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The number of days between two automatically started battery test. If this parameter is set to 0, the battery test is not started automatically. The user can remotely or locally start or force this test."
+              ::= { es1dc1ConfigList 72}
+es1dc1CfgBatBatTestDischargeCurrent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The current at which the battery must be discharged during a battery test. The monitoring regulates the bus voltage in order to satisfy this condition. The load current must be of course higher than this parameter."
+              ::= { es1dc1ConfigList 73}
+es1dc1CfgBatBatTestMinimalDischargeCurrent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The battery current under which the battery test must be stopped because the load is too low."
+              ::= { es1dc1ConfigList 74}
+es1dc1CfgBatBatTestDuration     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The timeout in minute after which the battery test must be stopped."
+              ::= { es1dc1ConfigList 75}
+es1dc1CfgBatBatTestRequMinutesWithoutMainsFail     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The minimal time in minute without mains failure in order to allow a battery start. This parameter is not taken into account when the battery test is forced."
+              ::= { es1dc1ConfigList 76}
+es1dc1CfgBatBatTestSchedulerCronRule     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { es1dc1ConfigList 77}
+es1dc1CfgSmartEnergySmartEnergyBooleanCond     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is the boolean condition which allows or not to automatically optimize the number of rectifier in remote off."
+              ::= { es1dc1ConfigList 83}
+es1dc1CfgLVDBatLVDNodeId     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This is a list of the node id of the Smart Electronic LVDs, coma separated"
+              ::= { es1dc1ConfigList 86}
+es1dc1CfgDigInputsDigInput1Name     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The name of the digital input 1"
+              ::= { es1dc1ConfigList 91}
+es1dc1CfgDigInputsDigInput1NormallyClosed     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "True/False value defining if the digital input 1 is normally closed. If this digital input is not in this default state, the related alarm is set."
+              ::= { es1dc1ConfigList 92}
+es1dc1CfgDigInputsDigInput2Name     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The name of the digital input 2"
+              ::= { es1dc1ConfigList 93}
+es1dc1CfgDigInputsDigInput2NormallyClosed     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "True/False value defining if the digital input 2 is normally closed. If this digital input is not in this default state, the related alarm is set."
+              ::= { es1dc1ConfigList 94}
+es1dc1CfgDigInputsDigInput3Name     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The name of the digital input 3"
+              ::= { es1dc1ConfigList 95}
+es1dc1CfgDigInputsDigInput3NormallyClosed     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "True/False value defining if the digital input 3 is normally closed. If this digital input is not in this default state, the related alarm is set."
+              ::= { es1dc1ConfigList 96}
+es1dc1CfgDigInputsDigInput4Name     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The name of the digital input 4"
+              ::= { es1dc1ConfigList 97}
+es1dc1CfgDigInputsDigInput4NormallyClosed     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "True/False value defining if the digital input 4 is normally closed. If this digital input is not in this default state, the related alarm is set."
+              ::= { es1dc1ConfigList 98}
+es1dc1CfgDigInputsDigInput5Name     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The name of the digital input 5"
+              ::= { es1dc1ConfigList 99}
+es1dc1CfgDigInputsDigInput5NormallyClosed     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "True/False value defining if the digital input 5 is normally closed. If this digital input is not in this default state, the related alarm is set."
+              ::= { es1dc1ConfigList 100}
+es1dc1CfgDigInputsDigInput6Name     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The name of the digital input 6"
+              ::= { es1dc1ConfigList 101}
+es1dc1CfgDigInputsDigInput6NormallyClosed     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "True/False value defining if the digital input 6 is normally closed. If this digital input is not in this default state, the related alarm is set."
+              ::= { es1dc1ConfigList 102}
+es1dc1CfgRelsDryAlarm1AlternativeBooleanCond     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Another Boolean condition to activate the dry alarm relay 1. The way to define boolean condition is detailed in the PLC chapter."
+              ::= { es1dc1ConfigList 111}
+es1dc1CfgRelsDryAlarm2AlternativeBooleanCond     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Another Boolean condition to activate the dry alarm relay 2. The way to define boolean condition is detailed in the PLC chapter."
+              ::= { es1dc1ConfigList 112}
+es1dc1CfgRelsDryAlarm3AlternativeBooleanCond     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Another Boolean condition to activate the dry alarm relay 3. The way to define boolean condition is detailed in the PLC chapter."
+              ::= { es1dc1ConfigList 113}
+es1dc1CfgRelsDryAlarm4AlternativeBooleanCond     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Another Boolean condition to activate the dry alarm relay 4. The way to define boolean condition is detailed in the PLC chapter."
+              ::= { es1dc1ConfigList 114}
+es1dc1CfgSensorsAmbientTempLow     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The temperature under which the alarm 'Ambiant Temperature Too Low' must be set."
+              ::= { es1dc1ConfigList 131}
+es1dc1CfgSensorsAmbientTempHigh     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The temperature under which the alarm 'Ambiant Temperature Too Low' must be set."
+              ::= { es1dc1ConfigList 132}
+es1dc1CfgSensorsAmbientTempHysteresis     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The hysteresis on the 'Battery Temperature Too High' and 'Battery Temperature Too Low' alarms."
+              ::= { es1dc1ConfigList 133}
+es1dc1CfgGenericReadAccessUserNumbers     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The list of the user numbers which have read access to this equipment. The user numbers are coma separated. The accepted user id are 1,2,3,4 and 5. Ex: 1,3,4"
+              ::= { es1dc1ConfigList 521}
+es1dc1CfgGenericWriteAccessUserNumbers     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The list of the user numbers which have write access to this equipment. This means that these users can modify the configuration element, the alarm settings and use the control elements. The user numbers are coma separated.  The accepted user ids are 1,2,3,4 and 5. Ex: 1,3,4"
+              ::= { es1dc1ConfigList 522}
+es1dc1CfgGenericEventTableLength     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The maximum length of the table. The value must be comprised between 10 and 4000"
+              ::= { es1dc1ConfigList 601}
+es1dc1CfgGenericEventTableLengthByRectifier     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The maximum length of the table. The value must be comprised between 10 and 4000"
+              ::= { es1dc1ConfigList 602}
+es1dc1CfgPLCNumberOfPLCData     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The number of PLC data. Every equipment can manage up to 30 user programmable data. Data elements are automatically added in the data table. Configuration parameters are added to set the PLC Data Name and the PLC Data Mathematical calculation. In order to use these functionalities, you need a license with the 'PLC' module"
+              ::= { es1dc1ConfigList 901}
+es1dc1CfgPLCNumberOfPLCAlarm     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The number of PLC alarm. Every equipment can manage up to 30 user programmable alarms. Alarm elements are automatically added in the alarm table. The alarm parameters are added to set the PLC Alarm Name and the PLC Alarm Boolean condition. In order to use these functionalities, you need a licence with the 'PLC' module"
+              ::= { es1dc1ConfigList 902}
+es1dc1Control          OBJECT IDENTIFIER ::= { es1dc1 16 }
+es1dc1ControlNumber      OBJECT-TYPE
+              SYNTAX          Integer32
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The number of entries in the Control table related to the DC System"
+              ::= { es1dc1Control 1 }
+es1dc1ControlTable      OBJECT-TYPE
+              SYNTAX          SEQUENCE OF Es1dc1ControlEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The table of Control entries related to the DC System"
+              ::= { es1dc1Control 2 }
+es1dc1ControlEntry      OBJECT-TYPE
+              SYNTAX          Es1dc1ControlEntry
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "A Control entry"
+              INDEX {es1dc1ControlIndex}
+              ::= { es1dc1ControlTable 1 }
+Es1dc1ControlEntry ::=
+             SEQUENCE{
+             es1dc1ControlIndex       Unsigned32,
+             es1dc1ControlName        DisplayString,
+             es1dc1ControlValue       DisplayString,
+              es1dc1ControlEntryStatus  RowStatus
+             }
+es1dc1ControlIndex      OBJECT-TYPE
+              SYNTAX          Unsigned32
+              MAX-ACCESS      not-accessible
+              STATUS          current
+              DESCRIPTION    "The Control entry Index"
+              ::= { es1dc1ControlEntry 1 }
+es1dc1ControlName      OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION    "The Control entry name"
+              ::= { es1dc1ControlEntry 2 }
+es1dc1ControlValue     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The Control entry value"
+              ::= { es1dc1ControlEntry 3 }
+es1dc1ControlEntryStatus      OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION    "The status of this table entry - not used, only for compliance"
+              ::= { es1dc1ControlEntry 4 }
+es1dc1ControlList         OBJECT IDENTIFIER ::= { es1dc1Control 3 }
+es1dc1CtrlSystemBackToFloat     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The dc system must go back in floating mode."
+              ::= { es1dc1ControlList 1}
+es1dc1CtrlSystemStartBatTest     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The dc system must start a battery test."
+              ::= { es1dc1ControlList 2}
+es1dc1CtrlSystemForceBatTest     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The dc system must force a battery test."
+              ::= { es1dc1ControlList 3}
+es1dc1CtrlSystemStartBoostMode     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The dc system must go in boost mode."
+              ::= { es1dc1ControlList 4}
+es1dc1CtrlLVDOpenTheLVD     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Try to open the LVD. It could not work if the LVD is electronic, and the request will be canceled after 15 sec."
+              ::= { es1dc1ControlList 11}
+es1dc1CtrlLVDCloseTheLVD     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "The LVD must be closed"
+              ::= { es1dc1ControlList 12}
+es1dc1CtrlBatCorrectBatCurrentOffset     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "NA"
+              ::= { es1dc1ControlList 21}
+es1dc1CtrlBatResetLastBatTestState     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Reset the state of the last battery test. If an alarm 'Battery Last Test Failed' is set, the alarm will be cleared."
+              ::= { es1dc1ControlList 41}
+es1dc1CtrlSaveSaveConfInMCU     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Save configuration parameters in the MCU microcontroller. If comp@s is not present, the system will be correctly managed."
+              ::= { es1dc1ControlList 51}
+es1dc1CtrlAdvancedSetMCUSpecificConfId     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control allows to reconfigure the MCU to support specific hardware configuration, with embedded distribution for example"
+              ::= { es1dc1ControlList 55}
+es1dc1CtrlDigInputsSetDigInput4CounterValue     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Set Counter Value"
+              ::= { es1dc1ControlList 61}
+es1dc1CtrlRelsInvertRel1StateForXSeconds     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Generate Pulse on relay 1"
+              ::= { es1dc1ControlList 111}
+es1dc1CtrlRelsInvertRel2StateForXSeconds     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Generate Pulse on relay 2"
+              ::= { es1dc1ControlList 112}
+es1dc1CtrlRelsInvertRel3StateForXSeconds     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Generate Pulse on relay 3"
+              ::= { es1dc1ControlList 113}
+es1dc1CtrlRelsInvertRel4StateForXSeconds     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "Generate Pulse on relay 4"
+              ::= { es1dc1ControlList 114}
+es1dc1CtrlGenericClearMyEvents     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "By writing '1' to this control element, all the events of this equipment will be cleared."
+              ::= { es1dc1ControlList 501}
+es1dc1CtrlGenericClearAllEvents     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "By writing '1' to this control element, all the events of this equipment and all the events of all the sub-equipments will be cleared."
+              ::= { es1dc1ControlList 502}
+es1dc1CtrlGenericAddEvent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element adds an event of severity none. The event name is the text written to this control element"
+              ::= { es1dc1ControlList 511}
+es1dc1CtrlGenericAddMajorEvent     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element adds an event of severity major. The event name is the text written to this control element"
+              ::= { es1dc1ControlList 512}
+es1dc1CtrlGenericResetDefaultNamesAndGroups     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element resets all the element Names, Groups and Subgroups to default values for this equipment"
+              ::= { es1dc1ControlList 521}
+es1dc1CtrlGenericResetDefaultNamesAndGroupsRecursive     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-write
+              STATUS          current
+              DESCRIPTION    "This control element resets all the element Names, Groups and Subgroups to default values for this equipment and all sub equipments"
+              ::= { es1dc1ControlList 522}
+es1dc1Notifications           OBJECT IDENTIFIER ::= { es1dc1 18 }
+es1dc1NotificationPrefix      OBJECT IDENTIFIER ::= { es1dc1Notifications 0 }
+es1dc1NotificationOfEvent NOTIFICATION-TYPE
+          OBJECTS {
+          es1dc1EventId,
+          es1dc1EventName,
+          es1dc1EventDateTime,
+          es1dc1EventSeverityType,
+          es1dc1EventSeverityLevel,
+          es1dc1AlarmSummary
+          }
+          STATUS current
+          DESCRIPTION  "Notification generated when a new event appears"
+          ::= { es1dc1NotificationPrefix 1 }
+
+es1dc1Compliance OBJECT IDENTIFIER ::= { es1dc1 19}
+es1dc1ComplianceGroups OBJECT IDENTIFIER ::={ es1dc1Compliance 1}
+es1dc1FullCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION " The compliance statement for SNMPV2 entities which implement the SNMPV2 MIB. "
+    MODULE
+        MANDATORY-GROUPS { es1dc1GlobalGroup, es1dc1NotificationGroup }
+    ::= { es1dc1Compliance 2 }
+
+es1dc1GlobalGroup OBJECT-GROUP
+     OBJECTS{es1dc1GlobalStatus, es1dc1GlobalAlarmSeverityType, es1dc1GlobalAlarmSeverityLevel, es1dc1GlobalAlarmSeverityTypeInt, es1dc1DescriptionNumber, es1dc1DescriptionName, es1dc1DescriptionValue, es1dc1DescriptionEntryStatus, es1dc1DescDescriptionDescription, es1dc1DescDescriptionReference, es1dc1DescDescriptionProductName, es1dc1DescDescriptionHardwareReference, es1dc1DescDescriptionSoftwareReference, es1dc1DescDescriptionSerialNumber, es1dc1DescDescriptionManufacturingDate, es1dc1DescDescriptionDistributionModuleProductName, es1dc1DescDescriptionDistributionModuleHardwareReference, es1dc1DescDescriptionDistributionModuleSoftwareReference, es1dc1DescDescriptionDistributionModuleSerialNumber, es1dc1DescDescriptionDistributionModuleManufacturingDate, es1dc1AlarmNumber, es1dc1AlarmName, es1dc1AlarmActive, es1dc1AlarmSeverityType, es1dc1AlarmSeverityLevel, es1dc1AlarmStartTime, es1dc1AlarmStopTime, es1dc1AlarmEntryStatus, es1dc1AlarmSummary, es1dc1EventNumber, es1dc1EventId, es1dc1EventName, es1dc1EventDateTime, es1dc1EventSeverityType, es1dc1EventSeverityLevel, es1dc1EventEntryStatus, es1dc1DataNumber, es1dc1DataName, es1dc1DataValue, es1dc1DataEntryStatus, es1dc1DataSystemDCMode, es1dc1DataSystemPreviousDCMode, es1dc1DataSystemNiMHChargeMode, es1dc1DataDCBusBusVoltage, es1dc1DataSystemRatioDeliveredOnAvailablePower, es1dc1DataACBusMinutesSinceLastACFailBegin, es1dc1DataACBusMinutesSinceLastACFailEnd, es1dc1DataRectifiersRectifiersOutPower, es1dc1DataRectifiersRectifiersOutCurrent, es1dc1DataRectifiersRectifiersOutPowerMax, es1dc1DataRectifiersRectifiersOutCurrentMax, es1dc1DataRectifiersNumberOfRectifierMax, es1dc1DataRectifiersNumberOfPresentRectifier, es1dc1DataRectifiersNumberOfAbsentRectifier, es1dc1DataRectifiersNumberOfActiveRectifier, es1dc1DataRectifiersNumberOfACFailRectifier, es1dc1DataRectifiersNumberOfDCFailRectifier, es1dc1DataRectifiersNumberOfRemoteOffRectifier, es1dc1DataRectifiersNumberOfOverTempRectifier, es1dc1DataLoadLoadPower, es1dc1DataLoadLoadCurrent, es1dc1DataBatBatInputCurrent, es1dc1DataBatBatInputPower, es1dc1DataBatBatTemp, es1dc1DataBatBatTestState, es1dc1DataBatLastBatTestDischargedCapacityRatio, es1dc1DataBatLastBatTestDischargedCapacity, es1dc1DataBatLastBatTestFinalVoltage, es1dc1DataBatBatTestDuration, es1dc1DataBatPreviousBatTestDischargedCapacityRatio, es1dc1DataBatPreviousBatTestDischargedCapacity, es1dc1DataBatPreviousBatTestFinalVoltage, es1dc1DataBatPreviousBatTestDuration, es1dc1DataBatPreviousBatTestState, es1dc1DataBatMinutesSinceLastTestBat, es1dc1DataBatNextScheduledBatTest, es1dc1DataBatBatChargeCapacity, es1dc1DataBatCalculatedAutonomy, es1dc1DataBatBatCurrentIntegration, es1dc1DataLVDLVDState, es1dc1DataRelsRel1State, es1dc1DataRelsRel2State, es1dc1DataRelsRel3State, es1dc1DataRelsRel4State, es1dc1DataSmartEnergyEfficiencyOptimizedNumberOfRectifier, es1dc1DataSmartEnergySystemLossWithoutOptimisation, es1dc1DataSmartEnergySystemLossWithOptimisation, es1dc1DataSmartEnergyRectifierModelUsedForCalculation, es1dc1DataSmartEnergySmartEnergySavings, es1dc1DataSensorsAmbientTemp, es1dc1DataSensorsPulseCounter4, es1dc1ConfigNumber, es1dc1ConfigName, es1dc1ConfigValue, es1dc1ConfigEntryStatus, es1dc1CfgDCBusDCBusFloatVoltageat25degC, es1dc1CfgDCBusDCBusVoltageExtraLow, es1dc1CfgDCBusDCBusVoltageExtraLowHysteresis, es1dc1CfgDCBusDCBusVoltageLow, es1dc1CfgDCBusDCBusVoltageLowHysteresis, es1dc1CfgDCBusDCBusVoltageHigh, es1dc1CfgDCBusDCBusVoltageHighHysteresis, es1dc1CfgDCBusDCBusVoltageExtraHigh, es1dc1CfgDCBusDCBusVoltageExtraHighHysteresis, es1dc1CfgLVDLVDDisconnectVoltage, es1dc1CfgLVDLVDDisconnectDelay, es1dc1CfgBatTempCompensationSlope, es1dc1CfgBatMaxPosTempCompensation, es1dc1CfgBatMaxNegTempCompensation, es1dc1CfgRectifiersMinimalNumberOfPresentRectifiers, es1dc1CfgRectifiersRectifierModel, es1dc1CfgRectifiersForcedRemoteOffRectifers, es1dc1CfgBatBatChargeCurrentLimit, es1dc1CfgBatBatStringCapacity, es1dc1CfgBatBatTempLow, es1dc1CfgBatBatTempHigh, es1dc1CfgBatBatTempHysteresis, es1dc1CfgBatMinimalCurrentForDischargingAlarm, es1dc1CfgBatCurrentHysteresisForDischargingAlarm, es1dc1CfgBatPeukertNumber, es1dc1CfgBatMaxDepthOfDischargeforAutonomyEstimation, es1dc1CfgBatBoostAutomatic, es1dc1CfgBatBoostActivationLowVoltage, es1dc1CfgBatBoostTerminationVoltage, es1dc1CfgBatBoostTerminationCurrent, es1dc1CfgBatBoostTerminationTime, es1dc1CfgBatBatTestType, es1dc1CfgBatBatTestEndVoltage, es1dc1CfgBatBatTestDischargeRatio, es1dc1CfgBatBatTestInterval, es1dc1CfgBatBatTestDischargeCurrent, es1dc1CfgBatBatTestMinimalDischargeCurrent, es1dc1CfgBatBatTestDuration, es1dc1CfgBatBatTestRequMinutesWithoutMainsFail, es1dc1CfgBatBatTestSchedulerCronRule, es1dc1CfgSmartEnergySmartEnergyBooleanCond, es1dc1CfgLVDBatLVDNodeId, es1dc1CfgDigInputsDigInput1Name, es1dc1CfgDigInputsDigInput1NormallyClosed, es1dc1CfgDigInputsDigInput2Name, es1dc1CfgDigInputsDigInput2NormallyClosed, es1dc1CfgDigInputsDigInput3Name, es1dc1CfgDigInputsDigInput3NormallyClosed, es1dc1CfgDigInputsDigInput4Name, es1dc1CfgDigInputsDigInput4NormallyClosed, es1dc1CfgDigInputsDigInput5Name, es1dc1CfgDigInputsDigInput5NormallyClosed, es1dc1CfgDigInputsDigInput6Name, es1dc1CfgDigInputsDigInput6NormallyClosed, es1dc1CfgRelsDryAlarm1AlternativeBooleanCond, es1dc1CfgRelsDryAlarm2AlternativeBooleanCond, es1dc1CfgRelsDryAlarm3AlternativeBooleanCond, es1dc1CfgRelsDryAlarm4AlternativeBooleanCond, es1dc1CfgSensorsAmbientTempLow, es1dc1CfgSensorsAmbientTempHigh, es1dc1CfgSensorsAmbientTempHysteresis, es1dc1CfgGenericReadAccessUserNumbers, es1dc1CfgGenericWriteAccessUserNumbers, es1dc1CfgGenericEventTableLength, es1dc1CfgGenericEventTableLengthByRectifier, es1dc1CfgPLCNumberOfPLCData, es1dc1CfgPLCNumberOfPLCAlarm, es1dc1ControlNumber, es1dc1ControlName, es1dc1ControlValue, es1dc1ControlEntryStatus, es1dc1CtrlSystemBackToFloat, es1dc1CtrlSystemStartBatTest, es1dc1CtrlSystemForceBatTest, es1dc1CtrlSystemStartBoostMode, es1dc1CtrlLVDOpenTheLVD, es1dc1CtrlLVDCloseTheLVD, es1dc1CtrlBatCorrectBatCurrentOffset, es1dc1CtrlBatResetLastBatTestState, es1dc1CtrlSaveSaveConfInMCU, es1dc1CtrlAdvancedSetMCUSpecificConfId, es1dc1CtrlDigInputsSetDigInput4CounterValue, es1dc1CtrlRelsInvertRel1StateForXSeconds, es1dc1CtrlRelsInvertRel2StateForXSeconds, es1dc1CtrlRelsInvertRel3StateForXSeconds, es1dc1CtrlRelsInvertRel4StateForXSeconds, es1dc1CtrlGenericClearMyEvents, es1dc1CtrlGenericClearAllEvents, es1dc1CtrlGenericAddEvent, es1dc1CtrlGenericAddMajorEvent, es1dc1CtrlGenericResetDefaultNamesAndGroups, es1dc1CtrlGenericResetDefaultNamesAndGroupsRecursive}
+     STATUS       current
+     DESCRIPTION  "text"
+     ::= { es1dc1ComplianceGroups 1 }
+
+es1dc1NotificationGroup NOTIFICATION-GROUP
+     NOTIFICATIONS {es1dc1NotificationOfEvent}
+     STATUS       current
+     DESCRIPTION  "text"
+     ::= { es1dc1ComplianceGroups 2 }
+
+
+
+extensions   OBJECT IDENTIFIER ::= { siteV1 21 }
+es1InverterSystems   OBJECT IDENTIFIER ::= { es1 25 }
+es1RemotePowerFeedingSystems   OBJECT IDENTIFIER ::= { es1 28 }
+
+
+ END

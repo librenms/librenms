@@ -11,53 +11,116 @@
 |
 */
 
-Route::get('/laravel', function () {
+// Auth
+Auth::routes();
 
-    // load legacy session, but don't allow it to be updated in laravel code
-    session_start();
-    session_write_close();
+// WebUI
+Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
+    // Test
+    Route::get('/laravel', function () {
+        return view('laravel');
+    });
 
-    if (!empty($_SESSION['user_id'])) {
-        Auth::onceUsingId($_SESSION['user_id']);
-    } else {
-        return redirect()->to('/');
-    }
+    // pages
+    Route::resource('device-groups', 'DeviceGroupController');
+    Route::get('locations', 'LocationController@index');
+    Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
+    Route::resource('users', 'UserController');
 
-    $user = Auth::getUser();
-    \App\Checks::postAuth();
-    Toastr::info('Welcome ' . ($user->realname ?: $user->username));
+    // old route redirects
+    Route::permanentRedirect('poll-log', 'pollers/tab=log/');
 
-    return view('laravel');
+    // Two Factor Auth
+    Route::group(['prefix' => '2fa', 'namespace' => 'Auth'], function () {
+        Route::get('', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
+        Route::post('', 'TwoFactorController@verifyTwoFactor')->name('2fa.verify');
+        Route::post('add', 'TwoFactorController@create')->name('2fa.add');
+        Route::post('cancel', 'TwoFactorController@cancelAdd')->name('2fa.cancel');
+        Route::post('remove', 'TwoFactorController@destroy')->name('2fa.remove');
+
+        Route::post('{user}/unlock', 'TwoFactorManagementController@unlock')->name('2fa.unlock');
+        Route::delete('{user}', 'TwoFactorManagementController@destroy')->name('2fa.delete');
+    });
+
+    // Ajax routes
+    Route::group(['prefix' => 'ajax'], function () {
+        // page ajax controllers
+        Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
+
+        // misc ajax controllers
+        Route::group(['namespace' => 'Ajax'], function () {
+            Route::post('set_resolution', 'ResolutionController@set');
+            Route::get('netcmd', 'NetCommand@run');
+            Route::post('ripe/raw', 'RipeNccApiController@raw');
+        });
+
+        // form ajax handlers, perhaps should just be page controllers
+        Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
+            Route::resource('widget-settings', 'WidgetSettingsController');
+        });
+
+        // js select2 data controllers
+        Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
+            Route::get('application', 'ApplicationController');
+            Route::get('bill', 'BillController');
+            Route::get('device', 'DeviceController');
+            Route::get('device-field', 'DeviceFieldController');
+            Route::get('device-group', 'DeviceGroupController');
+            Route::get('eventlog', 'EventlogController');
+            Route::get('graph', 'GraphController');
+            Route::get('graph-aggregate', 'GraphAggregateController');
+            Route::get('graylog-streams', 'GraylogStreamsController');
+            Route::get('syslog', 'SyslogController');
+            Route::get('location', 'LocationController');
+            Route::get('munin', 'MuninPluginController');
+            Route::get('service', 'ServiceController');
+            Route::get('port', 'PortController');
+            Route::get('port-field', 'PortFieldController');
+        });
+
+        // jquery bootgrid data controllers
+        Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
+            Route::post('customers', 'CustomersController');
+            Route::post('device', 'DeviceController');
+            Route::post('eventlog', 'EventlogController');
+            Route::post('fdb-tables', 'FdbTablesController');
+            Route::post('graylog', 'GraylogController');
+            Route::post('location', 'LocationController');
+            Route::post('port-nac', 'PortNacController');
+            Route::post('syslog', 'SyslogController');
+        });
+
+        // dashboard widgets
+        Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
+            Route::post('alerts', 'AlertsController');
+            Route::post('availability-map', 'AvailabilityMapController');
+            Route::post('component-status', 'ComponentStatusController');
+            Route::post('device-summary-horiz', 'DeviceSummaryHorizController');
+            Route::post('device-summary-vert', 'DeviceSummaryVertController');
+            Route::post('eventlog', 'EventlogController');
+            Route::post('generic-graph', 'GraphController');
+            Route::post('generic-image', 'ImageController');
+            Route::post('globe', 'GlobeController');
+            Route::post('graylog', 'GraylogController');
+            Route::post('placeholder', 'PlaceholderController');
+            Route::post('notes', 'NotesController');
+            Route::post('server-stats', 'ServerStatsController');
+            Route::post('syslog', 'SyslogController');
+            Route::post('top-devices', 'TopDevicesController');
+            Route::post('top-interfaces', 'TopInterfacesController');
+            Route::post('worldmap', 'WorldMapController');
+        });
+    });
+
+    // demo helper
+    Route::permanentRedirect('demo', '/');
+
+    // blank page, dummy page for external code using Laravel::bootWeb()
+    Route::any('/blank', function () {
+        return '';
+    });
+
+    // Legacy routes
+    Route::any('/{path?}', 'LegacyController@index')
+        ->where('path', '^((?!_debugbar).)*');
 });
-
-Route::post('/ajax/set_resolution', 'AjaxController@setResolution');
-
-
-// Debugbar routes need to be here because of catch-all
-if (config('app.env') !== 'production' && config('app.debug')) {
-    Route::get('/_debugbar/assets/stylesheets', [
-        'as' => 'debugbar-css',
-        'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@css'
-    ]);
-
-    Route::get('/_debugbar/assets/javascript', [
-        'as' => 'debugbar-js',
-        'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@js'
-    ]);
-
-    Route::get('/_debugbar/open', [
-        'as' => 'debugbar-open',
-        'uses' => '\Barryvdh\Debugbar\Controllers\OpenController@handler'
-    ]);
-}
-
-// Legacy routes
-Route::any('/api/v0/{path?}', 'LegacyController@api')->where('path', '.*');
-Route::any('/{path?}', 'LegacyController@index')->where('path', '.*');
-
-// should never reach this
-Route::any('/{any?}', function ($any = null) {
-    echo "Failed to find path\n";
-    echo $any . PHP_EOL;
-    dd($any);
-})->where('any', '.*');

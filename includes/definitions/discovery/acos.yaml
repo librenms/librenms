@@ -12,7 +12,7 @@ modules:
                 -
                     oid: axSysPowerSupplyStatusTable
                     value: axPowerSupplyStatus
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.12.1.3.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.12.1.3.{{ $index }}'
                     descr: axPowerSupplyName
                     index: 'axPowerSupplyStatus.{{ $index }}'
                     states:
@@ -23,7 +23,7 @@ modules:
                 -
                     oid: axSysFanStatusTable
                     value: axFanStatus
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.9.1.3.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.9.1.3.{{ $index }}'
                     descr: axFanName
                     index: 'axFanStatus.{{ $index }}'
                     states:
@@ -37,7 +37,7 @@ modules:
                 -
                     oid: axPowerSupplyVoltageTable
                     value: axPowerSupplyVoltageStatus
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.11.1.2.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.11.1.2.{{ $index }}'
                     descr: axPowerSupplyVoltageDescription
                     index: 'axPowerSupplyVoltageStatus.{{ $index }}'
                     states:
@@ -46,7 +46,7 @@ modules:
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
                 -
                     oid: axSysHwPhySystemTempStatus
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.5.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.5.{{ $index }}'
                     descr: System Temp
                     index: 'axSysHwPhySystemTempStatus.{{ $index }}'
                     states:
@@ -59,7 +59,7 @@ modules:
             data:
                 -
                     oid: axPowerSupplyVoltageTotal
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.10.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.10.{{ $index }}'
                     index: 'axPowerSupplyVoltageTotal.{{ $index }}'
                     descr: Power Supply
         fanspeed:
@@ -67,28 +67,28 @@ modules:
                 -
                     oid: axSysFanStatusTable
                     value: axFanSpeed
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.9.1.4.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.9.1.4.{{ $index }}'
                     descr: axFanName
                     index: 'axFanName.{{ $index }}'
                 -
                     oid: axSysHwFan1Speed
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.2.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.2.{{ $index }}'
                     descr: Fan 1 Speed
                     index: 'axSysHwFan1Speed.{{ $index }}'
                 -
                     oid: axSysHwFan2Speed
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.3.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.3.{{ $index }}'
                     descr: Fan 2 Speed
                     index: 'axSysHwFan2Speed.{{ $index }}'
                 -
                     oid: axSysHwFan3Speed
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.4.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.4.{{ $index }}'
                     descr: Fan 3 Speed
                     index: 'axSysHwFan3Speed.{{ $index }}'
         temperature:
             data:
                 -
                     oid: axSysHwPhySystemTemp
-                    num_oid: .1.3.6.1.4.1.22610.2.4.1.5.1.
+                    num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.1.{{ $index }}'
                     descr: System Temp
                     index: 'axSysHwPhySystemTemp.{{ $index }}'

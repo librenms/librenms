@@ -1,0 +1,318 @@
+--  *****************************************************************
+--  DLINKSW-CABLE-DIAG-MIB.mib : Cable Diagnostic MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-CABLE-DIAG-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	    TEXTUAL-CONVENTION			FROM SNMPv2-TC
+	    MODULE-IDENTITY,OBJECT-TYPE,
+	    Integer32            		FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		                            FROM SNMPv2-CONF
+	    ifIndex	        			FROM IF-MIB
+	    dlinkIndustrialCommon		FROM DLINK-ID-REC-MIB;
+
+        		
+	dlinkSwCableDiagMIB MODULE-IDENTITY
+		LAST-UPDATED "201301180000Z"
+        ORGANIZATION "D-Link Corp."
+	  	CONTACT-INFO
+            "	        D-Link Corporation
+
+             	Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                   		Taipei City 114, Taiwan, R.O.C
+             	Tel:     +886-2-66000123
+             	E-mail: tsd@dlink.com.tw
+           	"
+	  	DESCRIPTION
+	    	"The MIB module for determining the status of 
+			the cables attached to the device."
+	
+        REVISION "201301180000Z"
+        DESCRIPTION
+            " This is the first version of this MIB file.
+            "
+	  	::= {dlinkIndustrialCommon 58}
+
+    DlinkCableDiagStatus ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION
+             "The status of a pair of the cable.
+             other(0) - Other status is not specified here. E.g. the 
+                        diagnostics has never been performed, or the previous
+                        result is cleared.             
+             ok(1)    - The pair or cable has no error.
+             open(2)  - The cable in the error pair does not have a connection
+                        at the specified position.
+             short(3) - The cable in the error pair has a short problem at the
+                        specified position.  
+             openOrShort(4) - The PHY has no capability to distinguish between
+                        open and short state.  
+             crosstalk(5)- The cable in the error pair has a crosstalk problem
+                        at the specified position.
+             unKnown(6) - The diagnostics got an unknown status.                                                                                    
+             noCable(7) - The port does not have any cable connection to the
+                        remote partner.  
+             shutdown(8)- The remote partner is powered off.             
+            "
+        SYNTAX         INTEGER {
+            other(0),
+            ok(1),
+            open(2),
+            short(3),
+            openOrShort(4),
+            crosstalk(5),
+            unKnown(6),
+            noCable(7),
+            shutdown(8)                
+        }
+                                	
+-- -----------------------------------------------------------------------------
+    dCableDiagNotifications    OBJECT IDENTIFIER ::= { dlinkSwCableDiagMIB 0 }
+    dCableDiagObjects          OBJECT IDENTIFIER ::= { dlinkSwCableDiagMIB 1 }
+    dCableDiagConformance      OBJECT IDENTIFIER ::= { dlinkSwCableDiagMIB 2 }
+
+-- -----------------------------------------------------------------------------
+-- Notifications
+-- -----------------------------------------------------------------------------
+
+-- -----------------------------------------------------------------------------
+-- Objects
+-- -----------------------------------------------------------------------------	  		
+    dCableDiagIfTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DCableDiagIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table contains a list of information about test on the device's 	
+            interfaces. Note that entries will exist in this table when the 
+            corresponding interface is capable to run test."            
+        ::= { dCableDiagObjects 1 }
+
+    dCableDiagIfEntry OBJECT-TYPE
+        SYNTAX          DCableDiagIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dCableDiagIfTable, contains the
+            testing controls on an interface."
+        INDEX   { ifIndex }
+        ::= { dCableDiagIfTable 1 }
+
+    DCableDiagIfEntry ::=   SEQUENCE {
+		dCableDiagIfAction 	    INTEGER		
+    }  
+        
+    dCableDiagIfAction OBJECT-TYPE 
+        SYNTAX  INTEGER {
+            noOp(1),
+            test(2),
+            clear(3)               
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object control the action to be executed on the interface.            
+		            
+            noOp(1)  - No action is taken if this object is set to 'noOp'.
+                       When read, the value 'noOp' is returned.
+                        
+            test(2)  - Start the test on the interface.
+	            	
+            clear(3) - Clear all the test results on the interface. 
+                       The value of the following objects of the entry will
+                       become 'other'.
+                       -- dCableDiagResultPair1Status
+                       -- dCableDiagResultPair2Status
+                       -- dCableDiagResultPair3Status  
+                       -- dCableDiagResultPair4Status 
+                       The value of the following objects of the entry will
+                       become -1 (unavailable)
+                       -- dCableDiagResultPair1Length
+                       -- dCableDiagResultPair2Length
+                       -- dCableDiagResultPair3Length
+                       -- dCableDiagResultPair4Length
+                       The value of dCableDiagResultStatus of the entry will
+                       become 'notRun'.
+            "            
+        ::= { dCableDiagIfEntry 1 }           
+        
+-- -----------------------------------------------------------------------------                	  		
+    dCableDiagResultTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DCableDiagResultEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table contains a list of interface's cable situation.
+            Note that entries will exist in this table when the 
+            corresponding interface is a copper Ethernet port.
+            "
+        ::= { dCableDiagObjects 2 }
+
+    dCableDiagResultEntry OBJECT-TYPE
+        SYNTAX  DCableDiagResultEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in dCableDiagResultTable contains cable situation
+            of an interface."
+        INDEX   { ifIndex }
+        ::= { dCableDiagResultTable 1 }
+
+    DCableDiagResultEntry ::=       SEQUENCE {
+		dCableDiagResultPair1Status 	DlinkCableDiagStatus,
+		dCableDiagResultPair2Status     DlinkCableDiagStatus,
+		dCableDiagResultPair3Status		DlinkCableDiagStatus,
+		dCableDiagResultPair4Status		DlinkCableDiagStatus,
+		dCableDiagResultPair1Length  	Integer32,
+		dCableDiagResultPair2Length		Integer32,
+		dCableDiagResultPair3Length		Integer32,
+		dCableDiagResultPair4Length		Integer32,
+		dCableDiagResultStatus			INTEGER
+    }
+       
+    dCableDiagResultPair1Status OBJECT-TYPE
+        SYNTAX          DlinkCableDiagStatus 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of pair 1 of the cable."
+        ::= { dCableDiagResultEntry 1 }
+        
+    dCableDiagResultPair2Status OBJECT-TYPE
+        SYNTAX          DlinkCableDiagStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of pair 2 of the cable."
+        ::= { dCableDiagResultEntry 2 }        
+
+    dCableDiagResultPair3Status OBJECT-TYPE
+        SYNTAX          DlinkCableDiagStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of pair 3 of the cable."
+        ::= { dCableDiagResultEntry 3 }        
+
+    dCableDiagResultPair4Status OBJECT-TYPE
+        SYNTAX          DlinkCableDiagStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of pair 4 of the cable."
+        ::= { dCableDiagResultEntry 4 }
+                           
+    dCableDiagResultPair1Length OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "meters"        
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the approximate length or length to the failure of 
+            pair 1 of the cable. This value is in meter units. 
+            The special value of -1 indicates the length is unavailable."
+        ::= { dCableDiagResultEntry 5 } 
+        
+    dCableDiagResultPair2Length OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "meters"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the approximate length or length to the failure of 
+            pair 2 of the cable. This value is in meter units.
+            The special value of -1 indicates the length is unavailable."
+        ::= { dCableDiagResultEntry 6 }  
+        
+    dCableDiagResultPair3Length OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "meters"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the approximate length or length to the failure of 
+            pair 3 of the cable. This value is in meter units.
+            The special value of -1 indicates the length is unavailable."
+        ::= { dCableDiagResultEntry 7 }   
+        
+    dCableDiagResultPair4Length OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "meters"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the approximate length or length to the failure of 
+            pair 4 of the cable. This value is in meter units.
+            The special value of -1 indicates the length is unavailable."
+        ::= { dCableDiagResultEntry 8 }                         
+        	        
+    dCableDiagResultStatus OBJECT-TYPE 
+        SYNTAX  INTEGER {
+            notRun(0),
+            processing(1),
+            lastTestOk(2),
+            lastTestFailed(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Indicates the status of cable diagnostics on the interface.
+            
+            notRun(0) - the cable diagnostics has never been run for this
+                        interface or the previous result is cleared.
+            	
+            processing(1) - the cable diagnostics is currently running on the
+                          interface.
+            	
+            lastTestOk(2) - the last cable diagnostics was performed successfully
+                          on the interface.
+            	
+            lastTestFailed(3) - the last cable diagnostics failed on the interface."
+        ::= { dCableDiagResultEntry 9 } 
+        
+-- -----------------------------------------------------------------------------
+-- Conformance
+-- -----------------------------------------------------------------------------
+    dCableDiagCompliances OBJECT IDENTIFIER ::= { dCableDiagConformance 1 }
+		
+	dCableDiagCompliance MODULE-COMPLIANCE
+		STATUS          current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-CABLE-DIAG-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dCableDiagBasicGroup		    
+		}					                        
+	    ::= { dCableDiagCompliances 1 }
+		
+	dCableDiagGroups OBJECT IDENTIFIER ::= { dCableDiagCompliances 2 }
+		
+    dCableDiagBasicGroup OBJECT-GROUP
+		OBJECTS { 
+		    dCableDiagIfAction, 
+		    dCableDiagResultPair1Status,
+		    dCableDiagResultPair2Status,
+		    dCableDiagResultPair3Status,
+		    dCableDiagResultPair4Status,
+		    dCableDiagResultPair1Length,
+		    dCableDiagResultPair2Length,
+		    dCableDiagResultPair3Length,
+		    dCableDiagResultPair4Length,
+		    dCableDiagResultStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to  
+			 configuration and information of fundamental cable diagnostics feature."						
+		::= { dCableDiagGroups 1 }
+
+	
+
+       
+END
+

@@ -67,13 +67,13 @@ class IpTest extends TestCase
         $this->assertEquals('2001:db8:85a3::8a2e:370:7334', new IPv6('2001:db8:85a3::8a2e:370:7334'));
         $this->assertEquals('::1', new IPv6('::1'));
 
-        $this->setExpectedException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         new IPv6('192.168.0.1');
-        $this->setExpectedException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         new IPv6('127.0.0.1');
-        $this->setExpectedException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         new IPv4('2001:db8:85a3::8a2e:370:7334');
-        $this->setExpectedException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         new IPv4('::1');
     }
 
@@ -94,10 +94,10 @@ class IpTest extends TestCase
 
         $this->assertEquals('::', IP::fromHexString('00000000000000000000000000000000'));
 
-        $this->setExpectedException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         IP::fromHexString("c0 a8 01 01 fe");
 
-        $this->setExpectedException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         IP::fromHexString('20 01 0d b8 00 00 00 00 00 00 00 00 00 02 00 00 00 01');
     }
 
@@ -126,13 +126,13 @@ class IpTest extends TestCase
         $this->assertTrue(IP::parse('2001:db8:85a3::8a2e:370:7334')->inNetwork('2001:db8:85a3::8a2e:370:7334/128'));
         $this->assertFalse(IP::parse('2001:db8:85a3::8a2e:370:7335')->inNetwork('2001:db8:85a3::8a2e:370:7334/128'));
 
-        $this->setExpectedException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         IP::parse('42')->inNetwork('192.168.1.0/4');
 
-        $this->setExpectedException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         IP::parse('192.168.1.256')->inNetwork('192.168.1.0/24');
 
-        $this->setExpectedException('LibreNMS\Exceptions\InvalidIpException');
+        $this->expectException('LibreNMS\Exceptions\InvalidIpException');
         IP::parse('192.168.1.0')->inNetwork('192.168.1.0');
     }
 

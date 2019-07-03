@@ -27,6 +27,7 @@ namespace LibreNMS;
 
 use App\Models\GraphType;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
 
 class Config
@@ -83,9 +84,6 @@ class Config
         $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
         self::set('alert.macros.rule', $macros);
 
-        // variable definitions (remove me)
-        require $install_dir . '/includes/vmware_guestid.inc.php';
-
         // Load user config
         @include $install_dir . '/config.php';
 
@@ -128,6 +126,18 @@ class Config
         }
 
         return $curr;
+    }
+
+    /**
+     * Unset a config setting
+     * or multiple
+     *
+     * @param string|array $key
+     */
+    public static function forget($key)
+    {
+        global $config;
+        Arr::forget($config, $key);
     }
 
     /**
@@ -315,6 +325,28 @@ class Config
     }
 
     /**
+     * Serialise the whole configuration to json for use in external processes.
+     *
+     * @return string
+     */
+    public static function json_encode()
+    {
+        global $config;
+
+        return json_encode($config);
+    }
+
+    /**
+     * Get the full configuration array
+     * @return array
+     */
+    public static function getAll()
+    {
+        global $config;
+        return $config;
+    }
+
+    /**
      * merge the database config with the global config
      * Global config overrides db
      */
@@ -417,10 +449,6 @@ class Config
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
         }
 
-        if (self::get('secure_cookies')) {
-            ini_set('session.cookie_secure', 1);
-        }
-
         // If we're on SSL, let's properly detect it
         if (isset($_SERVER['HTTPS'])) {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
@@ -442,7 +470,7 @@ class Config
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         // make sure we have full path to binaries in case PATH isn't set
-        foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool') as $bin) {
+        foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6') as $bin) {
             if (!is_executable(self::get($bin))) {
                 self::set($bin, self::locateBinary($bin), $persist, $bin, "Path to $bin", 'external', 'paths');
             }
@@ -508,16 +536,14 @@ class Config
         }
 
         // Check for testing database
-        if (getenv('DBTEST')) {
-            if (isset($config['test_db_name'])) {
-                $config['db_name'] = $config['test_db_name'];
-            }
-            if (isset($config['test_db_user'])) {
-                $config['db_user'] = $config['test_db_user'];
-            }
-            if (isset($config['test_db_pass'])) {
-                $config['db_pass'] = $config['test_db_pass'];
-            }
+        if (isset($config['test_db_name'])) {
+            putenv('DB_TEST_DATABASE=' . $config['test_db_name']);
+        }
+        if (isset($config['test_db_user'])) {
+            putenv('DB_TEST_USERNAME=' . $config['test_db_user']);
+        }
+        if (isset($config['test_db_pass'])) {
+            putenv('DB_TEST_PASSWORD=' . $config['test_db_pass']);
         }
 
         return array_intersect_key($config, $keys); // return only the db settings

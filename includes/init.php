@@ -27,10 +27,10 @@
  * @param array $modules Which modules to initialize
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-global $config, $permissions, $vars;
+global $vars, $console_color;
 
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 ini_set('display_errors', 1);
@@ -39,10 +39,9 @@ ini_set('display_startup_errors', 1);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-require_once $install_dir . '/includes/common.php';
-
 # composer autoload
 if (!is_file($install_dir . '/vendor/autoload.php')) {
+    require_once $install_dir . '/includes/common.php';
     c_echo("%RError: Missing dependencies%n, run: %B./scripts/composer_wrapper.php install --no-dev%n\n\n");
 }
 require_once $install_dir . '/vendor/autoload.php';
@@ -55,6 +54,7 @@ if (!function_exists('module_selected')) {
 }
 
 // function only files
+require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
 require_once $install_dir . '/includes/rrdtool.inc.php';
 require_once $install_dir . '/includes/influxdb.inc.php';
@@ -74,8 +74,7 @@ require_once $install_dir . '/includes/functions.php';
 require_once $install_dir . '/includes/rewrites.php';
 
 if (module_selected('web', $init_modules)) {
-    chdir($install_dir . '/html');
-    require_once $install_dir . '/html/includes/functions.inc.php';
+    require_once $install_dir . '/includes/html/functions.inc.php';
 }
 
 if (module_selected('discovery', $init_modules)) {
@@ -83,35 +82,40 @@ if (module_selected('discovery', $init_modules)) {
 }
 
 if (module_selected('polling', $init_modules)) {
-    require_once $install_dir . '/includes/device-groups.inc.php';
     require_once $install_dir . '/includes/polling/functions.inc.php';
 }
 
 if (module_selected('alerts', $init_modules)) {
-    require_once $install_dir . '/includes/device-groups.inc.php';
     require_once $install_dir . '/includes/alerts.inc.php';
+}
+
+// Boot Laravel
+if (module_selected('auth', $init_modules)) {
+    \LibreNMS\Util\Laravel::bootWeb();
+} else {
+    \LibreNMS\Util\Laravel::bootCli();
+}
+
+set_debug(false); // disable debug initially (hides legacy errors too)
+
+if (!module_selected('nodb', $init_modules)) {
+    \LibreNMS\DB\Eloquent::boot();
+
+    if (!\LibreNMS\DB\Eloquent::isConnected()) {
+        echo "Could not connect to database, check logs/librenms.log.\n";
+
+        if (!extension_loaded('mysqlnd') || !extension_loaded('pdo_mysql')) {
+            echo "\nYour PHP is missing required mysql extension(s), please install and enable.\n";
+            echo "Check the install docs for more info: https://docs.librenms.org/Installation/\n";
+        }
+
+        exit;
+    }
 }
 
 // Display config.php errors instead of http 500
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
-
-if (!module_selected('nodb', $init_modules)) {
-    // Connect to database
-    try {
-        // \LibreNMS\DB\Eloquent::boot();
-
-        dbConnect();
-    } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
-        if (isCli()) {
-            echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
-            exit(2);
-        } else {
-            // punt to the Laravel error handler
-            throw $e;
-        }
-    }
-}
 
 // Load config if not already loaded (which is the case if inside Laravel)
 if (!Config::has('install_dir')) {
@@ -122,12 +126,12 @@ if (!Config::has('install_dir')) {
 ini_set('display_errors', $display_bak);
 
 
-if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']) && $config['php_memory_limit'] > 128) {
-    ini_set('memory_limit', $config['php_memory_limit'].'M');
+if (is_numeric(Config::get('php_memory_limit')) && Config::get('php_memory_limit') > 128) {
+    ini_set('memory_limit', Config::get('php_memory_limit') . 'M');
 }
 
 try {
-    Auth::get();
+    LegacyAuth::get();
 } catch (Exception $exception) {
     print_error('ERROR: no valid auth_mechanism defined!');
     echo $exception->getMessage() . PHP_EOL;
@@ -142,21 +146,7 @@ if (module_selected('discovery', $init_modules) && !update_os_cache()) {
 }
 
 if (module_selected('web', $init_modules)) {
-    umask(0002);
-    if (!isset($config['title_image'])) {
-        $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
-    }
-    require $install_dir . '/html/includes/vars.inc.php';
+    require $install_dir . '/includes/html/vars.inc.php';
 }
 
 $console_color = new Console_Color2();
-
-if (module_selected('auth', $init_modules) ||
-    (
-        module_selected('graphs', $init_modules) &&
-        isset($config['allow_unauth_graphs']) &&
-        $config['allow_unauth_graphs'] != true
-    )
-) {
-    require $install_dir . '/html/includes/authenticate.inc.php';
-}

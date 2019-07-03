@@ -1,6 +1,7 @@
 os: raisecom
 text: 'Raisecom ROAP'
 type: network
+bad_snmpEngineTime: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

@@ -2,17 +2,10 @@
 
 namespace App\Models;
 
-class Mempool extends BaseModel
+class Mempool extends DeviceRelatedModel
 {
 
     protected $table = 'mempools';
 
     protected $primaryKey = 'mempool_id';
-
-    // ---- Define Relationships ----
-    
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
-    }
 }

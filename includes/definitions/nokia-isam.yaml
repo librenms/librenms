@@ -1,0 +1,24 @@
+os: nokia-isam
+text: 'NOKIA ISAM'
+type: network
+icon: nokia
+group: nokia
+bad_ifXEntry:
+    - NFXS-E
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+      sysObjectID:
+        - .1.3.6.1.4.1.637.61
+mib_dir:
+    - nokia
+bad_iftype:
+    - aluGponOnu
+    - bridge
+    - ieee8023adLag
+    - l2vlan
+    - slip
+    - softwareLoopback

@@ -13,7 +13,7 @@
 if ($device['os'] == "juniper-mss") {
     d_echo('Juniper MSS : ');
 
-    $memory_pool = snmp_get_multi_oid($device, 'trpzSysCpuMemoryInstantUsage.0 trpzSysCpuMemorySize.0', '-OQUs', 'TRAPEZE-NETWORKS-SYSTEM-MIB');
+    $memory_pool = snmp_get_multi_oid($device, ['trpzSysCpuMemoryInstantUsage.0', 'trpzSysCpuMemorySize.0'], '-OQUs', 'TRAPEZE-NETWORKS-SYSTEM-MIB');
 
     $used = $memory_pool['trpzSysCpuMemoryInstantUsage.0'];
     $total = $memory_pool['trpzSysCpuMemorySize.0'];

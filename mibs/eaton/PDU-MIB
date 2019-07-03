@@ -1,0 +1,1385 @@
+PDU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE     FROM SNMPv2-SMI
+    enterprises, Integer32, IpAddress, Opaque           FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, DisplayString, MacAddress       FROM SNMPv2-TC;
+
+eaton MODULE-IDENTITY
+    LAST-UPDATED "200803140000Z"	-- March 14, 2008
+    ORGANIZATION "Eaton Corporation"
+    CONTACT-INFO "
+                  Author:	Eaton Corporation
+                  postal:    	Eaton Corporation
+                               Eaton Center
+                               1111 Superior Avenue
+                               Cleveland, OH 44114-2584
+                  phone:      	+1 (216) 523-5000
+                 "
+    DESCRIPTION  "This mib describes the SNMP functions of the
+                  Power Distribution Unit by Eaton Corporation."
+    REVISION	 "200803140000z"
+    DESCRIPTION  "Modified MIB in effort to better support HP Openview
+		  and other SNMP managers."
+
+    REVISION     "200702140000Z"
+    DESCRIPTION  "Updated version for remote access to pdu."
+		::= { enterprises 534 }
+
+product		OBJECT IDENTIFIER ::= { eaton 6 }
+pduagent	OBJECT IDENTIFIER ::= { product 6 }
+pdu		OBJECT IDENTIFIER ::= { pduagent 6 }
+
+traps		OBJECT IDENTIFIER ::= { pdu 0 }
+board		OBJECT IDENTIFIER ::= { pdu 1 }
+environmental   OBJECT IDENTIFIER ::= { pdu 2 }
+conformance     OBJECT IDENTIFIER ::= { pdu 9 }
+info            OBJECT IDENTIFIER ::= { board 1 }
+outlets         OBJECT IDENTIFIER ::= { board 2 }
+unit            OBJECT IDENTIFIER ::= { board 3 }
+
+unitReadings    OBJECT IDENTIFIER ::= { unit 1 }
+
+compliances     OBJECT IDENTIFIER ::= { conformance 1 }
+groups          OBJECT IDENTIFIER ::= { conformance 2 }
+
+-- Conformance Information
+
+compliance      MODULE-COMPLIANCE
+                STATUS current
+                DESCRIPTION
+                    "The requirements for conformance to the PDU-MIB."
+                MODULE -- this module
+
+                GROUP infoGroup
+                DESCRIPTION
+                    "The info group."
+
+                GROUP outletsGroup
+                DESCRIPTION
+                    "The outlets group."
+
+                GROUP unitSensorsGroup
+                DESCRIPTION
+                    "The unit sensor readings association group."
+
+                GROUP externalTemperatureGroup
+                DESCRIPTION
+                    "The external temperature sensor association group."
+
+                GROUP externalHumidityGroup
+                DESCRIPTION
+                    "The external humidity sensor association group."
+
+                GROUP trapsGroup
+                DESCRIPTION
+                    "The traps group."
+                ::= { compliances 1 }
+
+infoGroup       OBJECT-GROUP
+                OBJECTS { firmwareVersion,
+                          serialNumber,
+                          ipAddress,
+                          netmask,
+                          gateway,
+                          mac,
+                          hardwareRev,
+                          userName,
+                          objectName,
+                          objectInstance,
+                          targetUser,
+                          groupName,
+                          imageVersion,
+			  sensorDescr,
+			  thresholdDescr,
+			  thresholdSeverity,
+			  thresholdEventType,
+                          status,
+			  slaveIpAddress }
+                STATUS  current
+                DESCRIPTION
+                    "A collection of objects providing basic information
+                     about the pdu."
+                ::= { groups 1 }
+
+outletsGroup    OBJECT-GROUP
+                OBJECTS { outletCount,
+                          outletLabel,
+                          outletOperationalState,
+                          outletCurrent,
+                          outletMaxCurrent,
+                          outletVoltage,
+                          outletActivePower,
+                          outletApparentPower,
+                          outletPowerFactor,
+			  outletCurrentUpperWarning,
+			  outletCurrentUpperCritical }
+                STATUS  current
+                DESCRIPTION
+                    "A collection of objects providing basic information
+                     about the outlets, including sensor readings."
+                ::= { groups 2 }
+
+unitSensorsGroup          OBJECT-GROUP
+                          OBJECTS {	unitCurrent,
+					unitVoltage,
+					unitActivePower,
+					unitApparentPower,
+				        unitCpuTemp,
+				        unitCircuitBreak0State,
+			                unitCircuitBreak1State,
+			                unitCircuitBreak2State,
+		                        unitCircuitBreak0Current,
+		                        unitCircuitBreak1Current,
+	                                unitCircuitBreak2Current,
+					unitVoltageLowerWarning,
+					unitVoltageUpperWarning,
+					unitVoltageLowerCritical,
+					unitVoltageUpperCritical,
+					unitCurrentUpperWarning,
+					unitCurrentUpperCritical,
+					unitTempLowerWarning,
+					unitTempUpperWarning,
+					unitTempLowerCritical,
+					unitTempUpperCritical }
+                          STATUS  current
+                          DESCRIPTION
+                              "A collection of objects providing unit level sensor readings."
+                          ::= { groups 4 }
+
+externalTemperatureGroup   OBJECT-GROUP
+                           OBJECTS { tempSensorCount,
+                                     tempSensorLabel,
+                                     temperature,
+                                     tempLowerWarning,
+                                     tempUpperWarning,
+                                     tempLowerCritical,
+                                     tempUpperCritical,
+                                     tempLowerWarningReset,
+                                     tempUpperWarningReset,
+                                     tempLowerCriticalReset,
+                                     tempUpperCriticalReset }
+                           STATUS  current
+                           DESCRIPTION
+                               "A collection of objects providing external temperature sensor readings and threshold settings."
+                           ::= { groups 6 }
+
+externalHumidityGroup   OBJECT-GROUP
+                        OBJECTS { humiditySensorCount,
+                                  humiditySensorLabel,
+                                  humidity,
+                                  humidityLowerWarning,
+                                  humidityUpperWarning,
+                                  humidityLowerCritical,
+                                  humidityUpperCritical,
+                                  humidityLowerWarningReset,
+                                  humidityUpperWarningReset,
+                                  humidityLowerCriticalReset,
+                                  humidityUpperCriticalReset }
+                        STATUS  current
+                        DESCRIPTION
+                            "A collection of objects providing external humidity sensor readings and threshold settings."
+                        ::= { groups 7 }
+
+trapsGroup      NOTIFICATION-GROUP
+                NOTIFICATIONS { rebootStarted,
+                                rebootCompleted,
+                                userLogin,
+                                userLogout,
+                                userAuthenticationFailure,
+                                userSessionTimeout,
+                                userAdded,
+                                userModified,
+                                userDeleted,
+                                groupAdded,
+                                groupModified,
+                                groupDeleted,
+                                deviceUpdateStarted,
+                                userBlocked,
+                                powerControl,
+                                userPasswordChanged,
+                                passwordSettingsChanged,
+                                firmwareFileDiscarded,
+                                firmwareValidationFailed,
+                                securityViolation,
+                                logFileCleared,
+				thresholdAlarm,
+				outletGroupingConnectivityLost }
+                STATUS  current
+                DESCRIPTION
+                    "A collection of traps."
+                ::= { groups 9 }
+
+
+-- Textual Conventions
+
+MilliAmps       ::= TEXTUAL-CONVENTION
+                STATUS        current
+                DESCRIPTION
+                    "Data type for reporting sensor readings and thresholds
+                    associated with current sensors. If the underlying hardware
+                    sensor indicates 1 amp, then the SNMP agent will report
+                    a value of 1000 milliamps.  The value is scaled in this
+                    manner as a way to deal with floating point types
+                    that SNMP does not currently support."
+                SYNTAX Unsigned32
+
+MilliVolts      ::= TEXTUAL-CONVENTION
+                STATUS      current
+                DESCRIPTION
+                    "Data type for reporting sensor readings and thresholds
+                    associated with voltage sensors. If the underlying hardware
+                    sensor indicates 1 volts, then the SNMP agent will report
+                    a value of 1000 millivolts.  The value is scaled in this
+                    manner as a way to deal with floating point types
+                    that SNMP does not currently support."
+                SYNTAX Unsigned32
+
+Watts           ::= TEXTUAL-CONVENTION
+                STATUS      current
+                DESCRIPTION
+                    "Data type for reporting sensor readings and thresholds
+                    associated with active power sensors. If the underlying hardware
+                    sensor indicates 1 watt, then the SNMP agent will report
+                    a value of 1 watt. No scaling is performed for this type."
+                SYNTAX Unsigned32
+
+VoltAmps        ::= TEXTUAL-CONVENTION
+                STATUS      current
+                DESCRIPTION
+                    "Data type for reporting sensor readings and thresholds
+                    associated with apparent power sensors. If the underlying hardware
+                    sensor indicates 1 volt-amp, then the SNMP agent will report
+                    a value of 1 volt-amp. No scaling is performed for this type."
+                SYNTAX Unsigned32
+
+DegreesCelsius  ::= TEXTUAL-CONVENTION
+                STATUS      current
+                DESCRIPTION
+                    "Data type for reporting sensor readings and thresholds
+                    associated with temperature sensors. If the underlying hardware
+                    sensor indicates 1 degree Celsius, then the SNMP agent will report
+                    a value of 1 degree Celsius. No scaling is performed for this type."
+                SYNTAX Unsigned32
+
+Hertz           ::= TEXTUAL-CONVENTION
+                STATUS      current
+                DESCRIPTION
+                    "Data type for reporting sensor readings and thresholds
+                    associated with frequency sensors. If the underlying hardware
+                    sensor indicates 1 Hertz, then the SNMP agent will report
+                    a value of 1 Hertz. No scaling is performed for this type."
+                SYNTAX Unsigned32
+
+RelativeHumidity   ::= TEXTUAL-CONVENTION
+                   STATUS      current
+                   DESCRIPTION
+                       "Data type for reporting sensor readings and thresholds
+                       associated with humidity sensors. Relative humidity is
+                       expressed as percentage and is defined as the ratio of the
+                       partial pressure of water vapor in a gaseous mixture of
+                       air and water vapor to the saturated vapor pressure of water
+                       at a given temperature."
+                   SYNTAX Unsigned32 (0..100)
+
+PowerFactorPercentage   ::= TEXTUAL-CONVENTION
+                   STATUS      current
+                   DESCRIPTION
+                       "Data type for reporting sensor readings and thresholds
+                       associated with power factor sensors. The power factor of
+                       an AC power system is defined as the ratio of the real
+                       or active power to the apparent power and is a number
+                       between 0 and 1.  A PowerFactorPercentage value is calculated
+                       by taking this ratio and multiplying by 100.  The power factor
+                       is used to indicate how efficiently a particular load is
+                       utilizing energy."
+                   SYNTAX Unsigned32 (0..100)
+
+SensorTypeEnumeration ::= TEXTUAL-CONVENTION
+                          STATUS current
+                          DESCRIPTION
+                              "The types a sensor can be."
+                          SYNTAX        INTEGER { outletCurrent(0),
+                                                  outletMaxCurrent(1),
+                                                  outletVoltage(2),
+                                                  outletActivePower(3),
+                                                  outletApparentPower(4),
+                                                  outletMaxActivePower(5),
+                                                  outletAverageActivePower(6),
+                                                  outletPowerFactor(7),
+                                                  powerBranchVoltage(200),
+                                                  powerBranchFrequency(201),
+                                                  powerBranchTemperature(202),
+                                                  powerBranchCurrent(203),
+                                                  environmentalTemp1(300),
+                                                  environmentalTemp2(301),
+                                                  environmentalTemp3(302),
+                                                  environmentalTemp4(303),
+                                                  environmentalTemp5(304),
+                                                  environmentalTemp6(305),
+                                                  environmentalTemp7(306),
+                                                  environmentalTemp8(307),
+                                                  environmentalHumidity1(400),
+                                                  environmentalHumidity2(401),
+                                                  environmentalHumidity3(402),
+                                                  environmentalHumidity4(403),
+                                                  environmentalHumidity5(404),
+                                                  environmentalHumidity6(405),
+                                                  environmentalHumidity7(406),
+                                                  environmentalHumidity8(407),
+                                                  unitRmsCurrent(500),
+                                                  unitMaxRmsCurrent(501),
+                                                  unitVoltage(502),
+                                                  unitCpuTemp(503),
+                                                  unitActivePower(504),
+                                                  unitApparentPower(505),
+                                                  unitCircuitBreak0State(550),
+                                                  unitCircuitBreak1State(551),
+                                                  unitCircuitBreak2State(552),
+                                                  unitCircuitBreak0Current(600),
+                                                  unitCircuitBreak1Current(601),
+                                                  unitCircuitBreak2Current(602) }
+
+SensorStateEnumeration ::= TEXTUAL-CONVENTION
+                           STATUS current
+                           DESCRIPTION
+                               "The states a sensor can be in."
+                           SYNTAX        INTEGER { unavailable(-1),
+                                                   ok(0),
+                                                   belowLowerWarning(1),
+                                                   aboveUpperWarning(2),
+                                                   belowLowerCritical(3),
+                                                   aboveUpperCritical(4) }
+
+
+-- the info group
+
+firmwareVersion OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    read-only
+                STATUS        current
+                DESCRIPTION
+                    "The current firmware version"
+                ::= { info 1 }
+
+serialNumber    OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    read-only
+                STATUS        current
+                DESCRIPTION
+                    "The serial number."
+                ::= { info 2 }
+
+ipAddress       OBJECT-TYPE
+                SYNTAX        IpAddress
+                MAX-ACCESS    read-only
+                STATUS        current
+                DESCRIPTION
+                    "The current IP address. A value of 0.0.0.0 indicates an error
+                     or an unset option."
+                ::= { info 3 }
+
+netmask         OBJECT-TYPE
+                SYNTAX        IpAddress
+                MAX-ACCESS    read-only
+                STATUS        current
+                DESCRIPTION
+                    "The current Netmask. A value of 0.0.0.0 indicates an error
+                     or an unset option."
+                ::= { info 4 }
+
+gateway         OBJECT-TYPE
+                SYNTAX        IpAddress
+                MAX-ACCESS    read-only
+                STATUS        current
+                DESCRIPTION
+                    "The current Gateway. A value of 0.0.0.0 indicates an error
+                     or an unset option."
+                ::= { info 5 }
+
+mac             OBJECT-TYPE
+                SYNTAX        MacAddress
+                MAX-ACCESS    read-only
+                STATUS        current
+                DESCRIPTION
+                    "The current MAC address."
+                ::= { info 6 }
+
+hardwareRev     OBJECT-TYPE
+                SYNTAX        Integer32(0..255)
+                MAX-ACCESS    read-only
+                STATUS        current
+                DESCRIPTION
+                    "The hardware revision number."
+                ::= { info 7 }
+
+userName        OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    accessible-for-notify
+                STATUS        current
+                DESCRIPTION
+                    "The login of a user."
+                ::= { info 10 }
+
+objectName      OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    accessible-for-notify
+                STATUS        current
+                DESCRIPTION
+                    "The model type of the device"
+                ::= { info 12 }
+
+objectInstance  OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    accessible-for-notify
+                STATUS        current
+                DESCRIPTION
+                    "The device name"
+                ::= { info 13}
+
+targetUser      OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    accessible-for-notify
+                STATUS        current
+                DESCRIPTION
+                    "The user record being operated on"
+                ::= { info 14}
+
+groupName       OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    accessible-for-notify
+                STATUS        current
+                DESCRIPTION
+                    "The group record being operated on"
+                ::= { info 15 }
+
+imageVersion    OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    accessible-for-notify
+                STATUS        current
+                DESCRIPTION
+                    "The version of the Upgrade image"
+                ::= { info 18 }
+
+sensorDescr     OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    accessible-for-notify
+                STATUS        current
+                DESCRIPTION
+                    "Sensor description indicating which sensor experienced a threshold exceeded 
+                      event.  When applicable the description will indicate the sensor number."
+                ::= { info 19 }
+
+thresholdDescr  OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    accessible-for-notify
+                STATUS        current
+                DESCRIPTION
+                    "Threshold description indicating which configured threshold has been triggered (or cleared)."
+                ::= { info 20 }
+
+thresholdSeverity  OBJECT-TYPE
+		   SYNTAX        DisplayString
+		   MAX-ACCESS    accessible-for-notify
+		   STATUS        current
+		   DESCRIPTION
+			"String (Warning, Critical, etc...) indicating the severity of the threshold which has been triggered (or cleared)."
+                ::= { info 21 }
+
+thresholdEventType  OBJECT-TYPE
+		    SYNTAX        DisplayString
+		    MAX-ACCESS    accessible-for-notify
+		    STATUS        current
+		    DESCRIPTION
+			"String (triggered, cleared) indicating if the threshold event indicates that a configured threshold 
+                     has been triggered or cleared."
+                ::= { info 22 }
+
+status          OBJECT-TYPE
+                SYNTAX        DisplayString
+                MAX-ACCESS    accessible-for-notify
+                STATUS        current
+                DESCRIPTION
+                    "The success status of an operation"
+                ::= { info 23 }
+
+slaveIpAddress  OBJECT-TYPE
+                SYNTAX        IpAddress
+                MAX-ACCESS    read-only
+                STATUS        current
+                DESCRIPTION
+                    "In a shepherding configuration, this is the IP address of slave PDU. A value of 0.0.0.0 indicates an error
+                     or an unset option."
+                ::= { info 24}
+
+-- the outlets group
+
+-- Implementation for managing the outlets
+
+outletCount     OBJECT-TYPE
+                SYNTAX        Integer32
+                MAX-ACCESS    read-only
+                STATUS        current
+                DESCRIPTION
+                    "The number of outlets (regardless of
+                     their current state) present on this pdu."
+                ::= { outlets 1 }
+
+
+-- the outlets table
+
+-- The outlets table contains information on the pdu's outlets.
+-- It further provides functions for managing them.
+
+outletTable     OBJECT-TYPE
+                SYNTAX        SEQUENCE OF OutletEntryStruct
+                MAX-ACCESS    not-accessible
+                STATUS        current
+                DESCRIPTION
+                    "A list of outlet entries. The number of
+                     entries is given by the value of outletCount."
+                ::= { outlets 2 }
+
+outletEntry     OBJECT-TYPE
+                SYNTAX        OutletEntryStruct
+                MAX-ACCESS    not-accessible
+                STATUS        current
+                DESCRIPTION
+                    "An outlet entry containing objects at the
+                     for a particular outlet."
+                INDEX         { outletIndex }
+                ::= { outletTable 1 }
+
+OutletEntryStruct ::= SEQUENCE { outletIndex                        Integer32,
+                                 outletLabel                        DisplayString,
+                                 outletOperationalState             INTEGER,
+                                 outletCurrent                      MilliAmps,
+                                 outletMaxCurrent                   MilliAmps,
+                                 outletVoltage                      MilliVolts,
+                                 outletActivePower                  Watts,
+                                 outletApparentPower                VoltAmps,
+                                 outletPowerFactor                  PowerFactorPercentage,
+				 outletCurrentUpperWarning	    MilliAmps,
+				 outletCurrentUpperCritical	    MilliAmps }
+
+outletIndex                           OBJECT-TYPE
+                                      SYNTAX        Integer32(0..255)
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "A unique value for each outlet. Its value
+                                           ranges between 1 and the value of outletCount."
+                                      ::= { outletEntry 1 }
+
+outletLabel                           OBJECT-TYPE
+                                      SYNTAX        DisplayString
+                                      MAX-ACCESS    read-write
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "A textual string containing information
+                                           about the outlet."
+                                      ::= { outletEntry 2 }
+
+outletOperationalState                OBJECT-TYPE
+                                      SYNTAX        INTEGER { error(-1),
+                                                              off(0),
+                                                              on(1),
+                                                              cycling(2) }
+                                      MAX-ACCESS    read-write
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "A value for each outlet which describes the
+                                           operational state of the outlet. It is also
+                                           used to set the operational state of the outlet"
+                                      ::= { outletEntry 3 }
+
+outletCurrent                         OBJECT-TYPE
+                                      SYNTAX        MilliAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "A unique value for the current sensor
+                                           attached to the outlet.  This value is
+                                           reported in milliamps (1/1000th of an amp)"
+                                      ::= { outletEntry 4 }
+
+outletMaxCurrent                      OBJECT-TYPE
+                                      SYNTAX        MilliAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                           "A unique value for the max. current sensor
+                                           attached to the outlet.  This value is
+                                           reported in milliamps (1/1000th of an amp)"
+                                      ::= { outletEntry 5 }
+
+outletVoltage                         OBJECT-TYPE
+                                      SYNTAX        MilliVolts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "A unique value for the voltage sensor
+                                           attached to the outlet.This value is
+                                           reported in millivolts (1/1000th of a volt)"
+                                      ::= { outletEntry 6 }
+
+outletActivePower                     OBJECT-TYPE
+                                      SYNTAX        Watts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "A unique value for the active power sensor
+                                           attached to the outlet.  This value is
+                                           reported in Watts."
+                                      ::= { outletEntry 7 }
+
+outletApparentPower                   OBJECT-TYPE
+                                      SYNTAX        VoltAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "A unique value for the apparent power sensor
+                                           attached to the outlet.  This value is
+                                           reported in Volt-Amps"
+                                      ::= { outletEntry 8 }
+
+outletPowerFactor                     OBJECT-TYPE
+                                      SYNTAX        PowerFactorPercentage
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "A unique value for the power factor
+                                           of the outlet. The reading represents a
+                                           percentage in the range of 0% to 100%."
+                                      ::= { outletEntry 9 }
+
+outletCurrentUpperWarning             OBJECT-TYPE
+                                      SYNTAX        MilliAmps
+                                      MAX-ACCESS    read-write
+                                      STATUS        current
+                                      DESCRIPTION
+                                           "The value of the upper warning (non-critical)
+                                            current threshold for the outlet. This value is
+                                           reported in milliamps (1/1000th of an amp)"
+                                      ::= { outletEntry 21 }
+
+outletCurrentUpperCritical            OBJECT-TYPE
+                                      SYNTAX        MilliAmps
+                                      MAX-ACCESS    read-write
+                                      STATUS        current
+                                      DESCRIPTION
+                                           "The value of the upper critical current 
+                                            threshold for the outlet. This value is
+                                           reported in milliamps (1/1000th of an amp)"
+                                      ::= { outletEntry 23 }
+
+
+
+-- the unitReadings group
+
+-- The unitReadings group contains sensor reading values
+-- for the PDU unit as a whole
+
+unitCurrent               OBJECT-TYPE
+                          SYNTAX      MilliAmps
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's current sensor in millamps."
+                          ::= { unitReadings 1 }
+
+unitVoltage               OBJECT-TYPE
+                          SYNTAX      MilliVolts
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's voltage sensor in millivolts."
+                          ::= { unitReadings 2 }
+
+unitActivePower         OBJECT-TYPE
+                          SYNTAX      Watts
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's voltage sensor in volt-amps."
+                          ::= { unitReadings 3 }
+
+unitApparentPower         OBJECT-TYPE
+                          SYNTAX      Watts
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's voltage sensor in volt-amps."
+                          ::= { unitReadings 4 }
+
+unitCpuTemp               OBJECT-TYPE
+                          SYNTAX      DegreesCelsius
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's CPU temperature sensor in degrees Celsius."
+                          ::= { unitReadings 5 }
+
+
+unitCircuitBreak0State    OBJECT-TYPE
+                          SYNTAX      INTEGER { unavailable(-1),
+						ok(0),
+                                                tripped(1) }
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's circuit breaker state sensor 0."
+                          ::= { unitReadings 20 }
+
+unitCircuitBreak1State    OBJECT-TYPE
+                          SYNTAX      INTEGER { unavailable(-1),
+						ok(0),
+                                                tripped(1) }
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's circuit breaker state sensor 1."
+                          ::= { unitReadings 21 }
+
+unitCircuitBreak2State     OBJECT-TYPE
+                          SYNTAX      INTEGER { unavailable(-1),
+						ok(0),
+                                                tripped(1) }
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's circuit breaker state sensor 2."
+                          ::= { unitReadings 22 }
+
+unitCircuitBreak0Current  OBJECT-TYPE
+                          SYNTAX      MilliAmps
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's circuit breaker current sensor 0."
+                          ::= { unitReadings 40 }
+
+unitCircuitBreak1Current  OBJECT-TYPE
+                          SYNTAX      MilliAmps
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's circuit breaker current sensor 1."
+                          ::= { unitReadings 41 }
+
+unitCircuitBreak2Current  OBJECT-TYPE
+                          SYNTAX      MilliAmps
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The value for the unit's circuit breaker current sensor 2."
+                          ::= { unitReadings 42 }
+
+unitVoltageLowerWarning   OBJECT-TYPE
+                          SYNTAX        MilliVolts 
+                          MAX-ACCESS    read-write
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the lower warning (non-critical) unit level voltage threshold."
+                          ::= { unitReadings 60 }
+
+unitVoltageLowerCritical  OBJECT-TYPE
+                          SYNTAX        MilliVolts 
+                          MAX-ACCESS    read-write
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the lower critical unit level voltage threshold."
+                          ::= { unitReadings 61 }
+
+unitVoltageUpperWarning  OBJECT-TYPE
+                          SYNTAX        MilliVolts 
+                          MAX-ACCESS    read-write
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the upper warning (non-critical) unit level voltage threshold."
+                          ::= { unitReadings 62 }
+
+unitVoltageUpperCritical  OBJECT-TYPE
+                          SYNTAX        MilliVolts 
+                          MAX-ACCESS    read-write
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the upper critical unit level voltage threshold."
+                          ::= { unitReadings 63 }
+
+unitCurrentUpperWarning   OBJECT-TYPE
+                          SYNTAX        MilliAmps
+                          MAX-ACCESS    read-write
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the upper warning (non-critical) unit level current threshold."
+                          ::= { unitReadings 70 }
+
+unitCurrentUpperCritical  OBJECT-TYPE
+                          SYNTAX        MilliAmps
+                          MAX-ACCESS    read-only
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the upper critical unit level current threshold.  NOTE:  This 
+                               particular threshold is NOT settable "
+                          ::= { unitReadings 71 }
+
+unitTempLowerWarning      OBJECT-TYPE
+                          SYNTAX        DegreesCelsius
+                          MAX-ACCESS    read-write
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the lower warning (non-critical) unit level temperature threshold."
+                          ::= { unitReadings 80 }
+
+unitTempLowerCritical     OBJECT-TYPE
+                          SYNTAX		DegreesCelsius 
+                          MAX-ACCESS    read-write
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the lower critical unit level temperature threshold."
+                          ::= { unitReadings 81 }
+
+unitTempUpperWarning      OBJECT-TYPE
+                          SYNTAX        DegreesCelsius 
+                          MAX-ACCESS    read-write
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the upper warning (non-critical) unit level temperature threshold."
+                          ::= { unitReadings 82 }
+
+unitTempUpperCritical     OBJECT-TYPE
+                          SYNTAX        DegreesCelsius
+                          MAX-ACCESS    read-write
+                          STATUS        current
+                          DESCRIPTION
+                              "The value of the upper critical unit level temperature threshold."
+                          ::= { unitReadings 83 }
+
+
+-- the externalTemperature group
+
+-- Implementation for managing external temperature sensors
+
+tempSensorCount     OBJECT-TYPE
+                    SYNTAX        Integer32
+                    MAX-ACCESS    read-only
+                    STATUS        current
+                    DESCRIPTION
+                       "The number of external temperature sensors (regardless of
+                         their current state) present on this pdu."
+                    ::= { environmental 1 }
+
+
+-- the temperature sensors table
+
+-- The tempSensorTable table contains information on the pdu's external temperature sensors.
+
+tempSensorTable     OBJECT-TYPE
+                    SYNTAX        SEQUENCE OF TempSensorEntryStruct
+                    MAX-ACCESS    not-accessible
+                    STATUS        current
+                    DESCRIPTION
+                        "A list of temperature sensor entries. The number of
+                         entries is given by the value of tempSensorCount."
+                    ::= { environmental 2 }
+
+tempSensorEntry     OBJECT-TYPE
+                    SYNTAX        TempSensorEntryStruct
+                    MAX-ACCESS    not-accessible
+                    STATUS        current
+                    DESCRIPTION
+                        "An entry containing sensor reading and threshold
+                        settings for a particular temperature sensor."
+                    INDEX         { tempSensorIndex }
+                    ::= { tempSensorTable 1 }
+
+TempSensorEntryStruct ::= SEQUENCE { tempSensorIndex                Integer32,
+                                 tempSensorLabel                    DisplayString,
+                                 temperature                        DegreesCelsius,
+                                 tempLowerWarning                   DegreesCelsius,
+                                 tempUpperWarning                   DegreesCelsius,
+                                 tempLowerCritical                  DegreesCelsius,
+                                 tempUpperCritical                  DegreesCelsius,
+                                 tempLowerWarningReset              DegreesCelsius,
+                                 tempUpperWarningReset              DegreesCelsius,
+                                 tempLowerCriticalReset             DegreesCelsius,
+                                 tempUpperCriticalReset             DegreesCelsius }
+
+tempSensorIndex                    OBJECT-TYPE
+                                   SYNTAX        Integer32(0..255)
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "A unique value for each temperature sensor. Its value
+                                        ranges between 1 and tempSensorCount."
+                                   ::= { tempSensorEntry 1 }
+
+tempSensorLabel                   OBJECT-TYPE
+                                   SYNTAX        DisplayString
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "A settable human-readable label for the external temperature
+                                       sensor.  One possible use for this label is to convey sensor
+                                       location."
+                                   ::= { tempSensorEntry 2 }
+
+temperature                        OBJECT-TYPE
+                                   SYNTAX        DegreesCelsius
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the external temperature sensor reported
+                                       in degrees celsius."
+                                   ::= { tempSensorEntry 3 }
+
+tempLowerWarning       OBJECT-TYPE
+                                   SYNTAX        DegreesCelsius
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the lower warning (non-critical) threshold."
+                                   ::= { tempSensorEntry 4 }
+
+tempUpperWarning       OBJECT-TYPE
+                                   SYNTAX        DegreesCelsius
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the upper warning (non-critical) threshold."
+                                   ::= { tempSensorEntry 5 }
+
+tempLowerCritical         OBJECT-TYPE
+                                   SYNTAX        DegreesCelsius
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the lower critical threshold."
+                                   ::= { tempSensorEntry 6 }
+
+tempUpperCritical          OBJECT-TYPE
+                                   SYNTAX        DegreesCelsius
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the upper critical threshold."
+                                   ::= { tempSensorEntry 7 }
+
+tempLowerWarningReset      OBJECT-TYPE
+                                   SYNTAX        DegreesCelsius
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the lower warning (non-critical) reset/hysteresis value."
+                                   ::= { tempSensorEntry 8 }
+
+tempUpperWarningReset      OBJECT-TYPE
+                                   SYNTAX        DegreesCelsius
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the upper warning (non-critical) reset/hysteresis value."
+                                   ::= { tempSensorEntry 9 }
+
+tempLowerCriticalReset     OBJECT-TYPE
+                                   SYNTAX        DegreesCelsius
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the lower critical reset/hysteresis value."
+                                   ::= { tempSensorEntry 10 }
+
+tempUpperCriticalReset     OBJECT-TYPE
+                                   SYNTAX        DegreesCelsius
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the upper critical reset/hysteresis value."
+                                   ::= { tempSensorEntry 11 }
+
+-- the externalHumidity group
+
+-- Implementation for managing external humidity sensors
+
+humiditySensorCount     OBJECT-TYPE
+                        SYNTAX        Integer32
+                        MAX-ACCESS    read-only
+                        STATUS        current
+                        DESCRIPTION
+                           "The number of external humidity sensors (regardless of
+                             their current state) present on this pdu."
+                        ::= { environmental 3 }
+
+
+-- the humidity sensors table
+
+-- The humiditySensorTable table contains information on the pdu's external humidity sensors.
+
+humiditySensorTable     OBJECT-TYPE
+                        SYNTAX        SEQUENCE OF HumiditySensorEntryStruct
+                        MAX-ACCESS    not-accessible
+                        STATUS        current
+                        DESCRIPTION
+                            "A list of humidity sensor entries. The number of
+                             entries is given by the value of humiditySensorCount."
+                        ::= { environmental 4 }
+
+humiditySensorEntry     OBJECT-TYPE
+                        SYNTAX        HumiditySensorEntryStruct
+                        MAX-ACCESS    not-accessible
+                        STATUS        current
+                        DESCRIPTION
+                            "An entry containing sensor reading and threshold
+                            settings for a particular humidity sensor."
+                        INDEX         { humiditySensorIndex }
+                        ::= { humiditySensorTable 1 }
+
+HumiditySensorEntryStruct ::= SEQUENCE { humiditySensorIndex            Integer32,
+                                 humiditySensorLabel                    DisplayString,
+                                 humidity                               RelativeHumidity,
+                                 humidityLowerWarning                   RelativeHumidity,
+                                 humidityUpperWarning                   RelativeHumidity,
+                                 humidityLowerCritical                  RelativeHumidity,
+                                 humidityUpperCritical                  RelativeHumidity,
+                                 humidityLowerWarningReset              RelativeHumidity,
+                                 humidityUpperWarningReset              RelativeHumidity,
+                                 humidityLowerCriticalReset             RelativeHumidity,
+                                 humidityUpperCriticalReset             RelativeHumidity }
+
+humiditySensorIndex                OBJECT-TYPE
+                                   SYNTAX        Integer32(0..255)
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "A unique value for each humidity sensor. Its value
+                                        ranges between 1 and humiditySensorCount."
+                                   ::= { humiditySensorEntry 1 }
+
+humiditySensorLabel                OBJECT-TYPE
+                                   SYNTAX        DisplayString
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "A settable human-readable label for the external humidity
+                                       sensor.  One possible use for this label is to convey sensor
+                                       location."
+                                   ::= { humiditySensorEntry 2 }
+
+humidity                           OBJECT-TYPE
+                                   SYNTAX        RelativeHumidity
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the external humidity sensor reported
+                                       as relative humidity (a percentage)."
+                                   ::= { humiditySensorEntry 3 }
+
+humidityLowerWarning      OBJECT-TYPE
+                                   SYNTAX        RelativeHumidity
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the lower warning (non-critical) threshold."
+                                   ::= { humiditySensorEntry 4 }
+
+humidityUpperWarning      OBJECT-TYPE
+                                   SYNTAX        RelativeHumidity
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the upper warning (non-critical) threshold."
+                                   ::= { humiditySensorEntry 5 }
+
+humidityLowerCritical         OBJECT-TYPE
+                                   SYNTAX        RelativeHumidity
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the lower critical threshold."
+                                   ::= { humiditySensorEntry 6 }
+
+humidityUpperCritical          OBJECT-TYPE
+                                   SYNTAX        RelativeHumidity
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the upper critical threshold."
+                                   ::= { humiditySensorEntry 7 }
+
+humidityLowerWarningReset      OBJECT-TYPE
+                                   SYNTAX        RelativeHumidity
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the lower warning (non-critical) reset/hysteresis value."
+                                   ::= { humiditySensorEntry 8 }
+
+humidityUpperWarningReset      OBJECT-TYPE
+                                   SYNTAX        RelativeHumidity
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the upper warning (non-critical) reset/hysteresis value."
+                                   ::= { humiditySensorEntry 9 }
+
+humidityLowerCriticalReset     OBJECT-TYPE
+                                   SYNTAX        RelativeHumidity
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the lower critical reset/hysteresis value."
+                                   ::= { humiditySensorEntry 10 }
+
+humidityUpperCriticalReset     OBJECT-TYPE
+                                   SYNTAX        RelativeHumidity
+                                   MAX-ACCESS    read-write
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The value of the upper critical reset/hysteresis value."
+                                   ::= { humiditySensorEntry 11 }
+
+
+-- Start the traps
+
+rebootStarted             NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName }
+                          STATUS current
+                          DESCRIPTION
+                              "The reboot process has started"
+                          ::= { traps 1 }
+
+rebootCompleted           NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance }
+                          STATUS current
+                          DESCRIPTION
+                              "The reboot process is complete"
+                          ::= { traps 2 }
+
+userLogin                 NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    ipAddress }
+                          STATUS current
+                          DESCRIPTION
+                              "A user logged in"
+                          ::= { traps 3 }
+
+userLogout                NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    ipAddress }
+                          STATUS current
+                          DESCRIPTION
+                              "A user logged out"
+                          ::= { traps 4 }
+
+userAuthenticationFailure NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    ipAddress }
+                          STATUS current
+                          DESCRIPTION
+                              "A user authentication attempt failed"
+                          ::= { traps 5 }
+
+userSessionTimeout        NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    ipAddress }
+                          STATUS current
+                          DESCRIPTION
+                              "A user timed out from the device"
+                          ::= { traps 8 }
+
+userAdded                 NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    targetUser }
+                          STATUS current
+                          DESCRIPTION
+                              "A user was added to the system"
+                          ::= { traps 11 }
+
+userModified              NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    targetUser }
+                          STATUS current
+                          DESCRIPTION
+                              "A user account was modified"
+                          ::= { traps 12 }
+
+userDeleted               NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    targetUser }
+                          STATUS current
+                          DESCRIPTION
+                              "A user was deleted from the system"
+                          ::= { traps 13 }
+
+groupAdded                NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    groupName }
+                          STATUS current
+                          DESCRIPTION
+                              "A group was added to the system"
+                          ::= { traps 14 }
+
+groupModified             NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    groupName }
+                          STATUS current
+                          DESCRIPTION
+                              "A group was modified"
+                          ::= { traps 15 }
+
+
+groupDeleted              NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    groupName }
+                          STATUS current
+                          DESCRIPTION
+                              "A group was deleted from the system"
+                          ::= { traps 16 }
+
+deviceUpdateStarted       NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    ipAddress,
+                                    imageVersion }
+                          STATUS current
+                          DESCRIPTION
+                              "The device update has started"
+                          ::= { traps 20 }
+
+userBlocked               NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    ipAddress }
+                          STATUS current
+                          DESCRIPTION
+                              "A blocked user tried to log in"
+                          ::= { traps 22 }
+
+powerControl              NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    ipAddress,
+                                    outletLabel,
+                                    outletOperationalState }
+                          STATUS current
+                          DESCRIPTION
+                              "An outlet has been switched"
+                          ::= { traps 23 }
+
+userPasswordChanged       NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    targetUser,
+                                    ipAddress }
+                          STATUS current
+                          DESCRIPTION
+                              "A user password was changed"
+                          ::= { traps 24 }
+
+passwordSettingsChanged   NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    status }
+                          STATUS current
+                          DESCRIPTION
+                              "Strong password settings changed "
+                          ::= { traps 28 }
+
+-- Start new event to support RP products
+
+firmwareFileDiscarded     NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName }
+                          STATUS current
+                          DESCRIPTION
+                              "A firmware file discarded "
+                          ::= { traps 36 }
+
+firmwareValidationFailed  NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName }
+                          STATUS current
+                          DESCRIPTION
+                              "A firmware validation failed "
+                          ::= { traps 38 }
+
+securityViolation         NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName,
+                                    ipAddress }
+                          STATUS current
+                          DESCRIPTION
+                              "Security violation."
+                          ::= { traps 39 }
+
+logFileCleared            NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName }
+                          STATUS current
+                          DESCRIPTION
+                              "The log file has been cleared."
+                          ::= { traps 41 }
+
+--sensor threshold exceeded traps
+
+thresholdAlarm			  NOTIFICATION-TYPE
+				  OBJECTS { objectName,
+					    objectInstance,
+					    ipAddress,
+					    sensorDescr,
+					    thresholdDescr,
+					    thresholdSeverity,
+					    thresholdEventType  }
+				  STATUS  current
+				  DESCRIPTION
+					 "Configured sensor theshold event. The 'thresholdType' variable will indicate whether or not
+                                          the threshold triggered or cleared"
+				  ::= { traps 45 }
+
+-- Shepherd Application traps
+outletGroupingConnectivityLost       NOTIFICATION-TYPE
+                                     OBJECTS { objectName,
+                                               objectInstance,
+                                               ipAddress,
+                                               slaveIpAddress }
+                                     STATUS current
+                                     DESCRIPTION
+                                         "Master PDU lost contact with the slave PDU in an outlet grouping configuration."
+                                     ::= { traps 50 }
+
+
+END

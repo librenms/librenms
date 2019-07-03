@@ -23,11 +23,19 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Pushbullet implements Transport
+class Pushbullet extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts = $this->config['pushbullet-token'];
+        }
+        return $this->contactPushbullet($obj, $opts);
+    }
+
+    public function contactPushbullet($obj, $opts)
     {
         // Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
 
@@ -54,5 +62,22 @@ class Pushbullet implements Transport
             return 'HTTP Status code ' . $code;
         }
         return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Access Token',
+                    'name' => 'pushbullet-token',
+                    'descr' => 'Pushbullet Access Token',
+                    'type' => 'text'
+                ]
+            ],
+            'validation' => [
+                'pushbullet-token' => 'required|string'
+            ]
+        ];
     }
 }

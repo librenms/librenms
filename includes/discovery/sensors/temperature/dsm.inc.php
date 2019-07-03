@@ -13,7 +13,7 @@ $diskstation_temperature = snmp_get($device, $diskstation_temperature_oid, '-Oqv
 discover_sensor($valid['sensor'], 'temperature', $device, $diskstation_temperature_oid, '99', 'snmp', 'System Temperature', '1', '1', null, null, null, null, $diskstation_temperature);
 
 // Get all disks in the device
-$disks = snmpwalk_cache_multi_oid($device, 'diskTable', array(), 'SYNOLOGY-DISK-MIB');
+$disks = snmpwalk_cache_multi_oid($device, 'diskTable', [], 'SYNOLOGY-DISK-MIB');
 // Parse all disks in the device to get the temperature
 if (is_array($disks)) {
     foreach ($disks as $disk_number => $entry) {

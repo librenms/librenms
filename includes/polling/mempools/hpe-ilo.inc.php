@@ -1,6 +1,6 @@
 <?php
 
-$data = snmp_get_multi_oid($device, 'cpqHoPhysicalMemorySize.0 cpqHoPhysicalMemoryFree.0 cpqHoPagingMemorySize.0 cpqHoPagingMemoryFree.0', '-OUQs', 'CPQHOST-MIB');
+$data = snmp_get_multi_oid($device, ['cpqHoPhysicalMemorySize.0', 'cpqHoPhysicalMemoryFree.0', 'cpqHoPagingMemorySize.0', 'cpqHoPagingMemoryFree.0'], '-OUQs', 'CPQHOST-MIB');
 $units = 1024*1024;
 
 if ($mempool['mempool_index'] == 0) {

@@ -16,11 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Syslog implements Transport
+class Syslog extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['syslog_host'] = $this->config['syslog-host'];
+            $opts['syslog_port'] = $this->config['syslog-port'];
+            $opts['syslog_facility'] = $this->config['syslog-facility'];
+        }
+        return $this->contactSyslog($obj, $opts);
+    }
+
+    public function contactSyslog($obj, $opts)
     {
         $syslog_host = '127.0.0.1';
         $syslog_port = 514;
@@ -115,5 +125,36 @@ class Syslog implements Transport
             socket_close($socket);
         }
         return true;
+    }
+    
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Host',
+                    'name' => 'syslog-host',
+                    'descr' => 'Syslog Host',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Port',
+                    'name' => 'syslog-port',
+                    'descr' => 'Syslog Port',
+                    'type' => 'text'
+                ],
+                [
+                    'title' => 'Facility',
+                    'name' => 'syslog-facility',
+                    'descr' => 'Syslog Facility',
+                    'type' => 'text'
+                ]
+            ],
+            'validation' => [
+                'syslog-host' => 'required|string',
+                'syslog-port' => 'required|numeric',
+                'syslog-facility' => 'required|string'
+            ]
+        ];
     }
 }

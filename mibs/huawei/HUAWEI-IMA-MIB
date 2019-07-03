@@ -1,8 +1,8 @@
 -- =================================================================
--- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Private IMA Interface MIB
--- Version: V1.0
+-- Version: V2.11
 -- History:
 --      V1.0 
 -- ==================================================================
@@ -32,26 +32,32 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
 --  February 10,2009 at 14:00 GMT
 -- February 10,2009 at 14:00 GMT
     hwImaMIB MODULE-IDENTITY
-        LAST-UPDATED "200902101400Z" -- February 10,2009 at 14:00 GMT
+        LAST-UPDATED "201702170000Z" -- February 10,2009 at 14:00 GMT
         ORGANIZATION 
-            "Huawei Technologies co.,Ltd."
+            "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
-            "Huawei Technologies co.,Ltd.
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            http://www.huawei.com
-            Zip:100085
-            " 
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
         DESCRIPTION
             "The MIB is mainly used to configure Inverse Multiplexing
             for ATM (IMA) interfaces."  
+
+        REVISION     "201702170000Z"       
+        DESCRIPTION       
+            "V2.11, modify the description of hwImaNotifications." 
         ::= { hwDatacomm 176 }
         
         
 -- The object identifier subtree for the HUAWEI-IMA-MIB.
     hwImaMibObjects OBJECT IDENTIFIER ::= { hwImaMIB 1 }
     hwImaMibConformance OBJECT IDENTIFIER ::= { hwImaMIB 2 }     
+    hwImaNotifications OBJECT IDENTIFIER ::= { hwImaMIB 3 }
+
 -- Textual conventions
     MilliSeconds ::= TEXTUAL-CONVENTION
         STATUS current
@@ -91,10 +97,10 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "Length of the IMA frames."
         SYNTAX INTEGER {
-            m32(32),
-            m64(64),
-            m128(128),
-            m256(256) 
+            m32(1),
+            m64(2),
+            m128(3),
+            m256(4) 
             }
             
     ImaLinkState ::= TEXTUAL-CONVENTION
@@ -158,7 +164,10 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         hwImaGroupNumRxActLinks Gauge32,
         hwImaGroupTxOamLabelValue Integer32 (1..255),
         hwImaGroupRxOamLabelValue Integer32 (0..255),
-        hwImaGroupFirstLinkIfIndex InterfaceIndex
+        hwImaGroupFirstLinkIfIndex InterfaceIndex,
+        hwImaGroupName OCTET STRING,
+        hwImaGroupTxClock Integer32,
+        hwImaGroupRxClock Integer32
         }
 
     hwImaGroupIfIndex OBJECT-TYPE
@@ -277,7 +286,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         ::= { hwImaGroupEntry 12 }
         
     hwImaGroupDiffDelayMax OBJECT-TYPE
-        SYNTAX MilliSeconds (25..100)
+        SYNTAX MilliSeconds (25..120)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -370,7 +379,35 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
             "This object identifies the first link of this IMA Group."
         ::= { hwImaGroupEntry 21 }  
 
---
+
+    -- 1.3.6.1.4.1.2011.5.25.176.1.1.1.22
+    hwImaGroupName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The name of interface ImaGroup."
+        ::= { hwImaGroupEntry 22 }
+    -- 1.3.6.1.4.1.2011.5.25.176.1.1.1.23
+    hwImaGroupTxClock OBJECT-TYPE
+        SYNTAX Integer32 (1..2)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The clock mode to be used by the IMA group in the transmit direction."
+        DEFVAL { 2 }
+        ::= { hwImaGroupEntry 23 }
+
+    -- 1.3.6.1.4.1.2011.5.25.176.1.1.1.24
+    hwImaGroupRxClock OBJECT-TYPE
+        SYNTAX Integer32 (1..2)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Mode of IMA clock as received from remote IMA function."
+        ::= { hwImaGroupEntry 24 }
+
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3
 -- The IMA Link subtree
 --
 -- The IMA Link subtree consists of a table of IMA links. Each entry
@@ -402,7 +439,8 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         hwImaLinkNeRxState ImaLinkState,
         hwImaLinkFeTxState ImaLinkState,
         hwImaLinkFeRxState ImaLinkState,
-        hwImaLinkRowStatus RowStatus
+        hwImaLinkRowStatus RowStatus,
+        hwImaLinkName OCTET STRING
         }
         
     hwImaLinkIfIndex OBJECT-TYPE
@@ -488,6 +526,161 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         ::= { hwImaLinkEntry 51 }
        
 
+    -- 1.3.6.1.4.1.2011.5.25.176.1.2.1.52
+    hwImaLinkName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaLinkEntry 52 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3
+    hwImaAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwImaAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaMibObjects 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1
+    hwImaAlarmEntry OBJECT-TYPE
+        SYNTAX HwImaAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Description."
+        INDEX { hwImaAlarmIfIndex }
+        ::= { hwImaAlarmTable 1 }
+
+    
+    HwImaAlarmEntry ::=
+        SEQUENCE { 
+            hwImaAlarmIfIndex
+                Integer32,
+            hwImaGroupNeDownEn
+                Integer32,
+            hwImaGroupFeDownEn
+                Integer32,
+            hwImaGroupTxClkMismatchEn
+                Integer32,
+            hwImaLinkLifEn
+                Integer32,
+            hwImaLinkLodsEn
+                Integer32,
+            hwImaLinkRfiEn
+                Integer32,
+            hwImaLinkFeTxUnusableEn
+                Integer32,
+            hwImaLinkFeRxUnusableEn
+                Integer32,
+            hwIMAAllEn
+                Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.1
+    hwImaAlarmIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.2
+    hwImaGroupNeDownEn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.3
+    hwImaGroupFeDownEn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.4
+    hwImaGroupTxClkMismatchEn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.5
+    hwImaLinkLifEn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.6
+    hwImaLinkLodsEn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 6 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.7
+    hwImaLinkRfiEn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 7 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.8
+    hwImaLinkFeTxUnusableEn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 8 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.9
+    hwImaLinkFeRxUnusableEn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 9 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.1.3.1.10
+    hwIMAAllEn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwImaAlarmEntry 10 }
+
+    
 -- Conformance Information
 
     hwImaMibGroups OBJECT IDENTIFIER ::= { hwImaMibConformance 1 }
@@ -556,7 +749,10 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
             hwImaGroupNumRxActLinks,
             hwImaGroupTxOamLabelValue,
             hwImaGroupRxOamLabelValue,
-            hwImaGroupFirstLinkIfIndex 
+            hwImaGroupFirstLinkIfIndex, 
+            hwImaGroupName,
+            hwImaGroupTxClock,
+            hwImaGroupRxClock
             }
         STATUS current
         DESCRIPTION
@@ -577,6 +773,184 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "A set of objects providing status information for an IMA link."
         ::= { hwImaMibGroups 2 }
+    
+    hwImaGroupAlarmTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            hwImaGroupNeDownAlarm,
+            hwImaGroupNeDownAlarmResume,
+            hwImaGroupFeDownAlarm,
+            hwImaGroupFeDownAlarmResume,
+            hwImaGroupTxClkMismatch,
+            hwImaGroupTxClkMismatchResume           
+            }
+        STATUS current
+        DESCRIPTION
+            "A set of NOTIFICATION providing alarm information for an IMA group."
+        ::= { hwImaMibGroups 3 }   
+        
+    hwImaLinkAlarmTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            hwImaLinkLifAlarm,
+            hwImaLinkLifAlarmResume,
+            hwImaLinkLodsAlarm,
+            hwImaLinkLodsAlarmResume,
+            hwImaLinkRfiAlarm,
+            hwImaLinkRfiAlarmResume,
+            hwImaLinkFeTxUnusableAlarm,
+            hwImaLinkFeTxUnusableAlarmResume,
+            hwImaLinkFeRxUnusableAlarm,
+            hwImaLinkFeRxUnusableAlarmResume          
+            }
+        STATUS current
+        DESCRIPTION
+            "A set of NOTIFICATION providing alarm information for an IMA link."
+        ::= { hwImaMibGroups 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.1
+    hwImaGroupNeDownAlarm NOTIFICATION-TYPE
+        OBJECTS { hwImaGroupName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating the failure in the local IMA group is generated."
+        ::= { hwImaNotifications 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.2
+    hwImaGroupNeDownAlarmResume NOTIFICATION-TYPE
+        OBJECTS { hwImaGroupName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating the failure in the local IMA group is cleared."
+        ::= { hwImaNotifications 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.3
+    hwImaGroupFeDownAlarm NOTIFICATION-TYPE
+        OBJECTS { hwImaGroupName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating the failure in the remote IMA group is generated."
+        ::= { hwImaNotifications 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.4
+    hwImaGroupFeDownAlarmResume NOTIFICATION-TYPE
+        OBJECTS { hwImaGroupName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating the failure in the remote IMA group is cleared."
+        ::= { hwImaNotifications 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.5
+    hwImaGroupTxClkMismatch NOTIFICATION-TYPE
+        OBJECTS { hwImaGroupName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the clock mode sent by the local IMA group does not match that sent by the remote IMA group is generated."
+        ::= { hwImaNotifications 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.6
+    hwImaGroupTxClkMismatchResume NOTIFICATION-TYPE
+        OBJECTS { hwImaGroupName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the clock mode sent by the local IMA group does not match that sent by the remote IMA group is cleared."
+        ::= { hwImaNotifications 6 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.7
+    hwImaLinkLifAlarm NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the IMA link is out of frame is generated."
+        ::= { hwImaNotifications 7 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.8
+    hwImaLinkLifAlarmResume NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating the IMA link is out of frame is cleared."
+        ::= { hwImaNotifications 8 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.9
+    hwImaLinkLodsAlarm NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the IMA link differential delay exceeds the threshold is generated."
+        ::= { hwImaNotifications 9 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.10
+    hwImaLinkLodsAlarmResume NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the IMA link differential delay exceeds the threshold is cleared."
+        ::= { hwImaNotifications 10 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.11
+    hwImaLinkRfiAlarm NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating the failure in the remote IMA link is generated."
+        ::= { hwImaNotifications 11 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.12
+    hwImaLinkRfiAlarmResume NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating the failure in the remote IMA link is cleared."
+        ::= { hwImaNotifications 12 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.13
+    hwImaLinkFeTxUnusableAlarm NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the remote IMA link cannot be used to send packets is generated."
+        ::= { hwImaNotifications 13 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.14
+    hwImaLinkFeTxUnusableAlarmResume NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the remote IMA link cannot be used to send packets is cleared."
+        ::= { hwImaNotifications 14 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.15
+    hwImaLinkFeRxUnusableAlarm NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the remote IMA link cannot be used to receive packets is generated."
+        ::= { hwImaNotifications 15 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.176.3.16
+    hwImaLinkFeRxUnusableAlarmResume NOTIFICATION-TYPE
+        OBJECTS { hwImaLinkName }
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the remote IMA link cannot be used to receive packets is cleared."
+        ::= { hwImaNotifications 16 }
+
+    
 END
 
 --

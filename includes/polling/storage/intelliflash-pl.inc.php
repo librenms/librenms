@@ -27,7 +27,7 @@ if (!is_array($storage_cache['intelliflash-pl'])) {
     d_echo($storage_cache);
 }
 //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
-$entry = $storage_cache['intelliflash-pl'][$storage[storage_index]];
+$entry = $storage_cache['intelliflash-pl'][$storage['storage_index']];
 $storage['units'] = 1;
 $storage['size'] = (($entry['poolSizeHigh'] << 32 ) + $entry['poolSizeLow']) * $storage['units'];
 $storage['used'] = (($entry['poolUsedSizeHigh'] << 32 ) + $entry['poolUsedSizeLow']) * $storage['units'];

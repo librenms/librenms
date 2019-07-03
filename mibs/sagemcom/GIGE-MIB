@@ -1,0 +1,990 @@
+--*******************************************************************
+--*    SAGEM SA			 							  				*
+--*******************************************************************
+--*******************************************************************
+
+--  Filename: GigE
+--  File type: .mib    
+-- 
+--  Description:	SNMPc source Mib file.
+--		The MIB module defines the gigabitEthernet card managment in Adr2500c
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--		Name: S.LAURENT	
+--		Date: 22 05 2002 
+--		Desc: original
+--   
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+
+
+--*******************************************************************
+-- MIB: GIGE-MIB
+--*******************************************************************
+GIGE-MIB DEFINITIONS ::= BEGIN
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+   IMPORTS
+   adr2500c								FROM ADR2500C-MIB 
+   SagemBoolean, Severity						FROM EQUIPMENT-MIB
+   MODULE-IDENTITY,OBJECT-TYPE,Counter64				FROM SNMPv2-SMI
+   DisplayString, PhysAddress              				FROM SNMPv2-TC; 
+
+   gige	MODULE-IDENTITY
+      LAST-UPDATED "0205220000Z"
+      ORGANIZATION "SAGEM-Tolbiac drd/ddp/tmhd"
+      CONTACT-INFO
+	"    "
+      DESCRIPTION 
+        "The MIB module specific for GigE module of Adr2500c"
+      ::= { adr2500c 10 }
+                                                                      
+                                                                      
+--*******************************************************************
+--* Gige part  
+--*******************************************************************   
+
+   BandwidthSize    ::= INTEGER 
+   { 
+   	none(0), 
+   	stm1(1), 
+   	stm4(4), 
+   	stm16(16),
+   	stm64(64)
+   }
+      
+   gigeNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of gigabitEthernet cards in equipment."  
+      ::= { gige 10 } 
+   
+   gigeTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF GigeEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of gigabitEthernet cards in equipment."  
+      ::= { gige 11 } 
+   
+   gigeEntry   OBJECT-TYPE
+      SYNTAX       GigeEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular gigabitEthernet card of the equipment." 
+      INDEX        { gigeIndex  } 
+      ::= { gigeTable 1 } 
+
+   GigeEntry ::= SEQUENCE { 
+   	  gigeIndex			   INTEGER,		-- boardIndex
+      gigeSdhBandwidth     BandwidthSize,
+      gigeAutoTest		   SagemBoolean,
+      gigeWarmStart		   SagemBoolean
+   }
+
+   gigeIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A unique value which identify a particular	gigabitEthernet card of the equipment.
+	The value of this index is a constant value assigned to an entry at
+	equipment design time. It is usualy related to harware"  
+      ::= { gigeEntry 1 } 
+   
+   gigeSdhBandwidth   OBJECT-TYPE
+      SYNTAX       BandwidthSize
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field set the size of the SDH Bandwidth which is allocated to the gigabitEthernet card."  
+      ::= { gigeEntry 2 } 
+   
+   gigeAutoTest   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "When the value of this field is set to true, an autotest is executed on the gigabitEthernet card."  
+      ::= { gigeEntry 3 } 
+
+   gigeWarmStart   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "When the value of this field is set to true, a warmStart is launched on the gigabitEthernet card."  
+      ::= { gigeEntry 4 } 
+
+   -- End of gige description     
+     
+
+--*******************************************************************
+--* Maintenance part  
+--*******************************************************************  
+
+   LoopbackGE    ::= INTEGER 
+   { 
+   	none(0),     -- GE-SDH Bidirectionnal Transmission 
+   	local1(1),   -- GE-GE Loopback (above GFP)
+   	local2(2),   -- GE-GE Loopback (beyong GFP)
+   	local3(3),   -- GE-GE Loopback (into SERDES)
+   	local4(4),   -- GE-GE Loopback (into GMAC Bloc)
+   	remote(10)   -- SDH-SDH Loopback (into Tramer)
+   }
+   
+   
+   maintenanceNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of gigabitEthernet ports in equipment."  
+      ::= { gige 20 } 
+   
+   maintenanceTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF MaintenanceEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of gigabitEthernet ports in equipment."  
+      ::= { gige 21 } 
+   
+   maintenanceEntry   OBJECT-TYPE
+      SYNTAX       MaintenanceEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular gigabitEthernet port of the equipment." 
+      INDEX        { maintenanceIndex  } 
+      ::= { maintenanceTable 1 } 
+
+   MaintenanceEntry ::= SEQUENCE { 
+   	  maintenanceIndex			   	INTEGER,		-- channelIndex = nspiTTPIndex
+      maintenanceAutoTest		   	SagemBoolean,
+      maintenanceLoopback			LoopbackGE,
+      maintenancePRBSSent			DisplayString,
+      maintenancePRBSReceived 	    DisplayString,
+      maintenanceResetAllCounters	SagemBoolean,
+      maintenanceResetLanCounters	SagemBoolean,      
+      maintenanceResetGfpCounters	SagemBoolean,      
+      maintenanceResetQosCounters	SagemBoolean                  
+   }
+
+   maintenanceIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A unique value which identify a particular	gigabitEthernet port of the equipment.
+	The value of this index is a constant value assigned to an entry at
+	equipment design time. It is usualy related to harware"  
+      ::= { maintenanceEntry 1 } 
+   
+   maintenanceAutoTest   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "When the value of this field is set to true, an autotest is executed on the gigabitEthernet port."  
+      ::= { maintenanceEntry 2 } 
+
+   maintenanceLoopback   OBJECT-TYPE
+      SYNTAX       LoopbackGE
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field set a loopback mode to a particular gigabitEthernet port."  
+      ::= { maintenanceEntry 3 } 
+   
+   maintenancePRBSSent   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to sent a PRBS frame on a particular gigabitEthernet port."  
+      ::= { maintenanceEntry 4 } 
+   
+   maintenancePRBSReceived   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The value is the actual PRBS frame received in the particular gigabitEthernet port."  
+      ::= { maintenanceEntry 5 } 
+
+   maintenanceResetAllCounters   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "When the value of this field is set to true, all counters attached to this interface are deleted."  
+      ::= { maintenanceEntry 6 } 
+
+   maintenanceResetLanCounters   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "When the value of this field is set to true, all QoS counters attached to this interface are deleted."  
+      ::= { maintenanceEntry 7 } 
+
+   maintenanceResetGfpCounters   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "When the value of this field is set to true, all Gfp counters attached to this interface are deleted."  
+      ::= { maintenanceEntry 8 } 
+
+   maintenanceResetQosCounters   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "When the value of this field is set to true, all Qos counters attached to this interface are deleted."  
+      ::= { maintenanceEntry 9 } 
+   
+   -- End of maintenance part     
+ 
+
+--*******************************************************************
+--* QoS part  
+--*******************************************************************      
+
+   QosType    ::= INTEGER 
+   { 
+   	none(0),     
+   	pauseMode(1),
+   	userPriority(2),
+   	vlanId(3),
+   	balanced(4),   
+   	ipv4TOS(10),
+   	ipv6TClass(11),
+   	dscp(13)
+   }
+   
+   CongestionControl    ::= INTEGER 
+   { 
+   	none(0),     
+   	red(1),    -- Random Early Detection 
+   	wred(2)    -- Weighted Random Early Detection
+   }
+
+   SchedulingSystem    ::= INTEGER 
+   { 
+   	unknown(0),     
+   	spq(1),    -- Strict Priority Queuing
+   	wfq(4),    -- Weighted Fair Queuing
+    cbwfq(5),  -- Class-Based Weighted Fair Queuing
+    wrr(10)	   -- Weighted Round Robbin
+   }
+
+   
+   qosNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of Quality of Service set in equipment. This number match to channelNumber because
+	there is only one Qos per Sdh Channel.
+	= number of entries in qosTable"  
+      ::= { gige 30 } 
+   
+   qosTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF QosEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of Qos in equipment."  
+      ::= { gige 31 } 
+   
+   qosEntry   OBJECT-TYPE
+      SYNTAX       QosEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular qos of the equipment." 
+      INDEX        { qosIndex  } 
+      ::= { qosTable 1 } 
+
+   QosEntry ::= SEQUENCE { 
+   	  qosIndex				   	INTEGER,		-- channelIndex = nspiTTPIndex
+      qosClassNumber		   	INTEGER,
+      qosType					QosType,
+      qosCongestionControl		CongestionControl,
+      qosSchedulingSystem		SchedulingSystem,
+      qosBwREnable		 	    SagemBoolean,
+      qosHCInCCDiscardsGe		Counter64,      
+      qosHCInCCDiscardsWan		Counter64      
+   }
+
+   qosIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A unique value which identify a particular	QoS of the equipment.
+	The value of this index is a constant value assigned to an entry at
+	equipment design time. It is usualy related to harware"  
+      ::= { qosEntry 1 } 
+   
+   qosClassNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to choose the number of CoS defined for the QoS"  
+      ::= { qosEntry 2 } 
+
+   qosType   OBJECT-TYPE
+      SYNTAX       QosType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to choose the type of Qos"  
+      ::= { qosEntry 3 } 
+   
+   qosCongestionControl   OBJECT-TYPE
+      SYNTAX       CongestionControl
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to choose a mechanism to manage congestion problems. Some Type of Qos
+        force the value of this field. "  
+      ::= { qosEntry 4 }  
+      
+   qosSchedulingSystem   OBJECT-TYPE
+      SYNTAX       SchedulingSystem
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to choose a mechanism to manage congestion problems. "  
+      ::= { qosEntry 5 } 
+      
+   qosBwREnable   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to activate or desactivate the Sdh throughput reservation feature. "  
+      ::= { qosEntry 6 } 
+     
+   qosHCInCCDiscardsGe   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The number of packets received on the GE interface which were discarded to prevent from switch saturation"  
+      ::= { qosEntry 7 } 
+
+   qosHCInCCDiscardsWan   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The number of packets received on the WAN interface which were discarded to prevent from switch saturation"  
+      ::= { qosEntry 8 } 
+   
+   -- End of QoS part     
+
+
+
+
+--*******************************************************************
+--* CoS part  
+--*******************************************************************  
+
+   CosId    ::= INTEGER 
+   { 
+   	cos0(0),     
+   	cos1(1),   
+   	cos2(2),
+   	cos3(3),
+   	cos4(4),
+   	cos5(5),
+   	cos6(6),
+   	cos7(7)
+   }
+   
+   cosNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of Class of Service set in equipment
+	= number of entries in cosTable 
+	= qosNumber * qosClassNumber"  
+      ::= { gige 40 } 
+   
+   cosTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF CosEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of CoS in equipment."  
+      ::= { gige 41 } 
+   
+   cosEntry   OBJECT-TYPE
+      SYNTAX       CosEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular CoS of the equipment." 
+      INDEX        { cosIndex  } 
+      ::= { cosTable 1 } 
+
+   CosEntry ::= SEQUENCE { 
+   	  cosIndex				   	INTEGER,		
+   	  cosQosId				   	INTEGER,                   -- qosIndex
+      cosId						CosId,
+      cosDefinition				DisplayString,
+      cosBwRRatioMin	 	    INTEGER,
+      cosBwRRatioMax	 	    INTEGER,
+      cosHCInOctets				Counter64,      
+      cosHCOutOctets			Counter64,      
+      cosHCInPkts				Counter64,      
+      cosHCOutPkts				Counter64,      
+      cosHCInCCDiscards			Counter64      
+   }
+
+   cosIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A unique value which identify a particular	CoS of the equipment.
+	The value of this index is a constant value assigned to an entry at
+	equipment design time. It is usualy related to harware. Its values are taken between 1 and cosNumber."  
+      ::= { cosEntry 1 } 
+   
+   cosQosId   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to identify which QoS this Class is belonging. Its values must match to qosIndex."  
+      ::= { cosEntry 2 } 
+
+   cosId   OBJECT-TYPE
+      SYNTAX       CosId
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        " This field identify the class of Service."  
+      ::= { cosEntry 3 } 
+   
+   cosDefinition   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "This optional textual field brings some precisions about the CoS configuration. "  
+      ::= { cosEntry 4 } 
+   
+   cosBwRRatioMin   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "When the qosBwREnable field is set to True, then this field allows to configure the guaranted percentage of SDH
+        throughput which must be booked up for the CoS"  
+      ::= { cosEntry 5 } 
+
+   cosBwRRatioMax   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "When the qosBwREnable field is set to True, then this field allows to configure the maximum percentage of SDH
+        throughput which can be booked up for the CoS"  
+      ::= { cosEntry 6 } 
+
+   cosHCInOctets   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The total number of octets received on the GE interface (excluding framing characters preambule and sfd)
+         and belonging to a CosId packet"  
+      ::= { cosEntry 7 } 
+
+   cosHCOutOctets   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The total number of octets transmitted out of the Wan interface (excluding framing characters preambule and sfd)
+         and belonging to a CosId paket"  
+      ::= { cosEntry 8 } 
+
+   cosHCInPkts   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The total number of octets received on the GE interface (excluding framing characters preambule and sfd)
+         and belonging to a CosId packet"  
+      ::= { cosEntry 9 } 
+
+   cosHCOutPkts   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The total number of octets transmitted out of the Wan interface (excluding framing characters preambule and sfd)
+         and belonging to a CosId paket"  
+      ::= { cosEntry 10 } 
+
+   cosHCInCCDiscards   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The number of CosId packets received on the GE interface which were discarded by RED/WRED/BandWidthReservation
+         to prevent from congestion."  
+      ::= { cosEntry 11 } 
+   
+   -- End of CoS part     
+
+
+--*******************************************************************
+--* GFP part  
+--*******************************************************************  
+
+   GfpFailure    ::= INTEGER 
+   { 
+   	none(0),     
+   	oofd(1),   
+   	lofd(2),
+   	fdsc(3)
+   }
+
+   GfpState    ::= INTEGER(0..2147483647) 
+  -- { 
+  -- 	none(0),     
+  -- 	(1),   
+  -- 	(2),
+  -- 	(3)
+  -- }
+    
+   gfpNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"ports Number of the Gfp layer.
+	= number of entries in gfpTable "  
+      ::= { gige 50 } 
+   
+   gfpTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF GfpEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of gfp port in the equipment."  
+      ::= { gige 51 } 
+   
+   gfpEntry   OBJECT-TYPE
+      SYNTAX       GfpEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular gfp port of the equipment." 
+      INDEX        { gfpIndex  } 
+      ::= { gfpTable 1 } 
+
+   GfpEntry ::= SEQUENCE { 
+   	  gfpIndex				   	INTEGER,		 -- channelIndex
+      gfpHCInPkts				Counter64,
+      gfpHCInIdlePkts			Counter64,
+      gfpHCInCorruptedPkts 	    Counter64,
+      gfpHCInErrors		 	    Counter64,
+      gfpHCInCorrectedPkts 	    Counter64,
+      gfpHCFCSErrors			Counter64,      
+      gfpHCInOctets				Counter64,      
+      gfpHCOutPkts				Counter64,
+      gfpHCOutIdlePkts			Counter64,
+      gfpHCOutOctets			Counter64,
+      gfpIdleRate				INTEGER,
+      gfpSendingRate			INTEGER,
+   	  gfpState				   	GfpState,         
+      gfpAdminStatus			INTEGER,
+      gfpOperStatus				INTEGER,
+      gfpMonitor				SagemBoolean,
+      gfpFailure				GfpFailure,
+      gfpSeverity				Severity,
+      gfpOOFD					Severity,
+      gfpLOFD					Severity,
+      gfpFDSC					Severity
+   }
+
+   gfpIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A unique value which identify a particular	gfp port in the equipment.
+	The value of this index is a constant value assigned to an entry at
+	equipment design time. It is usualy related to harware. Its values are mapped to channelIndex values."  
+      ::= { gfpEntry 1 } 
+   
+   gfpHCInPkts   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        " The total number of packets received on the Gfp interface"  
+      ::= { gfpEntry 2 } 
+   
+   gfpHCInIdlePkts   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+         " The total number of Idle frames received on the Gfp interface"  
+      ::= { gfpEntry 3 } 
+   
+   gfpHCInCorruptedPkts   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        " The total number of mismatched packets received on the Gfp interface."  
+      ::= { gfpEntry 4 } 
+
+   gfpHCInErrors   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The total number of mismatched packets that have been discarded. "  
+      ::= { gfpEntry 5 } 
+
+   gfpHCInCorrectedPkts   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The total number of mismatched packets received on the Gfp interface that have been corrected. "  
+      ::= { gfpEntry 6 } 
+     
+   gfpHCFCSErrors   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The number of frames received on the Gfp interface that are an integral number of octets
+         in length but do not pass the FCS check. "  
+      ::= { gfpEntry 7 } 
+
+   gfpHCInOctets   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        " The total number of Octets received on the Gfp interface"  
+      ::= { gfpEntry 8 } 
+      
+   gfpHCOutPkts   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        " The total number of packets transmitted out of the Gfp interface"  
+      ::= { gfpEntry 9 } 
+       
+   gfpHCOutIdlePkts   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        " The total number of Idle frame transmitted out of the Gfp interface"  
+      ::= { gfpEntry 10 } 
+
+   gfpHCOutOctets   OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        " The total number of packets transmitted out of the Gfp interface"  
+      ::= { gfpEntry 11 } 
+
+   gfpIdleRate   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        " The received Idle frames rate on a particular gfp port. "  
+      ::= { gfpEntry 12 } 
+ 
+   gfpSendingRate   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        " The sent frames rate on a particular gfp port. "  
+      ::= { gfpEntry 13 } 
+
+   gfpState   OBJECT-TYPE
+      SYNTAX       GfpState
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to know in which state this gfp port is working."  
+      ::= { gfpEntry 14 } 
+
+    gfpAdminStatus   OBJECT-TYPE
+      SYNTAX       INTEGER {
+                      up(1),       -- ready to pass packets
+                      down(2),
+                      testing(3)   -- in some test mode
+                   }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The desired state of the gfp port.  The
+     testing(3) state indicates that no operational
+     packets can be passed."  
+      ::= { gfpEntry 15 } 
+
+   gfpOperStatus   OBJECT-TYPE
+      SYNTAX       INTEGER {
+                     up(1),       -- ready to pass packets
+                     down(2),
+                     testing(3)   -- in some test mode
+                   }
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The current operational state of the gfp port.
+     The testing(3) state indicates that no operational
+     packets can be passed."  
+      ::= { gfpEntry 16 }          
+      
+   gfpMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this gfp port."  
+      ::= { gfpEntry 17 } 
+   
+   gfpFailure   OBJECT-TYPE
+      SYNTAX       GfpFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on channel"  
+      ::= { gfpEntry 18 } 
+   
+   gfpSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for gfp port."  
+      ::= { gfpEntry 19 }    
+         
+   gfpOOFD   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associated with Out of Frame Delineation failure
+	for gfp port."  
+      ::= { gfpEntry 20 }     
+  
+   gfpLOFD   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associated with Loss Of Frame Delineation failure
+	for gfp port."  
+      ::= { gfpEntry 21 } 
+   
+   gfpFDSC   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associated with Frame Delineation State Change failure
+	for gfp port."  
+      ::= { gfpEntry 22 }
+-- End of GFP part     
+    
+
+--*******************************************************************
+--* PAUSE part  
+--*******************************************************************  
+
+   PauseFailure    ::= INTEGER 
+   { 
+   	none(0),     
+   	pauseModeRejected(1)
+   }
+    
+   pauseNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of ports in the equipment which accept Pause mechanism
+	= number of entries in pauseTable "  
+      ::= { gige 60 } 
+   
+   pauseTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF PauseEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of Ethernet port in the equipment which accept Pause mechanism."  
+      ::= { gige 61 } 
+   
+   pauseEntry   OBJECT-TYPE
+      SYNTAX       PauseEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular Ethernet port of the equipment." 
+      INDEX        { pauseIndex  } 
+      ::= { pauseTable 1 } 
+
+   PauseEntry ::= SEQUENCE { 
+   	  pauseIndex				INTEGER,		 -- Lan ifIndex
+   	  pauseTime				   	INTEGER,         
+      pauseBetweenTime			INTEGER,
+      pauseMacSA				PhysAddress,
+      pauseMacDA 	    		PhysAddress,
+      pauseCHT		 	    	INTEGER,
+      pauseCLT 	    			INTEGER,
+      pauseMonitor				SagemBoolean,      
+      pauseFailure				PauseFailure,      
+      pauseSeverity				Severity,
+      pauseModeRejected			Severity
+   }
+
+   pauseIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A unique value which identify a particular	Ethernet Physical port of a gigabitEthernet card.
+	The value of this index is a constant value assigned to an entry at
+	equipment design time. It is usualy related to harware. Its values are mapped to IfIndex values of Lan Ports."  
+      ::= { pauseEntry 1 } 
+   
+   pauseTime   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to set the Time during which the linkPartner stop any transmission. The Unit used is the time slot
+        (= 512 ns)."  
+      ::= { pauseEntry 2 } 
+
+   pauseBetweenTime   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to set the Time between two Pause Frames transmission. The Unit used is the time slot
+        (= 512 ns)."  
+      ::= { pauseEntry 3 } 
+   
+   pauseMacSA   OBJECT-TYPE
+      SYNTAX       PhysAddress
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+         " The physical address of the Ethernet port.
+         This address is used to fill the SourceAddress field of any Pause Frame which is trasmitted by the LinkPartner."  
+      ::= { pauseEntry 4 } 
+   
+   pauseMacDA   OBJECT-TYPE
+      SYNTAX       PhysAddress
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+         " The physical address used to fill the DestinationAddress field of any Pause Frame which is transmitted by the LinkPartner."  
+      ::= { pauseEntry 5 } 
+
+   pauseCHT   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to configure the credit High Threshold of Pause mechanism."  
+      ::= { pauseEntry 6 } 
+
+   pauseCLT   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "This field allows to configure the credit Low Threshold of Pause mechanism."  
+      ::= { pauseEntry 7 } 
+     
+   pauseMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this Ethernet port."  
+      ::= { pauseEntry 10 } 
+   
+   pauseFailure   OBJECT-TYPE
+      SYNTAX       PauseFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures in the pause mechanism of the Ethernet port."  
+      ::= { pauseEntry 11 } 
+   
+   pauseSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to severity associated to the current pause failure."  
+      ::= { pauseEntry 12 }    
+         
+   pauseModeRejected   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"This field allows to configure the Severity associated with Pause Mode Rejected failure
+	for Ethernet port."  
+      ::= { pauseEntry 13 } 
+   
+-- End of Pause part     
+
+
+END
+
+
+
+

@@ -1,0 +1,153 @@
+mib: AC-ANALOG-MIB:AcGateway:AC-PSTN-MIB:DS1-MIB:AC-PM-PSTN-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - callerDisplayCallerDisplay
+                    - channelsStartingPhoneNum
+                    - acAnalogFxsFxoType
+                    - acTrunkDialPlanName
+                    - dsx1CircuitIdentifier
+                    - acPMTrunkUtilizationAttributes
+        state:
+            data:
+                -
+                    oid: acAnalogFxsFxoTable
+                    value: acAnalogFxsFxoHookState
+                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}
+                    descr: 'FXO {{ $index }} ({{ $callerDisplayCallerDisplay }}, {{ $channelsStartingPhoneNum }})'
+                    index: 'hookStatus{{ $index }}'
+                    state_name: acAnalogFxsFxoHookState
+                    states:
+                        - { descr: offHook, graph: 0, value: 0, generic: 0 }
+                        - { descr: onHook, graph: 0, value: 1, generic: 0 }
+                    skip_values:
+                        -
+                            oid: acAnalogFxsFxoType
+                            op: '!='
+                            value: 0
+                -
+                    oid: acAnalogFxsFxoTable
+                    value: acAnalogFxsFxoHookState
+                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}
+                    descr: 'FXS {{ $index }} ({{ $callerDisplayCallerDisplay }}, {{ $channelsStartingPhoneNum }})'
+                    index: 'hookStatus{{ $index }}'
+                    state_name: acAnalogFxsFxoHookState
+                    states:
+                        - { descr: offHook, graph: 0, value: 0, generic: 0 }
+                        - { descr: onHook, graph: 0, value: 1, generic: 0 }
+                    skip_values:
+                        -
+                            oid: acAnalogFxsFxoType
+                            op: '!='
+                            value: 1
+                -
+                    oid: acAnalogFxsFxoTable
+                    value: acAnalogFxsFxoHookState
+                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}
+                    descr: 'E&M {{ $index }} ({{ $callerDisplayCallerDisplay }}, {{ $channelsStartingPhoneNum }})'
+                    index: 'hookStatus{{ $index }}'
+                    state_name: acAnalogFxsFxoHookState
+                    states:
+                        - { descr: offHook, graph: 0, value: 0, generic: 0 }
+                        - { descr: onHook, graph: 0, value: 1, generic: 0 }
+                    skip_values:
+                        -
+                            oid: acAnalogFxsFxoType
+                            op: '!='
+                            value: 2
+                -
+                    oid: acTrunkTable
+                    value: acTrunkAdministrativeState
+                    num_oid: .1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.2.{{ $index }}
+                    descr: 'Trunk {{ $index }} AdminStatus ({{ $acTrunkDialPlanName }})'
+                    index: 'trunkAdminStatus{{ $index }}'
+                    state_name: acTrunkAdministrativeState
+                    states:
+                        - { descr: locked, graph: 0, value: 0, generic: 0 }
+                        - { descr: unLocked, graph: 0, value: 1, generic: 0 }
+                -
+                    oid: acTrunkTable
+                    value: acTrunkProtocolType
+                    num_oid: .1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.3.{{ $index }}
+                    descr: 'Trunk {{ $index }} Type ({{ $acTrunkDialPlanName }})'
+                    index: 'trunkProtocolType{{ $index }}'
+                    state_name: acTrunkProtocolType
+                    states:
+                        - { descr: NONE , graph: 0, value: 0 , generic: 0 }
+                        - { descr: E1_EURO_ISDN , graph: 0, value: 1 , generic: 0 }
+                        - { descr: T1_CAS , graph: 0, value: 2 , generic: 0 }
+                        - { descr: T1_RAW_CAS , graph: 0, value: 3 , generic: 0 }
+                        - { descr: T1_TRANSPARENT , graph: 0, value: 4 , generic: 0 }
+                        - { descr: E1_TRANSPARENT_31 , graph: 0, value: 5 , generic: 0 }
+                        - { descr: E1_TRANSPARENT_30 , graph: 0, value: 6 , generic: 0 }
+                        - { descr: E1_MFCR2 , graph: 0, value: 7 , generic: 0 }
+                        - { descr: E1_CAS , graph: 0, value: 8 , generic: 0 }
+                        - { descr: E1_RAW_CAS , graph: 0, value: 9 , generic: 0 }
+                        - { descr: T1_NI2_ISDN , graph: 0, value: 10 , generic: 0 }
+                        - { descr: T1_4ESS_ISDN , graph: 0, value: 11 , generic: 0 }
+                        - { descr: T1_5ESS_9_ISDN , graph: 0, value: 12 , generic: 0 }
+                        - { descr: T1_5ESS_10_ISDN , graph: 0, value: 13 , generic: 0 }
+                        - { descr: T1_DMS100_ISDN , graph: 0, value: 14 , generic: 0 }
+                        - { descr: J1_TRANSPARENT , graph: 0, value: 15 , generic: 0 }
+                        - { descr: T1_NTT_ISDN , graph: 0, value: 16 , generic: 0 }
+                        - { descr: E1_AUSTEL_ISDN , graph: 0, value: 17 , generic: 0 }
+                        - { descr: E1_HKT_ISDN , graph: 0, value: 18 , generic: 0 }
+                        - { descr: E1_KOR_ISDN , graph: 0, value: 19 , generic: 0 }
+                        - { descr: T1_HKT_ISDN , graph: 0, value: 20 , generic: 0 }
+                        - { descr: E1_QSIG , graph: 0, value: 21 , generic: 0 }
+                        - { descr: E1_TNZ_ISDN , graph: 0, value: 22 , generic: 0 }
+                        - { descr: T1_QSIG , graph: 0, value: 23 , generic: 0 }
+                        - { descr: T1_IUA , graph: 0, value: 28 , generic: 0 }
+                        - { descr: E1_IUA , graph: 0, value: 29 , generic: 0 }
+                        - { descr: E1_FRENCH_VN6_ISDN , graph: 0, value: 30 , generic: 0 }
+                        - { descr: E1_FRENCH_VN3_ISDN , graph: 0, value: 31 , generic: 0 }
+                        - { descr: T1_EURO_ISDN , graph: 0, value: 34 , generic: 0 }
+                        - { descr: T1_DMS100_MERIDIAN_ISDN , graph: 0, value: 35 , generic: 0 }
+                        - { descr: T1_NI1_ISDN , graph: 0, value: 36 , generic: 0 }
+                        - { descr: E1_DUA , graph: 0, value: 37 , generic: 0 }
+                        - { descr: E1_Q931_PACKETS , graph: 0, value: 38 , generic: 0 }
+                        - { descr: T1_Q931_PACKETS , graph: 0, value: 39 , generic: 0 }
+                        - { descr: E1_NI2_ISDN , graph: 0, value: 40 , generic: 0 }
+                        - { descr: E1-CAS-R15 , graph: 0, value: 41 , generic: 0 }
+                        - { descr: V5 , graph: 0, value: 43 , generic: 0 }
+                        - { descr: BRI-EURO-ISDN, graph: 0, value: 50 , generic: 0 }
+                        - { descr: BRI-NI-2, graph: 0, value: 51 , generic: 0 }
+                        - { descr: BRI-DMS100, graph: 0, value: 52 , generic: 0 }
+                        - { descr: BRI-5ESS, graph: 0, value: 53 , generic: 0 }
+                        - { descr: BRI-QSIG , graph: 0, value: 54 , generic: 0 }
+                        - { descr: BRI-VNG, graph: 0, value: 55 , generic: 0 }
+                        - { descr: BRI-NTT, graph: 0, value: 56 , generic: 0 }
+                        - { descr: BRI-IUA, graph: 0, value: 57 , generic: 0 }
+                -
+                    oid: dsx1ConfigTable
+                    value: dsx1LoopbackConfig
+                    num_oid: .1.3.6.1.2.1.10.18.6.1.9.{{ $index }}
+                    descr: 'DS1 LoopbackConfig ({{ $dsx1CircuitIdentifier }}){{ $index }}'
+                    index: 'DS1loopback{{ $index }}'
+                    state_name: dsx1LoopbackConfig
+                    states:
+                        - { descr: No Loop , graph: 0, value: 1 , generic: 0 }
+                        - { descr: Payload Loop , graph: 0, value: 2 , generic: 3 }
+                        - { descr: Line Loop , graph: 0, value: 3 , generic: 3 }
+                        - { descr: Other Loop , graph: 0, value: 4 , generic: 3 }
+                        - { descr: Inward Loop , graph: 0, value: 5 , generic: 3 }
+                        - { descr: Dual Loop , graph: 0, value: 6 , generic: 3 }
+                -
+                    oid: acTrunkStatusTable
+                    value: acTrunkStatusAlarm
+                    num_oid: .1.3.6.1.4.1.5003.9.10.9.2.1.1.1.7.{{ $index }}
+                    descr: 'Trunk Status {{ $index }})'
+                    index: 'trunkStatus{{ $index }}'
+                    high_limit: acPMTrunkUtilizationAttributesHighThreshold
+                    low_limit: -1
+                    state_name: acTrunkUtilization
+                    states:
+                        - { descr: Disabled , graph: 0, value: 0 , generic: 3 }
+                        - { descr: Active , graph: 0, value: 1 , generic: 0 }
+                        - { descr: LosLof , graph: 0, value: 2 , generic: 2 }
+                        - { descr: Ais , graph: 0, value: 3 , generic: 2 }
+                        - { descr: Rai , graph: 0, value: 4 , generic: 2 }
+                        - { descr: DChannel , graph: 0, value: 5 , generic: 2 }
+                        - { descr: LowerLayerDown , graph: 0, value: 6 , generic: 2 }

@@ -1,7 +1,7 @@
 <?php
 
-use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'fail2ban';
@@ -33,7 +33,7 @@ try {
     return;
 }
 
-$f2b = $f2b[data];
+$f2b = $f2b['data'];
 
 $metrics = [];
 
@@ -43,11 +43,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('firewalled', 'GAUGE', 0);
 
 
-$fields = array(
-    'banned' => $f2b['total'],
-    'firewalled'=>'U', // legacy ds
-);
-$metrics['total'] = $fields;
+$fields = ['banned' => $f2b['total']];
+$metrics['total'] = $fields; // don't include legacy ds in db
+$fields['firewalled'] = 'U'; // legacy ds
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -79,7 +77,7 @@ $component = new LibreNMS\Component();
 $f2b_components = $component->getComponents($device_id, $options);
 
 // if no jails, delete fail2ban components
-if (empty($jails)) {
+if (empty($f2b['jails'])) {
     if (isset($f2b_components[$device_id])) {
         foreach ($f2b_components[$device_id] as $component_id => $_unused) {
             $component->deleteComponent($component_id);
@@ -94,7 +92,9 @@ if (empty($jails)) {
 
     $id = $component->getFirstComponentID($f2bc);
     $f2bc[$id]['label'] = 'Fail2ban Jails';
-    $f2bc[$id]['jails'] = json_encode(array_keys($f2b['jails']));
+    $jails = array_keys($f2b['jails']);
+    sort($jails);
+    $f2bc[$id]['jails'] = json_encode(array_values($jails));
 
     $component->setComponentPrefs($device_id, $f2bc);
 }

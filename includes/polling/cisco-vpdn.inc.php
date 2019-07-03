@@ -12,7 +12,7 @@ use LibreNMS\RRD\RrdDefinition;
 if ($device['os_group'] == 'cisco') {
     $data = snmpwalk_cache_oid($device, 'cvpdnSystemEntry', null, 'CISCO-VPDN-MGMT-MIB');
 
-    foreach ($data as $type => $vpdn) {
+    foreach ((array)$data as $type => $vpdn) {
         if ($vpdn['cvpdnSystemTunnelTotal'] || $vpdn['cvpdnSystemSessionTotal']) {
             $rrd_name = array('vpdn', $type);
             $rrd_def = RrdDefinition::make()

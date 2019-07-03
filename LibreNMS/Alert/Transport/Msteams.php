@@ -11,18 +11,27 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Msteams implements Transport
+class Msteams extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['url'] = $this->config['msteam-url'];
+        }
+        
+        return $this->contactMsteams($obj, $opts);
+    }
+
+    public function contactMsteams($obj, $opts)
     {
         $url   = $opts['url'];
         $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
         $data  = array(
-            'title' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
+            'title' => $obj['title'],
             'themeColor' => $color,
-            'text' => strip_tags($obj['msg'])
+            'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>')
         );
         $curl  = curl_init();
         set_curl_proxy($curl);
@@ -40,7 +49,23 @@ class Msteams implements Transport
             var_dump("Microsoft Teams returned Error, retry later");
             return false;
         }
-
         return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Webhook URL',
+                    'name' => 'msteam-url',
+                    'descr' => 'Microsoft Teams Webhook URL',
+                    'type' => 'text',
+                ]
+            ],
+            'validation' => [
+                'msteam-url' => 'required|url'
+            ]
+        ];
     }
 }

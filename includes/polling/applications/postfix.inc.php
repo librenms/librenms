@@ -4,7 +4,7 @@ $app_id = $app['app_id'];
 
 use LibreNMS\RRD\RrdDefinition;
 
-$options      = '-O qv';
+$options      = '-Oqv';
 $queueOID     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.97.105.108.113';
 $detailOID    = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.15.112.111.115.116.102.105.120.100.101.116.97.105.108.101.100';
 $mailq = snmp_walk($device, $queueOID, $options);

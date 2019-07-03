@@ -25,13 +25,8 @@
 
 namespace App\Models;
 
-class Pseudowire extends BaseModel
+class Pseudowire extends PortRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'pseudowire_id';
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasPortAccess($query, $user);
-    }
 }

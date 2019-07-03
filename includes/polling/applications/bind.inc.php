@@ -10,7 +10,7 @@ echo " $name";
 if (!empty($agent_data['app'][$name])) {
     $bind = $agent_data['app'][$name];
 } else {
-    $options = '-O qv';
+    $options = '-Oqv';
     $mib     = 'NET-SNMP-EXTEND-MIB';
     $oid     = 'nsExtendOutputFull.4.98.105.110.100';
     $bind    = snmp_get($device, $oid, $options, $mib);

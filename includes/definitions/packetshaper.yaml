@@ -1,7 +1,7 @@
 os: packetshaper
 text: 'Blue Coat PacketShaper'
 type: network
-ifname: 1
+ifname: true
 icon: bluecoat
 mib_dir:
     - bluecoat

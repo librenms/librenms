@@ -12,7 +12,7 @@ modules:
                 -
                     oid: hpicfPsTable
                     value: hpicfPsTemp
-                    num_oid: .1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.4.
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.4.{{ $index }}'
                     index: 'hpicfPsTemp.{{ $index }}'
                     descr: 'Power Supply #{{ $index }}'
         power:
@@ -20,7 +20,7 @@ modules:
                 -
                     oid: hpicfPsTable
                     value: hpicfPsWattageCur
-                    num_oid: .1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.6.
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.6.{{ $index }}'
                     index: 'hpicfPsWattageCur.{{ $index }}'
                     high_limit: hpicfPsWattageMax
                     descr: 'Power Supply #{{ $index }}'
@@ -29,7 +29,7 @@ modules:
                 -
                     oid: hpicfFanTable
                     value: hpicfFanState
-                    num_oid: .1.3.6.1.4.1.11.2.14.11.5.1.54.2.1.1.4.
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.54.2.1.1.4.{{ $index }}'
                     descr: 'Fan #{{ $index }}'
                     index: 'hpicfFanState.{{ $index }}'
                     state_name: hpicfFanState
@@ -43,7 +43,7 @@ modules:
                 -
                     oid: hpicfPsTable
                     value: hpicfPsState
-                    num_oid: .1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.2.
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.2.{{ $index }}'
                     descr: 'Power Supply #{{ $index }}'
                     index: 'hpicfPsState.{{ $index }}'
                     state_name: hpicfPsState

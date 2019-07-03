@@ -6,7 +6,7 @@ modules:
                 -
                     oid: npRelHumTable
                     value: npRelHumValue
-                    num_oid: .1.3.6.1.4.1.25728.8400.1.1.2.
+                    num_oid: '.1.3.6.1.4.1.25728.8400.1.1.2.{{ $index }}'
                     low_limit: npRelHumSafeRangeLow
                     high_limit: npRelHumSafeRangeHigh
                     skip_values: 0
@@ -16,7 +16,7 @@ modules:
                 -
                     oid: npSmokeTable
                     value: npSmokeStatus
-                    num_oid: .1.3.6.1.4.1.25728.8200.1.1.2.
+                    num_oid: '.1.3.6.1.4.1.25728.8200.1.1.2.{{ $index }}'
                     descr: 'Smoke {{ $index }}'
                     skip_values: 5
                     index: 'npSmokeStatus.{{ $index }}'
@@ -29,7 +29,7 @@ modules:
                 -
                     oid: npCurLoopTable
                     value: npCurLoopStatus
-                    num_oid: .1.3.6.1.4.1.25728.8300.1.1.2.
+                    num_oid: '.1.3.6.1.4.1.25728.8300.1.1.2.{{ $index }}'
                     descr: 'Loop {{ $index }}'
                     index: 'npCurLoopStatus.{{ $index }}'
                     state_name: npCurLoopStatus
@@ -42,7 +42,7 @@ modules:
                 -
                     oid: npRelayTable
                     value: npRelayState
-                    num_oid: .1.3.6.1.4.1.25728.5500.5.1.15.
+                    num_oid: '.1.3.6.1.4.1.25728.5500.5.1.15.{{ $index }}'
                     descr: 'Relay {{ $index }}'
                     index: 'npRelayState.{{ $index }}'
                     state_name: npRelayState
@@ -52,7 +52,7 @@ modules:
                 -
                     oid: npThermoTable
                     value: npThermoStatus
-                    num_oid: .1.3.6.1.4.1.25728.8800.1.1.3
+                    num_oid: '.1.3.6.1.4.1.25728.8800.1.1.3.{{ $index }}'
                     descr: 'Thermo {{ $index }}'
                     skip_values: 0
                     index: 'npThermoStatus.{{ $index }}'
@@ -65,7 +65,7 @@ modules:
                 -
                     oid: npRelHumTable
                     value: npRelHumStatus
-                    num_oid: .1.3.6.1.4.1.25728.8400.1.1.3.
+                    num_oid: '.1.3.6.1.4.1.25728.8400.1.1.3.{{ $index }}'
                     descr: 'Relative Humidity {{ $index }}'
                     skip_values: 0
                     index: 'npRelHumStatus.{{ $index }}'
@@ -78,7 +78,7 @@ modules:
                 -
                     oid: npRelHumTable
                     value: npRelHumTempStatus
-                    num_oid: .1.3.6.1.4.1.25728.8400.1.1.5.
+                    num_oid: '.1.3.6.1.4.1.25728.8400.1.1.5.{{ $index }}'
                     descr: 'Humidity Temp {{ $index }}'
                     skip_values: 0
                     index: 'npRelHumTempStatus.{{ $index }}'
@@ -93,7 +93,7 @@ modules:
                 -
                     oid: npThermoTable
                     value: npThermoValue
-                    num_oid: .1.3.6.1.4.1.25728.8800.1.1.2.
+                    num_oid: '.1.3.6.1.4.1.25728.8800.1.1.2.{{ $index }}'
                     low_limit: npThermoLow
                     high_limit: npThermoHigh
                     skip_values: 0
@@ -101,7 +101,7 @@ modules:
                 -
                     oid: npRelHumTable
                     value: npRelHumTempValue
-                    num_oid: .1.3.6.1.4.1.25728.8400.1.1.4.
+                    num_oid: '.1.3.6.1.4.1.25728.8400.1.1.4.{{ $index }}'
                     low_limit: npRelHumTempSafeRangeLow
                     high_limit: npRelHumTempSafeRangeHigh
                     skip_values: 0

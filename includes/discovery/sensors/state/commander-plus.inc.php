@@ -24,28 +24,18 @@
  */
 
 $start_oid = '.1.3.6.1.4.1.18642.1.2.4';
-$state_table = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.18642.1.2.4', array(), 'CCPOWER-MIB');
+$state_table = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.18642.1.2.4', [], 'CCPOWER-MIB');
 $x = 1;
 foreach ($state_table[0] as $state_name => $state_value) {
-    $state_index_id = create_state_index($state_name);
     //Create State Translation
-    $states = array(
-        array($state_index_id,'inactive',1,1,2),
-        array($state_index_id,'active',1,2,0),
-    );
+    $states = [
+        ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'inactive'],
+        ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'active'],
+    ];
+    create_state_index($state_name, $states);
 
-    foreach ($states as $value) {
-        $insert = array(
-            'state_index_id' => $value[0],
-            'state_descr' => $value[1],
-            'state_draw_graph' => $value[2],
-            'state_value' => $value[3],
-            'state_generic_value' => $value[4]
-        );
-        dbInsert($insert, 'state_translations');
-    }
     $descr = $state_name;
-    discover_sensor($valid['sensor'], 'state', $device, $start_oid.'.'.$x.'.0', $state_name, $state_name, $descr, '1', '1', null, null, null, null, $state_value, 'snmp');
+    discover_sensor($valid['sensor'], 'state', $device, $start_oid.'.'.$x.'.0', $state_name, $state_name, $descr, 1, 1, null, null, null, null, $state_value, 'snmp');
 
     //Create Sensor To State Index
     create_sensor_to_state_index($device, $state_name, $state_name);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace LibreNMS\Tests;
 
 use Illuminate\Contracts\Console\Kernel;
 

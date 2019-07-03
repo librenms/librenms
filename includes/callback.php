@@ -32,7 +32,7 @@ if ($enabled == 1) {
         'cef'             => 'SELECT COUNT(*) AS `total` FROM `cef_switching`',
         'cisco_asa'       => 'SELECT COUNT(*) AS `total`,`oid` FROM `ciscoASA` WHERE `disabled` = 0 GROUP BY `oid`',
         'mempool'         => 'SELECT COUNT(*) AS `total`,`mempool_descr` FROM `mempools` GROUP BY `mempool_descr`',
-        'dbschema'        => 'SELECT COUNT(*) AS `total`, `version` FROM `dbSchema`',
+        'dbschema'        => 'SELECT COUNT(*) AS `total`, COUNT(*) AS `version` FROM `migrations`',
         'snmp_version'    => 'SELECT COUNT(*) AS `total`,`snmpver` FROM `devices` GROUP BY `snmpver`',
         'os'              => 'SELECT COUNT(*) AS `total`,`os` FROM `devices` GROUP BY `os`',
         'type'            => 'SELECT COUNT(*) AS `total`,`type` FROM `devices` GROUP BY `type`',
@@ -116,7 +116,7 @@ if ($enabled == 1) {
 
     $post = curl_init();
     set_curl_proxy($post);
-    curl_setopt($post, CURLOPT_URL, $config['callback_post']);
+    curl_setopt($post, CURLOPT_URL, \LibreNMS\Config::get('callback_post'));
     curl_setopt($post, CURLOPT_POST, count($submit));
     curl_setopt($post, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($post, CURLOPT_RETURNTRANSFER, 1);
@@ -127,7 +127,7 @@ if ($enabled == 1) {
 
     $clear = curl_init();
     set_curl_proxy($clear);
-    curl_setopt($clear, CURLOPT_URL, $config['callback_clear']);
+    curl_setopt($clear, CURLOPT_URL, \LibreNMS\Config::get('callback_clear'));
     curl_setopt($clear, CURLOPT_POST, count($clear));
     curl_setopt($clear, CURLOPT_POSTFIELDS, $fields);
     curl_setopt($clear, CURLOPT_RETURNTRANSFER, 1);

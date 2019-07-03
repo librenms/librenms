@@ -23,28 +23,15 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-$oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-DISTRIBUTION-PANEL-MIB');
+$oids = snmpwalk_cache_oid($device, 'outputEntry', [], 'ICT-DISTRIBUTION-PANEL-MIB');
 
 if (is_array($oids)) {
     $state_name = 'outputFuseStatus';
-    $state_index_id = create_state_index($state_name);
-
-    if ($state_index_id) {
-        $states = array(
-            array($state_index_id, 'OK', 0, 1, 0) ,
-            array($state_index_id, 'OPEN', 0, 2, 2)
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = [
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
+        ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'OPEN'],
+    ];
+    create_state_index($state_name, $states);
 
     foreach ($oids as $index => $entry) {
         $fuse_state_oid = '.1.3.6.1.4.1.39145.10.8.1.4.' . $index;
@@ -58,7 +45,7 @@ if (is_array($oids)) {
             $current_value = 2;
         }
 
-        discover_sensor($valid['sensor'], 'state', $device, $fuse_state_oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current_value, 'snmp', $index);
+        discover_sensor($valid['sensor'], 'state', $device, $fuse_state_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
 
         create_sensor_to_state_index($device, $state_name, $index);
     }

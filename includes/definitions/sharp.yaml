@@ -7,9 +7,8 @@ over:
     - { graph: device_toner, text: Toner }
 discovery:
     - sysDescr:
-        - SHARP MX-
+        - 'SHARP MX-'
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
-
+    toner: true

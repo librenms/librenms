@@ -1,0 +1,252 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.177.15.1.1.2",
+                    "sysDescr": "Sonus SBC Portfolio",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "sonus-sbc",
+                    "type": "appliance",
+                    "serial": null,
+                    "icon": "sonus.png"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.177.15.1.1.2",
+                    "sysDescr": "Sonus SBC Portfolio",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "sonus-sbc",
+                    "type": "appliance",
+                    "serial": null,
+                    "icon": "sonus.png"
+                }
+            ]
+        }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": "0",
+                    "hrDeviceIndex": "196608",
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
+                    "processor_index": "196608",
+                    "processor_type": "hr",
+                    "processor_usage": "14",
+                    "processor_descr": "Processor",
+                    "processor_precision": "1",
+                    "processor_perc_warn": "75"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "0",
+                    "mempool_total": "0",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Virtual memory",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "0",
+                    "mempool_total": "0",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "10",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Swap space",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "0",
+                    "mempool_total": "0",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                }
+            ]
+        },
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": "79",
+                    "mempool_used": "200724480",
+                    "mempool_free": "51826688",
+                    "mempool_total": "252551168",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Virtual memory",
+                    "mempool_perc": "79",
+                    "mempool_used": "200724480",
+                    "mempool_free": "51826688",
+                    "mempool_total": "252551168",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                },
+                {
+                    "mempool_index": "10",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": "1024",
+                    "mempool_descr": "Swap space",
+                    "mempool_perc": "0",
+                    "mempool_used": "0",
+                    "mempool_free": "0",
+                    "mempool_total": "0",
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": "0",
+                    "mempool_perc_warn": "75"
+                }
+            ]
+        }
+    },
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "36",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/tmp",
+                    "storage_size": "12582912",
+                    "storage_units": "4096",
+                    "storage_used": "311296",
+                    "storage_free": "0",
+                    "storage_perc": "0",
+                    "storage_perc_warn": "60",
+                    "storage_deleted": "0"
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "38",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/etc/symphony/sw_update",
+                    "storage_size": "33554432",
+                    "storage_units": "4096",
+                    "storage_used": "0",
+                    "storage_free": "0",
+                    "storage_perc": "0",
+                    "storage_perc_warn": "60",
+                    "storage_deleted": "0"
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "39",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/log",
+                    "storage_size": "1048576",
+                    "storage_units": "4096",
+                    "storage_used": "57344",
+                    "storage_free": "0",
+                    "storage_perc": "0",
+                    "storage_perc_warn": "60",
+                    "storage_deleted": "0"
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "36",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/tmp",
+                    "storage_size": "12582912",
+                    "storage_units": "4096",
+                    "storage_used": "311296",
+                    "storage_free": "12271616",
+                    "storage_perc": "2",
+                    "storage_perc_warn": "60",
+                    "storage_deleted": "0"
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "38",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/etc/symphony/sw_update",
+                    "storage_size": "33554432",
+                    "storage_units": "4096",
+                    "storage_used": "0",
+                    "storage_free": "33554432",
+                    "storage_perc": "0",
+                    "storage_perc_warn": "60",
+                    "storage_deleted": "0"
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "39",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/log",
+                    "storage_size": "1048576",
+                    "storage_units": "4096",
+                    "storage_used": "57344",
+                    "storage_free": "991232",
+                    "storage_perc": "5",
+                    "storage_perc_warn": "60",
+                    "storage_deleted": "0"
+                }
+            ]
+        }
+    }
+}

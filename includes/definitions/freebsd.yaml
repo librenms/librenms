@@ -2,11 +2,11 @@ os: freebsd
 type: server
 group: unix
 text: FreeBSD
-processor_stacked: 1
+processor_stacked: true
 over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_ucd_memory, text: 'Memory Usage' }
 discovery_modules:
-    applications: 1
+    applications: true
 discovery:
     - sysDescr: FreeBSD

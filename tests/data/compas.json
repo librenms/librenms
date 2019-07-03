@@ -1,0 +1,370 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.26854.3.2.1",
+                    "sysDescr": "Alpha Innovations Comp@s Monitoring System",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "compas",
+                    "type": "power",
+                    "serial": null,
+                    "icon": "alpha.png",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.26854.3.2.1",
+                    "sysDescr": "Alpha Innovations Comp@s Monitoring System",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "compas",
+                    "type": "power",
+                    "serial": null,
+                    "icon": "alpha.png",
+                    "location": "<private>"
+                }
+            ]
+        }
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "charge",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.91.0",
+                    "sensor_index": "0",
+                    "sensor_type": "compas",
+                    "sensor_descr": "Battery Charge",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 100,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.61.0",
+                    "sensor_index": "es1dc1DataBatBatInputCurrent",
+                    "sensor_type": "compas",
+                    "sensor_descr": "Battery Input Current",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.52.0",
+                    "sensor_index": "es1dc1DataLoadLoadCurrent",
+                    "sensor_type": "compas",
+                    "sensor_descr": "Load Current",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.22.0",
+                    "sensor_index": "es1dc1DataRectifiersRectifiersOutCurrent",
+                    "sensor_type": "compas",
+                    "sensor_descr": "Output Current",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": 15,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "runtime",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.92.0",
+                    "sensor_index": "0",
+                    "sensor_type": "compas",
+                    "sensor_descr": "Runtime",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3600,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.72.0",
+                    "sensor_index": "es1dc1DataBatBatTestState",
+                    "sensor_type": "es1dc1DataBatBatTestState",
+                    "sensor_descr": "Battery Test Status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "es1dc1DataBatBatTestState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.1.0",
+                    "sensor_index": "es1dc1DataSystemDCMode",
+                    "sensor_type": "es1dc1DataSystemDCMode",
+                    "sensor_descr": "System DC Mode",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "es1dc1DataSystemDCMode"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.71.0",
+                    "sensor_index": "0",
+                    "sensor_type": "compas",
+                    "sensor_descr": "Battery Temperature",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 11,
+                    "sensor_limit": 31,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 1,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.11.0",
+                    "sensor_index": "0",
+                    "sensor_type": "compas",
+                    "sensor_descr": "DC Bus Voltage",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 55,
+                    "sensor_limit": 63.25,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 46.75,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "Never Tested",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "Success",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "On Going",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "Failed: Timeout",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "Failed: Vbus Too Low",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "Failed: Load Too Low",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "Failed: AC Failure",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "Failed: Canceled",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "Failed: LVD Opened",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "es1dc1DataBatBatTestState",
+                    "state_descr": "Failed: No Battery",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "es1dc1DataSystemDCMode",
+                    "state_descr": "Float",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "es1dc1DataSystemDCMode",
+                    "state_descr": "Equalize",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "es1dc1DataSystemDCMode",
+                    "state_descr": "Battery Test",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "es1dc1DataSystemDCMode",
+                    "state_descr": "AC Failure",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "es1dc1DataSystemDCMode",
+                    "state_descr": "Safe",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

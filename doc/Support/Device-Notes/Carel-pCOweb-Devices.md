@@ -1,4 +1,5 @@
 source: Carel-pCOweb-Devices.md
+path: blob/master/doc/
 
 # Carel pCOweb Devices
 The pCOWeb card is used to interface the pCO system to networks that use the HVAC protocols based on the Ethernet physical standard such the SNMP. The problem with this card is that the implementation is based on the final manufacturer of the HVAC (Heating, Ventilation and Air Conditioning) and not based on a standard given by Carel. So each pCOweb card has a different configuration that needs a different MIB depending on the manufacturer implementation.

@@ -25,7 +25,7 @@
 
 namespace App\Models;
 
-class Application extends BaseModel
+class Application extends DeviceRelatedModel
 {
     /**
      * Indicates if the model should be timestamped.
@@ -76,19 +76,5 @@ class Application extends BaseModel
     {
         return collect(self::$display_name)
             ->get($this->app_type, ucwords(str_replace(['_', '-'], ' ', $this->app_type)));
-    }
-
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
     }
 }

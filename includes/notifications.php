@@ -31,9 +31,8 @@
  */
 function get_notifications()
 {
-    global $config;
     $obj = array();
-    foreach ($config['notifications'] as $name => $url) {
+    foreach (\LibreNMS\Config::get('notifications') as $name => $url) {
         echo '[ '.date('r').' ] '.$url.' ';
         $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))), true);
         if (isset($feed['channel'])) {
@@ -60,7 +59,7 @@ function post_notifications()
     $notifs = get_notifications();
     echo '[ '.date('r').' ] Updating DB ';
     foreach ($notifs as $notif) {
-        if (dbFetchCell('select 1 from notifications where checksum = ?', array($notif['checksum'])) != 1 && dbInsert('notifications', $notif) > 0) {
+        if (dbFetchCell('select 1 from notifications where checksum = ?', array($notif['checksum'])) != 1 && dbInsert($notif, 'notifications') > 0) {
             echo '.';
         }
     }
@@ -134,7 +133,7 @@ function new_notification($title, $message, $severity = 0, $source = 'adhoc', $d
     );
 
     if (dbFetchCell('SELECT 1 FROM `notifications` WHERE `checksum` = ?', array($notif['checksum'])) != 1) {
-        return dbInsert('notifications', $notif) > 0;
+        return dbInsert($notif, 'notifications') > 0;
     }
 
     return false;

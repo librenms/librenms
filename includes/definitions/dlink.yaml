@@ -2,8 +2,8 @@ os: dlink
 text: 'D-Link Switch'
 type: network
 icon: dlink
-ifname: 1
-empty_ifdescr: 1
+ifname: true
+empty_ifdescr: true
 discovery:
     -
         sysObjectID_except:

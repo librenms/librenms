@@ -23,7 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-
 namespace LibreNMS\Device;
 
 use LibreNMS\Config;
@@ -60,7 +59,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
      * @param string $type
      * @param int $device_id
      * @param string $oid
-     * @param int $index
+     * @param int|string $index
      * @param string $description
      * @param int $precision The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
      * @param int $current_usage
@@ -84,7 +83,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $proc = new static();
         $proc->processor_type = $type;
         $proc->device_id = $device_id;
-        $proc->processor_index = $index;
+        $proc->processor_index = (string)$index;
         $proc->processor_descr = $description;
         $proc->processor_precision = $precision;
         $proc->processor_usage = $current_usage;
@@ -147,12 +146,17 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             $processors = $os->discoverProcessors();
         }
 
+        foreach ($processors as $processor) {
+            $processor->processor_descr = substr($processor->processor_descr, 0, 64);
+            $processors[] = $processor;
+        }
+
         if (isset($processors) && is_array($processors)) {
             self::sync(
                 $os->getDeviceId(),
                 $processors,
-                array('device_id', 'processor_index', 'processor_type'),
-                array('processor_usage')
+                ['device_id', 'processor_index', 'processor_type'],
+                ['processor_usage', 'processor_perc_warn']
             );
         }
 

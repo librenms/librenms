@@ -25,15 +25,16 @@
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Config;
+
 class RrdtoolTest extends TestCase
 {
 
     public function testBuildCommandLocal()
     {
-        global $config;
-        $config['rrdcached'] = '';
-        $config['rrdtool_version'] = '1.4';
-        $config['rrd_dir'] = '/opt/librenms/rrd';
+        Config::set('rrdcached', '');
+        Config::set('rrdtool_version', '1.4');
+        Config::set('rrd_dir', '/opt/librenms/rrd');
 
         $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('create /opt/librenms/rrd/f o', $cmd);
@@ -45,7 +46,7 @@ class RrdtoolTest extends TestCase
         $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
 
 
-        $config['rrdtool_version'] = '1.6';
+        Config::set('rrdtool_version', '1.6');
 
         $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('create /opt/librenms/rrd/f o -O', $cmd);
@@ -59,10 +60,9 @@ class RrdtoolTest extends TestCase
 
     public function testBuildCommandRemote()
     {
-        global $config;
-        $config['rrdcached'] = 'server:42217';
-        $config['rrdtool_version'] = '1.4';
-        $config['rrd_dir'] = '/opt/librenms/rrd';
+        Config::set('rrdcached', 'server:42217');
+        Config::set('rrdtool_version', '1.4');
+        Config::set('rrd_dir', '/opt/librenms/rrd');
 
         $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('create /opt/librenms/rrd/f o', $cmd);
@@ -74,7 +74,7 @@ class RrdtoolTest extends TestCase
         $this->assertEquals('update f o --daemon server:42217', $cmd);
 
 
-        $config['rrdtool_version'] = '1.6';
+        Config::set('rrdtool_version', '1.6');
 
         $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('create f o -O --daemon server:42217', $cmd);
@@ -88,11 +88,10 @@ class RrdtoolTest extends TestCase
 
     public function testBuildCommandException()
     {
-        global $config;
-        $config['rrdcached'] = '';
-        $config['rrdtool_version'] = '1.4';
+        Config::set('rrdcached', '');
+        Config::set('rrdtool_version', '1.4');
 
-        $this->setExpectedException('LibreNMS\Exceptions\FileExistsException');
+        $this->expectException('LibreNMS\Exceptions\FileExistsException');
         // use this file, since it is guaranteed to exist
         rrdtool_build_command('create', __FILE__, 'o');
     }

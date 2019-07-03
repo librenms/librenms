@@ -6,7 +6,7 @@ modules:
                 -
                     oid: powerSystem
                     value: powerSystemStatus
-                    num_oid: .1.3.6.1.4.1.12148.10.2.1.
+                    num_oid: '.1.3.6.1.4.1.12148.10.2.1.{{ $index }}'
                     descr: System Status
                     state_name: powerSystemStatus
                     states:
@@ -33,7 +33,7 @@ modules:
                 -
                     oid: mains
                     value: mainsStatus
-                    num_oid: .1.3.6.1.4.1.12148.10.3.1.
+                    num_oid: '.1.3.6.1.4.1.12148.10.3.1.{{ $index }}'
                     descr: Mains Status
                     state_name: mainsStatus
                     states:
@@ -60,7 +60,7 @@ modules:
                 -
                     oid: rectifiers.rectifierTable.rectifierEntry
                     value: rectifierStatus
-                    num_oid: .1.3.6.1.4.1.12148.10.5.6.1.2.
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.2.{{ $index }}'
                     descr: Rectifier {{ $index }} Status
                     state_name: rectifierStatus
                     states:
@@ -87,7 +87,7 @@ modules:
                 -
                     oid: load
                     value: loadFusesStatus
-                    num_oid: .1.3.6.1.4.1.12148.10.9.3.
+                    num_oid: '.1.3.6.1.4.1.12148.10.9.3.{{ $index }}'
                     descr: Load Fuses {{ $index }} Status
                     state_name: loadFusesStatus
                     states:
@@ -114,7 +114,7 @@ modules:
                 -
                     oid: battery
                     value: batteryStatus
-                    num_oid: .1.3.6.1.4.1.12148.10.10.1.
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.1.{{ $index }}'
                     descr: Battery Status
                     state_name: batteryStatus
                     states:
@@ -143,50 +143,56 @@ modules:
                 -
                     oid: mains.mainsVoltageTable.mainsVoltageEntry
                     value: mainsVoltageValue
-                    num_oid: .1.3.6.1.4.1.12148.10.3.4.1.6.
+                    num_oid: '.1.3.6.1.4.1.12148.10.3.4.1.6.{{ $index }}'
                     descr: Mains Input Voltage
+                    index: 'mains.{{ $index }}'
                 -
                     oid: rectifiers.rectifierTable.rectifierEntry
                     value: rectifierInputVoltageValue
-                    num_oid: .1.3.6.1.4.1.12148.10.5.6.1.4.
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.4.{{ $index }}'
                     descr: Rectifier {{ $index }} Input Voltage
+                    index: 'input.{{ $index }}'
                 -
                     oid: battery.batteryVoltage
                     value: batteryVoltageValue
-                    num_oid: .1.3.6.1.4.1.12148.10.10.5.5.
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.5.5.{{ $index }}'
                     descr: Battery Voltage
+                    index: 'battery.{{ $index }}'
                     divisor: 100
         current:
             data:
                 -
                     oid: rectifiers.rectifiersCurrent
                     value: rectifiersCurrentValue
-                    num_oid: .1.3.6.1.4.1.12148.10.5.2.5.
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
                     descr: System Output Current
+                    index: 'current.{{ $index }}'
                     divisor: 10
                 -
                     oid: rectifiers.rectifierTable.rectifierEntry
                     value: rectifierOutputCurrentValue
-                    num_oid: .1.3.6.1.4.1.12148.10.5.6.1.3.
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.3.{{ $index }}'
                     descr: Rectifier {{ $index }} Output Current
+                    index: 'output.{{ $index }}'
                     divisor: 10
                 -
                     oid: battery.batteryCurrents
                     value: batteryCurrentsValue
-                    num_oid: .1.3.6.1.4.1.12148.10.10.6.5.
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.6.5.{{ $index }}'
                     descr: Battery Current
+                    index: 'battery.{{ $index }}'
                     divisor: 10
         temperature:
             data:
                 -
                     oid: battery.batteryTemperatures
                     value: batteryTemperaturesValue
-                    num_oid: .1.3.6.1.4.1.12148.10.10.7.5.
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.7.5.{{ $index }}'
                     descr: Battery Temperature
         runtime:
             data:
                 -
                     oid: battery.batteryTimeLeft
                     value: batteryTimeLeftValue
-                    num_oid: .1.3.6.1.4.1.12148.10.10.8.5.
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.8.5.{{ $index }}'
                     descr: Battery Run Time Remaining

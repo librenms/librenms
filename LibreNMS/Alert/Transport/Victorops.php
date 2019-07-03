@@ -24,16 +24,24 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Victorops implements Transport
+class Victorops extends Transport
 {
     public function deliverAlert($obj, $opts)
+    {
+        if (!empty($this->config)) {
+            $opts['url'] = $this->config['victorops-url'];
+        }
+        return $this->contactVictorops($obj, $opts);
+    }
+
+    public function contactVictorops($obj, $opts)
     {
         $url = $opts['url'];
 
         $protocol = array(
-            'entity_id' => ($obj['id'] ? $obj['id'] : $obj['uid']),
+            'entity_id' => strval($obj['id'] ? $obj['id'] : $obj['uid']),
             'state_start_time' => strtotime($obj['timestamp']),
             'entity_display_name' => $obj['title'],
             'state_message' => $obj['msg'],
@@ -64,5 +72,22 @@ class Victorops implements Transport
             return false;
         }
         return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Post URL',
+                    'name' => 'victorops-url',
+                    'descr' => 'Victorops Post URL',
+                    'type' => 'text'
+                ]
+            ],
+            'validation' => [
+                'victorops-url' => 'required|string'
+            ]
+        ];
     }
 }

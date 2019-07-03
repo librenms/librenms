@@ -1,9 +1,9 @@
 <?php
 
-$f5_chassis = array();
+$f5_chassis = [];
 // Get the Chassis Temperature values
 //Pull the sysChassisTempTable table from the snmpwalk
-$f5_chassis = snmpwalk_cache_multi_oid($device, 'sysChassisTempTable', array(), 'F5-BIGIP-SYSTEM-MIB');
+$f5_chassis = snmpwalk_cache_multi_oid($device, 'sysChassisTempTable', [], 'F5-BIGIP-SYSTEM-MIB');
 
 if (is_array($f5_chassis)) {
     echo "sysChassisTempTable: ";
@@ -19,8 +19,8 @@ if (is_array($f5_chassis)) {
 }
 
 // Get the CPU Temperature values
-$f5cpu = array();
-$f5cpu = snmpwalk_cache_multi_oid($device, 'sysCpuSensorTemperature', array(), 'F5-BIGIP-SYSTEM-MIB');
+$f5cpu = [];
+$f5cpu = snmpwalk_cache_multi_oid($device, 'sysCpuSensorTemperature', [], 'F5-BIGIP-SYSTEM-MIB');
 
 if (is_array($f5cpu)) {
     echo "sysCpuSensorTemperature: ";

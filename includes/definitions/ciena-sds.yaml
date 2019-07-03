@@ -1,5 +1,5 @@
 os: ciena-sds
-text: Ciena Service Delivery Switch
+text: 'Ciena Service Delivery Switch'
 icon: ciena
 over:
     - { graph: device_bits, text: Traffic }

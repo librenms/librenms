@@ -1,4 +1,5 @@
 source: Extensions/Applications.md
+path: blob/master/doc/
 ## Introduction
 
 You can use Application support to graph performance statistics of many applications.
@@ -36,6 +37,7 @@ After you have enabled the application module, it would be wise to then also ena
 The unix-agent does not have a discovery module, only a poller module. That poller module is always disabled by default. It needs to be manually enabled if using the agent. Some applications will be automatically enabled by the unix-agent poller module. It is better to ensure that your application is enabled for monitoring. You can check by following the steps under the `SNMP Extend` heading.
 
 1. [Apache](#apache) - SNMP extend, Agent
+1. [Asterisk](#asterisk) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [C.H.I.P.](#chip) - SNMP extend
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
@@ -46,7 +48,7 @@ The unix-agent does not have a discovery module, only a poller module. That poll
 1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
 1. [FreeRADIUS](#freeradius) - SNMP extend, Agent
 1. [Freeswitch](#freeswitch) - SNMP extend, Agent
-1. [GPSD](#gpsd) - Agent
+1. [GPSD](#gpsd) - SNMP extend, Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
 1. [Munin](#munin) - Agent
@@ -60,10 +62,11 @@ The unix-agent does not have a discovery module, only a poller module. That poll
 1. [OS Updates](#os-updates) - SNMP extend
 1. [PHP-FPM](#php-fpm) - SNMP extend
 1. [Pi-hole](#pi-hole) - SNMP extend
+1. [Portactivity](#portactivity) - SNMP extend
 1. [Postfix](#postfix) - SNMP extend
 1. [Postgres](#postgres) - SNMP extend
 1. [PowerDNS](#powerdns) - Agent
-1. [PowerDNS Recursor](#powerdns-recursor) - Direct, Agent
+1. [PowerDNS Recursor](#powerdns-recursor) - Direct, SNMP extend, Agent
 1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
@@ -115,6 +118,27 @@ snmpwalk <various options depending on your setup> localhost NET-SNMP-EXTEND-MIB
 (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs to be installed: apt-get install libwww-perl)
 2. On the device page in Librenms, edit your host and check the `Apache` under the Applications tab.
 
+### Asterisk
+A small shell script that reports various Asterisk call status.
+
+##### SNMP Extend
+1. Copy the [asterisk script](https://github.com/librenms/librenms-agent/blob/master/snmp/asterisk) to `/etc/snmp/` on your asterisk server.
+
+2. Run `chmod +x /etc/snmp/asterisk`
+
+3. Configure `ASCLI` in the script.
+
+4. Verify it is working by running `/etc/snmp/asterisk`
+
+5. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend asterisk /etc/snmp/asterisk
+```
+
+6. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
 ### BIND9 aka named
 
 1: Create stats file with appropriate permissions:
@@ -157,7 +181,7 @@ Anything starting with a # is comment. The format for variables are $variable=$v
 Content of an example /etc/snmp/bind.config . Please edit with your own settings.
 ```
 rndc = The path to rndc. Default: /usr/bin/env rndc
-call_rndc = A 0/1 boolean on weather to call rndc stats. Suggest to set to 0 if using netdata. Default: 1
+call_rndc = A 0/1 boolean on whether or not to call rndc stats. Suggest to set to 0 if using netdata. Default: 1
 stats_file = The path to the named stats file. Default: /var/run/named/stats
 agent = A 0/1 boolean for if this is being used as a LibreNMS agent or not. Default: 0
 zero_stats = A 0/1 boolean for if the stats file should be zeroed first. Default: 0 (1 if guessed)
@@ -262,8 +286,10 @@ The application should be auto-discovered as described at the top of the page. I
 SNMP extend script to get your exim stats data into your host.
 
 ##### SNMP Extend
-1. Copy the [exim stats](https://github.com/librenms/librenms-agent/blob/master/snmp/exim-stats.sh) to `/etc/snmp/` (or any other suitable location) on your host.
-
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/exim-stats.sh -O /etc/snmp/exim-stats.sh
+```
 2. Run `chmod +x /etc/snmp/exim-stats.sh`
 
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
@@ -438,7 +464,21 @@ extend freeswitch /etc/snmp/freeswitch
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
 ### GPSD
-A small shell script that reports GPSD status.
+
+##### SNMP Extend
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/gpsd -O /etc/snmp/gpsd
+```
+2. Run `chmod +x /etc/snmp/gpsd`
+
+3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend gpsd /etc/snmp/gpsd
+```
+4. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading at the top of the page.
 
 ##### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`
@@ -469,6 +509,9 @@ The application should be auto-discovered as described at the top of the page. I
 ### Memcached
 ##### SNMP Extend
 1. Copy the [memcached script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached) to `/etc/snmp/` on your remote server.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/memcached -O /etc/snmp/memcached
+```
 
 2. Make the script executable: `chmod +x /etc/snmp/memcached`
 
@@ -570,6 +613,7 @@ location /nginx-status {
     stub_status on;
     access_log   off;
     allow 127.0.0.1;
+    allow ::1;
     deny all;
 }
 ```
@@ -577,14 +621,14 @@ location /nginx-status {
 ##### SNMP Extend
 1. Download the script onto the desired host.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nginx-stats -O /etc/snmp/nginx-stats
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nginx -O /etc/snmp/nginx
 ```
 
-2. Run `chmod +x /etc/snmp/nginx-stats`
+2. Run `chmod +x /etc/snmp/nginx`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend nginx /etc/snmp/nginx-stats
+extend nginx /etc/snmp/nginx
 ```
 4. Restart snmpd on your host
 
@@ -611,14 +655,14 @@ A shell script that gets stats from ntp client.
 ##### SNMP Extend
 1. Download the script onto the desired host.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-client.sh -O /etc/snmp/ntp-client.sh
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/ntp-client -O /etc/snmp/ntp-client
 ```
 
-2. Run `chmod +x /etc/snmp/ntp-client.sh`
+2. Run `chmod +x /etc/snmp/ntp-client`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend ntp-client /etc/snmp/ntp-client.sh
+extend ntp-client /etc/snmp/ntp-client
 ```
 
 4. Restart snmpd on your host
@@ -690,14 +734,14 @@ For pacman users automatically refreshing the database, it is recommended you us
 ##### SNMP Extend
 1. Download the script onto the desired host.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/os-updates.sh -O /etc/snmp/os-updates.sh
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/osupdate -O /etc/snmp/osupdate
 ```
 
-2. Run `chmod +x /etc/snmp/os-updates.sh`
+2. Run `chmod +x /etc/snmp/osupdate`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend osupdate /etc/snmp/os-updates.sh
+extend osupdate /etc/snmp/osupdate
 ```
 
 4. Restart snmpd on your host
@@ -709,15 +753,16 @@ The application should be auto-discovered as described at the top of the page. I
 
 ### PHP-FPM
 #### SNMP Extend
-1. Copy the shell script, phpfpm-sp, to the desired host. `wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpm-sp -O /etc/snmp/phpfpm-sp`
+1. Copy the shell script, phpfpmsp, to the desired host. `wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpmsp -O /etc/snmp/phpfpmsp`
 
-2. Run `chmod +x /etc/snmp/phpfpm-sp`
+2. Run `chmod +x /etc/snmp/phpfpmsp`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend phpfpmsp /etc/snmp/phpfpm-sp
+extend phpfpmsp /etc/snmp/phpfpmsp
 ```
-5: Edit /etc/snmp/phpfpm-sp to include the status URL for the PHP-FPM pool you are monitoring.
+5. Edit /etc/snmp/phpfpmsp to include the status URL for the PHP-FPM pool you are monitoring.
+
 6. Restart snmpd on your host
 
 It is worth noting that this only monitors a single pool. If you want to monitor multiple pools, this won't do it.
@@ -742,6 +787,38 @@ extend pi-hole /etc/snmp/pi-hole
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
+### Portactivity
+#### SNMP Extend
+
+1. Install the Perl module Parse::Netstat and optionally JSON when you want to use -P flag.
+
+##### Ubuntu 18
+```
+apt install libparse-netstat-perl
+apt install libjson-perl
+```
+
+2. Copy the Perl script to the desired host (the host must be added to LibreNMS devices)
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/portactivity -O /etc/snmp/portactivity
+```
+
+3. Make the script executable. (chmod +x /etc/snmp/portactivity)
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend portactivity /etc/snmp/portactivity -p http,ldap,imap
+```
+
+Will monitor HTTP, LDAP, and IMAP. The -p switch specifies what ports to use. This is a comma seperated list.
+
+These must be found in '/etc/services' or where ever NSS is set to fetch it from. If not, it will throw an error.
+
+If you want to JSON returned by it to be printed in a pretty format use the -P flag.
+
+5. Restart snmpd on your host.
+
+Please note that for only TCP[46] services are supported.
 
 ### Postfix
 #### SNMP Extend
@@ -769,6 +846,8 @@ Please note that each time /etc/snmp/postfixdetailed is ran, the cache file is u
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
+> NOTE: If using RHEL for your postfix server, qshape must be installed manually as it is not officially supported. CentOs 6 rpms seem to work without issues.
+
 ### Postgres
 #### SNMP Extend
 1: Copy the shell script, postgres, to the desired host. `wget https://github.com/librenms/librenms-agent/raw/master/snmp/postgres -O /etc/snmp/postgres`
@@ -782,7 +861,7 @@ extend postgres /etc/snmp/postgres
 
 4: Restart snmpd on your host
 
-5: Install the Nagios check check_postgres.pl on your system.
+5: Install the Nagios check check_postgres.pl on your system: https://github.com/bucardo/check_postgres
 
 6: Verify the path to check_postgres.pl in /etc/snmp/postgres is correct.
 
@@ -792,7 +871,21 @@ The application should be auto-discovered as described at the top of the page. I
 
 ### PowerDNS
 An authoritative DNS server: https://www.powerdns.com/auth.html
+
 #### SNMP Extend
+1: Copy the shell script, powerdns.py, to the desired host. `wget https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns.py -O /etc/snmp/powerdns.py`
+
+2: Run `chmod +x /etc/snmp/powerdns.py`
+
+3: Edit your snmpd.conf file and add:
+```
+extend powerdns /etc/snmp/powerdns.py
+```
+
+4: Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
 
 ##### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `powerdns` script to `/usr/lib/check_mk_agent/local/`
@@ -877,7 +970,8 @@ snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 SNMP extend script to get your PI data into your host.
 
 ##### SNMP Extend
-1. Copy the [raspberry script](https://github.com/librenms/librenms-agent/blob/master/snmp/raspberry.sh) to `/etc/snmp/` (or any other suitable location) on your PI host.
+1. Download the script onto the desired host.
+`wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/raspberry.sh -O /etc/snmp/raspberry.sh`
 
 2. Make the script executable: `chmod +x /etc/snmp/raspberry.sh`
 
@@ -890,6 +984,8 @@ extend raspberry /etc/snmp/raspberry.sh
 ```
 snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
 ```
+
+**Note:** If you are using Raspian, the default user is `Debian-snmp`. Change `snmp` above to `Debian-snmp`. You can verify the user snmpd is using with `ps aux | grep snmpd` 
 
 5. Restart snmpd on PI host
 
@@ -1054,13 +1150,20 @@ The application should be auto-discovered as described at the top of the page. I
 A small shell script that exports apcacess ups status.
 
 ##### SNMP Extend
-1. Copy the [ups apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups.sh) to `/etc/snmp/` on your host.
+1. Copy the [ups apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups) to `/etc/snmp/` on your host.
 
-2. Run `chmod +x /etc/snmp/ups-apcups.sh`
+2. Run `chmod +x /etc/snmp/ups-apcups`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend ups-apcups /etc/snmp/ups-apcups.sh
+extend ups-apcups /etc/snmp/ups-apcups
+```
+
+If 'apcaccess' is not in the PATH enviromental variable snmpd is
+using, you may need to do something like below.
+
+```
+extend ups-apcups/usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/ups-apcups
 ```
 
 4. Restart snmpd on your host
@@ -1091,6 +1194,7 @@ The application should be auto-discovered as described at the top of the page. I
 ### ZFS
 
 ##### SNMP Extend
+`zfs-linux` requires python3 >=python3.5.
 
 The installation steps are:
 

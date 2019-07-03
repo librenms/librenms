@@ -26,23 +26,23 @@
             ],
             "application_metrics": [
                 {
-                    "metric": "jail_dovecot",
-                    "value": "0",
+                    "metric": "jail_dovecot_banned",
+                    "value": "5",
                     "value_prev": null,
                     "app_type": "fail2ban"
                 },
                 {
-                    "metric": "jail_sshd",
-                    "value": "0",
+                    "metric": "jail_sshd_banned",
+                    "value": "3",
                     "value_prev": null,
                     "app_type": "fail2ban"
                 },
                 {
-                    "metric": "total",
-                    "value": "0",
+                    "metric": "total_banned",
+                    "value": "8",
                     "value_prev": null,
                     "app_type": "fail2ban"
-                },
+                }
             ]
         }
     }

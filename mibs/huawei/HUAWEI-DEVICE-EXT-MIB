@@ -1,9 +1,9 @@
 --====================================================================
--- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: Huawei Device extent MIB File for base device infomation
 -- Reference:
--- Version: V1.0
+-- Version: V2.01
 -- History:
 -- V1.0 2009-01-05, publish
 -- ===================================================================
@@ -23,19 +23,22 @@
     
     
         hwDeviceExt MODULE-IDENTITY 
-            LAST-UPDATED "200901051414Z"
+            LAST-UPDATED "201612231414Z"
             ORGANIZATION 
-                "Huawei Technologies Co.,Ltd."
+                  "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                "VRP Team Huawei Technologies Co.,Ltd.
-                Huawei Bld.,NO.3 Xinxi Rd., 
-                Shang-Di Information Industry Base,
-                Hai-Dian District Beijing P.R. China
-                http://www.huawei.com
-                Zip:100085
-                "
+                  "Huawei Industrial Base
+                    Bantian, Longgang
+                     Shenzhen 518129
+                     People's Republic of China
+                     Website: http://www.huawei.com
+                     Email: support@huawei.com
+                   "
             DESCRIPTION 
                 "The MIB module for collect base device information."
+            REVISION "201612231414Z"
+            DESCRIPTION
+                "modify the description."
             REVISION "200812171414Z"
             DESCRIPTION 
                 "The initial revision of this MIB module ."
@@ -58,7 +61,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The name of a platform.For example,Huawei Versatile Routing Platform Software."  
+                "The name of a platform."  
             ::= { hwDeviceExtObject 2 }
             
         hwPlatformVersion OBJECT-TYPE
@@ -66,7 +69,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The version of a platform.For example,VRP (R) Software,Version 3.10."  
+                "The version of a platform."  
             ::= { hwDeviceExtObject 3 }               
             
         hwProductName OBJECT-TYPE
@@ -74,9 +77,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The name of a product.For example,Quidway NetEngine 5000E.The product name is not equal to the system name.
-                the system name is an instance of the product name.User can config the system name of a device,bot can not change 
-                the  product name of the device."  
+                "The name of a product."  
             ::= { hwDeviceExtObject 4 }   
             
         hwProductVersion OBJECT-TYPE
@@ -84,7 +85,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The version of a product.For example,NE5000E V200R002C01B39L."  
+                "The version of a product."  
             ::= { hwDeviceExtObject 5 }
 
         

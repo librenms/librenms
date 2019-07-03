@@ -36,9 +36,9 @@ use LibreNMS\Proc;
  */
 function rrdtool_initialize($dual_process = true)
 {
-    global $config, $rrd_sync_process, $rrd_async_process;
+    global $rrd_sync_process, $rrd_async_process;
 
-    $command = $config['rrdtool'] . ' -';
+    $command = Config::get('rrdtool') . ' -';
 
     $descriptor_spec = array(
         0 => array('pipe', 'r'), // stdin  is a pipe that the child will read from
@@ -46,7 +46,7 @@ function rrdtool_initialize($dual_process = true)
         2 => array('pipe', 'w'), // stderr is a pipe that the child will write to
     );
 
-    $cwd = $config['rrd_dir'];
+    $cwd = Config::get('rrd_dir');
 
     if (!rrdtool_running($rrd_sync_process)) {
         $rrd_sync_process = new Proc($command, $descriptor_spec, $cwd);
@@ -132,7 +132,7 @@ function rrdtool_graph($graph_file, $options)
  */
 function rrdtool($command, $filename, $options)
 {
-    global $config, $debug, $vdebug, $rrd_async_process, $rrd_sync_process;
+    global $debug, $vdebug, $rrd_async_process, $rrd_sync_process;
     /** @var Proc $rrd_sync_process */
     /** @var Proc $rrd_async_process */
 
@@ -149,8 +149,8 @@ function rrdtool($command, $filename, $options)
 
     // do not write rrd files, but allow read-only commands
     $ro_commands = array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport');
-    if (!empty($config['norrd']) && !in_array($command, $ro_commands)) {
-        c_echo('[%rRRD Disabled%n]', !$config['hide_rrd_disabled']);
+    if (!empty(Config::get('norrd')) && !in_array($command, $ro_commands)) {
+        c_echo('[%rRRD Disabled%n]', !Config::get('hide_rrd_disabled'));
         return array(null, null);
     }
 
@@ -189,8 +189,6 @@ function rrdtool($command, $filename, $options)
  */
 function rrdtool_build_command($command, $filename, $options)
 {
-    global $config;
-
     if ($command == 'create') {
         // <1.4.3 doesn't support -O, so make sure the file doesn't exist
         if (version_compare(Config::get('rrdtool_version', '1.4'), '1.4.3', '<')) {
@@ -204,15 +202,15 @@ function rrdtool_build_command($command, $filename, $options)
 
     // no remote for create < 1.5.5 and tune < 1.5
     $rrdtool_version = Config::get('rrdtool_version', '1.4');
-    if ($config['rrdcached'] &&
+    if (Config::get('rrdcached') &&
         !($command == 'create' && version_compare($rrdtool_version, '1.5.5', '<')) &&
-        !($command == 'tune' && $config['rrdcached'] && version_compare($rrdtool_version, '1.5', '<'))
+        !($command == 'tune' && Config::get('rrdcached') && version_compare($rrdtool_version, '1.5', '<'))
     ) {
         // only relative paths if using rrdcached
-        $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
-        $options = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $options);
+        $filename = str_replace([Config::get('rrd_dir') . '/', Config::get('rrd_dir')], '', $filename);
+        $options = str_replace([Config::get('rrd_dir') . '/', Config::get('rrd_dir')], '', $options);
 
-        return "$command $filename $options --daemon " . $config['rrdcached'];
+        return "$command $filename $options --daemon " . Config::get('rrdcached');
     }
 
     return "$command $filename $options";
@@ -227,10 +225,9 @@ function rrdtool_build_command($command, $filename, $options)
  */
 function rrdtool_check_rrd_exists($filename)
 {
-    global $config;
-    if ($config['rrdcached'] && version_compare(Config::get('rrdtool_version', '1.4'), '1.5', '>=')) {
+    if (Config::get('rrdcached') && version_compare(Config::get('rrdtool_version', '1.4'), '1.5', '>=')) {
         $chk = rrdtool('last', $filename, '');
-        $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
+        $filename = str_replace([Config::get('rrd_dir') . '/', Config::get('rrd_dir')], '', $filename);
         return !str_contains(implode($chk), "$filename': No such file or directory");
     } else {
         return is_file($filename);
@@ -303,7 +300,6 @@ function rrdtool_escape($string, $length = null)
  */
 function rrd_name($host, $extra, $extension = ".rrd")
 {
-    global $config;
     $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
     return implode("/", array(get_rrd_dir($host), $filename.$extension));
 } // rrd_name
@@ -317,9 +313,8 @@ function rrd_name($host, $extra, $extension = ".rrd")
  */
 function get_rrd_dir($host)
 {
-    global $config;
     $host = str_replace(':', '_', trim($host, '[]'));
-    return implode("/", array($config['rrd_dir'], $host));
+    return implode("/", [Config::get('rrd_dir'), $host]);
 } // rrd_dir
 
 
@@ -333,9 +328,7 @@ function get_rrd_dir($host)
  */
 function proxmox_rrd_name($pmxcluster, $vmid, $vmport)
 {
-    global $config;
-
-    $pmxcdir = join('/', array($config['rrd_dir'], 'proxmox', safename($pmxcluster)));
+    $pmxcdir = join('/', [Config::get('rrd_dir'), 'proxmox', safename($pmxcluster)]);
     // this is not needed for remote rrdcached
     if (!is_dir($pmxcdir)) {
         mkdir($pmxcdir, 0775, true);
@@ -402,10 +395,8 @@ function rrdtool_tune($type, $filename, $max)
  */
 function rrdtool_data_update($device, $measurement, $tags, $fields)
 {
-    global $config;
-
     $rrd_name = $tags['rrd_name'] ?: $measurement;
-    $step = $tags['rrd_step'] ?: $config['rrd']['step'];
+    $step = $tags['rrd_step'] ?: Config::get('rrd.step');
     $oldname = $tags['rrd_oldname'];
     if (!empty($oldname)) {
         rrd_file_rename($device, $oldname, $rrd_name);
@@ -419,7 +410,7 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
     }
 
     if (isset($tags['rrd_def']) && !rrdtool_check_rrd_exists($rrd)) {
-        $newdef = "--step $step " . $tags['rrd_def'] . $config['rrd_rra'];
+        $newdef = "--step $step " . $tags['rrd_def'] . Config::get('rrd_rra');
         rrdtool('create', $rrd, $newdef);
     }
 

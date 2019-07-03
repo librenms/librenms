@@ -24,10 +24,9 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\Snmpsim;
-
-global $config;
 
 $install_dir = realpath(__DIR__ . '/..');
 
@@ -64,35 +63,34 @@ if (getenv('SNMPSIM')) {
 if (getenv('DBTEST')) {
     global $schema, $sql_mode;
 
-    try {
-        dbConnect();
-    } catch (DatabaseConnectException $e) {
-        echo $e->getMessage() . PHP_EOL;
-    }
+    // create testing table if needed
+    $db_config = Config::getDatabaseSettings();
+    $db_name = $db_config['db_name'];
 
-    $sql_mode = dbFetchCell("SELECT @@global.sql_mode");
-    $db_name = dbFetchCell("SELECT DATABASE()");
+    $connection = new PDO("mysql:host={$db_config['db_host']}", $db_config['db_user'], $db_config['db_pass']);
+    $connection->query("CREATE DATABASE IF NOT EXISTS $db_name CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+    unset($connection); // close connection
+
+    Eloquent::boot();
+    Eloquent::setStrictMode();
+
     $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", [$db_name]) == 0);
-    dbQuery("SET GLOBAL sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
-    $cmd = $config['install_dir'] . '/build-base.php';
+    $cmd = Config::get('install_dir') . '/build-base.php';
     exec($cmd, $schema);
 
     Config::load(); // reload the config including database config
+    load_all_os();
 
     register_shutdown_function(function () use ($empty_db, $sql_mode) {
-        global $config;
-        dbConnect();
+        Eloquent::boot();
 
         echo "Cleaning database...\n";
-
-        // restore sql_mode
-        dbQuery("SET GLOBAL sql_mode='$sql_mode'");
 
         $db_name = dbFetchCell('SELECT DATABASE()');
         if ($empty_db) {
             dbQuery("DROP DATABASE $db_name");
-        } elseif (isset($config['test_db_name']) && $config['test_db_name'] == $db_name) {
+        } elseif (Config::get('test_db_name') == $db_name) {
             // truncate tables
             $tables = dbFetchColumn('SHOW TABLES');
 
@@ -100,8 +98,7 @@ if (getenv('DBTEST')) {
                 'alert_templates',
                 'config', // not sure about this one
                 'dbSchema',
-                'graph_types',
-                'port_association_mode',
+                'migrations',
                 'widgets',
             );
             $truncate = array_diff($tables, $excluded);

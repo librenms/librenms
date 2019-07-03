@@ -3,7 +3,7 @@ type: server
 group: unix
 text: OpenBSD
 bad_snmpEngineTime: true
-processor_stacked: 1
+processor_stacked: true
 over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }

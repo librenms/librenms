@@ -30,4 +30,10 @@ echo 'inletPoleTable ';
 $pre_cache['raritan_inletPoleTable'] = snmpwalk_group($device, 'inletPoleTable', 'PDU-MIB', 2);
 
 echo 'inletLabel ';
-$pre_cache['raritan_inletLabel'] = snmpwalk_cache_oid($device, 'inletLabel', array(), 'PDU2-MIB');
+$pre_cache['raritan_inletLabel'] = snmpwalk_cache_oid($device, 'inletLabel', [], 'PDU2-MIB');
+
+echo 'externalSensors';
+$pre_cache['raritan_extSensorConfig'] = snmpwalk_cache_oid($device, 'externalSensorConfigurationTable', [], 'PDU2-MIB');
+
+echo 'externalSensorMeasurementsTable';
+$pre_cache['raritan_extSensorMeasure'] = snmpwalk_cache_oid($device, 'externalSensorMeasurementsTable', [], 'PDU2-MIB');

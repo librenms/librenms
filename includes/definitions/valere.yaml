@@ -2,7 +2,7 @@ os: valere
 text: 'Eltek Valere'
 type: power
 icon: eltek
-nobulk: 1
+nobulk: true
 mib_dir:
     - eltek
 over:

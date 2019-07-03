@@ -1,0 +1,14 @@
+os: wisi-tangram
+text: 'WISI Tangram'
+type: network
+icon: wisi
+mib_dir:
+    - wisi
+over: []
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.7465
+    - snmpget:
+          oid: .1.3.6.1.4.1.7465.20.2.9.1.2.1.3.1.2
+          op: contains
+          value: 'GT01'

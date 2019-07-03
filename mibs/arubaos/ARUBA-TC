@@ -1,4 +1,4 @@
---- ArubaOS 6.5.2.0_59123
+--- ArubaOS 8.5.0.0_70258
 -- vim:set ts=4 sw=4:
 ARUBA-TC DEFINITIONS ::= BEGIN
 
@@ -61,7 +61,12 @@ ArubaHTMode ::= TEXTUAL-CONVENTION
 						vht40(5),
 						vht80(6),
 						vht160(7),
-						vht80plus80(8)
+						vht80plus80(8),
+						he20(9),
+						he40(10),
+						he80(11),
+						he160(12),
+						he80plus80(13)
 					  }
         
 ArubaHTExtChannel ::= TEXTUAL-CONVENTION
@@ -84,7 +89,8 @@ ArubaMonEncryptionType ::= TEXTUAL-CONVENTION
 		 				open(0),
 						wep(1),
 						wpa(2),
-						wpa2(3)
+						wpa2(3),
+						wpa3(4)
 					  }
 
 ArubaMonEncryptionCipher ::= TEXTUAL-CONVENTION
@@ -96,8 +102,9 @@ ArubaMonEncryptionCipher ::= TEXTUAL-CONVENTION
 						wep40(1),
 						wep104(2),
 						tkip(3),
-                        aesccmp(4),
-                        other(5)
+						aesccmp(4),
+						other(5),
+						gcm256(6)
 					  }
 
 ArubaMonAuthAlgorithm ::= TEXTUAL-CONVENTION
@@ -108,7 +115,16 @@ ArubaMonAuthAlgorithm ::= TEXTUAL-CONVENTION
 		 				none(0),
 						psk(1),
 						dot1x(2),
-                        other(3)
+						ftdot1x(3),
+						ftpsk(4),
+						dot1x256(5),
+						psk256(6),
+						tdls(7),
+						sae(8),
+						ftsae(9),
+						other(10),
+						suiteb(11),
+						owe(12)
 					  }
                       
 ArubaSwitchRole ::= TEXTUAL-CONVENTION
@@ -118,7 +134,8 @@ ArubaSwitchRole ::= TEXTUAL-CONVENTION
 	SYNTAX       INTEGER {
 		 				master(1),
 						local(2),
-						backupmaster(3)
+						backupmaster(3),
+                                                standalone(4)
 					  }
           
 ArubaSupportStatus ::= TEXTUAL-CONVENTION
@@ -246,7 +263,13 @@ ArubaEncryptionType ::= TEXTUAL-CONVENTION
                         bSec-128(12),
                         bSec-256(13),
                         aes-128-cmac(14),
-                        unknown(15)
+                        unknown(15),
+                        ft-psk(16),
+                        ft-8021x(17),
+                        wpa3-cnsa(18),
+                        owe-aes(20),
+                        wpa3-sae-aes(21),
+                        wpa3-aes-gcmp-256(22)
 					  }
      
 ArubaUserForwardMode ::= TEXTUAL-CONVENTION
@@ -336,7 +359,15 @@ ArubaEncryptionMethods ::= TEXTUAL-CONVENTION
 						wpa-psk-aes(9),
 						wpa-aes(10),
 						wpa2-psk-tkip(11),
-						wpa2-8021x-tkip(12)
+						wpa2-8021x-tkip(12),
+						bSec-128(13),
+						bSec-256(14),
+						owe-aes(16),
+						wpa3-sae-aes(17),
+						wpa3-cnsa(18),
+						wpa3-aes-ccm-128(19),
+						mpsk-aes(21),
+						wpa3-aes-gcm-256(22)
 						}
 
  ArubaHashAlgorithms ::= TEXTUAL-CONVENTION
@@ -434,8 +465,7 @@ ArubaCardType ::= TEXTUAL-CONVENTION
 					sw7030(25),
 					sw7205(26),
 					sw7024(27),
-					sw7240xm(28),
-					sw7008(29)
+					sw7024xm(28)
 				}
  
 ArubaESIServerMode ::= TEXTUAL-CONVENTION
@@ -609,8 +639,9 @@ ArubaPortSpeed ::= TEXTUAL-CONVENTION
 						  speed1000Mbps(3), 
 						  speedAuto(4),
 						  speed10Gbps(5),
-						  speed2Gbps(6),
-						  speed5Gbps(7)
+						  speed2Point5Gbps(6),
+						  speed5Gbps(7),
+                          speed40Gbps(8)
 						}
 
 ArubaPortDuplex ::= TEXTUAL-CONVENTION
@@ -887,6 +918,16 @@ ArubaDot3azStatus ::= TEXTUAL-CONVENTION
 						eee10GBaseKX4(6),
 						eee10GBaseKR(7)
 					 }
+	
+ArubaDot3bzStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the state of 802.3bz."
+    SYNTAX      INTEGER {
+						unsupported(0),
+						no(1),
+		 				yes(2)
+					 }
 		
 ArubaThresholdResourceType ::= TEXTUAL-CONVENTION
 	STATUS		current
@@ -1089,6 +1130,19 @@ ArubaFlexRadioMode ::= TEXTUAL-CONVENTION
                             dual2GHzplus5GHzBand(2), 
                             unknown(3),
                             notApplicable(4)
+                       }
+
+ArubaDual5GMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  Dual 5GHz Operating Mode
+		"
+	SYNTAX		INTEGER {
+                            disabled(0),
+                            enabled(1),
+                            unknown(2),
+                            notApplicable(3)
                        }
 
 END

@@ -6,11 +6,10 @@ over:
     - { graph: device_toner, text: Toner }
 discovery:
     - sysDescr:
-        - KONICA MINOLTA
+        - 'KONICA MINOLTA'
     - sysObjectID:
         - .1.3.6.1.4.1.18334.1.2.1.2.1.
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
-
+    toner: true

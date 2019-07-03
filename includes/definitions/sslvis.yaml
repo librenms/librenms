@@ -1,7 +1,7 @@
 os: sslvis
 text: 'Blue Coat SSL Visibility'
 type: network
-ifname: 1
+ifname: true
 icon: bluecoat
 mib_dir:
     - bluecoat

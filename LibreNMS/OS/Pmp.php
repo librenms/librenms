@@ -32,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
 use LibreNMS\OS;
 
 class Pmp extends OS implements
@@ -40,7 +41,8 @@ class Pmp extends OS implements
     WirelessFrequencyDiscovery,
     WirelessUtilizationDiscovery,
     WirelessSsrDiscovery,
-    WirelessClientsDiscovery
+    WirelessClientsDiscovery,
+    WirelessErrorsDiscovery
 {
 
     /**
@@ -137,31 +139,71 @@ class Pmp extends OS implements
      */
     public function discoverWirelessUtilization()
     {
-        $downlink = '.1.3.6.1.4.1.161.19.3.1.12.1.1.0'; //WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization
-        $uplink = '.1.3.6.1.4.1.161.19.3.1.12.1.2.0'; //WHISP-APS-MIB::frUtlLowTotalUplinkUtilization
+        $lowdownlink  = '.1.3.6.1.4.1.161.19.3.1.12.1.1.0'; // WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization
+        $lowuplink    = '.1.3.6.1.4.1.161.19.3.1.12.1.2.0'; // WHISP-APS-MIB::frUtlLowTotalUplinkUtilization
+        $meddownlink  = '.1.3.6.1.4.1.161.19.3.1.12.2.1.0'; // WHISP-APS-MIB::frUtlMedTotalDownlinkUtilization
+        $meduplink    = '.1.3.6.1.4.1.161.19.3.1.12.2.2.0'; // WHISP-APS-MIB::frUtlMedTotalUplinkUtilization
+        $highdownlink = '.1.3.6.1.4.1.161.19.3.1.12.3.1.0'; // WHISP-APS-MIB::frUtlHighTotalDownlinkUtilization
+        $highuplink   = '.1.3.6.1.4.1.161.19.3.1.12.3.2.0'; // WHISP-APS-MIB::frUtlHighTotalUplinkUtilization
 
         // 450M Specific Utilizations
-        $muSectorDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.29.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkSectorUtilization
-        $muDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.30.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkMumimoUtilization
-        $suDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.31.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkSumimoUtilization
+        $muSectorDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.29.0'; // WHISP-APS-MIB::frUtlMedMumimoDownlinkSectorUtilization
+        $muDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.30.0'; // WHISP-APS-MIB::frUtlMedMumimoDownlinkMumimoUtilization
+        $suDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.31.0'; // WHISP-APS-MIB::frUtlMedMumimoDownlinkSumimoUtilization
 
         return array(
             new WirelessSensor(
                 'utilization',
                 $this->getDeviceId(),
-                $downlink,
+                $lowdownlink,
                 'pmp-downlink',
                 0,
-                'Downlink Utilization',
+                '1m Downlink Utilization',
                 null
             ),
             new WirelessSensor(
                 'utilization',
                 $this->getDeviceId(),
-                $uplink,
+                $lowuplink,
                 'pmp-uplink',
                 0,
-                'Uplink Utilization',
+                '1m Uplink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $meddownlink,
+                'pmp-downlink',
+                1,
+                '5m Downlink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $meduplink,
+                'pmp-uplink',
+                1,
+                '5m Uplink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $highdownlink,
+                'pmp-downlink',
+                2,
+                '15m Downlink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $highuplink,
+                'pmp-uplink',
+                2,
+                '15m Uplink Utilization',
                 null
             ),
             new WirelessSensor(
@@ -279,6 +321,48 @@ class Pmp extends OS implements
                 'pmp',
                 0,
                 'Client Count',
+                null
+            )
+        );
+    }
+
+    /**
+     * Discover wireless bit errors.  This is in total bits. Type is errors.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessErrors()
+    {
+        $fecInErrorsCount = '.1.3.6.1.4.1.161.19.3.3.1.95.0';
+        $fecOutErrorsCount = '.1.3.6.1.4.1.161.19.3.3.1.97.0';
+        $fecCRCError = '.1.3.6.1.4.1.161.19.3.3.1.223.0';
+        return array(
+            new WirelessSensor(
+                'errors',
+                $this->getDeviceId(),
+                $fecCRCError,
+                'pmp-fecCRCError',
+                0,
+                'CRC Errors',
+                null
+            ),
+            new WirelessSensor(
+                'errors',
+                $this->getDeviceId(),
+                $fecOutErrorsCount,
+                'pmp-fecOutErrorsCount',
+                0,
+                'Out Error Count',
+                null
+            ),
+            new WirelessSensor(
+                'errors',
+                $this->getDeviceId(),
+                $fecInErrorsCount,
+                'pmp-fecInErrorsCount',
+                0,
+                'In Error Count',
                 null
             )
         );

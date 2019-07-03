@@ -1,5 +1,5 @@
 os: digipower
-text: 'Digipower'
+text: Digipower
 type: power
 over:
     - { graph: device_current, text: Current }

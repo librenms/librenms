@@ -42,7 +42,9 @@ raidEntry	  OBJECT-TYPE
 RaidEntry ::= SEQUENCE {
     raidIndex		Integer32,
     raidName		OCTET STRING,
-	raidStatus		Integer32
+	raidStatus		Integer32,
+	raidFreeSize	Counter64,
+	raidTotalSize	Counter64
 }
 
 raidIndex OBJECT-TYPE
@@ -73,12 +75,43 @@ raidStatus OBJECT-TYPE
 	 Normal(1): The raid functions normally.
  	 Degrade(11): Degrade happens when a tolerable failure of disk(s) occurs.
  	 Crashed(12): Raid has crashed and just uses for read-only operation.
+	 
+	 ** 2018/6/15 add **
+	 DataScrubbing(13): Raid status is DATASCRUBBING
+	 RaidDeploying(14) : Deploying Single volume on pool
+	 RaidUnDeploying(15): Undeploying Single volume on pool
+	 RaidMountCache(16): Mounting SSD cache
+	 RaidUnmountCache(17): Unmounting SSD cache
+	 RaidExpandingUnfinishedSHR(18): Continue expand SHR if interrupted
+	 RaidConvertSHRToPool(19): Converting Single volume on SHR to mutiple volume on SHR
+	 RaidMigrateSHR1ToSHR2(20): Migrating SHR1 to SHR2
+	 RaidUnknownStatus(21): Unknown raid status
+	 ** END **
 
 	 Note:
 	 Other status will be showed when creating or deleting raids, including below status, Repairing(2), Migrating(3), Expanding(4), Deleting(5), Creating(6), RaidSyncing(7), RaidParityChecking(8), RaidAssembling(9) and Canceling(10).
 	"
     ::= { raidEntry 3 }
 
+raidFreeSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Synology raid freesize
+	 Free space in bytes.
+	"
+    ::= { raidEntry 4 }
+
+raidTotalSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Synology raid totalsize
+	 Total space in bytes.
+	"
+    ::= { raidEntry 5 }
 
 raidConformance OBJECT IDENTIFIER ::= { synoRaid 2 }
 raidCompliances OBJECT IDENTIFIER ::= { raidConformance 1 }

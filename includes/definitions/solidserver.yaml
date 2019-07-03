@@ -1,0 +1,13 @@
+os: solidserver
+text: EfficientIP SOLIDserver
+type: server
+icon: eip
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - efficientip
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.2440

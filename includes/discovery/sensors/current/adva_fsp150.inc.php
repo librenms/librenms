@@ -21,12 +21,12 @@
 // ******************************************
 
     // Define Sensors and Limits
-    $sensors_adva = array
-                (
-                array(
-                        'sensor_name'     => 'psuOutputCurrent',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8')
-                );
+    $sensors_adva = [
+        [
+        'sensor_name'     => 'psuOutputCurrent',
+        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8'
+        ]
+    ];
 
     $multiplier = 1;
     $divisor    = 1000;
@@ -37,7 +37,7 @@
             if ($pre_cache['adva_fsp150'][$index][$sensor_name]) {
                 $oid          = $entry['sensor_oid'].".".$index;
                 $descr        = $pre_cache['adva_fsp150'][$index]['slotCardUnitName']." [#".$pre_cache['adva_fsp150'][$index]['slotIndex']."]";
-                $current      = $pre_cache['adva_fsp150'][$index][$entry]/$divisor;
+                $current      = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']]/$divisor;
 
                 discover_sensor(
                     $valid['sensor'],

@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Layer Two Interface Management MIB
 -- Reference:
--- Version: V1.0
+-- Version: V2.14
 -- History:
 --      V1.0 
 -- ==================================================================
@@ -18,7 +18,7 @@ IMPORTS
     TruthValue,TEXTUAL-CONVENTION
         FROM SNMPv2-TC
 
-    MODULE-IDENTITY,OBJECT-TYPE,Integer32,IpAddress,OBJECT-IDENTITY
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, OBJECT-IDENTITY, NOTIFICATION-TYPE, Counter64
         FROM SNMPv2-SMI
 
     ifIndex,InterfaceIndex,ifDescr
@@ -26,6 +26,12 @@ IMPORTS
         
     RowStatus
         FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF       
+        
+    VlanIdOrNone, VlanId
+        FROM Q-BRIDGE-MIB       
     
     EnabledStatus
         FROM P-BRIDGE-MIB;
@@ -33,20 +39,32 @@ IMPORTS
      hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
      
     hwL2IfMib MODULE-IDENTITY
-        LAST-UPDATED "200505100836Z"        
+        LAST-UPDATED "201708170900Z"        
     ORGANIZATION 
-        "Huawei Technologies co.,Ltd."
+        "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
-        "VRP Team Huawei Technologies co.,Ltd.
-        Huawei Bld.,NO.3 Xinxi Rd., 
-        Shang-Di Information Industry Base,
-        Hai-Dian District Beijing P.R. China
-        http://www.huawei.com
-            Zip:100085
-        "
+        "Huawei Industrial Base
+          Bantian, Longgang
+           Shenzhen 518129
+           People's Republic of China
+           Website: http://www.huawei.com
+           Email: support@huawei.com
+         "
     DESCRIPTION
         "information of layer2 interface and information of hybrid port and
         information of trunk port"
+    REVISION	 "201708170900Z"
+    DESCRIPTION
+	"Modify descriptions of the nodes."
+	REVISION	 "201611220900Z"
+    DESCRIPTION
+	"Add hwL2IfActivePortType."         
+    REVISION	 "201308060900Z"
+    DESCRIPTION
+	"Add hwL2IfActivePortType." 
+    REVISION	 "201307240900Z"
+    DESCRIPTION
+	"Add two l2ifport types:desirable(6),auto(7)."    
             ::= { hwL2Mgmt 1 }
           
 
@@ -76,7 +94,7 @@ VlanList ::= TEXTUAL-CONVENTION
 --
 -- ============================================================================       
     hwL2IfPortMax  OBJECT-TYPE 
-        SYNTAX  INTEGER
+        SYNTAX  Integer32
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION 
@@ -100,8 +118,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS not-accessible
         STATUS   current
         DESCRIPTION 
-            " This is a table of layer2 interface,so it displays some attribute of
-            layer2 interface."
+            "This table is used to query and configure the basic attributes of a Layer 2 interface, including number, index, type, default VLAN ID, and the MAC address learning status."
         ::= { hwL2Interface  3 }
 
 
@@ -116,19 +133,19 @@ VlanList ::= TEXTUAL-CONVENTION
 
     HwL2IfEntry ::=
     SEQUENCE {
-        hwL2IfPortNum INTEGER,
+        hwL2IfPortNum Integer32,
         hwL2IfPortIfIndex InterfaceIndex,    
         hwL2IfPortType        INTEGER,    
-        hwL2IfPVID      INTEGER,
+        hwL2IfPVID      Integer32,
         hwL2IfIsSrcMacFilter   TruthValue,
         hwL2IfMacAddrLearnMode INTEGER,    
         hwL2IfMacAddressLearn INTEGER,    
-        hwL2IfBcastRatio INTEGER,      
-        hwL2IfMcastRatio INTEGER,      
-        hwL2IfUcastRatio INTEGER,  
-        hwL2IfOutBcastRatio INTEGER,      
-        hwL2IfOutMcastRatio INTEGER,      
-        hwL2IfOutUcastRatio INTEGER,
+        hwL2IfBcastRatio Integer32,      
+        hwL2IfMcastRatio Integer32,      
+        hwL2IfUcastRatio Integer32,  
+        hwL2IfOutBcastRatio Integer32,      
+        hwL2IfOutMcastRatio Integer32,      
+        hwL2IfOutUcastRatio Integer32,
         hwL2IfDiscardBcast EnabledStatus,
         hwL2IfDiscardUnknownMcast EnabledStatus,
         hwL2IfDiscardUnknownUcast EnabledStatus,
@@ -138,20 +155,21 @@ VlanList ::= TEXTUAL-CONVENTION
         hwL2IfInInvalidVlanPkts  Counter64,
         hwL2IfFlushEnable  EnabledStatus,
         hwL2IfFlushControlVlan  Integer32,
-        hwL2IfTrustDefaultPriority EnabledStatus,
-        hwL2IfOfflineStatus EnabledStatus,
+        hwL2IfCurrentInBcastPercent EnabledStatus,
+        hwL2IfCurrentOutBcastPercent EnabledStatus,
         hwL2IfQinqVlanTransEnable EnabledStatus,
         hwL2IfQinqVlanTransMissDrop INTEGER,
         hwL2IfIpSubnetVlanEnable EnabledStatus,
         hwL2IfMacVlanEnable EnabledStatus,
-    hwL2IfPolicyVlanEnable EnabledStatus,
-    hwL2IfVlanPrecedence  Integer32,
-    hwL2IfIsolateGroupEnable  EnabledStatus
+        hwL2IfPolicyVlanEnable EnabledStatus,
+        hwL2IfVlanPrecedence  Integer32,
+        hwL2IfIsolateGroupEnable  EnabledStatus,
+        hwL2IfActivePortType        INTEGER
         }
 
                       
     hwL2IfPortNum OBJECT-TYPE   
-        SYNTAX  INTEGER (1..65535)      
+        SYNTAX  Integer32 (1..65535)      
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION 
@@ -165,9 +183,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-            "A unique value, greater than zero, for each interface or interface
-             sub-layer in the managed system. The value is consistent with the
-             ifIndex in ifTable of IF-MIB."
+            "The value of this object identifies the index of the Layer 2 interface."
            ::= { hwL2IfEntry 2 }
     
 
@@ -180,18 +196,18 @@ VlanList ::= TEXTUAL-CONVENTION
                     access(2) ,
                     hybrid(3) ,    
                     fabric(4),
-                    qinq(5)
+                    qinq(5),
+                    desirable(6),
+                    auto(7)
                 }
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-             " Layer2 interface Port type, it contains invalid(0), trunk(1),
-             access(2), hybrid(3), fabric(4)and qinq(5).Do not support 
-             fabric(4) now.invalid(0),which we read only,can't modify."
+             "The value of this object identifies the type of the Layer 2 interface."
         ::= { hwL2IfEntry 3 }
 
     hwL2IfPVID  OBJECT-TYPE
-        SYNTAX  INTEGER
+        SYNTAX  Integer32
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
@@ -216,16 +232,16 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION 
-            " Status indicates mac address learn mode of the interface.
-               IVL(1) means independent VLAN learning.SVL means shared VLAN learning.
-            We only support iVL now."
+            "The object indicates the mode for learning MAC addresses."
         ::= { hwL2IfEntry 6 }
             
     hwL2IfMacAddressLearn OBJECT-TYPE
         SYNTAX  INTEGER
             {
                 enabled(1),
-                disabled(2)
+                disabled(2),
+                discard(3),
+                invalid(4)
             }
         MAX-ACCESS read-write
         STATUS current
@@ -233,12 +249,12 @@ VlanList ::= TEXTUAL-CONVENTION
              " Status indicates if the interface is allowed to learn mac 
              address, enable(1) can be setted, (enabled(1) means that 
              the interface can learn mac address), otherwise disabled(2) 
-             can be setted."
+             can be setted. discard(3) means the interface will drop packets."
         ::= { hwL2IfEntry 7 }
       
     --suppression step of percentage mode       
     hwL2IfBcastRatio OBJECT-TYPE
-        SYNTAX  INTEGER (0..100)
+        SYNTAX  Integer32 (0..100)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
@@ -247,7 +263,7 @@ VlanList ::= TEXTUAL-CONVENTION
         ::= { hwL2IfEntry 8 }
 
     hwL2IfMcastRatio OBJECT-TYPE
-        SYNTAX  INTEGER (0..100)
+        SYNTAX  Integer32 (0..100)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
@@ -256,7 +272,7 @@ VlanList ::= TEXTUAL-CONVENTION
         ::= { hwL2IfEntry 9 }
 
     hwL2IfUcastRatio OBJECT-TYPE
-        SYNTAX  INTEGER (0..100)
+        SYNTAX  Integer32 (0..100)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
@@ -265,7 +281,7 @@ VlanList ::= TEXTUAL-CONVENTION
         ::= { hwL2IfEntry 10 }
         
     hwL2IfOutBcastRatio OBJECT-TYPE
-        SYNTAX  INTEGER (0..100)
+        SYNTAX  Integer32 (0..100)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
@@ -274,7 +290,7 @@ VlanList ::= TEXTUAL-CONVENTION
         ::= { hwL2IfEntry 11 }
 
     hwL2IfOutMcastRatio OBJECT-TYPE
-        SYNTAX  INTEGER (0..100)
+        SYNTAX  Integer32 (0..100)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
@@ -283,7 +299,7 @@ VlanList ::= TEXTUAL-CONVENTION
         ::= { hwL2IfEntry 12 }
 
     hwL2IfOutUcastRatio OBJECT-TYPE
-        SYNTAX  INTEGER (0..100)
+        SYNTAX  Integer32 (0..100)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
@@ -353,7 +369,7 @@ VlanList ::= TEXTUAL-CONVENTION
         
      hwL2IfFlushEnable      OBJECT-TYPE
         SYNTAX  EnabledStatus
-        MAX-ACCESS read-only
+        MAX-ACCESS read-write
         STATUS current
         DESCRIPTION   
             " The flush enable status of layer2 port."
@@ -361,12 +377,12 @@ VlanList ::= TEXTUAL-CONVENTION
         
      hwL2IfFlushControlVlan    OBJECT-TYPE
         SYNTAX  Integer32 (1..4094 | 65535)
-        MAX-ACCESS read-only
+        MAX-ACCESS read-write
         STATUS current
         DESCRIPTION   
             " The control vlan of flush packet."
         ::= { hwL2IfEntry 22 }          
-     hwL2IfTrustDefaultPriority    OBJECT-TYPE
+     hwL2IfCurrentInBcastPercent    OBJECT-TYPE
         SYNTAX  EnabledStatus
         MAX-ACCESS read-write
         STATUS current
@@ -375,7 +391,7 @@ VlanList ::= TEXTUAL-CONVENTION
             1:enable;  2:disable(default)."
         ::= { hwL2IfEntry 23 } 
         
-     hwL2IfOfflineStatus    OBJECT-TYPE
+     hwL2IfCurrentOutBcastPercent    OBJECT-TYPE
         SYNTAX  EnabledStatus
         MAX-ACCESS read-write
         STATUS current
@@ -450,6 +466,24 @@ VlanList ::= TEXTUAL-CONVENTION
             "The value enabled(1) indicates that the port is a member of the port-isolate group; disable(2) indicates that the port is not a member of the port-isolate group. The default value is disable(2)."
         DEFVAL  {2}
         ::= { hwL2IfEntry 31 }
+
+        hwL2IfActivePortType  OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                    invalid(0),  
+                    trunk(1) ,     
+                    access(2) ,
+                    hybrid(3) ,    
+                    fabric(4),
+                    qinq(5)
+                }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " Layer2 interface active port type, it contains invalid(0), trunk(1),
+             access(2), hybrid(3), fabric(4), qinq(5).Do not support fabric(4) now."
+        ::= { hwL2IfEntry 32 }
+
         
 -- ============================================================================
 -- Hybrid port group
@@ -459,7 +493,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION 
-            " Hybrid-port configuration table  "
+            "This table describes the VLAN information about Layer 2 hybrid interfaces in tagged and untagged modes."
         ::= { hwL2Interface  9 }
 
     hwL2IfHybridPortEntry  OBJECT-TYPE
@@ -474,7 +508,7 @@ VlanList ::= TEXTUAL-CONVENTION
     HwL2IfHybridPortEntry  ::=
     SEQUENCE 
             {
-                hwL2IfHybridPortIndex            INTEGER,    
+                hwL2IfHybridPortIndex            Integer32,    
                 hwL2IfHybridTaggedVlanListLow    VlanList,
                 hwL2IfHybridTaggedVlanListHigh   VlanList,
                 hwL2IfHybridUnTaggedVlanListLow  VlanList,
@@ -484,7 +518,7 @@ VlanList ::= TEXTUAL-CONVENTION
 
 
     hwL2IfHybridPortIndex  OBJECT-TYPE
-        SYNTAX  INTEGER  (1..65535)
+        SYNTAX  Integer32  (1..65535)
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION 
@@ -497,8 +531,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
-            " The lowest possible value of the tagged vlan list on the 
-            Hybrid-port."
+            "This object indicates the low-bit tagged VLANs carried in packets that can pass through the hybrid interface. There are 2048 low-bit VLANs (0-2047) and VLAN 0 is not used."
         ::= { hwL2IfHybridPortEntry 2 }
 
 
@@ -507,8 +540,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION   
-            " The highest possible value of the tagged vlan list on the 
-            Hybrid-port."
+            "This object indicates the high-bit tagged VLANs carried in packets that can pass through the hybrid interface. There are 2048 high-bit VLANs (2048-4095) and VLAN 4095 is not used."
         ::= { hwL2IfHybridPortEntry 3 }
 
 
@@ -517,8 +549,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
-            " The lowest possible value of the untagged vlan list on the 
-            Hybrid-port."
+            "This object indicates the low-bit untagged VLANs carried in packets that can pass through the hybrid interface. There are 2048 low-bit VLANs (0-2047) and VLAN 0 is not used."
         ::= { hwL2IfHybridPortEntry 4 }
 
 
@@ -527,8 +558,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION  
-             " The highest possible value of the untagged vlan list on the 
-             Hybrid-port."
+             "This object indicates the high-bit untagged VLANs carried in packets that can pass through the hybrid interface. There are 2048 high-bit VLANs (2048-4095) and VLAN 4095 is not used."
         ::= { hwL2IfHybridPortEntry 5 }  
 
 
@@ -540,7 +570,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION 
-            " Trunk-port configuration table. Trunk-port is a logistic port."
+            "This table describes the allowed VLAN information about Layer 2 trunk interfaces."
         ::= { hwL2Interface  10 }
 
 
@@ -556,14 +586,14 @@ VlanList ::= TEXTUAL-CONVENTION
     HwL2IfTrunkPortEntry  ::=
         SEQUENCE 
             {
-                hwL2IfTrunkPortIndex            INTEGER,
+                hwL2IfTrunkPortIndex            Integer32,
                 hwL2IfTrunkAllowPassVlanListLow    VlanList,
                 hwL2IfTrunkAllowPassVlanListHigh   VlanList
             }
 
 
     hwL2IfTrunkPortIndex  OBJECT-TYPE
-        SYNTAX  INTEGER  (1..65535)
+        SYNTAX  Integer32  (1..65535)
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION 
@@ -576,8 +606,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
-            " The lowest possible value of the Vlan list that port Trunk allows
-             to pass."
+            "This object indicates low-bit VLANs carried in packets that can pass through the trunk interface. There are 2048 low-bit VLANs (0-2047) and VLAN 0 is not used."
         ::= { hwL2IfTrunkPortEntry 2 }
 
 
@@ -586,8 +615,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION   
-            " The highest possible value of the Vlan list that port Trunk 
-            allows to pass."
+            "This object indicates high-bit VLANs carried in packets that can pass through the trunk interface. There are 2048 high-bit VLANs (2048-4095) and 4095 is not used."
         ::= { hwL2IfTrunkPortEntry 3 }
 
     hwL2IfPortIsolateTable  OBJECT-TYPE
@@ -926,7 +954,7 @@ VlanList ::= TEXTUAL-CONVENTION
                         hwL2IfPortLoopDetectInterval
                                 Integer32,
                         hwL2IfPortLoopDetectAction
-                                EnabledStatus,
+                                INTEGER,
                         hwL2IfPortLoopDetectStatus
                                 INTEGER,
                         hwL2IfPortLoopDetectProtocol
@@ -934,7 +962,7 @@ VlanList ::= TEXTUAL-CONVENTION
                  }
 
     hwL2IfPortLoopDetectPort OBJECT-TYPE
-        SYNTAX  Integer32 (1..65535)
+        SYNTAX  Integer32
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
@@ -959,7 +987,12 @@ VlanList ::= TEXTUAL-CONVENTION
         ::= { hwL2IfPortLoopDetectEntry 3 }      
 
     hwL2IfPortLoopDetectAction OBJECT-TYPE
-        SYNTAX EnabledStatus
+        SYNTAX  INTEGER
+                {
+                    shutdown(1),
+                    block(2),
+                    trap(3)     
+                }
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -971,13 +1004,15 @@ VlanList ::= TEXTUAL-CONVENTION
                 {
                     normal(1),  
                     block(2),
-                    shutdown(3)      
+                    shutdown(3),
+                    trap(4)     
                 }
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-                "The current status of port(block/shutdown/normal)."
-        ::= { hwL2IfPortLoopDetectEntry 5 }                                    
+                "The current status of port(block/shutdown/trap/normal)."
+        ::= { hwL2IfPortLoopDetectEntry 5 }
+                                            
     hwL2IfPortLoopDetectProtocol  OBJECT-TYPE
         SYNTAX          OCTET STRING (SIZE(2))
         MAX-ACCESS      read-write
@@ -1123,7 +1158,7 @@ VlanList ::= TEXTUAL-CONVENTION
         ::= { hwL2IfPwSuppressionEntry 3 }
         
     hwL2IfPwSuppressionCir    OBJECT-TYPE
-        SYNTAX  Integer32 (0..10000000)
+        SYNTAX  Integer32 (100..1000000)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION   
@@ -1131,7 +1166,7 @@ VlanList ::= TEXTUAL-CONVENTION
         ::= { hwL2IfPwSuppressionEntry 4 }
     
     hwL2IfPwSuppressionCbs    OBJECT-TYPE
-        SYNTAX  Integer32 (2048..64000000)
+        SYNTAX  Integer32 (100..33554432)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION   
@@ -1155,7 +1190,114 @@ VlanList ::= TEXTUAL-CONVENTION
         STATUS current
         DESCRIPTION 
             "The detect period of system external loopback detection."
-        ::= { hwL2Interface  18 }
+        ::= { hwL2Interface  18 }   
+        
+-- ============================================================================
+-- real-time relationship of port-vlan
+-- ============================================================================
+    hwL2IfDynamicPortVlanTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwL2IfDynamicPortVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "Table for dynamic relationship of port-vlan."
+        ::= { hwL2Interface 19 }
+
+    hwL2IfDynamicPortVlanEntry  OBJECT-TYPE
+        SYNTAX HwL2IfDynamicPortVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "Entry of dynamic port-vlan relationship table."
+        INDEX { hwL2IfDynamicPortVlanPortIndex,hwL2IfDynamicPortVlanServiceType }
+            ::= { hwL2IfDynamicPortVlanTable 1}
+
+    HwL2IfDynamicPortVlanEntry  ::=
+    SEQUENCE 
+            {
+                hwL2IfDynamicPortVlanPortIndex
+                    Integer32, 
+                hwL2IfDynamicPortVlanServiceType
+                    INTEGER,  
+                hwL2IfDynamicPortVlanPvid
+                    VlanIdOrNone, 
+                hwL2IfDynamicPortVlanUntaggedVlanListLow    
+                    VlanList,
+                hwL2IfDynamicPortVlanUntaggedVlanListHigh   
+                    VlanList,
+                hwL2IfDynamicPortVlanTaggedVlanListLow  
+                    VlanList,
+                hwL2IfDynamicPortVlanTaggedVlanListHigh 
+                    VlanList
+            }
+
+    hwL2IfDynamicPortVlanPortIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "Port index of switch-port."
+        ::= { hwL2IfDynamicPortVlanEntry 1 }
+        
+    hwL2IfDynamicPortVlanServiceType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            configured(1),
+            gvrp(2),
+            voiceVLAN(3),
+            unAuthenUserVLAN(4),
+            dynAuthenVLAN(5),
+            hvrp(6),
+            elmi(7),
+            macFlapping(8),
+            loopbackDetect(9),
+            loopDetection(10)
+        }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "Service type of dynamic port-vlan relationship table."
+        ::= { hwL2IfDynamicPortVlanEntry 2 }        
+
+    hwL2IfDynamicPortVlanPvid OBJECT-TYPE
+        SYNTAX VlanIdOrNone
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+            "The Dynamic PVID of port-vlan table."
+        ::= { hwL2IfDynamicPortVlanEntry 3 }
+
+    hwL2IfDynamicPortVlanUntaggedVlanListLow OBJECT-TYPE
+        SYNTAX VlanList (SIZE(256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+            "The lowest possible value of the untagged vlan list of dynamic port-vlan table."
+        ::= { hwL2IfDynamicPortVlanEntry 4 }
+
+    hwL2IfDynamicPortVlanUntaggedVlanListHigh OBJECT-TYPE
+        SYNTAX VlanList (SIZE(256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION   
+            "The highest possible value of the untagged vlan list of Dynamic port-vlan table."
+        ::= { hwL2IfDynamicPortVlanEntry 5 }
+
+    hwL2IfDynamicPortVlanTaggedVlanListLow OBJECT-TYPE
+        SYNTAX VlanList (SIZE(256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+            "The lowest possible value of the tagged vlan list of Dynamic port-vlan table."
+        ::= { hwL2IfDynamicPortVlanEntry 6 }
+
+    hwL2IfDynamicPortVlanTaggedVlanListHigh OBJECT-TYPE
+        SYNTAX VlanList (SIZE(256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION  
+             "The highest possible value of the tagged vlan list of Dynamic port-vlan table."
+        ::= { hwL2IfDynamicPortVlanEntry 7 }         
        
     hwL2IfTraps OBJECT IDENTIFIER ::= { hwL2IfObjects 2 }
 
@@ -1166,11 +1308,11 @@ VlanList ::= TEXTUAL-CONVENTION
                 "Warning of receiving invalid VLAN packets in the interface."
             ::= { hwL2IfTraps 1 }        
 
-    hwLoopDetectStatusAlarm NOTIFICATION-TYPE
+    hwInBcastRisingThreshold NOTIFICATION-TYPE
             OBJECTS {ifDescr,hwL2IfPortLoopDetectStatus} 
             STATUS current     
             DESCRIPTION 
-                "Port status changed because loopback detect.(Normal/Block/Shutdown)"
+                "Port status changed because loopback detect.(Normal/Block/Shutdown/Trap)"
             ::= { hwL2IfTraps 2 }                          
 
     hwL2IfConformance OBJECT IDENTIFIER ::= { hwL2IfMib 2 }    
@@ -1257,7 +1399,8 @@ VlanList ::= TEXTUAL-CONVENTION
     hwL2IfPortTypeGroup OBJECT-GROUP
         OBJECTS    
             {
-                hwL2IfPortType    
+                hwL2IfPortType,    
+                hwL2IfActivePortType
             }
         STATUS      current
         DESCRIPTION
@@ -1288,8 +1431,8 @@ VlanList ::= TEXTUAL-CONVENTION
                  hwL2IfInInvalidVlanPkts,
                  hwL2IfFlushEnable,
                  hwL2IfFlushControlVlan,
-                 hwL2IfTrustDefaultPriority,
-                 hwL2IfOfflineStatus,
+                 hwL2IfCurrentInBcastPercent,
+                 hwL2IfCurrentOutBcastPercent,
                  hwL2IfQinqVlanTransEnable,
                  hwL2IfQinqVlanTransMissDrop,
                  hwL2IfIpSubnetVlanEnable,
@@ -1318,7 +1461,7 @@ VlanList ::= TEXTUAL-CONVENTION
             NOTIFICATIONS
                     {
                         hwL2IfInvalidVlanPacketAlarm,
-                        hwLoopDetectStatusAlarm                    
+                        hwInBcastRisingThreshold                    
                     }
             STATUS      current
         DESCRIPTION
@@ -1401,10 +1544,23 @@ VlanList ::= TEXTUAL-CONVENTION
             "A collection of objects in L2IfPwSuppression."
         ::= { hwL2IfGroups 17 }
  
+    hwL2IfDynamicPortVlanTableGroup OBJECT-GROUP
+            OBJECTS
+                    {
+                        hwL2IfDynamicPortVlanPvid,     
+                        hwL2IfDynamicPortVlanUntaggedVlanListLow,
+                        hwL2IfDynamicPortVlanUntaggedVlanListHigh,
+                        hwL2IfDynamicPortVlanTaggedVlanListLow,
+                        hwL2IfDynamicPortVlanTaggedVlanListHigh
+                    }
+            STATUS      current
+        DESCRIPTION
+            "A collection of objects of dynamic relationship of port-vlan."
+        ::= { hwL2IfGroups 19 }
 
--- ----------------------------------------------------------------------------
+-- ============================================================================
 -- compliance statements
--- ----------------------------------------------------------------------------
+-- ============================================================================
      hwL2IfCompliance MODULE-COMPLIANCE
         STATUS current
         DESCRIPTION 

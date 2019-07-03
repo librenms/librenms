@@ -1,4 +1,5 @@
 source: Installation/Installation-Ubuntu-1404-Nginx.md
+path: blob/master/doc/
 > NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
 **Please note the minimum supported PHP version is 5.6.4**
@@ -210,6 +211,8 @@ LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job ru
 Create the cronjob
 
     cp librenms.nonroot.cron /etc/cron.d/librenms
+
+> NOTE: Keep in mind  that cron, by default, only uses a very limited set of environment variables. You may need to configure proxy variables for the cron invocation. Alternatively adding the proxy settings in config.php is possible too. The config.php file will be created in the upcoming steps. Review the following URL after you finished librenms install steps: https://docs.librenms.org/Support/Configuration/#proxy-support
 
 ### Copy logrotate config ###
 

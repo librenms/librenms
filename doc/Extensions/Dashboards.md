@@ -1,4 +1,5 @@
 source: Extensions/Dashboards.md
+path: blob/master/doc/
 
 # Dashboards
 Create customised dashboards in LibreNMS per user. You can share dashboards with other users. You can also make a custom dashboard and

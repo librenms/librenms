@@ -6,7 +6,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 echo "postgres";
 
-$options      = '-O qv';
+$options      = '-Oqv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
 $postgres = snmp_walk($device, $oid, $options);
 
@@ -127,6 +127,9 @@ if (empty($found_dbs)) {
     } else {
         $pgc = $component->createComponent($device_id, 'postgres');
     }
+
+    // Make sure we don't readd it, just in a different order.
+    sort($found_dbs);
 
     $id = $component->getFirstComponentID($pgc);
     $pgc[$id]['label'] = 'Postgres';

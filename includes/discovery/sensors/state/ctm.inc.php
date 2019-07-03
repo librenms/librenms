@@ -23,46 +23,46 @@
  * @author     Paul Heinrichs <pdheinrichs@gmail.com>
  */
 
-$states = array(
-    'power' => array(
-        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Power On'),
-        array('value' => 0, 'generic' => 1, 'graph' => 0, 'descr' => 'Power Off'),
-    ),
-    'sync' => array(
-        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Sync Enabled'),
-        array('value' => 0, 'generic' => 1, 'graph' => 0, 'descr' => 'Sync Off'),
-    )
-);
-$octetSetup = array(
-    array(
+$states = [
+    'power' => [
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Power On'],
+        ['value' => 0, 'generic' => 1, 'graph' => 0, 'descr' => 'Power Off'],
+    ],
+    'sync' => [
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Sync Enabled'],
+        ['value' => 0, 'generic' => 1, 'graph' => 0, 'descr' => 'Sync Off'],
+    ]
+];
+$octetSetup = [
+    [
         'oid'           => 'portOnM.0',
         'state_name'    => 'portOnM',
         'states'        => $states['power'],
         'name'          => 'Master Port Enabled',
         'num_oid'       => '.1.3.6.1.4.1.25868.1.12.0'
-    ),
-    array(
+    ],
+    [
         'oid'           => 'portSyncM.0',
         'state_name'    => 'portSyncM',
         'states'        => $states['sync'],
         'name'          => 'Master Port Sync Status',
         'num_oid'       => '.1.3.6.1.4.1.25868.1.13.0'
-    ),
-    array(
+    ],
+    [
         'oid'           => 'portOnS.0',
         'state_name'    => 'portOnS',
         'states'        => $states['power'],
         'name'          => 'Slave Port Enabled',
         'num_oid'       => '.1.3.6.1.4.1.25868.1.29.0'
-    ),
-    array(
+    ],
+    [
         'oid'           => 'portSyncS.0',
         'state_name'    => 'portSyncS',
         'states'        => $states['sync'],
         'name'          => 'Slave Port Sync Status',
         'num_oid'       => '.1.3.6.1.4.1.25868.1.30.0'
-    ),
-);
+    ],
+];
 
 foreach ($octetSetup as $entry) {
     $octetString = snmp_get($device, $entry['oid'], "-Ovqe", "CTMMIBCUSTOM");

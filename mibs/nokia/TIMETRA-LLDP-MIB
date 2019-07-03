@@ -1,0 +1,1422 @@
+TIMETRA-LLDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-COMPLIANCE, OBJECT-GROUP              FROM SNMPv2-CONF
+
+    SnmpAdminString                              FROM SNMP-FRAMEWORK-MIB
+
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Counter32
+                                                 FROM SNMPv2-SMI
+
+    MacAddress, TEXTUAL-CONVENTION, TruthValue   FROM SNMPv2-TC
+
+    AddressFamilyNumbers                         FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+
+    ifIndex                                      FROM IF-MIB
+
+    LldpPortId, LldpPortIdSubtype,
+    LldpChassisId, LldpChassisIdSubtype,
+    LldpManAddress, LldpManAddrIfSubtype,
+    LldpSystemCapabilitiesMap,
+    lldpLocManAddrSubtype, lldpLocManAddr        FROM LLDP-MIB
+
+    TimeFilter, ZeroBasedCounter32               FROM RMON2-MIB
+
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix,  tmnxSRObjs              FROM TIMETRA-GLOBAL-MIB
+
+    TmnxEnabledDisabled                          FROM TIMETRA-TC-MIB
+    ;
+
+
+tmnxLldpMIBModule MODULE-IDENTITY
+    LAST-UPDATED    "201501010000Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision
+        LLDP on the Nokia SROS device.
+
+        Copyright 2008-2015 Nokia.  All rights reserved.
+        Reproduction of this document is authorized on the condition that
+        the foregoing copyright notice is included.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+    REVISION        "201501010000Z"
+    DESCRIPTION     "Rev 13.0                1 Jan 2015 00:00
+                     13.0 release of the TIMETRA-LLDP-MIB."
+
+    REVISION        "200902280000Z"
+    DESCRIPTION     "Rev 7.0                28 Feb 2009 00:00
+                     7.0 release of the TIMETRA-LLDP-MIB."
+
+    REVISION        "200202020200Z"
+    DESCRIPTION     "Rev 0.1                26 May 2008 00:00
+                     Initial version of the TIMETRA-LLDP-MIB."
+    ::= { timetraSRMIBModules  59 }
+
+tmnxLldpObjects                 OBJECT IDENTIFIER ::= { tmnxSRObjs         59 }
+tmnxLldpNotifications           OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 59 }
+tmnxLldpConformance             OBJECT IDENTIFIER ::= { tmnxSRConfs        59 }
+
+tmnxLldpConfiguration           OBJECT IDENTIFIER ::= { tmnxLldpObjects     1 }
+tmnxLldpStatistics              OBJECT IDENTIFIER ::= { tmnxLldpObjects     2 }
+tmnxLldpLocalSystemData         OBJECT IDENTIFIER ::= { tmnxLldpObjects     3 }
+tmnxLldpRemoteSystemsData       OBJECT IDENTIFIER ::= { tmnxLldpObjects     4 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--   TIMETRA-LLDP-MIB Textual Conventions
+--
+
+TmnxLldpDestAddressTableIndex   ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "An index value, used as the index to the table of destination
+         MAC addresses used both as the destination addresses on
+         transmitted LLDPDUs and on received LLDPDUs. This index value
+         is also used as a secondary index value in tables indexed
+         by fields of type ifIndex, in order to associate
+         a destination address with each row of the table."
+    SYNTAX     Integer32 (1..4096)
+
+TmnxLldpManAddressIndex         ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "An Index value, used as the index to the table of local port
+         management addresses, tmnxLldpConfigManAddrPortsTable. The
+         index represents a specific local management address application
+         on the system which may, or may not exist."
+    SYNTAX    INTEGER {
+                  system     (1),
+                  systemIpv6 (2)
+              }
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--   TIMETRA-LLDP-MIB Configuration
+--
+
+tmnxLldpTxCreditMax             OBJECT-TYPE
+    SYNTAX     Integer32 (1..100)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum number of consecutive LLDPDUs that can be
+         transmitted at any time.
+         The default value for tmnxLldpTxCreditMax object is 5.
+         The value of this object must be restored from non-volatile
+         storage after a re-initialization of the management system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.2.5.16"
+    DEFVAL { 5 }
+    ::= { tmnxLldpConfiguration   1 }
+
+tmnxLldpMessageFastTx           OBJECT-TYPE
+    SYNTAX     Integer32 (1..3600)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The interval at which LLDP frames are transmitted on
+         behalf of this LLDP agent during fast transmission period
+         (e.g. when a new neighbor is detected).
+         The default value for tmnxLldpMessageFastTx object is 1 second.
+         The value of this object must be restored from non-volatile
+         storage after a re-initialization of the management system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.2.5.3"
+    DEFVAL { 1 }
+    ::= { tmnxLldpConfiguration   2 }
+
+tmnxLldpMessageFastTxInit        OBJECT-TYPE
+    SYNTAX     Integer32 (1..8)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The tmnxLldpMessageFastTxInit specifies the number of PDUs
+         to transmit during a fast transmission period."
+    DEFVAL { 4 }
+    ::= { tmnxLldpConfiguration   3 }
+
+tmnxLldpAdminStatus             OBJECT-TYPE
+    SYNTAX     TmnxEnabledDisabled
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The tmnxLldpAdminStatus specifies whether or not LLDP
+        is operationally 'enabled(1)' on the system, or
+        'disabled(2).' This is a system-wide configuration and
+        overrides the individual port admin status."
+    ::= { tmnxLldpConfiguration   4 }
+
+
+--==================================================
+-- tmnxLldpPortConfigTable
+--
+-- LLDP configuration indexed on a per port, per destination
+-- address basis. The ifIndex is used as a means of indexing
+-- individual ports in the system; an index into the
+-- tmnxLldpPortCfgDestAddressIndex is used to index per address.
+--
+
+tmnxLldpPortConfigTable         OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TmnxLldpPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table that controls LLDP frame transmission on individual
+         ports and using particular destination MAC addresses."
+    ::= { tmnxLldpConfiguration   5 }
+
+tmnxLldpPortConfigEntry         OBJECT-TYPE
+    SYNTAX     TmnxLldpPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "LLDP configuration information for a particular port and
+         destination MAC address.
+
+         This configuration parameter controls the transmission and
+         the reception of LLDP frames on those interface/address
+         combinations whose rows are created in this table.
+
+         Rows in this table can only be created for MAC addresses
+         that can validly be used in association with the type of
+         interface concerned, as defined by table 8-2.
+
+         The contents of this table is persistent across
+         re-initializations or re-boots."
+    INDEX {
+              ifIndex,
+              tmnxLldpPortCfgDestAddressIndex
+          }
+    ::= { tmnxLldpPortConfigTable   1 }
+
+TmnxLldpPortConfigEntry         ::= SEQUENCE {
+    tmnxLldpPortCfgDestAddressIndex TmnxLldpDestAddressTableIndex,
+    tmnxLldpPortCfgAdminStatus      INTEGER,
+    tmnxLldpPortCfgNotifyEnable     TruthValue,
+    tmnxLldpPortCfgTLVsTxEnable     BITS,
+    tmnxLldpPortCfgTunnelNearestBrg INTEGER,
+    tmnxLldpPortCfgPortIdSubtype    LldpPortIdSubtype
+}
+
+tmnxLldpPortCfgDestAddressIndex OBJECT-TYPE
+    SYNTAX      TmnxLldpDestAddressTableIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index value used to identify the destination
+         MAC address associated with this entry. Its value identifies
+         the row in the tmnxLldpPortConfigTable where the MAC address
+         can be found."
+    ::= { tmnxLldpPortConfigEntry   1 }
+
+tmnxLldpPortCfgAdminStatus      OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   txOnly   (1),
+                   rxOnly   (2),
+                   txAndRx  (3),
+                   disabled (4)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The administratively desired status of the local LLDP agent.
+
+         If the associated tmnxLldpPortCfgAdminStatus object has a
+         value of 'txOnly(1)', then LLDP agent will transmit LLDP
+         frames on this port and it will not store any information
+         about the remote systems connected.
+
+         If the associated tmnxLldpPortCfgAdminStatus object has a
+         value of 'rxOnly(2)', then the LLDP agent will receive,
+         but it will not transmit LLDP frames on this port.
+
+         If the associated tmnxLldpPortCfgAdminStatus object has a
+         value of 'txAndRx(3)', then the LLDP agent will transmit
+         and receive LLDP frames on this port.
+
+         If the associated tmnxLldpPortCfgAdminStatus object has a
+         value of 'disabled(4)', then LLDP agent will not transmit or
+         receive LLDP frames on this port.  If there is remote systems
+         information which is received on this port and stored in
+         other tables, before the port's tmnxLldpPortCfgAdminStatus
+         becomes disabled, then the information will naturally age out."
+    REFERENCE
+        "IEEE 802.1AB-2005 10.5.1"
+    DEFVAL { disabled }
+    ::= { tmnxLldpPortConfigEntry  2 }
+
+tmnxLldpPortCfgNotifyEnable     OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The tmnxLldpPortCfgNotifyEnable controls, on a per
+         port basis,  whether or not notifications from the agent
+         are enabled. The value true(1) means that notifications are
+         enabled; the value false(2) means that they are not."
+    DEFVAL { false }
+   ::= { tmnxLldpPortConfigEntry  3 }
+
+tmnxLldpPortCfgTLVsTxEnable     OBJECT-TYPE
+    SYNTAX      BITS {
+                    portDesc (0),
+                    sysName  (1),
+                    sysDesc  (2),
+                    sysCap   (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The tmnxLldpPortCfgTLVsTxEnable, defined as a bitmap,
+         includes the basic set of LLDP TLVs whose transmission is
+         allowed on the local LLDP agent by the network management.
+         Each bit in the bitmap corresponds to a TLV type associated
+         with a specific optional TLV.
+
+         It should be noted that the organizationally-specific TLVs
+         are excluded from the tmnxLldpPortCfgTLVsTxEnable bitmap.
+
+         LLDP Organization Specific Information Extension MIBs should
+         have similar configuration object to control transmission
+         of their organizationally defined TLVs.
+
+         The bit 'portDesc(0)' indicates that LLDP agent should
+         transmit 'Port Description TLV'.
+
+         The bit 'sysName(1)' indicates that LLDP agent should transmit
+         'System Name TLV'.
+
+         The bit 'sysDesc(2)' indicates that LLDP agent should transmit
+         'System Description TLV'.
+
+         The bit 'sysCap(3)' indicates that LLDP agent should transmit
+         'System Capabilities TLV'.
+
+         There is no bit reserved for the management address TLV type
+         since transmission of management address TLVs are controlled
+         by another object.
+
+         The default value for tmnxLldpPortCfgTLVsTxEnable object is
+         empty set, which means no enumerated values are set.
+
+         The value of this object must be restored from non-volatile
+         storage after a re-initialization of the management system."
+    REFERENCE
+        "IEEE 802.1AB-2005 10.2.1.1"
+    DEFVAL { { } }
+    ::= { tmnxLldpPortConfigEntry   4 }
+
+tmnxLldpPortCfgTunnelNearestBrg  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notApplicable (0),
+                    enabled       (1),
+                    disabled      (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLldpPortCfgTunnelNearestBrg specifies whether or not
+         the nearest-bridge LLDP session is tunneled.
+
+         The default value on a nearest-bridge session is 'disabled (2)'.
+
+         Attempts to set this object on a LLDP session that is not a
+         nearest-bridge, are not permissible."
+    DEFVAL { notApplicable }
+    ::= { tmnxLldpPortConfigEntry   5 }
+
+tmnxLldpPortCfgPortIdSubtype  OBJECT-TYPE
+    SYNTAX      LldpPortIdSubtype
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLldpPortCfgPortIdSubtype specifies what format 
+         the local LLDP agent will use when filling in the portId TLV of 
+         the LLDPDUs it transmits."
+    REFERENCE
+        "IEEE 802.1AB-2009 Section 8.5.3.2 and 8.5.3.3"
+    DEFVAL { local } 
+    ::= { tmnxLldpPortConfigEntry   6 }
+
+--==================================================
+-- tmnxLldpConfigManAddrPortsTable
+--
+-- LLDP configuration on a per port/per ManAddr basis.
+--
+tmnxLldpConfigManAddrPortsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TmnxLldpConfigManAddrPortsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table that controls selection of LLDP management address
+         TLV instances to be transmitted on individual ports."
+    ::= { tmnxLldpConfiguration   6 }
+
+tmnxLldpConfigManAddrPortsEntry OBJECT-TYPE
+    SYNTAX     TmnxLldpConfigManAddrPortsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "LLDP configuration information that specifies the set of ports
+         on which the local system management address instance will be
+         transmitted.
+
+         This configuration object joins the tmnxLldpPortConfigTable and the
+         lldpLocManAddrTable. An entry exists for each Port/Management
+         address in the system. Rows are auto-created by the system when
+         ports are provisioned."
+    INDEX {
+              ifIndex,
+              tmnxLldpPortCfgDestAddressIndex,
+              tmnxLldpPortCfgAddressIndex
+          }
+    ::= { tmnxLldpConfigManAddrPortsTable   1 }
+
+TmnxLldpConfigManAddrPortsEntry ::= SEQUENCE {
+    tmnxLldpPortCfgAddressIndex     TmnxLldpManAddressIndex,
+    tmnxLldpPortCfgManAddrTxEnabled TmnxEnabledDisabled,
+    tmnxLldpPortCfgManAddrSubtype   AddressFamilyNumbers,
+    tmnxLldpPortCfgManAddress       LldpManAddress
+}
+
+tmnxLldpPortCfgAddressIndex     OBJECT-TYPE
+    SYNTAX     TmnxLldpManAddressIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The tmnxLldpPortCfgAddressIndex represents the system man address associated
+         with a particular row in the tmnxLldpConfigManAddrPortsTable."
+    ::= { tmnxLldpConfigManAddrPortsEntry   1 }
+
+tmnxLldpPortCfgManAddrTxEnabled    OBJECT-TYPE
+    SYNTAX     TmnxEnabledDisabled
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The tmnxLldpPortCfgManAddrTxEnabled specifies whether the port and
+         MAC address will transmit the managment address information."
+    DEFVAL { disabled }
+    ::= { tmnxLldpConfigManAddrPortsEntry   2 }
+
+tmnxLldpPortCfgManAddrSubtype   OBJECT-TYPE
+    SYNTAX     AddressFamilyNumbers
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The tmnxLldpPortCfgManAddrSubtype indicates the management address
+         representation in the tmnxLldpPortCfgManAddress object. The value
+         of 'other (0)' indicates that no management address is in use."
+    ::= { tmnxLldpConfigManAddrPortsEntry   3 }
+
+tmnxLldpPortCfgManAddress       OBJECT-TYPE
+    SYNTAX     LldpManAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The tmnxLldpPortCfgManAddress indicates the management address
+         used by the tmnxLldpPortCfgAddressIndex."
+    ::= { tmnxLldpConfigManAddrPortsEntry   4 }
+
+
+--==================================================
+-- lldpDestAddressTable
+--
+-- Destination MAC addresses used by LLDP
+--
+tmnxLldpDestAddressTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxLldpDestAddressTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table that contains the set of MAC addresses used
+         by LLDP for transmission and reception of LLDPDUs."
+    ::= { tmnxLldpConfiguration   7 }
+
+tmnxLldpDestAddressTableEntry   OBJECT-TYPE
+    SYNTAX     TmnxLldpDestAddressTableEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Destination MAC address information for LLDP.
+
+         This configuration parameter identifies a MAC address
+         corresponding to a TmnxLldpDestAddressTableIndex value.
+
+         Rows in this table are created as necessary, to support
+         MAC addresses needed by other tables in the MIB that
+         are indexed by MAC address.
+
+         A given row in this table cannot be deleted if the MAC
+         address table index value is in use in any other table
+         in the MIB.
+
+         The contents of this table is persistent across
+         re-initializations or re-boots."
+     INDEX  {
+                tmnxLldpAddressTableIndex
+            }
+    ::= { tmnxLldpDestAddressTable   1 }
+
+TmnxLldpDestAddressTableEntry   ::= SEQUENCE {
+      tmnxLldpAddressTableIndex     TmnxLldpDestAddressTableIndex,
+      tmnxLldpDestMacAddress        MacAddress
+}
+
+tmnxLldpAddressTableIndex       OBJECT-TYPE
+    SYNTAX     TmnxLldpDestAddressTableIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The index value used to identify the destination
+         MAC address associated with this entry.
+
+         The value of this object is used as an index to the
+         tmnxLldpDestAddressTable."
+    ::= { tmnxLldpDestAddressTableEntry   1 }
+
+tmnxLldpDestMacAddress          OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The MAC address associated with this entry.
+
+         The octet string identifies an individual or a group
+         MAC address that is in use by LLDP as a destination
+         MAC address.
+         The MAC address is encoded in the octet string in
+         canonical format (see IEEE Std 802)."
+    ::= { tmnxLldpDestAddressTableEntry   2 }
+
+--==================================================
+-- tmnxLldpStatsTxPortTable
+--
+-- TX statistics
+-- revised LLDP version indexed by port (via ifIndex) and
+-- destination address.
+--
+
+tmnxLldpStatsTxPortTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxLldpStatsTxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing LLDP transmission statistics for
+            individual port/destination address combinations.
+            Entries are not required to exist in
+            this table while the tmnxLldpPortConfigEntry object is equal to
+            'disabled(4)'."
+    ::= { tmnxLldpStatistics   1 }
+
+tmnxLldpStatsTxPortEntry        OBJECT-TYPE
+     SYNTAX      TmnxLldpStatsTxPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "LLDP frame transmission statistics for a particular port
+          and destination MAC address.
+          The port must be contained in the same chassis as the
+          LLDP agent.
+
+          All counter values in a particular entry shall be
+          maintained on a continuing basis and shall not be deleted
+          upon expiration of rx Info TTL timing counters in the LLDP
+          remote systems MIB of the receipt of a shutdown frame from
+          a remote LLDP agent.
+
+          All statistical counters associated with a particular
+          port on the local LLDP agent become frozen whenever the
+          admin status is disabled for the same port.
+
+          Rows in this table can only be created for MAC addresses
+          that can validly be used in association with the type of
+          interface concerned, as defined by table 8-2.
+
+          The contents of this table is persistent across
+          re-initializations or re-boots."
+     INDEX {
+               ifIndex,
+               tmnxLldpStatsTxDestMACAddress
+           }
+     ::= { tmnxLldpStatsTxPortTable   1 }
+
+TmnxLldpStatsTxPortEntry        ::= SEQUENCE {
+    tmnxLldpStatsTxDestMACAddress   TmnxLldpDestAddressTableIndex,
+    tmnxLldpStatsTxPortFrames       Counter32,
+    tmnxLldpStatsTxLLDPDULengthErrs Counter32
+}
+
+tmnxLldpStatsTxDestMACAddress   OBJECT-TYPE
+    SYNTAX      TmnxLldpDestAddressTableIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index value used to identify the destination
+         MAC address associated with this entry. Its value identifies
+         the row in the tmnxLldpPortConfigTable where the MAC address
+         can be found.
+
+         The value of this object is used as an index to the
+         tmnxLldpStatsTxPortTable."
+    ::= { tmnxLldpStatsTxPortEntry   1 }
+
+tmnxLldpStatsTxPortFrames       OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of LLDP frames transmitted by this LLDP agent
+         on the indicated port."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.5.2"
+    ::= { tmnxLldpStatsTxPortEntry   2 }
+
+tmnxLldpStatsTxLLDPDULengthErrs OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of LLDPD Length Errors recorded for the Port."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.2.7.2"
+    ::= { tmnxLldpStatsTxPortEntry   3 }
+
+--==================================================
+-- tmnxLldpStatsRxPortTable
+--
+-- RX statistics
+-- This version is indexed by ifIndex and destination
+-- MAC address.
+--
+
+tmnxLldpStatsRxPortTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxLldpStatsRxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing LLDP reception statistics for individual
+         ports and destination MAC addresses.
+         Entries are not required to exist in this table while
+         the tmnxLldpPortCfgAdminStatus object is equal to 'disabled(4)'."
+    ::= { tmnxLldpStatistics 2 }
+
+tmnxLldpStatsRxPortEntry        OBJECT-TYPE
+     SYNTAX      TmnxLldpStatsRxPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "LLDP frame reception statistics for a particular port.
+          The port must be contained in the same chassis as the
+          LLDP agent.
+
+          All counter values in a particular entry shall be
+          maintained on a continuing basis and shall not be deleted
+          upon expiration of rx Info TTL timing counters in the LLDP
+          remote systems MIB of the receipt of a shutdown frame from
+          a remote LLDP agent.
+
+          All statistical counters associated with a particular
+          port on the local LLDP agent become frozen whenever the
+          admin status is disabled for the same port.
+
+          Rows in this table can only be created for MAC addresses
+          that can validly be used in association with the type of
+          interface concerned, as defined by table 8-2.
+
+          The contents of this table is persistent across
+          re-initializations or re-boots."
+     INDEX {
+               ifIndex,
+               tmnxLldpStatsRxDestMACAddress
+           }
+     ::= { tmnxLldpStatsRxPortTable   1 }
+
+TmnxLldpStatsRxPortEntry        ::= SEQUENCE {
+    tmnxLldpStatsRxDestMACAddress   TmnxLldpDestAddressTableIndex,
+    tmnxLldpStatsRxPortFrameDiscard Counter32,
+    tmnxLldpStatsRxPortFrameErrs    Counter32,
+    tmnxLldpStatsRxPortFrames       Counter32,
+    tmnxLldpStatsRxPortTLVDiscard   Counter32,
+    tmnxLldpStatsRxPortTLVUnknown   Counter32,
+    tmnxLldpStatsRxPortAgeouts      ZeroBasedCounter32
+}
+
+tmnxLldpStatsRxDestMACAddress   OBJECT-TYPE
+    SYNTAX      TmnxLldpDestAddressTableIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index value used to identify the destination
+         MAC address associated with this entry. Its value identifies
+         the row in the tmnxLldpStatsRxPortTable where the MAC address
+         can be found."
+    ::= { tmnxLldpStatsRxPortEntry   1 }
+
+tmnxLldpStatsRxPortFrameDiscard OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of LLDP frames received by this LLDP agent on
+         the indicated port, and then discarded for any reason.
+         This counter can provide an indication that LLDP header
+         formating problems may exist with the local LLDP agent in
+         the sending system or that LLDPDU validation problems may
+         exist with the local LLDP agent in the receiving system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.5.2"
+    ::= { tmnxLldpStatsRxPortEntry   2 }
+
+tmnxLldpStatsRxPortFrameErrs    OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of invalid LLDP frames received by this LLDP
+         agent on the indicated port, while this LLDP agent is enabled."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.5.2"
+    ::= { tmnxLldpStatsRxPortEntry   3 }
+
+tmnxLldpStatsRxPortFrames       OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of valid LLDP frames received by this LLDP agent
+         on the indicated port, while this LLDP agent is enabled."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.5.2"
+    ::= { tmnxLldpStatsRxPortEntry   4 }
+
+tmnxLldpStatsRxPortTLVDiscard   OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of LLDP TLVs discarded for any reason by this LLDP
+         agent on the indicated port."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.5.2"
+    ::= { tmnxLldpStatsRxPortEntry   5 }
+
+tmnxLldpStatsRxPortTLVUnknown   OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of LLDP TLVs received on the given port that
+         are not recognized by this LLDP agent on the indicated port.
+
+         An unrecognized TLV is referred to as the TLV whose type value
+         is in the range of reserved TLV types (000 1001 - 111 1110)
+         in Table 9.1 of IEEE Std 802.1AB-2004. An unrecognized
+         TLV may be a basic management TLV from a later LLDP version."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.5.2"
+    ::= { tmnxLldpStatsRxPortEntry   6 }
+
+tmnxLldpStatsRxPortAgeouts      OBJECT-TYPE
+    SYNTAX     ZeroBasedCounter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The counter that represents the number of age-outs that
+         occurred on a given port. An age-out is the number of
+         times the complete set of information advertised by a
+         particular MSAP has been deleted from tables contained in
+         tmnxLldpRemoteSystemsData and lldpExtensions objects because
+         the information timeliness interval has expired.
+
+         This counter is similar to lldpStatsRemTablesAgeouts, except
+         that the counter is on a per port basis. This enables NMS to
+         poll tables associated with the tmnxLldpRemoteSystemsData objects
+         and all LLDP extension objects associated with remote systems
+         on the indicated port only.
+
+         This counter should be set to zero during agent initialization
+         and its value should not be saved in non-volatile storage.
+         When a port's admin status changes from 'disabled' to
+         'rxOnly', 'txOnly' or 'txAndRx', the counter associated with
+         the same port should reset to 0. The agent should also flush
+         all remote system information associated with the same port.
+
+         This counter should be incremented only once when the
+         complete set of information is invalidated (aged out) from
+         all related tables on a particular port. Partial ageing
+         is not allowed, and thus, should not change the value of
+         this counter."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 10.5.2"
+    ::= { tmnxLldpStatsRxPortEntry   7 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--   TIMETRA-LLDP-MIB Local System Data
+--
+
+--==================================================
+-- tmnxLldpLocPortTable
+--
+-- Port specific Local system data
+-- New version of the local system data table indexed
+-- by ifIndex and destination MAC address.
+--
+
+tmnxLldpLocPortTable            OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TmnxLldpLocPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table contains one or more rows, per port and
+         destination MAC address, of information
+         associated with the local system known to this agent."
+    ::= { tmnxLldpLocalSystemData   1 }
+
+tmnxLldpLocPortEntry            OBJECT-TYPE
+    SYNTAX     TmnxLldpLocPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Information about a particular port component.
+
+         Entries may be created and deleted in this table by the
+         agent.
+
+         Rows in this table can only be created for MAC addresses
+         that can validly be used in association with the type of
+         interface concerned, as defined by table 8-2.
+
+         The contents of this table is persistent across
+         re-initializations or re-boots."
+    INDEX {
+              ifIndex,
+              tmnxLldpLocPortDestMACAddress
+          }
+    ::= { tmnxLldpLocPortTable   1 }
+
+TmnxLldpLocPortEntry            ::= SEQUENCE {
+    tmnxLldpLocPortDestMACAddress   TmnxLldpDestAddressTableIndex,
+    tmnxLldpLocPortIdSubtype        LldpPortIdSubtype,
+    tmnxLldpLocPortId               LldpPortId,
+    tmnxLldpLocPortDesc             SnmpAdminString
+}
+
+tmnxLldpLocPortDestMACAddress   OBJECT-TYPE
+    SYNTAX     TmnxLldpDestAddressTableIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The index value used to identify the destination
+         MAC address associated with this entry. Its value identifies
+         the row in the tmnxLldpLocPortTable where the MAC address
+         can be found."
+    ::= { tmnxLldpLocPortEntry   1 }
+
+tmnxLldpLocPortIdSubtype        OBJECT-TYPE
+    SYNTAX     LldpPortIdSubtype
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The type of port identifier encoding used in the associated
+         'lldpLocPortId' object."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.3.2"
+    ::= { tmnxLldpLocPortEntry   2 }
+
+tmnxLldpLocPortId               OBJECT-TYPE
+    SYNTAX     LldpPortId
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The string value used to identify the port component
+         associated with a given port in the local system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.3.3"
+    ::= { tmnxLldpLocPortEntry   3 }
+
+tmnxLldpLocPortDesc             OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The string value used to identify the IEEE 802 LAN station's port
+         description associated with the local system. If the local
+         agent supports IETF RFC 2863, tmnxLldpLocPortDesc object should
+         have the same value of ifDescr object."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.5.2"
+    ::= { tmnxLldpLocPortEntry   4 }
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--   TIMETRA-LLDP-MIB Remote System Data
+--
+-- This version of the remote systems data table includes an additional index
+-- to allow data to be recorded per ifIndex and destination MAC address
+
+--==================================================
+-- tmnxLldpRemTable
+--
+--
+
+tmnxLldpRemTable                OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TmnxLldpRemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table contains one or more rows per physical network
+         connection known to this agent. The agent may wish to ensure
+         that only one tmnxLldpRemEntry is present for each local port
+         and destination MAC address,
+         or it may choose to maintain multiple tmnxLldpRemEntry rows for
+         the same local port and destination MAC address.
+
+         The following procedure may be used to retrieve remote
+         systems information updates from an LLDP agent:
+
+            1. NMS polls all tables associated with remote systems
+               and keeps a local copy of the information retrieved.
+               NMS polls periodically the values of the following
+               objects:
+                  a. lldpStatsRemTablesInserts
+                  b. lldpStatsRemTablesDeletes
+                  c. lldpStatsRemTablesDrops
+                  d. lldpStatsRemTablesAgeouts
+                  e. tmnxLldpStatsRxPortAgeouts for all ports.
+
+            2. LLDP agent updates remote systems MIB objects, and
+               sends out notifications to a list of notification
+               destinations.
+
+            3. NMS receives the notifications and compares the new
+               values of objects listed in step 1.
+
+               Periodically, NMS should poll the object
+               lldpStatsRemTablesLastChangeTime to find out if anything
+               has changed since the last poll. if something has
+               changed, NMS will poll the objects listed in step 1 to
+               figure out what kind of changes occurred in the tables.
+
+               if value of lldpStatsRemTablesInserts has changed,
+               then NMS will walk all tables by employing TimeFilter
+               with the last-polled time value. This request will
+               return new objects or objects whose values are updated
+               since the last poll.
+
+               if value of lldpStatsRemTablesAgeouts has changed,
+               then NMS will walk the tmnxLldpStatsRxPortAgeouts and
+               compare the new values with previously recorded ones.
+               For ports whose tmnxLldpStatsRxPortAgeouts value is
+               greater than the recorded value, NMS will have to
+               retrieve objects associated with those ports from
+               table(s) without employing a TimeFilter (which is
+               performed by specifying 0 for the TimeFilter.)
+
+               lldpStatsRemTablesDeletes and lldpStatsRemTablesDrops
+               objects are provided for informational purposes."
+    ::= { tmnxLldpRemoteSystemsData   1 }
+
+tmnxLldpRemEntry                OBJECT-TYPE
+    SYNTAX     TmnxLldpRemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Information about a particular physical network connection.
+         Entries may be created and deleted in this table by the agent,
+         if a physical topology discovery process is active.
+
+         Rows in this table can only be created for MAC addresses
+         that can validly be used in association with the type of
+         interface concerned, as defined by table 8-2.
+
+         The contents of this table is persistent across
+         re-initializations or re-boots."
+    INDEX {
+              tmnxLldpRemTimeMark,
+              ifIndex,
+              tmnxLldpRemLocalDestMACAddress,
+              tmnxLldpRemIndex
+          }
+    ::= { tmnxLldpRemTable   1 }
+
+TmnxLldpRemEntry                ::= SEQUENCE {
+    tmnxLldpRemTimeMark             TimeFilter,
+    tmnxLldpRemLocalDestMACAddress  TmnxLldpDestAddressTableIndex,
+    tmnxLldpRemIndex                Integer32,
+    tmnxLldpRemChassisIdSubtype     LldpChassisIdSubtype,
+    tmnxLldpRemChassisId            LldpChassisId,
+    tmnxLldpRemPortIdSubtype        LldpPortIdSubtype,
+    tmnxLldpRemPortId               LldpPortId,
+    tmnxLldpRemPortDesc             SnmpAdminString,
+    tmnxLldpRemSysName              SnmpAdminString,
+    tmnxLldpRemSysDesc              SnmpAdminString,
+    tmnxLldpRemSysCapSupported      LldpSystemCapabilitiesMap,
+    tmnxLldpRemSysCapEnabled        LldpSystemCapabilitiesMap
+}
+
+tmnxLldpRemTimeMark  OBJECT-TYPE
+    SYNTAX     TimeFilter
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A TimeFilter for this entry. See the TimeFilter textual
+         convention in IETF RFC 4502 and
+         http://www.ietf.org/IESG/Implementations/RFC2021-Implementation.txt
+         to see how TimeFilter works."
+    REFERENCE
+        "IETF RFC 4502 section 6"
+    ::= { tmnxLldpRemEntry   1 }
+
+tmnxLldpRemLocalDestMACAddress  OBJECT-TYPE
+    SYNTAX     TmnxLldpDestAddressTableIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The index value used to identify the destination
+         MAC address associated with this entry. Its value identifies
+         the row in the tmnxLldpRemTable where the MAC address
+         can be found."
+    ::= { tmnxLldpRemEntry   2 }
+
+tmnxLldpRemIndex                OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This object represents an arbitrary local integer value used
+         by this agent to identify a particular connection instance,
+         unique only for the indicated remote system.
+
+         An agent is encouraged to assign monotonically increasing
+         index values to new entries, starting with one, after each
+         reboot. It is considered unlikely that the tmnxLldpRemIndex
+         will wrap between reboots."
+    ::= { tmnxLldpRemEntry   3 }
+
+tmnxLldpRemChassisIdSubtype     OBJECT-TYPE
+    SYNTAX     LldpChassisIdSubtype
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The type of encoding used to identify the chassis associated
+         with the remote system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.2.2"
+    ::= { tmnxLldpRemEntry   4 }
+
+tmnxLldpRemChassisId            OBJECT-TYPE
+    SYNTAX     LldpChassisId
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The string value used to identify the chassis component
+         associated with the remote system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.2.3"
+    ::= { tmnxLldpRemEntry   5 }
+
+tmnxLldpRemPortIdSubtype        OBJECT-TYPE
+    SYNTAX     LldpPortIdSubtype
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The type of port identifier encoding used in the associated
+         'lldpRemPortId' object."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.3.2"
+    ::= { tmnxLldpRemEntry   6 }
+
+tmnxLldpRemPortId               OBJECT-TYPE
+    SYNTAX     LldpPortId
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The string value used to identify the port component
+         associated with the remote system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.3.3"
+    ::= { tmnxLldpRemEntry   7 }
+
+tmnxLldpRemPortDesc             OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The string value used to identify the description of
+         the given port associated with the remote system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.5.2"
+    ::= { tmnxLldpRemEntry   8 }
+
+tmnxLldpRemSysName              OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The string value used to identify the system name of the
+         remote system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.6.2"
+    ::= { tmnxLldpRemEntry   9 }
+
+tmnxLldpRemSysDesc              OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The string value used to identify the system description
+         of the remote system."
+    REFERENCE
+            "IEEE Std 802.1AB-200X 9.5.7.2"
+    ::= { tmnxLldpRemEntry  10 }
+
+tmnxLldpRemSysCapSupported      OBJECT-TYPE
+    SYNTAX     LldpSystemCapabilitiesMap
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The bitmap value used to identify which system capabilities
+         are supported on the remote system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.8.1"
+    ::= { tmnxLldpRemEntry  11 }
+
+tmnxLldpRemSysCapEnabled        OBJECT-TYPE
+    SYNTAX     LldpSystemCapabilitiesMap
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The bitmap value used to identify which system capabilities
+         are enabled on the remote system."
+    REFERENCE
+        "IEEE Std 802.1AB-200X 9.5.8.2"
+    ::= { tmnxLldpRemEntry  12 }
+
+--==================================================
+-- tmnxLldpRemManAddrTable
+--
+-- Management addresses of the remote system
+--
+
+tmnxLldpRemManAddrTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxLldpRemManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains one or more rows per management address
+         information on the remote system learned on a particular port
+         contained in the local chassis known to this agent."
+    ::= { tmnxLldpRemoteSystemsData   2 }
+
+tmnxLldpRemManAddrEntry         OBJECT-TYPE
+    SYNTAX      TmnxLldpRemManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Management address information about a particular chassis
+            component.  There may be multiple management addresses
+            configured on the remote system identified by a particular
+            tmnxLldpRemIndex whose information is received on
+            ifIndex and tmnxLldpRemLocalDestMACAddress of the local system.
+            Each management address should have distinct 'management address
+            type' (tmnxLldpRemManAddrSubtype) and 'management address'
+            (tmnxLldpRemManAddr.)
+
+            Entries may be created and deleted in this table by the
+            agent."
+    INDEX   { tmnxLldpRemTimeMark,
+              ifIndex,
+              tmnxLldpRemLocalDestMACAddress,
+              tmnxLldpRemIndex,
+              tmnxLldpRemManAddrSubtype,
+              tmnxLldpRemManAddr
+ }
+    ::= { tmnxLldpRemManAddrTable 1 }
+
+TmnxLldpRemManAddrEntry             ::= SEQUENCE {
+      tmnxLldpRemManAddrSubtype     AddressFamilyNumbers,
+      tmnxLldpRemManAddr            LldpManAddress,
+      tmnxLldpRemManAddrIfSubtype   LldpManAddrIfSubtype,
+      tmnxLldpRemManAddrIfId        Integer32,
+      tmnxLldpRemManAddrOID         OBJECT IDENTIFIER
+}
+
+tmnxLldpRemManAddrSubtype       OBJECT-TYPE
+    SYNTAX      AddressFamilyNumbers
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The type of management address identifier encoding used in
+         the associated 'lldpRemManagmentAddr' object."
+    REFERENCE
+        "IEEE 802.1AB-2005 9.5.9.3"
+    ::= { tmnxLldpRemManAddrEntry 1 }
+
+tmnxLldpRemManAddr              OBJECT-TYPE
+    SYNTAX      LldpManAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The string value used to identify the management address
+         component associated with the remote system.  The purpose
+         of this address is to contact the management entity."
+    REFERENCE
+        "IEEE 802.1AB-2005 9.5.9.4"
+    ::= { tmnxLldpRemManAddrEntry   2 }
+
+tmnxLldpRemManAddrIfSubtype     OBJECT-TYPE
+    SYNTAX      LldpManAddrIfSubtype
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The enumeration value that identifies the interface numbering
+         method used for defining the interface number, associated
+         with the remote system."
+    REFERENCE
+        "IEEE 802.1AB-2005 9.5.9.5"
+    ::= { tmnxLldpRemManAddrEntry   3 }
+
+tmnxLldpRemManAddrIfId          OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The integer value used to identify the interface number
+        regarding the management address component associated with
+        the remote system."
+    REFERENCE
+        "IEEE 802.1AB-2005 9.5.9.6"
+    ::= { tmnxLldpRemManAddrEntry   4 }
+
+tmnxLldpRemManAddrOID           OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OID value used to identify the type of hardware component
+         or protocol entity associated with the management address
+         advertised by the remote system agent."
+    REFERENCE
+        "IEEE 802.1AB-2005 9.5.9.8"
+    ::= { tmnxLldpRemManAddrEntry   5 }
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--   TIMETRA-LLDP-MIB Conformance
+--
+
+tmnxLldpCompliances             OBJECT IDENTIFIER ::= { tmnxLldpConformance  1 }
+tmnxLldpGroups                  OBJECT IDENTIFIER ::= { tmnxLldpConformance  2 }
+
+tmnxLldpCompliance              MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement the
+         LLDP MIB."
+    MODULE -- this module
+        MANDATORY-GROUPS {
+            tmnxLldpConfigGroup,
+            tmnxLldpStatsRxGroup,
+            tmnxLldpStatsTxGroup,
+            tmnxLldpLocSysGroup,
+            tmnxLldpRemSysGroup,
+            tmnxLldpRemManAddrGroup
+        }
+    ::= { tmnxLldpCompliances   1 }
+
+tmnxLldpV11v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement the
+         LLDP MIB for release 11.0 of the SROS series systems."
+    MODULE -- this module
+        MANDATORY-GROUPS {
+            tmnxLldpConfigGroup,
+            tmnxLldpConfigV11v0Group,
+            tmnxLldpStatsRxGroup,
+            tmnxLldpStatsTxGroup,
+            tmnxLldpLocSysGroup,
+            tmnxLldpRemSysGroup,
+            tmnxLldpRemManAddrGroup
+        }
+    ::= { tmnxLldpCompliances   2 }
+
+tmnxLldpV13v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement the
+         LLDP MIB for release 13.0 of the SROS series systems."
+    MODULE -- this module
+        MANDATORY-GROUPS {
+            tmnxLldpConfigV13v0Group
+        }
+    ::= { tmnxLldpCompliances   3 }
+
+-- MIB groupings
+
+tmnxLldpConfigGroup             OBJECT-GROUP
+    OBJECTS {
+        tmnxLldpTxCreditMax,
+        tmnxLldpMessageFastTx,
+        tmnxLldpMessageFastTxInit,
+        tmnxLldpAdminStatus,
+        tmnxLldpPortCfgAdminStatus,
+        tmnxLldpPortCfgNotifyEnable,
+        tmnxLldpPortCfgTLVsTxEnable,
+        tmnxLldpPortCfgManAddrTxEnabled,
+        tmnxLldpPortCfgManAddrSubtype,
+        tmnxLldpPortCfgManAddress,
+        tmnxLldpDestMacAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to configure the LLDP
+         implementation behavior.
+
+         This group is mandatory for agents which implement the LLDP."
+    ::= { tmnxLldpGroups   1 }
+
+tmnxLldpStatsRxGroup            OBJECT-GROUP
+    OBJECTS {
+        tmnxLldpStatsRxPortFrameDiscard,
+        tmnxLldpStatsRxPortFrameErrs,
+        tmnxLldpStatsRxPortFrames,
+        tmnxLldpStatsRxPortTLVDiscard,
+        tmnxLldpStatsRxPortTLVUnknown,
+        tmnxLldpStatsRxPortAgeouts
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to represent LLDP
+         reception statistics.
+
+         This group is mandatory for agents which implement the LLDP
+         and have the capability of receiving LLDP frames."
+    ::= { tmnxLldpGroups   2 }
+
+tmnxLldpStatsTxGroup            OBJECT-GROUP
+    OBJECTS {
+        tmnxLldpStatsTxPortFrames,
+        tmnxLldpStatsTxLLDPDULengthErrs
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to represent LLDP
+         transmission statistics.
+
+         This group is mandatory for agents which implement the LLDP
+         and have the capability of transmitting LLDP frames."
+    ::= { tmnxLldpGroups   3 }
+
+tmnxLldpLocSysGroup             OBJECT-GROUP
+    OBJECTS {
+        tmnxLldpLocPortIdSubtype,
+        tmnxLldpLocPortId,
+        tmnxLldpLocPortDesc
+    }
+    STATUS      current
+    DESCRIPTION
+            "The collection of objects which are used to represent LLDP
+            Local System Information.
+
+            This group is mandatory for agents which implement the LLDP
+            and have the capability of transmitting LLDP frames."
+    ::= { tmnxLldpGroups   4 }
+
+tmnxLldpRemSysGroup             OBJECT-GROUP
+    OBJECTS {
+        tmnxLldpRemChassisIdSubtype,
+        tmnxLldpRemChassisId,
+        tmnxLldpRemPortIdSubtype,
+        tmnxLldpRemPortId,
+        tmnxLldpRemPortDesc,
+        tmnxLldpRemSysName,
+        tmnxLldpRemSysDesc,
+        tmnxLldpRemSysCapSupported,
+        tmnxLldpRemSysCapEnabled
+
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to represent
+         LLDP Remote Systems Information. The objects represent the
+         information associated with the basic TLV set. Please note
+         that even the agent doesn't implement some of the optional
+         TLVs, it shall recognize all the optional TLV information
+         that the remote system may advertise.
+
+         This group is mandatory for agents which implement the LLDP
+         and have the capability of receiving LLDP frames."
+    ::= { tmnxLldpGroups   5 }
+
+tmnxLldpRemManAddrGroup          OBJECT-GROUP
+    OBJECTS {
+        tmnxLldpRemManAddrIfSubtype,
+        tmnxLldpRemManAddrIfId,
+        tmnxLldpRemManAddrOID
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to represent LLDP
+         Remote management address information.
+
+         This group is mandatory for agents which implement the LLDP
+         and have the capability of receiving LLDP frames."
+    ::= { tmnxLldpGroups   6 }
+
+tmnxLldpV11v0Groups              OBJECT IDENTIFIER ::= { tmnxLldpGroups 11 }
+
+tmnxLldpConfigV11v0Group         OBJECT-GROUP
+    OBJECTS {
+        tmnxLldpPortCfgTunnelNearestBrg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The additional collection of objects which are used to configure the
+         LLDP implementation behavior for Nokia SROS systems in Release
+         11.0."
+    ::= { tmnxLldpV11v0Groups 1 }
+
+tmnxLldpV13v0Groups              OBJECT IDENTIFIER ::= { tmnxLldpGroups 12 }
+
+tmnxLldpConfigV13v0Group         OBJECT-GROUP
+    OBJECTS {
+        tmnxLldpPortCfgPortIdSubtype
+    }
+    STATUS      current
+    DESCRIPTION
+        "The additional collection of objects which are used to configure the
+         LLDP implementation behavior for Nokia SROS systems in Release
+         13.0."
+    ::= { tmnxLldpV13v0Groups 1 }
+
+END

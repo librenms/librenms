@@ -2,7 +2,7 @@ os: tsc
 group: printer
 text: 'TSC Printer'
 icon: tsc
-ifname: 1
+ifname: true
 type: printer
 discovery:
     - sysObjectID:

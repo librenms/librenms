@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2001,2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: the huawei memory mib from huawei-device-mib
 -- Reference:
--- Version:     V1.0
+-- Version:     V1.01
 -- History:
 --    
 -- =================================================================
@@ -17,24 +17,32 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
             FROM HUAWEI-DEVICE-MIB            
         OBJECT-GROUP, MODULE-COMPLIANCE            
             FROM SNMPv2-CONF            
-        Gauge, OBJECT-TYPE, MODULE-IDENTITY            
-            FROM SNMPv2-SMI;
+        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32, Integer32
+            FROM SNMPv2-SMI
+        CounterBasedGauge64
+            FROM HCNUM-TC;
 
     hwMemoryDev MODULE-IDENTITY
-        LAST-UPDATED "200212290900Z"
+        LAST-UPDATED "201708170000Z"
         ORGANIZATION
-            "HAUWEI MIB Standard community
-             "
+            "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
-            "
-            ADDR: HUAWEI TECHNOLOGY CO.,LTD,SHEZHEN CHINA
-            Tel: 86-755-26540808
-            "
+            "Huawei Industrial Base
+            Bantian, Longgang
+            Shenzhen 518129
+            People's Republic of China
+            Website: http://www.huawei.com
+            Email: support@huawei.com
+            " 
         DESCRIPTION
             "
             This mib module defines the memory information. NMS can query memory
             utilization statistics from device by the mib.
-            "                        
+            " 
+        REVISION     "201708170000Z"
+        DESCRIPTION  "V1.01, change DESCRIPTION."
+        REVISION     "201407260000Z"
+        DESCRIPTION  "V1.00, initial version."	    
         ::= { hwDev 5 }            
     
     hwMemoryDevTable OBJECT-TYPE
@@ -72,7 +80,7 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
     HwMemoryDevEntry ::=
         SEQUENCE { 
             hwMemoryDevModuleIndex
-                INTEGER,
+                Integer32,
             hwMemoryDevSize
                 Unsigned32,
             hwMemoryDevFree
@@ -84,17 +92,24 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
             hwMemoryDevFail
                 Integer32,
             hwMemoryDevFailNoMem
-                Integer32
-            }
+                Integer32,
+            hwMemoryDevSize64
+                CounterBasedGauge64,
+            hwMemoryDevFree64
+                CounterBasedGauge64
+         }
 
     hwMemoryDevModuleIndex OBJECT-TYPE
-        SYNTAX INTEGER (1..65535)
+        --SYNTAX Integer32 (1..65535)
+        -- VRPV8R1 Capability 20100828 modify value scope
+        SYNTAX Integer32 (0..65535)
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
             "
-            The object is used only for the purpose of extension,In single CPU 
-            devices (NE16,eg.), hwMemoryDevModuleIndex equals 0.
+            This object indicates the 32-byte memory size of managed objects, in bytes. 
+            The value is the sum of hwMemoryDevFree and hwMemoryDevRawSliceUsed. 
+            Each board has a memory, and the memory size varies with the product.
             "
         ::= { hwMemoryDevEntry 1 }
     
@@ -146,7 +161,8 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "
-            The object indicates the count of memory allocation failures.
+            This object indicates the number of memory allocation failures. 
+            The default value is 0.
             "
         ::= { hwMemoryDevEntry 6 }
     
@@ -156,11 +172,30 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "
-            The object indicates the count of memory allocation
-            failures due to no free memory.
+            This object indicates the number of memory allocation failures due to memory exhaustion. 
+            The default value is 0.
             "
         ::= { hwMemoryDevEntry 7 }
-    
+    hwMemoryDevSize64 OBJECT-TYPE
+        SYNTAX CounterBasedGauge64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Indicates the total size of the memory module incase of excessing 4G
+            which is on the managed object, in bytes.
+            "
+        ::= { hwMemoryDevEntry 8}
+    hwMemoryDevFree64 OBJECT-TYPE
+        SYNTAX CounterBasedGauge64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object indicates the 64-byte idle memory size, in bytes. 
+            The value is always less than hwMemoryDevSize64.
+            "
+        ::= { hwMemoryDevEntry 9 }
     hwBufferTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwBufferEntry
         MAX-ACCESS not-accessible
@@ -199,9 +234,9 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
     HwBufferEntry ::=
         SEQUENCE { 
             hwBufferModuleIndex
-                INTEGER,
+                Integer32,
             hwBufferSize
-                INTEGER,
+                Integer32,
             hwBufferCurrentTotal
                 Integer32,
             hwBufferCurrentUsed
@@ -209,7 +244,7 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
             }
 
     hwBufferModuleIndex OBJECT-TYPE
-        SYNTAX INTEGER (0..65535)
+        SYNTAX Integer32 (0..65535)
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
@@ -220,7 +255,7 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
         ::= { hwBufferEntry 1 }
     
     hwBufferSize OBJECT-TYPE
-        SYNTAX INTEGER (1..65535)
+        SYNTAX Integer32 (1..65535)
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
@@ -236,7 +271,9 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "
-            The object indicates the total number of the buffer currently.
+            This object indicates the total number of buffers. 
+            The value varies with the line card and buffer size. 
+            It is a part of the memory. The value ranges from 32 to 4096.
             "
         ::= { hwBufferEntry 3 }
     
@@ -246,7 +283,10 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "
-            The object indicates the used number of the buffer currently.
+            This object indicates the number of buffers currently occupied. 
+            The value varies with the line card and buffer size. 
+            It is a part of the memory. The value ranges from 32 to 4096, in kbits. 
+            The value is always less than hwBufferCurrentTotal.
             "
         ::= { hwBufferEntry 4 }
 

@@ -6,4 +6,4 @@ mib_dir:
     - paloaltonetworks
 discovery:
     - sysDescr:
-        - Palo Alto Networks
+        - 'Palo Alto Networks'

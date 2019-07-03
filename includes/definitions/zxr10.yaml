@@ -6,5 +6,5 @@ icon: zte
 discovery:
     - sysDescr:
         - ZXR10
-        - ZTE Ethernet Switch
+        - 'ZTE Ethernet Switch'
 

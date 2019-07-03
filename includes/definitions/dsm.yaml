@@ -9,7 +9,7 @@ over:
     - { graph: device_storage, text: 'Storage Usage' }
 mib_dir:
     - synology
-processor_stacked: 1
+processor_stacked: true
 discovery:
     -
       sysDescr_regex: '/^Linux /'

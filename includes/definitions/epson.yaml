@@ -7,9 +7,8 @@ over:
     - { graph: device_toner, text: Toner }
 discovery:
     - sysDescr:
-        - EPSON Built-in
+        - 'EPSON Built-in'
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
-
+    toner: true

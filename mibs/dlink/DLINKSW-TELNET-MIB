@@ -1,0 +1,219 @@
+--  *****************************************************************
+--  DLINKSW-TELNET-MIB.mib : TELNET MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+DLINKSW-TELNET-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32 
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF 
+        TruthValue
+            FROM SNMPv2-TC 
+        InterfaceIndexOrZero          
+            FROM IF-MIB
+        InetAddressType,InetAddress
+            FROM INET-ADDRESS-MIB 
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB  
+        dlinkIndustrialCommon			
+			FROM DLINK-ID-REC-MIB;
+
+     
+    dlinkSwTelnetMIB MODULE-IDENTITY
+        LAST-UPDATED "201304220000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "         D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:    +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for TELNET application."
+
+        REVISION     "201304220000Z"
+        DESCRIPTION 
+            "First release of this MIB."
+        ::= { dlinkIndustrialCommon 40 }
+
+-- -----------------------------------------------------------------------------
+    dTelnetNotifications    OBJECT IDENTIFIER ::= { dlinkSwTelnetMIB 0 }
+    dTelnetObjects          OBJECT IDENTIFIER ::= { dlinkSwTelnetMIB 1 }
+    dTelnetConformance      OBJECT IDENTIFIER ::= { dlinkSwTelnetMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dTelnetServerEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "This object specifies whether the TELNET server function on
+            the device is enabled."
+        DEFVAL { true }
+        ::= { dTelnetObjects 1 } 
+        
+    dTelnetServerTcpPort OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "This object indicates TCP port for the TELNET server.
+            The well-known TCP port for the TELNET server is 23.
+            "
+        DEFVAL { 23 } 
+        ::= { dTelnetObjects 2 }                
+
+    dTelnetSourceInterfaceIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface whose IP address
+            will be used as the source address of packets that initiates a TELNET
+            connection.
+            A zero value indicates the source interface is not specified and the
+            IP address of the closest interface will be used.
+            "
+        DEFVAL { 0 } 
+        ::= { dTelnetObjects 3 } 
+
+-- -----------------------------------------------------------------------------
+    dTelnetSessionTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DTelnetSessionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of TELNET users."
+        ::= { dTelnetObjects 4 }
+
+    dTelnetSessionEntry OBJECT-TYPE
+        SYNTAX          DTelnetSessionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains the information of a TELNET session."
+        INDEX  { dTelnetSessionID }
+        ::= { dTelnetSessionTable 1 }
+
+    DTelnetSessionEntry ::=        SEQUENCE {
+        dTelnetSessionID                  Unsigned32,
+        dTelnetSessionUserName            SnmpAdminString,
+        dTelnetSessionUserPrivilegeLvl    Unsigned32,
+        dTelnetSessionLoginDuration       Unsigned32,            
+        dTelnetSessionHostAddrType        InetAddressType,
+        dTelnetSessionHostAddr            InetAddress            
+     }  
+
+    dTelnetSessionID OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A unique number that identifies the TELNET session."
+        ::= { dTelnetSessionEntry 1 }
+
+    dTelnetSessionUserName OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (1..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the TELNET user."
+        ::= { dTelnetSessionEntry 2 }
+                                    
+    dTelnetSessionUserPrivilegeLvl OBJECT-TYPE
+        SYNTAX          Unsigned32 (1.. 15)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the privilege level of the entry."
+        ::= { dTelnetSessionEntry 3 }
+   
+    dTelnetSessionLoginDuration OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the elapsed time the user has
+	        loginned."
+        ::= { dTelnetSessionEntry 4 }
+    
+    dTelnetSessionHostAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType    
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The host address type of the TELNET client.           
+            "
+        ::= { dTelnetSessionEntry 5 }    
+
+    dTelnetSessionHostAddr OBJECT-TYPE
+        SYNTAX          InetAddress    
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The host address of the TELNET client.           
+            "
+        ::= { dTelnetSessionEntry 6 }       
+
+-- Conformance
+  
+
+    dTelnetCompliances    OBJECT IDENTIFIER ::= { dTelnetConformance 1 }
+
+    dTelnetGroups         OBJECT IDENTIFIER ::= { dTelnetConformance 2 }        
+       
+       
+   dTelnetCompliance MODULE-COMPLIANCE
+        STATUS   deprecated
+        DESCRIPTION
+                "The compliance statement for entities which
+                 implement the DLINKSW-TELNET-MIB."
+        MODULE MANDATORY-GROUPS { 
+            dTelnetConfigGroup,
+            dTelnetSessionInfoGroup
+        }
+
+       OBJECT          dTelnetSourceInterfaceIndex       
+       MIN-ACCESS      read-only
+       DESCRIPTION
+            "It is compliant to implement this object as read-only. 
+            Support for configurable source interface is only
+            required on the platform which supports TELNET client."
+       
+        ::= { dTelnetCompliances 1 }
+
+    dTelnetConfigGroup OBJECT-GROUP
+        OBJECTS   {  
+            dTelnetServerEnabled,
+            dTelnetServerTcpPort,
+            dTelnetSourceInterfaceIndex
+        }
+        STATUS current
+        DESCRIPTION 
+             "A collection of objects for TELNET configuration."
+            ::= { dTelnetGroups 1 }
+        
+    dTelnetSessionInfoGroup OBJECT-GROUP
+        OBJECTS            {   
+            dTelnetSessionUserName,
+            dTelnetSessionUserPrivilegeLvl, 
+            dTelnetSessionLoginDuration,
+            dTelnetSessionHostAddrType, 
+            dTelnetSessionHostAddr             
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects to display TELNET connection related
+            information."
+        ::= { dTelnetGroups 2 }
+            
+   
+END
+

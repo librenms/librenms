@@ -1,0 +1,1557 @@
+
+
+-- Telecom MIB
+-- ===============================================================================
+-- Revision History
+-- v0.01 2014-06-10 Lilinhua
+--
+-- enterprise id: .1.3.6.1.4.1.935.10(device).2(matAgent).2(matTraps)
+--
+-- ===============================================================================
+TELECOM-MIB	DEFINITIONS ::= BEGIN
+IMPORTS
+TRAP-TYPE
+FROM RFC-1215
+DisplayString
+FROM SNMPv2-TC
+OBJECT-TYPE
+FROM RFC-1212
+enterprises,Counter, IpAddress
+FROM RFC1155-SMI;
+PositiveInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This data type is a non-zero and non-negative value."
+       SYNTAX       INTEGER (1..2147483647)
+NonNegativeInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This data type is a non-negative value."
+       SYNTAX       INTEGER (0..2147483647)
+ppc OBJECT IDENTIFIER ::= { enterprises 935 }
+device	OBJECT IDENTIFIER ::= { ppc 10 }
+matAgent	OBJECT IDENTIFIER ::= { device 2 }
+matObjects OBJECT IDENTIFIER ::= { matAgent 1 }
+matTraps OBJECT IDENTIFIER ::= { matAgent 2 }
+matController	OBJECT IDENTIFIER ::= { matObjects 1 }
+matInverter	OBJECT IDENTIFIER ::= { matObjects 2 }
+matSts	OBJECT IDENTIFIER ::= { matObjects 3 }
+matDryContact	OBJECT IDENTIFIER ::= { matObjects 4 }
+matConfig	OBJECT IDENTIFIER ::= { matObjects 5 }
+matTrapTargets	OBJECT IDENTIFIER ::= { matObjects 6 }
+-- ========================================================================
+-- matController
+-- ========================================================================
+matConSerialNum	OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 15 ) )
+ACCESS	read-only
+STATUS	mandatory
+DESCRIPTION	"Controller serial number."
+::= { matController 1 }
+matConName	OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 31 ) )
+ACCESS	read-only
+STATUS	mandatory
+DESCRIPTION	"Power system name."
+::= { matController 2 }
+matConWarningState	OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 31 ) )
+ACCESS	read-only
+STATUS	mandatory
+DESCRIPTION	"The values indicate the unrestored traps.
+For example,
+if 'Controller Battery Low' and 'Controller temperature High'
+the agent send
+the trap 85 and trap 87 to
+NMS,
+so the value of matConWarningState should be '85,87'.
+And then the two events restored, the value of matConWarningState
+should change to empty."
+::= { matController 3 }
+matConTemperature OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Temperature of the controller, the unit is 0.1 degree."
+::= { matController 4 }
+matAgentSoftwareVerison	OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 31 ) )
+ACCESS	read-only
+STATUS	mandatory
+DESCRIPTION	"The Network Management Card software/firmware version."
+::= { matController 5 }
+-- ========================================================================
+-- matInverter
+-- ========================================================================
+matInvModuleNum OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"The number of Inverter modules."
+::= { matInverter 1 }
+matInvTable	OBJECT-TYPE
+SYNTAX	SEQUENCE OF MATInvEntry
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"This table list Inverter message."
+::= { matInverter 2 }
+matInvEntry	OBJECT-TYPE
+SYNTAX	MATInvEntry
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"An entry containing information applicable to a particular Inverter module."
+INDEX	{ matInvModuleIndex }
+::= { matInvTable	1 }
+MATInvEntry::= SEQUENCE {
+matInvModuleIndex PositiveInteger,
+matInvSerialNum DisplayString,
+matInvFirmwareVersion DisplayString,
+matInvHardwareVersion DisplayString,
+matInvWarningState	DisplayString,
+matInvOutputVoltage NonNegativeInteger,
+matInvOutputCurrent NonNegativeInteger,
+matInvBatteryVoltage NonNegativeInteger,
+matInvOutputFreq NonNegativeInteger,
+matInvOutputPower NonNegativeInteger,
+matInvPowerLimit NonNegativeInteger,
+matInvRunTime	NonNegativeInteger,
+matInvTemperature INTEGER,
+matInvLineVoltage NonNegativeInteger,
+matInvLineFreq	NonNegativeInteger,
+matInvMbsPosition INTEGER,
+matInvRunMode	INTEGER,
+matInvPriority	INTEGER,
+matConfInvOutputVoltage	NonNegativeInteger,
+matConfInvInputVoltage NonNegativeInteger,
+matConfInvOutputVoltHighLoss NonNegativeInteger,
+matConfInvOutputVoltLowLoss NonNegativeInteger,
+matConfInvOutputPower NonNegativeInteger,
+matConfInvOutputFreq NonNegativeInteger,
+matInvPhaseType	INTEGER,
+matInvOnOffStatus INTEGER
+}
+matInvModuleIndex	OBJECT-TYPE
+SYNTAX	PositiveInteger
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"The index of Inverter module."
+::= { matInvEntry 1 }
+matInvSerialNum OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 15 ) )
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Module serial number."
+::= { matInvEntry 2 }
+matInvFirmwareVersion OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 7 ) )
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Firmware version."
+::= { matInvEntry 3 }
+matInvHardwareVersion OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 7 ) )
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Hardware version."
+::= { matInvEntry 4 }
+matInvWarningState	OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 63 ) )
+ACCESS	read-only
+STATUS	mandatory
+DESCRIPTION	"The values indicate the unrestored traps.
+For example,
+if 'Inverter fault' and 'Inverter Over-loading'
+the agent send
+the trap 1 and trap 3 to
+NMS,
+so the value of matConWarningState should be '1,3'.
+And then the two events restored, the value of matConWarningState
+should change to empty."
+::= { matInvEntry 5 }
+matInvOutputVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Inverter Output Voltage, the unit is 0.1 Volt."
+::= { matInvEntry 6 }
+matInvOutputCurrent OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Inverter Output Current, unit is 0.1 amp."
+::= { matInvEntry 7 }
+matInvBatteryVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Inverter Battery voltage, the unit is 0.1 Volt."
+::= { matInvEntry 8 }
+matInvOutputFreq OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Output frequency, the unit is 0.1 Hz."
+::= { matInvEntry 9 }
+matInvOutputPower OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Output power, the unit is VA."
+::= { matInvEntry 10 }
+matInvPowerLimit OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Power Limit Status of Inverter module, the unit is percent."
+::= { matInvEntry 11 }
+matInvRunTime	OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Run time, the unit is Hour."
+::= { matInvEntry 12 }
+matInvTemperature OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Temperature of the inverter, the unit is 0.1 degree."
+::= { matInvEntry 13 }
+matInvLineVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Line voltage of 3.5K, the unit is 0.1 Volt."
+::= { matInvEntry 14 }
+matInvLineFreq	OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Line frequency of 3.5K, the unit is 0.1 Hz."
+::= { matInvEntry 15 }
+matInvMbsPosition OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-3) command
+transfer(1),
+normal(2),
+bypass(3),
+invalid(4)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"MBS position of 3.5K."
+::= { matInvEntry 16 }
+matInvRunMode	OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-5) command
+powerOn(1),
+standby(2),
+bypass(3),
+line(4),
+battery(5),
+fault(6)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Currently run mode of 3.5K."
+::= { matInvEntry 17 }
+matInvPriority	OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-1) command
+batteryMode(1),
+lineMode(2)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Priority of 3.5K."
+::= { matInvEntry 18 }
+matConfInvOutputVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Rating Output voltage, the unit is 0.1 Volt."
+::= { matInvEntry 19 }
+matConfInvInputVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Rating Input voltage, the unit is 0.1 Volt."
+::= { matInvEntry 20 }
+matConfInvOutputVoltHighLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Output High Loss voltage, the unit is 0.1 Volt."
+::= { matInvEntry 21 }
+matConfInvOutputVoltLowLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Output Low loss voltage, the unit is 0.1 Volt."
+::= { matInvEntry 22 }
+matConfInvOutputPower OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Rating output power, the unit is VA."
+::= { matInvEntry 23 }
+matConfInvOutputFreq OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Rating output frequency, the unit is 0.1 Hz."
+::= { matInvEntry 24 }
+matInvPhaseType	OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-1) command
+singlePhase(1),
+threePhase(2)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Phase type."
+::= { matInvEntry 25 }
+matInvOnOffStatus OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-1) command
+shutdown(1),
+start(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Inverter module On/Off status."
+::= { matInvEntry 26 }
+-- ========================================================================
+-- matSts
+-- ========================================================================
+matStsModuleNum OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"The number of STS modules."
+::= { matSts 1 }
+matStsTable	OBJECT-TYPE
+SYNTAX	SEQUENCE OF MATStsEntry
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"This table list STS message."
+::= { matSts 2 }
+matStsEntry	OBJECT-TYPE
+SYNTAX	MATStsEntry
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"An entry containing information applicable to a particular STS module."
+INDEX	{ matStsModuleIndex }
+::= { matStsTable	1 }
+MATStsEntry::= SEQUENCE {
+matStsModuleIndex PositiveInteger,
+matStsModuleType DisplayString,
+matStsSerialNum DisplayString,
+matStsFirmwareVersion DisplayString,
+matStsHardwareVersion DisplayString,
+matStsWarningState	DisplayString,
+matStsMainInputVoltage NonNegativeInteger,
+matStsMainInputFreq NonNegativeInteger,
+matStsInvInputVoltage NonNegativeInteger,
+matStsInvInputFreq NonNegativeInteger,
+matStsOutputVoltage NonNegativeInteger,
+matStsOutputCurrent NonNegativeInteger,
+matStsOutputPower NonNegativeInteger,
+matStsOutputFreq NonNegativeInteger,
+matStsRuntime	NonNegativeInteger,
+matStsTemperature INTEGER,
+matStsMbsStatus INTEGER,
+matStsStatus INTEGER,
+matStsRunningMode INTEGER,
+matStsMainHighLossVoltage NonNegativeInteger,
+matStsMainLowLossVoltage NonNegativeInteger,
+matStsInvHighLossVoltage NonNegativeInteger,
+matStsInvLosLossVoltage NonNegativeInteger
+}
+matStsModuleIndex	OBJECT-TYPE
+SYNTAX	PositiveInteger
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"The index of STS module."
+::= { matStsEntry 1 }
+matStsModuleType OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 3 ) )
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Module type, 050 represent 50A, 100 represent 100A."
+::= { matStsEntry 2 }
+matStsSerialNum OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 15 ) )
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Module serial number."
+::= { matStsEntry 3 }
+matStsFirmwareVersion OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 7 ) )
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Firmware version."
+::= { matStsEntry 4 }
+matStsHardwareVersion OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 7 ) )
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"Hardware version."
+::= { matStsEntry 5 }
+matStsWarningState	OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 63 ) )
+ACCESS	read-only
+STATUS	mandatory
+DESCRIPTION	"The values indicate the unrestored traps.
+For example,
+if 'STS running in fault mode' and 'STS fan fault'
+the agent send
+the trap 59 and trap 61 to
+NMS,
+so the value of matConWarningState should be '59,61'.
+And then the two events restored, the value of matConWarningState
+should change to empty."
+::= { matStsEntry 6 }
+matStsMainInputVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS Mains I/P voltage, the unit is 0.1 Volts."
+::= { matStsEntry 7 }
+matStsMainInputFreq OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS Mains I/P frequency, the unit is 0.1 Hz."
+::= { matStsEntry 8 }
+matStsInvInputVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS INV I/P voltage, the unit is 0.1 volts."
+::= { matStsEntry 9 }
+matStsInvInputFreq OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS INV I/P frequency, the unit is 0.1 Hz."
+::= { matStsEntry 10 }
+matStsOutputVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS O/P voltage, the unit is 0.1 volts."
+::= { matStsEntry 11 }
+matStsOutputCurrent OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS O/P Current, the unit is 0.1 amp."
+::= { matStsEntry 12 }
+matStsOutputPower OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS O/P Power, the unit is VA."
+::= { matStsEntry 13 }
+matStsOutputFreq OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS O/P frequency, the unit is 0.1 Hz."
+::= { matStsEntry 14 }
+matStsRuntime	OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS Runtime, the unit is Hour."
+::= { matStsEntry 15 }
+matStsTemperature OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS module's Temperature, the unit is 0.1 degree."
+::= { matStsEntry 16 }
+matStsMbsStatus OBJECT-TYPE
+SYNTAX INTEGER {
+-- QS: 0 1 2 3 4 5 6 other
+-- matStsMbsStatus: 1 2 6(err) 3 4 6(err) 5 6(err)
+normalPosition(1),
+issPosition(2),
+ibpPosition(3),
+mssPosition(4),
+mbpPosition(5),
+mbsError(6)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS MBS status."
+::= { matStsEntry 17 }
+matStsStatus OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-1) command
+onLine(1),
+offLine(2)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS status."
+::= { matStsEntry 18 }
+matStsRunningMode OBJECT-TYPE
+SYNTAX INTEGER {
+inverter(1),
+mains(2),
+noOutput(3)
+}
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS Running Mode."
+::= { matStsEntry 19 }
+matStsMainHighLossVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS Main high loss voltage, the unit is 0.1 volts."
+::= { matStsEntry 20 }
+matStsMainLowLossVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS Main low loss voltag, the unit is 0.1 volts."
+::= { matStsEntry 21 }
+matStsInvHighLossVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS Inverter high loss voltage, the unit is 0.1 volts."
+::= { matStsEntry 22 }
+matStsInvLosLossVoltage OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"STS Inverter low loss voltage, the unit is 0.1 volts."
+::= { matStsEntry 23 }
+-- ========================================================================
+-- matDryContact
+-- ========================================================================
+matDryContactNum OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"The number of dry contact."
+::= { matDryContact 1 }
+matDryContactTable	OBJECT-TYPE
+SYNTAX	SEQUENCE OF MATDryContactEntry
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"This table list dry contact message."
+::= { matDryContact 2 }
+matDryContactEntry	OBJECT-TYPE
+SYNTAX	MATDryContactEntry
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"An entry containing information of one dry contact."
+INDEX	{ matDryContactIndex }
+::= { matDryContactTable	1 }
+MATDryContactEntry::= SEQUENCE {
+matDryContactIndex PositiveInteger,
+matDryContactString DisplayString
+}
+matDryContactIndex OBJECT-TYPE
+SYNTAX	PositiveInteger
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"The index of dry contact."
+::= { matDryContactEntry	1 }
+matDryContactString OBJECT-TYPE
+SYNTAX DisplayString ( SIZE ( 0 .. 29 ) )
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"format: xx xx xx xx xx xx xx xx xx xx,
+xx: alarm code. If the configured alarm is less than 10, then fill the position with '--' to instead 'xx'.
+Alarm code:
+Inverter fault	0x01(for 3.5Kva system and 1.5Kva system),
+Inverter over load	0x02(for 3.5Kva system and 1.5Kva system),
+Inverter fan fault	0x03(for 3.5Kva system and 1.5Kva system),
+Inverter power limit	0x04(for 3.5Kva system and 1.5Kva system),
+Inverter DC input Abnormal	0x05(for 3.5Kva system and 1.5Kva system),
+Inverter low volt off	0x06(for 3.5Kva system and 1.5Kva system),
+Inverter lost	0x07(for 3.5Kva system and 1.5Kva system),
+Inverter Mains unavailable	0x19(for 3.5Kva system),
+Inverter Maintenance Bypass	0x1A(for 3.5Kva system),
+Inverter Output	0x1B(for 3.5Kva system),
+STS Inv unavailable	0x2A(for 1.5Kva system),
+STS Main unavailable	0x2B(for 1.5Kva system),
+STS Output overload	0x2C(for 1.5Kva system),
+STS OP Short circuit	0x2D(for 1.5Kva system),
+STS K1 Relay open	0x23(for 1.5Kva system),
+STS SCR1 short	0x24(for 1.5Kva system),
+STS SCR2 short	0x25(for 1.5Kva system),
+STS INV Bypass Mode	0x2F(for 1.5Kva system),
+STS Over temperature	0x30(for 1.5Kva system),
+STS MBS Abnormal	0x31(for 1.5Kva system),
+STS Fan Lock	0x27(for 1.5Kva system),
+STS Fault Mode	0x26(for 1.5Kva system),
+STS Eeprom Fault	0x28(for 1.5Kva system),
+SPS Power Fail	0x32(for 1.5Kva system),
+STS Output abnormal	0x34(for 1.5Kva system),
+STS Maintenance Bypass	0x35(for 1.5Kva system),
+STS Output	0x36(for 1.5Kva system),
+Controller temperature high	0x42(for 3.5Kva system and 1.5Kva system),
+Controller eeprom fail	0x43(for 3.5Kva system and 1.5Kva system),
+Controller CAN Bus Off	0x45(for 3.5Kva system and 1.5Kva system)"
+::= { matDryContactEntry	2 }
+-- ========================================================================
+-- matConfig
+-- ========================================================================
+matConfInvSysOutputFreq OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Inverter system output frequency, can be 500 or 600, the unit is 0.1 Hz."
+::= { matConfig 1 }
+matConfInvSysOutputVolt OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Inverter system output voltage, can be 1100, 1150,1200,2080,2200,2300,2400.
+The unit is 0.1 Volt."
+::= { matConfig 2 }
+matConfInvSysOutputVoltHighLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Output voltage high loss of Inverter System, the unit is 0.1 Volt.
+This value depends on matConfInvSysOutputVolt, the least significant
+digit must be zero, see table:
+matConfInvSysOutputVolt(0.1V) Range(0.1V)
+1100	1170-1270,
+1150	1220-1320,
+1200 1270-1380,
+2080 2200-2400,
+2200 2330-2520,
+2300 2440-2640,
+2400 2540-2760"
+::= { matConfig 3 }
+matConfInvSysOutputVoltLowLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Output Voltage Low Loss of inverter System, the unit is 0.1 volt.
+This value depends on matConfInvSysOutputVolt, the least significant
+digit must be zero, see table:
+matConfInvSysOutputVolt(0.1V) Range(0.1V)
+1100	890-1050,
+1150	930-1100,
+1200 1000-1140,
+2080 1760-1980,
+2200 1760-2090,
+2300 1850-2180,
+2400 1930-2280"
+::= { matConfig 4 }
+matConfInvSysInputVolt OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Inverter System Input Voltage, the unit is 0.1 Volt.
+This value depends on matConfInvInputVoltage:
+matConfInvInputVoltage(0.1V)=480: Range(400-440),
+matConfInvInputVoltage(0.1V)=600: Range(500-550)"
+::= { matConfig 5 }
+matConfInvSysPowerLimit OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Inverter System Power Limited level, format: xxx, range: 50 to 100, the unit is percent."
+::= { matConfig 6 }
+matConfInvSysLineVoltHighLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"High loss for line voltage of 3.5k inverter module, the unit is 0.1 volt.
+This value depends on matConfInvSysOutputVolt, the least significant
+digit must be zero, see table:
+matConfInvSysOutputVolt(0.1V) Range(0.1V)
+2080 2180-2650,
+2200 2300-2650,
+2300 2400-2650,
+2400 2500-2650"
+::= { matConfig 7 }
+matConfInvSysLineVoltLowLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Low loss for line voltage of 3.5k inverter module, the unit is 0.1 volt.
+This value depends on matConfInvSysOutputVolt, the least significant
+digit must be zero, see table:
+matConfInvSysOutputVolt(0.1V) Range(0.1V)
+2080 1850-1980,
+2200 1850-2100,
+2300 1850-2200,
+2400 1850-2300"
+::= { matConfig 8 }
+matConfInvSysPriority OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-1) command
+batteryMode(1),
+lineMode(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Priority for 3.5K inverter module."
+::= { matConfig 9 }
+matConfInvSysFanSpeed OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-1) command
+normalSpeed(1),
+fullSpeed(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"Inverter System fan speed."
+::= { matConfig 10 }
+matConfStsAcVoltHighLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"STS Module AC Voltage High Loss Volt, the unit is 0.1 volt.
+This value depends on matConfInvSysOutputVolt, the least significant
+digit must be zero, see table:
+matConfInvSysOutputVolt(0.1V) Range(0.1V)
+1100	1170-1270,
+1150	1220-1320,
+1200 1270-1380,
+2080 2200-2400,
+2200 2330-2520,
+2300 2440-2640,
+2400 2540-2760"
+::= { matConfig 11 }
+matConfStsAcVoltLowLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"STS Module AC Voltage Low Loss Volt, the unit is 0.1 volt.
+This value depends on matConfInvSysOutputVolt, the least significant
+digit must be zero, see table:
+matConfInvSysOutputVolt(0.1V) Range(0.1V)
+1100	890-1050,
+1150	930-1100,
+1200 1000-1140,
+2080 1760-1980,
+2200 1760-2090,
+2300 1850-2180,
+2400 1930-2280"
+::= { matConfig 12 }
+matConfStsIpvVoltHighLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"STS module Inverter IPV High Loss Volt, the unit is 0.1 volt.
+This value depends on matConfInvSysOutputVolt, the least significant
+digit must be zero, see table:
+matConfInvSysOutputVolt(0.1V) Range(0.1V)
+1100	1170-1270,
+1150	1220-1320,
+1200 1270-1380,
+2080 2200-2400,
+2200 2330-2520,
+2300 2440-2640,
+2400 2540-2760"
+::= { matConfig 13 }
+matConfStsIpvVoltLowLoss OBJECT-TYPE
+SYNTAX NonNegativeInteger
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"STS module Inverter IPV low Loss Volt, the unit is 0.1 volt.
+This value depends on matConfInvSysOutputVolt, the least significant
+digit must be zero, see table:
+matConfInvSysOutputVolt(0.1V) Range(0.1V)
+1100	890-1050,
+1150	930-1100,
+1200 1000-1140,
+2080 1760-1980,
+2200 1760-2090,
+2300 1850-2180,
+2400 1930-2280"
+::= { matConfig 14 }
+matConfStsPriority OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-1) command
+onLine(1),
+offLine(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"STS output priority."
+::= { matConfig 15 }
+matConfStsFanSpeed OBJECT-TYPE
+SYNTAX INTEGER {
+-- add 1 compare with Q1(0-1) command
+normalSpeed(1),
+fullSpeed(2)
+}
+ACCESS read-write
+STATUS mandatory
+DESCRIPTION	"STS fan speed."
+::= { matConfig 16 }
+--========================================================================
+-- matTrapTargets
+--========================================================================
+matTrapTargetsNum OBJECT-TYPE
+SYNTAX INTEGER
+ACCESS read-only
+STATUS mandatory
+DESCRIPTION	"The number of trap targets."
+::= { matTrapTargets 1 }
+matTrapTargetsTable	OBJECT-TYPE
+SYNTAX	SEQUENCE OF MatTrapTargetsEntry
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"This table list the managers'IP to send traps to."
+::= { matTrapTargets 2 }
+matTrapTargetsEntry	OBJECT-TYPE
+SYNTAX	MatTrapTargetsEntry
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"An entry containing information of one trap target."
+INDEX	{ matTrapTargetsIndex }
+::= { matTrapTargetsTable 1 }
+MatTrapTargetsEntry ::= SEQUENCE {
+matTrapTargetsIndex PositiveInteger,
+matTrapTargetsAddress DisplayString,
+matTrapTargetsCommunity	DisplayString,
+matTrapType INTEGER,
+matTrapSeverityLevel INTEGER,
+matTrapTargetsDesc DisplayString
+}
+matTrapTargetsIndex	OBJECT-TYPE
+SYNTAX	PositiveInteger
+ACCESS	not-accessible
+STATUS	mandatory
+DESCRIPTION	"The index to a trap receiver entry"
+::= { matTrapTargetsEntry 1 }
+matTrapTargetsAddress	OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 45 ) )
+ACCESS	read-write
+STATUS	mandatory
+DESCRIPTION	"The IP address of the manager to send a trap to."
+::= { matTrapTargetsEntry 2 }
+matTrapTargetsCommunity	OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 31 ) )
+ACCESS	read-write
+STATUS	mandatory
+DESCRIPTION	"The community name to use in the trap when
+sent to the manager."
+::= { matTrapTargetsEntry 3 }
+matTrapType	OBJECT-TYPE
+SYNTAX	INTEGER { none ( 1 ) , matTrap ( 2 ) }
+ACCESS	read-write
+STATUS	mandatory
+DESCRIPTION	"The type of trap to be received by the manager."
+::= { matTrapTargetsEntry 4 }
+matTrapSeverityLevel	OBJECT-TYPE
+SYNTAX	INTEGER { observe ( 1 ) , major ( 2 ) , critical ( 3 ) }
+ACCESS	read-write
+STATUS	mandatory
+DESCRIPTION	"The severity level of traps to be received by this manager."
+::= { matTrapTargetsEntry 5 }
+matTrapTargetsDesc	OBJECT-TYPE
+SYNTAX	DisplayString ( SIZE ( 0 .. 31 ) )
+ACCESS	read-write
+STATUS	mandatory
+DESCRIPTION	"Description of trap receivers"
+::= { matTrapTargetsEntry 6 }
+-- ===========================================================================
+-- matTraps
+-- Level: Critical, Major, Observe
+-- ===========================================================================
+matInvFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"MAJOR: Inverter fault."
+::= 1
+matReturnFromInvFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter fault."
+::= 2
+matInvOverLoad TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"MAJOR: Inverter Over-loading."
+::= 3
+matReturnFromInvOverLoad TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Over-loading."
+::= 4
+matInvFanFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"MAJOR: Inverter Fan fault."
+::= 5
+matReturnFromInvFanFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Fan fault."
+::= 6
+matInvTempPowerLimit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"MAJOR: Inverter power limit."
+::= 7
+matReturnFromInvTempPowerLimit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter power limit."
+::= 8
+matInvInputAbnormal TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"MAJOR: Inverter input abnormal."
+::= 9
+matReturnFromInvInputAbnormal TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVEReturn from Inverter input abnormal."
+::= 10
+matInvLowInputShutdown TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"MAJOR: Inverter shut down due to low input voltage."
+::= 11
+matReturnFromInvLowInputShutdown TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter shut down due to low input voltage."
+::= 12
+matInvNotRespond TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter disconnected."
+::= 13
+matReturnFromInvNotRespond TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Inverter connected."
+::= 14
+matInvBusVoltageOverLimit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter Bus voltage over the maximal level."
+::= 15
+matReturnFromInvBusVoltOverLimit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Bus voltage over the maximal level."
+::= 16
+matInvBusVoltageUnderLimit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter Bus volt under the minimal level."
+::= 17
+matReturnFromInvBusVoltUnderLimit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Bus volt under the minimal level."
+::= 18
+matInvBusSoftFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter Bus Soft Start Fail."
+::= 19
+matReturnFromInvBusSoftFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Bus Soft Start Fail."
+::= 20
+matInvOutputShort TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter Output Short."
+::= 21
+matReturnFromInvOutputShort TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Output Short."
+::= 22
+matInvOutputVoltLow TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter output voltage low."
+::= 23
+matReturnFromInvOutputVoltLow TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter output voltage low."
+::= 24
+matInvOutputVoltHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter output voltage high."
+::= 25
+matReturnFromInvOutputVoltHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter output voltage high."
+::= 26
+matInvTemperatureHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter Temperature High."
+::= 27
+matReturnFromInvTemperatureHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Temperature High."
+::= 28
+matInvNegativePowerProtect TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter negative power protection."
+::= 29
+matReturnFromInvNegativePowerProtect TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter negative power protection."
+::= 30
+matInvPulseFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter Sync Pulse Fault."
+::= 31
+matReturnFromInvPulseFault TRAP-TYPE
+ENTERPRISE matTraps
+DESCRIPTION	"OBSERVE: Return from Inverter Sync Pulse Fault."
+::= 32
+matInvEPOShutdown TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter EPO shutdown."
+::= 33
+matReturnFromInvEPOShutdown TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter EPO shutdown."
+::= 34
+matInvSoftStartFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter soft start fail."
+::= 35
+matReturnFromInvSoftStartFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter soft start fail."
+::= 36
+matInvEEPROMFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"MAJOR: Inverter EEPROM fault."
+::= 37
+matReturnFromInvEEPROMFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter EEPROM fault."
+::= 38
+matInvBypassSCRShort TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter Bypass SCR Short."
+::= 39
+matReturnFromInvBypassSCRShort TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Bypass SCR Short."
+::= 40
+matInvMBSPosError TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter MBS Position Error."
+::= 41
+matReturnFromInvMBSPosError TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter MBS Position Error."
+::= 42
+matInvBackfeedRelayOpen TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter Backfeed Relay Open."
+::= 43
+matReturnFromInvBackfeedRelayOpen TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Backfeed Relay Open."
+::= 44
+matInvHardwareError TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"CRITICAL: Inverter Hardware Detection Error."
+::= 45
+matReturnFromInvHardwareError TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Hardware Detection Error."
+::= 46
+matInvMainUnavailable TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"MAJOR: Inverter Mains Unavailable."
+::= 47
+matReturnFromInvMainUnavailable	TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Mains Unavailable."
+::= 48
+matInvMaintenaceBypass TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"MAJOR: Inverter Maintenance Bypass."
+::= 49
+matReturnFromInvMaintenaceBypass TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matInvSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Inverter Maintenance Bypass."
+::= 50
+-- STS trap
+matStsBypassUnavailable TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS Bypass unavailable."
+::= 51
+matReturnFromStsBypassUnavailable TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Bypass unavailable."
+::= 52
+matStsBackfeedRelayOpen TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS Back-feed relay open."
+::= 53
+matReturnFromStsBackfeedRelayOpen TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Back-feed relay open."
+::= 54
+matStsScr1ShortCurcuit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"CRITICAL: STS SCR1 short circuit."
+::= 55
+matReturnFromStsScr1ShortCurcuit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS SCR1 short circuit."
+::= 56
+matStsScr2ShortCurcuit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"CRITICAL: STS SCR2 short circuit."
+::= 57
+matReturnFromStsScr2ShortCurcuit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS SCR2 short circuit."
+::= 58
+matStsFaultMode TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"CRITICAL: STS running in fault mode."
+::= 59
+matReturnFromStsFaultMode TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS running in fault mode."
+::= 60
+matStsFanFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS fan fault."
+::= 61
+matReturnFromStsFanFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS fan fault."
+::= 62
+matStsEEPROMFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS EEPROM fault."
+::= 63
+matReturnFromStsEEPROMFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS EEPROM fault."
+::= 64
+matStsInvFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS Inverter unavailable."
+::= 65
+matReturnFromStsInvFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Inverter unavailable."
+::= 66
+matStsMainsFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS Mains unavailable."
+::= 67
+matReturnFromStsMainFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Mains unavailable."
+::= 68
+matStsOverLoad TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS Output over load."
+::= 69
+matReturnFromStsOverLoad TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Output over load."
+::= 70
+matStsOutputShortCircuit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"CRITICAL: STS Output short circuit."
+::= 71
+matReturnFromStsOutputShortCircuit TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Output short circuit."
+::= 72
+matStsInvBypassMode TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"CRITICAL: STS Inverter bypass mode."
+::= 73
+matReturnFromStsInvBypassMode TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Inverter bypass mode."
+::= 74
+matStsTemperatureHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS temperature high."
+::= 75
+matReturnFromStsTemperatureHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS temperature high."
+::= 76
+matStsMBSPosFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"CRITICAL: STS MBS in abnormal position."
+::= 77
+matReturnFromStsMBSPosFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS MBS in abnormal position."
+::= 78
+matStsControlPowerFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"CRITICAL: STS Control power fail."
+::= 79
+matReturnFromStsControlPowerFail TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Control power fail."
+::= 80
+matStsNotRespond TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"CRITICAL: STS disconnected."
+::= 81
+matReturnFromStsNotRespond TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: STS connected."
+::= 82
+matStsOutputAbnormal TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS Output abnormal."
+::= 83
+matReturnFromStsOutputAbnormal TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Output abnormal."
+::= 84
+matStsMaintenanceBypass TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"MAJOR: STS Maintenance Bypass."
+::= 85
+matReturnFromStsMaintenanceBypass TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matStsSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from STS Maintenance Bypass."
+::= 86
+-- control warning
+matConBatteryLow TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"CRITICAL: Controller Battery Low."
+::= 87
+matReturnFromConBatteryLow TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Controller Battery Low."
+::= 88
+matConTemperatureHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"CRITICAL: Controller temperature High."
+::= 89
+matReturnFromConTemperatureHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Controller temperature High."
+::= 90
+matConEEPROMFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"MAJOR: Controller EEPROM fault."
+::= 91
+matReturnFromConEEPROMFault TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Controller EEPROM fault."
+::= 92
+matConBatteryVoltHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"CRITICAL: Controller Battery voltage high."
+::= 93
+matReturnFromConBatteryVoltHigh TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Controller Battery voltage high."
+::= 94
+matConCanBusOff TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"CRITICAL: Controller CAN bus off."
+::= 95
+matReturnFromConCanBusOff TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Controller CAN bus off."
+::= 96
+matConCommunicationLost TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"CRITICAL: Controller communication lost."
+::= 97
+matReturnFromCommunicationLost TRAP-TYPE
+ENTERPRISE matTraps
+VARIABLES {
+matConSerialNum
+}
+DESCRIPTION	"OBSERVE: Return from Controller communication lost."
+::= 98
+END
+
+
+

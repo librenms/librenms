@@ -25,7 +25,7 @@ DAILY_SCRIPT=$(readlink -f "$0")
 LIBRENMS_DIR=$(dirname "$DAILY_SCRIPT")
 COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php --no-interaction"
 
-# set log_file, using librenms $config['log_dir'], if set
+# set log_file, using librenms 'log_dir' config setting, if set
 # otherwise we default to <LibreNMS Install Directory>/logs
 LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
 
@@ -126,16 +126,23 @@ set_notifiable_result() {
 #######################################
 check_php_ver() {
     local branch=$(git rev-parse --abbrev-ref HEAD)
-    local ver_res=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
-    if [[ "$branch" == "php53" ]] && [[ "$ver_res" == "0" ]]; then
+    local ver_56=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
+    local ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
+    if [[ "$branch" == "php53" ]] && [[ "$ver_56" == "0" ]]; then
         status_run "Supported PHP version, switched back to master branch." 'git checkout master'
         branch="master"
-    elif [[ "$branch" != "php53" ]] && [[ "$ver_res" == "1" ]]; then
+    elif [[ "$branch" == "php56" ]] && [[ "$ver_71" == "0" ]]; then
+        status_run "Supported PHP version, switched back to master branch." 'git checkout master'
+        branch="master"
+    elif [[ "$branch" != "php53" ]] && [[ "$ver_56" == "1" ]]; then
         status_run "Unsupported PHP version, switched to php53 branch." 'git checkout php53'
         branch="php53"
+    elif [[ "$branch" != "php56" ]] && [[ "$ver_71" == "1" ]]; then
+        status_run "Unsupported PHP version, switched to php56 branch." 'git checkout php56'
+        branch="php56"
     fi
 
-    set_notifiable_result phpver ${ver_res}
+    set_notifiable_result phpver ${branch}
 
     return ${ver_res};
 }
@@ -204,7 +211,7 @@ main () {
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             update_res=$?
             new_ver=$(git rev-parse --short HEAD)
-        elif [[ "$up" == "3" ]]; then
+        else
             # Update to last Tag
             old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
             status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))' 'update'
@@ -255,6 +262,8 @@ main () {
                 # Cleanups
                 local options=("refresh_alert_rules"
                                "refresh_os_cache"
+                               "refresh_device_groups"
+                               "recalculate_device_dependencies"
                                "syslog"
                                "eventlog"
                                "authlog"
@@ -264,7 +273,9 @@ main () {
                                "purgeusers"
                                "bill_data"
                                "alert_log"
-                               "rrd_purge");
+                               "rrd_purge"
+                               "ports_fdb"
+                               "ports_purge");
                 call_daily_php "${options[@]}";
             ;;
             submodules)

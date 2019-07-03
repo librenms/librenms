@@ -23,7 +23,7 @@ if (!is_array($mempool_cache['fiberhome-switch'])) {
     d_echo($mempool_cache);
 }
 
-$entry = $mempool_cache['fiberhome-switch'][$mempool[mempool_index]];
+$entry = $mempool_cache['fiberhome-switch'][$mempool['mempool_index']];
 
 if ($entry['memoryPoolTotalBytes'] < 0) {
     $entry['memoryPoolTotalBytes'] = ($entry['memoryPoolTotalBytes'] * -1);

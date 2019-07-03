@@ -1,0 +1,169 @@
+-- =================================================================
+-- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved
+--
+-- Description:HUAWEI VIRTUALPERCEPTION MIB
+-- Reference:
+-- Version: V1.11
+-- ===========================================================
+
+    HUAWEI-VP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hwDatacomm
+                FROM HUAWEI-MIB
+            EnabledStatus
+                FROM P-BRIDGE-MIB
+            ifIndex, ifName
+                FROM IF-MIB
+            DisplayString, RowStatus
+                FROM SNMPv2-TC
+            Integer32, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+            MacAddress 
+                FROM SNMPv2-TC;                
+
+--
+-- Module Identifier
+--
+    hwVpMIB MODULE-IDENTITY
+        LAST-UPDATED "201407161350Z"        -- July 16, 2014 at 13:50 GMT
+        ORGANIZATION
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com"
+        DESCRIPTION
+            "The HUAWEI-VP-MIB contains objects to
+            Manage configuration and Monitor running state
+            for virtual perception feature."
+        REVISION "201407161350Z"
+        DESCRIPTION "V1.11, modified the MAX-ACCESS of hwVpVmVlan, hwVpVmMac and hwVpVmProfileId." 
+       ::= { hwDatacomm 307 }
+--
+-- Objects Identifier
+--
+    hwVpObjects OBJECT IDENTIFIER ::= { hwVpMIB 1 }
+    hwVpNotifications OBJECT IDENTIFIER ::= { hwVpMIB 2 }
+    hwVpConformance OBJECT IDENTIFIER ::= { hwVpMIB 3 }
+
+--  TABLE: hwVpVmTable
+    hwVpVmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwVpVmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of VM."
+        ::= { hwVpObjects 1 }
+        
+    hwVpVmEntry OBJECT-TYPE
+        SYNTAX HwVpVmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION            
+            "Provides information about VM entry."
+        INDEX { hwVpVmVlan, hwVpVmMac }
+        ::= { hwVpVmTable 1 }            
+           
+    HwVpVmEntry ::=
+        SEQUENCE { 
+            hwVpVmVlan
+                Integer32,
+            hwVpVmMac
+                MacAddress,
+            hwVpVmProfileId
+                DisplayString
+         }               
+               
+--
+-- Node definitions
+--
+    hwVpVmVlan OBJECT-TYPE
+        SYNTAX Integer32 (0..4094)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the VLAN of VM."
+        ::= { hwVpVmEntry 1 }                  
+
+    hwVpVmMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the MAC of VM."
+        ::= { hwVpVmEntry 2 } 
+        
+    hwVpVmProfileId OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..64))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the profile ID of VM."
+        ::= { hwVpVmEntry 3 }    
+
+--
+-- Notification Identifier
+--
+    hwVpVmDownloadProfileFault NOTIFICATION-TYPE
+        OBJECTS { hwVpVmVlan, hwVpVmMac, hwVpVmProfileId, ifIndex, ifName }
+        STATUS current
+        DESCRIPTION
+            "The alarm is reported when VM fail to download profile."
+        ::= { hwVpNotifications 1 }
+
+    hwVpVmDownloadProfileFaultResume NOTIFICATION-TYPE
+        OBJECTS { hwVpVmVlan, hwVpVmMac, hwVpVmProfileId, ifIndex, ifName }
+        STATUS current
+        DESCRIPTION
+            "The event is reported when VM succeed in downloading profile."
+        ::= { hwVpNotifications 2 }
+        
+    hwVpVmAuthenticateFail NOTIFICATION-TYPE
+        OBJECTS { hwVpVmVlan, hwVpVmMac, hwVpVmProfileId, ifIndex, ifName }
+        STATUS current
+        DESCRIPTION
+            "The alarm is reported when VM fail to pass authentication."
+        ::= { hwVpNotifications 3 }
+
+    hwVpVmDeliverAuthorInformationFail NOTIFICATION-TYPE
+        OBJECTS { hwVpVmVlan, hwVpVmMac, hwVpVmProfileId, ifIndex, ifName }
+        STATUS current
+        DESCRIPTION
+            "The alarm is reported when VM fail to deliver authorization information."
+        ::= { hwVpNotifications 4 }
+--
+-- Conformance Identifier
+--
+    hwVpCompliances OBJECT IDENTIFIER ::= { hwVpConformance 1 }
+
+    hwVpCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "This is the virtual perception compliance."
+        MODULE -- this module
+            MANDATORY-GROUPS { hwVpObjectGroup, hwVpNotificationGroup }
+        ::= { hwVpCompliances 1 }
+
+    hwVpGroups OBJECT IDENTIFIER ::= { hwVpConformance 2 }
+
+    hwVpObjectGroup OBJECT-GROUP
+        OBJECTS { hwVpVmMac, hwVpVmVlan, hwVpVmProfileId }
+        STATUS current
+        DESCRIPTION
+            "This is the virtual perception object group."
+        ::= { hwVpGroups 1 }
+        
+    hwVpNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwVpVmDownloadProfileFault, hwVpVmDownloadProfileFaultResume, hwVpVmAuthenticateFail, hwVpVmDeliverAuthorInformationFail }
+        STATUS current
+        DESCRIPTION
+            "This is the virtual perception notification group."
+        ::= { hwVpGroups 2 }        
+
+    END

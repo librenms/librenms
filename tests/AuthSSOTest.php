@@ -25,52 +25,51 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Authentication\Auth;
-use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 class AuthSSOTest extends DBTestCase
 {
     private $last_user = null;
     private $original_auth_mech = null;
+    private $server;
 
     public function setUp()
     {
         parent::setUp();
-        global $config;
 
-        $this->original_auth_mech = $config['auth_mechanism'];
-        $config['auth_mechanism'] = 'sso';
+        $this->original_auth_mech = Config::get('auth_mechanism');
+        Config::set('auth_mechanism', 'sso');
+
+        $this->server = $_SERVER;
     }
 
     // Set up an SSO config for tests
     public function basicConfig()
     {
-        global $config;
-
-        $config['sso']['mode'] = 'env';
-        $config['sso']['create_users'] = true;
-        $config['sso']['update_users'] = true;
-        $config['sso']['trusted_proxies'] = array('127.0.0.1', '::1');
-        $config['sso']['user_attr'] = 'REMOTE_USER';
-        $config['sso']['realname_attr'] = 'displayName';
-        $config['sso']['email_attr'] = 'mail';
-        $config['sso']['descr_attr'] = null;
-        $config['sso']['level_attr'] = null;
-        $config['sso']['group_strategy'] = 'static';
-        $config['sso']['group_attr'] = 'member';
-        $config['sso']['group_filter'] = '/(.*)/i';
-        $config['sso']['group_delimiter'] = ';';
-        $config['sso']['group_level_map'] = null;
-        $config['sso']['static_level'] = -1;
+        Config::set('sso.mode', 'env');
+        Config::set('sso.create_users', true);
+        Config::set('sso.update_users', true);
+        Config::set('sso.trusted_proxies', ['127.0.0.1', '::1']);
+        Config::set('sso.user_attr', 'REMOTE_USER');
+        Config::set('sso.realname_attr', 'displayName');
+        Config::set('sso.email_attr', 'mail');
+        Config::set('sso.descr_attr', null);
+        Config::set('sso.level_attr', null);
+        Config::set('sso.group_strategy', 'static');
+        Config::set('sso.group_attr', 'member');
+        Config::set('sso.group_filter', '/(.*)/i');
+        Config::set('sso.group_delimiter', ';');
+        Config::set('sso.group_level_map', null);
+        Config::set('sso.static_level', -1);
     }
 
     // Set up $_SERVER in env mode
     public function basicEnvironmentEnv()
     {
-        global $config;
         unset($_SERVER);
 
-        $config['sso']['mode'] = 'env';
+        Config::set('sso.mode', 'env');
 
         $_SERVER['REMOTE_ADDR'] = '::1';
         $_SERVER['REMOTE_USER'] = 'test';
@@ -83,10 +82,9 @@ class AuthSSOTest extends DBTestCase
     // Set up $_SERVER in header mode
     public function basicEnvironmentHeader()
     {
-        global $config;
         unset($_SERVER);
 
-        $config['sso']['mode'] = 'header';
+        Config::set('sso.mode', 'header');
 
         $_SERVER['REMOTE_ADDR'] = '::1';
         $_SERVER['REMOTE_USER'] = bin2hex(openssl_random_pseudo_bytes(16));
@@ -108,7 +106,7 @@ class AuthSSOTest extends DBTestCase
 
     public function breakUser()
     {
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         if ($this->last_user !== null) {
             $r = $a->deleteUser($a->getUserid($this->last_user));
@@ -122,139 +120,123 @@ class AuthSSOTest extends DBTestCase
     // Excercise general auth flow
     public function testValidAuthNoCreateUpdate()
     {
-        global $config;
-
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
-        $config['sso']['create_users'] = false;
-        $config['sso']['update_users'] = false;
+        Config::set('sso.create_users', false);
+        Config::set('sso.update_users', false);
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
         $user = $this->makeBreakUser();
-        $this->assertTrue($a->authenticate($user, null));
+        $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Retrieve it and validate
         $dbuser = $a->getUser($a->getUserid($user));
-        $this->assertFalse($a->authSSOGetAttr($config['sso']['realname_attr']) === $dbuser['realname']);
+        $this->assertFalse($a->authSSOGetAttr(Config::get('sso.realname_attr')) === $dbuser['realname']);
         $this->assertFalse($dbuser['level'] === "0");
-        $this->assertFalse($a->authSSOGetAttr($config['sso']['email_attr']) === $dbuser['email']);
+        $this->assertFalse($a->authSSOGetAttr(Config::get('sso.email_attr')) === $dbuser['email']);
     }
 
     // Excercise general auth flow with creation enabled
     public function testValidAuthCreateOnly()
     {
-        global $config;
-
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
-        $config['sso']['create_users'] = true;
-        $config['sso']['update_users'] = false;
+        Config::set('sso.create_users', true);
+        Config::set('sso.update_users', false);
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
         $user = $this->makeBreakUser();
-        $this->assertTrue($a->authenticate($user, null));
+        $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Retrieve it and validate
         $dbuser = $a->getUser($a->getUserid($user));
-        $this->assertTrue($a->authSSOGetAttr($config['sso']['realname_attr']) === $dbuser['realname']);
-        $this->assertTrue($dbuser['level'] === "-1");
-        $this->assertTrue($a->authSSOGetAttr($config['sso']['email_attr']) === $dbuser['email']);
+        $this->assertTrue($a->authSSOGetAttr(Config::get('sso.realname_attr')) === $dbuser['realname']);
+        $this->assertTrue($dbuser['level'] == -1);
+        $this->assertTrue($a->authSSOGetAttr(Config::get('sso.email_attr')) === $dbuser['email']);
 
         // Change a few things and reauth
         $_SERVER['mail'] = 'test@example.net';
         $_SERVER['displayName'] = 'Testier User';
-        $config['sso']['static_level'] = 10;
-        $this->assertTrue($a->authenticate($user, null));
+        Config::set('sso.static_level', 10);
+        $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Retrieve it and validate the update was not persisted
         $dbuser = $a->getUser($a->getUserid($user));
-        $this->assertFalse($a->authSSOGetAttr($config['sso']['realname_attr']) === $dbuser['realname']);
+        $this->assertFalse($a->authSSOGetAttr(Config::get('sso.realname_attr')) === $dbuser['realname']);
         $this->assertFalse($dbuser['level'] === "10");
-        $this->assertFalse($a->authSSOGetAttr($config['sso']['email_attr']) === $dbuser['email']);
+        $this->assertFalse($a->authSSOGetAttr(Config::get('sso.email_attr')) === $dbuser['email']);
     }
 
     // Excercise general auth flow with updates enabled
     public function testValidAuthUpdate()
     {
-        global $config;
-
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
         $user = $this->makeBreakUser();
-        $this->assertTrue($a->authenticate($user, null));
+        $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Change a few things and reauth
         $_SERVER['mail'] = 'test@example.net';
         $_SERVER['displayName'] = 'Testier User';
-        $config['sso']['static_level'] = 10;
-        $this->assertTrue($a->authenticate($user, null));
+        Config::set('sso.static_level', 10);
+        $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Retrieve it and validate the update persisted
         $dbuser = $a->getUser($a->getUserid($user));
-        $this->assertTrue($a->authSSOGetAttr($config['sso']['realname_attr']) === $dbuser['realname']);
-        $this->assertTrue($dbuser['level'] === "10");
-        $this->assertTrue($a->authSSOGetAttr($config['sso']['email_attr']) === $dbuser['email']);
+        $this->assertTrue($a->authSSOGetAttr(Config::get('sso.realname_attr')) === $dbuser['realname']);
+        $this->assertTrue($dbuser['level'] == 10);
+        $this->assertTrue($a->authSSOGetAttr(Config::get('sso.email_attr')) === $dbuser['email']);
     }
 
     // Check some invalid authentication modes
     public function testBadAuth()
     {
-        global $config;
-
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
         unset($_SERVER);
 
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
-        $a->authenticate(null, null);
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
+        $a->authenticate([]);
 
         $this->basicEnvironmentHeader();
         unset($_SERVER);
 
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
-        $a->authenticate(null, null);
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
+        $a->authenticate([]);
     }
 
     // Test some missing attributes
     public function testNoAttribute()
     {
-        global $config;
-
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
         unset($_SERVER['displayName']);
         unset($_SERVER['mail']);
 
-        $this->assertTrue($a->authenticate($this->makeBreakUser(), null));
+        $this->assertTrue($a->authenticate(['username' => $this->makeBreakUser()]));
 
         $this->basicEnvironmentHeader();
         unset($_SERVER['HTTP_DISPLAYNAME']);
         unset($_SERVER['HTTP_MAIL']);
 
-        $this->assertTrue($a->authenticate($this->makeBreakUser(), null));
-    }
-
-    public function testReauthenticate()
-    {
-        $this->setExpectedException(AuthenticationException::class);
-        Auth::reset()->reauthenticate(null, null);
+        $this->assertTrue($a->authenticate(['username' => $this->makeBreakUser()]));
     }
 
     // Document the modules current behaviour, so that changes trigger test failures
     public function testCapabilityFunctions()
     {
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->assertTrue($a->canUpdatePasswords() === 0);
         $this->assertTrue($a->changePassword(null, null) === 0);
@@ -267,13 +249,11 @@ class AuthSSOTest extends DBTestCase
 
     public function testGetExternalUserName()
     {
-        global $config;
-
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
-        $this->assertInternalType('string', $a->getExternalUsername());
+        $this->assertIsString($a->getExternalUsername());
 
         // Missing
         unset($_SERVER['REMOTE_USER']);
@@ -281,55 +261,53 @@ class AuthSSOTest extends DBTestCase
         $this->basicEnvironmentEnv();
 
         // Missing pointer to attribute
-        unset($config['sso']['user_attr']);
+        Config::forget('sso.user_attr');
         $this->assertNull($a->getExternalUsername());
         $this->basicEnvironmentEnv();
 
         // Non-existant attribute
-        $config['sso']['user_attr'] = 'foobar';
+        Config::set('sso.user_attr', 'foobar');
         $this->assertNull($a->getExternalUsername());
         $this->basicEnvironmentEnv();
 
         // null pointer to attribute
-        $config['sso']['user_attr'] = null;
+        Config::set('sso.user_attr', null);
         $this->assertNull($a->getExternalUsername());
         $this->basicEnvironmentEnv();
 
         // null attribute
-        $config['sso']['user_attr'] = 'REMOTE_USER';
+        Config::set('sso.user_attr', 'REMOTE_USER');
         $_SERVER['REMOTE_USER'] = null;
         $this->assertNull($a->getExternalUsername());
     }
 
     public function testGetAttr()
     {
-        global $config;
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $_SERVER['HTTP_VALID_ATTR'] = 'string';
         $_SERVER['alsoVALID-ATTR'] = 'otherstring';
 
-        $config['sso']['mode'] = 'env';
+        Config::set('sso.mode', 'env');
         $this->assertNull($a->authSSOGetAttr('foobar'));
         $this->assertNull($a->authSSOGetAttr(null));
         $this->assertNull($a->authSSOGetAttr(1));
-        $this->assertInternalType('string', $a->authSSOGetAttr('alsoVALID-ATTR'));
-        $this->assertInternalType('string', $a->authSSOGetAttr('HTTP_VALID_ATTR'));
+        $this->assertIsString($a->authSSOGetAttr('alsoVALID-ATTR'));
+        $this->assertIsString($a->authSSOGetAttr('HTTP_VALID_ATTR'));
 
-        $config['sso']['mode'] = 'header';
+        Config::set('sso.mode', 'header');
         $this->assertNull($a->authSSOGetAttr('foobar'));
         $this->assertNull($a->authSSOGetAttr(null));
         $this->assertNull($a->authSSOGetAttr(1));
         $this->assertNull($a->authSSOGetAttr('alsoVALID-ATTR'));
-        $this->assertInternalType('string', $a->authSSOGetAttr('VALID-ATTR'));
+        $this->assertIsString($a->authSSOGetAttr('VALID-ATTR'));
     }
 
     public function testTrustedProxies()
     {
-        global $config;
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
-        $config['sso']['trusted_proxies'] = array('127.0.0.1', '::1', '2001:630:50::/48', '8.8.8.0/25');
+        Config::set('sso.trusted_proxies', ['127.0.0.1', '::1', '2001:630:50::/48', '8.8.8.0/25']);
 
         // v4 valid CIDR
         $_SERVER['REMOTE_ADDR'] = '8.8.8.8';
@@ -368,7 +346,7 @@ class AuthSSOTest extends DBTestCase
         $this->assertFalse($a->authSSOProxyTrusted());
 
         // Not a list
-        $config['sso']['trusted_proxies'] = '8.8.8.0/25';
+        Config::set('sso.trusted_proxies', '8.8.8.0/25');
         $_SERVER['REMOTE_ADDR'] = '8.8.8.8';
         $this->assertFalse($a->authSSOProxyTrusted());
 
@@ -379,60 +357,57 @@ class AuthSSOTest extends DBTestCase
 
     public function testLevelCaulculationFromAttr()
     {
-        global $config;
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
-        $config['sso']['mode'] = 'env';
-        $config['sso']['group_strategy'] = 'attribute';
+        Config::set('sso.mode', 'env');
+        Config::set('sso.group_strategy', 'attribute');
 
         //Integer
-        $config['sso']['level_attr'] = 'level';
+        Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = 9;
         $this->assertTrue($a->authSSOCalculateLevel() === 9);
 
         //String
-        $config['sso']['level_attr'] = 'level';
+        Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = "9";
         $this->assertTrue($a->authSSOCalculateLevel() === 9);
 
         //Invalid String
-        $config['sso']['level_attr'] = 'level';
+        Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = 'foobar';
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
 
         //null
-        $config['sso']['level_attr'] = 'level';
+        Config::set('sso.level_attr', 'level');
         $_SERVER['level'] = null;
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
 
         //Unset pointer
-        unset($config['sso']['level_attr']);
+        Config::forget('sso.level_attr');
         $_SERVER['level'] = "9";
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
 
         //Unset attr
-        $config['sso']['level_attr'] = 'level';
+        Config::set('sso.level_attr', 'level');
         unset($_SERVER['level']);
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
     }
 
     public function testGroupParsing()
     {
-        global $config;
-
         $this->basicConfig();
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
 
-        $config['sso']['group_strategy'] = 'map';
-        $config['sso']['group_delimiter'] = ';';
-        $config['sso']['group_attr'] = 'member';
-        $config['sso']['group_level_map'] = array('librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5);
+        Config::set('sso.group_strategy', 'map');
+        Config::set('sso.group_delimiter', ';');
+        Config::set('sso.group_attr', 'member');
+        Config::set('sso.group_level_map', ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5]);
         $_SERVER['member'] = "librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins";
 
         // Valid options
@@ -461,47 +436,46 @@ class AuthSSOTest extends DBTestCase
         $_SERVER['member'] = "librenms-admins;librenms-readers;librenms-billingcontacts;unrelatedgroup;confluence-admins";
 
         // Empty
-        $config['sso']['group_level_map'] = array();
+        Config::set('sso.group_level_map', []);
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Not associative
-        $config['sso']['group_level_map'] = array('foo', 'bar', 'librenms-admins');
+        Config::set('sso.group_level_map', ['foo', 'bar', 'librenms-admins']);
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Null
-        $config['sso']['group_level_map'] = null;
+        Config::set('sso.group_level_map', null);
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Unset
-        unset($config['sso']['group_level_map']);
+        Config::forget('sso.group_level_map');
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // No delimiter
-        unset($config['sso']['group_delimiter']);
+        Config::forget('sso.group_delimiter');
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
         // Test group filtering by regex
-        $config['sso']['group_filter'] = "/confluence-(.*)/i";
-        $config['sso']['group_delimiter'] = ';';
-        $config['sso']['group_level_map'] = array('librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5, 'confluence-admins' => 7);
+        Config::set('sso.group_filter', "/confluence-(.*)/i");
+        Config::set('sso.group_delimiter', ';');
+        Config::set('sso.group_level_map', ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5, 'confluence-admins' => 7]);
         $this->assertTrue($a->authSSOParseGroups() === 7);
 
         // Test group filtering by empty regex
-        $config['sso']['group_filter'] = "";
+        Config::set('sso.group_filter', "");
         $this->assertTrue($a->authSSOParseGroups() === 10);
 
         // Test group filtering by null regex
-        $config['sso']['group_filter'] = null;
+        Config::set('sso.group_filter', null);
         $this->assertTrue($a->authSSOParseGroups() === 10);
     }
 
     public function tearDown()
     {
-        parent::tearDown();
-        global $config;
-
-        $config['auth_mechanism'] = $this->original_auth_mech;
-        unset($config['sso']);
+        Config::set('auth_mechanism', $this->original_auth_mech);
+        Config::forget('sso');
         $this->breakUser();
+        $_SERVER = $this->server;
+        parent::tearDown();
     }
 }

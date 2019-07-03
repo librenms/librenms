@@ -1,0 +1,1272 @@
+--*******************************************************************
+--*    SAGEM SA			 							  				*
+--*******************************************************************
+--*******************************************************************
+
+--  Filename: protection
+--  File type: .mib    
+-- 
+--  Description:	SNMPc source Mib file.
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--
+--		Name: F.Bonnevialle	
+--		Date: 12 12 2000 
+--		Desc: original
+-- 
+--		Name: F.Bonnevialle/S.Laurent	
+--		Date: 04 05 2001 
+--		Desc: Modification to fit with SDH-ETS MIB
+--  
+--		Name: F.Bonnevialle/S.Laurent	
+--		Date: 05 06 2001 
+--		Desc: Bug correction 
+-- 
+--		Name: J.Thieser	
+--		Date: 10 08 01 
+--		Desc: modifications for IONOS NMS (SPRing)      
+--   
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+
+
+--*******************************************************************
+-- MIB: PROTECTION-MIB
+--*******************************************************************
+PROTECTION-MIB DEFINITIONS ::= BEGIN 
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+
+   IMPORTS
+   sagemDr								FROM SAGEM-DR-MIB
+   SagemBoolean, Severity				FROM EQUIPMENT-MIB
+   MODULE-IDENTITY,OBJECT-TYPE      	FROM SNMPv2-SMI;
+
+   protection	MODULE-IDENTITY
+      LAST-UPDATED "9911290000Z"
+      ORGANIZATION "SAGEM-Tolbiac drd/ddp/tmhd"
+      CONTACT-INFO
+	"   "
+      DESCRIPTION 
+	" This MIB describe protection mechanisms used by SDH equipment"
+   ::= { sagemDr 130 }
+   
+   -- multiplex section protection
+   msp			OBJECT IDENTIFIER ::= { protection 10 } 
+   
+   -- multiplex section shared protection ring
+   msSPRing		OBJECT IDENTIFIER ::= { protection 20 }
+   
+   -- sub network connection protection
+   sncp			OBJECT IDENTIFIER ::= { protection 30 }
+   
+   -- card protection
+   cardp		OBJECT IDENTIFIER ::= { protection 40 }
+
+
+--*******************************************************************
+--* Common declarations  
+--******************************************************************* 
+
+   TrafficStatus ::= INTEGER 
+   { 
+   	none(0),             -- Future case of a non-implemented link 
+   	working(1),
+   	protection(2)
+   }  
+      
+
+
+
+--*******************************************************************
+--* multiplex section protection (msp)  
+--******************************************************************* 
+   
+   MspInitiator ::= INTEGER 
+   {
+	unknown(0),
+	local(1),
+	remote(2) 
+   }  
+
+   MspFailure ::= INTEGER 
+   {
+	none(0),pam(1),scm(2),otm(4),scmOtm(6) 
+   }  
+   
+   MspPriority ::= INTEGER 
+   { 
+   	unknown(0),
+   	highG783(1),
+   	low(2) 
+   }
+   
+   MspStatus ::= INTEGER 
+   {
+	lockoutProtection(15),forcedSwitch(14),
+	highSF(13),lowSF(12),highSD(11),lowSD(10),
+	manualSwitch(8),waitToRestore(6),exercise(4),
+	reverseRequest(2),doNotRevert(1),noRequest(0) 
+   }           
+  
+   MspType ::= INTEGER 
+   { 
+ 	unknown(0),
+   	onePlusOneOptimized(1),
+   	onePlusOneCompatible(2),
+   	oneForN(3)
+   }                        
+
+   MspDirection ::= INTEGER 
+   { 
+   	unknown(0),
+   	unidirectionnal(1),
+   	bidirectionnal(2)
+   }                        
+
+   MspCommand ::= INTEGER 
+   {
+   	clear(0),lw(1),lp(2),fsW(3),fsP(4),msW(5),msP(6),exer(7) 
+   }  
+   
+   
+   mspNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of multiplex section protection in equipment."  
+      ::= { msp 1 } 
+   
+   mspTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF MspEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of multiplex section protection in equipment."  
+      ::= { msp 2 } 
+   
+   mspEntry   OBJECT-TYPE
+      SYNTAX       MspEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular multiplex section protection of the equipment.
+     Each entry is created in using the msTTPTable of the Sdh-Ets MIB."
+      INDEX        { mspIndex } 
+      ::= { mspTable 1 }       
+       
+       
+   MspEntry ::= SEQUENCE 
+   {
+		mspIndex          		INTEGER,      	-- msTTPIndex = mspWorkingPointer
+    	mspWorkingPointer   	INTEGER,		-- mst working
+    	mspProtectionPointer   	INTEGER,  		-- mst protection
+		mspType    				MspType,
+    	mspDir    				MspDirection,
+		mspTraffic        		TrafficStatus,
+		mspRevertive      		SagemBoolean,
+		mspWtr            		INTEGER,
+		mspSfSdPriority   		MspPriority,
+		mspSfSdHoldOffTime  	INTEGER,
+		mspCommand       		MspCommand,
+		mspInitiator			MspInitiator,			
+		mspStatus		     	MspStatus, 
+		mspMonitor	  			SagemBoolean,
+		mspFailure				MspFailure,
+    	mspSeverity				Severity,
+		mspPam					Severity,
+		mspScm					Severity,
+		mspOtm					Severity
+	}
+   
+   
+   mspIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular	multiplex section protection.
+	 This index is equal to an msTTPIndex(=spiIndex) which gives the interface involved . 
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+     ::= { mspEntry 1 } 
+   
+   mspWorkingPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on working synchronous port interface side.
+	In most equipments, this value cannot be changed and points to
+	the working MST it is hard wired with."  
+      ::= { mspEntry 2 } 
+   
+   mspProtectionPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on protection synchronous port interface side.
+	In most equipments, this value cannot be changed and points to
+	the protection MST it is hard wired with.
+	When this variable is setting, the protection is created and activated (if it's possible).
+	The two considerated sections must have the same Stm Level. "  
+      ::= { mspEntry 3 } 
+      
+   mspType   OBJECT-TYPE
+      SYNTAX       MspType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Indication of the protection type."  
+      ::= { mspEntry 4 } 
+
+   mspDir	   OBJECT-TYPE
+      SYNTAX       MspDirection
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Indication of the direction."  
+      ::= { mspEntry 5 } 
+
+   mspTraffic   OBJECT-TYPE
+      SYNTAX       TrafficStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The value of this field indicates the protection switch position."  
+      ::= { mspEntry 6 } 
+      
+   mspRevertive   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If the value is true the msp function is allowed to spontaneously
+	switch back to working chanel when it is available.
+	If not, the msp can switch back to working chanel only if
+	protection chanel fails."  
+      ::= { mspEntry 7 } 
+   
+   mspWtr   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The time (in seconds) the msp function waits before
+	considering a chanel as good after a fail."  
+      ::= { mspEntry 8 } 
+   
+   mspSfSdPriority   OBJECT-TYPE
+      SYNTAX       MspPriority
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Signal Fail and Signal Degrade can be treated according to two set
+	of priority. The equipement will send SF and SD events according to
+	the value of this field."  
+      ::= { mspEntry 9 } 
+   
+   mspSfSdHoldOffTime   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The period (in tenth of seconds) during which a
+	sf or a Signal Degrade is
+	ignored by the MSP switch."  
+      ::= { mspEntry 10 }   
+    
+   mspCommand   OBJECT-TYPE
+      SYNTAX       MspCommand
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Manual or forced commands can be apply to the protection switch.
+	The forced and manual switch can be refused or cleared by equipment
+	if a higher priority APS command is received or if the protection chanel
+	is down.
+	When this field is set to manual or forced, the mspTraffic field
+	becomes read-write, and a set can be issued to specifie on which
+	chanel the command does apply.
+	Commands: 
+ 		LP (Lockout of Protection) 
+ 		LW (Lockout of Working channel)
+ 		FSW (Forced Switch of a Working channel to protection)
+ 		FSP (Forced Switch of a Protection channel to working) case 1+1
+ 		MSW (Manual Switch of a Working channel to protection)
+ 		MSp (Manual Switch of a Protection channel to working) case 1+1 
+ 		EXER (EXERcise)
+	"  
+      ::= { mspEntry 11 } 
+    
+   mspInitiator   OBJECT-TYPE
+      SYNTAX       MspInitiator
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Indicates the initiator equipment."  
+      ::= { mspEntry 12 } 
+
+   mspStatus   OBJECT-TYPE
+      SYNTAX       MspStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Indicates the initiator equipment status :
+	 	lockoutProtection(15),
+	 	forcedSwitch(14),
+	 	highSF(13),
+	 	lowSF(12),
+	 	highSD(11),
+	 	lowSD(10),
+		manualSwitch(8),
+		waitToRestore(6),
+		exercise(4),
+		reverseRequest(2),
+		doNotRevert(1),
+		noRequest(0)	"  
+      ::= { mspEntry 13 } 
+  
+    mspMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this multiplex section protection."  
+      ::= { mspEntry 14 } 
+   
+   mspFailure   OBJECT-TYPE
+      SYNTAX       MspFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on multiplex section protection."  
+      ::= { mspEntry 15 } 
+   
+   mspSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for multiplex section protection."  
+      ::= { mspEntry 16 }    
+           
+   mspPam   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Protection Architecture Mismatch failure
+	for multiplex section protection."  
+      ::= { mspEntry 20 } 
+   
+   mspScm   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Selector Control Mismatch failure
+	for multiplex section protection."  
+      ::= { mspEntry 21 } 
+   
+  mspOtm   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Operation Type Mismatch failure
+	for multiplex section protection."  
+      ::= { mspEntry 22 } 
+   -- End of multiplex section protection description  
+        
+        
+--*******************************************************************
+--* multiplex section shared protection ring  (ms SpRing)  
+--******************************************************************* 
+   MsSPRingFailure ::= INTEGER 
+   {
+	none(0), ato(1), arv(2), aun (3), ptm (4), mms (5), exr(6) 
+   }  
+
+   MsSPRingStatus ::= INTEGER 
+   {
+	off(19),lockoutProtection (15), forcedSwitchR (13), sfR (11), sdR (8), 
+	manualSwitchR (6),
+	waitToRestore (5), exerR (3), reverseRequestR (1), noRequest (0) 
+   }           
+                 
+   
+   MsSPRingCommand ::= INTEGER 
+   {
+   	clear(16),lpS(15),fsR(13),msR(6),exerR(3),on(20),off(19) 
+   }  
+   
+   MsSPRingID ::= INTEGER 
+   {
+	node0(0), node1(1), node2(2),node3 (3), node4 (4),
+	node5(5), node6(6), node7(7),node8 (8), node9 (9), 
+	node10(10), node11(11), node12(12),node13 (13), node14 (14), 
+	node15(15), nodeUNK(255)  
+   } 
+   
+    State   ::= INTEGER
+	{
+		off   			(0),
+		idle	 		(1), 
+		pass	 		(2), 	
+		switch 			(3), 	
+		unknown			(4) 
+	}
+
+   msSPRingNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of multiplex section protection in equipment."  
+      ::= { msSPRing 1 } 
+              
+   msSPRingTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF MsSPRingEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of multiplex section protection in equipment."  
+      ::= { msSPRing 6 } 
+         
+   msSPRingEntry   OBJECT-TYPE
+      SYNTAX       MsSPRingEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular multiplex section protection of the equipment.
+     Each entry is created in using the msTTPTable of the Sdh-Ets MIB.
+	 spiIndex gives the interface involved (line east or west)" 
+      INDEX        { msSPRingIndex } 
+      ::= { msSPRingTable 1 }       
+           
+   MsSPRingEntry ::= SEQUENCE 
+   {
+		msSPRingIndex          		INTEGER,  -- West index  
+	 	msSPRingWestPointer   		INTEGER,  -- vers mst    
+    	msSPRingEastPointer   		INTEGER,  -- vers mst    	
+		msSPRingWtr            		INTEGER,   -- 0-30 min,+/-1min,def 5min
+		msSPRingSfSdHoldOffTime 	INTEGER, 
+		msSPRingCommandSide    		INTEGER,  -- vers mst
+		msSPRingCommand       		MsSPRingCommand,
+		msSPRingInitiator1			MsSPRingID,   -- 0..15
+		msSPRingInitiator2			MsSPRingID,   -- 0..15   
+		msSPRingNodeState			State, 
+		msSPRingSwitchingSide    	INTEGER,  -- vers mst 		   
+		msSPRingWestTraffic        	TrafficStatus,
+		msSPRingEastTraffic        	TrafficStatus,
+        msSPRingWestStatus 			MsSPRingStatus, 
+        msSPRingEastStatus   		MsSPRingStatus,
+        msSPRingMonitor				SagemBoolean, 
+		msSPRingFailure				MsSPRingFailure,
+    	msSPRingSeverity			Severity,
+		msSPRingAto					Severity,
+		msSPRingArv					Severity,
+		msSPRingAun					Severity,
+		msSPRingPtm					Severity,
+		msSPRingMms					Severity,
+		msSPRingExr					Severity,
+		msSPRingSimpleFailure		SagemBoolean,
+		msSPRingId					MsSPRingID
+	}
+
+    msSPRingIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular	SPRing = West STM index."  
+      ::= { msSPRingEntry 1 } 
+   
+   msSPRingWestPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on  synchronous port interface side.
+	In most equipments, this value cannot be changed and points to
+	the West MST it is hard wired with."  
+      ::= { msSPRingEntry 2 } 
+
+   msSPRingEastPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on  synchronous port interface side.
+	In most equipments, this value cannot be changed and points to
+	the East MST it is hard wired with.
+	When this variable is setting, the protection is created and activated (if it's possible).
+	The two considerated sections must have the same Stm Level."  
+      ::= { msSPRingEntry 3 }      
+   
+   msSPRingWtr   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The time (in seconds) the spring function waits before
+	considering a chanel as good after a fail."  
+      ::= { msSPRingEntry 5 } 
+   
+   msSPRingSfSdHoldOffTime   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The period (in tenth of seconds) during which a
+	sf or a Signal Degrade is ignored by the SPRing switch."  
+      ::= { msSPRingEntry 6 } 
+      
+   msSPRingCommandSide   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Side of the command"  
+      ::= { msSPRingEntry 7 }   
+          
+   msSPRingCommand   OBJECT-TYPE
+      SYNTAX       MsSPRingCommand
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Manual or forced commands can be apply to the protection switch.
+	"  
+      ::= { msSPRingEntry 8 } 
+              
+   msSPRingInitiator1   OBJECT-TYPE
+      SYNTAX       MsSPRingID
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference(ID) to the equipment that initiate the SWITCH; this is mainly the Master
+	when the equipment is in SWITCH state; in some case like bidirectional SF both equipment
+	 of the couple equipment are Master.
+	 In PASS state Master and Slave are undeterminated"  
+      ::= { msSPRingEntry 10 } 
+      
+   msSPRingInitiator2   OBJECT-TYPE
+      SYNTAX       MsSPRingID
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference(ID) to the equipment that respond to the SWITCH; this is mainly the Slave
+	when the equipment is in SWITCH state; in some case like bidirectional SF both equipment
+	 of the couple equipment are Master.
+	 In PASS state Master and Slave are undeterminated"  
+
+      ::= { msSPRingEntry 11 } 
+     
+    msSPRingNodeState OBJECT-TYPE
+      SYNTAX 	   State 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { msSPRingEntry 29 } 
+  
+    msSPRingSwitchingSide   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Switching SideSide"  
+      ::= { msSPRingEntry 30 }   
+    
+    msSPRingWestTraffic   OBJECT-TYPE
+      SYNTAX       TrafficStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The value of this field indicates the protection switch position."  
+      ::= { msSPRingEntry 31 }  
+  
+    msSPRingEastTraffic   OBJECT-TYPE
+      SYNTAX       TrafficStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The value of this field indicates the protection switch position."  
+      ::= { msSPRingEntry 32 }  
+    
+    msSPRingWestStatus   OBJECT-TYPE
+      SYNTAX       MsSPRingStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Indicates the local status:
+	OFF (19), lockoutProtection (16), forcedSwitch-R(13),sf-R(11),sd-R(8),
+	manualSwitch-R(6),
+	waitToRestore(5),exer-R(3),noRequest(0)"  
+      ::= { msSPRingEntry 33 } 
+   
+    msSPRingEastStatus   OBJECT-TYPE
+      SYNTAX       MsSPRingStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Indicates the local status:
+	OFF (19), lockoutProtection (16), forcedSwitch-R(13),sf-R(11),sd-R(8),
+	manualSwitch-R(6),
+	waitToRestore(5),exer-R(3),noRequest(0)"  
+      ::= { msSPRingEntry 34 } 
+  
+     
+    msSPRingMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this multiplex section protection."  
+      ::= { msSPRingEntry 12 } 
+   
+   msSPRingFailure   OBJECT-TYPE
+      SYNTAX       MsSPRingFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on multiplex section protection"  
+      ::= { msSPRingEntry 13 } 
+   
+   msSPRingSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for multiplex section protection."  
+      ::= { msSPRingEntry 14 }    
+       
+   msSPRingAto   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with APS Time Out failure failure
+	for MS-SPRing."  
+      ::= { msSPRingEntry 21 } 
+   
+  msSPRingArv   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with APS Rules Violation failure failure
+	for MS-SPRing."  
+      ::= { msSPRingEntry 22 }
+
+   msSPRingAun   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with APS Unknown Node failure failure
+	for MS-SPRing."  
+      ::= { msSPRingEntry 23 } 
+   
+  msSPRingPtm   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Potential Traffic Misconnection failure
+	for MS-SPRing."  
+      ::= { msSPRingEntry 24 }   
+      
+  msSPRingMms   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Mutiple Multiplex Section Fail failure
+	for MS-SPRing."  
+      ::= { msSPRingEntry 25 } 
+   
+  msSPRingExr   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with EXeRcise failure
+	for MS-SPRing."  
+      ::= { msSPRingEntry 26 }              
+         
+  msSPRingSimpleFailure   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Indicate if simple or multi ring failure must be considerated"  
+      ::= { msSPRingEntry 27 }
+   
+   msSPRingId   OBJECT-TYPE
+      SYNTAX       MsSPRingID 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Ring Identifier of the equipement"  
+      ::= { msSPRingEntry 28 } 
+
+ --*******************************************************************                        
+   msSPRingTopoMapTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF MsSPRingTopoMapEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"Topology Map of the ring = West STM index + Val (1<=Val<=16)."  
+      ::= { msSPRing 11 } 
+     
+   msSPRingTopoMapEntry   OBJECT-TYPE
+      SYNTAX       MsSPRingTopoMapEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular entry of the ring topology map." 
+      INDEX        { msSPRingTopoMapIndex } 
+      ::= { msSPRingTopoMapTable 1 }       
+       
+-- 16 entries in this table       
+   MsSPRingTopoMapEntry ::= SEQUENCE 
+   {  
+   	msSPRingTopoMapIndex INTEGER,
+   	msSPRingTopoMapID    MsSPRingID
+   } 
+   
+   msSPRingTopoMapIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"index"  
+      ::= { msSPRingTopoMapEntry 1 } 
+   
+   msSPRingTopoMapID   OBJECT-TYPE
+      SYNTAX       MsSPRingID
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"identifier of the node"  
+      ::= { msSPRingTopoMapEntry 2 }   
+                        
+                        
+--*******************************************************************                        
+   MisconMapType  ::= INTEGER 
+   { 
+   	terminated(1), passedThrough (2)
+   }  
+   MsSPRingSide  ::= INTEGER 
+   { 
+   	west(0),east(1), unknown(2)
+   }  
+
+   msSPRingMisconMapTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF MsSPRingMisconMapEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"Connectivity (misconnection) Map of the ring."  
+      ::= { msSPRing 21 } 
+     
+   msSPRingMisconMapEntry   OBJECT-TYPE
+      SYNTAX       MsSPRingMisconMapEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular entry of the ring connectivity (misconnection) map. 
+     All entries are created after setting the msSPRingWestPointer."
+      INDEX        { msSPRingMisconMapIndex } 
+      ::= { msSPRingMisconMapTable 1 }       
+       
+--  8 West + 8 East entries in this table for each SPRing 
+   MsSPRingMisconMapEntry ::= SEQUENCE 
+   {  
+   	msSPRingMisconMapIndex 		INTEGER,   
+   	msSPRingMisconMapSide		MsSPRingSide,    
+   	msSPRingMisconMapIn 	 	MsSPRingID,
+   	msSPRingMisconMapOut    	MsSPRingID ,
+   	msSPRingMisconMapTimeSlot 	INTEGER,
+   	msSPRingMisconMapType	    MisconMapType,
+   	msSPRingMisconMapLOAccess	SagemBoolean 
+   } 
+   
+   msSPRingMisconMapIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Index = West STM index + Val (1<=Val<=16) 
+	ADR2500c : val = 1 to 8 for West and 9 to 16 for East"  
+      ::= { msSPRingMisconMapEntry 1 } 
+   
+   msSPRingMisconMapSide   OBJECT-TYPE
+      SYNTAX       MsSPRingSide
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Side (WestPointer/msSPRingEast) of the interface that supports the AU4"  
+      ::= { msSPRingMisconMapEntry 2 } 
+   
+   msSPRingMisconMapIn   OBJECT-TYPE
+      SYNTAX       MsSPRingID
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Node of the ring where the Au4 traffic enters the ring"  
+      ::= { msSPRingMisconMapEntry 3 } 
+   
+   msSPRingMisconMapOut   OBJECT-TYPE
+      SYNTAX       MsSPRingID
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Node of the ring where the Au4 traffic exits the ring"  
+      ::= { msSPRingMisconMapEntry 4 }   
+   
+   msSPRingMisconMapTimeSlot   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Time Slot assignment for the AU4"  
+      ::= { msSPRingMisconMapEntry 5 } 
+   
+   msSPRingMisconMapType   OBJECT-TYPE
+      SYNTAX       MisconMapType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If the value is equal to terminated, the traffic in the ring is inserted 
+	or extracted at this node.
+	If the value is equal to passedThrough the traffic only cross the node"  
+      ::= { msSPRingMisconMapEntry 6 }  
+      
+   msSPRingMisconMapLOAccess   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"True if the AU4 is accessed at LO layers somewhere in the ring"  
+      ::= { msSPRingMisconMapEntry 7 } 
+
+ --*******************************************************************                         
+   msSPRingNUTTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF MsSPRingNUTEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"Topology Map of the ring."  
+      ::= { msSPRing 31 } 
+     
+   msSPRingNUTEntry   OBJECT-TYPE
+      SYNTAX       MsSPRingNUTEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular entry of the ring topology map." 
+      INDEX        { msSPRingNUTIndex } 
+      ::= { msSPRingNUTTable 1 }       
+       
+-- 8 entries in this table       
+   MsSPRingNUTEntry ::= SEQUENCE 
+   {  
+   	msSPRingNUTIndex INTEGER,   -- time slot
+   	msSPRingNUTisNut    SagemBoolean
+   } 
+   
+   msSPRingNUTIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"AU4 index = West STM index + Val (Val = working timeSlot; 1<=Val<=8)"  
+      ::= { msSPRingNUTEntry 1 } 
+   
+   msSPRingNUTisNut   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Define if the traffic is used for NUT Traffic"  
+      ::= { msSPRingNUTEntry 2 }   
+
+                
+ -- End of multiplex section shared protection ring  (ms spRing)   
+       
+       
+       
+--*******************************************************************
+--* sncp  
+--*******************************************************************      
+   LinkType      ::= INTEGER
+   {          
+   	unknown(0),
+   	au(1),
+   	au4c(2), 
+   	au16c(3),
+   	tu3(10),
+   	tu12(20)
+   }
+  
+   TriggerCriterion ::= INTEGER 
+   { 
+    none(0),
+    sncI(1),
+    sncN(2),
+    sncIRdi(3),
+    sncNRdi(4)
+   }  
+   
+   SNCStateProcess ::= INTEGER 
+   { 
+	nrnormal(0),
+	nrsecours(1),
+	wtr(2),
+	dontRev(3),
+	mssecours(4), 
+	msnormal(5),
+	sdnormal(6),
+	sdsecours(7),  
+	sfnormal(8),
+	fssecours(9),
+	sfsecours(10),
+	fsnormal(11),
+    lockout(12)  
+--  msRDInormal(11), 
+--  sfmsRDInormal(12), 
+-- 	sdmsRDInormal(13), 
+-- 	msRDIsecours(16),
+-- 	sfmsRDIsecours (17),
+-- 	sdmsRDIsecours(18)
+   }   
+   
+   SNCCommand ::= INTEGER
+   {
+   	clear(0),
+   	manualWorking(1),
+   	manualProtection(2),
+    forcedWorking(3),
+    forcedProtection(4),
+    lockout(5),
+    off(19),
+    on(20) 
+   }
+
+   sncNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "Number of snc in equipment."
+      ::= { sncp 1 }
+      
+   sncTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF SncEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+   "List of snc protection in equipment."
+      ::= { sncp 2 }
+
+   sncEntry   OBJECT-TYPE
+      SYNTAX       SncEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION  
+   "A particular SNC protection which is created in using the linkTable of the Xconnection MIB."
+      INDEX        { sncIndex }
+      ::= { sncTable 1 }
+
+   SncEntry ::=
+      SEQUENCE { 
+      sncIndex					INTEGER,         -- linkIndex
+      sncLinkType				LinkType,
+      sncCTPSink            	INTEGER,
+      sncCTPSourceW	       		INTEGER,
+      sncCTPSourceP	       		INTEGER,
+      sncTrafficStatus         	TrafficStatus,    
+      sncWorkingTriggerType    	TriggerCriterion,
+      sncProtectionTriggerType 	TriggerCriterion,
+      sncRevertive             	SagemBoolean,
+      sncWtr                   	INTEGER,
+      sncStateProcess           SNCStateProcess,
+      sncHoldOffTime           	INTEGER,
+      sncCommand              	SNCCommand
+            
+   }
+   
+   sncIndex        OBJECT-TYPE                                       
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "sncIndex = 1000*sncType + sncTTPSink = linkIndex"
+      ::= { sncEntry 1 }
+      
+   sncCTPSink        OBJECT-TYPE                                       
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "The value of this field is the index of the Output Connection to which
+   an snc function is applied."
+      ::= { sncEntry 2 }
+   
+   sncLinkType        OBJECT-TYPE                                       
+      SYNTAX       LinkType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "Trail level of the connection"
+      ::= { sncEntry 3 }
+
+   sncCTPSourceW		OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "The value of this field indicates the Working Input Connection Point  which
+   composes the protection link of the Output Connection Point (sncIndex)."
+      ::= { sncEntry 4 }
+   
+   sncCTPSourceP		OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "The value of this field indicates the Protected Input Connection Point  which
+   composes the protection link of the Output Connection Point (sncIndex). 
+   When this variable is setting, the protection is created and activated (if it's possible). "
+      ::= { sncEntry 5 }
+   
+   sncTrafficStatus      OBJECT-TYPE
+      SYNTAX       TrafficStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"This field indicates the Protection unit switch position."
+      ::= { sncEntry 6}
+        
+   sncWorkingTriggerType OBJECT-TYPE
+      SYNTAX 	    TriggerCriterion
+      MAX-ACCESS   	read-write
+      STATUS       	current
+      DESCRIPTION
+   " The value of this field is the criterion to trigger a switch for the Working Input   
+   Connection Point.SNC/I uses SF criterion for switching: TU-AIS/TU-LOP for VC12/VC3 ,
+   AU-AIS/AU-LOP for VC4 and , by extension, ppiLOS and ppiAIS for pdh inputs.
+   SNC/N uses also SD criterion for switching: SD-V5 for VC12, 
+   SD-B3 for VC3/VC4.
+   SNC+LAN adds MS-RDI as switching criterion for LAN connection.
+   NONE means that just board extractions and some board failures activate switching."
+      ::= { sncEntry 8 }
+
+   sncProtectionTriggerType OBJECT-TYPE
+      SYNTAX       TriggerCriterion
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   " The value of this field is the criterion to trigger a switch for the Protection Input   
+   Connection Point. SNC/I uses SF criterion for switching: TU-AIS/TU-LOP for VC12/VC3 ,
+   AU-AIS/AU-LOP for VC4 and , by extension, ppiLOS and ppiAIS for pdh inputs.
+   SNC/N uses also SD criterion for switching: SD-V5 for VC12, 
+   SD-B3 for VC3/VC4.
+   SNC+LAN adds MS-RDI as switching criterion for LAN connection.
+   NONE means that just board extractions and some board failures activate switching."
+      ::= { sncEntry 9 }
+
+
+   sncRevertive    OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If the value is true the Protection unit function is allowed
+ 	to spontaneously switch back to working chanel when it is available.
+	If not, the snc can switch back to working chanel only if
+	protection chanel fails."  
+      ::= { sncEntry 20 } 
+   
+   sncWtr          OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The time (in seconds) the Protection unit function waits before
+	considering a chanel as good after a fail."  
+      ::= { sncEntry 21 } 
+
+    sncStateProcess      OBJECT-TYPE
+	  SYNTAX       SNCStateProcess
+	  MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	" The value of this field indicates the state of the snc protection process."
+      ::= { sncEntry 22 }
+
+   
+   sncHoldOffTime   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The time in tenth of seconds during which a protection trigger criterion is
+	ignored."  
+      ::= { sncEntry 23 } 
+   
+   sncCommand     OBJECT-TYPE
+      SYNTAX       SNCCommand
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Manual or forced commands can be apply to the protection unit.
+	The forced and manual switch can be refused or cleared by equipment
+	if a higher priority evenement is received or if the protection chanel
+	is down."
+      ::= { sncEntry 24 }    
+      
+      
+ --*******************************************************************
+--* Card Protection  
+--*******************************************************************      
+
+  CardpFamily ::= INTEGER
+   {
+   	none(0),
+   	switch (1)
+   }  
+   
+   CardpCommand ::= INTEGER
+   {
+   	clear(0),
+   	manualSwitch (1)
+   } 
+    
+   CardpStatus ::= INTEGER
+   {
+   	notSwitched(0),
+   	manualSwitch (1),
+   	automaticSwitch (2)
+   }  
+  
+    cardpNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "Number of card protections in equipment."
+      ::= { cardp 1 }
+      
+   cardpTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF CardpEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+   "List of card protections in equipment."
+      ::= { cardp 2 }
+
+   cardpEntry   OBJECT-TYPE
+      SYNTAX       CardpEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION  
+   "A particular card protection which is created in using the boardTable of the Shelf MIB."
+      INDEX        { cardpIndex }
+      ::= { cardpTable 1 }
+
+   CardpEntry ::=
+      SEQUENCE { 
+      cardpIndex				INTEGER,             -- working BoardIndex
+      cardpBoardFamily			CardpFamily,
+      cardpReliefIndex			INTEGER,             -- protection BoardIndex
+      cardpTrafficStatus		TrafficStatus,
+      cardpCommand	    		CardpCommand,
+      cardpStatus               CardpStatus
+   }
+   
+   cardpIndex      OBJECT-TYPE                                       
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "cardpIndex = boardIndex in the Shelf Mib. 
+   This index points to the working board."
+      ::= { cardpEntry 1 }
+      
+   cardpBoardFamily  OBJECT-TYPE                                       
+      SYNTAX       CardpFamily
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "This field indicates the family of board concerned by the protection."
+      ::= { cardpEntry 2 }
+   
+   cardpReliefIndex   OBJECT-TYPE                                       
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "A reference to the relief card. It must be an existing index in the boardTable of Shelf Mib.
+   The relief card and the protected Card must below to the same familly.
+   	When this variable is setting, the protection is created and activated (if it's possible)."
+      ::= { cardpEntry 3 }
+
+   cardpTrafficStatus   OBJECT-TYPE                                       
+      SYNTAX       TrafficStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "Indication of the protection switch position."
+      ::= { cardpEntry 4 }
+
+   cardpCommand   OBJECT-TYPE                                       
+      SYNTAX       CardpCommand
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "Manual commands can be apply to the protection unit.
+	The manual switch can be refused or cleared by equipment
+	if a higher priority evenement is received or if the protection chanel
+	is down."
+      ::= { cardpEntry 5 }  
+
+   cardpStatus   OBJECT-TYPE                                       
+      SYNTAX       CardpStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "Indication of the current protection status"
+      ::= { cardpEntry 6 }
+
+
+ END
+
+

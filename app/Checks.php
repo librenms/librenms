@@ -28,104 +28,22 @@ namespace App;
 use App\Models\Device;
 use App\Models\Notification;
 use Auth;
+use Cache;
 use Carbon\Carbon;
-use Dotenv\Dotenv;
-use Kamaln7\Toastr\Facades\Toastr;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\FilePermissionsException;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Toastr;
 
 class Checks
 {
     public static function preBoot()
     {
         // check php extensions
-        $missing = self::missingPhpExtensions();
-
-        if (!empty($missing)) {
+        if ($missing = self::missingPhpExtensions()) {
             self::printMessage(
                 "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
                 $missing,
-                true
-            );
-        }
-
-        // check file/folder permissions
-        $check_folders = [
-            self::basePath('bootstrap/cache'),
-            self::basePath('storage'),
-            self::basePath('storage/framework/sessions'),
-            self::basePath('storage/framework/views'),
-            self::basePath('storage/framework/cache'),
-            self::basePath('logs'),
-        ];
-
-        $check_files = [
-            self::basePath('logs/librenms.log'), // This file is important because Laravel needs to be able to write to it
-        ];
-
-        // check that each is writable
-        $check_folders = array_filter($check_folders, function ($path) {
-            return !is_writable($path);
-        });
-
-        $check_files = array_filter($check_files, function ($path) {
-            return file_exists($path) xor is_writable($path);
-        });
-
-        if (!empty($check_folders) || !empty($check_files)) {
-            // only operate on parent directories, not files
-            $check = array_unique(array_merge($check_folders, array_map('dirname', $check_files)));
-
-            // load .env, it isn't loaded
-            $dotenv = new Dotenv(__DIR__ . '/../');
-            $dotenv->load();
-
-            $user = env('LIBRENMS_USER', 'librenms');
-            $group = env('LIBRENMS_GROUP', $user);
-
-            // build chown message
-            $dirs = implode(' ', $check);
-            $chown_commands =                 [
-                "chown -R $user:$group $dirs",
-                "setfacl -R -m g::rwx $dirs",
-                "setfacl -d -m g::rwx $dirs",
-            ];
-
-            $current_groups = explode(' ', trim(exec('groups')));
-            if (!in_array($group, $current_groups)) {
-                $current_user = trim(exec('whoami'));
-                $chown_commands[] = "usermod -a -G $group $current_user";
-            }
-
-
-            //check for missing directories
-            $missing = array_filter($check, function ($file) {
-                return !file_exists($file);
-            });
-
-            if (!empty($missing)) {
-                array_unshift($chown_commands, 'mkdir -p ' . implode(' ', $missing));
-            }
-
-            $short_dirs = implode(', ', array_map(function ($dir) {
-                return str_replace(self::basePath(), '', $dir);
-            }, $check));
-
-            self::printMessage(
-                "Error: $short_dirs not writable! Run these commands as root on your LibreNMS server to fix:",
-                $chown_commands
-            );
-
-            // build SELinux output
-            $selinux_commands = [];
-            foreach ($check as $dir) {
-                $selinux_commands[] = "semanage fcontext -a -t httpd_sys_content_t '$dir(/.*)?'";
-                $selinux_commands[] = "semanage fcontext -a -t httpd_sys_rw_content_t '$dir(/.*)?'";
-                $selinux_commands[] = "restorecon -RFvv $dir";
-            }
-
-            self::printMessage(
-                "If using SELinux you may also need:",
-                $selinux_commands,
                 true
             );
         }
@@ -150,26 +68,39 @@ class Checks
      */
     public static function postAuth()
     {
-        $notifications = Notification::isUnread(Auth::user())->where('severity', '>', 1)->get();
-        foreach ($notifications as $notification) {
-            Toastr::error("<a href='notifications/'>$notification->body</a>", $notification->title);
+        // limit popup messages frequency
+        if (Cache::get('checks_popup_timeout') || !Auth::check()) {
+            return;
         }
 
-        if (Device::isUp()->whereTime('last_polled', '<=', Carbon::now()->subMinutes(15))->count() > 0) {
-            Toastr::warning('<a href="poll-log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last 15 minutes, you may want to check that out :)</a>', 'Devices unpolled');
-        }
+        Cache::put('checks_popup_timeout', true, Config::get('checks_popup_timer', 5));
 
-        // Directory access checks
-        $rrd_dir = Config::get('rrd_dir');
-        if (!is_dir($rrd_dir)) {
-            Toastr::error("RRD Directory is missing ($rrd_dir).  Graphing may fail.");
-        }
+        $user = Auth::user();
 
-        $temp_dir = Config::get('temp_dir');
-        if (!is_dir($temp_dir)) {
-            Toastr::error("Temp Directory is missing ($temp_dir).  Graphing may fail.");
-        } elseif (!is_writable($temp_dir)) {
-            Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail.");
+        if ($user->isAdmin()) {
+            $notifications = Notification::isUnread($user)->where('severity', '>', 1)->get();
+            foreach ($notifications as $notification) {
+                Toastr::error("<a href='notifications/'>$notification->body</a>", $notification->title);
+            }
+
+            $warn_sec = Config::get('rrd.step', 300) * 3;
+            if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subSeconds($warn_sec))->exists()) {
+                $warn_min = $warn_sec / 60;
+                Toastr::warning('<a href="poll-log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>', 'Devices unpolled');
+            }
+
+            // Directory access checks
+            $rrd_dir = Config::get('rrd_dir');
+            if (!is_dir($rrd_dir)) {
+                Toastr::error("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=" . url('validate') . ">Validate your install</a>");
+            }
+
+            $temp_dir = Config::get('temp_dir');
+            if (!is_dir($temp_dir)) {
+                Toastr::error("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=" . url('validate') . ">Validate your install</a>");
+            } elseif (!is_writable($temp_dir)) {
+                Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
+            }
         }
     }
 
@@ -195,15 +126,14 @@ class Checks
         }
     }
 
-    private static function basePath($path = '')
-    {
-        $base_dir = realpath(__DIR__ . '/..');
-        return "$base_dir/$path";
-    }
-
     private static function missingPhpExtensions()
     {
-        $required_modules = ['mysqli', 'mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
+        // allow mysqli, but prefer mysqlnd
+        if (!extension_loaded('mysqlnd') && !extension_loaded('mysqli')) {
+            return ['mysqlnd'];
+        }
+
+        $required_modules = ['mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
 
         return array_filter($required_modules, function ($module) {
             return !extension_loaded($module);

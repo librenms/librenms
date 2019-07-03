@@ -3,12 +3,12 @@ group: printer
 text: 'Kyocera Mita Printer'
 over:
     - { graph: device_toner, text: Toner }
-ifname: 1
+ifname: true
 type: printer
 discovery:
     - sysDescr_regex:
         - '/^KYOCERA/'
 discovery_modules:
-    toner: 1
+    toner: true
 poller_modules:
-    toner: 1
+    toner: true

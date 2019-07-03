@@ -4,9 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use LibreNMS\Exceptions\DatabaseConnectException;
 
 class Handler extends ExceptionHandler
 {
@@ -25,48 +23,46 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Report or log an exception.
+     * A list of the exceptions that can be upgraded. Checked in order.
      *
-     * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
-     *
-     * @param  \Exception  $exception
-     * @return void
+     * @var array
      */
-    public function report(Exception $exception)
-    {
-        parent::report($exception);
-    }
+    protected $upgradable = [
+        \LibreNMS\Exceptions\FilePermissionsException::class,
+        \LibreNMS\Exceptions\DatabaseConnectException::class,
+        \LibreNMS\Exceptions\DuskUnsafeException::class,
+    ];
 
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
-     */
     public function render($request, Exception $exception)
     {
-        if ($exception instanceof QueryException) {
-            // connect exception, convert to our standard connection exception
-            if (config('app.debug')) {
-                // get message form PDO exception, it doesn't contain the query
-                $message = $exception->getMessage();
-            } else {
-                $message = $exception->getPrevious()->getMessage();
+        // If for some reason Blade hasn't been registered, try it now
+        try {
+            if (!app()->bound('view')) {
+                app()->register(\App\Providers\ViewServiceProvider::class);
+                app()->register(\Illuminate\Translation\TranslationServiceProvider::class);
             }
-
-            if (in_array($exception->getCode(), [1044, 1045, 2002])) {
-                throw new DatabaseConnectException($message, $exception->getCode(), $exception);
-            }
-            return response('Unhandled MySQL Error [' . $exception->getCode() . "] $message");
+        } catch (\Exception $e) {
+            // continue without view
         }
 
-        // emulate Laravel 5.5 renderable exceptions
-        if (method_exists($exception, 'render')) {
-            return $exception->render($request);
+        // try to upgrade generic exceptions to more specific ones
+        foreach ($this->upgradable as $class) {
+            if ($new = $class::upgrade($exception)) {
+                return parent::render($request, $new);
+            }
         }
 
         return parent::render($request, $exception);
+    }
+
+    protected function convertExceptionToArray(Exception $e)
+    {
+        // override the non-debug error output to clue in user on how to debug
+        if (!config('app.debug') && !$this->isHttpException($e)) {
+            return ['message' => 'Server Error: Set APP_DEBUG=true to see details.'];
+        }
+
+        return parent::convertExceptionToArray($e);
     }
 
     /**
@@ -78,10 +74,8 @@ class Handler extends ExceptionHandler
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
-        }
-
-        return redirect()->guest(route('login'));
+        return $request->expectsJson() || $request->is('api/*')
+            ? response()->json(['message' => $exception->getMessage()], 401)
+            : redirect()->guest($exception->redirectTo() ?? route('login'));
     }
 }

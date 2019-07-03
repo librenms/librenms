@@ -1,0 +1,364 @@
+    GBNL2Dhcp6Snooping-MIB  DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter32,
+        TimeTicks, IpAddress                    FROM SNMPv2-SMI
+        DisplayString, TruthValue,RowStatus,
+        MacAddress                              FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+
+        gbnL2                                   FROM ADMIN-MASTER-MIB;
+
+    gbnL2Dhcp6Snooping  MODULE-IDENTITY
+        LAST-UPDATED    "0105030000Z"  -- May 03,2001
+        ORGANIZATION    "Admin Co., Ltd."
+        CONTACT-INFO    "Admin Co., Ltd.
+                         E-mail: support@newzyxel.com"
+
+        DESCRIPTION     "ADMIN Enterprise MIB definition."
+
+        REVISION        "0105030000Z"  -- May 03,2001
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL2 9 }
+
+------------------------------------------------------------------------------
+-- Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+    dhcp6snoopingOnOff OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "start/stop dhcp6snooping.Default is off¡£"
+        ::= { gbnL2Dhcp6Snooping 1 }
+
+    dhcp6snoopingPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Dhcp6snoopingPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains port informations of dhcp6snooping."
+        ::= { gbnL2Dhcp6Snooping 2 }
+
+    dhcp6snoopingPortEntry OBJECT-TYPE
+        SYNTAX      Dhcp6snoopingPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Port informations of dhcp6snooping. This is indexed
+            by the port number."
+        INDEX { portIndex }
+        ::= { dhcp6snoopingPortTable 1 }
+
+    Dhcp6snoopingPortEntry ::=
+    SEQUENCE {
+        portIndex
+           INTEGER,
+        portTrustMode
+           INTEGER,
+        portMaxNum
+           INTEGER,
+        portIpSourceGuardMode
+           INTEGER
+    }
+
+    portIndex OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The Index of the port."
+        ::= { dhcp6snoopingPortEntry 1 }
+
+    portTrustMode OBJECT-TYPE
+        SYNTAX INTEGER {
+        trust(1),
+        untrust(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Port mode of dhcp6snooping.Default is untrust."
+    ::= { dhcp6snoopingPortEntry 2 }
+
+    portMaxNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Max clients in this port.Range is from 0 to 2048.Default is 2048."
+        ::= { dhcp6snoopingPortEntry 3 }
+
+    portIpSourceGuardMode OBJECT-TYPE
+        SYNTAX INTEGER {
+        on(1),
+        off(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Port IP source guard mode .Default is off."
+    ::= { dhcp6snoopingPortEntry 4 }
+
+    dhcp6snoopingVlanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Dhcp6snoopingVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains vlan informations of dhcp6snooping."
+        ::= { gbnL2Dhcp6Snooping 3 }
+
+    dhcp6snoopingVlanEntry OBJECT-TYPE
+        SYNTAX      Dhcp6snoopingVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "VLAN informations of dhcp6snooping. This is indexed
+            by the vlan number."
+        INDEX { vlanIndex }
+        ::= { dhcp6snoopingVlanTable 1 }
+
+    Dhcp6snoopingVlanEntry ::=
+    SEQUENCE {
+        vlanIndex
+           INTEGER,
+        vlanMaxNum
+           INTEGER
+    }
+
+    vlanIndex OBJECT-TYPE
+        SYNTAX       INTEGER (1..4094)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The Index of the vlan."
+        ::= { dhcp6snoopingVlanEntry 1 }    
+        
+    vlanMaxNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Max clients in this vlan.Range is from 0 to 2048.Default is 2048."
+        ::= { dhcp6snoopingVlanEntry 2 }
+        
+    dhcp6snoopingPortDownAction OBJECT-TYPE
+        SYNTAX     INTEGER {
+            fastRemove(1),
+            autoAging(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When port moves to down state, if fast-remove is enabled, switch will remove entries immediately,
+             if auto-aging is enabled, switch will wait until lease time expires and remove entries." 
+        ::= { gbnL2Dhcp6Snooping 4 }
+        
+-- dhcpv6 snooping client table
+    dhcp6snoopingClientTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Dhcp6snoopingClientEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table to show dhcpv6 snooping clients."
+        ::= { gbnL2Dhcp6Snooping 6 }
+    dhcp6snoopingClientEntry OBJECT-TYPE
+        SYNTAX      Dhcp6snoopingClientEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "entry of dhcpv6 snooping clients table."
+        INDEX { client6MacAddr }
+        ::= { dhcp6snoopingClientTable 1 }
+    Dhcp6snoopingClientEntry ::=
+    SEQUENCE {
+        client6MacAddr     MacAddress,
+        client6VlanId      INTEGER,
+        client6PortId      INTEGER,
+        client6LeaseNum    INTEGER,
+        client6IpAddrStr   OCTET STRING,
+        client6IpAddrStr2  OCTET STRING,
+        client6LeaseTime   OCTET STRING
+    }
+    client6MacAddr OBJECT-TYPE
+        SYNTAX       MacAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "dhcpv6 snooping client mac address."
+        ::= { dhcp6snoopingClientEntry 1 }  
+    client6VlanId OBJECT-TYPE
+        SYNTAX       INTEGER(1..4094)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "dhcpv6 snooping client vlan id."
+        ::= { dhcp6snoopingClientEntry 2 }  
+    client6PortId OBJECT-TYPE
+        SYNTAX       INTEGER(1..255)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "dhcpv6 snooping client port id."
+        ::= { dhcp6snoopingClientEntry 3 }  
+    client6LeaseNum OBJECT-TYPE
+        SYNTAX       INTEGER(1..255)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "dhcpv6 snooping client lease number."
+        ::= { dhcp6snoopingClientEntry 4 }  
+    client6IpAddrStr OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..255))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "dhcpv6 snooping client ip address string."
+        ::= { dhcp6snoopingClientEntry 5 }  
+    client6IpAddrStr2 OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..255))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "dhcpv6 snooping client ip address string 2."
+        ::= { dhcp6snoopingClientEntry 6 }  
+    client6LeaseTime OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..255))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "dhcpv6 snooping client lease time string."
+        ::= { dhcp6snoopingClientEntry 7 }
+-- dhcpv6 snooping ipv6 source guard bind table
+    dhcpsIpv6SourceGuardBindTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DhcpsIpv6SourceGuardBindEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains ipv6 source guard bind informations of dhcp6snooping."
+        ::= { gbnL2Dhcp6Snooping 7 }
+    dhcpsIpv6SourceGuardBindEntry OBJECT-TYPE
+        SYNTAX      DhcpsIpv6SourceGuardBindEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "entry of dhcpv6 snooping ipv6 source guard bind table."
+        INDEX { ip6BindIndex }
+        ::= { dhcpsIpv6SourceGuardBindTable 1 }
+    DhcpsIpv6SourceGuardBindEntry ::=
+    SEQUENCE {
+        ip6BindIndex                   INTEGER,
+        ip6BindIpAddr                  OCTET STRING,
+        ip6BindMacAddr                 MacAddress,
+        ip6BindPortId                  INTEGER,
+        ip6BindVlanId                  INTEGER,
+        ip6SourceGuardBindRowstatus     RowStatus
+    }
+    ip6BindIndex OBJECT-TYPE
+        SYNTAX       INTEGER(1..380)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "ipv6 source guard bind port id."
+        ::= { dhcpsIpv6SourceGuardBindEntry 1 }  
+    ip6BindIpAddr OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..39))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "ipv6 source guard bind ipv6 address."
+        ::= { dhcpsIpv6SourceGuardBindEntry 2 }  
+    ip6BindMacAddr OBJECT-TYPE
+        SYNTAX       MacAddress
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "ipv6 source guard bind mac address."
+        ::= { dhcpsIpv6SourceGuardBindEntry 3 }  
+    ip6BindPortId OBJECT-TYPE
+        SYNTAX       INTEGER(1..255)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "ipv6 source guard bind port id."
+        ::= { dhcpsIpv6SourceGuardBindEntry 4 }  
+    ip6BindVlanId OBJECT-TYPE
+        SYNTAX       INTEGER(1..4094)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "ipv6 source guard bind vlan id."
+        ::= { dhcpsIpv6SourceGuardBindEntry 5 }  
+    ip6SourceGuardBindRowstatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "RowStatus."
+        ::= { dhcpsIpv6SourceGuardBindEntry 6 }  
+-- others
+    ipv6SourceGuardDisabledVlanString OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..255))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "IP Source Guard is disabled in following vlans."
+        ::= { gbnL2Dhcp6Snooping 8 }  
+-- dhcp6snooping infomation
+dhcp6snoopingInfomation		OBJECT IDENTIFIER ::= { gbnL2Dhcp6Snooping 20 }
+    dhcp6snoopingInfoOption18Enable OBJECT-TYPE
+        SYNTAX     INTEGER { true(1), false(0) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp6snooping infomation options 18 enabled, default disable(0)." 
+        ::= { dhcp6snoopingInfomation 1 }
+    dhcp6snoopingInfoOption37Enable OBJECT-TYPE
+        SYNTAX     INTEGER { true(1), false(0) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp6snooping infomation options 37 enabled, default disable(0)." 
+        ::= { dhcp6snoopingInfomation 2 }
+    dhcp6snoopingInfoRemoteId OBJECT-TYPE
+        SYNTAX     INTEGER { ipv4(1), ipv6(2), hostname(3), selfdefined(4) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp6snooping infomation remote id, default hostname(3)." 
+        ::= { dhcp6snoopingInfomation 3 }
+    dhcp6snoopingInfoRemoteStr OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp6snooping infomation option content, it is associated with remote id.
+            when remote id is 1, and this string can translate into ipv4 address,
+              or remote id is 2, and this string can translate into ipv6 address,
+              or remote id is 3,
+              or remote id is 4, and this string is not zerolength,
+            these two value commit to the system." 
+        ::= { dhcp6snoopingInfomation 4 }
+    dhcp6snoopingInfoInterfaceId OBJECT-TYPE
+        SYNTAX     INTEGER { ipv4(1), ipv6(2), hostname(3), selfdefined(4) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp6snooping infomation remote id, default hostname(3)." 
+        ::= { dhcp6snoopingInfomation 5 }
+    dhcp6snoopingInfoInterfaceStr OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp6snooping infomation option content, it is associated with remote id.
+            when remote id is 1, and this string can translate into ipv4 address,
+              or remote id is 2, and this string can translate into ipv6 address,
+              or remote id is 3,
+              or remote id is 4, and this string is not zerolength,
+            these two value commit to the system." 
+        ::= { dhcp6snoopingInfomation 6 }
+END

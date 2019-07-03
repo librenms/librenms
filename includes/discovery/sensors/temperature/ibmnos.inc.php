@@ -5,7 +5,7 @@ if (strstr($device['sysDescr'], 'IBM Flex System Fabric')) {
     if ($check_oids !== false) {
             $index = 0;
         echo 'IBM Flex System Fabric ';
-        $temps = array();
+        $temps = [];
         $temps['.1.3.6.1.4.1.20301.2.5.1.3.1.22.0'] = 'Temperature Sensor 1';
         $temps['.1.3.6.1.4.1.20301.2.5.1.3.1.23.0'] = 'Temperature Sensor 2';
         $temps['.1.3.6.1.4.1.20301.2.5.1.3.1.26.0'] = 'Temperature Sensor 3';

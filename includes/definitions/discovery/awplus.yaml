@@ -15,7 +15,7 @@ modules:
                 -
                     oid:  atEnvMonv2FanTable
                     value:  atEnvMonv2FanCurrentSpeed
-                    num_oid: .1.3.6.1.4.1.207.8.4.4.3.12.1.1.5.
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.1.1.5.{{ $index }}'
                     descr: atEnvMonv2FanDescription
                     index: 'atEnvMonv2FanIndex.{{ $index }}'
                     low_limit: atEnvMonv2FanLowerThreshold
@@ -24,7 +24,7 @@ modules:
                 -
                     oid: atEnvMonv2VoltageTable
                     value: atEnvMonv2VoltageCurrent
-                    num_oid: .1.3.6.1.4.1.207.8.4.4.3.12.2.1.5.
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.2.1.5.{{ $index }}'
                     descr: atEnvMonv2VoltageDescription
                     index: 'atEnvMonv2VoltageIndex.{{ $index }}'
                     divisor: 1000
@@ -37,7 +37,7 @@ modules:
                 -
                     oid:  atEnvMonv2TemperatureTable
                     value:  atEnvMonv2TemperatureCurrent
-                    num_oid: .1.3.6.1.4.1.207.8.4.4.3.12.3.1.5.
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.3.1.5.{{ $index }}'
                     descr: atEnvMonv2TemperatureDescription
                     index: 'atEnvMonv2TemperatureIndex.{{ $index }}'
                     high_limit: atEnvMonv2TemperatureUpperThreshold
@@ -46,7 +46,7 @@ modules:
                 -
                     oid: atEnvMonv2FanTable
                     value: atEnvMonv2FanStatus
-                    num_oid: .1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.{{ $index }}'
                     descr: atEnvMonv2FanDescription
                     index: 'atEnvMonv2FanIndex.{{ $index }}'
                     state_name: 'AtFanState'
@@ -57,7 +57,7 @@ modules:
                 -
                     oid: atEnvMonv2VoltageTable
                     value: atEnvMonv2VoltageStatus
-                    num_oid: .1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.{{ $index }}'
                     descr: atEnvMonv2VoltageDescription
                     index: 'atEnvMonv2VoltageIndex.{{ $index }}'
                     state_name: 'AtVoltageState'
@@ -68,7 +68,7 @@ modules:
                 -
                     oid: atEnvMonv2TemperatureTable
                     value: atEnvMonv2TemperatureStatus
-                    num_oid: .1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.{{ $index }}'
                     descr: atEnvMonv2TemperatureDescription
                     index: 'atEnvMonv2TemperatureIndex.{{ $index }}'
                     state_name: 'AtTemperatureState'
@@ -79,7 +79,7 @@ modules:
                 -
                     oid: atEnvMonv2PsbSensorTable
                     value: atEnvMonv2PsbSensorStatus
-                    num_oid: .1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.{{ $index }}'
                     descr: atEnvMonv2PsbSensorDescription
                     index: 'atEnvMonv2PsbSensorIndex.{{ $index }}'
                     state_name: 'AtPowerSupplyState'

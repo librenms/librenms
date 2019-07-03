@@ -25,22 +25,26 @@
 
 namespace App\Models;
 
-class OspfInstance extends BaseModel
+class OspfInstance extends DeviceRelatedModel
 {
     public $timestamps = false;
-    protected $primaryKey = 'ospf_instance_id';
-
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
-    }
+    protected $fillable = [
+        'device_id',
+        'ospf_instance_id',
+        'context_name',
+        'ospfRouterId',
+        'ospfAdminStat',
+        'ospfVersionNumber',
+        'ospfAreaBdrRtrStatus',
+        'ospfASBdrRtrStatus',
+        'ospfExternLsaCount',
+        'ospfExternLsaCksumSum',
+        'ospfTOSSupport',
+        'ospfOriginateNewLsas',
+        'ospfRxNewLsas',
+        'ospfExtLsdbLimit',
+        'ospfMulticastExtensions',
+        'ospfExitOverflowInterval',
+        'ospfDemandExtensions',
+    ];
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use LibreNMS\Config;
 
 class LoginController extends Controller
 {
@@ -25,7 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -35,5 +37,19 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    public function username()
+    {
+        return 'username';
+    }
+
+    public function showLoginForm()
+    {
+        if (Config::get('public_status')) {
+            $devices = Device::isActive()->get();
+            return view('auth.public-status')->with('devices', $devices);
+        }
+        return view('auth.login');
     }
 }

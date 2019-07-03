@@ -27,4 +27,4 @@ echo 'emsStatusSysTempUnits ';
 $pre_cache['emu2_temp_scale'] = snmp_get($device, 'emsStatusSysTempUnits.0', '-OQv', 'PowerNet-MIB');
 
 echo 'emsProbeStatusEntry ';
-$pre_cache['emu2_temp'] = snmpwalk_cache_oid($device, 'emsProbeStatusEntry', array(), 'PowerNet-MIB');
+$pre_cache['emu2_temp'] = snmpwalk_cache_oid($device, 'emsProbeStatusEntry', [], 'PowerNet-MIB');

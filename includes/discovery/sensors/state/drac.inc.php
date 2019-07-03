@@ -21,7 +21,7 @@ $tables = [
 
 foreach ($tables as $tablevalue) {
     list($table_oid, $num_oid, $value_oid, $descr_oid) = $tablevalue;
-    $temp = snmpwalk_cache_multi_oid($device, $table_oid, array(), 'IDRAC-MIB-SMIv2', null, '-OQUse');
+    $temp = snmpwalk_cache_multi_oid($device, $table_oid, [], 'IDRAC-MIB-SMIv2', null, '-OQUse');
     // '-OQUsetX'
 
     if (!empty($temp)) {

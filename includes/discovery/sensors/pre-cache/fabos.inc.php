@@ -24,4 +24,4 @@
 */
 
 echo 'swSensorEntry ';
-$pre_cache['fabos_sensors'] = snmpwalk_cache_multi_oid($device, 'swSensorEntry', array(), 'SW-MIB');
+$pre_cache['fabos_sensors'] = snmpwalk_cache_multi_oid($device, 'swSensorEntry', [], 'SW-MIB');

@@ -19,17 +19,40 @@
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ups-apcups"
 $name = 'ups-apcups';
 $app_id = $app['app_id'];
-$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.117.112.115.45.97.112.99.117.112.115';
-$ups_apcups = trim(snmp_get($device, $oid, '-Oqv'), '"');
 
 echo ' '.$name;
 
-list ($line_volt, $load, $charge, $remaining, $bat_volt, $line_nominal, $bat_nominal) = explode("\n", $ups_apcups);
+try {
+    $json_return=json_app_get($device, $name);
+} catch (JsonAppParsingFailedException $e) {
+    // Legacy script, build compatible array
+    $legacy = trim($e->getOutput());
+
+    // pull apart the legacy info and create the basic required hash with it
+    list ($line_volt, $load, $charge, $remaining, $bat_volt, $line_nominal, $bat_nominal) = explode("\n", $legacy);
+    $json_return=array(
+        'data' => array(
+            'charge' => $charge,
+            'time_remaining' => $remaining,
+            'battery_nominal' => $bat_nominal,
+            'battery_voltage' => $bat_volt,
+            'input_voltage' => $line_volt,
+            'nominal_voltage' => $line_nominal,
+            'load' => $load
+        )
+    );
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    return;
+}
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -42,15 +65,15 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('load', 'GAUGE', 0, 100);
 
 $fields = array(
-    'charge' => $charge,
-    'time_remaining' => $remaining,
-    'battery_nominal' => $bat_nominal,
-    'battery_voltage' => $bat_volt,
-    'input_voltage' => $line_volt,
-    'nominal_voltage' => $line_nominal,
-    'load' => $load
-);
+                'charge' => $json_return['data']['charge'],
+                'time_remaining' => $json_return['data']['time_remaining'],
+                'battery_nominal' => $json_return['data']['battery_nominal'],
+                'battery_voltage' => $json_return['data']['battery_voltage'],
+                'input_voltage' => $json_return['data']['input_voltage'],
+                'nominal_voltage' => $json_return['data']['nominal_voltage'],
+                'load' => $json_return['data']['load'],
+                );
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-update_application($app, $ups_apcups, $fields);
+update_application($app, 'OK', $fields);

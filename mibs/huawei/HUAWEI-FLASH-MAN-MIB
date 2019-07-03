@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: flash mangement mib
 -- Reference:   huawei enterprise mib
--- Version:     V1.0
+-- Version:     V2.04
 -- History:
 --             initial version 2002-12-20
 -- =================================================================
@@ -24,23 +24,54 @@
     
 --  1.3.6.1.4.1.2011.6.9
         hwFlash MODULE-IDENTITY 
-            LAST-UPDATED "200207010000Z"        -- July 01, 2002 at 00:00 GMT
+            LAST-UPDATED "201502100001Z"        -- Feb 10, 2015 at 00:00 GMT
             ORGANIZATION 
-                "Huawei Technologies co.,Ltd."
+                  "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                "VRP Team Huawei Technologies co.,Ltd.
-                Huawei Bld.,NO.3 Xinxi Rd., 
-                Shang-Di Information Industry Base,
-                Hai-Dian District Beijing P.R. China
-                http://www.huawei.com
-                Zip:100085
-                "
-            DESCRIPTION 
+                  "Huawei Industrial Base
+                    Bantian, Longgang
+                     Shenzhen 518129
+                     People's Republic of China
+                     Website: http://www.huawei.com
+                     Email: support@huawei.com
+                   "
+		DESCRIPTION 
                 "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
                 and flash card operations. There are no constraints on this MIB.
                 "
-            REVISION "200207010000Z"        -- July 01, 2002 at 00:00 GMT
-            DESCRIPTION
+               REVISION "201502100001Z"
+	
+		DESCRIPTION 
+                "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
+                and flash card operations. There are no constraints on this MIB.
+                "
+               REVISION "201501260001Z"
+			
+			DESCRIPTION 
+                "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
+                and flash card operations. There are no constraints on this MIB.
+                "
+               REVISION "201412150001Z"
+			   
+			   DESCRIPTION 
+                "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
+                and flash card operations. There are no constraints on this MIB.
+                "
+               REVISION "201307090001Z"
+			   
+                DESCRIPTION 
+                "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
+                and flash card operations. There are no constraints on this MIB.
+                "
+               REVISION "200207010000Z"        -- July 01, 2002 at 00:00 GMT\
+
+               
+        
+               
+
+
+
+                        DESCRIPTION
                 "The initial revision of this MIB module ."
             ::= { huaweiUtility 9 }
         
@@ -803,12 +834,14 @@
                 hwFlhFileStatus
                     INTEGER,
                 hwFlhFileChecksum
-                    OCTET STRING
+                    OCTET STRING,
+                hwFlhFileTime
+                    TimeStamp
              }
 
 --  1.3.6.1.4.1.2011.6.9.1.1.4.2.1.1.1
         hwFlhFileIndex OBJECT-TYPE
-            SYNTAX Integer32 (1..1024)
+            SYNTAX Integer32 (1..2147483647)
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
@@ -865,6 +898,17 @@
                 The file checksum located in the header of file.
                 "
             ::= { huaweiFlhFileEntry 5 }
+
+-- 1.3.6.1.4.1.2011.6.9.1.1.4.2.1.1.6
+        hwFlhFileTime OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+            The file checksum located in the header of file.
+                "
+            ::= { huaweiFlhFileEntry 6 }
         
 --  The operation on the flash.
 -- 1.3.6.1.4.1.2011.6.9.1.2
@@ -957,7 +1001,17 @@
                 hwFlhOperSourceInterface
                     OCTET STRING,
                 hwFlhOperMemSize
-                         Integer32   
+                    Integer32,
+        hwFlhOperVpnInstanceName
+            OCTET STRING,
+                hwFlhOperTotalFileLength
+                    Integer32,            
+        hwFlhOperTransferProgress
+            Integer32,
+            hwFlhOperErrorReason
+               DisplayString,
+            hwFlhOperServerIpv6Address
+               OCTET STRING			   
              }
 
 --  1.3.6.1.4.1.2011.6.9.1.2.1.1.1
@@ -977,7 +1031,8 @@
                 {
                 net2FlashWithErase(1),
                 net2FlashWithoutErase(2),
-                flash2Net(3)
+                flash2Net(3),
+                delete(4)
                 }
             MAX-ACCESS read-create
             STATUS current
@@ -987,18 +1042,12 @@
                 net2FlashWithErase    Copy a file to flash; erase
                             flash before copy.
                             Use the FTP protocol or SFTP protocol.
-                net2FlashWithoutErase Copy a file to flash; do not
-                            erase.
-                            Note that this command will fail
-                            if the hwFlhPartRequireErase
-                            object specifies that the
-                            partition being copied to needs
-                            erasure.
-                            Use the FTP protocol or SFTP protocol.
+                net2FlashWithoutErase     Same with net2FlashWithErase.    
+
                 flash2Net        Copy a file from flash using
                             the FTP protocol or SFTP protocol.
                             
-                
+                delete      delete file or directory by source file name.
                 "
             ::= { huaweiFlhOpEntry 2 }
         
@@ -1009,7 +1058,10 @@
             STATUS current
             DESCRIPTION
                 "Specifies the protocol used to transfer file.
-                The default value of it is ftp.                
+                The default value of it is ftp. When hwFlhOperProtocol is specified as SFTP, only 
+                password authentication-type is valid.
+
+              
                 "
             DEFVAL { ftp }
             ::= { huaweiFlhOpEntry 3 }
@@ -1022,9 +1074,7 @@
             DESCRIPTION
                 "
                 The address of remote host acting as server for any operation.
-                
-                The default value of which is 255.255.255.255"
-            DEFVAL { 'FFFFFFFF'h }
+                "
             ::= { huaweiFlhOpEntry 4 }
         
 --  1.3.6.1.4.1.2011.6.9.1.2.1.1.5
@@ -1034,7 +1084,7 @@
             STATUS current
             DESCRIPTION
                 "
-                When use ftp to transfer files, the user name must be 
+                When use ftp or sftp to transfer files, the user name must be 
                 specified by this node.
                 "
             ::= { huaweiFlhOpEntry 5 }
@@ -1047,7 +1097,7 @@
             DESCRIPTION
                 "Remote user password for copy via ftp protocol. Optional.
                 This object will be ignored for protocols other than
-                ftp. "
+                ftp and sftp. "
             ::= { huaweiFlhOpEntry 6 }
         
 --  1.3.6.1.4.1.2011.6.9.1.2.1.1.7
@@ -1066,7 +1116,7 @@
         
 --  1.3.6.1.4.1.2011.6.9.1.2.1.1.8
         hwFlhOperDestinationFile OBJECT-TYPE
-            SYNTAX DisplayString
+            SYNTAX DisplayString (SIZE (0..255))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -1172,52 +1222,100 @@
                 aborted even if the status is set to notInService.
                 "
             ::= { huaweiFlhOpEntry 12 }
-        
+            
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.13
         hwFlhOperServerPort OBJECT-TYPE
-            SYNTAX Integer32(22|1025..55535)
+            SYNTAX Integer32(1..65535)
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-               "This object specifies the SFTP server port that is used for file transfer 
-                only if the value of hwFlhOperProtocol is sftp.  
+               "This object specifies the SFTP/FTP server port that is used for file transfer 
+                only if the value of hwFlhOperProtocol is sftp/ftp.  
                 The default SFTP server port is 22 if no port is specified.  
-                If the value of hwFlhOperProtocol is not sftp, this object is ignored by the 
+                The default FTP server port is 21 if no port is specified. 
+                If the value of hwFlhOperProtocol is not sftp/ftp, this object is ignored by the 
                 implementation. "
             ::= { huaweiFlhOpEntry 13 }
+
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.14
     hwFlhOperSourceAddress OBJECT-TYPE    
         SYNTAX      IpAddress
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
-            "The source IP address. When the operation type is running2Net,
-            net2Running, net2Startup or startup2net, the source IP address 
+            "The source IP address. When hwFlhOperType is specified as  net2FlashWithErase,
+            net2FlashWithoutErase or flash2Net, the source IP address 
             of the client may be specified or not. Default is 0.0.0.0 .
             If the source type is set to both of IP address and interface, 
             the former has the priority."        
         DEFVAL { 0 }
         ::= { huaweiFlhOpEntry 14 }     
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.15        
     hwFlhOperSourceInterface OBJECT-TYPE    
         SYNTAX      OCTET STRING (SIZE (1..47))
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
-            "The name of the interface.When the operation type is running2Net,
-            net2Running,net2Startup or startup2net, the source interface 
+            "The name of the source interface.When hwFlhOperType is specified as  
+            net2FlashWithErase,net2FlashWithoutErase or flash2Net,the source interface 
             of the FTP/TFTP client may be specified or not. If the source 
             type is set to both of IP address and interface,the former has 
             the priority."    
         ::= { huaweiFlhOpEntry 15 } 
         
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.16
          hwFlhOperMemSize OBJECT-TYPE
             SYNTAX Integer32
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "This object specifies the reserved space (in KBs) guaranteed by a host. The value 0 indicates that no space need be reserved.
-This object is optional in the Set operation of file upload. The default value is 0. This object is unavailable in the Set operation
-of file download.
-                "
+                "This object specifies the reserved space (in KBs) guaranteed by a host. 
+                The value 0 indicates that no space need be reserved. The default value is 0. This 
+                object is optional when hwFlhOperType is specified as net2FlashWithErase or 
+                net2FlashWithoutErase in the Set operation. This object is unavailable when 
+                hwFlhOperType is specified as flash2Net or delete in the Set operation. "
             ::= { huaweiFlhOpEntry 16 }
+            
+    hwFlhOperVpnInstanceName OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (1..31))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The vpn instance name of the file server."
+       ::= { huaweiFlhOpEntry 17 }
+                   
+            
+    hwFlhOperTotalFileLength OBJECT-TYPE
+       SYNTAX Integer32 (0..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The total length of the file, in bytes."
+       ::= { huaweiFlhOpEntry 18 }                
+                
+    hwFlhOperTransferProgress OBJECT-TYPE
+       SYNTAX Integer32 (0..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The transfer progress of the file."
+       ::= { huaweiFlhOpEntry 19 }            
+    hwFlhOperErrorReason OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (1..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The failure reason of operation."
+       ::= { huaweiFlhOpEntry 20 }
+    hwFlhOperServerIpv6Address OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..46))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The address of remote host acting as Ipv6 server for any operation."    
+        ::= { huaweiFlhOpEntry 21 }	   
+                   
         hwFlhSyncTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwFlhSyncEntry
             MAX-ACCESS not-accessible
@@ -1225,6 +1323,7 @@ of file download.
             DESCRIPTION
                 "A table of Flash synchronize operate include copy/delete etc."
             ::= { huaweiFlashOperate 2 }
+            
         hwFlhSyncEntry OBJECT-TYPE
             SYNTAX HwFlhSyncEntry
             MAX-ACCESS not-accessible
@@ -1287,7 +1386,7 @@ of file download.
                 all        Net make all chassis and all board as handled object;"
             ::= { hwFlhSyncEntry 3 }
         hwFlhSyncSourcePath OBJECT-TYPE
-            SYNTAX DisplayString (SIZE (1..32))
+            SYNTAX DisplayString (SIZE (1..255))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -1305,7 +1404,7 @@ of file download.
                 It must be specified."
             ::= { hwFlhSyncEntry 5 }
         hwFlhSyncDestinationPath OBJECT-TYPE
-            SYNTAX DisplayString (SIZE (1..32))
+            SYNTAX DisplayString (SIZE (1..255))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -1337,9 +1436,7 @@ of file download.
             OBJECTS { hwFlhOperStatus }
             STATUS current
             DESCRIPTION 
-                "A hwFlhOperNotification is sent at the completion of a flash copy operation if 
-                hwFlhOperEndNotification is true.
-                "
+                "A hwFlhOperNotification is sent only when hwFlhOperEndNotification is true."
             ::= { huaweiFlashNotification 1 }
             
         hwFlhSyncSuccessNotification NOTIFICATION-TYPE
@@ -1401,7 +1498,9 @@ of file download.
                 {
                 flash(1),
                 hardDisk(2),
-                cfCard(3)
+                cfCard(3),
+                usbDisk(4),
+                sdCard(5)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -1508,8 +1607,9 @@ of file download.
         hwFlhOperationGroup OBJECT-GROUP
             OBJECTS { hwFlhOperType, hwFlhOperProtocol, hwFlhOperServerAddress, hwFlhOperServerUser, hwFlhOperPassword, 
                 hwFlhOperSourceFile, hwFlhOperDestinationFile, hwFlhOperStatus, hwFlhOperEndNotification, hwFlhOperProgress, 
-                hwFlhOperRowStatus, hwFlhOperServerPort, hwFlhOperSourceAddress, hwFlhOperSourceInterface , hwFlhSyncType, 
-                hwFlhSyncRange, hwFlhSyncSourcePath, hwFlhSyncSourceFile, hwFlhSyncDestinationPath, hwFlhSyncDestinationFile, hwFlhSyncRowStatus }
+                hwFlhOperRowStatus, hwFlhOperServerPort, hwFlhOperSourceAddress, hwFlhOperSourceInterface , hwFlhOperMemSize,
+                hwFlhSyncType, hwFlhSyncRange, 
+                hwFlhSyncSourcePath, hwFlhSyncSourceFile, hwFlhSyncDestinationPath, hwFlhSyncDestinationFile, hwFlhSyncRowStatus,hwFlhOperServerIpv6Address }
             STATUS current
             DESCRIPTION 
                 "A collection of objects of flash operations.

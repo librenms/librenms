@@ -1,4 +1,5 @@
 ### Securing with nginx
+path: blob/master/doc/
 According to the [man page](https://linux.die.net/man/1/rrdcached), under "SECURITY CONSIDERATIONS", rrdcached has no authentication or security except for running under a unix socket. If you choose to use a network socket instead of a unix socket, you will need to secure your rrdcached installation. To do so you can proxy rrdcached using nginx to allow only specific IPs to connect.
 
 using the same setup above, using nginx version 1.9.0 or later, you can follow this setup to proxy the default rrdcached port to the local unix socket.

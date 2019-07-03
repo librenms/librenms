@@ -1,0 +1,37 @@
+-- File Name : PBI-MAIN-MIB
+-- Date      : Thu Sep 21 14:37:52 CST 2006
+-- Author    : AdventNet Agent Toolkit Java Edition - MIB Editor 6
+
+
+
+PBI-MAIN-MIB	DEFINITIONS ::= BEGIN
+	pbi	MODULE-IDENTITY
+		LAST-UPDATED	"200609131023Z"
+		ORGANIZATION	"PBI"
+		CONTACT-INFO	"Tel:(010)82617178 
+Fax:(010)82610263 
+E-mail:mkt@pbi-china.com"
+		DESCRIPTION		"use this mib to support the mib-II group"
+		REVISION		"200609131023Z"
+		DESCRIPTION		""
+		::=  {  enterprises  1070  }
+
+	org	OBJECT IDENTIFIER
+		::=  {  iso  3  }
+
+	dod	OBJECT IDENTIFIER
+		::=  {  org  6  }
+
+	internet	OBJECT IDENTIFIER
+		::=  {  dod  1  }
+
+	private	OBJECT IDENTIFIER
+		::=  {  internet  4  }
+
+	enterprises	OBJECT IDENTIFIER
+		::=  {  private  1  }
+
+	mg	OBJECT IDENTIFIER
+		::=  {  pbi  3  }
+
+END

@@ -8,18 +8,18 @@ modules:
                 -
                     oid: upsOutputTable
                     value: upsOutputVoltage
-                    num_oid: .1.3.6.1.4.1.7309.6.1.4.4.1.2.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.2.{{ $index }}'
                     index: 'upsOutputVoltage.{{ $index }}'
                     descr: 'Output #{{ $index }}'
                 -
                     oid: upsInputTable
                     value: upsInputVoltage
-                    num_oid: .1.3.6.1.4.1.7309.6.1.3.2.1.3.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.3.2.1.3.{{ $index }}'
                     index: 'upsInputVoltage.{{ $index }}'
                     descr: 'Input #{{ $index }}'
                 -
                     oid: upsBatteryVoltage
-                    num_oid: .1.3.6.1.4.1.7309.6.1.2.3.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.2.3.{{ $index }}'
                     index: 'upsBatteryVoltage.{{ $index }}'
                     descr: Battery
         frequency:
@@ -27,12 +27,12 @@ modules:
                 -
                     oid: upsInputTable
                     value: upsInputFrequency
-                    num_oid: .1.3.6.1.4.1.7309.6.1.3.2.1.2.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.3.2.1.2.{{ $index }}'
                     index: 'upsInputFrequency.{{ $index }}'
                     descr: 'Input #{{ $index }}'
                 -
                     oid: upsOutputFrequency
-                    num_oid: .1.3.6.1.4.1.7309.6.1.4.2.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.2.{{ $index }}'
                     index: 'upsOutputFrequency.{{ $index }}'
                     descr: Output
                     divisor: 10
@@ -43,7 +43,7 @@ modules:
                 -
                     oid: upsOutputTable
                     value: upsOutputCurrent
-                    num_oid: .1.3.6.1.4.1.7309.6.1.4.4.1.3.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.3.{{ $index }}'
                     index: 'upsOutputCurrent.{{ $index }}'
                     descr: 'Output #{{ $index }}'
         power:
@@ -51,7 +51,7 @@ modules:
                 -
                     oid: upsOutputTable
                     value: upsOutputPowerWatt
-                    num_oid: .1.3.6.1.4.1.7309.6.1.4.4.1.5.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.5.{{ $index }}'
                     index: 'upsOutputPowerWatt.{{ $index }}'
                     descr: 'Output #{{ $index }}'
         load:
@@ -59,19 +59,19 @@ modules:
                 -
                     oid: upsOutputTable
                     value: upsOutputPercentLoad
-                    num_oid: .1.3.6.1.4.1.7309.6.1.4.4.1.7.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.7.{{ $index }}'
                     index: 'upsOutputPercentLoad.{{ $index }}'
                     descr: 'Output {{ $index }}'
         temperature:
             data:
                 -
                     oid: upsConfigFanOnTemperature
-                    num_oid: .1.3.6.1.4.1.7309.6.1.6.4.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.6.4.{{ $index }}'
                     index: 'upsConfigFanOnTemperature.{{ $index }}'
                     descr: Fan On
                 -
                     oid: upsBatteryTemperature
-                    num_oid: .1.3.6.1.4.1.7309.6.1.2.6.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.2.6.{{ $index }}'
                     index: 'upsBatteryTemperature.{{ $index }}'
                     descr: Battery
         runtime:
@@ -80,14 +80,14 @@ modules:
             data:
                 -
                     oid: upsMinutesOnBattery
-                    num_oid: .1.3.6.1.4.1.7309.6.1.2.2.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.2.2.{{ $index }}'
                     index: 'upsMinutesOnBattery.{{ $index }}'
                     descr: Minutes on battery
         state:
             data:
                 -
                     oid: upsOutputSource
-                    num_oid: .1.3.6.1.4.1.7309.6.1.4.1.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.1.{{ $index }}'
                     descr: Output Source
                     index: 'upsOutputSource.{{ $index }}'
                     state_name: upsOutputSource
@@ -105,7 +105,7 @@ modules:
                         - { value: 11, generic: 2, graph: 1, descr: bypass }
                 -
                     oid: upsBatteryStatus
-                    num_oid: .1.3.6.1.4.1.7309.6.1.2.1.
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.2.1.{{ $index }}'
                     descr: Battery Status
                     index: 'upsBatteryStatus.{{ $index }}'
                     state_name: upsBatteryStatus

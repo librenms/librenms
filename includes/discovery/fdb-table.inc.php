@@ -39,15 +39,20 @@ if (!empty($insert)) {
 
                 if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port) {
                     $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
-
                     dbUpdate(
-                        array('port_id' => $new_port),
+                        array('port_id' => $new_port, 'updated_at' => array('NOW()'),),
                         'ports_fdb',
                         '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
                         array($device['device_id'], $vlan_id, $mac_address_entry)
                     );
                     echo 'U';
                 } else {
+                    dbUpdate(
+                        array('updated_at' => array('NOW()'),), //we need to do this unless we use Eloquent "update" method
+                        'ports_fdb',
+                        '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
+                        array($device['device_id'], $vlan_id, $mac_address_entry)
+                    );
                     echo '.';
                 }
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
@@ -57,6 +62,8 @@ if (!empty($insert)) {
                     'mac_address' => $mac_address_entry,
                     'vlan_id' => $vlan_id,
                     'device_id' => $device['device_id'],
+                    'created_at' => array('NOW()'), //we need to do this unless we use Eloquent "create" method
+                    'updated_at' => array('NOW()'), //we need to do this unless we use Eloquent "update" method
                 );
 
                 dbInsert($new_entry, 'ports_fdb');
@@ -67,17 +74,9 @@ if (!empty($insert)) {
         echo PHP_EOL;
     }
 
+    //We do not delete anything here, as daily.sh will take care of the cleaning.
+
     // Delete old entries from the database
-    foreach ($existing_fdbs as $vlan_id => $entries) {
-        foreach ($entries as $entry) {
-            dbDelete(
-                'ports_fdb',
-                '`port_id` = ? AND `mac_address` = ? AND `vlan_id` = ? and `device_id` = ?',
-                array($entry['port_id'], $entry['mac_address'], $entry['vlan_id'], $entry['device_id'])
-            );
-            d_echo("Deleting: {$entry['mac_address']}\n", '-');
-        }
-    }
 }
 
 unset(

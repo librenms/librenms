@@ -1,14 +1,45 @@
 <?php
+
 echo "\nCaching OIDs:";
 
 if ($device['os'] == 'junos') {
     $entity_array = array();
     echo ' jnxBoxAnatomy';
     $entity_array = snmpwalk_cache_oid($device, 'jnxBoxAnatomy', $entity_array, 'JUNIPER-MIB');
+} elseif ($device['os'] == 'aruba-instant') {
+    $entity_array = array();
+    echo 'aruba-instant';
+
+    $ai_mib = 'AI-AP-MIB';
+    $ai_ig_data = snmpwalk_group($device, 'aiInfoGroup', $ai_mib);
+     discover_entity_physical(
+         $valid,
+         $device,
+         1,                                              // entPhysicalIndex
+         $ai_ig_data['aiVirtualControllerIPAddress.0'],  // entPhysicalDescr
+         'chassis',                                      // entPhysicalClass
+         $ai_ig_data['aiVirtualControllerName.0'],       // entPhysicalName
+         'Instant Virutal Controller Cluster',           // entPhysicalModelName
+         $ai_ig_data['aiVirtualControllerKey.0'],        // entPhysicalSerialNum
+         '0',                                            // entPhysicalContainedIn
+         'Aruba',                                        // entPhysicalMfgName
+         '-1',                                           // entPhysicalParentRelPos
+         'Aruba',                                        // entPhysicalVendorType
+         null,                                           // entPhysicalHardwareRev
+         null,                                           // entPhysicalFirmwareRev
+         null,                                           // entPhysicalSoftwareRev
+         null,                                           // entPhysicalIsFRU
+         null,                                           // entPhysicalAlias
+         null,                                           // entPhysicalAssetID
+         null                                            // ifIndex
+     );
+
+    $entity_array = snmpwalk_group($device, 'aiAccessPointEntry', $ai_mib);
+    $instant_index = 2;
 } elseif ($device['os'] == 'timos') {
     $entity_array = array();
     echo 'tmnxHwObjs';
-    $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', '+'.$config['mib_dir'].'/aos:'.$config['mib_dir']);
+    $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', 'nokia');
 } else {
     $entity_array = array();
     echo ' entPhysicalEntry';
@@ -17,6 +48,71 @@ if ($device['os'] == 'junos') {
     if (!empty($entity_array)) {
         echo ' entAliasMappingIdentifier';
         $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
+    }
+}
+if ($device['os'] == 'vrp') {
+    echo ' hwEntityBoardType';
+    $entity_array = snmpwalk_cache_oid($device, 'hwEntityBoardType', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
+    echo ' hwEntityBomEnDesc';
+    $entity_array = snmpwalk_cache_oid($device, 'hwEntityBomEnDesc', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
+}
+if ($device['os'] == 'saf-cfm') {
+    $entity_array = [];
+    echo ' saf-cfmAnatomy';
+    $oid = '.1.3.6.1.4.1.7571.100.1.1.2.22';
+    $device_array = snmpwalk_cache_oid($device, $oid, [], 'SAF-MPMUX-MIB')[0];
+
+    $entity_array[1] = [
+        'entPhysicalDescr' => $device_array['termProduct'],
+        'entPhysicalVendorType' => $device_array['termProduct'],
+        'entPhysicalContainedIn' => '0',
+        'entPhysicalClass' => 'chassis',
+        'entPhysicalParentRelPos' => '-1',
+        'entPhysicalName' => 'Chassis',
+        'entPhysicalSerialNum' => $device_array['serialNumber'],
+        'entPhysicalMfgName' => 'SAF',
+        'entPhysicalModelName' => $device_array['serialNumber'],
+        'entPhysicalIsFRU' => 'true',
+    ];
+
+    foreach ([1 => 'rf1Version', 2 => 'rf2Version'] as $index => $item) {
+        $entity_array[] = [
+            'entPhysicalDescr' => $device_array[$item],
+            'entPhysicalVendorType' => 'radio',
+            'entPhysicalContainedIn' => 1,
+            'entPhysicalClass' => 'module',
+            'entPhysicalParentRelPos' => $index,
+            'entPhysicalName' => "Radio $index",
+            'entPhysicalIsFRU' => 'true',
+        ];
+    }
+
+    if ($device_array['termProduct'] == 'SAF CFM-M4P-MUX') {
+        foreach (range(1, 4) as $index) {
+            $entity_array[] = [
+                'entPhysicalDescr' => 'Module Container',
+                'entPhysicalVendorType' => 'containerSlot',
+                'entPhysicalContainedIn' => 1,
+                'entPhysicalClass' => 'container',
+                'entPhysicalParentRelPos' => $index + 2,
+                'entPhysicalName' => "Slot $index",
+                'entPhysicalIsFRU' => 'false',
+            ];
+        }
+
+        foreach ([1 => 'm1Description', 2 => 'm2Description', 3 => 'm3Description', 4 => 'm4Description'] as $index => $item) {
+            if (!str_contains($device_array[$item], 'N/A')) {
+                $entity_array[] = [
+                    'entPhysicalDescr' => $device_array[$item],
+                    'entPhysicalVendorType' => 'module',
+                    'entPhysicalContainedIn' => $index + 3,
+                    'entPhysicalClass' => 'module',
+                    'entPhysicalParentRelPos' => 1,
+                    'entPhysicalName' => "Module $index",
+                    'entPhysicalIsFRU' => 'true',
+                ];
+            }
+        }
     }
 }
 
@@ -42,6 +138,24 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         // fix for issue 1865, $entPhysicalIndex, as it contains a quad dotted number on newer Junipers
         // using str_replace to remove all dots should fix this even if it changes in future
         $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
+    } elseif ($device['os'] == 'aruba-instant') {
+        $entPhysicalDescr        = $entry['aiAPMACAddress'];
+        $entPhysicalContainedIn  = 1;
+        $entPhysicalSerialNum    = $entry['aiAPSerialNum'];
+        $entPhysicalModelName    = $entry['aiAPModel'];
+        $entPhysicalMfgName      = 'Aruba';
+        $entPhysicalVendorType   = 'Aruba';
+        $entPhysicalParentRelPos = -1;
+        $entPhysicalSoftwareRev  = $device['version'];
+        $entPhysicalIndex        = $instant_index;
+
+        if ($entry['aiAPIPAddress'] == $ai_ig_data['aiMasterIPAddress.0']) {
+            $entPhysicalName = sprintf('%s %s Cluster Master', $entry['aiAPName'], $entry['aiAPIPAddress']);
+        } else {
+            $entPhysicalName = sprintf('%s %s Cluster Member', $entry['aiAPName'], $entry['aiAPIPAddress']);
+        }
+
+        $instant_index += 1;
     } elseif ($device['os'] == 'timos') {
         $entPhysicalDescr        = $entry['tmnxCardTypeDescription'];
         $entPhysicalContainedIn  = $entry['tmnxHwContainedIn'];
@@ -59,13 +173,14 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalAlias        = $entry['tmnxHwAlias'];
         $entPhysicalAssetID      = $entry['tmnxHwAssetID'];
         $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
-    } else {
-        $entPhysicalDescr        = $entry['entPhysicalDescr'];
+    } elseif ($device['os'] == 'vrp') {
+        //Add some details collected in the VRP Entity Mib
+        $entPhysicalDescr        = $entry['hwEntityBomEnDesc'];
         $entPhysicalContainedIn  = $entry['entPhysicalContainedIn'];
         $entPhysicalClass        = $entry['entPhysicalClass'];
         $entPhysicalName         = $entry['entPhysicalName'];
         $entPhysicalSerialNum    = $entry['entPhysicalSerialNum'];
-        $entPhysicalModelName    = $entry['entPhysicalModelName'];
+        $entPhysicalModelName    = $entry['hwEntityBoardType'];
         $entPhysicalMfgName      = $entry['entPhysicalMfgName'];
         $entPhysicalVendorType   = $entry['entPhysicalVendorType'];
         $entPhysicalParentRelPos = $entry['entPhysicalParentRelPos'];
@@ -75,6 +190,22 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalIsFRU        = $entry['entPhysicalIsFRU'];
         $entPhysicalAlias        = $entry['entPhysicalAlias'];
         $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
+    } else {
+        $entPhysicalDescr        = array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '';
+        $entPhysicalContainedIn  = array_key_exists('entPhysicalContainedIn', $entry)  ? $entry['entPhysicalContainedIn']  : '';
+        $entPhysicalClass        = array_key_exists('entPhysicalClass', $entry)        ? $entry['entPhysicalClass']        : '';
+        $entPhysicalName         = array_key_exists('entPhysicalName', $entry)         ? $entry['entPhysicalName']         : '';
+        $entPhysicalSerialNum    = array_key_exists('entPhysicalSerialNum', $entry)    ? $entry['entPhysicalSerialNum']    : '';
+        $entPhysicalModelName    = array_key_exists('entPhysicalModelName', $entry)    ? $entry['entPhysicalModelName']    : '';
+        $entPhysicalMfgName      = array_key_exists('entPhysicalMfgName', $entry)      ? $entry['entPhysicalMfgName']      : '';
+        $entPhysicalVendorType   = array_key_exists('entPhysicalVendorType', $entry)   ? $entry['entPhysicalVendorType']   : '';
+        $entPhysicalParentRelPos = array_key_exists('entPhysicalParentRelPos', $entry) ? $entry['entPhysicalParentRelPos'] : '';
+        $entPhysicalHardwareRev  = array_key_exists('entPhysicalHardwareRev', $entry)  ? $entry['entPhysicalHardwareRev']  : '';
+        $entPhysicalFirmwareRev  = array_key_exists('entPhysicalFirmwareRev', $entry)  ? $entry['entPhysicalFirmwareRev']  : '';
+        $entPhysicalSoftwareRev  = array_key_exists('entPhysicalSoftwareRev', $entry)  ? $entry['entPhysicalSoftwareRev']  : '';
+        $entPhysicalIsFRU        = array_key_exists('entPhysicalIsFRU', $entry)        ? $entry['entPhysicalIsFRU']        : '';
+        $entPhysicalAlias        = array_key_exists('entPhysicalAlias', $entry)        ? $entry['entPhysicalAlias']        : '';
+        $entPhysicalAssetID      = array_key_exists('entPhysicalAssetID', $entry)      ? $entry['entPhysicalAssetID']      : '';
     }//end if
 
     if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {
@@ -115,62 +246,7 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalModelName = $entPhysicalVendorTypes[$entPhysicalVendorType];
     }
 
-    // FIXME - dbFacile
-    if ($entPhysicalDescr || $entPhysicalName) {
-        $entPhysical_id = dbFetchCell('SELECT entPhysical_id FROM `entPhysical` WHERE device_id = ? AND entPhysicalIndex = ?', array($device['device_id'], $entPhysicalIndex));
-
-        if ($entPhysical_id) {
-            $update_data = array(
-                'entPhysicalIndex'        => $entPhysicalIndex,
-                'entPhysicalDescr'        => $entPhysicalDescr,
-                'entPhysicalClass'        => $entPhysicalClass,
-                'entPhysicalName'         => $entPhysicalName,
-                'entPhysicalModelName'    => $entPhysicalModelName,
-                'entPhysicalSerialNum'    => $entPhysicalSerialNum,
-                'entPhysicalContainedIn'  => $entPhysicalContainedIn,
-                'entPhysicalMfgName'      => $entPhysicalMfgName,
-                'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
-                'entPhysicalVendorType'   => $entPhysicalVendorType,
-                'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
-                'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
-                'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
-                'entPhysicalIsFRU'        => $entPhysicalIsFRU,
-                'entPhysicalAlias'        => $entPhysicalAlias,
-                'entPhysicalAssetID'      => $entPhysicalAssetID,
-            );
-            dbUpdate($update_data, 'entPhysical', 'device_id=? AND entPhysicalIndex=?', array($device['device_id'], $entPhysicalIndex));
-            echo '.';
-        } else {
-            $insert_data = array(
-                'device_id'               => $device['device_id'],
-                'entPhysicalIndex'        => $entPhysicalIndex,
-                'entPhysicalDescr'        => $entPhysicalDescr,
-                'entPhysicalClass'        => $entPhysicalClass,
-                'entPhysicalName'         => $entPhysicalName,
-                'entPhysicalModelName'    => $entPhysicalModelName,
-                'entPhysicalSerialNum'    => $entPhysicalSerialNum,
-                'entPhysicalContainedIn'  => $entPhysicalContainedIn,
-                'entPhysicalMfgName'      => $entPhysicalMfgName,
-                'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
-                'entPhysicalVendorType'   => $entPhysicalVendorType,
-                'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
-                'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
-                'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
-                'entPhysicalIsFRU'        => $entPhysicalIsFRU,
-                'entPhysicalAlias'        => $entPhysicalAlias,
-                'entPhysicalAssetID'      => $entPhysicalAssetID,
-            );
-
-            if (!empty($ifIndex)) {
-                $insert_data['ifIndex'] = $ifIndex;
-            }
-
-            dbInsert($insert_data, 'entPhysical');
-            echo '+';
-        }//end if
-
-        $valid[$entPhysicalIndex] = 1;
-    }//end if
+    discover_entity_physical($valid, $device, $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex);
 }//end foreach
 echo "\n";
 unset(

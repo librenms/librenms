@@ -1,10 +1,10 @@
 os: cyberoam-utm
-text: Cyberoam UTM
+text: 'Cyberoam UTM'
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-icon: cyberoam
+icon: sophos
 type: appliance
 mib_dir:
     - cyberoam

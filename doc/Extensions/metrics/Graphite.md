@@ -1,4 +1,5 @@
 source: Extensions/metrics/Graphite.md
+path: blob/master/doc/
 # Enabling support for Graphite.
 
 This module sends all metrics to a remote graphite service. You need something like Grafana for graphing.

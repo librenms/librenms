@@ -6,7 +6,7 @@ modules:
                 -
                     oid: tempTable
                     value: tempStatus
-                    num_oid: .1.3.6.1.4.1.6894.2.2.1.4.
+                    num_oid: '.1.3.6.1.4.1.6894.2.2.1.4.{{ $index }}'
                     descr: 'Temperature Sensor {{ $index }}'
                     index: '{{ $index }}'
                     states:
@@ -16,7 +16,7 @@ modules:
                 -
                     oid: fanTable
                     value: fanStatus
-                    num_oid: .1.3.6.1.4.1.6894.2.4.1.4.
+                    num_oid: '.1.3.6.1.4.1.6894.2.4.1.4.{{ $index }}'
                     descr: 'Fan Sensor {{ $index }}'
                     index: '{{ $index }}'
                     states:
@@ -25,7 +25,7 @@ modules:
                 -
                     oid: powerTable
                     value: powerStatus
-                    num_oid: .1.3.6.1.4.1.6894.2.6.1.4.
+                    num_oid: '.1.3.6.1.4.1.6894.2.6.1.4.{{ $index }}'
                     descr: 'Power Supply Sensor {{ $index }}'
                     index: '{{ $index }}'
                     states:
@@ -34,7 +34,7 @@ modules:
                 -
                     oid: physicalDiskTable
                     value: physDiskState
-                    num_oid: .1.3.6.1.4.1.6894.2.9.1.7.
+                    num_oid: '.1.3.6.1.4.1.6894.2.9.1.7.{{ $index }}'
                     descr: 'Disk Sensor {{ $index }}'
                     index: '{{ $index }}'
                     states:

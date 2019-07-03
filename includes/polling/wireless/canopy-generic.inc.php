@@ -254,7 +254,7 @@ if (strstr($version, 'AP') == false) {
 
 //AP Equipment
 if (strstr($version, 'AP')) {
-    $multi_get_array = snmp_get_multi($device, "regCount.0 regFailureCount.0 currentRadioFreqCarrier.0 frUtlLowTotalDownlinkUtilization.0 frUtlLowTotalUplinkUtilization.0", "-OQU", "WHISP-APS-MIB");
+    $multi_get_array = snmp_get_multi($device, ['regCount.0', 'regFailureCount.0', 'currentRadioFreqCarrier.0', 'frUtlLowTotalDownlinkUtilization.0', 'frUtlLowTotalUplinkUtilization.0'], "-OQU", "WHISP-APS-MIB");
     d_echo($multi_get_array);
     $registered = $multi_get_array[0]["WHISP-APS-MIB::regCount"];
     $failed = $multi_get_array[0]["WHISP-APS-MIB::regFailureCount"];

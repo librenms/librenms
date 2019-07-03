@@ -24,7 +24,7 @@
  */
 
 echo 'OneFS: ';
-$oids = snmpwalk_cache_multi_oid($device, 'fanTable', array(), 'ISILON-MIB');
+$oids = snmpwalk_cache_multi_oid($device, 'fanTable', [], 'ISILON-MIB');
 
 foreach ($oids as $index => $entry) {
     if (is_numeric($entry['fanSpeed']) && is_numeric($index)) {

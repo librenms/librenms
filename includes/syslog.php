@@ -3,7 +3,7 @@
 // FIXME : use db functions properly
 // $device_id_host = @dbFetchCell("SELECT device_id FROM devices WHERE `hostname` = '".mres($entry['host'])."' OR `sysName` = '".mres($entry['host'])."'");
 // $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '" . $entry['host']."' AND I.port_id = A.port_id");
-
+use LibreNMS\Config;
 
 function get_cache($host, $value)
 {
@@ -48,22 +48,25 @@ function get_cache($host, $value)
 
 function process_syslog($entry, $update)
 {
-    global $config, $dev_cache;
+    global $dev_cache;
 
-    foreach ($config['syslog_filter'] as $bi) {
+    foreach (Config::get('syslog_filter') as $bi) {
         if (strpos($entry['msg'], $bi) !== false) {
             return $entry;
         }
     }
 
     $entry['host'] = preg_replace("/^::ffff:/", "", $entry['host']);
+    if ($new_host = Config::get("syslog_xlate.{$entry['host']}")) {
+        $entry['host'] = $new_host;
+    }
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
     if ($entry['device_id']) {
         $os = get_cache($entry['host'], 'os');
         $hostname = get_cache($entry['host'], 'hostname');
 
-        if ((isset($config['enable_syslog_hooks'])) && ($config['enable_syslog_hooks']) && (isset($config['os'][$os]['syslog_hook'])) && (is_array($config['os'][$os]['syslog_hook']))) {
-            foreach ($config['os'][$os]['syslog_hook'] as $k => $v) {
+        if (Config::get('enable_syslog_hooks') && is_array(Config::getOsSetting($os, 'syslog_hook'))) {
+            foreach (Config::getOsSetting($os, 'syslog_hook') as $k => $v) {
                 $syslogprogmsg = $entry['program'].": ".$entry['msg'];
                 if ((isset($v['script'])) && (isset($v['regex'])) && ((preg_match($v['regex'], $syslogprogmsg)))) {
                     shell_exec(escapeshellcmd($v['script']).' '.escapeshellarg($hostname).' '.escapeshellarg($os).' '.escapeshellarg($syslogprogmsg).' >/dev/null 2>&1 &');

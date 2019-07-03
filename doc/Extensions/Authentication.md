@@ -1,4 +1,5 @@
 source: Extensions/Authentication.md
+path: blob/master/doc/
 # Authentication modules
 
 LibreNMS supports multiple authentication modules along with [Two Factor Auth](http://docs.librenms.org/Extensions/Two-Factor-Auth/).
@@ -18,9 +19,11 @@ Here we will provide configuration details for these modules.
 
 - Single Sign-on: [sso](#single-sign-on)
 
+⚠️ **When enabling a new authentication module, the local users will no longer be available to log in.**
+
 ### Enable authentication module
 
-To enable a particular authentication module you need to set this up in config.php.
+To enable a particular authentication module you need to set this up in config.php. Please note that only ONE module can be enabled. LibreNMS doesn't support multiple authentication mechanism at the same time.
 
 ```php
 $config['auth_mechanism'] = "mysql";
@@ -158,6 +161,7 @@ $config['auth_ldap_group']  = 'cn=groupname,ou=groups,dc=example,dc=com'; // gen
 $config['auth_ldap_groupmemberattr'] = 'memberUid'; // attribute to use to see if a user is a member of a group
 $config['auth_ldap_uid_attribute'] = 'uidnumber';   // attribute for unique id
 $config['auth_ldap_debug'] = false;                 // enable for verbose debug messages
+$config['auth_ldap_userdn'] = true;                 // Uses a users full DN as the value of the member attribute in a group instead of member: username. (it’s member: uid=username,ou=groups,dc=domain,dc=com)
 ```
 
 ### LDAP bind user (optional)
@@ -181,16 +185,24 @@ An example config setup for use with Jumpcloud LDAP as a service is:
 ```php
 $config['auth_mechanism'] = "ldap";
 $config['auth_ldap_version'] = 3;
-$config['auth_ldap_server'] = "ldap.jumpcloud.com";
-$config['auth_ldap_port'] = 389;
+$config['auth_ldap_server'] = "ldap.jumpcloud.com"; #Set to ldaps://ldap.jumpcloud.com to enable LDAPS
+$config['auth_ldap_port'] = 389; #Set to 636 if using LDAPS
 $config['auth_ldap_prefix'] = "uid=";
 $config['auth_ldap_suffix'] = ",ou=Users,o={id},dc=jumpcloud,dc=com";
-$config['auth_ldap_groupbase'] = "cn=librenms,ou=Users,o={id},dc=jumpcloud,dc=com";
-$config['auth_ldap_groupmemberattr'] = "memberUid";
-$config['auth_ldap_groups']['librenms']['level'] = 10;
+$config['auth_ldap_groupbase'] = "ou=Users,o={id},dc=jumpcloud,dc=com";
+$config['auth_ldap_groupmemberattr'] = "member";
+$config['auth_ldap_groups'] = ['{group}' => ['level' => 10],];
+$config['auth_ldap_userdn'] = true;
 ```
+Replace {id} with the unique ID provided by Jumpcloud.  Replace {group} with the unique group name created in Jumpcloud.  This field is case sensitive.
 
-Replace {id} with the unique ID provided by Jumpcloud.
+Note: If you have multiple user groups to define individual access levels replace the `$config['auth_ldap_groups']` line with the following:
+```php
+$config['auth_ldap_groups'] = [
+    '{admin_group}' => ['level' => 10],
+    '{global_readonly_group}' => ['level' => 5],
+];
+```
 
 
 # Radius Authentication
@@ -273,7 +285,7 @@ $config['auth_ldap_cache_ttl'] = 300;
 
 ## View/embedded graphs without being logged into LibreNMS
 ```php
-$config['allow_unauth_graphs_cidr'] = array(127.0.0.1/32');
+$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 

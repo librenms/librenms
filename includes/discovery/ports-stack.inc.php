@@ -2,6 +2,7 @@
 
 $sql = "SELECT * FROM `ports_stack` WHERE `device_id` = '".$device['device_id']."'";
 
+$stack_db_array = [];
 foreach (dbFetchRows($sql) as $entry) {
     $stack_db_array[$entry['port_id_high']][$entry['port_id_low']]['ifStackStatus'] = $entry['ifStackStatus'];
 }

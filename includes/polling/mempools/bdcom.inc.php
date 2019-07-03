@@ -18,7 +18,7 @@
 
 echo 'BDCOM Memory Pool';
 
-$memory_pool = snmp_get_multi_oid($device, 'bdcomMemoryPoolUsed.0 bdcomMemoryPoolFree.0', '-OQUs', 'BDCOM-MEMORY-POOL-MIB');
+$memory_pool = snmp_get_multi_oid($device, ['bdcomMemoryPoolUsed.0', 'bdcomMemoryPoolFree.0'], '-OQUs', 'BDCOM-MEMORY-POOL-MIB');
 
 $mempool['free']  = ['bdcomMemoryPoolFree.0'];
 $mempool['used']  = $memory_pool['bdcomMemoryPoolUsed.0'];

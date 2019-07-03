@@ -1,7 +1,7 @@
 os: ros
 text: 'Siemens Ruggedcom Switches (ROS)'
 type: network
-empty_ifdescr: 1
+empty_ifdescr: true
 icon: siemens
 mib_dir:
     - ros

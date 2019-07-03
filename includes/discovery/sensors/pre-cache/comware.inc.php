@@ -11,4 +11,4 @@
  */
 
 echo 'hh3cTransceiverInfoTable ';
-$pre_cache['comware_oids'] = snmpwalk_cache_multi_oid($device, 'hh3cTransceiverInfoTable', array(), 'HH3C-TRANSCEIVER-INFO-MIB');
+$pre_cache['comware_oids'] = snmpwalk_cache_multi_oid($device, 'hh3cTransceiverInfoTable', [], 'HH3C-TRANSCEIVER-INFO-MIB');

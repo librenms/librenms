@@ -1,0 +1,54 @@
+LLDPPRIVATE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, Counter32, TimeTicks, OBJECT-TYPE, Integer32
+             FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+             FROM SNMPv2-CONF
+        gbnL2 FROM ADMIN-MASTER-MIB;
+
+
+    lldpPrivateMIB MODULE-IDENTITY
+          LAST-UPDATED "20060727Z"  -- July 27, 2006
+          ORGANIZATION "admin Inc."
+          CONTACT-INFO
+              "admin
+                  E-mail: "
+
+          DESCRIPTION "LLDP private module management."
+
+          REVISION    "20060727Z" -- July 27, 2006
+          DESCRIPTION "Initial Version"
+
+          ::= { gbnL2 5 }
+
+    lldpPrivateObjects    OBJECT IDENTIFIER ::= { lldpPrivateMIB 0 }
+
+--
+-- ***********************************************************
+--
+-- 				L L D P  PRIVATE  C O N F I G
+--
+-- ***********************************************************
+--
+
+lldpAdminStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+			"If lldpAdminStatus object has a value of 'enable(1)',then LLDP 			  						        
+			module configuration will be active. If lldpAdminStatus object has a 	
+			value of 'disable(2)',then LLDP module configuration will be 
+			inactive."
+	REFERENCE
+			"LLDP system admin status"
+	DEFVAL { disable }
+	::= { lldpPrivateObjects 1 }
+
+END
+
+

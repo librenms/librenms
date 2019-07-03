@@ -25,25 +25,19 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
 // Note that as this test set depends on mres(), it is a DBTestCase even though the database is unused
 class AuthHTTPTest extends DBTestCase
 {
-    public function testReauthenticate()
-    {
-        $this->setExpectedException(AuthenticationException::class);
-        Auth::reset()->reauthenticate(null, null);
-    }
-
     // Document the modules current behaviour, so that changes trigger test failures
     public function testCapabilityFunctions()
     {
-        global $config;
-        $config['auth_mechanism'] = 'http-auth';
+        Config::set('auth_mechanism', 'http-auth');
 
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         $this->assertTrue($a->canUpdatePasswords() === 0);
         $this->assertTrue($a->changePassword(null, null) === 0);
@@ -54,16 +48,14 @@ class AuthHTTPTest extends DBTestCase
 
     public function testOldBehaviourAgainstCurrent()
     {
-        global $config;
-
         $old_username = null;
         $new_username = null;
 
-        $config['auth_mechanism'] = 'http-auth';
+        Config::set('auth_mechanism', 'http-auth');
         $users = array('steve',  '   steve', 'steve   ', '   steve   ', '    steve   ', '', 'CAT');
         $vars = array('REMOTE_USER', 'PHP_AUTH_USER');
 
-        $a = Auth::reset();
+        $a = LegacyAuth::reset();
 
         foreach ($vars as $v) {
             foreach ($users as $u) {
@@ -72,7 +64,7 @@ class AuthHTTPTest extends DBTestCase
                 // Old Behaviour
                 if (isset($_SERVER['REMOTE_USER'])) {
                     $old_username = clean($_SERVER['REMOTE_USER']);
-                } elseif (isset($_SERVER['PHP_AUTH_USER']) && $config['auth_mechanism'] === 'http-auth') {
+                } elseif (isset($_SERVER['PHP_AUTH_USER']) && Config::get('auth_mechanism') === 'http-auth') {
                     $old_username = clean($_SERVER['PHP_AUTH_USER']);
                 }
 
@@ -90,6 +82,6 @@ class AuthHTTPTest extends DBTestCase
             unset($_SERVER[$v]);
         }
 
-        unset($config['auth_mechanism']);
+        Config::forget('auth_mechanism');
     }
 }

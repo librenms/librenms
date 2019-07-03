@@ -2,22 +2,72 @@
 
 namespace App\Models;
 
-class Service extends BaseModel
+use Illuminate\Database\Eloquent\Builder;
+
+class Service extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'service_id';
 
     // ---- Query Scopes ----
 
-    public function scopeHasAccess($query, User $user)
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsOk($query)
     {
-        return $this->hasDeviceAccess($query, $user);
+        return $query->where([
+            ['service_ignore', '=', 0],
+            ['service_disabled', '=', 0],
+            ['service_status', '=', 0],
+        ]);
     }
 
-    // ---- Define Relationships ----
-
-    public function device()
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsCritical($query)
     {
-        return $this->belongsTo('App\Models\Device', 'device_id');
+        return $query->where([
+            ['service_ignore', '=', 0],
+            ['service_disabled', '=', 0],
+            ['service_status', '=', 2],
+        ]);
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsWarning($query)
+    {
+        return $query->where([
+            ['service_ignore', '=', 0],
+            ['service_disabled', '=', 0],
+            ['service_status', '=', 1],
+        ]);
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsIgnored($query)
+    {
+        return $query->where([
+            ['service_ignore', '=', 1],
+            ['service_disabled', '=', 0],
+        ]);
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsDisabled($query)
+    {
+        return $query->where('service_disabled', 1);
     }
 }

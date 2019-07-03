@@ -1,4 +1,5 @@
 source: Extensions/Component.md
+path: blob/master/doc/
 
 # About
 

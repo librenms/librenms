@@ -2,8 +2,8 @@ os: aos
 group: nokia
 text: 'Alcatel-Lucent OS'
 type: network
-ifXmcbc: 1
-ifname: 1
+ifXmcbc: true
+ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 icon: alcatellucent

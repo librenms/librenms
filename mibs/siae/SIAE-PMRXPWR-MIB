@@ -1,0 +1,672 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-PMRXPWR-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Counter32, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+             DisplayString, RowStatus
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    pmRxPwr MODULE-IDENTITY
+        LAST-UPDATED "201410070000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Performance Monitoring on Received (RX) RF Power.
+            "
+        REVISION "201410070000Z"
+        DESCRIPTION
+            "Changed MAX-ACCESS caluse of some object of pmRxPwrTpClassTable
+             from read-write to read-create
+            "
+        REVISION "201405130000Z"
+        DESCRIPTION
+            "Changed DEFVAL clause of pmRxPwrTpClassRltXThreshold.
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of pmRxPwrMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 12 }
+
+----------------------------------------------------------------------------------
+--  object identifier inside the module
+----------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------
+--  pmRxPwr (PERFORMANCE MONITORING RECEIVED POWER LEVEL) GROUP
+----------------------------------------------------------------------------------
+--
+--  The following objects are used to manage the Received Power Performance
+--  Monitoring function.
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+--
+-------  The following table contains the records with  the counters used to monitor
+-------  the received  power  of the radio.
+-------  Begin of pmRxPwrCounterTable
+--
+    pmRxPwrMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {pmRxPwr 1}
+
+    pmRxPwrCounterTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PmRxPwrCounterRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with PmRxPwr records: one record for 1+0 configuration and two
+             record for 1+1 configuration."
+    ::= {pmRxPwr 2}
+
+    pmRxPwrCounterRecord  OBJECT-TYPE
+        SYNTAX      PmRxPwrCounterRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "PmRxPwrCounter record."
+        INDEX {pmRxPwrBranchId, pmRxPwrCounterBlockId}
+    ::= {pmRxPwrCounterTable 1}
+
+    PmRxPwrCounterRecord  ::=
+        SEQUENCE {
+            pmRxPwrBranchId            Integer32,
+            pmRxPwrCounterBlockId      Integer32,
+            pmRxPwrCounterBlockType    INTEGER,
+            pmRxPwrCounterBlockStatus  INTEGER,
+            pmRxPwrCounterTimeStamp    Unsigned32,
+            pmRxPwrRlts1Counter        Counter32,
+            pmRxPwrRlts2Counter        Counter32,
+            pmRxPwrRlts3Counter        Counter32,
+            pmRxPwrRlts4Counter        Counter32,
+            pmRxPwrRlts5Counter        Counter32,
+            pmRxPwrTMMax               Integer32,
+            pmRxPwrTMMin               Integer32,
+            pmRxPwrAverageRxLevel      Integer32
+        }
+
+    pmRxPwrBranchId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the Radio Branch"
+    ::= {pmRxPwrCounterRecord 1}
+
+    pmRxPwrCounterBlockId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies  the counters block and the counter type
+             according to the following code:
+             1  Current Daily counters
+             2  Daily counters (Day before counters)
+             3  Current 15 minutes counters
+             4  15 minutes counters N. 1 (The most recent 15 minutes counters)
+                ..............................................
+             n  15 minutes counters N. n
+             20 15 minutes counters N.16(The oldest 15 min. counters 4 hours before)."
+    ::= {pmRxPwrCounterRecord 2}
+
+    pmRxPwrCounterBlockType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             daily      (1),
+                             fifteenMin (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the counter block."
+    ::= {pmRxPwrCounterRecord 3}
+
+    pmRxPwrCounterBlockStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             meaningless   (1),
+                             meaningfull   (2),
+                             incomplete    (3),
+                             dummy         (4),
+                             lost          (5),
+                             restarted     (6)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status of the block counter."
+    ::= {pmRxPwrCounterRecord 4}
+
+    pmRxPwrCounterTimeStamp  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object is the time when the performance record is closed reported
+             as the second number since 1-Gen-1970."
+    ::= {pmRxPwrCounterRecord 5}
+
+    pmRxPwrRlts1Counter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds when the Received power is less than the threshold 1."
+    ::= {pmRxPwrCounterRecord 6}
+
+    pmRxPwrRlts2Counter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds when the Received power is less than the threshold 2"
+    ::= {pmRxPwrCounterRecord 7}
+
+    pmRxPwrRlts3Counter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds when the Received power is less than the threshold 3"
+    ::= {pmRxPwrCounterRecord 8}
+
+    pmRxPwrRlts4Counter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds when the Received power is less than the threshold 4"
+    ::= {pmRxPwrCounterRecord 9}
+
+    pmRxPwrRlts5Counter  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds when the Received power is less than the threshold 5"
+    ::= {pmRxPwrCounterRecord 10}
+
+    pmRxPwrTMMax  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum Power Received Level Tide Mark."
+    ::= {pmRxPwrCounterRecord 11}
+
+    pmRxPwrTMMin  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Minimum Power Received Level Tide Mark."
+    ::= {pmRxPwrCounterRecord 12}
+
+    pmRxPwrAverageRxLevel OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " Power Received Level  (Average value)"
+    ::=  {pmRxPwrCounterRecord 13}
+--
+-------  End of pmRxPwrCounterTable
+
+--
+-------  The following table contains the records used to manage the P.M. on both
+-------  radio branch and the threshold cross alarms
+-------  Begin of pmRxPwrTpClassTable
+--
+    pmRxPwrTpClassTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     PmRxPwrTpClassRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with PmRxPwrTpClass records: one record for 1+0 configuration
+             and two record for 1+1 configuration."
+    ::= {pmRxPwr 3}
+
+    pmRxPwrTpClassRecord  OBJECT-TYPE
+        SYNTAX      PmRxPwrTpClassRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "PmRxPwrTpClass record."
+        INDEX {pmRxPwrTpClassBranchId}
+    ::= {pmRxPwrTpClassTable 1}
+
+    PmRxPwrTpClassRecord  ::=
+        SEQUENCE {
+            pmRxPwrTpClassBranchId            Integer32,
+            pmRxPwrTpClassStartStop           INTEGER,
+            pmRxPwrTpClassLabel               DisplayString,
+            pmRxPwrTpClassTimeStamp           Unsigned32,
+            pmRxPwrTpClass15MRlts1Alarm       AlarmStatus,
+            pmRxPwrTpClass15MRlts2Alarm       AlarmStatus,
+            pmRxPwrTpClass15MRlts3Alarm       AlarmStatus,
+            pmRxPwrTpClass15MRlts4Alarm       AlarmStatus,
+            pmRxPwrTpClass15MRlts5Alarm       AlarmStatus,
+            pmRxPwrTpClass24HRlts1Alarm       AlarmStatus,
+            pmRxPwrTpClass24HRlts2Alarm       AlarmStatus,
+            pmRxPwrTpClass24HRlts3Alarm       AlarmStatus,
+            pmRxPwrTpClass24HRlts4Alarm       AlarmStatus,
+            pmRxPwrTpClass24HRlts5Alarm       AlarmStatus,
+            pmRxPwrTpClassRlt1Threshold       INTEGER,
+            pmRxPwrTpClassRlt2Threshold       INTEGER,
+            pmRxPwrTpClassRlt3Threshold       INTEGER,
+            pmRxPwrTpClassRlt4Threshold       INTEGER,
+            pmRxPwrTpClassRlt5Threshold       INTEGER,
+            pmRxPwrTpClass15MRlts1Threshold   Integer32,
+            pmRxPwrTpClass15MRlts2Threshold   Integer32,
+            pmRxPwrTpClass15MRlts3Threshold   Integer32,
+            pmRxPwrTpClass15MRlts4Threshold   Integer32,
+            pmRxPwrTpClass15MRlts5Threshold   Integer32,
+            pmRxPwrTpClass24HRlts1Threshold   Integer32,
+            pmRxPwrTpClass24HRlts2Threshold   Integer32,
+            pmRxPwrTpClass24HRlts3Threshold   Integer32,
+            pmRxPwrTpClass24HRlts4Threshold   Integer32,
+            pmRxPwrTpClass24HRlts5Threshold   Integer32,
+            pmRxPwrTpClassRowStatus           RowStatus
+        }
+
+    pmRxPwrTpClassBranchId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the Radio Branch"
+    ::= {pmRxPwrTpClassRecord 1}
+
+    pmRxPwrTpClassStartStop  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             start   (1),
+                             stop    (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to start and to stop the Perfomance Monitoring
+             counter evaluation."
+    ::= {pmRxPwrTpClassRecord 2}
+
+    pmRxPwrTpClassLabel  OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to identify the Tp class:
+             pmRxPwrTpClassBranchId = 1 label = Radio 1
+             pmRxPwrTpClassBranchId = 2 label = Radio 2."
+    ::= {pmRxPwrTpClassRecord 3}
+
+    pmRxPwrTpClassTimeStamp  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object is the time when the performance record is closed reported
+             as the second number since 1/1/70."
+    ::= {pmRxPwrTpClassRecord 4}
+
+    pmRxPwrTpClass15MRlts1Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "15 minutes Rlts1 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 5}
+
+    pmRxPwrTpClass15MRlts2Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "15 minutes Rlts2 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 6}
+
+    pmRxPwrTpClass15MRlts3Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "15 minutes Rlts3 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 7}
+
+    pmRxPwrTpClass15MRlts4Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "15 minutes Rlts4 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 8}
+
+    pmRxPwrTpClass15MRlts5Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "15 minutes Rlts5 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 9}
+
+    pmRxPwrTpClass24HRlts1Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Daily Rlts1 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 10}
+
+    pmRxPwrTpClass24HRlts2Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Daily Rlts2 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 11}
+
+    pmRxPwrTpClass24HRlts3Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Daily Rlts3 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 12}
+
+    pmRxPwrTpClass24HRlts4Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Daily Rlts4 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 13}
+
+    pmRxPwrTpClass24HRlts5Alarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Daily Rlts5 threshold cross alarm with associated severity."
+    ::= {pmRxPwrTpClassRecord 14}
+
+    pmRxPwrTpClassRlt1Threshold  OBJECT-TYPE
+        SYNTAX      INTEGER     (-100..-20)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Received Power Level Threshold 1 (dBm value); range -100 to -20"
+        DEFVAL {-40}
+    ::= {pmRxPwrTpClassRecord 15}
+
+    pmRxPwrTpClassRlt2Threshold  OBJECT-TYPE
+        SYNTAX      INTEGER     (-100..-20)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Received Power Level Threshold 2 (dBm value); range -100 to -20"
+        DEFVAL {-50}
+    ::= {pmRxPwrTpClassRecord 16}
+
+    pmRxPwrTpClassRlt3Threshold  OBJECT-TYPE
+        SYNTAX      INTEGER     (-100..-20)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Received Power Level Threshold 3 (dBm value); range -100 to -20"
+        DEFVAL {-60}
+    ::= {pmRxPwrTpClassRecord 17}
+
+    pmRxPwrTpClassRlt4Threshold  OBJECT-TYPE
+        SYNTAX      INTEGER     (-100..-20)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Received Power Level Threshold 4 (dBm value); range -100 to -20"
+        DEFVAL {-70}
+    ::= {pmRxPwrTpClassRecord 18}
+
+    pmRxPwrTpClassRlt5Threshold  OBJECT-TYPE
+        SYNTAX      INTEGER     (-100..-20)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Received Power Level Threshold 5 (dBm value); range -100 to -20"
+        DEFVAL {-80}
+    ::= {pmRxPwrTpClassRecord 19}
+
+    pmRxPwrTpClass15MRlts1Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within 15 minutes to set
+             pmRxPwrTpClass15MRlts1Alarm (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 20}
+
+    pmRxPwrTpClass15MRlts2Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within 15 minutes to set
+             pmRxPwrTpClass15MRlts2Alarm (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 21}
+
+    pmRxPwrTpClass15MRlts3Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within 15 minutes to set
+             pmRxPwrTpClass15MRlts3Alarm (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 22}
+
+    pmRxPwrTpClass15MRlts4Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within 15 minutes to set
+             pmRxPwrTpClass15MRlts4Alarm (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 23}
+
+    pmRxPwrTpClass15MRlts5Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within 15 minutes to set
+             pmRxPwrTpClass15MRlts5Alarm (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 24}
+
+    pmRxPwrTpClass24HRlts1Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within a day to set pmRxPwrTpClass24HRlts1Alarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 25}
+
+    pmRxPwrTpClass24HRlts2Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within a day to set pmRxPwrTpClass24HRlts2Alarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 26}
+
+    pmRxPwrTpClass24HRlts3Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within a day to set pmRxPwrTpClass24HRlts3Alarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 27}
+
+    pmRxPwrTpClass24HRlts4Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within a day to set pmRxPwrTpClass24HRlts4Alarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 28}
+
+    pmRxPwrTpClass24HRlts5Threshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within a day to set pmRxPwrTpClass24HRlts5Alarm
+             (zero value disables the alarm)."
+        DEFVAL {0}
+    ::= {pmRxPwrTpClassRecord 29}
+
+    pmRxPwrTpClassRowStatus   OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of pmRxPwrTpClass.
+            "
+    ::= {pmRxPwrTpClassRecord 30}
+
+
+--
+-------  End of pmRxPwrTpClassTable
+
+--
+--  MAINTENANCE TABLE
+--
+
+-------  Begin of pmRxPwrTpMaintTable
+--
+    pmRxPwrTpMaintTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     PmRxPwrTpMaintRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Command for maintenance of Termination Point.
+             Objects in this table is not persistent. An Instance of this 
+             table is created on creation of pmRxPwrTpClassTable"
+    ::= {pmRxPwr 4}
+
+    pmRxPwrTpMaintRecord  OBJECT-TYPE
+        SYNTAX      PmRxPwrTpMaintRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "PmG828 Termination Point Maintenance record."
+        INDEX {pmRxPwrTpClassBranchId}
+    ::= {pmRxPwrTpMaintTable 1}
+
+    PmRxPwrTpMaintRecord  ::=
+        SEQUENCE {
+            pmRxPwrTpMaintCounterClear      INTEGER,
+            pmRxPwrTpMaintAlarmClear        INTEGER
+        }
+
+    pmRxPwrTpMaintCounterClear  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive   (0),
+                             clear       (1)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear the Perfomance Monitoring counters."
+    ::= {pmRxPwrTpMaintRecord 1}
+
+    pmRxPwrTpMaintAlarmClear  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive   (0),
+                             clear       (1)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear the Perfomance Monitoring threshold cross alarms."
+    ::= {pmRxPwrTpMaintRecord 2}
+--
+-------  End of pmRxPwrTpMaintTable
+
+--
+-------  The following objects are common to all radio branches.
+--
+    pmRxPwrTpClass15MRltsAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the pmRxPwrTpClass15MRltsAlarm and
+             enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {pmRxPwr 5}
+
+    pmRxPwrTpClass24HRltsAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the pmRxPwrTpClass24HRltsAlarm and
+             enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {pmRxPwr 6}
+
+------ End group -----------------------------------------------------------------
+
+END
+
+
+
+

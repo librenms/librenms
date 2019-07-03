@@ -1,0 +1,23 @@
+mib: DKT-CATV-MIB:DKT-FE-MIB:DKT-GE-MIB:DKT-GENERIC-MIB:DKT-MIB:DKT-RMON-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: catvSignalDetect
+                    value: catvSignalDetect
+                    num_oid: '.1.3.6.1.4.1.27304.11.3.{{ $index }}'
+                    descr: 'CATV Signal Detect'
+                    index: '0'
+                    states:
+                        - { descr: Signal Ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: No Signal, graph: 0, value: 0, generic: 3 }
+                -
+                    oid: catvSwitch
+                    value: catvSwitch
+                    num_oid: '.1.3.6.1.4.1.27304.11.2.{{ $index }}'
+                    descr: 'CATV Module'
+                    index: '0'
+                    states:
+                        - { descr: Powered, graph: 0, value: 1, generic: 0 }
+                        - { descr: Not powered, graph: 0, value: 0, generic: 3 }

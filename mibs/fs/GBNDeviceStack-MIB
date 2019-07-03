@@ -1,0 +1,437 @@
+
+    GBNDeviceStack-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, IpAddress,
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+
+        DisplayString, MacAddress,
+        RowStatus, TruthValue                   FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnDevice                               FROM ADMIN-MASTER-MIB
+        ;
+        
+    gbnDeviceStackMib MODULE-IDENTITY
+        LAST-UPDATED    "2013/07/09"  -- July 09, 2013
+        ORGANIZATION    "ADMIN"
+        CONTACT-INFO    "ADMIN
+                         E-mail: support@admin.com"
+
+        DESCRIPTION     "gbn stack Enterprise MIB definition."
+
+        REVISION        "2013/07/09"  -- July 09, 2013
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnDevice 5 }
+
+
+------------------------------------------------------------------------------
+--  Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+    --
+    --  "DURABLE":
+    --    Objects that are saved across a system reset and/or power cycle
+    --    are noted as "DURABLE" for convenience in the DESCRIPTION
+    --    section of the object definition.  Code must be explicitly
+    --    written to implement these DURABLE objects.
+    --
+
+------------------------------------------------------------------------------
+--  define groups in gbn-stack-MIB
+
+stackEnableRunning OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "stack mode running status."
+    ::= { gbnDeviceStackMib 1 }
+
+stackEnableConfig OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "trigger to enable or disable stack mode, need to reboot to take effect."
+    ::= { gbnDeviceStackMib 2 }
+
+stackUnitMax OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "max unit members support in stack mode."
+    ::= { gbnDeviceStackMib 3 }
+
+stackPortVirtualLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF StackPortVirtualLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table of virtual link."
+    REFERENCE
+        "9.6.1"
+    ::= { gbnDeviceStackMib 4 }
+
+stackPortVirtualLinkEntry OBJECT-TYPE
+    SYNTAX      StackPortVirtualLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "virtuallink is a virtual link, it includes none or some real physical ports.System have two virtuallink:virtuallink 1 and virtualink 2."
+    INDEX { stackPortVirtualLinkPhyPort }
+    ::= { stackPortVirtualLinkTable 1 }
+
+StackPortVirtualLinkEntry ::=
+    SEQUENCE {
+        stackPortVirtualLinkDevice
+            Integer32,
+        stackPortVirtualLinkSlot
+            Integer32,
+        stackPortVirtualLinkPortNum
+            Integer32,
+        stackPortVirtualLinkPhyPort
+            Integer32,            
+        stackPortVirtualLinkModeRunning
+            INTEGER,	            
+        stackPortVirtualLinkModeConfig
+            INTEGER,
+        stackPortVirtualLinkLinkStatus
+            INTEGER,
+        stackPortVirtualLinkLinkSpeed
+            INTEGER,
+        }
+
+stackPortVirtualLinkPhyPort OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "port number of switch."
+    ::= { stackPortVirtualLinkEntry 1 }
+
+stackPortVirtualLinkDevice OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "device in <device/slot/portnum>."
+    ::= { stackPortVirtualLinkEntry 2 }
+
+stackPortVirtualLinkSlot OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "slot in <device/slot/portnum>."
+    ::= { stackPortVirtualLinkEntry 3 }
+
+stackPortVirtualLinkPortNum OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "portnum in <device/slot/portnum>."
+    ::= { stackPortVirtualLinkEntry 4 }
+
+stackPortVirtualLinkModeRunning OBJECT-TYPE
+    SYNTAX  INTEGER {
+              none(0),
+              virtuallink1(1),
+              virtuallink2(2)
+          }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "running status."
+    ::= { stackPortVirtualLinkEntry 5 }
+
+stackPortVirtualLinkModeConfig OBJECT-TYPE
+    SYNTAX  INTEGER {
+              none(0),
+              virtuallink1(1),
+              virtuallink2(2)
+          }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "trigger to change virtuallink mode of phyical port, need to reboot to tabke effect."
+    ::= { stackPortVirtualLinkEntry 6 }
+
+stackPortVirtualLinkLinkStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+              linkdown(0),
+              linkup(1)
+          }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "link status of this phyical port."
+    ::= { stackPortVirtualLinkEntry 7 }
+
+stackPortVirtualLinkLinkSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+              s10g(0),
+              s12g(1),
+              s1g(2),
+              s2-5g(3),
+              s5g(4),
+              s10m(5),
+              s100m(6),
+              unknow(7)
+          }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "link speed of this phyical port."
+    ::= { stackPortVirtualLinkEntry 8 }
+
+stackMemberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF StackMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table of stack members."
+    REFERENCE
+        "9.6.1"
+    ::= { gbnDeviceStackMib 5 }
+
+stackMemberEntry OBJECT-TYPE
+    SYNTAX      StackMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "members of stack system, when stack is not running, only unit 0 can use."
+    INDEX { stackMemberUnit }
+    ::= { stackMemberTable 1 }
+
+StackMemberEntry ::=
+    SEQUENCE {
+        stackMemberUnit
+            Integer32,
+        stackMemberMode
+            INTEGER,
+        stackMemberNewUnit
+            Integer32,	            
+        stackMemberPriorityRunning
+            Integer32,
+        stackMemberPriorityConfig
+            Integer32,
+        stackMemberReboot
+            TruthValue,
+        stackMemberVirtualLink1Hop
+            Integer32,
+        stackMemberVirtualLink2Hop
+            Integer32,
+        stackMemberMac
+            MacAddress,
+        }
+
+stackMemberUnit OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "unit number, range is form 0 to (stackUnitMax - 1)."
+    ::= { stackMemberEntry 1 }
+
+stackMemberMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+              slave(0),
+              master(1)
+          }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "member unit is master or slave."
+    ::= { stackMemberEntry 2 }
+
+stackMemberNewUnit OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "trigger to change unit number, range is form 0 to (stackUnitMax - 1).need to reboot to tabke effect"
+    ::= { stackMemberEntry 3 }
+
+stackMemberPriorityRunning OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)    
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "running priorty of this unit.default is 0"
+    ::= { stackMemberEntry 4 }
+
+stackMemberPriorityConfig OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)    
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "trigger to change priortiy of this unit, need to reboot to tabke effect.default is 0.need to reboot to tabke effect"
+    ::= { stackMemberEntry 5 }
+
+stackMemberReboot OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "trigger to reboot this unit."
+    ::= { stackMemberEntry 6 }
+
+stackMemberVirtualLink1Hop OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "how many hops can master unit reach this unit from virtuallink 1.range is from 0 to stackUnitMax, and stackUnitMax means infinite."
+    ::= { stackMemberEntry 7 }
+
+stackMemberVirtualLink2Hop OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "how many hops can master unit reach this unit from virtuallink 2.range is from 0 to stackUnitMax, and stackUnitMax means infinite."
+    ::= { stackMemberEntry 8 }
+
+stackMemberMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "mac address of this unit."
+    ::= { stackMemberEntry 9 }
+
+stackLinkdownDelay OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "enable or disable linkdown-delay function.default is disable.this mib can be accessed only when stackEnableRunning is true."
+    ::= { gbnDeviceStackMib 6 }
+
+stackHelloTimeOut OBJECT-TYPE
+    SYNTAX Integer32 (1..32)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "enable or disable linkdown-delay function.default is disable.default is 30 seconds.this mib can be accessed only when stackEnableRunning is true."
+    ::= { gbnDeviceStackMib 7 }
+
+stackLacpMadDomain OBJECT-TYPE
+    SYNTAX Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "lacp mad domain id.default is 0.this mib can be accessed only when stackEnableRunning is true."
+    ::= { gbnDeviceStackMib 8 }
+
+stackLacpMadTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF StackLacpMadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table of lacp mad.this mib can be accessed only when stackEnableRunning is true."
+    REFERENCE
+        "9.6.1"
+    ::= { gbnDeviceStackMib 9 }
+
+stackLacpMadEntry OBJECT-TYPE
+    SYNTAX      StackLacpMadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table of lacp mad."
+    INDEX { lacpMadChannelGroup }
+    ::= { stackLacpMadTable 1 }
+
+StackLacpMadEntry ::=
+    SEQUENCE {
+        lacpMadChannelGroup
+            Integer32,
+        lacpMadEnable
+            TruthValue,
+        }
+
+lacpMadChannelGroup OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "lacp channel group number."
+    ::= { stackLacpMadEntry 1 }
+
+lacpMadEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "enable or disable lacp mad function.default is disable."
+    ::= { stackLacpMadEntry 2 }
+
+stackMadExcludeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF StackMadExcludeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table of mad exclude of port.this mib can be accessed only when stackEnableRunning is true."
+    REFERENCE
+        "9.6.1"
+    ::= { gbnDeviceStackMib 10 }
+
+stackMadExcludeEntry OBJECT-TYPE
+    SYNTAX      StackMadExcludeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table of mad exclude of port."
+    INDEX { madExcludePort }
+    ::= { stackMadExcludeTable 1 }
+
+StackMadExcludeEntry ::=
+    SEQUENCE {
+        madExcludePort
+            Integer32,
+        macExcludeEnable
+            TruthValue,
+        }
+
+madExcludePort OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "port number of system."
+    ::= { stackMadExcludeEntry 1 }    
+
+macExcludeEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "enable or disable mad exclude function.default is disable."
+    ::= { stackMadExcludeEntry 2 }
+    
+    ----------------------------------------------------------------------------------
+    --stack TRAP MIB--
+    ----------------------------------------------------------------------------------
+stackTrap      OBJECT IDENTIFIER ::= { gbnDeviceStackMib 11 }
+    stackPortVirtualLinkStateChange NOTIFICATION-TYPE
+    OBJECTS { stackPortVirtualLinkDevice, stackPortVirtualLinkSlot,
+              stackPortVirtualLinkPortNum, stackPortVirtualLinkLinkStatus }
+    STATUS  current
+    DESCRIPTION
+           "A link state change trap signifies that the SNMP entity, 
+           acting in an agent role, has detected that the 
+           stackPortVirtualLinkLinkStatus object for one of its communication
+           links is about to enter the down or up state from some other state."
+   	::= { stackTrap 1 }
+--
+-- END of gbn-stack-MIB                
+--
+
+END
+

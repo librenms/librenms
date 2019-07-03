@@ -32,6 +32,6 @@ foreach ($pre_cache['sentry4_humid'] as $index => $data) {
     $high_warn_limit = $data['st4HumidSensorHighWarning'];
     $current         = $data['st4HumidSensorValue'];
     if ($current >= 0) {
-        discover_sensor($valid['sensor'], 'humidity', $device, $oid, "st4HumidSensor.$index", 'sentry4', $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        discover_sensor($valid['sensor'], 'humidity', $device, $oid, "st4HumidSensorValue.$index", 'sentry4', $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
     }
 }

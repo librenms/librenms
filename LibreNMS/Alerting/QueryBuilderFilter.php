@@ -65,6 +65,10 @@ class QueryBuilderFilter implements \JsonSerializable
         foreach ($macros as $key => $value) {
             $field = 'macros.' . $key;
 
+            if (preg_match('/^past_\d+m$/', $key)) {
+                continue; // don't include the time based macros, they don't work like that
+            }
+
             if (ends_with($key, '_usage_perc')) {
                 $this->filter[$field] = [
                     'id' => $field,
@@ -110,7 +114,7 @@ class QueryBuilderFilter implements \JsonSerializable
 
                 $field = "$table.$column";
 
-                if (ends_with($column, ['_perc', '_current'])) {
+                if (ends_with($column, ['_perc', '_current', '_usage', '_perc_warn'])) {
                     $this->filter[$field] = [
                         'id' => $field,
                         'type' => 'string',
@@ -144,7 +148,8 @@ class QueryBuilderFilter implements \JsonSerializable
         if (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';
         } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
-            return 'integer';
+            //TODO implement field selection and change back to integer
+            return 'string';
         } elseif (starts_with($type, ['timestamp', 'datetime'])) {
             return 'datetime';
         } elseif (starts_with($type, 'enum')) {
@@ -154,7 +159,6 @@ class QueryBuilderFilter implements \JsonSerializable
         // binary, blob
         return null;
     }
-
 
     /**
      * Specify data which should be serialized to JSON
