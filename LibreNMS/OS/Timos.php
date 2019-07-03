@@ -193,9 +193,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
         $filter = '/300\.[0-9]+\.[0-9]+\.[0-9]+/';
 
-        foreach ($mplsSapCache as $key => $value){
+        foreach ($mplsSapCache as $key => $value) {
             $garbage = preg_match($filter, $key);
-            if($garbage){
+            if ($garbage) {
                 unset($key);
                 break;
             }
@@ -419,9 +419,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
         $filter = '/300\.[0-9]+\.[0-9]+\.[0-9]+/';
 
-        foreach ($mplsSapCache as $key => $value){
+        foreach ($mplsSapCache as $key => $value) {
             $garbage = preg_match($filter, $key);
-            if($garbage){
+            if ($garbage) {
                 unset($key);
                 break;
             }
