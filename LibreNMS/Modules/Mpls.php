@@ -91,11 +91,15 @@ class Mpls implements Module
 
             echo "\nMPLS SDPs: ";
             ModuleModelObserver::observe('\App\Models\MplsSdp');
-            $sdps = $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->pollMplsSdps());
+            $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->pollMplsSdps());
 
-            //echo "\nMPLS Virtual Circuits: ";
-            //ModuleModelObserver::observe('\App\Models\MplsSdpVc');
-            //$this->syncModels($os->getDeviceModel(), 'mplsSdpVcs', $os->pollMplsVcs($lsps));
+            echo "\nMPLS Services: ";
+            ModuleModelObserver::observe('\App\Models\MplsService');
+            $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->pollMplsServices());
+
+            echo "\nMPLS SDP Bindings: ";
+            ModuleModelObserver::observe('\App\Models\MplsSdpBind');
+            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->pollMplsSdpBinds());
 
             echo PHP_EOL;
         }
