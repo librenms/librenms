@@ -31,6 +31,7 @@ use App\Models\MplsLsp;
 use App\Models\MplsLspPath;
 use App\Models\MplsSdp;
 use App\Models\MplsService;
+use App\Models\MplsSap;
 use App\Models\MplsSdpBind;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
@@ -178,6 +179,44 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         }
         return $svcs;
     }
+    
+    /**
+     * @return Collection MplsSap objects
+     */
+    public function discoverMplsSaps()
+    {
+        $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
+        
+        $saps = collect();
+        
+        // Workaround, there are some oids not covered by actual MIB, try to filter them
+        // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
+        $filter = '/300\.[0-9]+\.[0-9]+\.[0-9]+/';
+
+        foreach ($mplsSapCache as $key => $value){
+            $garbage = preg_match($filter, $key);
+            if($garbage){
+                unset($key);
+                break;
+            }
+            list($svcId, $sapPortId, $sapEncapValue) = explode('.', $key);
+            $saps->push(new MplsSap([
+                'svc_oid' => $svcId,
+                'sapPortId' => $sapPortId,
+                'device_id' => $this->getDeviceId(),
+                'sapEncapValue' => $sapEncapValue,
+                'sapRowStatus' => $value['sapRowStatus'],
+                'sapType' => $value['sapType'],
+                'sapDescription' => $value['sapDescription'],
+                'sapAdminStatus' => $value['sapAdminStatus'],
+                'sapOperStatus' => $value['sapOperStatus'],
+                'sapLastMgmtChange' => $value['sapLastMgmtChange'],
+                'sapLastStatusChange' => $value['sapLastStatusChange'],
+            ]));
+        }
+        return $saps;
+    }
+
 
     /**
      * @return Collection MplsSdpBind objects
@@ -365,6 +404,44 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         }
 
         return $svcs;
+    }
+
+    /**
+     * @return Collection MplsSap objects
+     */
+    public function pollMplsSaps()
+    {
+        $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
+        
+        $saps = collect();
+        
+        // Workaround, there are some oids not covered by actual MIB, try to filter them
+        // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
+        $filter = '/300\.[0-9]+\.[0-9]+\.[0-9]+/';
+
+        foreach ($mplsSapCache as $key => $value){
+            $garbage = preg_match($filter, $key);
+            if($garbage){
+                unset($key);
+                break;
+            }
+            list($svcId, $sapPortId, $sapEncapValue) = explode('.', $key);
+            $saps->push(new MplsSap([
+                'svc_oid' => $svcId,
+                'sapPortId' => $sapPortId,
+                'device_id' => $this->getDeviceId(),
+                'sapEncapValue' => $sapEncapValue,
+                'sapRowStatus' => $value['sapRowStatus'],
+                'sapType' => $value['sapType'],
+                'sapDescription' => $value['sapDescription'],
+                'sapAdminStatus' => $value['sapAdminStatus'],
+                'sapOperStatus' => $value['sapOperStatus'],
+                'sapLastMgmtChange' => $value['sapLastMgmtChange'],
+                'sapLastStatusChange' => $value['sapLastStatusChange'],
+            ]));
+        }
+
+        return $saps;
     }
 
     /**

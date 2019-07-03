@@ -51,6 +51,11 @@ interface MplsDiscovery
     public function discoverMplsServices();
 
     /**
+     * @return Collection MplsSap objects
+     */
+    public function discoverMplsSaps();
+
+    /**
      * @return Collection MplsSdpBind objects
      */
     public function discoverMplsSdpBinds();

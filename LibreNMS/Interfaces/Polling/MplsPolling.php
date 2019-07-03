@@ -51,6 +51,11 @@ interface MplsPolling
     public function pollMplsServices();
 
     /**
+     * @return Collection MplsSap objects
+     */
+    public function pollMplsSaps();
+
+    /**
      * @return Collection MplsSdpBind objects
      */
     public function pollMplsSdpBinds();

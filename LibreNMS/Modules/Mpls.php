@@ -63,6 +63,10 @@ class Mpls implements Module
             ModuleModelObserver::observe('\App\Models\MplsService');
             $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->discoverMplsServices());
 
+            echo "\nMPLS SAPs: ";
+            ModuleModelObserver::observe('\App\Models\MplsSap');
+            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->discoverMplsSaps());
+
             echo "\nMPLS SDP Bindings: ";
             ModuleModelObserver::observe('\App\Models\MplsSdpBind');
             $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->discoverMplsSdpBinds());
@@ -97,6 +101,10 @@ class Mpls implements Module
             ModuleModelObserver::observe('\App\Models\MplsService');
             $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->pollMplsServices());
 
+            echo "\nMPLS SAPs: ";
+            ModuleModelObserver::observe('\App\Models\MplsSap');
+            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->pollMplsSaps());
+
             echo "\nMPLS SDP Bindings: ";
             ModuleModelObserver::observe('\App\Models\MplsSdpBind');
             $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->pollMplsSdpBinds());
@@ -117,6 +125,7 @@ class Mpls implements Module
         $os->getDeviceModel()->mplsLspPaths()->delete();
         $os->getDeviceModel()->mplsSdps()->delete();
         $os->getDeviceModel()->mplsServices()->delete();
+        $os->getDeviceModel()->mplsSaps()->delete();
         $os->getDeviceModel()->mplsSdpBinds()->delete();
     }
 }
