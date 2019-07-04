@@ -200,10 +200,10 @@ function get_sensor_rrd($device, $sensor)
 
 function get_sensor_rrd_type($device, $sensor)
 {
-    if (strpos($sensor['sensor_index'], "derive__") === 0) {
+    if ($sensor['sensor_class'] == 'count' && strpos($sensor['sensor_index'], "derive__") === 0) {
         return 'DERIVE';
     }
-    if (strpos($sensor['sensor_index'], "counter__") === 0) {
+    if ($sensor['sensor_class'] == 'count' && strpos($sensor['sensor_index'], "counter__") === 0) {
         return 'COUNTER';
     }
     return 'GAUGE';
