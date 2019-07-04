@@ -12,24 +12,24 @@ echo generate_link('General', $link_array, array('nfsen' => 'general'));
 echo '|';
 echo generate_link('Stats', $link_array, array('nfsen' => 'stats'));
 
-$printedChannel=false;
-$nfsen_hostname=nfsen_hostname($device['hostname']);
+$printedChannel = false;
+$nfsen_hostname = nfsen_hostname($device['hostname']);
 foreach (\LibreNMS\Config::get('nfsen_rrds') as $nfsenDir) {
-    $hostDir=$nfsenDir.'/'.$nfsen_hostname.'/';
+    $hostDir = $nfsenDir.'/'.$nfsen_hostname.'/';
     if (is_dir($hostDir)) {
-        $nfsenRRDchannelGlob=$hostDir.'*.rrd';
+        $nfsenRRDchannelGlob = $hostDir.'*.rrd';
         foreach (glob($nfsenRRDchannelGlob) as $nfsenRRD) {
             $channel = str_replace(array($hostDir, '.rrd'), '', $nfsenRRD);
 
             if (!$printedChannel) {
                 echo '|Channels:';
-                $printedChannel=true;
+                $printedChannel = true;
             } else {
                 echo ',';
             }
 
             if ($vars['channel'] == $channel) {
-                $channelFilter=$hostDir.$channel.'-filter.txt';
+                $channelFilter = $hostDir.$channel.'-filter.txt';
             }
 
             echo generate_link($channel, $link_array, array('nfsen' => 'channel', 'channel' => $channel));
