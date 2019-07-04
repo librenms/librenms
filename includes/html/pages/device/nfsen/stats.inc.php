@@ -8,14 +8,14 @@ echo 'Top N:
 <select name="topN" id="topN" size=1>
 ';
 
-$option_default = $vars['topN'] ?? \LibreNMS\Config::get('nfsen_top_default');
+$option_default = $vars['[topN'] ?? \LibreNMS\Config::get('nfsen_top_default');
 
 $option_int=0;
 foreach (\LibreNMS\Config::get('nfsen_top_N') as $option) {
     if (strcmp($option_default, $option) == 0) {
-        echo '<OPTION value="'.$option.'" selected>'.$option.'</OPTION>';
+        echo '<option value="'.$option.'" selected>'.$option.'</option>';
     } else {
-        echo '<OPTION value="'.$option.'">'.$option.'</OPTION>';
+        echo '<option value="'.$option.'">'.$option.'</option>';
     }
 }
 
@@ -29,9 +29,9 @@ $option_keys=array_keys(\LibreNMS\Config::get('nfsen_lasts'));
 $options=\LibreNMS\Config::get('nfsen_lasts');
 foreach ($option_keys as $option) {
     if (strcmp($option_default, $option) == 0) {
-        echo '<OPTION value="'.$option.'" selected>'.$options[$option].'</OPTION>';
+        echo '<option value="'.$option.'" selected>'.$options[$option].'</option>';
     } else {
-        echo '<OPTION value="'.$option.'">'.$options[$option].'</OPTION>';
+        echo '<option value="'.$option.'">'.$options[$option].'</option>';
     }
 }
 
@@ -62,9 +62,9 @@ $stat_types=array(
 // puts together the drop down options
 foreach ($stat_types as $option => $descr) {
     if (strcmp($option_default, $option) == 0) {
-        echo '<OPTION value="'.$option.'" selected>'.$descr."</OPTION>\n";
+        echo '<option value="'.$option.'" selected>'.$descr."</option>\n";
     } else {
-        echo '<OPTION value="'.$option.'">'.$descr."</OPTION>\n";
+        echo '<option value="'.$option.'">'.$descr."</option>\n";
     }
 }
 
@@ -94,9 +94,9 @@ $order_types=array(
 // puts together the drop down options
 foreach ($order_types as $option => $descr) {
     if (strcmp($option_default, $option) == 0) {
-        echo '<OPTION value="'.$option.'" selected>'.$option."</OPTION>\n";
+        echo '<option value="'.$option.'" selected>'.$option."</option>\n";
     } else {
-        echo '<OPTION value="'.$option.'">'.$option."</OPTION>\n";
+        echo '<option value="'.$option.'">'.$option."</option>\n";
     }
 }
 
