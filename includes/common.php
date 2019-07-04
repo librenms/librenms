@@ -198,6 +198,17 @@ function get_sensor_rrd($device, $sensor)
     return rrd_name($device['hostname'], get_sensor_rrd_name($device, $sensor));
 }
 
+function get_sensor_rrd_type($device, $sensor)
+{
+    if (strpos($sensor['sensor_index'], "derive__") === 0) {
+        return 'DERIVE';
+    }
+    if (strpos($sensor['sensor_index'], "counter__") === 0) {
+        return 'COUNTER';
+    }
+    return 'GAUGE';
+}
+
 function get_sensor_rrd_name($device, $sensor)
 {
     # For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
