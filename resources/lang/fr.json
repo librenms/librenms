@@ -1,4 +1,5 @@
 {
+  "Shutdown": "Shutdown",
   "The :attribute must a valid IP address\/network or hostname.": ":attribute doit avoir une adresse IP valide ou un nom d'hôte valide.",
   "Never polled": "Jamais sondé",
   "This indicates the most likely endpoint switchport": "Ceci indique le port de commutation le plus probable",
