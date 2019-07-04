@@ -17,7 +17,7 @@ if ($vars['view'] == 'lsp') {
     echo "<span class='pagemenu-selected'>";
 }
 
-echo generate_link('LSP', $link_array, array('view' => 'lsp'));
+echo generate_link('LSPs', $link_array, array('view' => 'lsp'));
 if ($vars['view'] == 'lsp') {
     echo '</span>';
 }
@@ -30,6 +30,28 @@ if ($vars['view'] == 'paths') {
 
 echo generate_link('Paths', $link_array, array('view' => 'paths'));
 if ($vars['view'] == 'paths') {
+    echo '</span>';
+}
+
+echo ' | ';
+
+if ($vars['view'] == 'sdps') {
+    echo "<span class='pagemenu-selected'>";
+}
+
+echo generate_link('SDPs', $link_array, array('view' => 'sdps'));
+if ($vars['view'] == 'sdps') {
+    echo '</span>';
+}
+
+echo ' | ';
+
+if ($vars['view'] == 'sdpbinds') {
+    echo "<span class='pagemenu-selected'>";
+}
+
+echo generate_link('SDP binds', $link_array, array('view' => 'sdpbinds'));
+if ($vars['view'] == 'sdpbinds') {
     echo '</span>';
 }
 
@@ -180,4 +202,133 @@ if ($vars['view'] == 'paths') {
         $i++;
     }
     echo '</table></div>';
-}
+} // end paths view
+
+if ($vars['view'] == 'sdps') {
+    echo '<tr><th><a title="Device">Device</a></th>
+        <th><a title="Service Distribution Point identifier">SDP Id</a></th>
+        <th><a title="The value of destination object specifies the device name of the remote end of the tunnel defined by this SDP">Destination</a></th>
+        <th><a title="This object specifies the type of delivery used by this SDP">Type</a></th>
+        <th><a title="The value of sdpActiveLspType indicates the type of LSP that is currently active on this SDP. For sdpDelivery gre, the value is always not-applicable. For sdpDelivery mpls, the values can be rsvp, ldp, mplsTp, srIsis, srOspf, srTeLsp, fpe, bgp or none.">LSP Type</a></th>
+        <th><a title="Generic information about this SDP">Description</a></th>
+        <th><a title="The desired administrative state for this SDP">Admin State</a></th>
+        <th><a title="The current operational state of this SDP">Oper State</a></th>
+        <th><a title="This object specifies the desired largest service frame size (in octets) that can be transmitted through this SDP to the far-end ESR, without requiring the packet to be fragmented. The default value of zero indicates that the path MTU should be computed dynamically from the corresponding MTU of the tunnel.">Admin MTU</a></th>
+        <th><a title="This object indicates the actual largest service frame size (in octets) that can be transmitted through this SDP to the far-end ESR, without requiring the packet to be fragmented. In order to be able to bind this SDP to a given service, the value of this object minus the control word size (if applicable) must be equal to or larger than the MTU of the service, as defined by its svcMtu.">Oper MTU</a></th>
+        <th><a title="The value of sysUpTime at the time of the most recent management-initiated change to this SDP.">Last Mgmt Change at</a></th>
+        <th><a title="The value of sysUpTime at the time of the most recent operating status change to this SDP.">Last Status Change at</a></th>
+        </tr>';
+
+    $i = 0;
+
+    foreach (dbFetchRows('SELECT * FROM `mpls_sdps` ORDER BY `sdp_oid') as $sdp) {
+        $device = device_by_id_cache($sdp['device_id']);
+        if (!is_integer($i / 2)) {
+            $bg_colour = \LibreNMS\Config::get('list_colour.even');
+        } else {
+            $bg_colour = \LibreNMS\Config::get('list_colour.odd');
+        }
+
+        $adminstate_status_color = $operstate_status_color = 'default';
+        $failcode_status_color = 'warning';
+
+        if ($sdp['sdpAdminStatus'] == 'up') {
+            $adminstate_status_color = 'success';
+        }
+        if ($sdp['sdpOperStatus'] == 'up') {
+            $operstate_status_color = 'success';
+        } elseif ($sdp['sdpAdminStatus'] == 'up' && $sdp['sdpOperStatus'] == 'down') {
+            $operstate_status_color = 'danger';
+        }
+
+        $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$sdp['sdpFarEndInetAddress']]);
+        $destination = $sdp['sdpFarEndInetAddress'];
+        if (is_array($host)) {
+            $destination = generate_device_link($host, 0, array('tab' => 'routing', 'proto' => 'mpls'));
+        }
+        echo "<tr bgcolor=$bg_colour>
+            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls')) . '</td>
+            <td>' . $sdp['sdp_oid'] . '</td>
+            <td>' . $destination . '</td>
+            <td>' . $sdp['sdpDelivery'] . '</td>
+            <td>' . $sdp['sdpActiveLspType'] . '</td>
+            <td>' . $sdp['sdpDescription'] . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . $sdp['sdpAdminStatus'] . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . $sdp['sdpOperStatus'] . '</td>
+            <td>' . $sdp['sdpAdminPathMtu'] . '</td>
+            <td>' . $sdp['sdpOperPathMtu'] . '</td>
+            <td>' . formatUptime($sdp['sdpLastMgmtChange']) . '</td>
+            <td>' . formatUptime($sdp['sdpLastStatusChange']) . '</td>';
+        echo '</tr>';
+
+        $i++;
+    }
+    echo '</table></div>';
+} // end sdps view
+
+if ($vars['view'] == 'sdpbinds') {
+    echo '<tr><th><a title="Device">Device</a></th>
+        <th><a title="SDP Binding identifier. SDP identifier : Service identifier">SDP Bind Id</a></th>
+        <th><a title="This object specifies whether this Service SDP binding is a spoke or a mesh.">Bind Type</a></th>
+        <th><a title="The value of VC Type is an enumerated integer that specifies the type of virtual circuit (VC) associated with the SDP binding">VC Type</a></th>
+        <th><a title="The desired state of this Service-SDP binding.">Admin State</a></th>
+        <th><a title="The value of sdpBindOperStatus indicates the operating status of this Service-SDP binding.
+up: The Service-SDP binding is operational.
+noEgressLabel: The ingress label is available but the egress one is missing.
+noIngressLabel:The egress label is available but the ingress one is not.
+noLabels: Both the ingress and the egress labels are missing.
+down: The binding is administratively down.
+svcMtuMismatch: Both labels are available, but a service  MTU mismatch was detected between the local and the far-end devices.
+sdpPathMtuTooSmall: The operating path MTU of the corresponding SDP minus the size of the SDP Bind control word (if applicable) is smaller than the service MTU.
+sdpNotReady: The SDPs signaling session is down.
+sdpDown: The SDP is not operationally up.
+sapDown: The SAP associated with the service is down.">Oper State</a></th>
+        <th><a title="The value of sysUpTime at the time of the most recent management-initiated change to this Service-SDP binding.">Last Mgmt Change at</a></th>
+        <th><a title="The value of the object sdpBindLastStatusChange indicates the value of sysUpTime at the time of the most recent operating status change to this SDP Bind.">Last Status Change at</a></th>
+        <th><a title="SDP Bind ingress forwarded packets">Ing Fwd Packets</a></th>
+        <th><a title="SDP Bind ingress forwarded octets">Ing Fwd Octets</a></th>
+        <th><a title="SDP Bind egress forwarded packets">Egr Fwd Packets</a></th>
+        <th><a title="SDP Bind egress forwarded octets">Egr Fwd Octets</a></th>
+        </tr>';
+
+    $i = 0;
+
+    foreach (dbFetchRows('SELECT * FROM `mpls_sdp_binds` ORDER BY `sdp_oid', `svc_oid`) as $sdpbind) {
+        $device = device_by_id_cache($sdpbind['device_id']);
+        if (!is_integer($i / 2)) {
+            $bg_colour = \LibreNMS\Config::get('list_colour.even');
+        } else {
+            $bg_colour = \LibreNMS\Config::get('list_colour.odd');
+        }
+
+        $adminstate_status_color = $operstate_status_color = 'default';
+        $failcode_status_color = 'warning';
+
+        if ($sdpbind['sdpBindAdminStatus'] == 'up') {
+            $adminstate_status_color = 'success';
+        }
+        if ($sdpbind['sdpBindOperStatus'] == 'up') {
+            $operstate_status_color = 'success';
+        } else {
+            $operstate_status_color = 'danger';
+        }
+
+        echo "<tr bgcolor=$bg_colour>
+            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls')) . '</td>
+            <td>' . $sdpbind['sdp_oid'] . ':' . $sdpbind['svc_oid'] . '</td>
+            <td>' . $sdpbind['sdpBindType'] . '</td>
+            <td>' . $sdpbind['sdpBindVcType'] . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . $sdpbind['sdpBindAdminStatus'] . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . $sdpbind['sdpBindOperStatus'] . '</td>
+            <td>' . formatUptime($sdpbind['sdpBindLastMgmtChange']) . '</td>
+            <td>' . formatUptime($sdpbind['sdpBindLastStatusChange']) . '</td>
+            <td>' . $sdpbind['sdpBindBaseStatsIngFwdPackets'] . '</td>
+            <td>' . $sdpbind['sdpBindBaseStatsIngFwdOctets'] . '</td>
+            <td>' . $sdpbind['sdpBindBaseStatsEgrFwdPackets'] . '</td>
+            <td>' . $sdpbind['sdpBindBaseStatsEgrFwdOctets'] . '</td>';
+        echo '</tr>';
+
+        $i++;
+    }
+    echo '</table></div>';
+} // end sdpbinds view
