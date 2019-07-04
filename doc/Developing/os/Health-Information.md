@@ -109,8 +109,8 @@ The only sensor we have defined here is airflow. The available options are as fo
   identify this sensor. `{{ $index }}` will be replaced by the `index`
   from the snmp walk.
   For the 'count' sensor class, it is possible to prefix the index with
-  ```counter__``` or ```derive__``` to change the RRD file type from
-  default GAUGE type. 
+  ``` counter__ ``` or ``` derive__ ``` to change the RRD file type from
+  default GAUGE type.
 - `skip_values` (optional): This is an array of values we should skip
   over (see note below).
 - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
