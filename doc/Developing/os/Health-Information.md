@@ -85,7 +85,8 @@ The only sensor we have defined here is airflow. The available options are as fo
   the value. If not provided willuse `oid`
 - `num_oid` (required): This is the numerical OID that contains
   `value`. This should always include `{{ $index }}`.  snmptranslate
-  -On can help figure out the number
+  -On can help figure out the number.
+  In case the index is a string, `{{ $index_string }}` can be used instead.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
 - `multiplier` (optional): This is the multiplier to use against the returned `value`.
 - `low_limit` (optional): This is the critical low threshold that
