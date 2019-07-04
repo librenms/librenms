@@ -29,17 +29,18 @@ if ($width > '500') {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))." RTT      Loss    SDev   RTT\:SDev                              \l'";
 }
 
+$filename_dir = generate_smokeping_file($device);
 if ($device['hostname'] == Config::get('own_hostname')) {
-    $filename = Config::get('smokeping.dir') . $dest['hostname'] . '.rrd';
+    $filename = $filename_dir . $dest['hostname'] . '.rrd';
     if (!rrdtool_check_rrd_exists($filename)) {
         // Try with dots in hostname replaced by underscores
-        $filename = Config::get('smokeping.dir') . str_replace('.', '_', $dest['hostname']) . '.rrd';
+        $filename = $filename_dir . str_replace('.', '_', $dest['hostname']) . '.rrd';
     }
 } else {
-    $filename = Config::get('smokeping.dir') . $dest['hostname'] . '~' . $device['hostname'] . '.rrd';
+    $filename = $filename_dir . $dest['hostname'] . '~' . $device['hostname'] . '.rrd';
     if (!rrdtool_check_rrd_exists($filename)) {
         // Try with dots in hostname replaced by underscores
-        $filename = Config::get('smokeping.dir') . str_replace('.', '_', $dest['hostname']) . '~' . $device['hostname'] . '.rrd';
+        $filename = $filename_dir . str_replace('.', '_', $dest['hostname']) . '~' . $device['hostname'] . '.rrd';
     }
 }
 
