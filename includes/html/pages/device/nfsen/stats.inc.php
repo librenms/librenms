@@ -8,7 +8,7 @@ echo 'Top N:
 <select name="topN" id="topN" size=1>
 ';
 
-$option_default = $vars['[topN'] ?? \LibreNMS\Config::get('nfsen_top_default');
+$option_default = $vars['topN'] ?? \LibreNMS\Config::get('nfsen_top_default');
 
 $option_int=0;
 foreach (\LibreNMS\Config::get('nfsen_top_N') as $option) {
