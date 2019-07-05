@@ -150,6 +150,16 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
 > =, !=, ==, !==, <=, >=, <, >,
 > starts, ends, contains, regex, in_array, not_starts,
 > not_ends, not_contains, not_regex, not_in_array
+>
+> Example:
+
+```yaml
+                    skip_values:
+                    -
+                      oid: sensorName
+                      op: 'not_in_array'
+                      value: ['sensor1', 'sensor2']
+```
 
 If you aren't able to use yaml to perform the sensor discovery, you
 will most likely need to use Advanced health discovery.
