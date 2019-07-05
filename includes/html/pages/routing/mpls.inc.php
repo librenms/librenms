@@ -55,6 +55,28 @@ if ($vars['view'] == 'sdpbinds') {
     echo '</span>';
 }
 
+echo ' | ';
+
+if ($vars['view'] == 'services') {
+    echo "<span class='pagemenu-selected'>";
+}
+
+echo generate_link('Services', $link_array, array('view' => 'services'));
+if ($vars['view'] == 'services') {
+    echo '</span>';
+}
+
+echo ' | ';
+
+if ($vars['view'] == 'saps') {
+    echo "<span class='pagemenu-selected'>";
+}
+
+echo generate_link('SAPs', $link_array, array('view' => 'saps'));
+if ($vars['view'] == 'saps') {
+    echo '</span>';
+}
+
 print_optionbar_end();
 
 echo '<div id="content">
@@ -221,7 +243,7 @@ if ($vars['view'] == 'sdps') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT * FROM `mpls_sdps` ORDER BY `sdp_oid') as $sdp) {
+    foreach (dbFetchRows('SELECT * FROM `mpls_sdps` ORDER BY `sdp_oid`') as $sdp) {
         $device = device_by_id_cache($sdp['device_id']);
         if (!is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
@@ -293,7 +315,7 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT * FROM `mpls_sdp_binds` ORDER BY `sdp_oid', `svc_oid`) as $sdpbind) {
+    foreach (dbFetchRows('SELECT * FROM `mpls_sdp_binds` ORDER BY `sdp_oid`, `svc_oid`') as $sdpbind) {
         $device = device_by_id_cache($sdpbind['device_id']);
         if (!is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
@@ -332,3 +354,128 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
     }
     echo '</table></div>';
 } // end sdpbinds view
+
+if ($vars['view'] == 'services') {
+    echo '<tr><th><a title="Device">Device</a></th>
+        <th><a title="The value of this object specifies the Service identifier. This value should be unique within the service domain.">Service Id</a></th>
+        <th><a title="The value of this object specifies the service type: e.g. epipe, tls, etc.">Type</a></th>
+        <th><a title="The value of this object specifies the ID of the customer who owns this service.">Customer</a></th>
+        <th><a title="The value of this object specifies the desired state of this service.">Admin Status</a></th>
+        <th><a title="The value of this object indicates the operating state of this service. The requirements for a service to be operationally up depend on the service type:
+epipe, apipe, fpipe, ipipe and cpipe services are up when the service is administratively up and either both SAPs or a SAP and a spoke SDP Bind are operationally up.
+tls services are up when the service is administratively up and either at least one SAP or spoke SDP Bind or one mesh SDP Bind is operationally up.
+tls service that has vxlan configuration is up when the service is administratively up.
+ies services are up when the service is administratively up and at least one interface is operationally up.
+vprn services are up when the service is administratively up however routing functionality is available only when TIMETRA-VRTR-MIB::vRtrOperState is up.">Oper Status</a></th>
+        <th><a title="The value of the object svcDescription specifiers an optional, generic information about this service.">Description</a></th>
+        <th><a title="The value of the object svcMtu specifies the largest frame size (in octets) that this service can handle. Setting svcMtu to a value of zero (0), causes the agent to recalculate the default MTU size. The default value of this object depends on the service type: 1514 octets for epipe and tls, 1508 for apipe and fpipe, and 1500 octets for vprn, ipipe and ies, 1514 octets for cpipe.">Service MTU</a></th>
+        <th><a title="The value of the object svcNumSaps indicates the number of SAPs defined on this service.">Num SAPs</a></th>
+        <th><a title="The value of of the object svcLastMgmtChange indicates the value of sysUpTime at the time of the most recent management-initiated change to this service.">Last Mgmt Change at</a></th>
+        <th><a title="The value of the object svcLastStatusChange indicates the value of sysUpTime at the time of the most recent operating status change to his service.">Last Status Change at</a></th>
+        <th><a title="The value of this object specifies, for a IES or VPRN service the associated virtual router instance where its interfaces are defined. This object has a special significance for the VPRN service as it can be used to associate the service to a specific virtual router instance. If no routing instance is specified or a value of zero (0) is specified, the agent will assign the vRtrID index value that would have been returned by the vRtrNextVRtrID object in the TIMETRA-VRTR-MIB">VRF</a></th>
+        <th><a title="The value specifies whether the MAC learning process is enabled in this TLS.">MAC Learning</a></th>
+        <th><a title="The value of the object svcTlsFdbTableSize specifies the maximum number of learned and static entries allowed in the FDB of this service. The maximum value of svcTlsFdbTableSize depends on the platform/chassis mode.">FDB Table Size</a></th>
+        <th><a title="The value of the object svcTlsFdbNumEntries indicates the current number of entries allocated in the FDB of this service.">FDB Entries</a></th>
+        <th><a title="The value of the object svcTlsStpAdminStatus specifies the administrative state of the Spanning Tree Protocol instance associated with this service.">STP Admin Status</a></th>
+        <th><a title="The value of the object svcTlsStpOperStatus indicates the operating status of the Spanning Tree Protocol instance associated with this service.">STP Oper Status</a></th>
+        </tr>';
+
+    $i = 0;
+
+    foreach (dbFetchRows('SELECT s.*, v.vrf_name FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` ORDER BY `svc_oid`') as $svc) {
+        $device = device_by_id_cache($svc['device_id']);
+        if (!is_integer($i / 2)) {
+            $bg_colour = \LibreNMS\Config::get('list_colour.even');
+        } else {
+            $bg_colour = \LibreNMS\Config::get('list_colour.odd');
+        }
+
+        $adminstate_status_color = $operstate_status_color = 'default';
+        $failcode_status_color = 'warning';
+
+        if ($svc['svcAdminStatus'] == 'up') {
+            $adminstate_status_color = 'success';
+        }
+        if ($svc['svcOperStatus'] == 'up') {
+            $operstate_status_color = 'success';
+        } else {
+            $operstate_status_color = 'danger';
+        }
+
+        echo "<tr bgcolor=$bg_colour>
+            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls')) . '</td>
+            <td>' . $svc['svc_oid'] . '</td>
+            <td>' . $svc['svcType'] . '</td>
+            <td>' . $svc['svcCustId'] . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . $svc['svcAdminStatus'] . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . $svc['svcOperStatus'] . '</td>
+            <td>' . $svc['svcDescription'] . '</td>
+            <td>' . $svc['svcMtu'] . '</td>
+            <td>' . $svc['svcNumSaps'] . '</td>
+            <td>' . formatUptime($svc['svcLastMgmtChange']) . '</td>
+            <td>' . formatUptime($svc['svcLastStatusChange']) . '</td>
+            <td>' . $svc['vrf_name'] . '</td>
+            <td>' . $svc['svcTlsMacLearning'] . '</td>
+            <td>' . $svc['svcTlsFdbTableSize'] . '</td>
+            <td>' . $svc['svcTlsFdbNumEntries'] . '</td>
+            <td>' . $svc['svcTlsStpAdminStatus'] . '</td>
+            <td>' . $svc['svcTlsStpOperStatus'] . '</td>';
+        echo '</tr>';
+
+        $i++;
+    }
+    echo '</table></div>';
+} // end services view
+
+if ($vars['view'] == 'saps') {
+    echo '<tr><th><a title="Device">Device</a></th>
+        <th><a title="The value of this object specifies the Service identifier.">Service Id</a></th>
+        <th><a title="The ID of the access port where this SAP is defined.">SAP Port</a></th>
+        <th><a title="The value of the label used to identify this SAP on the access port specified by sapPortId.">Encapsulation</a></th>
+        <th><a title="This object indicates the type of service where this SAP is defined.">Type</a></th>
+        <th><a title="Generic information about this SAP.">Description</a></th>
+        <th><a title="The desired state of this SAP.">Admin Status</a></th>
+        <th><a title="The value of the object sapOperStatus indicates the operating state of this SAP.">Oper Satatus</a></th>
+        <th><a title="The value of sysUpTime at the time of the most recent management-initiated change to this SAP.">Last Mgmt Change at</a></th>
+        <th><a title="The value of sysUpTime at the time of the most recent operating status change to this SAP.">Last Oper Change at</a></th>
+        </tr>';
+
+    $i = 0;
+
+    foreach (dbFetchRows('SELECT * FROM `mpls_saps` ORDER BY `svc_oid`, `sapPortId`, `sapEncapValue`') as $sap) {
+        $device = device_by_id_cache($sap['device_id']);
+        if (!is_integer($i / 2)) {
+            $bg_colour = \LibreNMS\Config::get('list_colour.even');
+        } else {
+            $bg_colour = \LibreNMS\Config::get('list_colour.odd');
+        }
+
+        $adminstate_status_color = $operstate_status_color = 'default';
+        $failcode_status_color = 'warning';
+
+        if ($sap['sapAdminStatus'] == 'up') {
+            $adminstate_status_color = 'success';
+        }
+        if ($sap['sapOperStatus'] == 'up') {
+            $operstate_status_color = 'success';
+        } else {
+            $operstate_status_color = 'danger';
+        }
+
+        echo "<tr bgcolor=$bg_colour>
+            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls')) . '</td>
+            <td>' . $sap['svc_oid'] . '</td>
+            <td>' . $sap['sapPortId'] . '</td>
+            <td>' . $sap['sapEncapValue'] . '</td>
+            <td>' . $sap['sapType'] . '</td>
+            <td>' . $sap['sapDescription'] . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . $sap['sapAdminStatus'] . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . $sap['sapOperStatus'] . '</td>
+            <td>' . formatUptime($sap['sapLastMgmtChange']) . '</td>
+            <td>' . formatUptime($sap['sapLastStatusChange']) . '</td>';
+        echo '</tr>';
+
+        $i++;
+    }
+    echo '</table></div>';
+} // end sap view

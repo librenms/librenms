@@ -154,7 +154,17 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDevice(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
 
         $svcs = collect();
+
+        // Workaround, remove some defalt entries we do not want to see
+        $filter = '/^\w* Service for internal purposes only/';
+
         foreach ($mplsSvcCache as $key => $value) {
+            $garbage = preg_match($filter, $value['svcDescription']);
+            if ($garbage) {
+                unset($key);
+                break;
+            }
+
             $svcs->push(new MplsService([
                 'svc_oid' => $value['svcId'],
                 'device_id' => $this->getDeviceId(),
@@ -167,8 +177,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'svcMtu' => $value['svcMtu'],
                 'svcNumSaps' => $value['svcNumSaps'],
                 'svcNumSdps' => $value['svcNumSdps'],
-                'svcLastMgmtChange' => $value['svcLastMgmtChange'],
-                'svcLastStatusChange' => $value['svcLastStatusChange'],
+                'svcLastMgmtChange' => round($value['svcLastMgmtChange'] / 100),
+                'svcLastStatusChange' => round($value['svcLastStatusChange'] / 100),
                 'svcVRouterId' => $value['svcVRouterId'],
                 'svcTlsMacLearning' => $value['svcTlsMacLearning'],
                 'svcTlsStpAdminStatus' => $value['svcTlsStpAdminStatus'],
@@ -210,8 +220,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'sapDescription' => $value['sapDescription'],
                 'sapAdminStatus' => $value['sapAdminStatus'],
                 'sapOperStatus' => $value['sapOperStatus'],
-                'sapLastMgmtChange' => $value['sapLastMgmtChange'],
-                'sapLastStatusChange' => $value['sapLastStatusChange'],
+                'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
+                'sapLastStatusChange' => round($value['sapLastStatusChange'] /100),
             ]));
         }
         return $saps;
@@ -379,7 +389,16 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDevice(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
 
         $svcs = collect();
+
+        // Workaround, remove some default entries we do not want to see
+        $filter = '/^\w* Service for internal purposes only/';
+
         foreach ($mplsSvcCache as $key => $value) {
+            $garbage = preg_match($filter, $value['svcDescription']);
+            if ($garbage) {
+                unset($key);
+                break;
+            }
             $svcs->push(new MplsService([
                 'svc_oid' => $value['svcId'],
                 'device_id' => $this->getDeviceId(),
@@ -392,8 +411,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'svcMtu' => $value['svcMtu'],
                 'svcNumSaps' => $value['svcNumSaps'],
                 'svcNumSdps' => $value['svcNumSdps'],
-                'svcLastMgmtChange' => $value['svcLastMgmtChange'],
-                'svcLastStatusChange' => $value['svcLastStatusChange'],
+                'svcLastMgmtChange' => round($value['svcLastMgmtChange'] / 100),
+                'svcLastStatusChange' => round($value['svcLastStatusChange'] / 100),
                 'svcVRouterId' => $value['svcVRouterId'],
                 'svcTlsMacLearning' => $value['svcTlsMacLearning'],
                 'svcTlsStpAdminStatus' => $value['svcTlsStpAdminStatus'],
@@ -436,8 +455,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'sapDescription' => $value['sapDescription'],
                 'sapAdminStatus' => $value['sapAdminStatus'],
                 'sapOperStatus' => $value['sapOperStatus'],
-                'sapLastMgmtChange' => $value['sapLastMgmtChange'],
-                'sapLastStatusChange' => $value['sapLastStatusChange'],
+                'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
+                'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
             ]));
         }
 
