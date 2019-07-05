@@ -16621,6 +16621,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2272.1.4.8.1.1.2.3",
                     "sensor_index": "rcChasPowerSupplyOperStatus.3",
+                    "sensor_type": "rcChasPowerSupplyOperStatus",
                     "sensor_type": "VOSS Power Supply 3",
                     "group": null,
                     "sensor_divisor": 1,
