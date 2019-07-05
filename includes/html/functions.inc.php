@@ -1639,5 +1639,14 @@ function get_sensor_label_color($sensor, $type = 'sensors')
         $label_style = "label-danger";
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");
-    return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
+    $sensor_current = $sensor['sensor_current'];
+    if (strpos($sensor['sensor_index'], "derive__") === 0 || strpos($sensor['sensor_index'], "counter__") === 0) {
+        $sensor_current = $sensor['sensor_current'] - (is_null($sensor['sensor_prev'])?$sensor['sensor_current']:$sensor['sensor_prev']);
+        $sensor_current = $sensor_current / Config::get('rrd.step', 300);
+        $unit .= " /s";
+        if (strpos($sensor['sensor_index'], "counter__") === 0) {
+            $sensor_current = max($sensor_current, 0);
+        }
+    }
+    return "<span class='label $label_style'>".trim(format_si($sensor_current).$unit)."</span>";
 }
