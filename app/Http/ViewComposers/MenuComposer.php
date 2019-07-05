@@ -81,7 +81,7 @@ class MenuComposer
         $vars['port_counts']['pseudowire'] = Config::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
 
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
-        $vars['custom_port_descr'] = collect(\LibreNMS\Config::get('custom_descr', []))
+        $vars['custom_port_descr'] = collect(Config::get('custom_descr', []))
             ->filter()
             ->map(function ($descr) {
                 return strtolower($descr);
@@ -217,7 +217,7 @@ class MenuComposer
             })->count();
 
         // Search bar
-        $vars['typeahead_limit'] = \LibreNMS\Config::get('webui.global_search_result_limit');
+        $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
 
         $view->with($vars);
     }

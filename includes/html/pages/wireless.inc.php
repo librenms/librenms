@@ -43,7 +43,7 @@ foreach ($valid_wireless_types as $type => $details) {
         $linkoptions .= '<span class="pagemenu-selected">';
     }
 
-    $linkoptions .= generate_link($details['short'], $link_array, array('metric'=> $type, 'view' => $vars['view']));
+    $linkoptions .= generate_link(__("wireless.$type.short"), $link_array, array('metric'=> $type, 'view' => $vars['view']));
 
     if ($class == $type) {
         $linkoptions .= '</span>';
@@ -76,9 +76,9 @@ if ($vars['view'] != "graphs") {
 
 if (isset($valid_wireless_types[$class])) {
     $graph_type = 'wireless_' . $class;
-    $unit = $valid_wireless_types[$class]['unit'];
+    $unit = __("wireless.$class.unit");
     $pagetitle[] = "Wireless :: ".$class;
-    include $config['install_dir'] . '/includes/html/pages/wireless/sensors.inc.php';
+    include \LibreNMS\Config::get('install_dir') . '/includes/html/pages/wireless/sensors.inc.php';
 } else {
     echo("No sensors of type " . $class . " found.");
 }

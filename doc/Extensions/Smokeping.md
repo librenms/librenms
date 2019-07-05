@@ -166,7 +166,39 @@ The following will configure Nginx to respond to `http://yourlibrenms/smokeping`
 After saving the config file, verify your Nginx config file syntax is OK with `sudo nginx -t`, then restart Nginx with `sudo systemctl restart nginx`
 
 You should be able to load the Smokeping web interface at `http://yourhost/smokeping`
-				
+
+#### Nginx Password Authentification
+
+You can use the purpose-made htpasswd utility included in the apache2-utils package (Nginx password files use the same format as Apache). You can install it on Ubuntu with
+
+```
+apt install apache2-utils
+```
+
+After that you need to create password for your user
+
+```
+htpasswd -c /etc/nginx/.htpasswd USER
+```
+
+You can verify your user and password with 
+
+```
+cat /etc/nginx/.htpasswd
+```
+
+Then you just need to add to your config `auth_basic` parameters
+
+```
+        location ^~ /smokeping/ {
+                alias /usr/share/smokeping/www/;
+                index smokeping.cgi;
+                gzip off;
+                auth_basic "Private Property";
+                auth_basic_user_file /etc/nginx/.htpasswd
+        }
+```
+
 ### Start SmokePing 
 
 Use the below commands to start and verify smokeping is running. 

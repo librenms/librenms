@@ -148,7 +148,7 @@ if __name__ == '__main__':
     ###################
     parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.', formatter_class=RawTextHelpFormatter)
     parser.add_argument('network', action='append', nargs='*', type=str, help="""CIDR noted IP-Range to scan. Can be specified multiple times
-This argument is only required if $config['nets'] is not set
+This argument is only required if 'nets' config is not set
 Example: 192.168.0.0/24
 Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
 Example: 192.168.0.1/32 will be treated as a single host address""")
@@ -195,7 +195,7 @@ Example: """ + __file__ + """ -P 192.168.0.0/24""")
 
     # make sure we have something to scan
     if not CONFIG.get('nets', []) and not netargs:
-        parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan')
+        parser.error('\'nets\' is not set in your LibreNMS config, you must specify a network to scan')
 
     # check for valid networks
     networks = []

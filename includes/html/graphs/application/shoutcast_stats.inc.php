@@ -38,4 +38,4 @@ $rrd_options .= " GPRINT:avg:\"\:%8.2lf\\n\"";
 $rrd_options .= ' LINE1:peak#C000FFFF:"Peak Listeners   "';
 $rrd_options .= " GPRINT:peak:LAST:\"\:%8.2lf\\n\"";
 $rrd_options .= " TICK:stream_offline#B4FF00FF:1.0:\"Streaming client offline\\n\"";
-$rrd_options .= ' TICK:server_offline'.$config['warn_colour_alt'].'FF:1.0:"Streaming server offline"';
+$rrd_options .= ' TICK:server_offline' . \LibreNMS\Config::get('warn_colour_alt') . 'FF:1.0:"Streaming server offline"';

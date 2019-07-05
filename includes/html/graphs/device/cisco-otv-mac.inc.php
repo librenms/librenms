@@ -36,11 +36,7 @@ foreach ($components as $id => $array) {
             }
 
             // Grab a color from the array.
-            if (isset($config['graph_colours']['mixed'][$count])) {
-                $color = $config['graph_colours']['mixed'][$count];
-            } else {
-                $color = $config['graph_colours']['oranges'][$count-7];
-            }
+            $color = \LibreNMS\Config::get("graph_colours.mixed.$count", \LibreNMS\Config::get('graph_colours.oranges.' . ($count - 7)));
 
             $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":count:AVERAGE ";
             $rrd_additions .= " AREA:DS" . $count . "#" . $color . ":'" . str_pad(substr($components[$id]['endpoint'], 0, 15), 15) . "'" . $stack;

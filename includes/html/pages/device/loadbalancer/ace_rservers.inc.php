@@ -58,9 +58,9 @@ echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=0 widt
 $i = '0';
 foreach (dbFetchRows('SELECT * FROM `loadbalancer_rservers` WHERE `device_id` = ? ORDER BY `farm_id`', array($device['device_id'])) as $rserver) {
     if (is_integer($i / 2)) {
-        $bg_colour = $config['list_colour']['even'];
+        $bg_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
-        $bg_colour = $config['list_colour']['odd'];
+        $bg_colour = \LibreNMS\Config::get('list_colour.odd');
     }
 
     if ($rserver['StateDescr'] == 'Server is now operational') {
@@ -82,7 +82,7 @@ foreach (dbFetchRows('SELECT * FROM `loadbalancer_rservers` WHERE `device_id` = 
 
         $graph_array['height'] = '100';
         $graph_array['width']  = '215';
-        $graph_array['to']     = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['id']     = $rserver['rserver_id'];
         $graph_array['type']   = $graph_type;
 

@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "proxmox") {
+if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "proxmox" || $device['os'] == "recoveryos") {
     list(,,$version) = explode(" ", $device['sysDescr']);
     if (strstr($device['sysDescr'], "386")|| strstr($device['sysDescr'], "486")||strstr($device['sysDescr'], "586")||strstr($device['sysDescr'], "686")) {
         $hardware = "Generic x86";

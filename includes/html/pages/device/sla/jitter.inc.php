@@ -7,7 +7,7 @@
         $graph_array['device']  = $device['device_id'];
         $graph_array['height']  = '100';
         $graph_array['width']   = '215';
-        $graph_array['to']      = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['type']    = 'device_sla_jitter-latency';
         $graph_array['id']      = $vars['id'];
         require 'includes/html/print-graphrow.inc.php';
@@ -23,7 +23,7 @@
         $graph_array['device']  = $device['device_id'];
         $graph_array['height']  = '100';
         $graph_array['width']   = '215';
-        $graph_array['to']      = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['type']    = 'device_sla_jitter';
         $graph_array['id']      = $vars['id'];
         require 'includes/html/print-graphrow.inc.php';
@@ -39,7 +39,7 @@
         $graph_array['device']  = $device['device_id'];
         $graph_array['height']  = '100';
         $graph_array['width']   = '215';
-        $graph_array['to']      = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['type']    = 'device_sla_jitter-loss';
         $graph_array['id']      = $vars['id'];
         require 'includes/html/print-graphrow.inc.php';
@@ -55,7 +55,7 @@
         $graph_array['device']  = $device['device_id'];
         $graph_array['height']  = '100';
         $graph_array['width']   = '215';
-        $graph_array['to']      = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['type']    = 'device_sla_jitter-lost';
         $graph_array['id']      = $vars['id'];
         require 'includes/html/print-graphrow.inc.php';
@@ -71,7 +71,7 @@
         $graph_array['device']  = $device['device_id'];
         $graph_array['height']  = '100';
         $graph_array['width']   = '215';
-        $graph_array['to']      = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['type']    = 'device_sla_jitter-mos';
         $graph_array['id']      = $vars['id'];
         require 'includes/html/print-graphrow.inc.php';
@@ -87,7 +87,7 @@
         $graph_array['device']  = $device['device_id'];
         $graph_array['height']  = '100';
         $graph_array['width']   = '215';
-        $graph_array['to']      = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['type']    = 'device_sla_jitter-icpif';
         $graph_array['id']      = $vars['id'];
         require 'includes/html/print-graphrow.inc.php';

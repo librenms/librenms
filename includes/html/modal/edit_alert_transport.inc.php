@@ -85,7 +85,7 @@ foreach ($transports_list as $transport) {
         if ($item['type'] !== 'hidden') {
             echo '<div class="form-group" title="' . $item['descr'] . '">';
             echo '<label for="' . $item['name'] . '" class="col-sm-3 col-md-2 control-label">' . $item['title'] . ': </label>';
-            if ($item['type'] == 'text') {
+            if ($item['type'] == 'text' || $item['type'] == 'password') {
                 echo '<div class="col-sm-9 col-md-10">';
                 echo '<input type="' . $item['type'] . '" id="' . $item['name'] . '" name="' . $item['name'] . '" class="form-control" ';
                 if ($item['required']) {

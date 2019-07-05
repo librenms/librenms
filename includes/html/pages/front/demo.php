@@ -17,10 +17,10 @@ foreach ($dev_list as $device_id => $descr) {
     echo "<div style='font-size: 16px; font-weight: bold; color: #555555;'>".$descr.'</div>';
     $graph_array['height']      = '100';
     $graph_array['width']       = '310';
-    $graph_array['to']          = $config['time']['now'];
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['device']      = $device_id;
     $graph_array['type']        = 'device_bits';
-    $graph_array['from']        = $config['time']['day'];
+    $graph_array['from'] = \LibreNMS\Config::get('time.day');
     $graph_array['legend']      = 'no';
     $graph_array['popup_title'] = $descr;
     // $graph_array['link']   = generate_device_link($device_id);
@@ -93,7 +93,7 @@ foreach (dbFetchRows($sql) as $device) {
     }
 }
 
-if ($config['warn']['ifdown']) {
+if (\LibreNMS\Config::get('warn.ifdown')) {
     $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'";
     foreach (dbFetchRows($sql) as $interface) {
         if (port_permitted($interface['port_id'])) {
@@ -131,11 +131,11 @@ foreach (dbFetchRows($sql) as $peer) {
     }
 }
 
-if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $config['uptime_warning'] > 0) {
+if (filter_var(\LibreNMS\Config::get('uptime_warning'), FILTER_VALIDATE_FLOAT) !== false && \LibreNMS\Config::get('uptime_warning') > 0) {
     $sql = "SELECT * FROM devices_attribs AS A, `devices` AS D WHERE
-        A.attrib_value < '".$config['uptime_warning']."' AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'";
+        A.attrib_value < '" . \LibreNMS\Config::get('uptime_warning') . "' AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'";
     foreach (dbFetchRows($sql) as $device) {
-        if (device_permitted($device['device_id']) && $device['attrib_value'] < $config['uptime_warning'] && $device['attrib_type'] == 'uptime') {
+        if (device_permitted($device['device_id']) && $device['attrib_value'] < \LibreNMS\Config::get('uptime_warning') && $device['attrib_type'] == 'uptime') {
             echo "<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ddffdd;'>
                 <strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
                 <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br />
@@ -151,7 +151,7 @@ echo "
     <h3>Recent Syslog Messages</h3>
     ";
 
-$sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from `syslog` ORDER BY seq DESC LIMIT 20";
+$sql = "SELECT *, DATE_FORMAT(timestamp, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') AS date from `syslog` ORDER BY seq DESC LIMIT 20";
 echo '<table cellspacing=0 cellpadding=2 width=100%>';
 foreach (dbFetchRows($sql) as $entry) {
     $entry = array_merge($entry, device_by_id_cache($entry['device_id']));

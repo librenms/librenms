@@ -47,6 +47,7 @@ Artisan::command('device:add
     {--P|ping-only : ' . __('Add a ping only device') . '}
     {--o|os=ping : ' . __('Ping only: specify OS') . '}
     {--w|hardware= : ' . __('Ping only: specify hardware') . '}
+    {--s|sysName= : ' . __('Ping only: specify sysName') . '}
 ', function () {
     /** @var \Illuminate\Console\Command $this */
     // Value Checks
@@ -75,6 +76,7 @@ Artisan::command('device:add
     $additional = [
         'os' => $this->option('os'),
         'hardware' => $this->option('hardware'),
+        'sysName' => $this->option('sysName'),
     ];
     if ($this->option('ping-only')) {
         $additional['snmp_disable'] = 1;
@@ -82,14 +84,15 @@ Artisan::command('device:add
         $additional['ping_fallback'] = 1;
     }
 
-    global $config;
-
     if ($this->option('community')) {
-        array_unshift($config['snmp']['community'], $this->option('community'));
+        $community_config = \LibreNMS\Config::get('snmp.community');
+        array_unshift($community_config, $this->option('community'));
+        \LibreNMS\Config::set('snmp.community', $community_config);
     }
     $auth = $this->option('auth-password');
     $priv = $this->option('privacy-password');
-    array_unshift($config['snmp']['v3'], [
+    $v3_config = \LibreNMS\Config::get('snmp.v3');
+    array_unshift($v3_config, [
         'authlevel'  => ($auth ? 'auth' : 'noAuth') . (($priv && $auth) ? 'Priv' : 'NoPriv'),
         'authname'   => $this->option('security-name'),
         'authpass'   => $this->option('auth-password'),
@@ -97,6 +100,7 @@ Artisan::command('device:add
         'cryptopass' => $this->option('privacy-password'),
         'cryptoalgo' => $this->option('privacy-protocol'),
     ]);
+    \LibreNMS\Config::set('snmp.v3', $v3_config);
 
     try {
         $init_modules = [];

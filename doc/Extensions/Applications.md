@@ -1093,7 +1093,12 @@ Extend` heading top of page.
 
 ## SNMP Extend
 
-1: Install the Perl module Parse::Netstat.
+Ubuntu is shown below.
+
+```
+apt install libparse-netstat-perl
+apt install libjson-perl
+```
 
 2: Copy the Perl script to the desired host (the host must be added to
    LibreNMS devices)

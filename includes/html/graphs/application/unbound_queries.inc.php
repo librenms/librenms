@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 require 'includes/html/graphs/common.inc.php';
 
 $i            = 0;
@@ -31,7 +33,7 @@ $array        = array(
 $colours      = 'merged';
 $rrd_list     = array();
 
-$config['graph_colours']['merged'] = array_merge($config['graph_colours']['greens'], $config['graph_colours']['blues']);
+Config::set('graph_colours.merged', array_merge(Config::get('graph_colours.greens'), Config::get('graph_colours.blues')));
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds) {
