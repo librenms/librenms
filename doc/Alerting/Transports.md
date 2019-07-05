@@ -68,7 +68,9 @@ API transports definitions are a bit more complex than the E-Mail configuration.
 allows to reach any service provider using POST or GET URLs (Like SMS provider, etc).
 
 The API-Option field can have the same placeholders as defined in the
-[Template-Syntax](Templates.md#syntax).
+[Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
+For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the 
+API transport
 
 __Note__: it is highly recommended to define your own
 [Templates](Templates.md) when you want to use the API transport.
@@ -77,7 +79,9 @@ should adapt to the Service Provider limits.
 
 **Example:**
 
-The exemple below will use the API named sms-api of my.example.com and send the title of the alert to the provided number using the provided service key. Refer to your service documentation to configure it properly.
+The exemple below will use the API named sms-api of my.example.com and send
+the title of the alert to the provided number using the provided service key. 
+Refer to your service documentation to configure it properly.
 
 | Config | Example |
 | ------ | ------- |
