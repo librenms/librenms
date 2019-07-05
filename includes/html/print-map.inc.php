@@ -259,7 +259,9 @@ foreach ($list as $items) {
     if ($link_used > 100) {
         $link_used = 100;
     }
-
+    if (is_nan($link_used)) {
+        $link_used = 0;
+    }
     $link_style = [
         'color' => [
             'border' => Config::get("network_map_legend.$link_used"),
