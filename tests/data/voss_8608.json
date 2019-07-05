@@ -16437,7 +16437,7 @@
                     "processor_index": "1",
                     "processor_type": "voss",
                     "processor_usage": 4,
-                    "processor_descr": "VSP Processor",
+                    "processor_descr": "VOSS Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -16448,7 +16448,7 @@
                     "processor_index": "2",
                     "processor_type": "voss",
                     "processor_usage": 9,
-                    "processor_descr": "VSP Processor",
+                    "processor_descr": "VOSS Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -16459,7 +16459,7 @@
                     "processor_index": "3",
                     "processor_type": "voss",
                     "processor_usage": 6,
-                    "processor_descr": "VSP Processor",
+                    "processor_descr": "VOSS Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -16470,7 +16470,7 @@
                     "processor_index": "4",
                     "processor_type": "voss",
                     "processor_usage": 5,
-                    "processor_descr": "VSP Processor",
+                    "processor_descr": "VOSS Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -16481,7 +16481,7 @@
                     "processor_index": "6",
                     "processor_type": "voss",
                     "processor_usage": 3,
-                    "processor_descr": "VSP Processor",
+                    "processor_descr": "VOSS Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -16492,7 +16492,7 @@
                     "processor_index": "21",
                     "processor_type": "voss",
                     "processor_usage": 4,
-                    "processor_descr": "VSP Processor",
+                    "processor_descr": "VOSS Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -16503,7 +16503,7 @@
                     "processor_index": "22",
                     "processor_type": "voss",
                     "processor_usage": 4,
-                    "processor_descr": "VSP Processor",
+                    "processor_descr": "VOSS Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -16514,7 +16514,7 @@
                     "processor_index": "23",
                     "processor_type": "voss",
                     "processor_usage": 4,
-                    "processor_descr": "VSP Processor",
+                    "processor_descr": "VOSS Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
