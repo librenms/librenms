@@ -61,6 +61,10 @@ ports:
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
+route:
+    inetCidrRoute:
+        excluded_fields: [device_id, created_at, updated_at]
+        order_by: inetCidrRouteDest
 nac:
     ports_nac:
         excluded_fields: [ports_nac_id, device_id, port_id]
