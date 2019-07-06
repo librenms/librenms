@@ -1,1 +1,121 @@
-null
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2011.2.23.291",
+                    "sysDescr": "S5720-56C-PWR-EI-AC\nHuawei Versatile Routing Platform Software \r\n VRP (R) software,Version 5.170 (S5720 V200R011C10SPC600) \r\n Copyright (C) 2007 Huawei Technologies Co., Ltd.",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "vrp",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "huawei.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2011.2.23.291",
+                    "sysDescr": "S5720-56C-PWR-EI-AC\nHuawei Versatile Routing Platform Software \r\n VRP (R) software,Version 5.170 (S5720 V200R011C10SPC600) \r\n Copyright (C) 2007 Huawei Technologies Co., Ltd.",
+                    "sysContact": "<private>",
+                    "version": "5.170 (V200R011C10SPC600) [1038865 seconds]",
+                    "hardware": "Huawei S5720",
+                    "features": null,
+                    "os": "vrp",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "huawei.svg",
+                    "location": "<private>"
+                }
+            ]
+        }
+    },
+    "route": {
+        "discovery": {
+            "inetCidrRoute": [
+                {
+                    "port_id": 0,
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 58,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 3,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "10.199.0.1",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 0
+                },
+                {
+                    "port_id": 0,
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 58,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.199.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "10.199.0.50",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 24
+                },
+                {
+                    "port_id": 0,
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 58,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.199.0.50",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "127.0.0.1",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 32
+                },
+                {
+                    "port_id": 0,
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 1,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "127.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "127.0.0.1",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 8
+                },
+                {
+                    "port_id": 0,
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 1,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "127.0.0.1",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "127.0.0.1",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 32
+                }
+            ]
+        }
+    }
+}

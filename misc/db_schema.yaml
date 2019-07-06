@@ -676,7 +676,6 @@ inetCidrRoute:
     - { Field: inetCidrRouteDest, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: inetCidrRouteNextHopType, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: inetCidrRouteNextHop, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: inetCidrRouteNextHop_device_id, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: inetCidrRoutePolicy, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: inetCidrRoutePfxLen, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
   Indexes:
@@ -1572,20 +1571,6 @@ pseudowires:
     - { Field: pw_descr, Type: varchar(128), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [pseudowire_id], Unique: true, Type: BTREE }
-route:
-  Columns:
-    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: ipRouteDest, Type: varchar(39), 'Null': false, Extra: '' }
-    - { Field: ipRouteIfIndex, Type: varchar(256), 'Null': true, Extra: '' }
-    - { Field: ipRouteMetric, Type: varchar(256), 'Null': false, Extra: '' }
-    - { Field: ipRouteNextHop, Type: varchar(39), 'Null': false, Extra: '' }
-    - { Field: ipRouteType, Type: varchar(256), 'Null': false, Extra: '' }
-    - { Field: ipRouteProto, Type: varchar(256), 'Null': false, Extra: '' }
-    - { Field: discoveredAt, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: ipRouteMask, Type: varchar(256), 'Null': false, Extra: '' }
-  Indexes:
-    device: { Name: device, Columns: [device_id, context_name, ipRouteDest, ipRouteNextHop], Unique: false, Type: BTREE }
 sensors:
   Columns:
     - { Field: sensor_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
