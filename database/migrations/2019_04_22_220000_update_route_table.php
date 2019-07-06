@@ -30,7 +30,6 @@ class UpdateRouteTable extends Migration
               $table->string('inetCidrRouteDest');
               $table->string('inetCidrRouteNextHopType');
               $table->string('inetCidrRouteNextHop');
-              $table->string('inetCidrRouteNextHop_device_id');
               $table->string('inetCidrRoutePolicy');
               $table->unsignedInteger('inetCidrRoutePfxLen');
         });

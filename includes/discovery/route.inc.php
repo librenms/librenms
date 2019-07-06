@@ -89,13 +89,6 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
         $entryClean['device_id'] = $device['device_id'];
         $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
         $entryClean['updated_at'] = $update_timestamp;
-        $entryClean['inetCidrRouteNextHop_device_id'] = $device['device_id'];
-        if ($entryClean['inetCidrRouteNextHop'] != '127.0.0.1' && $entryClean['inetCidrRouteNextHop'] != 'fe80::') {
-            $next_device = Device::findByIp($entryClean['inetCidrRouteNextHop']);
-            if ($next_device) {
-                $entryClean['inetCidrRouteNextHop_device_id'] = $next_device->device_id;
-            }
-        };
         $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
         if (isset($current) && isset($current['db']) && count($current['db']) > 0 &&  $delete_row[$current['db']['inetCidrRoute_id']] != 1) {
             //we already have a row in DB
@@ -142,10 +135,6 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                     $entry['device_id'] = $device['device_id'];
                     $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
                     $entry['updated_at'] = $update_timestamp;
-                    $entry['inetCidrRouteNextHop_device_id'] = $device['device_id'];
-                    if ($entry['inetCidrRouteNextHop'] != '127.0.0.1') {
-                        $entry['inetCidrRouteNextHop_device_id'] = Device::findByIp($entry['inetCidrRouteNextHop'])->device_id;
-                    };
                     unset($entry['inetCidrRouteAge']);
                     unset($entry['inetCidrRouteMetric2']);
                     unset($entry['inetCidrRouteMetric3']);
@@ -210,11 +199,6 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
                     $entryClean['device_id'] = $device['device_id'];
                     $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
                     $entryClean['updated_at'] = $update_timestamp;
-                    $entryClean['inetCidrRouteNextHop_device_id'] = $device['device_id'];
-                    if ($entryClean['inetCidrRouteNextHop'] != '127.0.0.1' && $entryClean['inetCidrRouteNextHop'] != 'fe80::') {
-                        $entryClean['inetCidrRouteNextHop_device_id'] = Device::findByIp($entryClean['inetCidrRouteNextHop'])->device_id;
-                    };
-
                     $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
                     if (isset($current) && isset($current['db']) && count($current['db']) > 0 &&  $delete_row[$current['db']['inetCidrRoute_id']] != 1) {
                         //we already have a row in DB
@@ -272,10 +256,6 @@ if ($mpls_skip != 1) {
                         $entry['device_id'] = $device['device_id'];
                         $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
                         $entry['updated_at'] = $update_timestamp;
-                        $entry['inetCidrRouteNextHop_device_id'] = $device['device_id'];
-                        if ($entry['inetCidrRouteNextHop'] != '127.0.0.1') {
-                            $entry['inetCidrRouteNextHop_device_id'] = Device::findByIp($entry['inetCidrRouteNextHop'])->device_id;
-                        };
                         $entry['inetCidrRouteIfIndex'] = $entry['mplsL3VpnVrfRteInetCidrIfIndex'];
                         $entry['inetCidrRouteType'] = $entry['mplsL3VpnVrfRteInetCidrType'];
                         $entry['inetCidrRouteProto'] = $entry['mplsL3VpnVrfRteInetCidrProto'];
