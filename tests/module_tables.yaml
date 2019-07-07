@@ -38,6 +38,18 @@ mpls:
         joins:
             - { left: mpls_lsp_paths.lsp_id, right: mpls_lsps.lsp_id, select: [vrf_oid, lsp_oid] }
         order_by: vrf_oid, lsp_oid, path_oid
+    mpls_sdps:
+        excluded_fields: [sdp_id, device_id]
+        order_by: sdp_oid
+    mpls_sdp_binds:
+        excluded_fields: [bind_id, device_id]
+        order_by: sdp_oid, svc_oid
+    mpls_services:
+        excluded_fields: [svc_id, device_id]
+        order_by: svc_oid
+    mpls_saps:
+        excluded_fields: [sap_id, device_id]
+        order_by: svc_oid, sapPortId, sapEncapValue
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
