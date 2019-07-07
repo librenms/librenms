@@ -182,7 +182,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     private function nokiaEncap($tmnxEncapVal)
     {
         // implement other encapsulation values
-        $map = sprintf( "%032b", $tmnxEncapVal);
+        $map = sprintf("%032b", $tmnxEncapVal);
        
         if (substr($map, -32, 20) == '00000000000000000000') { // 12-bit IEEE 802.1Q VLAN ID
             if ($tmnxEncapVal == 4095) {
@@ -199,7 +199,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
      * @param tmnxPortID a 32bit encoded value
      * @param scheme
      * @return converted ifName
-     
+
     The value of tmnxChassisPortIdScheme indicates the port mapping scheme used by the system for physical ports and channels as represented by the TIMETRA-TC-MIB::TmnxPortID textual convention.
     Slots, MDAs (if present), ports, and channels are numbered starting with 1.
 
@@ -257,7 +257,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     {
         // Fixme implement other schemes and channels
         if ($scheme == 'schemeA') {
-            $map = sprintf( "%032b", $tmnxPortId);
+            $map = sprintf("%032b", $tmnxPortId);
             
             if (substr($map, -32, 4) == '0101') { // LAG Port
                 if (substr($map, -28, 4) == '1011') { // Pseudowire Port
