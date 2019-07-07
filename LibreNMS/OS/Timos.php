@@ -41,6 +41,242 @@ use LibreNMS\OS;
 class Timos extends OS implements MplsDiscovery, MplsPolling
 {
     /**
+     * @param tmnxEnacpVal
+     * @return encapsulation string
+    The value of the label used to identify the entity using the specified encapsulation value on a specific port.
+    The format of this object depends on the encapsulation type defined on this port.
+    When the encapsulation is nullEncap the value of this object must be zero.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |00000000 00000000 00000000 00000000|
+         +--------+--------+--------+--------+
+
+         When the encapsulation is dot1qEncap the value of this object is equal
+         to the 12-bit IEEE 802.1Q VLAN ID.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |00000000 00000000 0000XXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         Bit 31 is set to 0 in the case of tagged-VLAN.
+         Bit 31 is set to 1 in the case of dotq-CP as follows:
+         31                                   0
+         +--------+--------+--------+--------+
+         |10000000 00000000 0000XXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         When the encapsulation is mplsEncap the value of this object is equal
+         to the 20-bit LSP ID.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |00000000 0000XXXX XXXXXXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         When the encapsulation is frEncap, the value of this object is equal
+         to the 10-bit Frame Relay DLCI.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |00000000 00000000 000000XX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         When the encapsulation is qinqEncap, the value of the outer 802.1Q
+         VLAN ID is encoded in the least significant 16 bits, and the value of
+         the inner VLAN ID is encoded in the most significant 16 bits.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |0000YYYY YYYYYYYY 0000XXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         where:
+             - '*' is represented as 4095.
+             - '0' is represented as 0.
+             - any other value in between as a valid tag.
+             - '*.null' is represented in the following way:
+
+               31                                  0
+               +--------+--------+--------+--------+
+               |10000000 00000000 00001111 11111111|
+               +--------+--------+--------+--------+
+
+         Bit 30 is set to 0 in the case of tagged-qinq for the bottom tag.
+         Bit 30 is set to 1 in the case of qinq-CP with bottom tag.
+         Bit 15 is set to 0 in the case of tagged-qinq for the top tag.
+         Bit 15 is set to 1 in the case of qinq-CP with top tag as follows:
+         31                                   0
+         +--------+--------+--------+--------+
+         |0100YYYY YYYYYYYY 0100XXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         When the encapsulation is atmEncap, the value of the ATM VCI is
+         encoded in the least significant 16 bits, and the value of the ATM VPI
+         is encoded in the next 12 bits.
+
+         For ATM VCs, the top 3 bits are 000.  The value of
+         the ATM VCI is encoded in the least significant 16
+         bits, and the value of the ATM VPI is encoded in the next
+         12 bits.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |0000YYYY YYYYYYYY XXXXXXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         For ATM capture VCs, bits 0 and 28 are 1.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |00010000 00000000 00000000 00000001|
+         +--------+--------+--------+--------+
+
+         For ATM VPs, the top 3 bits are 010.  The value of
+         the ATM VPI is encoded in the least significant 12 bits.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |01000000 00000000 0000XXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         For ATM VP ranges, the top 3 bits are 100.  The value of
+         the start of the ATM VPI range is encoded in the least significant
+         12 bits, and the value of the end of the ATM VP range is encoded
+         in the next 12 bits.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |10000000 YYYYYYYY YYYYXXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         For ATM ports, the top 3 bits are 110, and the rest of the bits must
+         be zero.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |11000000 00000000 00000000 00000000|
+         +--------+--------+--------+--------+
+
+         For ATM CPs, the top 3 bits are 001.  The value of
+         the ATM CP is encoded in the least significant 13 bits.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |00100000 00000000 000XXXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         When the encapsulation is wanMirrorEncap the value of this object is
+         equal to the 12-bit value.
+
+         31                                   0
+         +--------+--------+--------+--------+
+         |00000000 00000000 0000XXXX XXXXXXXX|
+         +--------+--------+--------+--------+
+
+         Some ports have a restrictions to the encapsulation types that they
+         can support and hence impose restrictions on the respective formats
+         defined above.
+     */
+    private function nokiaEncap($tmnxEncapVal)
+    {
+        // implement other encapsulation values
+        $map = sprintf( "%032b", $tmnxEncapVal);
+       
+        if (substr($map, -32, 20) == '00000000000000000000') { // 12-bit IEEE 802.1Q VLAN ID
+            if ($tmnxEncapVal == 4095) {
+                $encap = '*';
+            } else {
+                $encap = $tmnxEncapVal;
+            }
+        }
+
+        return $encap;
+    }
+
+    /**
+     * @param tmnxPortID a 32bit encoded value
+     * @param scheme
+     * @return converted ifName
+     
+    The value of tmnxChassisPortIdScheme indicates the port mapping scheme used by the system for physical ports and channels as represented by the TIMETRA-TC-MIB::TmnxPortID textual convention.
+    Slots, MDAs (if present), ports, and channels are numbered starting with 1.
+
+    000    0001    0011    00001   0000000000000000
+    Scheme A:
+    32 30 | 29 26 | 25 22 | 21 16 | 15  1 |
+    +-----+-------+-------+-------+-------+
+    |000  |  slot |  mda  | port  |  zero | Physical Port
+    +-----+-------+-------+-------+-------+
+
+    32 30 | 29 26 | 25 22 | 21 16 | 15  1 |
+    +-----+-------+-------+-------+-------+
+    |001  |  slot |  mda  | port  |channel| Channel
+    +-----+-------+-------+-------+-------+
+
+    Scheme B:
+    32 29 | 28 24 | 23 19 | 18 15 | 14  11 | 10 4 | 3  1 |
+    +-----+-------+-------+-------+--------+------+------+
+    |0110 |  zero |  slot |  mda  |  zero  | port | zero | Physical Port
+    +-----+-------+-------+-------+--------+------+------+
+
+    32 29 | 28 24 | 23 19 | 18 15 | 14  11 | 10 4 | 3  1 |
+    +-----+-------+-------+-------+--------+------+------+
+    |0111 |  zero |  slot |  mda  |  zero  | port | zero | Channel (*)
+    +-----+-------+-------+-------+--------+------+------+
+    (*) The encoding does not specify a value for channel since it is implicitly channel 1.
+
+    Scheme C:
+    32 30 | 29 26 | 25    24 | 23 22 | 21   16 | 15  1 |
+    +-----+-------+----------+-------+---------+-------+
+    |000  |  slot |  port-hi |  mda  | port-lo |  zero | Physical Port
+    +-----+-------+----------+-------+---------+-------+
+
+    32 30 | 29 26 | 25    24 | 23 22 | 21   16 | 15  1 |
+    +-----+-------+----------+-------+---------+-------+
+    |001  |  slot |  port-hi |  mda  | port-lo |channel| Channel
+    +-----+-------+----------+-------+---------+-------+
+    (*) 'port-hi' and 'port-lo' are combined make a port.
+
+    Virtual ports and LAGs are encoded as:
+    32     29 | 28             10 | 9   1 |
+    +---------+-------------------+-------+
+    | 0 1 0 0 |   zeros           |   ID  | Virtual Port
+    +---------+-------------------+-------+
+
+    32     29 | 28             11 | 10  1 |
+    +---------+-------------------+-------+
+    | 0 1 0 1 |   zeros           |   ID  | LAG Port
+    +---------+-------------------+-------+
+
+    Pseudowire Port
+    0101       1011 000000000000000000000001
+    */
+    private function nokiaIfName($tmnxPortId, $scheme)
+    {
+        // Fixme implement other schemes and channels
+        if ($scheme == 'schemeA') {
+            $map = sprintf( "%032b", $tmnxPortId);
+            
+            if (substr($map, -32, 4) == '0101') { // LAG Port
+                if (substr($map, -28, 4) == '1011') { // Pseudowire Port
+                    $ifName = "pw-" . bindec(substr($map, -10, 10));
+                } else {
+                    $ifName = "lag-" . bindec(substr($map, -10, 10));
+                }
+            } else {
+                $slot = bindec(substr($map, -29, 4));
+                $mda = bindec(substr($map, -25, 4));
+                $port = bindec(substr($map, -21, 6));
+                $ifName = $slot . "/" . $mda . "/" . $port;
+            }
+        }
+
+        return $ifName;
+    }
+
+    /**
      * @return Collection MplsLsp objects
      */
     public function discoverMplsLsps()
@@ -162,7 +398,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $garbage = preg_match($filter, $value['svcDescription']);
             if ($garbage) {
                 unset($key);
-                break;
+                continue;
             }
 
             $svcs->push(new MplsService([
@@ -196,25 +432,28 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     public function discoverMplsSaps()
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
+        $portScheme = snmp_get($this->getDevice(), 'tmnxChassisPortIdScheme.1', '-Oqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
         
         $saps = collect();
-        
+
         // Workaround, there are some oids not covered by actual MIB, try to filter them
         // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
-        $filter = '/300\.[0-9]+\.[0-9]+\.[0-9]+/';
+        $filter_key = '/300\.[0-9]+\.[0-9]+\.[0-9]+/';
+        // remove some defalt entries we do not want to see
+        $filter_value = '/^Internal SAP/';
 
         foreach ($mplsSapCache as $key => $value) {
-            $garbage = preg_match($filter, $key);
-            if ($garbage) {
+            if (preg_match($filter_key, $key) || preg_match($filter_value, $value['sapDescription'])) {
                 unset($key);
-                break;
+                continue;
             }
             list($svcId, $sapPortId, $sapEncapValue) = explode('.', $key);
             $saps->push(new MplsSap([
                 'svc_oid' => $svcId,
                 'sapPortId' => $sapPortId,
+                'ifName' => $this->nokiaIfName($sapPortId, $portScheme),
                 'device_id' => $this->getDeviceId(),
-                'sapEncapValue' => $sapEncapValue,
+                'sapEncapValue' => $this->nokiaEncap($sapEncapValue),
                 'sapRowStatus' => $value['sapRowStatus'],
                 'sapType' => $value['sapType'],
                 'sapDescription' => $value['sapDescription'],
@@ -397,7 +636,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $garbage = preg_match($filter, $value['svcDescription']);
             if ($garbage) {
                 unset($key);
-                break;
+                continue;
             }
             $svcs->push(new MplsService([
                 'svc_oid' => $value['svcId'],
@@ -431,35 +670,37 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     public function pollMplsSaps()
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
-        
+        $portScheme = snmp_get($this->getDevice(), 'tmnxChassisPortIdScheme.1', '-Oqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
+
         $saps = collect();
-        
+
         // Workaround, there are some oids not covered by actual MIB, try to filter them
         // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
-        $filter = '/300\.[0-9]+\.[0-9]+\.[0-9]+/';
+        $filter_key = '/300\.[0-9]+\.[0-9]+\.[0-9]+/';
+        // remove some default entries we do not want to see
+        $filter_value = '/^Internal SAP/';
 
         foreach ($mplsSapCache as $key => $value) {
-            $garbage = preg_match($filter, $key);
-            if ($garbage) {
+            if (preg_match($filter_key, $key) || preg_match($filter_value, $value['sapDescription'])) {
                 unset($key);
-                break;
+                continue;
             }
             list($svcId, $sapPortId, $sapEncapValue) = explode('.', $key);
             $saps->push(new MplsSap([
                 'svc_oid' => $svcId,
                 'sapPortId' => $sapPortId,
+                'ifName' => $this->nokiaIfName($sapPortId, $portScheme),
                 'device_id' => $this->getDeviceId(),
-                'sapEncapValue' => $sapEncapValue,
+                'sapEncapValue' => $this->nokiaEncap($sapEncapValue),
                 'sapRowStatus' => $value['sapRowStatus'],
                 'sapType' => $value['sapType'],
                 'sapDescription' => $value['sapDescription'],
                 'sapAdminStatus' => $value['sapAdminStatus'],
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
-                'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
+                'sapLastStatusChange' => round($value['sapLastStatusChange'] /100),
             ]));
         }
-
         return $saps;
     }
 

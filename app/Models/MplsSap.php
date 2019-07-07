@@ -12,6 +12,7 @@ class MplsSap extends Model implements Keyable
     protected $fillable = [
         'svc_oid',
         'sapPortId',
+        'ifName',
         'sapEncapValue',
         'device_id',
         'sapRowStatus',

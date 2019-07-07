@@ -17,8 +17,9 @@ class CreateMplsSapsTable extends Migration
             $table->increments('sap_id');
             $table->unsignedInteger('svc_oid');
             $table->unsignedInteger('sapPortId');
+            $table->string('ifName', 255)->nullable();
             $table->unsignedInteger('device_id')->index('device_id');
-            $table->unsignedInteger('sapEncapValue');
+            $table->string('sapEncapValue', 255)->nullable();
             $table->enum('sapRowStatus', array('active', 'notInService', 'notReady', 'createAndGo', 'createAndWait', 'destroy'))->nullable();
             $table->enum('sapType', array('unknown', 'epipe', 'tls', 'vprn', 'ies', 'mirror', 'apipe', 'fpipe', 'ipipe', 'cpipe', 'intTls', 'evpnIsaTls'))->nullable();
             $table->string('sapDescription', 80)->nullable();
