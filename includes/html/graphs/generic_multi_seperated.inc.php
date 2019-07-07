@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Config;
+
 require 'includes/html/graphs/common.inc.php';
 
 $rrddescr_len = 14; // length of the padded rrd_descr in legend
@@ -38,12 +40,12 @@ if (!$nototal) {
 $rrd_options .= " COMMENT:'\\n'";
 
 foreach ($rrd_list as $rrd) {
-    if (!$config['graph_colours'][$colours_in][$iter] || !$config['graph_colours'][$colours_out][$iter]) {
+    if (!Config::get("graph_colours.$colours_in.$iter") || !Config::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
     }
 
-    $colour_in = $config['graph_colours'][$colours_in][$iter];
-    $colour_out = $config['graph_colours'][$colours_out][$iter];
+    $colour_in = Config::get("graph_colours.$colours_in.$iter");
+    $colour_out = Config::get("graph_colours.$colours_out.$iter");
 
     if ($rrd['colour_area_in']) {
         $colour_in = $rrd['colour_area_in'];
@@ -124,10 +126,10 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' CDEF:outbitsX=outBX,8,*';
     $rrd_options .= ' CDEF:bitsX=inbitsX,outbitsX,+';
     $rrd_options .= ' CDEF:doutbitsX=doutBX,8,*';
-    $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $config['percentile_value'] . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $config['percentile_value'] . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outXperc=dpercentile_outXn,'.$config['percentile_value'].',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outXperc=dpercentile_outXn,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outXnd=doutbitsX,doutbitsX,-,dpercentile_outXperc,-1,*,+';
     $rrd_options .= ' VDEF:dpercentile_outXpercn=dpercentile_outXnd,FIRST';
 }
@@ -148,10 +150,10 @@ if (!$args['nototal']) {
     $rrd_options .= ' CDEF:outbits=outB,8,*';
     $rrd_options .= ' CDEF:bits=inbits,outbits,+';
     $rrd_options .= ' CDEF:doutbits=doutB,8,*';
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . $config['percentile_value'] . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . $config['percentile_value'] . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . $config['percentile_value'] . ',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
     $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
     $rrd_options .= ' VDEF:totin=inB,TOTAL';

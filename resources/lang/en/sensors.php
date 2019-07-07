@@ -4,7 +4,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Sesnors Language Lines
+    | Sensors Language Lines
     |--------------------------------------------------------------------------
     |
     | The following language lines are used to translate names and units of sensors
@@ -57,7 +57,7 @@ return [
         'short' => 'dBm',
         'long' => 'dBm',
         'unit' => 'dBm',
-        'unit_long' => 'Decibal-Milliwatts',
+        'unit_long' => 'Decibel-Milliwatts',
     ],
     'delay' => [
         'short' => 'Delay',

@@ -19980,7 +19980,7 @@
                     "sensor_index": "0",
                     "sensor_type": "fanMode",
                     "sensor_descr": "Fan Mode",
-                    "group": "",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,

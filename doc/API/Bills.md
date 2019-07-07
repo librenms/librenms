@@ -11,12 +11,14 @@ Route: `/api/v0/bills`
 Input:
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?period=previous
 ```
 
 Output:
+
 ```json
 {
  "status": "ok",
@@ -73,14 +75,16 @@ Route: `/api/v0/bills/:id`
        `/api/v0/bills?custid=:custid`
        `/api/v0/bills?custid=:custid&period=previous`
 
-  - id is the specific bill id
-  - ref is the billing reference
-  - custid is the customer reference
-  - period=previous indicates you would like the data for the last complete period rather than the current period
+- id is the specific bill id
+- ref is the billing reference
+- custid is the customer reference
+- period=previous indicates you would like the data for the last
+  complete period rather than the current period
 
 Input:
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?ref=:customerref
@@ -88,6 +92,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills?custi
 ```
 
 Output:
+
 ```json
 {
  "status": "ok",
@@ -137,7 +142,8 @@ Output:
 
 Retrieve a graph image associated with a bill.
 
-NB: The graphs returned from this will always be png as they do not come from rrdtool, even if you have SVG set.
+NB: The graphs returned from this will always be png as they do not
+come from rrdtool, even if you have SVG set.
 
 Route: `/api/v0/bills/:id/graphs/:graph_type
 
@@ -162,9 +168,11 @@ Route: `/api/v0/bills/:id/graphdata/:graph_type`
 
 Input:
 
-The `reducefactor` parameter is used to reduce the number of data points.  Billing data has 5 minute granularity, so
-requesting a graph for a long time period will result in many data points.  If not supplied, it will be automatically
-calculated.  A reducefactor of 1 means return all items, 2 means half of the items etc.
+The `reducefactor` parameter is used to reduce the number of data
+points. Billing data has 5 minute granularity, so requesting a graph
+for a long time period will result in many data points.  If not
+supplied, it will be automatically calculated.  A reducefactor of 1
+means return all items, 2 means half of the items etc.
 
 Example:
 
@@ -220,11 +228,13 @@ Route: `/api/v0/bills/:id/history`
 Input:
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1/history
 ```
 
 Output:
+
 ```json
 {
  "status": "ok",
@@ -261,7 +271,8 @@ Output:
 
 Retrieve a graph of a previous period of a bill
 
-NB: The graphs returned from this will always be png as they do not come from rrdtool, even if you have SVG set.
+NB: The graphs returned from this will always be png as they do not
+come from rrdtool, even if you have SVG set.
 
 Route: `/api/v0/bills/:id/history/:bill_hist_id/graphs/:graph_type`
 
@@ -281,7 +292,8 @@ Output:
 
 ### `get_bill_history_graphdata`
 
-Retrieve the data for a graph of a previous period of a bill, to be rendered in an external system
+Retrieve the data for a graph of a previous period of a bill, to be
+rendered in an external system
 
 Route: `/api/v0/bills/:id/history/:bill_hist_id/graphdata/:graph_type`
 
@@ -308,11 +320,13 @@ Route: `/api/v0/bills/:id`
 Input:
 
 Example:
+
 ```curl
 curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills/1
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -328,23 +342,27 @@ Route: `/api/v0/bills`
 
 Method: `POST`
 
-- If you send an existing bill_id the call replaces all values it receives.  
-  For example if you send 2 ports it will delete the existing ports and add the the 2 new ports.  
-  So to add ports you have to get the current ports first and add them to your update call.
+- If you send an existing bill_id the call replaces all values it
+  receives. For example if you send 2 ports it will delete the
+  existing ports and add the the 2 new ports. So to add ports you have
+  to get the current ports first and add them to your update call.
 
 Input:
 
 Example (create):
+
 ```curl
 curl -X POST -d '{"ports":[ 1021 ],"bill_name":"NEWBILL","bill_day":"1","bill_type":"quota","bill_quota":"2000000000000","bill_custid":"1337","bill_ref":"reference1","bill_notes":"mynote"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
 ```
 
 Example (set):
+
 ```curl
 curl -X POST -d '{"bill_id":"32","ports":[ 1021 ],"bill_name":"NEWNAME","bill_quota":"1000000000000"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bills
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",

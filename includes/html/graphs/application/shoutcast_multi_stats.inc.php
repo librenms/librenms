@@ -48,7 +48,7 @@ foreach ($rrd_list as $rrd) {
         $stack = ':STACK';
     }
 
-    $colour       = $config['graph_colours'][$colours][$x];
+    $colour = \LibreNMS\Config::get("graph_colours.$colours.$x");
     $rrd_options .= ' DEF:cur'.$x.'='.$rrd['filename'].':current:AVERAGE';
     $rrd_options .= ' DEF:peak'.$x.'='.$rrd['filename'].':peak:MAX';
     $rrd_options .= ' DEF:unique'.$x.'='.$rrd['filename'].':unique:AVERAGE';
@@ -65,14 +65,14 @@ foreach ($rrd_list as $rrd) {
         $totunique .= ',unique'.$x.',+';
     }
 
-    $x = (($x < count($config['graph_colours'][$colours]) - 1) ? $x + 1 : 0);
+    $x = (($x < count(\LibreNMS\Config::get("graph_colours.$colours")) - 1) ? $x + 1 : 0);
     // $x++;
 }//end foreach
 
 if (!$nototal) {
     $strlen = ((strlen($total_text) < $descr_len) ? ($descr_len - strlen($total_text)) : '0');
     $descr  = (isset($total_text) ? rrdtool_escape($total_text, ($desc_len + $strlen)) : 'Total');
-    $colour = $config['graph_colours'][$colours][$x];
+    $colour = \LibreNMS\Config::get("graph_colours.$colours.$x");
     for ($z = 0; $z < $strlen;
     $z++) {
         $descr .= ' ';

@@ -51,9 +51,9 @@ if (is_file("includes/html/pages/device/loadbalancer/$type.inc.php")) {
             if (is_file('includes/html/pages/device/loadbalancer/overview/'.mres($type).'.inc.php')) {
                 $g_i++;
                 if (!is_integer($g_i / 2)) {
-                    $row_colour = $config['list_colour']['even'];
+                    $row_colour = \LibreNMS\Config::get('list_colour.even');
                 } else {
-                    $row_colour = $config['list_colour']['odd'];
+                    $row_colour = \LibreNMS\Config::get('list_colour.odd');
                 }
 
                 echo '<div style="background-color: '.$row_colour.';">';

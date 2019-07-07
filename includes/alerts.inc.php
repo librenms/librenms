@@ -117,9 +117,9 @@ function GenSQLOld($rule)
  */
 function RunMacros($rule, $x = 1)
 {
-    global $config;
-    krsort($config['alert']['macros']['rule']);
-    foreach ($config['alert']['macros']['rule'] as $macro => $value) {
+    $macros = Config::get('alert.macros.rule', []) .
+        krsort($macros);
+    foreach ($macros as $macro => $value) {
         if (!strstr($macro, " ")) {
             $rule = str_replace('%macros.'.$macro, '('.$value.')', $rule);
         }
@@ -257,8 +257,6 @@ function RunRules($device_id)
  */
 function GetContacts($results)
 {
-    global $config;
-
     if (empty($results)) {
         return [];
     }
@@ -284,7 +282,7 @@ function GetContacts($results)
             }
         }
         if (is_numeric($result["device_id"])) {
-            if ($config['alert']['syscontact'] == true) {
+            if (Config::get('alert.syscontact') == true) {
                 if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", [$result["device_id"]])) {
                     $tmpa = dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_string' AND device_id = ?", array($result["device_id"]));
                 } else {
@@ -310,11 +308,11 @@ function GetContacts($results)
         if (empty($user['level'])) {
             $user['level'] = LegacyAuth::get()->getUserlevel($user['username']);
         }
-        if ($config['alert']['globals'] && ( $user['level'] >= 5 && $user['level'] < 10 )) {
+        if (Config::get('alert.globals') && ($user['level'] >= 5 && $user['level'] < 10)) {
             $contacts[$user['email']] = $user['realname'];
-        } elseif ($config['alert']['admins'] && $user['level'] == 10) {
+        } elseif (Config::get('alert.admins') && $user['level'] == 10) {
             $contacts[$user['email']] = $user['realname'];
-        } elseif ($config['alert']['users'] == true && in_array($user['user_id'], $uids)) {
+        } elseif (Config::get('alert.users') == true && in_array($user['user_id'], $uids)) {
             $contacts[$user['email']] = $user['realname'];
         }
     }
@@ -344,13 +342,13 @@ function GetContacts($results)
     }
 
     # Copy all email alerts to default contact if configured.
-    if (!isset($tmp_contacts[$config['alert']['default_mail']]) && ($config['alert']['default_copy'])) {
-        $tmp_contacts[$config['alert']['default_mail']] = '';
+    if (!isset($tmp_contacts[Config::get('alert.default_mail')]) && (Config::get('alert.default_copy'))) {
+        $tmp_contacts[Config::get('alert.default_mail')] = '';
     }
 
     # Send email to default contact if no other contact found
-    if ((count($tmp_contacts) == 0) && ($config['alert']['default_if_none']) && (!empty($config['alert']['default_mail']))) {
-        $tmp_contacts[$config['alert']['default_mail']] = '';
+    if ((count($tmp_contacts) == 0) && (Config::get('alert.default_if_none')) && (!empty(Config::get('alert.default_mail')))) {
+        $tmp_contacts[Config::get('alert.default_mail')] = '';
     }
 
     return $tmp_contacts;
@@ -575,12 +573,11 @@ function IsRuleValid($device_id, $rule)
  */
 function IssueAlert($alert)
 {
-    global $config;
     if (dbFetchCell('SELECT attrib_value FROM devices_attribs WHERE attrib_type = "disable_notify" && device_id = ?', array($alert['device_id'])) == '1') {
         return true;
     }
 
-    if ($config['alert']['fixed-contacts'] == false) {
+    if (Config::get('alert.fixed-contacts') == false) {
         if (empty($alert['query'])) {
             $alert['query'] = GenSQL($alert['rule'], $alert['builder']);
         }
@@ -703,7 +700,6 @@ function loadAlerts($where)
  */
 function RunAlerts()
 {
-    global $config;
     foreach (loadAlerts('alerts.state != 2 && alerts.open = 1') as $alert) {
         $noiss            = false;
         $noacc            = false;
@@ -723,7 +719,7 @@ function RunAlerts()
         if (!empty($rextra['count']) && empty($rextra['interval'])) {
             // This check below is for compat-reasons
             if (!empty($rextra['delay'])) {
-                if ((time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $config['alert']['tolerance_window']) < $rextra['delay'])) {
+                if ((time() - strtotime($alert['time_logged']) + Config::get('alert.tolerance_window')) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + Config::get('alert.tolerance_window')) < $rextra['delay'])) {
                     continue;
                 } else {
                     $alert['details']['delay'] = time();
@@ -741,12 +737,12 @@ function RunAlerts()
             }
         } else {
             // This is the new way
-            if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay']) {
+            if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + Config::get('alert.tolerance_window')) < $rextra['delay']) {
                 continue;
             }
 
             if (!empty($rextra['interval'])) {
-                if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $config['alert']['tolerance_window']) < $rextra['interval']) {
+                if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + Config::get('alert.tolerance_window')) < $rextra['interval']) {
                     continue;
                 } else {
                     $alert['details']['interval'] = time();

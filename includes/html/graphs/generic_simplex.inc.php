@@ -1,6 +1,6 @@
 <?php
 
-if ($config['old_graphs']) {
+if (\LibreNMS\Config::get('old_graphs')) {
     include 'includes/html/graphs/old_generic_simplex.inc.php';
 } else {
     // Draw generic bits graph

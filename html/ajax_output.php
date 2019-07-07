@@ -30,6 +30,6 @@ if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
 set_debug($_REQUEST['debug']);
 $id = basename($_REQUEST['id']);
 
-if ($id && is_file($config['install_dir'] . "/includes/html/output/$id.inc.php")) {
-    require $config['install_dir'] . "/includes/html/output/$id.inc.php";
+if ($id && is_file(\LibreNMS\Config::get('install_dir') . "/includes/html/output/$id.inc.php")) {
+    require \LibreNMS\Config::get('install_dir') . "/includes/html/output/$id.inc.php";
 }

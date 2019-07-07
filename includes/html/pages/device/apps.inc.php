@@ -12,7 +12,7 @@ $link_array = array(
     'tab'    => 'apps',
 );
 
-foreach (dbFetchRows('SELECT * FROM `applications` WHERE `device_id` = ?', array($device['device_id'])) as $app) {
+foreach (dbFetchRows('SELECT * FROM `applications` WHERE `device_id` = ? ORDER BY `app_type` ASC', array($device['device_id'])) as $app) {
     echo $sep;
 
     if (!$vars['app']) {

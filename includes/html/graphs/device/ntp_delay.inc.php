@@ -31,11 +31,7 @@ foreach ($components as $id => $array) {
 
     if (rrdtool_check_rrd_exists($rrd_filename)) {
         // Grab a color from the array.
-        if (isset($config['graph_colours']['mixed'][$count])) {
-            $color = $config['graph_colours']['mixed'][$count];
-        } else {
-            $color = $config['graph_colours']['oranges'][$count-7];
-        }
+        $color = \LibreNMS\Config::get("graph_colours.mixed.$count", \LibreNMS\Config::get('graph_colours.oranges.' . ($count - 7)));
 
         $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":delay:AVERAGE ";
         $rrd_additions .= " LINE1.25:DS" . $count . "#" . $color . ":'" . str_pad(substr($array['peer'], 0, 15), 15) . "'" . $stack;

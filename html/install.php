@@ -1,5 +1,6 @@
 <?php
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 session_start();
 $librenms_dir = realpath(__DIR__ . '/..');
@@ -105,12 +106,12 @@ $complete = 1;
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-  <title><?php echo($config['page_title_prefix']); ?></title>
+    <title><?php echo(Config::get('page_title_prefix')); ?></title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-  <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo(Config::get('stylesheet')); ?>" rel="stylesheet" type="text/css"/>
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -120,7 +121,7 @@ $complete = 1;
   <div class="container">
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
-        <h2 class="text-center">Welcome to the <?php echo($config['project_name']); ?> install</h2>
+          <h2 class="text-center">Welcome to the <?php echo(Config::get('project_name')); ?> install</h2>
       </div>
     </div>
     <div class="row">

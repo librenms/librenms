@@ -65,11 +65,9 @@ class SyslogTest extends TestCase
 
     public function testCiscoSyslog()
     {
-        // populate fake $dev_cache and $config
-        global $config, $dev_cache;
+        // populate fake $dev_cache
+        global $dev_cache;
         $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'ios', 'version' => 1, 'hostname' => 'cisco-switch1');
-        $config = array();
-        $config['syslog_filter'] = array();
 
         // ---- IOS ----
         $this->checkSyslog(
@@ -147,11 +145,9 @@ class SyslogTest extends TestCase
     }
     public function testLinuxSyslog()
     {
-        // populate fake $dev_cache and $config
-        global $config, $dev_cache;
+        // populate fake $dev_cache
+        global $dev_cache;
         $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'linux', 'version' => 1, 'hostname' => 'linux-server1');
-        $config = array();
-        $config['syslog_filter'] = array();
 
         // ---- PAM ----
         $this->checkSyslog(
@@ -200,11 +196,9 @@ class SyslogTest extends TestCase
 
     public function testProcurveSyslog()
     {
-        // populate fake $dev_cache and $config
-        global $config, $dev_cache;
+        // populate fake $dev_cache
+        global $dev_cache;
         $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'procurve', 'version' => 1, 'hostname' => 'procurve-switch1');
-        $config = array();
-        $config['syslog_filter'] = array();
 
         // ---- 2900/2910/3800/5400 ----
         $this->checkSyslog(
@@ -236,11 +230,9 @@ class SyslogTest extends TestCase
     }
     public function testZywallSyslog()
     {
-        // populate fake $dev_cache and $config
-        global $config, $dev_cache;
+        // populate fake $dev_cache
+        global $dev_cache;
         $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'zywall', 'version' => 1, 'hostname' => 'zywall');
-        $config = array();
-        $config['syslog_filter'] = array();
 
         // ---- USG60W ----
         $this->checkSyslog(

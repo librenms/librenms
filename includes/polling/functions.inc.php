@@ -42,7 +42,7 @@ function sensor_precache($device, $type)
 
 function poll_sensor($device, $class)
 {
-    global $config, $memcache, $agent_sensors;
+    global $agent_sensors;
 
     $sensors = array();
     $misc_sensors = array();
@@ -228,7 +228,7 @@ function record_sensor_data($device, $all_sensors)
  */
 function poll_device($device, $force_module = false)
 {
-    global $config, $device;
+    global $device;
 
     $device_start = microtime(true);
 
@@ -259,8 +259,8 @@ function poll_device($device, $force_module = false)
         dbUpdate(array('ip' => $db_ip), 'devices', 'device_id=?', array($device['device_id']));
     }
 
-    if ($config['os'][$device['os']]['group']) {
-        $device['os_group'] = $config['os'][$device['os']]['group'];
+    if ($os_group = Config::get("os.{$device['os']}.group")) {
+        $device['os_group'] = $os_group;
         echo ' ('.$device['os_group'].')';
     }
 
@@ -273,7 +273,7 @@ function poll_device($device, $force_module = false)
     $update_array = array();
 
     $host_rrd = rrd_name($device['hostname'], '', '');
-    if ($config['norrd'] !== true && !is_dir($host_rrd)) {
+    if (Config::get('norrd') !== true && !is_dir($host_rrd)) {
         mkdir($host_rrd);
         echo "Created directory : $host_rrd\n";
     }
@@ -285,15 +285,15 @@ function poll_device($device, $force_module = false)
         $oldgraphs = array();
 
         if ($device['snmp_disable']) {
-            $config['poller_modules'] = array();
+            Config::set('poller_modules', []);
         } else {
             // we always want the core module to be included, prepend it
-            $config['poller_modules'] = array('core' => true) + $config['poller_modules'];
+            Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
         }
 
         printChangedStats(true); // don't count previous stats
-        foreach ($config['poller_modules'] as $module => $module_status) {
-            $os_module_status = $config['os'][$device['os']]['poller_modules'][$module];
+        foreach (Config::get('poller_modules') as $module => $module_status) {
+            $os_module_status = Config::get("os.{$device['os']}.poller_modules.$module");
             d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
             d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
             d_echo("Device" . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
@@ -347,7 +347,14 @@ function poll_device($device, $force_module = false)
         }
 
         // Update device_groups
-        UpdateGroupsForDevice($device['device_id']);
+        echo "### Start Device Groups ###\n";
+        $dg_start = microtime(true);
+
+        $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
+        d_echo("Groups Added: " . implode(',', $group_changes['attached']) . PHP_EOL);
+        d_echo("Groups Removed: " . implode(',', $group_changes['detached']) . PHP_EOL);
+
+        echo "### End Device Groups, runtime: " . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
 
         if (!$force_module && !empty($graphs)) {
             echo "Enabling graphs: ";
@@ -418,8 +425,8 @@ function poll_device($device, $force_module = false)
         echo "\nPolled in $device_time seconds\n";
 
         // check if the poll took to long and log an event
-        if ($device_time > $config['rrd']['step']) {
-            log_event("Polling took longer than " . round($config['rrd']['step'] / 60, 2) .
+        if ($device_time > Config::get('rrd.step')) {
+            log_event("Polling took longer than " . round(Config::get('rrd.step') / 60, 2) .
                 ' minutes!  This will cause gaps in graphs.', $device, 'system', 5);
         }
 

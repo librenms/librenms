@@ -1,11 +1,13 @@
 source: Developing/os/Mem-CPU-Information.md
 path: blob/master/doc/
 
-This document will guide you through adding detection for Memory / Processor for your new device.
+This document will guide you through adding detection for Memory /
+Processor for your new device.
 
 #### Memory
 
-Detection for memory is done via two php scripts, one for discovery and the other for polling:
+Detection for memory is done via two php scripts, one for discovery
+and the other for polling:
 
 `includes/discovery/mempools/pulse.inc.php`
 
@@ -42,7 +44,8 @@ if (is_numeric($perc)) {
 
 #### Processor
 
-Detection for processors is done via a yaml file unless custom processing of data is required.
+Detection for processors is done via a yaml file unless custom
+processing of data is required.
 
 ##### YAML
 
@@ -80,11 +83,10 @@ Accessing values within yaml:
 | {{ $count }} | The count of entries (starting with 1) |
 | {{ $`oid` }} | Any oid in the table or pre-fetched |
 
-
 ##### Custom Discovery and Polling
 
-If you need to implement custom discovery or polling you can implement the ProcessorDiscovery interface and
-the ProcessorPolling interface in the OS class.
+If you need to implement custom discovery or polling you can implement
+the ProcessorDiscovery interface and the ProcessorPolling interface in the OS class.
 
 OS Class files reside under `LibreNMS\OS`
 
