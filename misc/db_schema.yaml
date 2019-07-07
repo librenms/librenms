@@ -1568,40 +1568,6 @@ route:
     - { Field: ipRouteMask, Type: varchar(256), 'Null': false, Extra: '' }
   Indexes:
     device: { Name: device, Columns: [device_id, context_name, ipRouteDest, ipRouteNextHop], Unique: false, Type: BTREE }
-sdps:
-  Columns:
-    - { Field: sdp_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: sdpId, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: sdpRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': false, Extra: '' }
-    - { Field: sdpDelivery, Type: 'enum(''gre'',''mpls'',''l2tpv3'',''greethbridged'')', 'Null': false, Extra: '' }
-    - { Field: sdpDescription, Type: varchar(80), 'Null': true, Extra: '' }
-    - { Field: sdpAdminStatus, Type: 'enum(''up'',''down'')', 'Null': false, Extra: '' }
-    - { Field: sdpOperStatus, Type: 'enum(''up'',''notAlive'',''notReady'',''invalidEgressInterface'',''transportTunnelDown'',''down'')', 'Null': false, Extra: '' }
-    - { Field: sdpAdminPathMtu, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: sdpOperPathMtu, Type: int(11), 'Null': true, Extra: '' }
-    - { Field: sdpLastMgmtChange, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: sdpLastStatusChange, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: sdpActiveLspType, Type: 'enum(''not-applicable'',''rsvp'',''ldp'',''bgp'',''none'',''mplsTp'',''srIsis'',''srOspf'',''srTeLsp'',''fpe'')', 'Null': false, Extra: '' }
-    - { Field: sdpFarEndInetAddressType, Type: 'enum(''ipv4'',''ipv6'')', 'Null': false, Extra: '' }
-    - { Field: sdpFarEndInetAddress, Type: varchar(46), 'Null': true, Extra: '' }
-    - { Field: mplsLspName, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: mplsLspFromAddr, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: mplsLspToAddr, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: mplsLspType, Type: 'enum(''unknown'',''dynamic'',''static'',''bypassOnly'',''p2mpLsp'',''p2mpAuto'',''mplsTp'',''meshP2p'',''oneHopP2p'',''srTe'',''meshP2pSrTe'',''oneHopP2pSrTe'')', 'Null': false, Extra: '' }
-    - { Field: mplsLspFastReroute, Type: 'enum(''true'',''false'')', 'Null': false, Extra: '' }
-    - { Field: mplsLspAge, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: mplsLspTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: mplsLspTimeDown, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: mplsLspPrimaryTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: mplsLspTransitions, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
-    - { Field: mplsLspLastTransition, Type: bigint(20), 'Null': true, Extra: '' }
-    - { Field: mplsLspConfiguredPaths, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
-    - { Field: mplsLspStandbyPaths, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
-    - { Field: mplsLspOperationalPaths, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [sdp_id], Unique: true, Type: BTREE }
-    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 sensors:
   Columns:
     - { Field: sensor_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
