@@ -162,6 +162,7 @@ $config['auth_ldap_groupmemberattr'] = 'memberUid'; // attribute to use to see i
 $config['auth_ldap_uid_attribute'] = 'uidnumber';   // attribute for unique id
 $config['auth_ldap_debug'] = false;                 // enable for verbose debug messages
 $config['auth_ldap_userdn'] = true;                 // Uses a users full DN as the value of the member attribute in a group instead of member: username. (it’s member: uid=username,ou=groups,dc=domain,dc=com)
+$config[‘auth_ldap_Userlist_filter’] = 'service=informatique'; // Replace 'service=informatique' by your ldap filter to limit the number of responses if you have an ldap directory with thousand of users
 ```
 
 ### LDAP bind user (optional)
