@@ -24,13 +24,13 @@ return [
         'external' => [
             'location' => 'Location Settings',
             'oxidized' => 'Oxidized Integration',
-            'paths' => 'Binary Locations',
+            'binaries' => 'Binary Locations',
             'peeringdb' => 'PeeringDB Integration',
-            'rrdtool' => 'RRDTool Setup',
             'unix-agent' => 'Unix-Agent Integration',
         ],
         'poller' => [
             'ping' => 'Ping',
+            'rrdtool' => 'RRDTool Setup',
         ],
         'system' => [
             'cleanup' => 'Cleanup',

@@ -1203,7 +1203,7 @@
         "description": "Path to fping",
         "default": "fping",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 0,
         "type": "text"
     },
@@ -1211,7 +1211,7 @@
         "description": "Path to fping6",
         "default": "fping6",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 1,
         "type": "text"
     },
@@ -3144,7 +3144,7 @@
         "description": "Path to ipmtool",
         "default": "/usr/bin/ipmitool",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 3,
         "type": "text"
     },
@@ -3253,7 +3253,7 @@
         "description": "Path to mtr",
         "default": "/usr/bin/mtr",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 4,
         "type": "text"
     },
@@ -3315,7 +3315,7 @@
         "description": "Path to nmap",
         "default": "/usr/bin/nmap",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 5,
         "type": "text"
     },
@@ -3467,7 +3467,7 @@
         "description": "Path to ping",
         "default": "/bin/ping",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 6,
         "type": "text"
     },
@@ -3638,7 +3638,7 @@
     "rrd.heartbeat": {
         "description": "Change the rrd heartbeat value (default 600)",
         "default": 600,
-        "group": "external",
+        "group": "poller",
         "section": "rrdtool",
         "order": 3,
         "type": "integer"
@@ -3646,15 +3646,30 @@
     "rrd.step": {
         "description": "Change the rrd step value (default 300)",
         "default": 300,
-        "group": "external",
+        "group": "poller",
         "section": "rrdtool",
         "order": 2,
         "type": "integer"
     },
     "rrd_dir": {
+        "default": "rrd"
     },
     "rrd_rra": {
-        "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 "
+        "description": "RRD Format Settings",
+        "help": "These cannot be changed without deleting your existing RRD files. Though one could conceivably increase or decrease the size of each RRA if one had performance problems or if one had a very fast I/O subsystem with no performance worries.",
+        "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 ",
+        "group": "poller",
+        "section": "rrdtool",
+        "order": 4,
+        "type": "text"
+    },
+    "rrdcached": {
+        "description": "Enable rrdcached (socket)",
+        "help": "Enables rrdcached by setting the location of the rrdcached socket. Can be unix or network socket (unix:/run/rrdcached.sock or localhost:42217)",
+        "group": "poller",
+        "section": "rrdtool",
+        "order": 5,
+        "type": "text"
     },
     "rrdgraph_def_text": {
         "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal"
@@ -3666,15 +3681,15 @@
         "description": "Path to rrdtool",
         "default": "rrdtool",
         "group": "external",
-        "section": "rrdtool",
-        "order": 0,
+        "section": "binaries",
+        "order": -1,
         "type": "text"
     },
     "rrdtool_tune": {
         "description": "Tune all rrd port files to use max values",
         "help": "Auto tune maximum value for rrd port files",
         "default": false,
-        "group": "external",
+        "group": "poller",
         "section": "rrdtool",
         "order": 1,
         "type": "boolean"
@@ -3685,7 +3700,7 @@
         "description": "Path to sfdp",
         "default": "/usr/bin/sfdp",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 7,
         "type": "text"
     },
@@ -3819,7 +3834,7 @@
         "description": "Path to snmpbulkwalk",
         "default": "/usr/bin/snmpbulkwalk",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 8,
         "type": "text"
     },
@@ -3827,7 +3842,7 @@
         "description": "Path to snmpget",
         "default": "/usr/bin/snmpget",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 9,
         "type": "text"
     },
@@ -3835,7 +3850,7 @@
         "description": "Path to snmpgetnext",
         "default": "snmpgetnext",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 10,
         "type": "text"
     },
@@ -3843,7 +3858,7 @@
         "description": "Path to snmptranslate",
         "default": "/usr/bin/snmptranslate",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 11,
         "type": "text"
     },
@@ -3854,7 +3869,7 @@
         "description": "Path to snmpwalk",
         "default": "/usr/bin/snmpwalk",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 12,
         "type": "text"
     },
@@ -3907,7 +3922,7 @@
         "description": "Path to traceroute",
         "default": "traceroute",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 13,
         "type": "text"
     },
@@ -3915,7 +3930,7 @@
         "description": "Path to traceroute6",
         "default": "traceroute6",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 14,
         "type": "text"
     },
@@ -3981,7 +3996,7 @@
         "description": "Path to virsh",
         "default": "/usr/bin/virsh",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 15,
         "type": "text"
     },
@@ -4389,7 +4404,7 @@
         "description": "Path to whois",
         "default": "/usr/bin/whois",
         "group": "external",
-        "section": "paths",
+        "section": "binaries",
         "order": 16,
         "type": "text"
     },
