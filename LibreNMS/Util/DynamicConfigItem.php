@@ -33,7 +33,6 @@ class DynamicConfigItem implements \ArrayAccess
     public $group;
     public $section;
     public $value;
-    public $description;
     public $type;
     public $default;
     public $hidden = false;
@@ -41,8 +40,8 @@ class DynamicConfigItem implements \ArrayAccess
     public $disabled = false;
     public $options = [];
     public $class;
-    public $help;
     public $pattern;
+    public $units;
 
     public function __construct($name, $settings = [])
     {
@@ -67,7 +66,7 @@ class DynamicConfigItem implements \ArrayAccess
         } elseif ($this->type == 'integer') {
             return filter_var($value, FILTER_VALIDATE_INT);
         } elseif ($this->type == 'select') {
-            return isset($this->options[$value]);
+            return in_array($value, $this->options);
         } elseif ($this->type == 'email') {
             return filter_var($value, FILTER_VALIDATE_EMAIL);
         } elseif (in_array($this->type, ['text', 'password'])) {
@@ -94,7 +93,12 @@ class DynamicConfigItem implements \ArrayAccess
 
     public function getOptions()
     {
-        return $this->options;
+        return array_reduce($this->options, function ($result, $option) {
+            $key = $this->optionTranslationKey($option);
+            $trans = __($key);
+            $result[$option] = ($trans === $key ? $option : $trans);
+            return $result;
+        }, []);
     }
 
     public function isHidden()
@@ -110,6 +114,40 @@ class DynamicConfigItem implements \ArrayAccess
     public function getType()
     {
         return $this->type;
+    }
+
+    public function hasDescription()
+    {
+        $key = $this->descriptionTranslationKey();
+        return __($key) !== $key;
+    }
+
+    public function hasHelp()
+    {
+        $key = $this->helpTranslationKey();
+        return __($key) !== $key;
+    }
+
+    public function hasUnits()
+    {
+        return isset($this->units);
+    }
+
+    public function getUnits()
+    {
+        return $this->hasUnits() ? __($this->units) : '';
+    }
+
+    public function getDescription()
+    {
+        $key = $this->descriptionTranslationKey();
+        $trans = __($key);
+        return $trans === $key ? $this->name : $trans;
+    }
+
+    public function getHelp()
+    {
+        return __($this->helpTranslationKey());
     }
 
     public function only($fields = [])
@@ -157,5 +195,20 @@ class DynamicConfigItem implements \ArrayAccess
     public function getName()
     {
         return $this->name;
+    }
+
+    private function descriptionTranslationKey()
+    {
+        return "settings.settings.$this->name.description";
+    }
+
+    private function helpTranslationKey()
+    {
+        return "settings.settings.$this->name.help";
+    }
+
+    private function optionTranslationKey($option)
+    {
+        return "settings.settings.$this->name.options.$option";
     }
 }

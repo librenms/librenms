@@ -1,10 +1,10 @@
-<div class="form-group has-feedback {{ $class }}">
-    <label for="{{ $name }}" class="col-sm-4 control-label">@lang($description)</label>
-    @if($help)
-        <div data-toggle="tooltip" title="@lang($help)" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
+<div class="form-group has-feedback {{ $config->class }}">
+    <label for="{{ $config->name }}" class="col-sm-4 control-label">{{ $config->getDescription() }}</label>
+    @if($config->hasHelp())
+        <div data-toggle="tooltip" title="{{ $config->getHelp() }}" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
     @endif
     <div class="col-sm-6 col-lg-4">
-        <input id="{{ $name }}" type="checkbox" name="{{ $name }}" @if($value) checked @endif data-on-text="Yes"
-               data-off-text="No" data-size="small" data-original="{{ $value ? 1 : 0 }}">
+        <input id="{{ $config->name }}" type="checkbox" name="{{ $config->name }}" @if($config->value) checked @endif data-on-text="Yes"
+               data-off-text="No" data-size="small" data-original="{{ $config->value ? 1 : 0 }}">
     </div>
 </div>

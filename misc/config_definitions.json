@@ -7,23 +7,17 @@
     "config": {
 
     "active_directory.users_purge": {
-        "description": "Keep inactive users for",
-        "units": "days",
-        "help": "Delete users from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in.",
         "default": 0,
+        "units": "days",
         "group": "auth",
         "section": "ad",
         "order": 2,
         "type": "integer"
     },
     "addhost_alwayscheckip": {
-        "description": "Check for duplicate IP when adding devices",
-        "help": "If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.",
         "default": false
     },
     "alert.ack_until_clear": {
-        "description": "Default acknowledge until alert clears option",
-        "help": "Default acknowledge until alert clears",
         "default": false,
         "group": "alerting",
         "section": "general",
@@ -31,8 +25,6 @@
         "type": "boolean"
     },
     "alert.admins": {
-        "description": "Issue alerts to admins",
-        "help": "Alert administrators",
         "default": true,
         "group": "alerting",
         "section": "general",
@@ -40,8 +32,6 @@
         "type": "boolean"
     },
     "alert.default_copy": {
-        "description": "Copy all email alerts to default contact",
-        "help": "Copy all email alerts to default contact",
         "default": true,
         "group": "alerting",
         "section": "general",
@@ -49,8 +39,6 @@
         "type": "boolean"
     },
     "alert.default_if_none": {
-        "description": "cannot set in webui?",
-        "help": "Send mail to default contact if no other contacts are found",
         "default": false,
         "group": "alerting",
         "section": "general",
@@ -59,8 +47,6 @@
         "hidden": true
     },
     "alert.default_mail": {
-        "description": "Default contact",
-        "help": "The default mail contact",
         "default": false,
         "group": "alerting",
         "section": "general",
@@ -68,8 +54,6 @@
         "type": "email"
     },
     "alert.default_only": {
-        "description": "Send alerts to default contact only",
-        "help": "Only alert default mail contact",
         "default": true,
         "group": "alerting",
         "section": "general",
@@ -77,8 +61,6 @@
         "type": "boolean"
     },
     "alert.disable": {
-        "description": "Disable alerting",
-        "help": "Stop alerts being generated",
         "default": false,
         "group": "alerting",
         "section": "general",
@@ -86,8 +68,6 @@
         "type": "boolean"
     },
     "alert.fixed-contacts": {
-        "description": "Updates to contact email addresses not honored",
-        "help": "If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active",
         "default": true,
         "group": "alerting",
         "section": "general",
@@ -95,8 +75,6 @@
         "type": "boolean"
     },
     "alert.globals": {
-        "description": "Issue alerts to read only users",
-        "help": "Alert read only administrators",
         "default": true,
         "group": "alerting",
         "section": "general",
@@ -104,8 +82,6 @@
         "type": "boolean"
     },
     "alert.syscontact": {
-        "description": "Issue alerts to sysContact",
-        "help": "Send alert to email in SNMP sysContact",
         "default": true,
         "group": "alerting",
         "section": "general",
@@ -113,8 +89,6 @@
         "type": "boolean"
     },
     "alert.transports.mail": {
-        "description": "Enable email alerting",
-        "help": "Mail alerting transport",
         "default": 5,
         "group": "alerting",
         "section": "email",
@@ -122,8 +96,6 @@
         "type": "boolean"
     },
     "alert.tolerance_window": {
-        "description": "Tolerance window for cron",
-        "help": "Tolerance window in seconds",
         "default": 5,
         "group": "alerting",
         "section": "general",
@@ -131,8 +103,6 @@
         "type": "integer"
     },
     "alert.users": {
-        "description": "Issue alerts to normal users",
-        "help": "Alert normal users",
         "default": false,
         "group": "alerting",
         "section": "general",
@@ -143,10 +113,8 @@
         "default": "%Y-%m-%d %H:%i"
     },
     "alert_log_purge": {
-        "description": "Alert log entries older than",
-        "units": "days",
-        "help": "Cleanup done by daily.sh",
         "default": 365,
+        "units": "days",
         "group": "system",
         "section": "cleanup",
         "order": 4,
@@ -197,8 +165,6 @@
         "default": true
     },
     "allow_unauth_graphs": {
-        "description": "Allow unauthenticated graph access",
-        "help": "Allows any one to access graphs without login",
         "default": false,
         "group": "webui",
         "section": "graph",
@@ -206,8 +172,6 @@
         "type": "booean"
     },
     "allow_unauth_graphs_cidr": {
-        "description": "Allow the given networks graph access",
-        "help": "Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)",
         "default": [],
         "group": "webui",
         "section": "graph",
@@ -245,24 +209,17 @@
         "default": "*"
     },
     "api_demo": {
-        "description": "This is the demo",
         "default": false,
         "type": "boolean"
     },
     "apps.powerdns-recursor.api-key": {
-        "description": "API key for PowerDNS Recursor",
-        "help": "API key for the PowerDNS Recursor app when connecting directly",
         "type": "text"
     },
     "apps.powerdns-recursor.https": {
-        "description": "PowerDNS Recursor use HTTPS?",
-        "help": "Use HTTPS instead of HTTP for the PowerDNS Recursor app when connecting directly",
         "default": false,
         "type": "boolean"
     },
     "apps.powerdns-recursor.port": {
-        "description": "PowerDNS Recursor port",
-        "help": "TCP port to use for the PowerDNS Recursor app when connecting directly",
         "default": 8082,
         "type": "integer"
     },
@@ -270,8 +227,6 @@
         "description": "Key to hold cache of autonomous systems descriptions"
     },
     "auth_ad_base_dn": {
-        "description": "Base DN",
-        "help": "groups and users must be under this dn. Example: dc=example,dc=com",
         "group": "auth",
         "section": "ad",
         "order": 1,
@@ -279,8 +234,6 @@
         "required": true
     },
     "auth_ad_check_certificates": {
-        "description": "Check certificate",
-        "help": "Check certificates for validity. Some servers use self signed certificates, disabling this allows those.",
         "default": false,
         "group": "auth",
         "section": "ad",
@@ -289,8 +242,6 @@
         "required": true
     },
     "auth_ad_group_filter": {
-        "description": "Group LDAP filter",
-        "help": "Active Directory LDAP filter for selecting groups",
         "default": "(objectclass=group)",
         "group": "auth",
         "section": "ad",
@@ -298,8 +249,6 @@
         "type": "text"
     },
     "auth_ad_groups": {
-        "description": "Group access",
-        "help": "Define groups that have access and level",
         "default": {
             "admin": {
                 "level": 10
@@ -317,8 +266,6 @@
         "type": "ldap-groups"
     },
     "auth_ad_user_filter": {
-        "description": "User LDAP filter",
-        "help": "Active Directory LDAP filter for selecting users",
         "default": "(objectclass=user)",
         "group": "auth",
         "section": "ad",
@@ -326,8 +273,6 @@
         "type": "text"
     },
     "auth_ldap_attr.uid": {
-        "description": "Attribute to check username against",
-        "help": "Attribute used to identify users by username",
         "default": "uid",
         "group": "auth",
         "section": "ldap",
@@ -335,66 +280,50 @@
         "type": "text"
     },
     "auth_ldap_binddn": {
-        "description": "Bind DN (overrides bind username)",
-        "help": "Full DN of bind user",
         "group": "auth",
         "section": "ldap",
         "order": 9,
         "type": "text"
     },
     "auth_ldap_bindpassword": {
-        "description": "Bind password",
-        "help": "Password for bind user",
         "group": "auth",
         "section": "ldap",
         "order": 8,
         "type": "password"
     },
     "auth_ldap_binduser": {
-        "description": "Bind username",
-        "help": "Used to query the LDAP server when no user is logged in (alerts, API, etc)",
         "group": "auth",
         "section": "ldap",
         "order": 10,
         "type": "text"
     },
     "auth_ad_binddn": {
-        "description": "Bind DN (overrides bind username)",
-        "help": "Full DN of bind user",
         "group": "auth",
         "section": "ldap",
         "order": 9,
         "type": "text"
     },
     "auth_ad_bindpassword": {
-        "description": "Bind password",
-        "help": "Password for bind user",
         "group": "auth",
         "section": "ldap",
         "order": 8,
         "type": "password"
     },
     "auth_ad_binduser": {
-        "description": "Bind username",
-        "help": "Used to query the AD server when no user is logged in (alerts, API, etc)",
         "group": "auth",
         "section": "ldap",
         "order": 10,
         "type": "text"
     },
     "auth_ldap_cache_ttl": {
-        "description": "LDAP cache expiration",
-        "units": "seconds",
-        "help": "Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.",
         "default": 300,
+        "units": "seconds",
         "group": "auth",
         "section": "ldap",
         "order": 20,
         "type": "integer"
     },
     "auth_ldap_debug": {
-        "description": "Show debug",
-        "help": "Shows debug information.  May expose private information, do not leave enabled.",
         "default": false,
         "group": "auth",
         "section": "ldap",
@@ -402,7 +331,6 @@
         "type": "boolean"
     },
     "auth_ldap_emailattr": {
-        "description": "Mail attribute",
         "default": "mail",
         "group": "auth",
         "section": "ldap",
@@ -410,8 +338,6 @@
         "type": "text"
     },
     "auth_ldap_group": {
-        "description": "Access group DN",
-        "help": "Distinguished name for a group to give normal level access. Example: cn=groupname,ou=groups,dc=example,dc=com",
         "default": "",
         "group": "auth",
         "section": "ldap",
@@ -420,8 +346,6 @@
         "disabled": true
     },
     "auth_ldap_groupbase": {
-        "description": "Group base DN",
-        "help": "Distinguished name to search for groups Example: ou=group,dc=example,dc=com",
         "default": "",
         "group": "auth",
         "section": "ldap",
@@ -429,7 +353,6 @@
         "type": "text"
     },
     "auth_ldap_groupmemberattr": {
-        "description": "Group member attribute",
         "default": "memberUid",
         "group": "auth",
         "section": "ldap",
@@ -437,8 +360,6 @@
         "type": "text"
     },
     "auth_ldap_groupmembertype":{
-        "description": "Find group members by",
-        "Help": "Checks the given item against the Group member attribute, DN Search may be slow",
         "group": "auth",
         "section": "ldap",
         "order": 16,
@@ -450,8 +371,6 @@
         }
     },
     "auth_ldap_groups": {
-        "description": "Group access",
-        "help": "Define groups that have access and level",
         "default": {
             "admin": {
                 "level": 10
@@ -469,8 +388,6 @@
         "type": "ldap-groups"
     },
     "auth_ldap_port": {
-        "description": "LDAP port",
-        "help": "Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636",
         "default": 389,
         "group": "auth",
         "section": "ldap",
@@ -478,8 +395,6 @@
         "type": "integer"
     },
     "auth_ldap_prefix": {
-        "description": "User prefix",
-        "help": "Used to turn a username into a distinguished name",
         "default": "uid=",
         "group": "auth",
         "section": "ldap",
@@ -487,8 +402,6 @@
         "type": "text"
     },
     "auth_ldap_server": {
-        "description": "LDAP Server(s)",
-        "help": "Set server(s), space separated. Prefix with ldaps:// for ssl",
         "default": "ldap.example.com",
         "group": "auth",
         "section": "ldap",
@@ -496,8 +409,6 @@
         "type": "text"
     },
     "auth_ldap_starttls": {
-        "description": "Use STARTTLS",
-        "help": "Use STARTTLS to secure the connection.  Alternative to LDAPS.",
         "default": "ldap.example.com",
         "group": "auth",
         "section": "ldap",
@@ -510,8 +421,6 @@
         }
     },
     "auth_ldap_suffix": {
-        "description": "User suffix",
-        "help": "Used to turn a username into a distinguished name",
         "default": ",ou=People,dc=example,dc=com",
         "group": "auth",
         "section": "ldap",
@@ -519,18 +428,14 @@
         "type": "text"
     },
     "auth_ldap_timeout":{
-        "description": "Connection timeout",
-        "units": "seconds",
-        "help": "If one or more servers are unresponsive, higher timeouts will cause slow access. To low may cause connection failures in some cases",
         "default": 5,
+        "units": "seconds",
         "group": "auth",
         "section": "ldap",
         "order": 7,
         "type": "integer"
     },
     "auth_ldap_uid_attribute": {
-        "description": "Unique ID attribute",
-        "help": "LDAP attribute to use to identify users, must be numeric",
         "default": "uidnumber",
         "group": "auth",
         "section": "ldap",
@@ -538,8 +443,6 @@
         "type": "text"
     },
     "auth_ldap_userdn": {
-        "description": "Use full user DN",
-        "help": "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it’s member: uid=username,ou=groups,dc=domain,dc=com)",
         "default": false,
         "group": "auth",
         "section": "ldap",
@@ -547,8 +450,6 @@
         "type": "boolean"
     },
     "auth_ldap_version": {
-        "description": "LDAP version",
-        "help": "LDAP version to use to talk to the server.  Usually this should be v3",
         "default": 3,
         "group": "auth",
         "section": "ldap",
@@ -560,8 +461,6 @@
         }
     },
     "auth_mechanism": {
-        "description": "Authorization Method (Caution!)",
-        "help": "Authorization method.  Caution, you may lose the ability to log in. You can override this back to mysql by setting \"$config['auth_mechanism'] = 'mysql';\" in your config.php",
         "default": "mysql",
         "group": "auth",
         "section": "general",
@@ -579,18 +478,14 @@
         }
     },
     "auth_remember": {
-        "description": "Remember me duration",
-        "units": "days",
-        "help": "Number of days to keep a user logged in when checking the remember me checkbox at log in.",
         "default": 30,
+        "units": "days",
         "group": "auth",
         "section": "general",
         "order": 1,
         "type": "integer"
     },
     "authlog_purge": {
-        "description": "Auth log entries older than (days)",
-        "help": "Cleanup done by daily.sh",
         "default": 30,
         "group": "system",
         "section": "cleanup",
@@ -762,8 +657,6 @@
         "default": "ifIndex"
     },
     "device_perf_purge": {
-        "description": "Device performance entries older than (days)",
-        "help": "Cleanup done by daily.sh",
         "default": 7,
         "group": "system",
         "section": "cleanup",
@@ -999,7 +892,6 @@
         "default": "/usr/bin/dot"
     },
     "email_auto_tls": {
-        "description": "Enable / disable Auto TLS support",
         "default": true,
         "group": "alerting",
         "section": "email",
@@ -1012,8 +904,6 @@
         "class": "smtp-form"
     },
     "email_backend": {
-        "description": "How to deliver mail",
-        "help": "The backend to use for sending email, can be mail, sendmail or SMTP",
         "default": "mail",
         "group": "alerting",
         "section": "email",
@@ -1026,8 +916,6 @@
         }
     },
     "email_from": {
-        "description": "From email address",
-        "help": "Email address used for sending emails (from)",
         "default": null,
         "group": "alerting",
         "section": "email",
@@ -1035,8 +923,6 @@
         "type": "email"
     },
     "email_html": {
-        "description": "Use HTML emails",
-        "help": "Send HTML emails",
         "default": false,
         "group": "alerting",
         "section": "email",
@@ -1044,7 +930,6 @@
         "type": "boolean"
     },
     "email_sendmail_path": {
-        "description": "Location of sendmail if using this option",
         "default": "/usr/sbin/sendmail",
         "group": "alerting",
         "section": "email",
@@ -1053,7 +938,6 @@
         "class": "sendmail-form"
     },
     "email_smtp_auth": {
-        "description": "Enable / disable smtp authentication",
         "default": false,
         "group": "alerting",
         "section": "email",
@@ -1062,7 +946,6 @@
         "class": "smtp-form"
     },
     "email_smtp_host": {
-        "description": "SMTP Host for sending email if using this option",
         "default": "localhost",
         "group": "alerting",
         "section": "email",
@@ -1072,7 +955,6 @@
         "class": "smtp-form"
     },
     "email_smtp_password": {
-        "description": "SMTP Auth password",
         "default": "NULL",
         "group": "alerting",
         "section": "email",
@@ -1081,7 +963,6 @@
         "class": "smtp-form"
     },
     "email_smtp_port": {
-        "description": "SMTP port setting",
         "default": 25,
         "group": "alerting",
         "section": "email",
@@ -1090,7 +971,6 @@
         "class": "smtp-form"
     },
     "email_smtp_secure": {
-        "description": "Enable / disable encryption (use tls or ssl)",
         "default": false,
         "group": "alerting",
         "section": "email",
@@ -1104,7 +984,6 @@
         "class": "smtp-form"
     },
     "email_smtp_timeout": {
-        "description": "SMTP timeout setting",
         "default": 10,
         "group": "alerting",
         "section": "email",
@@ -1113,7 +992,6 @@
         "class": "smtp-form"
     },
     "email_smtp_username": {
-        "description": "SMTP Auth username",
         "default": "NULL",
         "group": "alerting",
         "section": "email",
@@ -1122,8 +1000,6 @@
         "class": "smtp-form"
     },
     "email_user": {
-        "description": "From name",
-        "help": "Name used as part of the from address",
         "default": "LibreNMS",
         "group": "alerting",
         "section": "email",
@@ -1182,8 +1058,6 @@
         "default": 1
     },
     "eventlog_purge": {
-        "description": "Event log entries older than (days)",
-        "help": "Cleanup done by daily.sh",
         "default": 30,
         "group": "system",
         "section": "cleanup",
@@ -1200,7 +1074,6 @@
         "default": false
     },
     "fping": {
-        "description": "Path to fping",
         "default": "fping",
         "group": "external",
         "section": "binaries",
@@ -1208,7 +1081,6 @@
         "type": "text"
     },
     "fping6": {
-        "description": "Path to fping6",
         "default": "fping6",
         "group": "external",
         "section": "binaries",
@@ -1216,8 +1088,6 @@
         "type": "text"
     },
     "fping_options.count": {
-        "description": "fping count",
-        "help": "The number of pings to send when checking if a host is up or down via icmp",
         "default": 3,
         "group": "poller",
         "section": "ping",
@@ -1225,8 +1095,6 @@
         "type": "text"
     },
     "fping_options.interval": {
-        "description": "fping interval",
-        "help": "The amount of milliseconds to wait between pings",
         "default": 500,
         "units": "ms",
         "group": "poller",
@@ -1235,8 +1103,6 @@
         "type": "text"
     },
     "fping_options.timeout": {
-        "description": "fping timeout",
-        "help": "The amount of milliseconds to wait for an echo response before giving up",
         "default": 500,
         "units": "ms",
         "group": "poller",
@@ -1257,8 +1123,6 @@
         "default": 10
     },
     "geoloc.api_key": {
-        "description": "Geocoding API Key",
-        "help": "Geocoding API Key (Required to function)",
         "default": "",
         "group": "external",
         "section": "location",
@@ -1268,7 +1132,6 @@
         "required": true
     },
     "geoloc.engine": {
-        "description": "Geocoding Engine",
         "default": false,
         "group": "external",
         "section": "location",
@@ -3141,7 +3004,6 @@
         }
     },
     "ipmitool": {
-        "description": "Path to ipmtool",
         "default": "/usr/bin/ipmitool",
         "group": "external",
         "section": "binaries",
@@ -3250,7 +3112,6 @@
         "default": "DejaVuSansMono"
     },
     "mtr": {
-        "description": "Path to mtr",
         "default": "/usr/bin/mtr",
         "group": "external",
         "section": "binaries",
@@ -3312,7 +3173,6 @@
         "default": 0
     },
     "nmap": {
-        "description": "Path to nmap",
         "default": "/usr/bin/nmap",
         "group": "external",
         "section": "binaries",
@@ -3369,8 +3229,6 @@
         "default": true
     },
     "own_hostname": {
-        "description": "LibreNMS hostname",
-        "help": "Should be set to the hostname/ip the librenms server is added as",
         "default": "localhost",
         "group": "system",
         "section": "server",
@@ -3378,7 +3236,6 @@
         "type": "text"
     },
     "oxidized.default_group": {
-        "description": "Set the default group returned",
         "default": false,
         "group": "external",
         "section": "oxidized",
@@ -3386,7 +3243,6 @@
         "type": "text"
     },
     "oxidized.enabled": {
-        "description": "Enable Oxidized support",
         "default": false,
         "group": "external",
         "section": "oxidized",
@@ -3394,8 +3250,6 @@
         "type": "boolean"
     },
     "oxidized.features.versioning": {
-        "description": "Enable config versioning access",
-        "help": "Enable Oxidized config versioning (requires git backend)",
         "default": false,
         "group": "external",
         "section": "oxidized",
@@ -3403,7 +3257,6 @@
         "type": "boolean"
     },
     "oxidized.group_support": {
-        "description": "Enable the return of groups to Oxidized",
         "default": false,
         "group": "external",
         "section": "oxidized",
@@ -3411,15 +3264,12 @@
         "type": "boolean"
     },
     "oxidized.reload_nodes": {
-        "description": "Reload Oxidized nodes list, each time a device is added",
         "default": false,
         "group": "external",
         "section": "oxidized",
         "order": 5
     },
     "oxidized.url": {
-        "description": "URL to your Oxidized API",
-        "help": "Oxidized API url (For example: http://127.0.0.1:8888)",
         "default": false,
         "group": "external",
         "section": "oxidized",
@@ -3443,8 +3293,6 @@
         "default": "peering"
     },
     "peeringdb.enabled": {
-        "description": "Enable PeeringDB lookup",
-        "help": "Enable PeeringDB lookup (data is downloaded with daily.sh)",
         "default": false,
         "group": "external",
         "section": "peeringdb",
@@ -3455,8 +3303,6 @@
         "default": 95
     },
     "perf_times_purge": {
-        "description": "Poller performance log entries older than (days)",
-        "help": "Cleanup done by daily.sh",
         "default": 30,
         "group": "system",
         "section": "cleanup",
@@ -3464,7 +3310,6 @@
         "type": "integer"
     },
     "ping": {
-        "description": "Path to ping",
         "default": "/bin/ping",
         "group": "external",
         "section": "binaries",
@@ -3636,7 +3481,6 @@
         "default": "Mgmt"
     },
     "rrd.heartbeat": {
-        "description": "Change the rrd heartbeat value (default 600)",
         "default": 600,
         "group": "poller",
         "section": "rrdtool",
@@ -3644,7 +3488,6 @@
         "type": "integer"
     },
     "rrd.step": {
-        "description": "Change the rrd step value (default 300)",
         "default": 300,
         "group": "poller",
         "section": "rrdtool",
@@ -3655,8 +3498,6 @@
         "default": "rrd"
     },
     "rrd_rra": {
-        "description": "RRD Format Settings",
-        "help": "These cannot be changed without deleting your existing RRD files. Though one could conceivably increase or decrease the size of each RRA if one had performance problems or if one had a very fast I/O subsystem with no performance worries.",
         "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 ",
         "group": "poller",
         "section": "rrdtool",
@@ -3664,8 +3505,6 @@
         "type": "text"
     },
     "rrdcached": {
-        "description": "Enable rrdcached (socket)",
-        "help": "Enables rrdcached by setting the location of the rrdcached socket. Can be unix or network socket (unix:/run/rrdcached.sock or localhost:42217)",
         "group": "poller",
         "section": "rrdtool",
         "order": 5,
@@ -3678,7 +3517,6 @@
         "default": false
     },
     "rrdtool": {
-        "description": "Path to rrdtool",
         "default": "rrdtool",
         "group": "external",
         "section": "binaries",
@@ -3686,8 +3524,6 @@
         "type": "text"
     },
     "rrdtool_tune": {
-        "description": "Tune all rrd port files to use max values",
-        "help": "Auto tune maximum value for rrd port files",
         "default": false,
         "group": "poller",
         "section": "rrdtool",
@@ -3697,7 +3533,6 @@
     "secure_cookies": {
     },
     "sfdp": {
-        "description": "Path to sfdp",
         "default": "/usr/bin/sfdp",
         "group": "external",
         "section": "binaries",
@@ -3717,7 +3552,12 @@
         "default": 0
     },
     "site_style": {
-        "default": "light"
+        "default": "light",
+        "group": "webui",
+        "section": "style",
+        "order": 1,
+        "type": "select",
+        "options": ["blue", "dark", "light", "mono"]
     },
     "sla_type_labels.dhcp": {
         "default": "DHCP"
@@ -3831,7 +3671,6 @@
         "default": "v1"
     },
     "snmpbulkwalk": {
-        "description": "Path to snmpbulkwalk",
         "default": "/usr/bin/snmpbulkwalk",
         "group": "external",
         "section": "binaries",
@@ -3839,7 +3678,6 @@
         "type": "text"
     },
     "snmpget": {
-        "description": "Path to snmpget",
         "default": "/usr/bin/snmpget",
         "group": "external",
         "section": "binaries",
@@ -3847,7 +3685,6 @@
         "type": "text"
     },
     "snmpgetnext": {
-        "description": "Path to snmpgetnext",
         "default": "snmpgetnext",
         "group": "external",
         "section": "binaries",
@@ -3855,7 +3692,6 @@
         "type": "text"
     },
     "snmptranslate": {
-        "description": "Path to snmptranslate",
         "default": "/usr/bin/snmptranslate",
         "group": "external",
         "section": "binaries",
@@ -3866,7 +3702,6 @@
         "default": "unhandled"
     },
     "snmpwalk": {
-        "description": "Path to snmpwalk",
         "default": "/usr/bin/snmpwalk",
         "group": "external",
         "section": "binaries",
@@ -3889,7 +3724,6 @@
         "default": 0
     },
     "syslog_filter": {
-        "description": "Filter syslog messages containing",
         "default": [
             "last message repeated",
             "Connection from UDP: [",
@@ -3898,8 +3732,6 @@
         ]
     },
     "syslog_purge": {
-        "description": "Syslog entries older than (days)",
-        "help": "Cleanup done by daily.sh",
         "default": 30,
         "group": "system",
         "section": "cleanup",
@@ -3919,7 +3751,6 @@
         "default": 1
     },
     "traceroute": {
-        "description": "Path to traceroute",
         "default": "traceroute",
         "group": "external",
         "section": "binaries",
@@ -3927,7 +3758,6 @@
         "type": "text"
     },
     "traceroute6": {
-        "description": "Path to traceroute6",
         "default": "traceroute6",
         "group": "external",
         "section": "binaries",
@@ -3944,7 +3774,6 @@
         "default": 10
     },
     "unix-agent.connection-timeout": {
-        "description": "Unix-agent connection timeout",
         "default": 10,
         "group": "external",
         "section": "unix-agent",
@@ -3952,8 +3781,6 @@
         "type": "integer"
     },
     "unix-agent.port": {
-        "description": "Default unix-agent port",
-        "help": "Default port for the unix-agent (check_mk)",
         "default": 6556,
         "group": "external",
         "section": "unix-agent",
@@ -3961,7 +3788,6 @@
         "type": "integer"
     },
     "unix-agent.read-timeout": {
-        "description": "Unix-agent read timeout",
         "default": 10,
         "group": "external",
         "section": "unix-agent",
@@ -3969,14 +3795,12 @@
         "type": "integer"
     },
     "update": {
-        "description": "Enable updates in ./daily.sh",
         "default": 1,
         "group": "system",
         "section": "updates",
         "type": "boolean"
     },
     "update_channel": {
-        "description": "Set update Channel",
         "default": "master",
         "group": "system",
         "section": "updates",
@@ -3993,7 +3817,6 @@
         "default": 0
     },
     "virsh": {
-        "description": "Path to virsh",
         "default": "/usr/bin/virsh",
         "group": "external",
         "section": "binaries",
@@ -4307,8 +4130,6 @@
         "default": true
     },
     "webui.availability_map_box_size": {
-        "description": "Availability box width",
-        "help": "Input desired tile width in pixels for box size in full view",
         "default": 165,
         "group": "webui",
         "section": "availability-map",
@@ -4316,8 +4137,6 @@
         "type": "text"
     },
     "webui.availability_map_compact": {
-        "description": "Availability map compact view",
-        "help": "Availability map view with small indicators",
         "default": false,
         "group": "webui",
         "section": "availability-map",
@@ -4325,8 +4144,6 @@
         "type": "boolean"
     },
     "webui.availability_map_sort_status": {
-        "description": "Sort by status",
-        "help": "Sort devices and services by status",
         "default": false,
         "group": "webui",
         "section": "availability-map",
@@ -4334,8 +4151,6 @@
         "type": "boolean"
     },
     "webui.availability_map_use_device_groups": {
-        "description": "Use device groups filter",
-        "help": "Enable usage of device groups filter",
         "default": false,
         "group": "webui",
         "section": "availability-map",
@@ -4343,7 +4158,6 @@
         "type": "boolean"
     },
     "webui.default_dashboard_id": {
-        "description": "Global default dashboard_id for all users who do not have their own default set",
         "default": false,
         "group": "webui",
         "section": "dashboard",
@@ -4351,8 +4165,6 @@
         "type": "select"
     },
     "webui.dynamic_graphs": {
-        "description": "Enable dynamic graphs",
-        "help": "Enable dynamic graphs, enables zooming and panning on graphs",
         "default": false,
         "group": "webui",
         "section": "graph",
@@ -4360,8 +4172,6 @@
         "type": "boolean"
     },
     "webui.global_search_result_limit": {
-        "description": "Set the max search result limit",
-        "help": "Global search results limit",
         "default": 8,
         "group": "webui",
         "section": "search",
@@ -4370,8 +4180,6 @@
         "required": true
     },
     "webui.graph_stacked": {
-        "description": "Use stacked graphs",
-        "help": "Display stacked graphs instead of inverted graphs",
         "default": false,
         "group": "webui",
         "section": "graph",
@@ -4379,8 +4187,6 @@
         "type": "boolean"
     },
     "webui.graph_type": {
-        "description": "Set the graph type",
-        "help": "Set the default graph type",
         "default": "png",
         "group": "webui",
         "section": "graph",
@@ -4392,8 +4198,6 @@
         }
     },
     "webui.min_graph_height": {
-        "description": "Set the minimum graph height",
-        "help": "Minimum Graph Height (default: 300)",
         "default": 300,
         "group": "webui",
         "section": "graph",
@@ -4401,7 +4205,6 @@
         "type": "integer"
     },
     "whois": {
-        "description": "Path to whois",
         "default": "/usr/bin/whois",
         "group": "external",
         "section": "binaries",

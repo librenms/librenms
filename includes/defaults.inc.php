@@ -21,22 +21,6 @@
 // Please don't edit this file -- make changes to the configuration array in config.php
 //
 
-
-// Web Interface Settings
-if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
-    if (strpos($_SERVER['SERVER_NAME'], ':')) {
-        // Literal IPv6
-        $config['base_url'] = 'http://['.$_SERVER['SERVER_NAME'].']'.($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
-    } else {
-        $config['base_url'] = 'http://'.$_SERVER['SERVER_NAME'].($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
-    }
-}
-
-$config['project_home']   = 'http://www.librenms.org/';
-$config['project_issues'] = 'https://community.librenms.org/c/help';
-$config['github_api']   = 'https://api.github.com/repos/librenms/librenms/';
-$config['site_style']     = 'light';
-// Options are dark or light
 $config['stylesheet']   = 'css/styles.css';
 $config['mono_font']    = 'DejaVuSansMono';
 $config['favicon']      = '';

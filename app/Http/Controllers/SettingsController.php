@@ -84,7 +84,7 @@ class SettingsController extends Controller
     {
         $value = $request->get('value');
 
-        if (!$config->isValidSetting($id, $value)) {
+        if (!$config->isValidSetting($id)) {
             return $this->jsonResponse($id, ":id is not a valid setting", 400);
         }
 

@@ -41,7 +41,7 @@
                                             <div class="panel-body">
                                                 <form class="form-horizontal section-form" role="form">
                                                     @foreach($configs as $config)
-                                                        @includeIf('settings.types.' . $config->getType(), $config->toArray())
+                                                        @includeIf('settings.types.' . $config->getType(), compact('config'))
                                                     @endforeach
                                                 </form>
                                             </div>
