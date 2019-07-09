@@ -3,11 +3,16 @@ path: blob/master/doc/
 
 # Entities
 
-Entities as described earlier are based on the table and column names within the database, if you are unsure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
+Entities as described earlier are based on the table and column names
+within the database, if you are unsure of what the entity is you want
+then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
 
-Below are some common entities that you can use within the alerting system. This list is not exhaustive and you should look at the MySQL database schema for the full list.
+Below are some common entities that you can use within the alerting
+system. This list is not exhaustive and you should look at the MySQL
+database schema for the full list.
 
 ## Devices
+
 Entity | Description
 ---|---
 `devices.hostname` | The device hostname
@@ -24,6 +29,7 @@ Entity | Description
 `devices.type` | The device type such as network, server, firewall, etc.
 
 ## BGP Peers
+
 Entity | Description
 ---|---
 `bgpPeers.astext` | This is the description of the BGP Peer
@@ -34,6 +40,7 @@ Entity | Description
 `bgpPeers.bgpLocalAddr` | The local address of the BGP session.
 
 ## IPSec Tunnels
+
 Entity | Description
 ---|---
 `ipsec_tunnels.peer_addr` | The remote VPN peer address
@@ -41,6 +48,7 @@ Entity | Description
 `ipsec_tunnels.tunnel_status` | The VPN tunnels operational status.
 
 ## Memory pools
+
 Entity | Description
 ---|---
 `mempools.mempool_type` | The memory pool type such as hrstorage, cmp and cemp
@@ -48,6 +56,7 @@ Entity | Description
 `mempools.mempool_perc` | The used percentage of the memory pool.
 
 ## Ports
+
 Entity | Description
 ---|---
 `ports.ifDescr` | The interface description
@@ -60,18 +69,21 @@ Entity | Description
 `ports.ifMtu` | The MTU setting of the port.`
 
 ## Processors
+
 Entity | Description
 ---|---
 `processors.processor_usage` | The usage of the processor as a percentage
 `processors.processor_descr` | The description of the processor.
 
 ## Storage
+
 Entity | Description
 ---|---
 `storage.storage_descr` | The description of the storage
 `storage.storage_perc` | The usage of the storage as a percentage.
 
 ## Health / Sensors
+
  Entity | Description
 ---|---
  `sensors.sensor_desc` | The sensors description.

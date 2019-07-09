@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-$multi_get_array = snmp_get_multi($device, ['nbsCmmcChassisModel.1', 'nbsCmmcSysFwVers.0', 'nbsCmmcChassisSerialNum.1'], '-OQUs', 'NBS-CMMC-MIB', $config['install_dir'].'/mibs/mrv');
+$multi_get_array = snmp_get_multi($device, ['nbsCmmcChassisModel.1', 'nbsCmmcSysFwVers.0', 'nbsCmmcChassisSerialNum.1'], '-OQUs', 'NBS-CMMC-MIB', \LibreNMS\Config::get('install_dir') . '/mibs/mrv');
 $hardware = $multi_get_array[1]['nbsCmmcChassisModel'];
 $version = $multi_get_array[0]['nbsCmmcSysFwVers'];
 $serial = $multi_get_array[1]['nbsCmmcChassisSerialNum'];

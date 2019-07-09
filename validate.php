@@ -136,7 +136,7 @@ require 'includes/init.php';
 // make sure install_dir is set correctly, or the next includes will fail
 if (!file_exists(Config::get('install_dir').'/config.php')) {
     $suggested = realpath(__DIR__);
-    print_fail('$config[\'install_dir\'] is not set correctly.', "It should probably be set to: $suggested");
+    print_fail('\'install_dir\' config setting is not set correctly.', "It should probably be set to: $suggested");
     exit;
 }
 

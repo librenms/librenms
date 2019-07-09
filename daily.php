@@ -25,13 +25,13 @@ if (isset($options['d'])) {
 }
 
 if ($options['f'] === 'update') {
-    if (!$config['update']) {
+    if (!Config::get('update')) {
         exit(0);
     }
 
-    if ($config['update_channel'] == 'master') {
+    if (Config::get('update_channel') == 'master') {
         exit(1);
-    } elseif ($config['update_channel'] == 'release') {
+    } elseif (Config::get('update_channel') == 'release') {
         exit(3);
     }
     exit(0);
@@ -243,11 +243,11 @@ if ($options['f'] === 'purgeusers') {
         }
 
         $purge = 0;
-        if (is_numeric($config['radius']['users_purge']) && $config['auth_mechanism'] === 'radius') {
-            $purge = $config['radius']['users_purge'];
+        if (is_numeric(\LibreNMS\Config::get('radius.users_purge')) && Config::get('auth_mechanism') === 'radius') {
+            $purge = \LibreNMS\Config::get('radius.users_purge');
         }
-        if (is_numeric($config['active_directory']['users_purge']) && $config['auth_mechanism'] === 'active_directory') {
-            $purge = $config['active_directory']['users_purge'];
+        if (is_numeric(\LibreNMS\Config::get('active_directory.users_purge')) && Config::get('auth_mechanism') === 'active_directory') {
+            $purge = \LibreNMS\Config::get('active_directory.users_purge');
         }
         if ($purge > 0) {
             foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
@@ -309,9 +309,9 @@ if ($options['f'] === 'refresh_device_groups') {
 }
 
 if ($options['f'] === 'notify') {
-    if (isset($config['alert']['default_mail'])) {
+    if (\LibreNMS\Config::has('alert.default_mail')) {
         send_mail(
-            $config['alert']['default_mail'],
+            \LibreNMS\Config::get('alert.default_mail'),
             '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'),
             "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o']
         );

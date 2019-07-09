@@ -64,7 +64,7 @@ if ($vars['view'] == 'incoming') {
         foreach ($smokeping_files['in'][$device['hostname']] as $src => $host) {
             $hostname = str_replace('.rrd', '', $host);
             $host     = device_by_name($src);
-            if ($config['smokeping']['integration'] === true) {
+            if (\LibreNMS\Config::get('smokeping.integration') === true) {
                 $dest = device_by_name(str_replace("_", ".", $hostname));
             } else {
                 $dest = $host;
@@ -87,13 +87,14 @@ if ($vars['view'] == 'incoming') {
         $graph_array['type']   = 'device_smokeping_out_all_avg';
         $graph_array['device'] = $device['device_id'];
         echo '<tr><td>';
-        echo '<h3>Aggregate</h3>';
+        echo '<h3>Average</h3>';
 
         include 'includes/html/print-graphrow.inc.php';
 
         echo '</td></tr>';
 
         $graph_array['type']   = 'device_smokeping_out_all';
+        $graph_array['device'] = $device['device_id'];
         $graph_array['legend'] = 'no';
         echo '<tr><td>';
         echo '<h3>Aggregate</h3>';
@@ -106,7 +107,7 @@ if ($vars['view'] == 'incoming') {
 
         asort($smokeping_files['out'][$device['hostname']]);
         foreach ($smokeping_files['out'][$device['hostname']] as $host) {
-            $hostname           = str_replace('.rrd', '', $host);
+            $hostname       = str_replace('_', '.', str_replace('.rrd', '', $host));
             list($hostname) = explode('~', $hostname);
             $host           = device_by_name($hostname);
             if (is_numeric($host['device_id'])) {

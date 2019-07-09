@@ -14,10 +14,10 @@
 
 function graphite_update($device, $measurement, $tags, $fields)
 {
-    global $graphite, $config;
+    global $graphite;
     if ($graphite != false) {
         $timestamp = time();
-        $graphite_prefix = $config['graphite']['prefix'];
+        $graphite_prefix = \LibreNMS\Config::get('graphite.prefix');
         // metrics will be built as prefix.hostname.measurement.field value timestamp
         // metric fields can not contain . as this is used by graphite as a field separator
         $hostname = preg_replace('/\./', '_', $device['hostname']);

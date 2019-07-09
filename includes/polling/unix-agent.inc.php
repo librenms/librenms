@@ -3,24 +3,18 @@
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['os_group'] == 'unix') {
-    echo $config['project_name'].' UNIX Agent: ';
+    echo \LibreNMS\Config::get('project_name') . ' UNIX Agent: ';
 
     $agent_port = get_dev_attrib($device, 'override_Unixagent_port');
     if (empty($agent_port)) {
-        $agent_port = $config['unix-agent']['port'];
-    }
-    if (empty($config['unix-agent']['connection-timeout'])) {
-        $config['unix-agent']['connection-timeout'] = $config['unix-agent-connection-time-out'];
-    }
-    if (empty($config['unix-agent']['read-timeout'])) {
-        $config['unix-agent']['read-timeout'] = $config['unix-agent-read-time-out'];
+        $agent_port = \LibreNMS\Config::get('unix-agent.port');
     }
 
     $agent_start = microtime(true);
-    $agent       = fsockopen($device['hostname'], $agent_port, $errno, $errstr, $config['unix-agent']['connection-timeout']);
+    $agent = fsockopen($device['hostname'], $agent_port, $errno, $errstr, \LibreNMS\Config::get('unix-agent.connection-timeout'));
 
     // Set stream timeout (for timeouts during agent  fetch
-    stream_set_timeout($agent, $config['unix-agent']['read-timeout']);
+    stream_set_timeout($agent, \LibreNMS\Config::get('unix-agent.read-timeout'));
     $agentinfo = stream_get_meta_data($agent);
 
     if (!$agent) {

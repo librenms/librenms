@@ -30,7 +30,7 @@ function dbIsConnected()
 
 /**
  * Connect to the database.
- * Will use global $config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
+ * Will use global config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
  *
  * @param string $db_host
  * @param string $db_user

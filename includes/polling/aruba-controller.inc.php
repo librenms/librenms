@@ -3,8 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
-    global $config;
-
     $polled = time();
 
     // Build SNMP Cache Array

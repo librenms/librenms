@@ -7,20 +7,9 @@ $slas = dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` = 
 // Collect types
 $sla_types = array('all' => 'All');
 foreach ($slas as $sla) {
-    // Set a default type, if we know about it, it will be overwritten below.
-    $text = 'Unknown';
-
     $sla_type = $sla['rtt_type'];
 
-    if (!in_array($sla_type, $sla_types)) {
-        if (isset($config['sla_type_labels'][$sla_type])) {
-            $text = $config['sla_type_labels'][$sla_type];
-        }
-    } else {
-        $text = ucfirst($sla_type);
-    }
-
-    $sla_types[$sla_type] = $text;
+    $sla_types[$sla_type] = !in_array($sla_type, $sla_types) ? \LibreNMS\Config::get("sla_type_labels.$sla_type", 'Unknown') : ucfirst($sla_type);
 }
 asort($sla_types);
 
@@ -114,7 +103,7 @@ foreach ($slas as $sla) {
     $graph_array['device']  = $device['device_id'];
     $graph_array['height']  = '100';
     $graph_array['width']   = '215';
-    $graph_array['to']      = $config['time']['now'];
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['type']    = 'device_sla';
     $graph_array['id']      = $sla['sla_id'];
     echo '<div class="panel panel-default '.$danger.'">

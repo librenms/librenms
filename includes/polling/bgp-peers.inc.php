@@ -4,7 +4,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
-if ($config['enable_bgp']) {
+if (\LibreNMS\Config::get('enable_bgp')) {
     $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', array($device['device_id']));
 
     if (!empty($peers)) {
@@ -103,7 +103,11 @@ if ($config['enable_bgp']) {
 
                         $peer_data = [];
                         $peer_data['bgpPeerState'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgConnState'];
-                        $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperLastEvent']; // not exactly the same
+                        if ($bgpPeers[$vrfOid][$address]['tBgpPeerNgShutdown'] == '1') {
+                            $peer_data['bgpPeerAdminStatus'] = 'adminShutdown';
+                        } else {
+                            $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperLastEvent'];
+                        }
                         $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsRcvd'];  // That are actually only octets available,
                         $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent']; // not messages
                         $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
@@ -200,8 +204,8 @@ if ($config['enable_bgp']) {
 
             // --- Send event log notices ---
             if ($peer_data['bgpPeerFsmEstablishedTime']) {
-                if (!(is_array($config['alerts']['bgp']['whitelist'])
-                        && !in_array($peer['bgpPeerRemoteAs'], $config['alerts']['bgp']['whitelist']))
+                if (!(is_array(\LibreNMS\Config::get('alerts.bgp.whitelist'))
+                        && !in_array($peer['bgpPeerRemoteAs'], \LibreNMS\Config::get('alerts.bgp.whitelist')))
                     && ($peer_data['bgpPeerFsmEstablishedTime'] < $peer['bgpPeerFsmEstablishedTime']
                         || $peer_data['bgpPeerState'] != $peer['bgpPeerState'])
                 ) {
