@@ -314,12 +314,24 @@ function compare_var($a, $b, $comparison = '=')
             return $a < $b;
         case "contains":
             return str_contains($a, $b);
+        case "not_contains":
+            return !str_contains($a, $b);
         case "starts":
             return starts_with($a, $b);
+        case "not_starts":
+            return !starts_with($a, $b);
         case "ends":
             return ends_with($a, $b);
+        case "not_ends":
+            return !ends_with($a, $b);
         case "regex":
             return (bool)preg_match($b, $a);
+        case "not regex":
+            return !((bool)preg_match($b, $a));
+        case "in_array":
+            return in_array($a, $b);
+        case "not_in_array":
+            return !in_array($a, $b);
         default:
             return false;
     }
