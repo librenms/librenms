@@ -10,6 +10,9 @@ if (\LibreNMS\Config::get('enable_bgp')) {
     if (!empty($peers)) {
         if ($device['os'] == 'junos') {
             $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
+        } elseif ($device['os'] === 'dnos') {
+            $peer_data_checki = snmpwalk_group($device, 'bgpPeerEntry', 'BGP4-MIB');
+            $peer_data_check = array();
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', array(), 'ARISTA-BGP4V2-MIB');
         } elseif ($device['os'] === 'timos') {
@@ -171,6 +174,20 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                 }
 
                 // --- Build peer data if it is not already filled in ---
+                if (empty($peer_data) && ($device['os'] === 'dnos') && isset($peer_data_checki)) {
+                    foreach ($oid_map as $source => $target) {
+                        $v = isset($peer_data_checki[trim($peer_ip)][trim($source)]) ? $peer_data_checki[trim($peer_ip)][trim($source)] : '';
+                        if (str_contains($source, 'LocalAddr')) {
+                            try {
+                                $v = IP::fromHexString($v)->uncompressed();
+                            } catch (InvalidIpException $e) {
+                            }
+                        }
+                        $peer_data[$target] = $v;
+                    }
+                //d_echo($peer_data);
+                }
+
                 if (empty($peer_data) && isset($peer_identifier, $oid_map, $mib)) {
                     echo "Fetching $mib data... \n";
 

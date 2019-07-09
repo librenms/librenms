@@ -81,6 +81,10 @@ if (Config::get('enable_bgp')) {
     foreach ($vrfs_lite_cisco as $vrf) {
         $device['context_name'] = $vrf['context_name'];
         if (is_numeric($bgpLocalAs)) {
+            if ($bgpLocalAs < 0) {
+                $bgpLocalAs = fix_integer_value($bgpLocalAs);
+            }
+
             echo "AS$bgpLocalAs ";
             if ($bgpLocalAs != $device['bgpLocalAs']) {
                 dbUpdate(array('bgpLocalAs' => $bgpLocalAs), 'devices', 'device_id=?', array($device['device_id']));

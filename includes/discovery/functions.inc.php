@@ -1197,6 +1197,9 @@ function build_bgp_peers($device, $data, $peer2)
                 $peer_ip = str_replace('"', '', str_replace(' ', '', $peer_ip));
             }
         }
+        if (is_numeric($peer_as) && $peer_as < 0) {
+            $peer_as = fix_integer_value($peer_as);
+        }
         if ($peer && $peer_ip != '0.0.0.0') {
             d_echo("Found peer $peer_ip (AS$peer_as)\n");
             $peerlist[] = array(
