@@ -7,6 +7,7 @@ return [
         'external' => 'External',
         'global' => 'Global',
         'os' => 'OS',
+        'poller' => 'Poller',
         'system' => 'System',
         'webui' => 'Web UI',
     ],
@@ -27,6 +28,9 @@ return [
             'peeringdb' => 'PeeringDB Integration',
             'rrdtool' => 'RRDTool Setup',
             'unix-agent' => 'Unix-Agent Integration',
+        ],
+        'poller' => [
+            'ping' => 'Ping',
         ],
         'system' => [
             'cleanup' => 'Cleanup',

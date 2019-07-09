@@ -1216,13 +1216,33 @@
         "type": "text"
     },
     "fping_options.count": {
-        "default": 3
+        "description": "fping count",
+        "help": "The number of pings to send when checking if a host is up or down via icmp",
+        "default": 3,
+        "group": "poller",
+        "section": "ping",
+        "order": 1,
+        "type": "text"
     },
     "fping_options.interval": {
-        "default": 500
+        "description": "fping interval",
+        "help": "The amount of milliseconds to wait between pings",
+        "default": 500,
+        "units": "ms",
+        "group": "poller",
+        "section": "ping",
+        "order": 2,
+        "type": "text"
     },
     "fping_options.timeout": {
-        "default": 500
+        "description": "fping timeout",
+        "help": "The amount of milliseconds to wait for an echo response before giving up",
+        "default": 500,
+        "units": "ms",
+        "group": "poller",
+        "section": "ping",
+        "order": 3,
+        "type": "text"
     },
     "front_page": {
         "default": "pages/front/tiles.php"
@@ -3349,7 +3369,13 @@
         "default": true
     },
     "own_hostname": {
-        "default": "localhost"
+        "description": "LibreNMS hostname",
+        "help": "Should be set to the hostname/ip the librenms server is added as",
+        "default": "localhost",
+        "group": "system",
+        "section": "server",
+        "order": 4,
+        "type": "text"
     },
     "oxidized.default_group": {
         "description": "Set the default group returned",
