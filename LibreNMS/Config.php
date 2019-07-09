@@ -80,7 +80,7 @@ class Config
      */
     public static function getDefinitions()
     {
-        return json_decode(file_get_contents(self::get('install_dir') . '/misc/config_definitions.json'), true);
+        return json_decode(file_get_contents(self::get('install_dir') . '/misc/config_definitions.json'), true)['config'];
     }
 
     private static function loadDefaults()

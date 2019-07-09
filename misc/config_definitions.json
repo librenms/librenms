@@ -1,4 +1,11 @@
 {
+
+    "Warning!": "Please don't edit this file -- make changes to the config database table or the configuration array in config.php",
+
+
+
+    "config": {
+
     "active_directory.users_purge": {
         "description": "Keep inactive users for",
         "units": "days",
@@ -3203,8 +3210,10 @@
         "default": "#e3e3e3"
     },
     "log_dir": {
+        "default": "logs"
     },
     "log_file": {
+        "default": "logs/librenms.log"
     },
     "login_message": {
         "default": "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution."
@@ -3227,9 +3236,6 @@
         "section": "paths",
         "order": 4,
         "type": "text"
-    },
-    "mysql_log_level": {
-        "default": "ERROR"
     },
     "nagios_plugins": {
         "default": "/usr/lib/nagios/plugins"
@@ -4367,4 +4373,4 @@
     "xirrus_disable_stations": {
         "default": false
     }
-}
+}}
