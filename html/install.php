@@ -4,6 +4,7 @@ use LibreNMS\Config;
 
 session_start();
 $librenms_dir = realpath(__DIR__ . '/..');
+$php_temp_dir = sys_get_temp_dir();
 
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
@@ -210,6 +211,29 @@ if ($status == 'no') {
     }
 }
 echo "</td></tr>";
+    
+if (is_writeable($php_temp_dir)) {
+    $status = 'yes';
+    $row_class = 'success';
+} else {
+    $status = 'no';
+    $row_class = 'danger';
+    $complete = false;
+}
+
+echo "<tr class='$row_class'><td>Temporary directory writable</td><td>$status</td><td>";
+if ($status == 'no') {
+    echo "$php_temp_dir is not writable";
+    if (function_exists('posix_getgrgid')) {
+        $group_info = posix_getgrgid(filegroup(session_save_path()));
+        if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+            $group = $group_info['name'];
+            $user = get_current_user();
+            echo ", suggested fix <strong>chown $user:$group $php_temp_dir</strong>";
+        }
+    }
+}
+echo "</td></tr>";
 ?>
         </table>
       </div>
@@ -366,6 +390,9 @@ $config_file = <<<"EOD"
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
 \$config['user'] = 'librenms';
+
+// This is the temporary directory used by php, set by php_admin_value[sys_temp_dir], defaults to /tmp when not set.
+\$config['temp_dir'] = '$php_temp_dir';
 
 ### Locations - it is recommended to keep the default
 #\$config\['install_dir'\]  = "$install_dir";
