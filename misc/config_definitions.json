@@ -596,17 +596,17 @@
     "autodiscovery.cdp_exclude.platform_regexp": {
         "type": "array",
         "default": [
-            "\/^Cisco IP Phone\/"
+            "/^Cisco IP Phone/"
         ]
     },
     "autodiscovery.nets-exclude": {
         "type": "array",
         "default": [
-            "0.0.0.0\/8",
-            "127.0.0.0\/8",
-            "169.254.0.0\/16",
-            "224.0.0.0\/4",
-            "240.0.0.0\/4"
+            "0.0.0.0/8",
+            "127.0.0.0/8",
+            "169.254.0.0/16",
+            "224.0.0.0/4",
+            "240.0.0.0/4"
         ]
     },
     "autodiscovery.ospf": {
@@ -621,7 +621,7 @@
     "autodiscovery.xdp_exclude.sysdesc_regexp": {
         "type": "array",
         "default": [
-            "\/-K9W8-\/"
+            "/-K9W8-/"
         ]
     },
     "bad_disk_regexp": {
@@ -657,8 +657,8 @@
     "bad_if_regexp": {
         "type": "array",
         "default": [
-            "\/^ng[0-9]+$\/",
-            "\/^sl[0-9]\/"
+            "/^ng[0-9]+$/",
+            "/^sl[0-9]/"
         ]
     },
     "bad_iftype": {
@@ -693,10 +693,10 @@
         "default": 0
     },
     "callback_clear": {
-        "default": "https:\/\/stats.librenms.org\/clear.php"
+        "default": "https://stats.librenms.org/clear.php"
     },
     "callback_post": {
-        "default": "https:\/\/stats.librenms.org\/log.php"
+        "default": "https://stats.librenms.org/log.php"
     },
     "core_descr.0": {
         "default": "core"
@@ -765,24 +765,24 @@
     },
     "device_traffic_descr": {
         "default": [
-            "\/loopback\/",
-            "\/vlan\/",
-            "\/tunnel\/",
-            "\/bond\/",
-            "\/null\/",
-            "\/dummy\/"
+            "/loopback/",
+            "/vlan/",
+            "/tunnel/",
+            "/bond/",
+            "/null/",
+            "/dummy/"
         ],
         "type": "array"
     },
     "device_traffic_iftype": {
         "default": [
-            "\/loopback\/",
-            "\/tunnel\/",
-            "\/virtual\/",
-            "\/mpls\/",
-            "\/ieee8023adLag\/",
-            "\/l2vlan\/",
-            "\/ppp\/"
+            "/loopback/",
+            "/tunnel/",
+            "/virtual/",
+            "/mpls/",
+            "/ieee8023adLag/",
+            "/l2vlan/",
+            "/ppp/"
         ],
         "type": "array"
     },
@@ -989,10 +989,10 @@
     "distributed_poller_name": {
     },
     "dot": {
-        "default": "\/usr\/bin\/dot"
+        "default": "/usr/bin/dot"
     },
     "email_auto_tls": {
-        "description": "Enable \/ disable Auto TLS support",
+        "description": "Enable / disable Auto TLS support",
         "default": true,
         "group": "alerting",
         "section": "email",
@@ -1038,7 +1038,7 @@
     },
     "email_sendmail_path": {
         "description": "Location of sendmail if using this option",
-        "default": "\/usr\/sbin\/sendmail",
+        "default": "/usr/sbin/sendmail",
         "group": "alerting",
         "section": "email",
         "order": 5,
@@ -1046,7 +1046,7 @@
         "class": "sendmail-form"
     },
     "email_smtp_auth": {
-        "description": "Enable \/ disable smtp authentication",
+        "description": "Enable / disable smtp authentication",
         "default": false,
         "group": "alerting",
         "section": "email",
@@ -1083,7 +1083,7 @@
         "class": "smtp-form"
     },
     "email_smtp_secure": {
-        "description": "Enable \/ disable encryption (use tls or ssl)",
+        "description": "Enable / disable encryption (use tls or ssl)",
         "default": false,
         "group": "alerting",
         "section": "email",
@@ -1218,7 +1218,7 @@
         "default": 500
     },
     "front_page": {
-        "default": "pages\/front\/tiles.php"
+        "default": "pages/front/tiles.php"
     },
     "front_page_down_box_limit": {
         "default": 10
@@ -1255,7 +1255,7 @@
         }
     },
     "github_api": {
-        "default": "https:\/\/api.github.com\/repos\/librenms\/librenms\/"
+        "default": "https://api.github.com/repos/librenms/librenms/"
     },
     "graph_colours.blues": {
         "default": [
@@ -1613,7 +1613,7 @@
         "default": "wireless"
     },
     "graph_types.device.canopy_generic_450_linkRadioDbm.descr": {
-        "default": "Radio Link H\/V"
+        "default": "Radio Link H/V"
     },
     "graph_types.device.canopy_generic_450_linkRadioDbm.order": {
         "default": 5
@@ -1640,7 +1640,7 @@
         "default": "wireless"
     },
     "graph_types.device.canopy_generic_450_slaveHV.descr": {
-        "default": "Dbm H\/V"
+        "default": "Dbm H/V"
     },
     "graph_types.device.canopy_generic_450_slaveHV.order": {
         "default": 7
@@ -2843,7 +2843,7 @@
         "default": "system"
     },
     "graph_types.device.ucd_io.descr": {
-        "default": "System I\/O Activity"
+        "default": "System I/O Activity"
     },
     "graph_types.device.ucd_io.order": {
         "default": 0
@@ -2870,7 +2870,7 @@
         "default": "system"
     },
     "graph_types.device.ucd_swap_io.descr": {
-        "default": "Swap I\/O Activity"
+        "default": "Swap I/O Activity"
     },
     "graph_types.device.ucd_swap_io.order": {
         "default": 0
@@ -3023,12 +3023,12 @@
     },
     "ignore_mount": {
         "default": [
-            "\/kern",
-            "\/mnt\/cdrom",
-            "\/proc",
-            "\/dev",
-            "\/compat\/linux\/proc",
-            "\/compat\/linux\/sys"
+            "/kern",
+            "/mnt/cdrom",
+            "/proc",
+            "/dev",
+            "/compat/linux/proc",
+            "/compat/linux/sys"
         ],
         "type": "array"
     },
@@ -3040,17 +3040,17 @@
     },
     "ignore_mount_regexp": {
         "default": [
-            "\/on: \\\/packages\/",
-            "\/on: \\\/dev\/",
-            "\/on: \\\/proc\/",
-            "\/on: \\\/junos^\/",
-            "\/on: \\\/junos\\\/dev\/",
-            "\/on: \\\/jail\\\/dev\/",
-            "\/^(dev|proc)fs\/",
-            "\/^\\\/dev\\\/md0\/",
-            "\/^\\\/var\\\/dhcpd\\\/dev\/",
-            "\/UMA\/",
-            "\/^\\\/Volumes\\\/OS X Base System\/"
+            "/on: \\/packages/",
+            "/on: \\/dev/",
+            "/on: \\/proc/",
+            "/on: \\/junos^/",
+            "/on: \\/junos\\/dev/",
+            "/on: \\/jail\\/dev/",
+            "/^(dev|proc)fs/",
+            "/^\\/dev\\/md0/",
+            "/^\\/var\\/dhcpd\\/dev/",
+            "/UMA/",
+            "/^\\/Volumes\\/OS X Base System/"
         ]
     },
     "ignore_mount_removable": {
@@ -3115,7 +3115,7 @@
     },
     "ipmitool": {
         "description": "Path to ipmtool",
-        "default": "\/usr\/bin\/ipmitool",
+        "default": "/usr/bin/ipmitool",
         "group": "external",
         "section": "paths",
         "order": 3,
@@ -3140,7 +3140,7 @@
         "default": false
     },
     "irc_ctcp_version": {
-        "default": "LibreNMS IRCbot. https:\/\/www.librenms.org\/"
+        "default": "LibreNMS IRCbot. https://www.librenms.org/"
     },
     "irc_debug": {
         "default": false
@@ -3207,13 +3207,13 @@
     "log_file": {
     },
     "login_message": {
-        "default": "Unauthorised access or use shall render the user liable to criminal and\/or civil prosecution."
+        "default": "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution."
     },
     "map.engine": {
         "default": "leaflet"
     },
     "mapael.default_map": {
-        "default": "maps\/world_countries.js"
+        "default": "maps/world_countries.js"
     },
     "mib_dir": {
     },
@@ -3222,7 +3222,7 @@
     },
     "mtr": {
         "description": "Path to mtr",
-        "default": "\/usr\/bin\/mtr",
+        "default": "/usr/bin/mtr",
         "group": "external",
         "section": "paths",
         "order": 4,
@@ -3232,7 +3232,7 @@
         "default": "ERROR"
     },
     "nagios_plugins": {
-        "default": "\/usr\/lib\/nagios\/plugins"
+        "default": "/usr/lib/nagios/plugins"
     },
     "navbar.manage_groups.hide": {
         "default": 0
@@ -3287,17 +3287,17 @@
     },
     "nmap": {
         "description": "Path to nmap",
-        "default": "\/usr\/bin\/nmap",
+        "default": "/usr/bin/nmap",
         "group": "external",
         "section": "paths",
         "order": 5,
         "type": "text"
     },
     "notifications.LibreNMS": {
-        "default": "http:\/\/www.librenms.org\/notifications.rss"
+        "default": "http://www.librenms.org/notifications.rss"
     },
     "notifications.local": {
-        "default": "misc\/notifications.rss"
+        "default": "misc/notifications.rss"
     },
     "old_graphs": {
         "default": 1
@@ -3433,7 +3433,7 @@
     },
     "ping": {
         "description": "Path to ping",
-        "default": "\/bin\/ping",
+        "default": "/bin/ping",
         "group": "external",
         "section": "paths",
         "order": 6,
@@ -3571,19 +3571,19 @@
         "default": true
     },
     "port_descr_parser": {
-        "default": "includes\/port-descr-parser.inc.php"
+        "default": "includes/port-descr-parser.inc.php"
     },
     "ports_page_default": {
         "default": "details"
     },
     "project_home": {
-        "default": "http:\/\/www.librenms.org\/"
+        "default": "http://www.librenms.org/"
     },
     "project_id": {
         "default": "librenms"
     },
     "project_issues": {
-        "default": "https:\/\/community.librenms.org\/c\/help"
+        "default": "https://community.librenms.org/c/help"
     },
     "project_name": {
         "default": "LibreNMS"
@@ -3600,7 +3600,7 @@
     "rancid_repo_type": {
         "default": "svn"
     },
-    "rewrite_if_regexp.\/^cpu interface\/": {
+    "rewrite_if_regexp./^cpu interface/": {
         "default": "Mgmt"
     },
     "rrd.heartbeat": {
@@ -3651,7 +3651,7 @@
     },
     "sfdp": {
         "description": "Path to sfdp",
-        "default": "\/usr\/bin\/sfdp",
+        "default": "/usr/bin/sfdp",
         "group": "external",
         "section": "paths",
         "order": 7,
@@ -3691,7 +3691,7 @@
         "default": "Ethernet ping"
     },
     "sla_type_labels.fileIO": {
-        "default": "File I\/O"
+        "default": "File I/O"
     },
     "sla_type_labels.ftp": {
         "default": "FTP"
@@ -3788,7 +3788,7 @@
     },
     "snmpbulkwalk": {
         "description": "Path to snmpbulkwalk",
-        "default": "\/usr\/bin\/snmpbulkwalk",
+        "default": "/usr/bin/snmpbulkwalk",
         "group": "external",
         "section": "paths",
         "order": 8,
@@ -3796,7 +3796,7 @@
     },
     "snmpget": {
         "description": "Path to snmpget",
-        "default": "\/usr\/bin\/snmpget",
+        "default": "/usr/bin/snmpget",
         "group": "external",
         "section": "paths",
         "order": 9,
@@ -3812,7 +3812,7 @@
     },
     "snmptranslate": {
         "description": "Path to snmptranslate",
-        "default": "\/usr\/bin\/snmptranslate",
+        "default": "/usr/bin/snmptranslate",
         "group": "external",
         "section": "paths",
         "order": 11,
@@ -3823,7 +3823,7 @@
     },
     "snmpwalk": {
         "description": "Path to snmpwalk",
-        "default": "\/usr\/bin\/snmpwalk",
+        "default": "/usr/bin/snmpwalk",
         "group": "external",
         "section": "paths",
         "order": 12,
@@ -3839,7 +3839,7 @@
         "default": "REMOTE_USER"
     },
     "stylesheet": {
-        "default": "css\/styles.css"
+        "default": "css/styles.css"
     },
     "summary_errors": {
         "default": 0
@@ -3863,7 +3863,7 @@
         "type": "integer"
     },
     "temp_dir": {
-        "default": "\/tmp"
+        "default": "/tmp"
     },
     "timestamp_format": {
         "default": "d-m-Y H:i:s"
@@ -3950,7 +3950,7 @@
     },
     "virsh": {
         "description": "Path to virsh",
-        "default": "\/usr\/bin\/virsh",
+        "default": "/usr/bin/virsh",
         "group": "external",
         "section": "paths",
         "order": 15,
@@ -3969,10 +3969,10 @@
         "default": "Asianux Server 4 (64 bit)"
     },
     "vmware_guestid.centos64Guest": {
-        "default": "CentOS 4\/5 (64-bit)"
+        "default": "CentOS 4/5 (64-bit)"
     },
     "vmware_guestid.centosGuest": {
-        "default": "CentOS 4\/5"
+        "default": "CentOS 4/5"
     },
     "vmware_guestid.darwin64Guest": {
         "default": "Mac OS 10.5 (64 bit)"
@@ -3981,34 +3981,34 @@
         "default": "Mac OS 10.5"
     },
     "vmware_guestid.debian4Guest": {
-        "default": "Debian GNU\/Linux 4"
+        "default": "Debian GNU/Linux 4"
     },
     "vmware_guestid.debian4_64Guest": {
-        "default": "Debian GNU\/Linux 4 (64 bit)"
+        "default": "Debian GNU/Linux 4 (64 bit)"
     },
     "vmware_guestid.debian5Guest": {
-        "default": "Debian GNU\/Linux 5"
+        "default": "Debian GNU/Linux 5"
     },
     "vmware_guestid.debian5_64Guest": {
-        "default": "Debian GNU\/Linux 5 (64 bit)"
+        "default": "Debian GNU/Linux 5 (64 bit)"
     },
     "vmware_guestid.debian6Guest": {
-        "default": "Debian GNU\/Linux 6"
+        "default": "Debian GNU/Linux 6"
     },
     "vmware_guestid.debian6_64Guest": {
-        "default": "Debian GNU\/Linux 6 (64 bit)"
+        "default": "Debian GNU/Linux 6 (64 bit)"
     },
     "vmware_guestid.debian7Guest": {
-        "default": "Debian GNU\/Linux 7"
+        "default": "Debian GNU/Linux 7"
     },
     "vmware_guestid.debian7_64Guest": {
-        "default": "Debian GNU\/Linux 7 (64 bit)"
+        "default": "Debian GNU/Linux 7 (64 bit)"
     },
     "vmware_guestid.debian8Guest": {
-        "default": "Debian GNU\/Linux 8"
+        "default": "Debian GNU/Linux 8"
     },
     "vmware_guestid.debian8_64Guest": {
-        "default": "Debian GNU\/Linux 8 (64 bit)"
+        "default": "Debian GNU/Linux 8 (64 bit)"
     },
     "vmware_guestid.dosGuest": {
         "default": "MS-DOS."
@@ -4050,13 +4050,13 @@
         "default": "SCO OpenServer 6"
     },
     "vmware_guestid.oracleLinux64Guest": {
-        "default": "Oracle Linux 4\/5 (64-bit)"
+        "default": "Oracle Linux 4/5 (64-bit)"
     },
     "vmware_guestid.oracleLinuxGuest": {
-        "default": "Oracle Linux 4\/5"
+        "default": "Oracle Linux 4/5"
     },
     "vmware_guestid.os2Guest": {
-        "default": "OS\/2"
+        "default": "OS/2"
     },
     "vmware_guestid.other24xLinux64Guest": {
         "default": "Linux 2.4x Kernel (64 bit) (experimental)"
@@ -4358,7 +4358,7 @@
     },
     "whois": {
         "description": "Path to whois",
-        "default": "\/usr\/bin\/whois",
+        "default": "/usr/bin/whois",
         "group": "external",
         "section": "paths",
         "order": 16,
