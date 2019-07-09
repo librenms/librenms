@@ -32,7 +32,7 @@ if ($width > '500') {
 $filename_dir = generate_smokeping_file($device);
 if ($src['hostname'] == Config::get('own_hostname')) {
     $filename = $filename_dir . $device['hostname'].'.rrd';
-    if (!rrdtool_check_rrd_exists($filename_dir.$device['hostname'].'.rrd')) {
+    if (!rrdtool_check_rrd_exists($filename)) {
         // Try with dots in hostname replaced by underscores
         $filename = $filename_dir . str_replace('.', '_', $device['hostname']).'.rrd';
     }
