@@ -50,7 +50,9 @@ class Api extends Transport
         //get each line of key-values and process the variables;
         foreach (preg_split("/\\r\\n|\\r|\\n/", $options) as $current_line) {
             list($u_key, $u_val) = explode('=', $current_line, 2);
-
+            if (empty($u_key)) {
+                continue;
+            }
             // Replace the values
             foreach ($obj as $p_key => $p_val) {
                 $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
