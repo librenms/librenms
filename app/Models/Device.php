@@ -192,20 +192,13 @@ class Device extends BaseModel
 
     public function loadOs($force = false)
     {
-        global $config;
-
         $yaml_file = base_path('/includes/definitions/' . $this->os . '.yaml');
 
-        if ((empty($config['os'][$this->os]['definition_loaded']) || $force) && file_exists($yaml_file)) {
+        if ((!\LibreNMS\Config::getOsSetting($this->os, 'definition_loaded') || $force) && file_exists($yaml_file)) {
             $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
 
-            if (isset($config['os'][$this->os])) {
-                $config['os'][$this->os] = array_replace_recursive($os, $config['os'][$this->os]);
-            } else {
-                $config['os'][$this->os] = $os;
-            }
-
-            $config['os'][$this->os]['definition_loaded'] = true;
+            \LibreNMS\Config::set("os.$this->os", array_replace_recursive($os, \LibreNMS\Config::get("os.$this->os", [])));
+            \LibreNMS\Config::set("os.$this->os.definition_loaded", true);
         }
     }
 
@@ -339,27 +332,6 @@ class Device extends BaseModel
         }
 
         $this->save();
-    }
-
-    /**
-     * @return string
-     */
-    public function statusName()
-    {
-        if ($this->disabled == 1) {
-            return 'disabled';
-        } elseif ($this->ignore == 1) {
-            return 'ignore';
-        } elseif ($this->status == 0) {
-            return 'down';
-        } else {
-            $warning_time = \LibreNMS\Config::get('uptime_warning', 84600);
-            if ($this->uptime < $warning_time && $this->uptime != 0) {
-                return 'warn';
-            }
-
-            return 'up';
-        }
     }
 
     // ---- Accessors/Mutators ----

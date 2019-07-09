@@ -36,7 +36,7 @@
             @endif
         </tr>
         <tr>
-            <th><span class="black">Disabled/Shutdown</span></th>
+            <th><span class="black">@lang('Disabled')/@lang('Shutdown')</span></th>
             <td><a href="{{ url('devices/format=list_detail/disabled=1') }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
             <td><a href="{{ url('ports/format=list_detail/state=admindown') }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
             @if($show_services)

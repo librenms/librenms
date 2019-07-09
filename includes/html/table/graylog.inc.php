@@ -17,6 +17,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Config;
+
 $filter_hostname = mres($vars['hostname']);
 $filter_range = mres($vars['range']);
 
@@ -47,19 +49,19 @@ if (!empty($filter_hostname)) {
     }
 }
 
-if (isset($config['graylog']['base_uri'])) {
-    $graylog_base = $config['graylog']['base_uri'];
-} elseif (version_compare($config['graylog']['version'], '2.1', '>=')) {
+if (Config::has('graylog.base_uri')) {
+    $graylog_base = Config::get('graylog.base_uri');
+} elseif (version_compare(Config::get('graylog.version'), '2.1', '>=')) {
     $graylog_base = '/api/search/universal/relative';
 } else {
     $graylog_base = '/search/universal/relative';
 }
 
-$graylog_url = $config['graylog']['server'] . ':' . $config['graylog']['port'] . $graylog_base . '?query=' . urlencode($query) . '&range='. $filter_range . $extra_query;
+$graylog_url = Config::get('graylog.server') . ':' . Config::get('graylog.port') . $graylog_base . '?query=' . urlencode($query) . '&range=' . $filter_range . $extra_query;
 
 $context = stream_context_create(array(
     'http' => array(
-        'header'  => "Authorization: Basic " . base64_encode($config['graylog']['username'].':'.$config['graylog']['password']) . "\r\n" .
+        'header' => "Authorization: Basic " . base64_encode(Config::get('graylog.username') . ':' . Config::get('graylog.password')) . "\r\n" .
                      "Accept: application/json",
     )
 ));
@@ -67,8 +69,8 @@ $context = stream_context_create(array(
 $messages = json_decode(file_get_contents($graylog_url, false, $context), true);
 
 foreach ($messages['messages'] as $message) {
-    if (isset($config['graylog']['timezone'])) {
-        $userTimezone = new DateTimeZone($config['graylog']['timezone']);
+    if (Config::has('graylog.timezone')) {
+        $userTimezone = new DateTimeZone(Config::get('graylog.timezone'));
         $graylogTime = new DateTime($message['message']['timestamp']);
         $offset = $userTimezone->getOffset($graylogTime);
 

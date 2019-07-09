@@ -3,30 +3,45 @@ path: blob/master/doc/
 
 # Templates
 
-> This page is for installs running version 1.42 or later. You can find the older docs [here](Old_Templates.md)
+> This page is for installs running version 1.42 or later. You can
+> find the older docs [here](Old_Templates.md)
 
-Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content.
+Templates can be assigned to a single or a group of rules and can
+contain any kind of text. There is also a default template which is
+used for any rule that isn't associated with a template. This template
+can be found under `Alert Templates` page and can be edited. It also
+has an option revert it back to its default content.
 
-To attach a template to a rule just open the `Alert Templates` settings page, choose the template to assign and click the yellow button in the `Actions` column. In the appearing popupbox select the rule(s) you want the template to be assigned to and click the `Attach` button. You might hold down the CTRL key to select multiple rules at once.
+To attach a template to a rule just open the `Alert Templates`
+settings page, choose the template to assign and click the yellow
+button in the `Actions` column. In the appearing popupbox select the
+rule(s) you want the template to be assigned to and click the `Attach`
+button. You might hold down the CTRL key to select multiple rules at once.
 
-The templating engine in use is Laravel Blade. We will cover some of the basics here, however the official Laravel docs will have more information [here](https://laravel.com/docs/5.7/blade) 
+The templating engine in use is Laravel Blade. We will cover some of
+the basics here, however the official Laravel docs will have more
+information [here](https://laravel.com/docs/5.7/blade)
 
 ## Syntax
 
 Controls:
 
-- if-else (Else can be omitted):
-`@if ($alert->placeholder  == 'value') Some Text @else Other Text @endif`
-- foreach-loop:
-`@foreach ($alert->faults as $key => $value) Key: $key<br/>Value: $value @endforeach`
+- if-else (Else can be omitted): `@if ($alert->placeholder  ==
+  'value') Some Text @else Other Text @endif`
+- foreach-loop: `@foreach ($alert->faults as $key => $value) Key: $key
+  </br> alue: $value @endforeach`
 
 Placeholders:
 
-Placeholders are special variables that if used within the template will be replaced with the relevant data, I.e:
+Placeholders are special variables that if used within the template
+will be replaced with the relevant data, I.e:
 
-`The device {{ $alert->hostname }} has been up for {{ $alert->uptime }} seconds` would result in the following `The device localhost has been up for 30344 seconds`.
+`The device {{ $alert->hostname }} has been up for {{ $alert->uptime
+}} seconds` would result in the following `The device localhost has
+been up for 30344 seconds`.
 
-> When using placeholders to echo data, you need to wrap the placeholder in `{{ }}`. I.e `{{ $alert->hostname }}`.
+> When using placeholders to echo data, you need to wrap
+> the placeholder in `{{ }}`. I.e `{{ $alert->hostname }}`.
 
 - Device ID: `$alert->device_id`
 - Hostname of the Device: `$alert->hostname`
@@ -37,7 +52,7 @@ Placeholders are special variables that if used within the template will be repl
 - Type of Device: `$alert->type`
 - IP of the Device: `$alert->ip`
 - hardware of the Device: `$alert->hardware`
-- Software version of the Device: `$alert->version` 
+- Software version of the Device: `$alert->version`
 - location of the Device: `$alert->location`
 - uptime of the Device (in seconds): `$alert->uptime`
 - short uptime of the Device (28d 22h 30m 7s): `$alert->uptime_short`
@@ -58,7 +73,13 @@ Placeholders are special variables that if used within the template will be repl
 - Rule Builder (the actual rule) (use `{!! $alert->builder !!}`): `$alert->builder`
 - Alert-ID: `$alert->id`
 - Unique-ID: `$alert->uid`
-- Faults, Only available on alert (`$alert->state != 0`), must be iterated in a foreach (`@foreach ($alert->faults as $key => $value) @endforeach`). Holds all available information about the Fault, accessible in the format `$value['Column']`, for example: `$value['ifDescr']`. Special field `$value['string']` has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used and must be encased in `{{ }}`
+- Faults, Only available on alert (`$alert->state != 0`), must be
+  iterated in a foreach (`@foreach ($alert->faults as $key => $value)
+  @endforeach`). Holds all available information about the Fault,
+  accessible in the format `$value['Column']`, for example:
+  `$value['ifDescr']`. Special field `$value['string']` has most
+  Identification-information (IDs, Names, Descrs) as single string,
+  this is the equivalent of the default used and must be encased in `{{ }}`
 - State: `$alert->state`
 - Severity: `$alert->severity`
 - Rule: `$alert->rule`
@@ -66,13 +87,18 @@ Placeholders are special variables that if used within the template will be repl
 - Timestamp: `$alert->timestamp`
 - Transport type: `$alert->transport`
 - Transport name: `$alert->transport_name`
-- Contacts, must be iterated in a foreach, `$key` holds email and `$value` holds name: `$alert->contacts`
+- Contacts, must be iterated in a foreach, `$key` holds email and
+  `$value` holds name: `$alert->contacts`
 
-Placeholders can be used within the subjects for templates as well although $faults is most likely going to be worthless.
+Placeholders can be used within the subjects for templates as well
+although $faults is most likely going to be worthless.
 
-The Default Template is a 'one-size-fit-all'. We highly recommend defining your own templates for your rules to include more specific information.
+The Default Template is a 'one-size-fit-all'. We highly recommend
+defining your own templates for your rules to include more specific
+information.
 
 ## Base Templates
+
 If you'd like to reuse a common template for your alerts follow below
 
 A default file is located in
@@ -91,9 +117,12 @@ Displays the following:
     </body>
 </html>
 ```
+
 The important part being the `@yield('content')`
 
-You can use plain text or html as per Alert templates and this will form the basis of your common template, feel free to make as many templates in the directory as needed.
+You can use plain text or html as per Alert templates and this will
+form the basis of your common template, feel free to make as many
+templates in the directory as needed.
 
 In your alert template just use
 
@@ -107,11 +136,12 @@ In your alert template just use
 @endsection
 ```
 
-More info: https://laravel.com/docs/5.7/blade#extending-a-layout
+More info: [https://laravel.com/docs/5.7/blade#extending-a-layout](https://laravel.com/docs/5.7/blade#extending-a-layout)
 
 ## Examples
 
-#### Default Template:
+#### Default Template
+
 ```text
 {{ $alert->title }}
 Severity: {{ $alert->severity }}
@@ -129,7 +159,9 @@ Alert sent to:
   {{ $value }} <{{ $key }}>
 @endforeach
 ```
-#### Ports Utilization Template:
+
+#### Ports Utilization Template
+
 ```text
 {{ $alert->title }}
 Device Name: {{ $alert->hostname }}
@@ -146,12 +178,13 @@ Outbound Utilization: {{ (($value['ifOutOctets_rate']*8)/$value['ifSpeed'])*100 
 @endforeach
 ```
 
-#### Storage:
+#### Storage
+
 ```text
 {{ $alert->title }}
 
 Device Name: {{ $alert->hostname }}
-Severity: {{ $alert->severity }} 
+Severity: {{ $alert->severity }}
 Uptime: {{ $alert->uptime_short }}
 @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Timestamp: {{ $alert->timestamp }}
@@ -161,19 +194,20 @@ Features: {{ $alert->features }}
 Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
-Server: {{ $alert->sysName }} 
+Server: {{ $alert->sysName }}
 @foreach ($alert->faults as $key => $value)
 Mount Point: {{ $value['storage_descr'] }}
 Percent Utilized: {{ $value['storage_perc'] }}
 @endforeach
 ```
 
-#### Temperature Sensors:
+#### Temperature Sensors
+
 ```text
 {{ $alert->title }}
 
 Device Name: {{ $alert->hostname }}
-Severity: {{ $alert->severity }} 
+Severity: {{ $alert->severity }}
 Timestamp: {{ $alert->timestamp }}
 Uptime: {{ $alert->uptime_short }}
 @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
@@ -194,12 +228,13 @@ High Temperature Limit: {{ $value['sensor_limit'] }} °C
 @endif
 ```
 
-#### Value Sensors:
+#### Value Sensors
+
 ```text
 {{ $alert->title }}
 
 Device Name: {{ $alert->hostname }}
-Severity: {{ $alert->severity }} 
+Severity: {{ $alert->severity }}
 Timestamp: {{ $alert->timestamp }}
 Uptime: {{ $alert->uptime_short }}
 @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
@@ -216,16 +251,17 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
 ** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp over limit
 Previous Measurement: {{ $value['sensor_prev'] }}
 Limit: {{ $value['sensor_limit'] }}
-@endforeach 
+@endforeach
 @endif
 ```
 
-#### Memory Alert:
+#### Memory Alert
+
 ```text
 {{ $alert->title }}
 
 Device Name: {{ $alert->hostname }}
-Severity: {{ $alert->severity }} 
+Severity: {{ $alert->severity }}
 Uptime: {{ $alert->uptime_short }}
 @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Timestamp: {{ $alert->timestamp }}
@@ -235,15 +271,18 @@ Notes: {{ $alert->notes }}
 
 Server: {{ $alert->hostname }}
 @foreach ($alert->faults as $key => $value)
-Memory Description: {{ $value['mempool_descr'] }} 
+Memory Description: {{ $value['mempool_descr'] }}
 Percent Utilized: {{ $value['mempool_perc'] }}
-@endforeach 
+@endforeach
 ```
 
 ### Advanced options
 
 #### Conditional formatting
-Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
+
+Conditional formatting example, will display a link to the host in
+email or just the hostname in any other transport:
+
 ```text
 @if ($alert->transport == mail)<a href="https://my.librenms.install/device/device={{ $alert->hostname }}/">{{ $alert->hostname }}</a>
 @else
@@ -252,6 +291,7 @@ Conditional formatting example, will display a link to the host in email or just
 ```
 
 #### Traceroute debugs
+
 ```text
 @if ($alert->status == 0)
     @if ($alert->status == icmp)
@@ -262,15 +302,20 @@ Conditional formatting example, will display a link to the host in email or just
 
 ## Examples HTML
 
-Note: To use HTML emails you must set HTML email to Yes in the WebUI under Global Settings > Alerting Settings > Email transport > Use HTML emails
+Note: To use HTML emails you must set HTML email to Yes in the WebUI
+under Global Settings > Alerting Settings > Email transport > Use HTML
+emails
 
-Note: To include Graphs you must enable unauthorized graphs in config.php. Allow_unauth_graphs_cidr is optional, but more secure.
+Note: To include Graphs you must enable unauthorized graphs in
+config.php. Allow_unauth_graphs_cidr is optional, but more secure.
+
 ```
-$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');  
+$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 
-#### Service Alert:
+#### Service Alert
+
 ```
 <div style="font-family:Helvetica;">
 <h2>@if ($alert->state == 1) <span style="color:red;">{{ $alert->severity }} @endif
@@ -286,12 +331,13 @@ $config['allow_unauth_graphs'] = true;
 @foreach ($alert->faults as $key => $value) <b>{{ $value['service_desc'] }} - {{ $value['service_type'] }}</b><br>
 {{ $value['service_message'] }}<br>
 <br>
-@endforeach                                                                                                              
+@endforeach
 @endif
 </div>
 ```
 
-#### Processor Alert with Graph:
+#### Processor Alert with Graph
+
 ```
 {{ $alert->title }} <br>
 Severity: {{ $alert->severity }}  <br>
@@ -302,17 +348,18 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
 @if ($alert->faults) Faults:
 @foreach ($alert->faults as $key => $value)
 {{ $key }}: {{ $value['string'] }}<br>
-@endforeach 
+@endforeach
 @if ($alert->faults) <b>Faults:</b><br>
 @foreach ($alert->faults as $key => $value)<img src="https://server/graph.php?device={{ $value['device_id'] }}&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h"><br>
 https://server/graphs/id={{ $value['device_id'] }}/type=device_processor/<br>
-@endforeach 
+@endforeach
 Template: CPU alert <br>
 @endif
 @endif
 ```
 
-#### MS Teams formatted default template:
+#### MS Teams formatted default template
+
 ```
 <a href="https://your.librenms.url/device/device={{ $alert->device_id }}/">{{ $alert->title }}</a>
 <pre><strong>Device name:</strong> {{ $alert->sysName }}
@@ -328,11 +375,13 @@ Template: CPU alert <br>
 
 ## Included
 
-We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can 
-assign the BGP template to this rule to provide more information.
+We include a few templates for you to use, these are specific to the
+type of alert rules you are creating. For example if you create a rule
+that would alert on BGP sessions then you can assign the BGP template
+to this rule to provide more information.
 
 The included templates apart from the default template are:
 
-  - BGP Sessions
-  - Ports
-  - Temperature
+- BGP Sessions
+- Ports
+- Temperature

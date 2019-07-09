@@ -152,7 +152,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      */
     protected function joinTables($query)
     {
-        if (empty($this->builder['joins'])) {
+        if (!isset($this->builder['joins'])) {
             $this->generateJoins();
         }
 
@@ -176,8 +176,11 @@ class QueryBuilderFluentParser extends QueryBuilderParser
         foreach ($this->generateGlue() as $glue) {
             list($left, $right) = explode(' = ', $glue, 2);
             if (str_contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
+                list($leftTable, $leftKey) = explode('.', $left);
                 list($rightTable, $rightKey) = explode('.', $right);
-                $joins[] = [$rightTable, $left, $right];
+                $target_table = ($rightTable != 'devices' ? $rightTable : $leftTable);  // don't try to join devices
+
+                $joins[] = [$target_table, $left, $right];
             }
         }
 

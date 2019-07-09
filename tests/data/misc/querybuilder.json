@@ -172,5 +172,12 @@
         "devices.hostname LIKE '%one%' AND (devices.hostname LIKE '%two%' OR devices.hostname LIKE '%three%' OR (devices.hostname LIKE 'six%' AND devices.hostname = \"seven\")) AND (devices.hostname NOT LIKE '%four%' OR devices.hostname NOT LIKE '%five%')",
         "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%one%' AND (devices.hostname LIKE '%two%' OR devices.hostname LIKE '%three%' OR (devices.hostname LIKE 'six%' AND devices.hostname = \"seven\")) AND (devices.hostname NOT LIKE '%four%' OR devices.hostname NOT LIKE '%five%')",
         ["select * from `devices` where (`devices`.`hostname` LIKE ? AND (`devices`.`hostname` LIKE ? OR `devices`.`hostname` LIKE ? OR (`devices`.`hostname` LIKE ? AND `devices`.`hostname` = ?)) AND (`devices`.`hostname` NOT LIKE ? OR `devices`.`hostname` NOT LIKE ?))", ["%one%","%two%","%three%","six%","seven","%four%","%five%"]]
+    ],
+    [
+        "%locations.location ~ somewhere",
+        {"condition":"AND","rules":[{"id":"locations.location","field":"locations.location","type":"string","input":"text","operator":"regex","value":"somewhere"}],"valid":true},
+        "locations.location REGEXP \"somewhere\"",
+        "SELECT * FROM locations,devices WHERE (devices.device_id = ? AND locations.id = devices.location_id) AND locations.location REGEXP \"somewhere\"",
+        ["select * from `devices` left join `locations` on `locations`.`id` = `devices`.`location_id` where (`locations`.`location` REGEXP ?)", ["somewhere"]]
     ]
 ]

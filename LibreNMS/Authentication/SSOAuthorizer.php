@@ -45,7 +45,7 @@ class SSOAuthorizer extends MysqlAuthorizer
     public function authenticate($credentials)
     {
         if (empty($credentials['username'])) {
-            throw new AuthenticationException('$config[\'sso\'][\'user_attr\'] was not found or was empty');
+            throw new AuthenticationException('\'sso.user_attr\' config setting was not found or was empty');
         }
 
         // Build the user's details from attributes
@@ -97,7 +97,7 @@ class SSOAuthorizer extends MysqlAuthorizer
                 return null;
             }
         } else {
-            throw new AuthenticationException('$config[\'sso\'][\'trusted_proxies\'] is set, but this connection did not originate from trusted source: ' . $_SERVER['REMOTE_ADDR']);
+            throw new AuthenticationException('\'sso.trusted_proxies\'] is set in your config, but this connection did not originate from trusted source: ' . $_SERVER['REMOTE_ADDR']);
         }
     }
 
@@ -155,23 +155,23 @@ class SSOAuthorizer extends MysqlAuthorizer
                     throw new AuthenticationException('group assignment by attribute requested, but httpd is not setting the attribute to a number');
                 }
             } else {
-                throw new AuthenticationException('group assignment by attribute requested, but $config[\'sso\'][\'level_attr\'] not set');
+                throw new AuthenticationException('group assignment by attribute requested, but \'sso.level_attr\' not set in your config');
             }
         } elseif (Config::get('sso.group_strategy') === 'map') {
             if (Config::get('sso.group_level_map') && is_array(Config::get('sso.group_level_map')) && Config::get('sso.group_delimiter') && Config::get('sso.group_attr')) {
                 return (int) $this->authSSOParseGroups();
             } else {
-                throw new AuthenticationException('group assignment by level map requested, but $config[\'sso\'][\'group_level_map\'], $config[\'sso\'][\'group_attr\'], or $config[\'sso\'][\'group_delimiter\'] are not set');
+                throw new AuthenticationException('group assignment by level map requested, but \'sso.group_level_map\', \'sso.group_attr\', or \'sso.group_delimiter\' are not set in your config');
             }
         } elseif (Config::get('sso.group_strategy') === 'static') {
             if (Config::get('sso.static_level')) {
                 return (int) Config::get('sso.static_level');
             } else {
-                throw new AuthenticationException('group assignment by static level was requested, but $config[\'sso\'][\'group_level_map\'] was not set');
+                throw new AuthenticationException('group assignment by static level was requested, but \'sso.group_level_map\' was not set in your config');
             }
         }
 
-        throw new AuthenticationException('$config[\'sso\'][\'group_strategy\'] is not set to one of attribute, map or static - configuration is unsafe');
+        throw new AuthenticationException('\'sso.group_strategy\' is not set to one of attribute in your config, map or static - configuration is unsafe');
     }
 
     /**

@@ -4,9 +4,9 @@ $row = 1;
 
 foreach (get_disks($device['device_id']) as $drive) {
     if (is_integer($row / 2)) {
-        $row_colour = $config['list_colour']['even'];
+        $row_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
-        $row_colour = $config['list_colour']['odd'];
+        $row_colour = \LibreNMS\Config::get('list_colour.odd');
     }
 
     $fs_url = 'device/device='.$device['device_id'].'/tab=health/metric=diskio/';
@@ -15,8 +15,8 @@ foreach (get_disks($device['device_id']) as $drive) {
     $graph_array_zoom['type']   = 'diskio_ops';
     $graph_array_zoom['width']  = '400';
     $graph_array_zoom['height'] = '125';
-    $graph_array_zoom['from']   = $config['time']['twoday'];
-    $graph_array_zoom['to']     = $config['time']['now'];
+    $graph_array_zoom['from'] = \LibreNMS\Config::get('time.twoday');
+    $graph_array_zoom['to'] = \LibreNMS\Config::get('time.now');
 
     $overlib_link = overlib_link($fs_url, $drive['diskio_descr'], generate_graph_tag($graph_array_zoom), null);
 
