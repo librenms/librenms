@@ -74,23 +74,24 @@ HTTP GET requests are usually limited in length.
 For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the 
 API transport
 
-A few variables :
-| Config | Example |
-| ------ | ------- |
-| {{ $hostname }} | Hostname |
-| {{ $sysName }} | SysName |
-| {{ $sysDescr }} | SysDescr |
-| {{ $os }} | OS of device (librenms defined) |
-| {{ $type }} | Type of device (librenms defined) |
-| {{ $ip }} | IP Address |
-| {{ $hardware }} | Hardware |
-| {{ $version }} | Version |
-| {{ $uptime }} | Uptime in seconds |
+A few variables commonly used :
+
+| Variable            | Description |
+| ------------------  | ----------- |
+| {{ $hostname }}     | Hostname |
+| {{ $sysName }}      | SysName |
+| {{ $sysDescr }}     | SysDescr |
+| {{ $os }}           | OS of device (librenms defined) |
+| {{ $type }}         | Type of device (librenms defined) |
+| {{ $ip }}           | IP Address |
+| {{ $hardware }}     | Hardware |
+| {{ $version }}      | Version |
+| {{ $uptime }}       | Uptime in seconds |
 | {{ $uptime_short }} | Uptime in human-readable format |
-| {{ $timestamp }} | Timestamp of alert |
-| {{ $description }} | Description of device |
-| {{ $title }} | Title (as built from the Alert Template) |
-| {{ $msg }} | Body text (as built from the Alert Template) |
+| {{ $timestamp }}    | Timestamp of alert |
+| {{ $description }}  | Description of device |
+| {{ $title }}        | Title (as built from the Alert Template) |
+| {{ $msg }}          | Body text (as built from the Alert Template) |
 
 **Example:**
 
