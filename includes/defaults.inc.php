@@ -22,8 +22,6 @@
 //
 
 
-$config['slow_statistics'] = true;
-// THIS WILL CHANGE TO FALSE IN FUTURE
 // RRD Format Settings
 // These should not normally be changed
 // Though one could conceivably increase or decrease the size of each RRA if one had performance problems

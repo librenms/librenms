@@ -3767,9 +3767,6 @@
     "sla_type_labels.voip": {
         "default": "VoIP"
     },
-    "slow_statistics": {
-        "default": true
-    },
     "smokeping.pings": {
         "default": 20
     },
