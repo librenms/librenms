@@ -50,6 +50,7 @@ The unix-agent does not have a discovery module, only a poller module. That poll
 1. [Freeswitch](#freeswitch) - SNMP extend, Agent
 1. [GPSD](#gpsd) - SNMP extend, Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
+1. [Mdadm](#mdadm) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
 1. [Munin](#munin) - Agent
 1. [MySQL](#mysql) - SNMP extend, Agent
@@ -487,7 +488,6 @@ You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
-
 ### Mailscanner
 ##### SNMP Extend
 1. Download the script onto the desired host.
@@ -500,6 +500,27 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mails
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend mailscanner /etc/snmp/mailscanner.php
+```
+
+4. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
+### Mdadm
+
+This shell script checks mdadm health and array data
+
+##### SNMP Extend
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
+```
+
+2. Run `chmod +x /etc/snmp/mdadm`
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend mdadm /etc/snmp/mdadm
 ```
 
 4. Restart snmpd on your host
