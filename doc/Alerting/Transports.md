@@ -79,7 +79,7 @@ should adapt to the Service Provider limits.
 
 **Example:**
 
-The exemple below will use the API named sms-api of my.example.com and send
+The example below will use the API named sms-api of my.example.com and send
 the title of the alert to the provided number using the provided service key. 
 Refer to your service documentation to configure it properly.
 
