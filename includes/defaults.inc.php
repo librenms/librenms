@@ -21,31 +21,6 @@
 // Please don't edit this file -- make changes to the configuration array in config.php
 //
 
-$config['stylesheet']   = 'css/styles.css';
-$config['mono_font']    = 'DejaVuSansMono';
-$config['favicon']      = '';
-$config['page_refresh'] = '300';
-// Refresh the page every xx seconds, 0 to disable
-$config['front_page'] = 'pages/front/tiles.php';
-$config['front_page_settings']['top']['ports']   = 10;
-$config['front_page_settings']['top']['devices'] = 10;
-$config['front_page_down_box_limit']             = 10;
-$config['vertical_summary'] = 0;
-// Enable to use vertical summary on front page instead of horizontal
-$config['top_ports'] = 1;
-// This enables the top X ports box
-$config['top_devices'] = 1;
-// This enables the top X devices box
-$config['page_title_prefix'] = '';
-$config['page_title_suffix'] = $config['project_name'];
-$config['timestamp_format']  = 'd-m-Y H:i:s';
-$config['page_gen']          = 0;
-$config['enable_lazy_load']  = true;
-// display MySqL & PHP stats in footer?
-$config['login_message'] = 'Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.';
-$config['public_status'] = false;
-// Enable public accessable status page
-$config['old_graphs'] = 1;
 // RRDfiles from before the great rra reform. This is default for a while.
 $config['int_customers'] = 1;
 // Enable Customer Port Parsing

@@ -1065,7 +1065,11 @@
         "type": "integer"
     },
     "favicon": {
-        "default": ""
+        "default": "",
+        "group": "webui",
+        "section": "style",
+        "order": 2,
+        "type": "text"
     },
     "force_hostname_to_sysname": {
         "default": false
@@ -3098,7 +3102,11 @@
         "default": "logs/librenms.log"
     },
     "login_message": {
-        "default": "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution."
+        "default": "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.",
+        "group": "auth",
+        "section": "general",
+        "order": 3,
+        "type": "text"
     },
     "map.engine": {
         "default": "leaflet"
@@ -3277,9 +3285,6 @@
         "type": "text",
         "pattern": "[a-zA-Z0-9]{1,5}://.*",
         "required": true
-    },
-    "page_gen": {
-        "default": 0
     },
     "page_refresh": {
         "default": 300
@@ -3469,7 +3474,11 @@
         "default": "librenms"
     },
     "public_status": {
-        "default": false
+        "default": false,
+        "group": "auth",
+        "section": "general",
+        "order": 4,
+        "type": "boolean"
     },
     "rancid_ignorecomments": {
         "default": 0
@@ -3495,7 +3504,10 @@
         "type": "integer"
     },
     "rrd_dir": {
-        "default": "rrd"
+        "group": "poller",
+        "section": "rrdtool",
+        "order": 6,
+        "type": "text"
     },
     "rrd_rra": {
         "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 ",
@@ -3740,9 +3752,6 @@
     },
     "temp_dir": {
         "default": "/tmp"
-    },
-    "timestamp_format": {
-        "default": "d-m-Y H:i:s"
     },
     "top_devices": {
         "default": 1
