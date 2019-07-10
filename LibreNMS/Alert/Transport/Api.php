@@ -48,7 +48,7 @@ class Api extends Transport
         $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //get each line of key-values and process the variables;
-        foreach (preg_split("/\\r\\n|\\r|\\n/", $options, -1, PREG_SPLIT_NO_EMPTY)) as $current_line) {
+        foreach (preg_split("/\\r\\n|\\r|\\n/", $options, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
             list($u_key, $u_val) = explode('=', $current_line, 2);
 
             // Replace the values
