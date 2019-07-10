@@ -152,8 +152,8 @@ class LdapAuthorizer extends AuthorizerBase
             }
 
             $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
-            if (Config::get('auth_ldap_Userlist_filter') != null) {
-                $filter = '(' . Config::get('auth_ldap_Userlist_filter') . ')';
+            if (Config::get('auth_ldap_userlist_filter') != null) {
+                $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
             }
 
             // build group filter
