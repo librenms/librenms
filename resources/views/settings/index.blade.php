@@ -59,7 +59,9 @@
 
 @push('scripts')
     <script>
-        $(".toolTip").tooltip();
+        $(".toolTip").click(function () {
+            $(this).tooltip('toggle'); // toggle on tap for mobile
+        }).tooltip();
 
         // tab and section update address bar
         $('.settings-group-tabs a[data-toggle="tab"]').on('show.bs.tab', function (e) {
