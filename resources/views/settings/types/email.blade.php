@@ -5,7 +5,11 @@
     @endif
     <div class="col-sm-6 col-lg-4">
         <input id="{{ $config->name }}" class="form-control validation" type="email" name="{{ $config->name }}" value="{{ $config->value }}"
-               data-original="{{ $config->value }}" data-config_id="{{ $config->name }}" @if($config->pattern)pattern="{{ $config->pattern }}"@endif @if($config->required) required @endif>
+               data-original="{{ $config->value }}" data-config_id="{{ $config->name }}"
+               @if($config->pattern)pattern="{{ $config->pattern }}" @endif
+               @if($config->required) required @endif
+               @if(in_array($config->name, $readonly)) disabled title="@lang('settings.readonly')" @endif
+        >
         <span class="form-control-feedback"></span>
     </div>
 </div>

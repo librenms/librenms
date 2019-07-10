@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Config;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use LibreNMS\Util\DynamicConfig;
 
 class SettingsController extends Controller
@@ -12,19 +13,25 @@ class SettingsController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param DynamicConfig $dynamic_config
      * @param string $tab
      * @param string $section
      * @return \Illuminate\Http\Response
      */
-    public function index(DynamicConfig $config, $tab = 'global', $section = '')
+    public function index(DynamicConfig $dynamic_config, $tab = 'global', $section = '')
     {
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
         ];
 
-        $data['groups'] = $config->getGrouped();
+        $data['groups'] = $dynamic_config->getGrouped();
         $data['tabs'] = $data['groups']->keys();
+
+        // mark config.php settings as readonly
+        $config = [];
+        @include base_path('config.php');
+        $data['readonly'] = array_keys(Arr::dot($config));
 
         return view('settings.index', $data);
     }

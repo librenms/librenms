@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'readonly' => 'Set in config.php, remove from config.php to enable.',
     'groups' => [
         'alerting' => 'Alerting',
         'auth' => 'Authentication',
