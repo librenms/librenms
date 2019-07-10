@@ -319,7 +319,7 @@ via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/
 
 3: Set the variable 'agent' to '1' in the config.
 
-### Certificate
+# Certificate
 
 A small python3 script that checks age and remaining validity of certificates
 
@@ -340,7 +340,7 @@ Content of an example /etc/snmp/certificate.json . Please edit with your own set
 Key 'domains' contains a list of domains to check.
 Optional you can define a port. By default it checks on port 443.
 
-#### SNMP Extend
+## SNMP Extend
 1. Copy the shell script to the desired host.
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/certificate.py -O /etc/snmp/certificate.py
@@ -356,7 +356,7 @@ extend certificate /etc/snmp/certificate.py
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
-### C.H.I.P
+# C.H.I.P
 
 1: Copy the shell script to the desired host.
 
