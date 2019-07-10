@@ -1,5 +1,5 @@
 <div class="form-group has-feedback {{ $config->class }}">
-    <label for="{{ $config->name }}" class="col-sm-4 control-label">{{ $config->getDescription() }}</label>
+    <label for="{{ $config->name }}" class="col-sm-4 control-label" title="{{ $config->name }}">{{ $config->getDescription() }}</label>
     @if($config->hasHelp())
         <div data-toggle="tooltip" title="{{ $config->getHelp() }}" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
     @endif
