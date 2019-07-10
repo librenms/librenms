@@ -11,8 +11,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
         if ($device['os'] == 'junos') {
             $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
         } elseif ($device['os'] === 'dnos') {
-            $peer_data_checki = snmpwalk_group($device, 'bgpPeerEntry', 'BGP4-MIB');
-            $peer_data_check = array();
+            $all_bgp_peers_data = snmpwalk_group_string($device, 'bgpPeerEntry', 'BGP4-MIB'); //bulkwalk all bgp peers data in one query
+            $peer_data_check = array(); //make empty array to clear warning
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', array(), 'ARISTA-BGP4V2-MIB');
         } elseif ($device['os'] === 'timos') {
@@ -174,9 +174,10 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                 }
 
                 // --- Build peer data if it is not already filled in ---
-                if (empty($peer_data) && ($device['os'] === 'dnos') && isset($peer_data_checki)) {
+                //dnos: use all_bgp_peers_data that has all devices' information, don't poll each peer separately
+                if (empty($peer_data) && ($device['os'] === 'dnos') && isset($all_bgp_peers_data)) {
                     foreach ($oid_map as $source => $target) {
-                        $v = isset($peer_data_checki[trim($peer_ip)][trim($source)]) ? $peer_data_checki[trim($peer_ip)][trim($source)] : '';
+                        $v = isset($all_bgp_peers_data[trim($peer_ip)][trim($source)]) ? $all_bgp_peers_data[trim($peer_ip)][trim($source)] : '';
                         if (str_contains($source, 'LocalAddr')) {
                             try {
                                 $v = IP::fromHexString($v)->uncompressed();

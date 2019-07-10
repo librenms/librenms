@@ -667,7 +667,40 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), 
 
     return $array;
 }
+//same function as above but return values not converted to numeric
+function snmpwalk_group_string($device, $oid, $mib = '', $depth = 1, $array = array(), $mibdir = null)
+{
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUstX', $mib, $mibdir);
+    $data = rtrim(external_exec($cmd));
 
+    $line = strtok($data, "\n");
+    while ($line !== false) {
+        if (str_contains($line, 'at this OID')||str_contains($line, 'this MIB View')) {
+            $line = strtok("\n");
+            continue;
+        }
+
+        list($address, $value) = explode(' =', $line, 2);
+        preg_match_all('/([^[\]]+)/', $address, $parts);
+        $parts = $parts[1];
+        array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
+
+        $line = strtok("\n"); // get the next line and concatenate multi-line values
+        while ($line !== false && !str_contains($line, '=')) {
+            $value .= $line . PHP_EOL;
+            $line = strtok("\n");
+        }
+
+        // merge the parts into an array, creating keys if they don't exist
+        $tmp = &$array;
+        foreach ($parts as $part) {
+            $tmp = &$tmp[trim($part, '".')];
+        }
+        $tmp = trim($value, "\" \n\r"); // assign the value as the leaf
+    }
+
+    return $array;
+}
 function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0, $mibdir = null, $snmpflags = '-OQUs')
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpflags, $mib, $mibdir);
