@@ -212,7 +212,7 @@ if ($status == 'no') {
 }
 echo "</td></tr>";
     
-if (is_writeable($php_temp_dir)) {
+if (is_writable($php_temp_dir)) {
     $status = 'yes';
     $row_class = 'success';
 } else {
