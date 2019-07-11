@@ -127,10 +127,28 @@
             globalConfigUpdateValue($this, value);
         });
 
+        $('.config-undo').click(function (event) {
+            event.preventDefault();
+            var target = $(this).data('target');
+            var $target = $('#' + target.replace('.', '\\.'));
+            var value = $target.data('previous');
+            $target.val(value);
+            globalConfigUpdateValue($target, value);
+        });
+
+        $('.config-default').click(function (event) {
+            event.preventDefault();
+            var target = $(this).data('target');
+            var $target = $('#' + target.replace('.', '\\.'));
+            var value = $target.data('default');
+            $target.val(value);
+            globalConfigUpdateValue($target, value);
+        });
+
         function globalConfigUpdateValue(target, value) {
             var name = target.attr('name');
-            var original = target.data('original');
-            if (original != value && target[0].checkValidity()) {
+            var current = target.data('current');
+            if (current != value && target[0].checkValidity()) {
                 $.ajax({
                     type: 'PUT',
                     url: '{{ route('settings.update', ['']) }}/' + name,
@@ -148,23 +166,28 @@
         }
 
         function globalConfigUpdateSuccess(target, data) {
-            target.data('original', target.val());
+            var current = target.val();
+
+            target.data('previous', target.data('current'));
+            target.data('current', current);
             target.closest('.form-group').addClass('has-success');
             target.next().addClass('fa-check');
+            target.parent().parent().find('.config-undo').show();
+            target.parent().parent().find('.config-default').toggle(current != target.data('default'));
             setTimeout(function () {
                 target.closest('.form-group').removeClass('has-success');
                 target.next().removeClass('fa-check');
             }, 2000);
-            console.log(data.message);
-            toastr.success(data.message || 'Config ' + target.attr('name') + ' updated');
+            var message = '@lang('Config :name updated')';
+            toastr.success(data.message || message.replace(':name', target.attr('name')));
         }
 
         function globalConfigUpdateFailure(target, data) {
             if (target.is(':checkbox')) {
-                console.log(target.data('original'));
-                target.bootstrapSwitch('state', target.data('original'));
+                console.log(target.data('current'));
+                target.bootstrapSwitch('state', target.data('current'));
             } else {
-                target.val(target.data('original')).change();
+                target.val(target.data('current')).change();
             }
             target.closest('.form-group').addClass('has-error');
             target.next().addClass('fa-times');
@@ -172,7 +195,8 @@
                 target.closest('.form-group').removeClass('has-error');
                 target.next().removeClass('fa-times');
             }, 2000);
-            toastr.error(data.message || 'Error occurred updating ' + target.attr('name'));
+            var message = '@lang('Error occurred updating :name')';
+            toastr.error(data.message || message.replace(':name', target.attr('name')));
         }
     </script>
 @endpush
