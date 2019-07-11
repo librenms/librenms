@@ -3,6 +3,7 @@
 @section('title', __('Settings'))
 
 @section('content')
+    <div id="app">
     <div class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
             <ul class="nav nav-tabs settings-group-tabs">
@@ -52,12 +53,14 @@
                         </div>
                     </div>
                 @endforeach
+                </div>
             </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/app.js') }}"></script>
     <script>
         $(".toolTip").click(function () {
             $(this).tooltip('toggle'); // toggle on tap for mobile
