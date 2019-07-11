@@ -164,6 +164,7 @@ $rrd_options .= ' LINE1:percentile_in#aa0000';
 $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
 if ($_GET['previous'] == 'yes') {
+    $rrd_options .= " COMMENT:' \\n'";
     $rrd_options .= ' LINE1.25:in' . $format . "X#333300:'Prev In '\t";
     $rrd_options .= ' GPRINT:in' . $format . 'X:AVERAGE:%6.2lf%s';
     $rrd_options .= ' GPRINT:in' . $format . '_maxX:MAX:%6.2lf%s';
