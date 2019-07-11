@@ -35,7 +35,7 @@ $config['auth_mechanism'] = "mysql";
 
 - 5: **Global Read**: Read only Administrator. 
 
-- 10: **Administartor**: This is a global read/write admin account.
+- 10: **Administrator**: This is a global read/write admin account.
 
 - 11: **Demo Account**: Provides full read/write with certain restrictions (i.e can't delete devices).
 
