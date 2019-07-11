@@ -8,7 +8,7 @@
                data-current="{{ $config->value ? 1 : 0 }}"
                data-default="{{ $config->default }}"
                @if($config->value) checked @endif
-               @if(in_array($config->name, $readonly)) disabled title="@lang('settings.readonly')" @endif
+               @if($config->overridden) disabled title="@lang('settings.readonly')" @endif
         >
     </div>
     <div class="col-sm-2">

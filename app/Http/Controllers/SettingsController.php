@@ -27,11 +27,7 @@ class SettingsController extends Controller
 
         $data['groups'] = $dynamic_config->getGrouped();
         $data['tabs'] = $data['groups']->keys();
-
-        // mark config.php settings as readonly
-        $config = [];
-        @include base_path('config.php');
-        $data['readonly'] = array_keys(Arr::dot($config));
+        $data['sections'] = $dynamic_config->getSections();
 
         return view('settings.index', $data);
     }
@@ -125,6 +121,11 @@ class SettingsController extends Controller
         }
 
         return $this->jsonResponse($id, ":id is not set", 400);
+    }
+
+    public function listAll(DynamicConfig $config)
+    {
+        return response()->json($config->all()->filter->isValid());
     }
 
     /**

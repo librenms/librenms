@@ -4,6 +4,8 @@
 
 @section('content')
     <div id="app">
+    <librenms-settings :sections='{!! json_encode($sections) !!}'></librenms-settings>
+    </div>
     <div class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
             <ul class="nav nav-tabs settings-group-tabs">
@@ -56,10 +58,11 @@
                 </div>
             </div>
         </div>
-    </div>
 @endsection
 
+
 @push('scripts')
+    @routes
     <script src="{{ asset('js/app.js') }}"></script>
     <script>
         $(".toolTip").click(function () {
@@ -246,3 +249,9 @@
         }
     </style>
 @endpush
+<script>
+    import LibrenmsSettings from "../../js/components/LibrenmsSettings";
+    export default {
+        components: {LibrenmsSettings}
+    }
+</script>

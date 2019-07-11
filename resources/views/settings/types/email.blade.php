@@ -9,7 +9,7 @@
                data-default="{{ $config->default }}"
                @if($config->pattern)pattern="{{ $config->pattern }}" @endif
                @if($config->required) required @endif
-               @if(in_array($config->name, $readonly)) disabled title="@lang('settings.readonly')" @endif
+               @if($config->overridden) disabled title="@lang('settings.readonly')" @endif
         >
         <span class="form-control-feedback"></span>
     </div>

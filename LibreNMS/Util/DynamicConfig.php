@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Config;
 
@@ -34,7 +35,13 @@ class DynamicConfig
 
     public function __construct()
     {
-        $this->definitions = collect(Config::getDefinitions())->map(function ($item, $key) {
+        // prepare to mark overridden settings
+        $config = [];
+        @include base_path('config.php');
+        $readonly = Arr::dot($config);
+
+        $this->definitions = collect(Config::getDefinitions())->map(function ($item, $key) use ($readonly) {
+            $item['overridden'] = isset($readonly[$key]);
             return new DynamicConfigItem($key, $item);
         });
     }
@@ -69,6 +76,16 @@ class DynamicConfig
     public function getGroups()
     {
         return $this->definitions->pluck('group')->unique()->filter()->prepend('global');
+    }
+
+    public function getSections()
+    {
+        /** @var Collection $sections */
+        $sections = $this->definitions->groupBy('group')->map(function ($items) {
+            return $items->pluck('section')->unique()->filter()->values();
+        });
+        $sections->prepend($sections->pull('', []), 'global'); // rename '' to global
+        return $sections;
     }
 
     /**

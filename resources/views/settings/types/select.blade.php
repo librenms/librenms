@@ -6,7 +6,7 @@
                 name="{{ $config->name }}"
                 data-current="{{ $config->value }}"
                 data-default="{{ $config->default }}"
-                @if(in_array($config->name, $readonly)) disabled title="@lang('settings.readonly')" @endif
+                @if($config->overridden) disabled title="@lang('settings.readonly')" @endif
         >
             @foreach($config->getOptions() as $option => $text)
                 <option value="{{ $option }}" @if($config->value == $option) selected @endif>{{ $text }}</option>

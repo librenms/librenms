@@ -46,6 +46,7 @@
         "spatie/laravel-cors": "1.3.*",
         "symfony/yaml": "^4.0",
         "tecnickcom/tcpdf": "~6.2.0",
+        "tightenco/ziggy": "^0.7.1",
         "wpb/string-blade-compiler": "3.8.x-dev",
         "xjtuwangke/passwordhash": "dev-master"
     },

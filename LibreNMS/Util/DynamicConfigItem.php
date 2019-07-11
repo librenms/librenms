@@ -35,6 +35,7 @@ class DynamicConfigItem implements \ArrayAccess
     public $value;
     public $type;
     public $default;
+    public $overridden = false;  // overridden by config.php
     public $hidden = false;
     public $required = false;
     public $disabled = false;
