@@ -1,0 +1,42 @@
+os: scality
+type: storage
+icon: scality
+text: 'Scality Storage Ring'
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+
+poller_modules:
+    - mpls: false
+    - wireless: false
+
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.37489.
+#    - snmpget:
+#            - oid: supAvailable.1
+    - sysObjetctID_except: .1.3.6.1.4.1.8072
+
+mib_dir: 
+    - scality
+
+modules:
+    sensors:
+        state:
+            data:
+                -   
+                    oid: ringState
+                    value: ringState
+                    num_oid: '.1.3.6.1.4.1.37489.2.1.1.1.4.1.1.8.1.{{ $index }}'
+                    descr: '{{ $ringState }}'
+                    index: 'ringState.{{ $index }}'
+                    state_name: ringState
+                    state:
+                        - { descr: RUN, graph: 0, value: 0, generic: 0 }
+                        - { descr: BALANCING, graph: 0, value: 1, generic: 1 }
+                        - { descr: LOOP, graph: 0, value: 2, generic: 1 }
+                        - { value: 0, generic: 0, graph: 1, descr: RUN }
+                        - { value: 1, generic: 1, graph: 1, descr: BALANCING }
+                        - { value: 2, generic: 1, graph: 1, descr: LOOP }
+
+# Last edited 073278 - 02/072019

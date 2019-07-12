@@ -1,0 +1,1136 @@
+
+SCALITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY, 
+	enterprises, Counter64, Integer32
+		FROM SNMPv2-SMI
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+	TruthValue
+		FROM SNMPv2-TC
+	InetPortNumber
+		FROM INET-ADDRESS-MIB;
+
+scalityMIB MODULE-IDENTITY
+	LAST-UPDATED "201603160359Z"
+	ORGANIZATION 
+		"SCALITY
+		11, Rue Tronchet
+		75008 Paris
+		France
+		
+		+33.1.78.09.82.00
+		
+		http://www.scality.com"
+	CONTACT-INFO 
+		"For comments, requests, send an email to :
+		
+		snmp@scality.com
+		
+		with the release of the mib in the title."
+	DESCRIPTION 
+		"This is the SMI v2 Managed Information Base for SCALITY products."
+
+	REVISION "201610210916Z"
+	DESCRIPTION 
+		"1.1.1 -
+		fix typos
+		use correct type for addr"
+
+	REVISION "201603161051Z"
+	DESCRIPTION 
+		"1.1.0 -
+		Add tree for component and connector based on NASDK"
+
+	REVISION "201512011104Z"
+	DESCRIPTION 
+		"1.0.1 - 
+		Change address
+		Fix iodStatus trap"
+
+	REVISION "201201251812Z"
+	DESCRIPTION 
+		"1.0 - DRAFT version. Not to be published."
+::= { scality 1 }
+
+scality              OBJECT IDENTIFIER ::= { enterprises 37489 }
+products             OBJECT IDENTIFIER ::= { scality 2 }
+storage              OBJECT IDENTIFIER ::= { products 1 }
+servers              OBJECT IDENTIFIER ::= { storage 1 }
+version              OBJECT IDENTIFIER ::= { servers 1 }
+
+-- All variables and Traps relative to bizStoreNode processes.
+
+node                 OBJECT IDENTIFIER ::= { version 1 }
+
+-- All variables and Traps relative to bizIod processes.
+
+iod                  OBJECT IDENTIFIER ::= { version 2 }
+
+-- All information concerning bizStore processes.
+
+restConnector        OBJECT IDENTIFIER ::= { version 3 }
+
+-- All information relative to the SUPERVISOR.
+-- 
+-- Single point of view to have information about the whole rings managed.
+
+supervisor           OBJECT IDENTIFIER ::= { version 4 }
+
+-- All information relative to the connectors and components based on NASDK.
+
+connector            OBJECT IDENTIFIER ::= { version 5 }
+restDaemon           OBJECT IDENTIFIER ::= { version 6 }
+
+nodeTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NodeEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { node 1 }
+
+nodeEntry  OBJECT-TYPE
+	SYNTAX 	NodeEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { nodeIndex }
+	::= { nodeTable 1 }
+
+NodeEntry ::= SEQUENCE {
+	nodeIndex
+		Integer32,
+	nodeName
+		OCTET STRING,
+	nodeAddr
+		OCTET STRING,
+	nodeIpPort
+		InetPortNumber,
+	nodeStatus
+		OCTET STRING,
+	nodeRingName
+		OCTET STRING,
+	nodeObjects
+		Integer32,
+	nodeAvailable
+		TruthValue,
+	nodeNeedReload
+		TruthValue,
+	nodeTaskBlocked
+		TruthValue
+}
+
+nodeIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nodeEntry 1 }
+
+nodeName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Name in clear text of the node."
+	::= { nodeEntry 2 }
+
+-- NODEaddress (FQDN, ip v4 or other stuff).
+
+nodeAddr  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nodeEntry 3 }
+
+-- CHORD IP port to which node is bound.
+
+nodeIpPort  OBJECT-TYPE
+	SYNTAX     InetPortNumber
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nodeEntry 4 }
+
+nodeStatus  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the node (RUN, OOS, ...)"
+	::= { nodeEntry 5 }
+
+nodeRingName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Name of the ring to which the node belongs to."
+	::= { nodeEntry 6 }
+
+nodeObjects  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total number of objects stored by the node."
+	::= { nodeEntry 7 }
+
+-- Flag TRUE / FALSE that reflects the availabilty of the node.
+
+nodeAvailable  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nodeEntry 8 }
+
+-- Set to TRUE when NODE needs to be reloaded.
+
+nodeNeedReload  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nodeEntry 9 }
+
+-- Set to TRUE when auto split detection detects sucha a situation.
+
+nodeTaskBlocked  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { nodeEntry 10 }
+
+-- Trap sent when status changed.
+
+trapNodeStatusChanged  NOTIFICATION-TYPE
+	OBJECTS { nodeName, 
+		nodeStatus }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { node 3 }
+
+-- Trap sent when not available.
+
+trapNodeNotAvailable  NOTIFICATION-TYPE
+	OBJECTS { nodeName, 
+		nodeAvailable }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { node 4 }
+
+-- Trap sent when NODE claims to be reload.
+
+trapNodeNeedsReload  NOTIFICATION-TYPE
+	OBJECTS { nodeName, 
+		nodeNeedReload }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { node 5 }
+
+-- Trap sent when NODE reports info from Auto-split detection.
+
+trapNodeTaskBlocked  NOTIFICATION-TYPE
+	OBJECTS { nodeName, 
+		nodeTaskBlocked }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { node 6 }
+
+iodTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF IodEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { iod 1 }
+
+iodEntry  OBJECT-TYPE
+	SYNTAX 	IodEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { iodIndex }
+	::= { iodTable 1 }
+
+IodEntry ::= SEQUENCE {
+	iodIndex
+		Integer32,
+	iodName
+		OCTET STRING,
+	iodType
+		OCTET STRING,
+	iodStored
+		Counter64,
+	iodAvail
+		Counter64,
+	iodTotal
+		Counter64,
+	iodStatus
+		OCTET STRING,
+	iodFull
+		Integer32,
+	iodFsid
+		OCTET STRING,
+	iodAvailable
+		TruthValue,
+	iodRing
+		OCTET STRING
+}
+
+-- index for the table.
+
+iodIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..2000000)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"index"
+	::= { iodEntry 1 }
+
+-- Name, in clear text, of the iod.
+
+iodName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Name of biziod"
+	::= { iodEntry 2 }
+
+-- Type of the iod (disk attached or tier-2 attached)
+
+iodType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"disk or tier2"
+	::= { iodEntry 3 }
+
+-- Total amount of data (BYTE) stored in the disk managed by IOD
+
+iodStored  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Size of stored data in MB"
+	::= { iodEntry 4 }
+
+-- Available amount of space (BYTES) on the disk managed by IOD.
+
+iodAvail  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Available space in bytes for the disk managed by IOD"
+	::= { iodEntry 5 }
+
+-- Total capacity (BYTES) of the disk managed by IOD.
+
+iodTotal  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Total size in MB"
+	::= { iodEntry 6 }
+
+iodStatus  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { iodEntry 7 }
+
+iodFull  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Flag disk full"
+	::= { iodEntry 8 }
+
+iodFsid  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Filesystem ID"
+	::= { iodEntry 9 }
+
+-- Flag that reflects the availability status of the IOD.
+
+iodAvailable  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { iodEntry 10 }
+
+-- The ring associated to the biziod
+
+iodRing  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { iodEntry 11 }
+
+-- Trap sent when status changes to NOT available.
+
+trapIodNotAvailable  NOTIFICATION-TYPE
+	OBJECTS { iodName, 
+		iodAvailable }
+	STATUS     current
+	DESCRIPTION 
+		"-TRAP 
+		
+		Availability status."
+	::= { iod 3 }
+
+trapIodDiskFull  NOTIFICATION-TYPE
+	OBJECTS { iodName, 
+		iodFull }
+	STATUS     current
+	DESCRIPTION 
+		"Trap sent when disk reports that it is full."
+	::= { iod 4 }
+
+-- Iod status has changed.
+-- 
+-- 
+
+trapIodStatusChanged  NOTIFICATION-TYPE
+	OBJECTS { iodName, 
+		iodStatus }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { iod 5 }
+
+restConnectorTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF RestConnectorEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnector 1 }
+
+restConnectorEntry  OBJECT-TYPE
+	SYNTAX 	RestConnectorEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { restConnectorIndex }
+	::= { restConnectorTable 1 }
+
+RestConnectorEntry ::= SEQUENCE {
+	restConnectorIndex
+		Integer32,
+	restConnectorName
+		OCTET STRING,
+	restConnectorAddr
+		OCTET STRING,
+	restConnectorStatus
+		OCTET STRING,
+	restConnectorBootstrap
+		OCTET STRING,
+	restConnectorAvailable
+		TruthValue
+}
+
+-- restConnector index
+
+restConnectorIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnectorEntry 1 }
+
+-- Name of restConnector
+
+restConnectorName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnectorEntry 2 }
+
+-- Full address of connector (fqdn/ip:port)
+
+restConnectorAddr  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnectorEntry 3 }
+
+-- String with details concerning exact status of the REST connector
+
+restConnectorStatus  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnectorEntry 4 }
+
+-- List of nodes actually detected by restConnector
+
+restConnectorBootstrap  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnectorEntry 5 }
+
+-- TRUE / FALSE : status of restConnector
+
+restConnectorAvailable  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnectorEntry 6 }
+
+-- Trap sent when RestConnector status changed.
+
+trapRestConnStatusChanged  NOTIFICATION-TYPE
+	OBJECTS { restConnectorName, 
+		restConnectorStatus }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnector 3 }
+
+-- Trap sent when RestConnector becomes unavailable.
+
+trapRestConnectorNotAvailable  NOTIFICATION-TYPE
+	OBJECTS { restConnectorName, 
+		restConnectorAvailable }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnector 4 }
+
+ringTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF RingEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supervisor 1 }
+
+ringEntry  OBJECT-TYPE
+	SYNTAX 	RingEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { ringIndex }
+	::= { ringTable 1 }
+
+RingEntry ::= SEQUENCE {
+	ringIndex
+		Integer32,
+	ringName
+		OCTET STRING,
+	ringStateRun
+		TruthValue,
+	ringStateOOS
+		TruthValue,
+	ringNodeTotal
+		Integer32,
+	ringNodeRun
+		Integer32,
+	ringNodeOOS
+		Integer32,
+	ringState
+		OCTET STRING,
+	ringDiskTotal
+		Integer32,
+	ringObjectsTotal
+		Counter64,
+	ringStorageAvg
+		Integer32,
+	ringStorageStored
+		Counter64,
+	ringStorageUsed
+		Integer32,
+	ringStorageAvailable
+		Integer32,
+	ringStorageTotal
+		Integer32
+}
+
+-- Index of rows in ringTable.
+-- Each line describes a ring.
+
+ringIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 1 }
+
+-- Ring name
+
+ringName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 2 }
+
+-- TRUE if ring is in RUN state
+
+ringStateRun  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 3 }
+
+-- TRUE if ring is in OOS state
+
+ringStateOOS  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 4 }
+
+-- Agregated number of nodes in the whole ring referenced by ringIndex value.
+
+ringNodeTotal  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 5 }
+
+-- Agregated number of nodes in RUN state for the ring referenced by ringIndex.
+
+ringNodeRun  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 6 }
+
+-- Agregated number of nodes in OOS state for the ring referenced by ringIndex.
+
+ringNodeOOS  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 7 }
+
+-- Describes the current state of the whole ring in a human readable manner.
+-- Ring state can be composed with different states :
+-- - RUN
+-- - BALANCING
+-- - LOOP
+-- ...
+
+ringState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 8 }
+
+-- Agregated number of disks spread across all nodes for the ring referenced by ringIndex.
+
+ringDiskTotal  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 9 }
+
+-- Agregated number of objects stored in the whole ring referenced by ringIndex.
+
+ringObjectsTotal  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 10 }
+
+-- Average size of objects stored in the whole ring referenced by ringIndex.
+
+ringStorageAvg  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 11 }
+
+-- Describes the global size, in MB, of data stored in the whole ring referenced by ringIndex.
+
+ringStorageStored  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 12 }
+
+-- Total amount of space (in megaByte) used by data in the whole ring referenced by ringIndex.
+
+ringStorageUsed  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 13 }
+
+-- Available size in megaByte of size for all disks attached to the ring referenced by ringIndex.
+
+ringStorageAvailable  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 14 }
+
+-- Total amount of space of all disks attached to the ring referenced by ringIndex.
+
+ringStorageTotal  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ringEntry 15 }
+
+supTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF SupEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supervisor 2 }
+
+supEntry  OBJECT-TYPE
+	SYNTAX 	SupEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { supIndex }
+	::= { supTable 1 }
+
+SupEntry ::= SEQUENCE {
+	supIndex
+		Integer32,
+	supName
+		OCTET STRING,
+	supIpPort
+		InetPortNumber,
+	supAddr
+		OCTET STRING,
+	supNbSrvTotal
+		Integer32,
+	supNbSrvOk
+		Integer32,
+	supNbSrvNok
+		Integer32,
+	supAvailable
+		TruthValue
+}
+
+-- Index for the table.
+
+supIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supEntry 1 }
+
+-- Supervisor hostname
+
+supName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supEntry 2 }
+
+-- IP port used by the supervisor.
+
+supIpPort  OBJECT-TYPE
+	SYNTAX     InetPortNumber
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supEntry 3 }
+
+-- IPv4 address of the supervisor hostname.
+
+supAddr  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supEntry 4 }
+
+-- Total number of servers managed by the supervisor.
+
+supNbSrvTotal  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supEntry 5 }
+
+-- Total number of servers managed by the supervisor that are running well (OK).
+
+supNbSrvOk  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supEntry 6 }
+
+-- Total number of servers managed by the supervisor that are NOT running well (NOK).
+
+supNbSrvNok  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supEntry 7 }
+
+-- Flag TRUE / FALSE that reflects the current availability status of the SUPERVISOR.
+
+supAvailable  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supEntry 8 }
+
+-- Trap sent when number of nodes reported to be in RUN state has changed.
+
+trapRingRunChanged  NOTIFICATION-TYPE
+	OBJECTS { ringName, 
+		ringNodeRun }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supervisor 4 }
+
+-- Trap sent when RING status changed.
+
+trapRingStatusChanged  NOTIFICATION-TYPE
+	OBJECTS { ringName, 
+		ringState }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supervisor 6 }
+
+-- Trap sent when SUPERVISOR becomes not available.
+
+trapSupNotAvailable  NOTIFICATION-TYPE
+	OBJECTS { supName, 
+		supAvailable }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supervisor 7 }
+
+-- Trap sent when number of physical servers in state RUN has changed.
+
+trapSupSrvOKChanged  NOTIFICATION-TYPE
+	OBJECTS { supName, 
+		supNbSrvOk }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supervisor 8 }
+
+connectorTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF ConnectorEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { connector 1 }
+
+connectorEntry  OBJECT-TYPE
+	SYNTAX 	ConnectorEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { connectorIndex }
+	::= { connectorTable 1 }
+
+ConnectorEntry ::= SEQUENCE {
+	connectorIndex
+		Integer32,
+	connectorName
+		OCTET STRING,
+	connectorAddr
+		OCTET STRING,
+	connectorType
+		OCTET STRING,
+	connectorStatus
+		OCTET STRING
+}
+
+-- Index of rows in connectorTable
+-- Each line describes a connector or a component based on NASDK.
+
+connectorIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { connectorEntry 1 }
+
+-- connector name
+
+connectorName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { connectorEntry 2 }
+
+-- Key address of connector (ip/fqdn:port)
+
+connectorAddr  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { connectorEntry 3 }
+
+-- Type of connector (sfused, sproxyd, ....)
+
+connectorType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { connectorEntry 4 }
+
+-- Status of connector
+
+connectorStatus  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { connectorEntry 5 }
+
+trapConnectorStatusChanged  NOTIFICATION-TYPE
+	OBJECTS { connectorName, 
+		connectorStatus }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { connector 3 }
+
+restDaemonTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF RestDaemonEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restDaemon 1 }
+
+restDaemonEntry  OBJECT-TYPE
+	SYNTAX 	RestDaemonEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { restDaemonIndex }
+	::= { restDaemonTable 1 }
+
+RestDaemonEntry ::= SEQUENCE {
+	restDaemonIndex
+		Integer32,
+	restDaemonName
+		OCTET STRING,
+	restDaemonAddr
+		OCTET STRING,
+	restDaemonType
+		OCTET STRING,
+	restDaemonStatus
+		OCTET STRING
+}
+
+restDaemonIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restDaemonEntry 1 }
+
+restDaemonName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Name in clear text of the daemon"
+	::= { restDaemonEntry 2 }
+
+restDaemonAddr  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current address (ip:port) of the daemon"
+	::= { restDaemonEntry 3 }
+
+restDaemonType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Sub type of the daemon monitored"
+	::= { restDaemonEntry 4 }
+
+restDaemonStatus  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the daemon"
+	::= { restDaemonEntry 5 }
+
+-- Trap sent when status changes
+
+trapRestDaemonStatusChanged  NOTIFICATION-TYPE
+	OBJECTS { restDaemonName, 
+		restDaemonStatus }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restDaemon 3 }
+
+trapGrpNode  NOTIFICATION-GROUP
+	NOTIFICATIONS { trapNodeNotAvailable, 
+		trapNodeStatusChanged }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { node 2 }
+
+-- Trap link to IOD status
+
+trapGrpIod  NOTIFICATION-GROUP
+	NOTIFICATIONS { trapIodDiskFull, 
+		trapIodNotAvailable, 
+		trapIodStatusChanged }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { iod 2 }
+
+-- Traps linked to RestConnector management.
+
+trapGrpRestConnector  NOTIFICATION-GROUP
+	NOTIFICATIONS { trapRestConnectorNotAvailable, 
+		trapRestConnStatusChanged }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restConnector 2 }
+
+-- All traps linked to RING and SUPERVISOR management.
+
+trapGrpSupervisor  NOTIFICATION-GROUP
+	NOTIFICATIONS { trapRingRunChanged, 
+		trapRingStatusChanged, 
+		trapSupNotAvailable, 
+		trapSupSrvOKChanged }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { supervisor 3 }
+
+trapGrpConnector  NOTIFICATION-GROUP
+	NOTIFICATIONS { trapConnectorStatusChanged }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { connector 2 }
+
+trapGrpRestDaemon  NOTIFICATION-GROUP
+	NOTIFICATIONS { trapRestDaemonStatusChanged }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { restDaemon 2 }
+END
+
+
+-- This MIB was created using NuDesign Team's Visual MIBuilder (Ver 4.9).
+
+

@@ -28,6 +28,8 @@ foreach (explode("\n", $inlet_oids) as $inlet_data) {
     }
 }
 
+
+/*
 // Check for per-outlet polling
 $outlet_oids = snmp_walk($device, 'outletIndex', '-Osqn', 'PDU-MIB');
 $outlet_oids = trim($outlet_oids);
@@ -60,6 +62,8 @@ foreach (explode("\n", $outlet_oids) as $outlet_data) {
         }
     }
 }
+*/
+
 
 /**
  * raritan.inc.php
@@ -99,4 +103,42 @@ foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
         $current = $pre_cache['raritan_inletPoleTable'][$index][$x]['inletPoleCurrent'] / $divisor;
         discover_sensor($valid["sensor"], "current", $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
     }
+}
+
+//Check Outlets - added 073278 08/07/219
+//Did not want to remove " Check for per-outlet polling " section - no ownership
+
+$model = snmp_get($device, "PDU2-MIB::pduModel.1", "-Osqn", "PDU2-MIB");
+$outlet_oids = snmp_walk($device, "PDU2-MIB::outletLabel.1", "-Osqn", "PDU2-MIB");
+$outlet_oids = trim($outlet_oids);
+
+if ($outlet_oids) echo("PDU2 Outlet ");
+
+if (strpos($model,'PX3') !== false) {
+    foreach (explode("\n", $outlet_oids) as $outlet_data)
+    {
+      $outlet_data = trim($outlet_data);
+      if ($outlet_data)
+      {
+        $scale = 0.1;
+        list($outlet_oid,$outlet_descr) = explode(" ", $outlet_data,2);
+        $outlet_split_oid = explode('.',$outlet_oid);
+        $outlet_index = $outlet_split_oid[count($outlet_split_oid)-1];
+    
+        $outletsuffix = "$outlet_index";
+        $outlet_insert_index = $outlet_index;
+    
+        $enabled_thresholds = hexdec(snmp_get($device,"outletSensorEnabledThresholds.1.$outletsuffix.rmsCurrent", "-Ovq", "PDU2-MIB"));
+        $outlet_oid     = ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.$outletsuffix.1"; // PDU2-MIB::measurementsOutletSensorValue.1.X.rmsCurrent
+        $outlet_descr   = "Outlet $outletsuffix: " . snmp_get($device,"outletName.1.$outletsuffix", "-Ovq", "PDU2-MIB");
+        $outlet_divisor = pow(10, snmp_get($device, "outletSensorDecimalDigits.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB'));
+        $outlet_current = ((snmp_get($device,"measurementsOutletSensorValue.1.$outletsuffix.rmsCurrent", "-Ovq", "PDU2-MIB") / $outlet_divisor) / 1000 );
+    
+        if ($outlet_current >= 0)
+        {
+          discover_sensor($valid['sensor'], 'current', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $outlet_divsor, 1, null, null, null, null, $outlet_current);
+        }
+    
+      } // if ($outlet_data)
+    } // foreach (explode("\n", $outlet_oids) as $outlet_data)
 }
