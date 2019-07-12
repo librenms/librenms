@@ -45,7 +45,6 @@ if ($_GET['previous']) {
     }
 }
 
-
 $rrd_options .= " COMMENT:'\\n'";
 
 foreach ($rrd_list as $rrd) {
@@ -100,7 +99,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' VDEF:totoutB' . $i . '=outB' . $i . ',TOTAL';
         $rrd_options .= ' VDEF:tot' . $i . '=octets' . $i . ',TOTAL';
 		
-	if ($_GET['previous']) {
+		if ($_GET['previous']) {
             $in_thingX .= $seperatorX . 'inB' . $i . 'X,UN,0,' . 'inB' . $i . 'X,IF';
             $out_thingX .= $seperatorX . 'outB' . $i . 'X,UN,0,' . 'outB' . $i . 'X,IF';
             $plusesX .= $plusX;
@@ -110,7 +109,7 @@ foreach ($rrd_list as $rrd) {
             $rrd_options .= ' VDEF:totinB' . $i . 'X=inB' . $i . 'X,TOTAL';
             $rrd_options .= ' VDEF:totoutB' . $i . 'X=outB' . $i . 'X,TOTAL';
             $rrd_options .= ' VDEF:tot' . $i . 'X=octets' . $i . 'X,TOTAL';
-	}
+		}
     }
 
     if ($i) {
