@@ -34,11 +34,11 @@ class Ciscospark extends Transport
             'roomId' => $room_id
         );
 
-	if ($this->config['use-markdown'] === true) {
-	    $data['markdown'] = $text;
-	} else {
-	    $data['text'] = $text;
-	}
+        $akey = 'text';
+        if ($this->config['use-markdown'] === 'on') {
+            $akey = 'markdown';
+        }
+        $data[$akey] = $text;
 
         $curl   = curl_init();
         set_curl_proxy($curl);
@@ -76,13 +76,13 @@ class Ciscospark extends Transport
                     'descr' => 'CiscoSpark Room ID',
                     'type' => 'text',
                 ],
-		[
-		    'title' => 'Use Markdown',
-		    'name' => 'use-markdown',
-		    'descr' => 'Use Markdown when sending the alert',
-		    'type' => 'checkbox',
-		    'default' => false,
-		]
+                [
+                    'title' => 'Use Markdown?',
+                    'name' => 'use-markdown',
+                    'descr' => 'Use Markdown when sending the alert',
+                    'type' => 'checkbox',
+                    'default' => false,
+                ]
             ],
             'validation' => [
                 'api-token' => 'required|string',
