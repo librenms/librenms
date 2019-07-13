@@ -23,15 +23,46 @@
   -->
 
 <template>
-    
+    <div>
+        <div class="panel with-nav-tabs panel-default">
+            <div class="panel-heading">
+                <div class="tabs">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li v-for="tab in tabs" :key="tab.name" :class="{ 'active': tab.isActive }" role="presentation">
+                            <a role="tab" :href="tab.href" :aria-controls="tab.name" @click="selectTab(tab)">{{ tab.name }}</a>
+                        </li>
+                        <li class="pull-right">
+                            <slot name="header"></slot>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                <slot></slot>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
     export default {
-        name: "Tabs"
+        name: "Tabs",
+        data() {
+            return {tabs: []};
+        },
+        created() {
+            this.tabs = this.$children;
+        },
+        methods: {
+            selectTab(selectedTab) {
+                this.tabs.forEach(tab => {
+                    tab.isActive = (tab.name === selectedTab.name);
+                });
+            }
+        }
     }
 </script>
 
 <style scoped>
-
+.nav-tabs { border-bottom: none; }
 </style>

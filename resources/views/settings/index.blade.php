@@ -3,6 +3,7 @@
 @section('title', __('Settings'))
 
 @section('content')
+<div class="container">
     <div id="app">
     <librenms-settings :sections='{!! json_encode($sections) !!}'></librenms-settings>
     </div>
@@ -58,6 +59,7 @@
                 </div>
             </div>
         </div>
+</div>
 @endsection
 
 

@@ -83,6 +83,8 @@ class DynamicConfig
         /** @var Collection $sections */
         $sections = $this->definitions->groupBy('group')->map(function ($items) {
             return $items->pluck('section')->unique()->filter()->values();
+        })->sortBy(function ($item, $key) {
+            return $key;
         });
         $sections->prepend($sections->pull('', []), 'global'); // rename '' to global
         return $sections;

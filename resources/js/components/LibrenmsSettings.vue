@@ -23,56 +23,18 @@
   -->
 
 <template>
-    <div class="panel with-nav-tabs panel-default">
-        <div class="panel-heading">
-            <ul class="nav nav-tabs settings-group-tabs">
-                <li v-for="tab in tabs" :active="tab === active_tab" :class="{ active: active_tab === tab }">
-                    <a v-on:click="active_tab = tab">{{ tab }}</a>
-                </li>
-
-                <li class="pull-right">
-                    <form class="form-inline">
-                        <div class="input-group">
-                            <input v-model="search_phrase" type="search" class="form-control" placeholder="Search Settings">
-                        </div>
-                    </form>
-                </li>
-            </ul>
-        </div>
-        <div class="panel-body">
-            <div class="tab-content">
-                <div v-for="tab in tabs" :class="[{ active: tab === active_tab }, 'tab-pane', 'fade']">
-                    <div v-for="section in sections[tab]" class="panel-group">
-                        <div v-if="active_tab === 'global'">
-                            <p v-for="setting in this.settings"><b>{{ setting.name }}</b> = {{ JSON.stringify(setting.value) }}</p>
-                        </div>
-                        <div v-else>
-                            <div v-for="section in sections[tab]" class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <a data-toggle="collapse" :href="'#' + tab + '-' + section" v-on:click="active_section = section">
-                                            <i class="fa fa-caret-down"></i> {{ tab + '.' + section }}
-                                        </a>
-                                    </h4>
-                                </div>
-                                <div :class="['panel-collapse', 'collapse', { active: tab === active_tab && section === active_section }]">
-                                    <div class="panel-body">
-                                        <form class="form-horizontal section-form" role="form">
-                                            <div v-for="setting in getSectionSettings(tab, section)">
-                                                {{ setting.name }}
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+    <tabs>
+        <template v-slot:header>
+            <form class="form-inline">
+                <div class="input-group">
+                    <input id="settings-search" type="search" class="form-control" placeholder="Search Settings" style="border-radius: 4px">
                 </div>
-
-            </div>
-        </div>
-    </div>
+            </form>
+        </template>
+        <tab v-for="(tab, index) in tabs" :key="index" :name="tab" :selected="tab === active_tab">
+            <h1>{{ tab }}</h1>
+        </tab>
+    </tabs>
 </template>
 
 <script>
