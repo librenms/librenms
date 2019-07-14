@@ -187,6 +187,7 @@ if ($vars['view'] == 'edit' && LegacyAuth::user()->hasGlobalAdmin()) {
             $cdr       = $bill_data['bill_cdr'];
             $rate_95th = round($rate_95th, 2);
             $percent = round((($rate_95th) / $cdr * 100), 2);
+            $background = get_percentage_colours($percent);
             $type = '&amp;95th=yes';
 ?>
         <td>
