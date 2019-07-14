@@ -190,7 +190,7 @@ if ($vars['view'] == 'edit' && LegacyAuth::user()->hasGlobalAdmin()) {
             $type = '&amp;95th=yes';
 ?>
         <td>
-            <?php echo format_si($rate_95th) ?> of <?php echo format_si($cdr).'bps ('.$percent.'%)' ?> (95th%ile)
+            <?php echo format_si($rate_95th).'bps' ?> of <?php echo format_si($cdr).'bps ('.$percent.'%)' ?> (95th%ile)
         </td>
         <td style="width: 210px;">
             <?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']) ?>
@@ -199,7 +199,7 @@ if ($vars['view'] == 'edit' && LegacyAuth::user()->hasGlobalAdmin()) {
         <tr>
             <td colspan="2">
 <?php
-            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']));
+            echo 'Predicted usage: ' . format_si(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th'])).'bps';
 ?>
             </td>
 
