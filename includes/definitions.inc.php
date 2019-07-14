@@ -524,6 +524,11 @@ $config['graph_types']['device']['arbos_flows'] = ['section' => 'graphs', 'order
 
 //F5 specific graphs
 $config['graph_types']['device']['bigip_apm_sessions'] = ['section' => 'apm', 'order' => 0, 'descr' => 'Active Sessions'];
+$config['graph_types']['device']['bigip_system_tps'] = ['section' => 'ltm', 'order' => 0, 'descr' => 'SSL Transactions'];
+$config['graph_types']['device']['bigip_system_server_concurrent_connections'] = ['section' => 'ltm', 'order' => 1, 'descr' => 'Global Server Concurrent Connections'];
+$config['graph_types']['device']['bigip_system_client_concurrent_connections'] = ['section' => 'ltm', 'order' => 2, 'descr' => 'Global Client Concurrent Connections'];
+$config['graph_types']['device']['bigip_system_server_connection_rate'] = ['section' => 'ltm', 'order' => 3, 'descr' => 'Global Server Connection Rate'];
+$config['graph_types']['device']['bigip_system_client_connection_rate'] = ['section' => 'ltm', 'order' => 4, 'descr' => 'Global Client Connection Rate'];
 
 // Bluecoat ProxySG Graphs
 $config['graph_types']['device']['sgos_average_requests'] = ['section' => 'network', 'order' => 0, 'descr' => 'Average HTTP Requests'];
