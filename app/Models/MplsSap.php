@@ -10,6 +10,7 @@ class MplsSap extends Model implements Keyable
     protected $primaryKey = 'sap_id';
     public $timestamps = false;
     protected $fillable = [
+        'svc_id',
         'svc_oid',
         'sapPortId',
         'ifName',
@@ -39,11 +40,11 @@ class MplsSap extends Model implements Keyable
 
     public function binds()
     {
-        return $this->hasMany('App\Models\MplsSdpBind', 'svc_oid');
+        return $this->hasMany('App\Models\MplsSdpBind', 'svc_id');
     }
     
     public function services()
     {
-        return $this->hasMany('App\Models\MplsService', 'svc_oid');
+        return $this->hasMany('App\Models\MplsService', 'svc_id');
     }
 }

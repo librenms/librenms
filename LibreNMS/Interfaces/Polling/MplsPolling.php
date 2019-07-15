@@ -53,10 +53,10 @@ interface MplsPolling
     /**
      * @return Collection MplsSap objects
      */
-    public function pollMplsSaps();
+    public function pollMplsSaps($svcs);
 
     /**
      * @return Collection MplsSdpBind objects
      */
-    public function pollMplsSdpBinds();
+    public function pollMplsSdpBinds($sdps, $svcs);
 }

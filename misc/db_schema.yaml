@@ -922,6 +922,7 @@ mpls_lsp_paths:
 mpls_saps:
   Columns:
     - { Field: sap_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: svc_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: svc_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: sapPortId, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: ifName, Type: varchar(255), 'Null': true, Extra: '' }
@@ -960,6 +961,8 @@ mpls_sdps:
 mpls_sdp_binds:
   Columns:
     - { Field: bind_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: sdp_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: svc_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: sdp_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: svc_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }

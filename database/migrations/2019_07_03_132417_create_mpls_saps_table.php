@@ -15,6 +15,7 @@ class CreateMplsSapsTable extends Migration
     {
         Schema::create('mpls_saps', function (Blueprint $table) {
             $table->increments('sap_id');
+            $table->unsignedInteger('svc_id');
             $table->unsignedInteger('svc_oid');
             $table->unsignedInteger('sapPortId');
             $table->string('ifName', 255)->nullable();

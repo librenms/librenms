@@ -41,6 +41,6 @@ class MplsSdp extends Model implements Keyable
 
     public function binds()
     {
-        return $this->hasMany('App\Models\MplsSdpBind', 'sdp_oid');
+        return $this->hasMany('App\Models\MplsSdpBind', 'sdp_id');
     }
 }

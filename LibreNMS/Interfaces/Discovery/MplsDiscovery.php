@@ -53,10 +53,10 @@ interface MplsDiscovery
     /**
      * @return Collection MplsSap objects
      */
-    public function discoverMplsSaps();
+    public function discoverMplsSaps($svcs);
 
     /**
      * @return Collection MplsSdpBind objects
      */
-    public function discoverMplsSdpBinds();
+    public function discoverMplsSdpBinds($sdps, $svcs);
 }

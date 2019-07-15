@@ -15,6 +15,8 @@ class CreateMplsSdpBindsTable extends Migration
     {
         Schema::create('mpls_sdp_binds', function (Blueprint $table) {
             $table->increments('bind_id');
+            $table->unsignedInteger('sdp_id');
+            $table->unsignedInteger('svc_id');
             $table->unsignedInteger('sdp_oid');
             $table->unsignedInteger('svc_oid');
             $table->unsignedInteger('device_id')->index('device_id');

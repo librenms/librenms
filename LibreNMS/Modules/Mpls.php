@@ -57,19 +57,19 @@ class Mpls implements Module
 
             echo "\nMPLS SDPs: ";
             ModuleModelObserver::observe('\App\Models\MplsSdp');
-            $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->discoverMplsSdps());
+            $sdps = $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->discoverMplsSdps());
 
             echo "\nMPLS Services: ";
             ModuleModelObserver::observe('\App\Models\MplsService');
-            $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->discoverMplsServices());
+            $svcs = $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->discoverMplsServices());
 
             echo "\nMPLS SAPs: ";
             ModuleModelObserver::observe('\App\Models\MplsSap');
-            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->discoverMplsSaps());
+            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->discoverMplsSaps($svcs));
 
             echo "\nMPLS SDP Bindings: ";
             ModuleModelObserver::observe('\App\Models\MplsSdpBind');
-            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->discoverMplsSdpBinds());
+            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->discoverMplsSdpBinds($sdps, $svcs));
 
             echo PHP_EOL;
         }
@@ -95,19 +95,19 @@ class Mpls implements Module
 
             echo "\nMPLS SDPs: ";
             ModuleModelObserver::observe('\App\Models\MplsSdp');
-            $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->pollMplsSdps());
+            $sdps = $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->pollMplsSdps());
 
             echo "\nMPLS Services: ";
             ModuleModelObserver::observe('\App\Models\MplsService');
-            $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->pollMplsServices());
+            $svcs = $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->pollMplsServices());
 
             echo "\nMPLS SAPs: ";
             ModuleModelObserver::observe('\App\Models\MplsSap');
-            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->pollMplsSaps());
+            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->pollMplsSaps($svcs));
 
             echo "\nMPLS SDP Bindings: ";
             ModuleModelObserver::observe('\App\Models\MplsSdpBind');
-            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->pollMplsSdpBinds());
+            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->pollMplsSdpBinds($sdps, $svcs));
 
             echo PHP_EOL;
         }

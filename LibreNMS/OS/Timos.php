@@ -237,7 +237,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     /**
      * @return Collection MplsSap objects
      */
-    public function discoverMplsSaps()
+    public function discoverMplsSaps($svcs)
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
         $portScheme = snmp_get($this->getDevice(), 'tmnxChassisPortIdScheme.1', '-Oqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
@@ -256,7 +256,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 continue;
             }
             list($svcId, $sapPortId, $sapEncapValue) = explode('.', $key);
+            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
             $saps->push(new MplsSap([
+                'svc_id' => $svc_id,
                 'svc_oid' => $svcId,
                 'sapPortId' => $sapPortId,
                 'ifName' => $this->nokiaIfName($sapPortId, $portScheme),
@@ -278,7 +280,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     /**
      * @return Collection MplsSdpBind objects
      */
-    public function discoverMplsSdpBinds()
+    public function discoverMplsSdpBinds($sdps, $svcs)
     {
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
@@ -288,7 +290,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $bind_id = str_replace(' ', '', $value['sdpBindId']);
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
             $svc_oid = hexdec(substr($bind_id, 9, 16));
+            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
+            $svc_id = $svcs->firstWhere('svc_oid', $svc_oid)->svc_id;
             $binds->push(new MplsSdpBind([
+                'sdp_id' => $sdp_id,
+                'svc_id' => $svc_id,
                 'sdp_oid' => $sdp_oid,
                 'svc_oid' => $svc_oid,
                 'device_id' => $this->getDeviceId(),
@@ -475,7 +481,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     /**
      * @return Collection MplsSap objects
      */
-    public function pollMplsSaps()
+    public function pollMplsSaps($svcs)
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
         $portScheme = snmp_get($this->getDevice(), 'tmnxChassisPortIdScheme.1', '-Oqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
@@ -494,6 +500,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 continue;
             }
             list($svcId, $sapPortId, $sapEncapValue) = explode('.', $key);
+            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
             $saps->push(new MplsSap([
                 'svc_oid' => $svcId,
                 'sapPortId' => $sapPortId,
@@ -515,7 +522,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     /**
      * @return Collection MplsSDpBind objects
      */
-    public function pollMplsSdpBinds()
+    public function pollMplsSdpBinds($sdps, $svcs)
     {
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
@@ -525,7 +532,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $bind_id = str_replace(' ', '', $value['sdpBindId']);
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
             $svc_oid = hexdec(substr($bind_id, 9, 16));
+            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
+            $svc_id = $svcs->firstWhere('svc_oid', $svc_oid)->svc_id;
             $binds->push(new MplsSdpBind([
+                'sdp_id' => $sdp_id,
+                'svc_id' => $svc_id,
                 'sdp_oid' => $sdp_oid,
                 'svc_oid' => $svc_oid,
                 'device_id' => $this->getDeviceId(),

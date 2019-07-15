@@ -10,6 +10,8 @@ class MplsSdpBind extends Model implements Keyable
     protected $primaryKey = 'bind_id';
     public $timestamps = false;
     protected $fillable = [
+        'sdp_id',
+        'svc_id',
         'sdp_oid',
         'svc_oid',
         'device_id',
@@ -41,11 +43,11 @@ class MplsSdpBind extends Model implements Keyable
 
     public function sdp()
     {
-        return $this->belongsTo('App\Models\MplsSdp', 'sdp_oid');
+        return $this->belongsTo('App\Models\MplsSdp', 'sdp_id');
     }
 
     public function service()
     {
-        return $this->belongsTo('App\Models\MplsService', 'svc_oid');
+        return $this->belongsTo('App\Models\MplsService', 'svc_id');
     }
 }
