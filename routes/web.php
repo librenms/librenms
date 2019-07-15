@@ -17,8 +17,8 @@ Auth::routes();
 // WebUI
 Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     // Test
-    Route::get('/laravel', function () {
-        return view('laravel');
+    Route::get('/vue', function () {
+        return view('vue');
     });
 
     // pages

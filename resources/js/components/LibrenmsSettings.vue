@@ -32,14 +32,18 @@
             </form>
         </template>
         <tab v-for="(tab, index) in tabs" :key="index" :name="tab" :selected="tab === active_tab">
-            <h1>{{ tab }}</h1>
+            <accordion>
+                <accordion-item>{{ tab }}</accordion-item>
+            </accordion>
         </tab>
     </tabs>
 </template>
 
 <script>
+    import AccordianItem from "./AccordionItem";
     export default {
         name: "LibrenmsSettings",
+        components: {AccordianItem},
         props: ['sections'],
         data: function () {
             return {
