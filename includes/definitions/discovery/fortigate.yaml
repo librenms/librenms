@@ -64,3 +64,5 @@ modules:
                     index: 'fgVpnSslStatsActiveTunnels.{{ $index }}'
                     descr: SSL VPN Active tunnels
                     group: VPN
+
+
