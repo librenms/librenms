@@ -37,6 +37,7 @@ require Config::get('install_dir') . '/includes/html/api_functions.inc.php';
 $app->setName('api');
 
 $app->notFound(function () use ($app) {
+    dd($app->request()->getUrl());
     api_error(404, "This API route doesn't exist.");
 });
 

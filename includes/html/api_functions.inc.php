@@ -46,7 +46,7 @@ function api_success($result, $result_name, $message = null, $code = 200, $count
 
     $app  = \Slim\Slim::getInstance();
     $app->response->setStatus($code);
-    $app->response->headers->set('Content-Type', 'application/json');
+    api_set_header('Content-Type', 'application/json');
     $output = array('status'  => 'ok');
 
     if (isset($result)) {
@@ -77,7 +77,7 @@ function api_error($statusCode, $message)
 {
     $app  = \Slim\Slim::getInstance();
     $app->response->setStatus($statusCode);
-    $app->response->headers->set('Content-Type', 'application/json');
+    api_set_header('Content-Type', 'application/json');
     $output = array(
         'status'  => 'error',
         'message' => $message
@@ -85,6 +85,16 @@ function api_error($statusCode, $message)
     echo _json_encode($output);
     $app->stop();
 } // end api_error()
+
+function api_get_params()
+{
+    return \Slim\Slim::getInstance()->router()->getCurrentRoute()->getParams();
+}
+
+function api_set_header($header, $data)
+{
+    \Slim\Slim::getInstance()->response->headers->set($header, $data);
+}
 
 function check_bill_permission($bill_id)
 {
@@ -131,8 +141,7 @@ function check_not_demo()
 function get_graph_by_port_hostname()
 {
     // This will return a graph for a given port by the ifName
-    $app          = \Slim\Slim::getInstance();
-    $router       = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname     = $router['hostname'];
     $device_id    = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $vars         = array();
@@ -159,7 +168,7 @@ function get_graph_by_port_hostname()
     $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($device_id, $vars['port']));
 
     check_port_permission($vars['id'], $device_id);
-    $app->response->headers->set('Content-Type', get_image_type());
+    api_set_header('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/html/graphs/graph.inc.php';
     rrdtool_close();
@@ -172,8 +181,7 @@ function get_graph_by_port_hostname()
 function get_port_stats_by_port_hostname()
 {
     // This will return port stats based on a devices hostname and ifName
-    $app       = \Slim\Slim::getInstance();
-    $router    = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname  = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $ifName    = urldecode($router['ifname']);
@@ -207,8 +215,7 @@ function get_port_stats_by_port_hostname()
 function get_graph_generic_by_hostname()
 {
     // This will return a graph type given a device id.
-    $app          = \Slim\Slim::getInstance();
-    $router       = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname     = $router['hostname'];
     $sensor_id    = $router['sensor_id'] ?: null;
     $vars         = array();
@@ -242,7 +249,7 @@ function get_graph_generic_by_hostname()
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
     $vars['device'] = dbFetchCell('SELECT `D`.`device_id` FROM `devices` AS `D` WHERE `D`.`hostname`=?', array($hostname));
-    $app->response->headers->set('Content-Type', get_image_type());
+    api_set_header('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/html/graphs/graph.inc.php';
     rrdtool_close();
@@ -257,9 +264,6 @@ function list_locations()
 {
     check_is_read();
 
-    $app           = \Slim\Slim::getInstance();
-    $router        = $app->router()->getCurrentRoute()->getParams();
-
     $locations   = dbFetchRows("SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL");
     $total_locations = count($locations);
     if ($total_locations == 0) {
@@ -273,8 +277,7 @@ function list_locations()
 function get_device()
 {
     // return details of a single device
-    $app = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
 
     // use hostname as device_id if it's all digits
@@ -438,8 +441,7 @@ function del_device()
     check_is_admin();
 
     // This will add a device using the data passed encoded with json
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
 
     check_not_demo();
@@ -473,8 +475,7 @@ function del_device()
 function get_vlans()
 {
     // This will list all vlans for a given device
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
 
     if (empty($hostname)) {
@@ -508,7 +509,7 @@ function show_endpoints()
     }
 
     $app->response->setStatus('200');
-    $app->response->headers->set('Content-Type', 'application/json');
+    api_set_header('Content-Type', 'application/json');
     echo _json_encode($output);
 }
 
@@ -516,8 +517,6 @@ function show_endpoints()
 function list_bgp()
 {
     check_is_read();
-
-    $app        = \Slim\Slim::getInstance();
 
     $sql        = '';
     $sql_params = array();
@@ -547,8 +546,7 @@ function get_bgp()
 {
     check_is_read();
 
-    $app        = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
 
     $bgpPeerId        = $router['id'];
     if (!is_numeric($bgpPeerId)) {
@@ -570,7 +568,6 @@ function get_bgp()
 
 function list_cbgp()
 {
-    $app        = \Slim\Slim::getInstance();
     $sql        = '';
     $sql_params = array();
     $hostname   = $_GET['hostname'] ?: '';
@@ -585,15 +582,7 @@ function list_cbgp()
         $sql_params[] = LegacyAuth::id();
     }
 
-    $bgp_counters = array();
-    foreach (dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` LEFT JOIN `devices` ON `bgpPeers_cbgp`.`device_id` = `devices`.`device_id` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params) as $bgp_counter) {
-        $host_id = get_vm_parent_id($device);
-        $device['ip'] = inet6_ntop($device['ip']);
-        if (is_numeric($host_id)) {
-            $device['parent_id'] = $host_id;
-        }
-        $bgp_counters[] = $bgp_counter;
-    }
+    $bgp_counters = dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` LEFT JOIN `devices` ON `bgpPeers_cbgp`.`device_id` = `devices`.`device_id` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params);
     $total_bgp_counters = count($bgp_counters);
     if ($total_bgp_counters == 0) {
         api_error(404, 'BGP counters does not exist');
@@ -607,7 +596,6 @@ function list_ospf()
 {
     check_is_read();
 
-    $app        = \Slim\Slim::getInstance();
     $sql        = '';
     $sql_params = array();
     $hostname   = $_GET['hostname'];
@@ -630,8 +618,7 @@ function list_ospf()
 function get_graph_by_portgroup()
 {
     check_is_read();
-    $app    = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $group  = $router['group'] ?: '';
     $id     = $router['id'] ?: '';
     $vars   = array();
@@ -666,7 +653,7 @@ function get_graph_by_portgroup()
     unset($seperator);
     $vars['type'] = 'multiport_bits_separate';
     $vars['id']   = $if_list;
-    $app->response->headers->set('Content-Type', get_image_type());
+    api_set_header('Content-Type', get_image_type());
     rrdtool_initialize(false);
     include 'includes/html/graphs/graph.inc.php';
     rrdtool_close();
@@ -678,8 +665,7 @@ function get_graph_by_portgroup()
 
 function get_components()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
 
     // Do some filtering if the user requests.
@@ -709,8 +695,7 @@ function add_components()
 {
     check_is_admin();
 
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     $ctype = $router['type'];
 
@@ -727,8 +712,7 @@ function edit_components()
 {
     check_is_admin();
 
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     $data = json_decode(file_get_contents('php://input'), true);
 
@@ -748,8 +732,7 @@ function delete_components()
 {
     check_is_admin();
 
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $cid = $router['component'];
 
     $COMPONENT = new LibreNMS\Component();
@@ -763,8 +746,7 @@ function delete_components()
 
 function get_graphs()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
 
     // FIXME: this has some overlap with html/pages/device/graphs.inc.php
@@ -793,8 +775,7 @@ function get_graphs()
 
 function list_available_health_graphs()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     check_device_permission($device_id);
@@ -853,8 +834,7 @@ function list_available_health_graphs()
 
 function list_available_wireless_graphs()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     check_device_permission($device_id);
@@ -889,8 +869,7 @@ function list_available_wireless_graphs()
 
 function get_port_graphs()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     if (isset($_GET['columns'])) {
         $columns = $_GET['columns'];
@@ -914,8 +893,7 @@ function get_port_graphs()
 
 function get_ip_addresses()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $ipv4 = array();
     $ipv6 = array();
     if (isset($router['hostname'])) {
@@ -954,8 +932,7 @@ function get_ip_addresses()
 
 function get_port_info()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $port_id  = urldecode($router['portid']);
     check_port_permission($port_id, null);
 
@@ -966,7 +943,6 @@ function get_port_info()
 
 function get_all_ports()
 {
-    $app = \Slim\Slim::getInstance();
     if (isset($_GET['columns'])) {
         $columns = $_GET['columns'];
     } else {
@@ -987,8 +963,7 @@ function get_all_ports()
 
 function get_port_stack()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
     $device_id      = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -1006,8 +981,7 @@ function get_port_stack()
 function list_alert_rules()
 {
     check_is_read();
-    $app    = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $sql    = '';
     $param  = array();
     if (isset($router['id']) && $router['id'] > 0) {
@@ -1024,8 +998,7 @@ function list_alert_rules()
 function list_alerts()
 {
     check_is_read();
-    $app    = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
 
     $sql = "SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN ";
     if (isset($_GET['state'])) {
@@ -1059,7 +1032,6 @@ function list_alerts()
 function add_edit_rule()
 {
     check_is_admin();
-    $app  = \Slim\Slim::getInstance();
     $data = json_decode(file_get_contents('php://input'), true);
     if (json_last_error()) {
         api_error(500, "We couldn't parse the provided json");
@@ -1164,8 +1136,7 @@ function add_edit_rule()
 function delete_rule()
 {
     check_is_admin();
-    $app     = \Slim\Slim::getInstance();
-    $router  = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $rule_id = mres($router['id']);
     if (is_numeric($rule_id)) {
         if (dbDelete('alert_rules', '`id` =  ? LIMIT 1', array($rule_id))) {
@@ -1183,8 +1154,7 @@ function ack_alert()
 {
     check_is_admin();
 
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $alert_id = mres($router['id']);
     $data = json_decode(file_get_contents('php://input'), true);
 
@@ -1213,8 +1183,7 @@ function unmute_alert()
 {
     check_is_admin();
 
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $alert_id = mres($router['id']);
     $data = json_decode(file_get_contents('php://input'), true);
 
@@ -1240,8 +1209,7 @@ function unmute_alert()
 
 function get_inventory()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
 
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
@@ -1275,8 +1243,7 @@ function get_inventory()
 function list_oxidized()
 {
     check_is_read();
-    $app = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
 
     $hostname = $router['hostname'];
     $devices = array();
@@ -1333,14 +1300,13 @@ function list_oxidized()
         $devices[] = $device;
     }
 
-    $app->response->headers->set('Content-Type', 'application/json');
+    api_set_header('Content-Type', 'application/json');
     echo _json_encode($devices);
 }
 
 function list_bills()
 {
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
 
     $bills = array();
     $bill_id = mres($router['bill_id']);
@@ -1348,6 +1314,7 @@ function list_bills()
     $bill_custid = mres($_GET['custid']);
     $period = $_GET['period'];
     $param = array();
+    $sql = '';
 
     if (!empty($bill_custid)) {
         $sql    .= '`bill_custid` = ?';
@@ -1413,8 +1380,7 @@ function list_bills()
 
 function get_bill_graph()
 {
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $bill_id = mres($router['bill_id']);
     $graph_type = $router['graph_type'];
 
@@ -1432,14 +1398,13 @@ function get_bill_graph()
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
 
-    $app->response->headers->set('Content-Type', 'image/png');
+    api_set_header('Content-Type', 'image/png');
     include 'includes/html/graphs/graph.inc.php';
 }
 
 function get_bill_graphdata()
 {
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $bill_id = mres($router['bill_id']);
     $graph_type = $router['graph_type'];
 
@@ -1466,8 +1431,7 @@ function get_bill_graphdata()
 
 function get_bill_history()
 {
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $bill_id = mres($router['bill_id']);
 
     if (!LegacyAuth::user()->hasGlobalRead()) {
@@ -1484,8 +1448,7 @@ function get_bill_history()
 
 function get_bill_history_graph()
 {
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $bill_id = mres($router['bill_id']);
     $bill_hist_id = mres($router['bill_hist_id']);
     $graph_type = $router['graph_type'];
@@ -1520,14 +1483,13 @@ function get_bill_history_graph()
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
 
-    $app->response->headers->set('Content-Type', 'image/png');
+    api_set_header('Content-Type', 'image/png');
     include 'includes/html/graphs/graph.inc.php';
 }
 
 function get_bill_history_graphdata()
 {
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $bill_id = mres($router['bill_id']);
     $bill_hist_id = mres($router['bill_hist_id']);
     $graph_type = $router['graph_type'];
@@ -1558,8 +1520,7 @@ function get_bill_history_graphdata()
 function delete_bill()
 {
     check_is_admin();
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $bill_id = (int)$router['id'];
 
     if ($bill_id < 1) {
@@ -1739,8 +1700,7 @@ function create_edit_bill()
 function update_device()
 {
     check_is_admin();
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -1780,8 +1740,7 @@ function update_device()
 function rename_device()
 {
     check_is_admin();
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $new_hostname = $router['new_hostname'];
@@ -1802,8 +1761,7 @@ function rename_device()
 
 function get_device_groups()
 {
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
 
     if (!empty($router['hostname'])) {
         $device = ctype_digit($router['hostname']) ? Device::find($router['hostname']) : Device::findByHostname($router['hostname']);
@@ -1827,8 +1785,7 @@ function get_device_groups()
 function get_devices_by_group()
 {
     check_is_read();
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
 
     if (empty($router['name'])) {
         api_error(400, 'No device group name provided');
@@ -1853,7 +1810,6 @@ function get_devices_by_group()
 
 function list_vrf()
 {
-    $app        = \Slim\Slim::getInstance();
     $sql        = '';
     $sql_params = array();
     $hostname   = $_GET['hostname'];
@@ -1873,15 +1829,7 @@ function list_vrf()
         $sql_params[] = LegacyAuth::id();
     }
 
-    $vrfs       = array();
-    foreach (dbFetchRows("SELECT `vrfs`.* FROM `vrfs` LEFT JOIN `devices` ON `vrfs`.`device_id` = `devices`.`device_id` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params) as $vrf) {
-        $host_id = get_vm_parent_id($device);
-        $device['ip'] = inet6_ntop($device['ip']);
-        if (is_numeric($host_id)) {
-            $device['parent_id'] = $host_id;
-        }
-        $vrfs[] = $vrf;
-    }
+    $vrfs = dbFetchRows("SELECT `vrfs`.* FROM `vrfs` LEFT JOIN `devices` ON `vrfs`.`device_id` = `devices`.`device_id` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params);
     $total_vrfs = count($vrfs);
     if ($total_vrfs == 0) {
         api_error(404, 'VRFs do not exist');
@@ -1895,8 +1843,7 @@ function get_vrf()
 {
     check_is_read();
 
-    $app    = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $vrfId  = $router['id'];
     if (!is_numeric($vrfId)) {
         api_error(400, 'Invalid id has been provided');
@@ -1915,8 +1862,7 @@ function get_vrf()
 function list_ipsec()
 {
     check_is_read();
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -1931,7 +1877,6 @@ function list_ipsec()
 
 function list_vlans()
 {
-    $app      = \Slim\Slim::getInstance();
     $sql        = '';
     $sql_params = array();
     $hostname   = $_GET['hostname'] ?: '';
@@ -1946,15 +1891,7 @@ function list_vlans()
         $sql_params[] = LegacyAuth::id();
     }
 
-    $vlans       = array();
-    foreach (dbFetchRows("SELECT `vlans`.* FROM `vlans` LEFT JOIN `devices` ON `vlans`.`device_id` = `devices`.`device_id` WHERE `vlans`.`vlan_vlan` IS NOT NULL $sql", $sql_params) as $vlan) {
-        $host_id = get_vm_parent_id($device);
-        $device['ip'] = inet6_ntop($device['ip']);
-        if (is_numeric($host_id)) {
-            $device['parent_id'] = $host_id;
-        }
-        $vlans[] = $vlan;
-    }
+    $vlans = dbFetchRows("SELECT `vlans`.* FROM `vlans` LEFT JOIN `devices` ON `vlans`.`device_id` = `devices`.`device_id` WHERE `vlans`.`vlan_vlan` IS NOT NULL $sql", $sql_params);
     $vlans_count = count($vlans);
     if ($vlans_count == 0) {
         api_error(404, 'VLANs do not exist');
@@ -1966,8 +1903,7 @@ function list_vlans()
 
 function list_links()
 {
-    $app        = \Slim\Slim::getInstance();
-    $router     = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $sql        = '';
     $sql_params = array();
     $hostname   = $router['hostname'];
@@ -1982,15 +1918,7 @@ function list_links()
         $sql_params[] = LegacyAuth::id();
     }
 
-    $links       = array();
-    foreach (dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params) as $link) {
-        $host_id = get_vm_parent_id($device);
-        $device['ip'] = inet6_ntop($device['ip']);
-        if (is_numeric($host_id)) {
-            $device['parent_id'] = $host_id;
-        }
-        $links[] = $link;
-    }
+    $links = dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params);
     $total_links = count($links);
     if ($total_links == 0) {
         api_error(404, 'Links do not exist');
@@ -2004,8 +1932,7 @@ function get_link()
 {
     check_is_read();
 
-    $app    = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $linkId  = $router['id'];
     if (!is_numeric($linkId)) {
         api_error(400, 'Invalid id has been provided');
@@ -2023,8 +1950,7 @@ function get_link()
 
 function get_fdb()
 {
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
 
     if (empty($hostname)) {
@@ -2057,8 +1983,7 @@ function list_fdb()
 {
     check_is_read();
 
-    $app        = \Slim\Slim::getInstance();
-    $router     = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $mac        = $router['mac'];
 
     $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())
@@ -2079,8 +2004,7 @@ function list_sensors()
 {
     check_is_read();
 
-    $app        = \Slim\Slim::getInstance();
-    $router     = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
 
     $sensors = \App\Models\Sensor::hasAccess(Auth::user())->get();
     $total_sensors = $sensors->count();
@@ -2096,8 +2020,6 @@ function list_ip_addresses()
 {
     check_is_read();
 
-    $app            = \Slim\Slim::getInstance();
-    $router         = $app->router()->getCurrentRoute()->getParams();
     $ipv4_addresses = array();
     $ipv6_addresses = array();
 
@@ -2116,8 +2038,6 @@ function list_ip_networks()
 {
     check_is_read();
 
-    $app           = \Slim\Slim::getInstance();
-    $router        = $app->router()->getCurrentRoute()->getParams();
     $ipv4_networks = array();
     $ipv6_networks = array();
 
@@ -2135,8 +2055,7 @@ function list_ip_networks()
 function list_arp()
 {
     check_is_read();
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $ip       = $router['ip'];
     $hostname = $_GET['device'];
     $total    = 0;
@@ -2168,8 +2087,7 @@ function list_arp()
 function list_services()
 {
     check_is_read();
-    $app      = \Slim\Slim::getInstance();
-    $router   = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $services = array();
     $where    = array();
     $params   = array();
@@ -2219,9 +2137,8 @@ function list_logs()
 {
     check_is_read();
 
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
-    $type = $app->router()->getCurrentRoute()->getName();
+    $router = api_get_params();
+    $type = \Slim\Slim::getInstance()->router()->getCurrentRoute()->getName();
     $hostname = $router['hostname'];
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if ($type === 'list_eventlog') {
@@ -2291,22 +2208,13 @@ function validate_column_list($columns, $tableName)
     $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
 
     if (count($invalid_columns) > 0) {
-        $output = array(
-            'status'  => 'error',
-            'message' => 'Invalid columns: ' . join(',', $invalid_columns),
-        );
-        $app = \Slim\Slim::getInstance();
-        $app->response->setStatus(400);     // Bad request
-        $app->response->headers->set('Content-Type', 'application/json');
-        echo _json_encode($output);
-        $app->stop();
+        api_error(400, 'Invalid columns: ' . join(',', $invalid_columns));
     }
 }
 
 function add_service_for_host()
 {
-    $app = \Slim\Slim::getInstance();
-    $router = $app->router()->getCurrentRoute()->getParams();
+    $router = api_get_params();
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
