@@ -217,6 +217,7 @@ echo "</td></tr>";
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
         <form class="form-inline" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="1">
           <button type="submit" class="btn btn-success pull-right"
             <?php
@@ -237,6 +238,7 @@ echo "</td></tr>";
       </div>
       <div class="col-md-6">
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="2">
           <div class="form-group">
             <label for="dbhost" class="col-sm-4" control-label">DB Host: </label>
@@ -300,6 +302,7 @@ echo "</td></tr>";
       <div class="col-md-6">
         If you don't see any errors or messages above then the database setup has been successful.<br />
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="3">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -413,6 +416,7 @@ if (!file_exists("{$librenms_dir}/config.php")) {
 }
 ?>
       <form class="form-horizontal" role="form" method="post">
+          <?php echo csrf_field() ?>
         <input type="hidden" name="stage" value="6">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -436,6 +440,7 @@ if (!file_exists("{$librenms_dir}/config.php")) {
       </div>
       <div class="col-md-6">
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="4">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -492,6 +497,7 @@ if (LegacyAuth::get()->canManageUsers()) {
 
 ?>
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="5">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">

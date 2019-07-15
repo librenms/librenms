@@ -39,6 +39,7 @@ $pagetitle[] = 'Eventlog';
     $('.actionBar').append(
         '<div class="pull-left">' +
         '<form method="post" action="" class="form-inline" role="form" id="result_form">' +
+        '<?php echo csrf_field() ?>' +
         <?php
         if (!isset($vars['fromdevice'])) {
         ?>
