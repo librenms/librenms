@@ -46,7 +46,7 @@ if (LegacyAuth::user()->isDemoUser()) {
 ?>
 
     <form name="form1" method="post" action="" class="form-horizontal" role="form">
-      <?php echo csrf_field() ?>
+        <?php echo csrf_field() ?>
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-7">
           <div><h2>Delete Device</h2></div>

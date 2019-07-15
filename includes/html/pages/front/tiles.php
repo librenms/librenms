@@ -136,7 +136,7 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
   <div class="row" style="margin-top:5px;">
     <div class="col-md-6">
       <form class="form-inline" onsubmit="dashboard_add(this); return false;" name="add_form" id="add_form">
-          <?php echo csrf_field() ?>
+        <?php echo csrf_field() ?>
         <div class="col-sm-3 col-sx-6">
           <div class="input-group">
             <span class="input-group-btn">

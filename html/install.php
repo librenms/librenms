@@ -416,7 +416,7 @@ if (!file_exists("{$librenms_dir}/config.php")) {
 }
 ?>
       <form class="form-horizontal" role="form" method="post">
-          <?php echo csrf_field() ?>
+        <?php echo csrf_field() ?>
         <input type="hidden" name="stage" value="6">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">

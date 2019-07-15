@@ -110,7 +110,7 @@ $pagetitle[] = 'Add host';
   </div>
   <div class="col-sm-6">
 <form name="form1" method="post" action="" class="form-horizontal" role="form">
-  <?php echo csrf_field() ?>
+    <?php echo csrf_field() ?>
   <div><h2>Add Device</h2></div>
   <div class="alert alert-info">Devices will be checked for Ping/SNMP reachability before being probed.</div>
   <div class="well well-lg">
