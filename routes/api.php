@@ -11,5 +11,14 @@
 |
 */
 
+
+
+Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function () {
+    Route::get('devices', 'LegacyApiController@list_devices')->name('list_devices');
+//    Route::group(['prefix' => 'devices'], function () {
+//
+//    });
+});
+
 // Legacy API
 Route::any('/v0/{path?}', 'LegacyController@api')->where('path', '.*');

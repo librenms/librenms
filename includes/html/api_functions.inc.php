@@ -41,13 +41,10 @@ function authToken(\Slim\Route $route)
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
 {
     if (isset($result) && !isset($result_name)) {
-        api_error(500, 'Result name not specified');
+        return api_error(500, 'Result name not specified');
     }
 
-    $app  = \Slim\Slim::getInstance();
-    $app->response->setStatus($code);
-    api_set_header('Content-Type', 'application/json');
-    $output = array('status'  => 'ok');
+    $output = ['status' => 'ok'];
 
     if (isset($result)) {
         $output[$result_name] = $result;
@@ -64,8 +61,7 @@ function api_success($result, $result_name, $message = null, $code = 200, $count
     if (isset($extra)) {
         $output = array_merge($output, $extra);
     }
-    echo _json_encode($output);
-    $app->stop();
+    return response()->json($output, $code);
 } // end api_success()
 
 function api_success_noresult($code, $message = null)
@@ -75,19 +71,15 @@ function api_success_noresult($code, $message = null)
 
 function api_error($statusCode, $message)
 {
-    $app  = \Slim\Slim::getInstance();
-    $app->response->setStatus($statusCode);
-    api_set_header('Content-Type', 'application/json');
-    $output = array(
+    return response()->json([
         'status'  => 'error',
         'message' => $message
-    );
-    echo _json_encode($output);
-    $app->stop();
+    ], $statusCode);
 } // end api_error()
 
 function api_get_params()
 {
+    return Request::all();
     return \Slim\Slim::getInstance()->router()->getCurrentRoute()->getParams();
 }
 
@@ -297,12 +289,13 @@ function get_device()
     api_success(array($device), 'devices');
 }
 
-function list_devices()
+function list_devices(\Illuminate\Http\Request $request)
 {
     // This will return a list of devices
-    $order = $_GET['order'];
-    $type  = $_GET['type'];
-    $query = mres($_GET['query']);
+
+    $order = $request->get('order');
+    $type  = $request->get('type');
+    $query = $request->get('query');
     $param = array();
 
     if (empty($order)) {
@@ -353,9 +346,9 @@ function list_devices()
     }
 
 
-    if (!LegacyAuth::user()->hasGlobalRead()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql .= " AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $param[] = LegacyAuth::id();
+        $param[] = Auth::id();
     }
     $devices = array();
     $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
@@ -368,7 +361,7 @@ function list_devices()
         $devices[] = $device;
     }
 
-    api_success($devices, 'devices');
+    return api_success($devices, 'devices');
 }
 
 
