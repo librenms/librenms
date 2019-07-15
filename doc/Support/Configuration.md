@@ -858,8 +858,10 @@ the standard options, all of which you can configure.
 
 ```php
 $config['api']['cors']['enabled'] = false;
-$config['api']['cors']['origin'] = '*';
+$config['api']['cors']['origin'] = ['*'];
 $config['api']['cors']['maxage'] = '86400';
-$config['api']['cors']['allowmethods'] = array('POST', 'GET', 'PUT', 'DELETE', 'PATCH');
-$config['api']['cors']['allowheaders'] = array('Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Auth-Token');
+$config['api']['cors']['allowmethods'] = ['POST', 'GET', 'PUT', 'DELETE', 'PATCH'];
+$config['api']['cors']['allowheaders'] = ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Auth-Token'];
+$config['api']['cors']['exposeheaders'] = ['Cache-Control', 'Content-Language', 'Content-Type', 'Expires', 'Last-Modified', 'Pragma'];
+$config['api']['cors']['allowcredentials'] = false;
 ```
