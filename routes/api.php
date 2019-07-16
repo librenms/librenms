@@ -15,17 +15,31 @@
 
 Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function () {
     Route::get('system', 'LegacyApiController@server_info')->name('server_info');
+
+    // global read only access required
     Route::middleware(['can:global-read'])->group(function () {
         Route::get('bgp', 'LegacyApiController@list_bgp')->name('list_bgp');
         Route::get('bgp/{id}', 'LegacyApiController@get_bgp')->name('get_bgp');
         Route::get('ospf', 'LegacyApiController@list_ospf')->name('list_ospf');
+        Route::get('oxidized/{hostname?}', 'LegacyApiController@list_oxidized')->name('list_oxidized');
 
     });
+
+    // admin required
+    Route::middleware(['can:admin'])->group(function () {
+        Route::group(['prefix' => 'devices'], function () {
+            Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
+            Route::post(null, 'LegacyApiController@add_device')->name('add_device');
+            Route::delete('{hostname}', 'LegacyApiController@del_device')->name('del_device');
+            Route::patch('{hostname}', 'LegacyApiController@update_device')->name('update_device_field');
+            Route::patch('{hostname}/rename/{new_hostname}', 'LegacyApiController@rename_device')->name('rename_device');
+        });
+
+    });
+
+    // restricted by access
     Route::get('devices', 'LegacyApiController@list_devices')->name('list_devices');
     Route::get('ports', 'LegacyApiController@get_all_ports')->name('get_all_ports');
-//    Route::group(['prefix' => 'devices'], function () {
-//
-//    });
 });
 
 // Legacy API

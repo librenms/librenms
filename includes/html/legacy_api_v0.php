@@ -51,16 +51,16 @@ $app->group(
 //                $app->get('/bgp/:id', 'authToken', 'get_bgp')->name('get_bgp');
 //                $app->get('/ospf', 'authToken', 'list_ospf')->name('list_ospf');
                 // api/v0/bgp
-                $app->get('/oxidized(/:hostname)', 'authToken', 'list_oxidized')->name('list_oxidized');
+//                $app->get('/oxidized(/:hostname)', 'authToken', 'list_oxidized')->name('list_oxidized');
                 $app->group(
                     '/devices',
                     function () use ($app) {
-                        $app->delete('/:hostname', 'authToken', 'del_device')->name('del_device');
+//                        $app->delete('/:hostname', 'authToken', 'del_device')->name('del_device');
                         // api/v0/devices/$hostname
-                        $app->get('/:hostname', 'authToken', 'get_device')->name('get_device');
+//                        $app->get('/:hostname', 'authToken', 'get_device')->name('get_device');
                         // api/v0/devices/$hostname
-                        $app->patch('/:hostname', 'authToken', 'update_device')->name('update_device_field');
-                        $app->patch('/:hostname/rename/:new_hostname', 'authToken', 'rename_device')->name('rename_device');
+//                        $app->patch('/:hostname', 'authToken', 'update_device')->name('update_device_field');
+//                        $app->patch('/:hostname/rename/:new_hostname', 'authToken', 'rename_device')->name('rename_device');
                         $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');
                         // api/v0/devices/$hostname/vlans
                         $app->get('/:hostname/links', 'authToken', 'list_links')->name('get_links');
@@ -90,9 +90,9 @@ $app->group(
                         // api/v0/devices/$hostname/ports/$ifName/$type
                     }
                 );
-                $app->get('/devices', 'authToken', 'list_devices')->name('list_devices');
+//                $app->get('/devices', 'authToken', 'list_devices')->name('list_devices');
                 // api/v0/devices
-                $app->post('/devices', 'authToken', 'add_device')->name('add_device');
+//                $app->post('/devices', 'authToken', 'add_device')->name('add_device');
                 // api/v0/devices (json data needs to be passed)
                 $app->group(
                     '/devicegroups',

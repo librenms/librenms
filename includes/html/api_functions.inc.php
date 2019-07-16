@@ -66,7 +66,7 @@ function api_success($result, $result_name, $message = null, $code = 200, $count
 
 function api_success_noresult($code, $message = null)
 {
-    api_success(null, null, $message, $code);
+    return api_success(null, null, $message, $code);
 } // end api_success_noresult
 
 function api_error($statusCode, $message)
@@ -266,11 +266,10 @@ function list_locations()
 }
 
 
-function get_device()
+function get_device(\Illuminate\Http\Request $request)
 {
     // return details of a single device
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -278,7 +277,7 @@ function get_device()
     // find device matching the id
     $device = device_by_id_cache($device_id);
     if (!$device) {
-        api_error(404, "Device $hostname does not exist");
+        return api_error(404, "Device $hostname does not exist");
     }
 
     check_device_permission($device_id);
@@ -286,7 +285,7 @@ function get_device()
     if (is_numeric($host_id)) {
         $device = array_merge($device, array('parent_id' => $host_id));
     }
-    api_success(array($device), 'devices');
+    return api_success(array($device), 'devices');
 }
 
 function list_devices(\Illuminate\Http\Request $request)
@@ -365,35 +364,33 @@ function list_devices(\Illuminate\Http\Request $request)
 }
 
 
-function add_device()
+function add_device(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-
     // This will add a device using the data passed encoded with json
     // FIXME: Execution flow through this function could be improved
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode($request->getContent(), true);
 
     $additional = array();
     // keep scrutinizer from complaining about snmpver not being set for all execution paths
     $snmpver = 'v2c';
     if (empty($data)) {
-        api_error(400, 'No information has been provided to add this new device');
+        return api_error(400, 'No information has been provided to add this new device');
     }
     if (empty($data['hostname'])) {
-        api_error(400, 'Missing the device hostname');
+        return api_error(400, 'Missing the device hostname');
     }
 
     $hostname     = $data['hostname'];
-    $port = $data['port'] ? mres($data['port']) : Config::get('snmp.port');
-    $transport    = $data['transport'] ? mres($data['transport']) : 'udp';
-    $poller_group = $data['poller_group'] ? mres($data['poller_group']) : 0;
+    $port = $data['port'] ?: Config::get('snmp.port');
+    $transport    = $data['transport'] ?: 'udp';
+    $poller_group = $data['poller_group'] ?: 0;
     $force_add    = $data['force_add'] ? true : false;
     $snmp_disable = ($data['snmp_disable']);
     if ($snmp_disable) {
         $additional = array(
-            'sysName'      => $data['sysName'] ? mres($data['sysName']) : '',
-            'os'           => $data['os'] ? mres($data['os']) : 'ping',
-            'hardware'     => $data['hardware'] ? mres($data['hardware']) : '',
+            'sysName'      => $data['sysName'] ?: '',
+            'os'           => $data['os'] ?: 'ping',
+            'hardware'     => $data['hardware'] ?: '',
             'snmp_disable' => 1,
         );
     } elseif ($data['version'] == 'v1' || $data['version'] == 'v2c') {
@@ -401,15 +398,15 @@ function add_device()
             Config::set('snmp.community', [$data['community']]);
         }
 
-        $snmpver = mres($data['version']);
+        $snmpver = $data['version'];
     } elseif ($data['version'] == 'v3') {
         $v3 = array(
-            'authlevel'  => mres($data['authlevel']),
-            'authname'   => mres($data['authname']),
-            'authpass'   => mres($data['authpass']),
-            'authalgo'   => mres($data['authalgo']),
-            'cryptopass' => mres($data['cryptopass']),
-            'cryptoalgo' => mres($data['cryptoalgo']),
+            'authlevel'  => $data['authlevel'],
+            'authname'   => $data['authname'],
+            'authpass'   => $data['authpass'],
+            'authalgo'   => $data['authalgo'],
+            'cryptopass' => $data['cryptopass'],
+            'cryptoalgo' => $data['cryptoalgo'],
         );
 
         $v3_config = Config::get('snmp.v3');
@@ -417,29 +414,25 @@ function add_device()
         Config::set('snmp.v3', $v3_config);
         $snmpver = 'v3';
     } else {
-        api_error(400, 'You haven\'t specified an SNMP version to use');
+        return api_error(400, 'You haven\'t specified an SNMP version to use');
     }
     try {
         $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, 'ifIndex', $additional);
     } catch (Exception $e) {
-        api_error(500, $e->getMessage());
+        return api_error(500, $e->getMessage());
     }
 
-    api_success_noresult(201, "Device $hostname ($device_id) has been added successfully");
+    return api_success_noresult(201, "Device $hostname ($device_id) has been added successfully");
 }
 
 
-function del_device()
+function del_device(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-
     // This will add a device using the data passed encoded with json
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
 
-    check_not_demo();
     if (empty($hostname)) {
-        api_error(400, 'No hostname has been provided to delete');
+        return api_error(400, 'No hostname has been provided to delete');
     }
 
     // allow deleting by device_id or hostname
@@ -451,17 +444,17 @@ function del_device()
     }
 
     if (!$device) {
-        api_error(404, "Device $hostname not found");
+        return api_error(404, "Device $hostname not found");
     }
 
     $response = delete_device($device_id);
     if (empty($response)) {
         // FIXME: Need to provide better diagnostics out of delete_device
-        api_error(500, 'Device deletion failed');
+        return api_error(500, 'Device deletion failed');
     }
 
     // deletion succeeded - include old device details in response
-    api_success(array($device), 'devices', $response);
+    return api_success([$device], 'devices', $response);
 }
 
 
@@ -1226,12 +1219,9 @@ function get_inventory()
 }
 
 
-function list_oxidized()
+function list_oxidized(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-    $router = api_get_params();
-
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
     $devices = array();
     $device_types = "'" . implode("','", Config::get('oxidized.ignore_types')) . "'";
     $device_os = "'" . implode("','", Config::get('oxidized.ignore_os')) . "'";
@@ -1286,8 +1276,7 @@ function list_oxidized()
         $devices[] = $device;
     }
 
-    api_set_header('Content-Type', 'application/json');
-    echo _json_encode($devices);
+    return response()->json($devices, 200, [], JSON_PRETTY_PRINT);
 }
 
 function list_bills()
@@ -1683,64 +1672,61 @@ function create_edit_bill()
     api_success($bill_id, 'bill_id');
 }
 
-function update_device()
+function update_device(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode($request->getContent(), true);
     $bad_fields = array('device_id','hostname');
     if (empty($data['field'])) {
-        api_error(400, 'Device field to patch has not been supplied');
+        return api_error(400, 'Device field to patch has not been supplied');
     } elseif (in_array($data['field'], $bad_fields)) {
-        api_error(500, 'Device field is not allowed to be updated');
+        return api_error(500, 'Device field is not allowed to be updated');
     }
 
     if (is_array($data['field']) && is_array($data['data'])) {
         foreach ($data['field'] as $tmp_field) {
             if (in_array($tmp_field, $bad_fields)) {
-                api_error(500, 'Device field is not allowed to be updated');
+                return api_error(500, 'Device field is not allowed to be updated');
             }
         }
         if (count($data['field']) == count($data['data'])) {
+            $update = [];
             for ($x=0; $x<count($data['field']); $x++) {
                 $update[mres($data['field'][$x])] = mres($data['data'][$x]);
             }
             if (dbUpdate($update, 'devices', '`device_id`=?', array($device_id)) >= 0) {
-                api_success_noresult(200, 'Device fields have been updated');
+                return api_success_noresult(200, 'Device fields have been updated');
             } else {
-                api_error(500, 'Device fields failed to be updated');
+                return api_error(500, 'Device fields failed to be updated');
             }
         } else {
-            api_error(500, 'Device fields failed to be updated as the number of fields ('.count($data['field']).') does not match the supplied data ('.count($data['data']).')');
+            return api_error(500, 'Device fields failed to be updated as the number of fields ('.count($data['field']).') does not match the supplied data ('.count($data['data']).')');
         }
     } elseif (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id)) >= 0) {
-        api_success_noresult(200, 'Device ' . mres($data['field']) . ' field has been updated');
+        return api_success_noresult(200, 'Device ' . mres($data['field']) . ' field has been updated');
     } else {
-        api_error(500, 'Device ' . mres($data['field']) . ' field failed to be updated');
+        return api_error(500, 'Device ' . mres($data['field']) . ' field failed to be updated');
     }
 }
 
-function rename_device()
+function rename_device(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $new_hostname = $router['new_hostname'];
+    $new_hostname = $request->route('new_hostname');
     $new_device = getidbyname($new_hostname);
 
     if (empty($new_hostname)) {
-        api_error(500, 'Missing new hostname');
+        return api_error(500, 'Missing new hostname');
     } elseif ($new_device) {
-        api_error(500, 'Device failed to rename, new hostname already exists');
+        return api_error(500, 'Device failed to rename, new hostname already exists');
     } else {
         if (renamehost($device_id, $new_hostname, 'api') == '') {
-            api_success_noresult(200, 'Device has been renamed');
+            return api_success_noresult(200, 'Device has been renamed');
         } else {
-            api_error(500, 'Device failed to be renamed');
+            return api_error(500, 'Device failed to be renamed');
         }
     }
 }

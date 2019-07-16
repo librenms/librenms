@@ -12,7 +12,6 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 /**
@@ -288,11 +287,11 @@ function print_graph_popup($graph_array)
 
 function bill_permitted($bill_id)
 {
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         return true;
     }
 
-    return \Permissions::canAccessBill($bill_id, LegacyAuth::id());
+    return \Permissions::canAccessBill($bill_id, Auth::id());
 }
 
 function port_permitted($port_id, $device_id = null)
@@ -305,7 +304,7 @@ function port_permitted($port_id, $device_id = null)
         return true;
     }
 
-    return \Permissions::canAccessPort($port_id, LegacyAuth::id());
+    return \Permissions::canAccessPort($port_id, Auth::id());
 }
 
 function application_permitted($app_id, $device_id = null)
@@ -323,10 +322,10 @@ function application_permitted($app_id, $device_id = null)
 
 function device_permitted($device_id)
 {
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         return true;
     }
-    return \Permissions::canAccessDevice($device_id, LegacyAuth::id());
+    return \Permissions::canAccessDevice($device_id, Auth::id());
 }
 
 function print_graph_tag($args)
@@ -686,11 +685,11 @@ function devclass($device)
 
 function getlocations()
 {
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         return dbFetchRows('SELECT id, location FROM locations ORDER BY location');
     }
 
-    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [LegacyAuth::id()]);
+    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [Auth::id()]);
 }
 
 
