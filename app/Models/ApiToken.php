@@ -66,7 +66,7 @@ class ApiToken extends BaseModel
     {
         $token = new static;
         $token->user_id = $user->user_id;
-        $token->token_hash = Str::random(32);
+        $token->token_hash = $bytes = bin2hex(random_bytes(16));
         $token->description = $description;
         $token->disabled = false;
         $token->save();

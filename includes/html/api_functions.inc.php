@@ -118,7 +118,7 @@ function check_is_admin()
 
 function check_is_read()
 {
-    if (!LegacyAuth::user()->hasGlobalRead()) {
+    if (!Auth::user()->hasGlobalRead()) {
         api_error(403, 'Insufficient privileges');
     }
 }
@@ -509,8 +509,6 @@ function show_endpoints()
 
 function list_bgp()
 {
-    check_is_read();
-
     $sql        = '';
     $sql_params = array();
     $hostname   = $_GET['hostname'] ?: '';
@@ -528,10 +526,10 @@ function list_bgp()
     $bgp_sessions       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
     $total_bgp_sessions = count($bgp_sessions);
     if (!is_numeric($total_bgp_sessions)) {
-        api_error(500, 'Error retrieving bgpPeers');
+        return api_error(500, 'Error retrieving bgpPeers');
     }
 
-    api_success($bgp_sessions, 'bgp_sessions');
+    return api_success($bgp_sessions, 'bgp_sessions');
 }
 
 
@@ -869,7 +867,9 @@ function get_port_graphs()
     } else {
         $columns = 'ifName';
     }
-    validate_column_list($columns, 'ports');
+    if ($validate = validate_column_list($columns, 'ports') !== true) {
+        return $validate;
+    }
 
     // use hostname as device_id if it's all digits
     $device_id   = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -881,7 +881,7 @@ function get_port_graphs()
     }
 
     $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex` ASC", $params);
-    api_success($ports, 'ports');
+    return api_success($ports, 'ports');
 }
 
 function get_ip_addresses()
@@ -934,24 +934,23 @@ function get_port_info()
     api_success($port, 'port');
 }
 
-function get_all_ports()
+function get_all_ports(\Illuminate\Http\Request $request)
 {
-    if (isset($_GET['columns'])) {
-        $columns = $_GET['columns'];
-    } else {
-        $columns = 'port_id, ifName';
+    $columns = $request->get('columns', 'port_id, ifName');
+    if ($validate = validate_column_list($columns, 'ports') !== true) {
+        return $validate;
     }
-    validate_column_list($columns, 'ports');
+
     $params = array();
     $sql = '';
-    if (!LegacyAuth::user()->hasGlobalRead()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
-        array_push($params, LegacyAuth::id());
-        array_push($params, LegacyAuth::id());
+        array_push($params, Auth::id());
+        array_push($params, Auth::id());
     }
     $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0 $sql", $params);
 
-    api_success($ports, 'ports');
+    return api_success($ports, 'ports');
 }
 
 function get_port_stack()
@@ -2201,8 +2200,10 @@ function validate_column_list($columns, $tableName)
     $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
 
     if (count($invalid_columns) > 0) {
-        api_error(400, 'Invalid columns: ' . join(',', $invalid_columns));
+        return api_error(400, 'Invalid columns: ' . join(',', $invalid_columns));
     }
+
+    return true;
 }
 
 function add_service_for_host()
@@ -2258,7 +2259,7 @@ function add_service_for_host()
 function server_info()
 {
     $versions = version_info();
-    api_success([
+    return api_success([
         $versions
     ], 'system');
 }

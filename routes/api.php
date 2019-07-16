@@ -14,7 +14,13 @@
 
 
 Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function () {
+    Route::get('system', 'LegacyApiController@server_info')->name('server_info');
+    Route::middleware(['can:global-read'])->group(function () {
+        Route::get('bgp', 'LegacyApiController@list_bgp')->name('list_bgp');
+
+    });
     Route::get('devices', 'LegacyApiController@list_devices')->name('list_devices');
+    Route::get('ports', 'LegacyApiController@get_all_ports')->name('get_all_ports');
 //    Route::group(['prefix' => 'devices'], function () {
 //
 //    });
