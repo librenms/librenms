@@ -502,6 +502,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             list($svcId, $sapPortId, $sapEncapValue) = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
             $saps->push(new MplsSap([
+                'svc_id' => $svc_id,
                 'svc_oid' => $svcId,
                 'sapPortId' => $sapPortId,
                 'ifName' => $this->nokiaIfName($sapPortId, $portScheme),
