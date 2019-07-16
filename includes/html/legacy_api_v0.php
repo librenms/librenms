@@ -37,7 +37,6 @@ require Config::get('install_dir') . '/includes/html/api_functions.inc.php';
 $app->setName('api');
 
 $app->notFound(function () use ($app) {
-    dd($app->request()->getUrl());
     api_error(404, "This API route doesn't exist.");
 });
 
@@ -47,10 +46,10 @@ $app->group(
         $app->group(
             '/v0',
             function () use ($app) {
-                $app->get('/system', 'authToken', 'server_info')->name('server_info');
-                $app->get('/bgp', 'authToken', 'list_bgp')->name('list_bgp');
-                $app->get('/bgp/:id', 'authToken', 'get_bgp')->name('get_bgp');
-                $app->get('/ospf', 'authToken', 'list_ospf')->name('list_ospf');
+//                $app->get('/system', 'authToken', 'server_info')->name('server_info');
+//                $app->get('/bgp', 'authToken', 'list_bgp')->name('list_bgp');
+//                $app->get('/bgp/:id', 'authToken', 'get_bgp')->name('get_bgp');
+//                $app->get('/ospf', 'authToken', 'list_ospf')->name('list_ospf');
                 // api/v0/bgp
                 $app->get('/oxidized(/:hostname)', 'authToken', 'list_oxidized')->name('list_oxidized');
                 $app->group(

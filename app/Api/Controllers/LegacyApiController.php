@@ -40,6 +40,6 @@ class LegacyApiController
         require base_path('/includes/init.php');
         require_once base_path('includes/html/api_functions.inc.php');
 
-        return app()->call($method_name);
+        return app()->call($method_name, $arguments);
     }
 }

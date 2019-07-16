@@ -17,6 +17,8 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     Route::get('system', 'LegacyApiController@server_info')->name('server_info');
     Route::middleware(['can:global-read'])->group(function () {
         Route::get('bgp', 'LegacyApiController@list_bgp')->name('list_bgp');
+        Route::get('bgp/{id}', 'LegacyApiController@get_bgp')->name('get_bgp');
+        Route::get('ospf', 'LegacyApiController@list_ospf')->name('list_ospf');
 
     });
     Route::get('devices', 'LegacyApiController@list_devices')->name('list_devices');

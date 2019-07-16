@@ -61,7 +61,7 @@ function api_success($result, $result_name, $message = null, $code = 200, $count
     if (isset($extra)) {
         $output = array_merge($output, $extra);
     }
-    return response()->json($output, $code);
+    return response()->json($output, $code, [], JSON_PRETTY_PRINT);
 } // end api_success()
 
 function api_success_noresult($code, $message = null)
@@ -74,7 +74,7 @@ function api_error($statusCode, $message)
     return response()->json([
         'status'  => 'error',
         'message' => $message
-    ], $statusCode);
+    ], $statusCode, [], JSON_PRETTY_PRINT);
 } // end api_error()
 
 function api_get_params()
@@ -533,27 +533,23 @@ function list_bgp()
 }
 
 
-function get_bgp()
+function get_bgp(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-
-    $router = api_get_params();
-
-    $bgpPeerId        = $router['id'];
+    $bgpPeerId = $request->route('id');
     if (!is_numeric($bgpPeerId)) {
-        api_error(400, 'Invalid id has been provided');
+        return api_error(400, 'Invalid id has been provided');
     }
 
     $bgp_session       = dbFetchRows("SELECT * FROM `bgpPeers` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' AND bgpPeer_id = ?", array($bgpPeerId));
     $bgp_session_count = count($bgp_session);
     if (!is_numeric($bgp_session_count)) {
-        api_error(500, 'Error retrieving BGP peer');
+        return api_error(500, 'Error retrieving BGP peer');
     }
     if ($bgp_session_count == 0) {
-        api_error(404, "BGP peer $bgpPeerId does not exist");
+        return api_error(404, "BGP peer $bgpPeerId does not exist");
     }
 
-    api_success($bgp_session, 'bgp_session');
+    return api_success($bgp_session, 'bgp_session');
 }
 
 
@@ -583,13 +579,11 @@ function list_cbgp()
 }
 
 
-function list_ospf()
+function list_ospf(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-
     $sql        = '';
     $sql_params = array();
-    $hostname   = $_GET['hostname'];
+    $hostname   = $request->get('hostname');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql        = ' AND `device_id`=?';
@@ -599,10 +593,10 @@ function list_ospf()
     $ospf_neighbours       = dbFetchRows("SELECT * FROM ospf_nbrs WHERE `ospfNbrState` IS NOT NULL AND `ospfNbrState` != '' $sql", $sql_params);
     $total_ospf_neighbours = count($ospf_neighbours);
     if (!is_numeric($total_ospf_neighbours)) {
-        api_error(500, 'Error retrieving ospf_nbrs');
+        return api_error(500, 'Error retrieving ospf_nbrs');
     }
 
-    api_success($ospf_neighbours, 'ospf_neighbours');
+    return api_success($ospf_neighbours, 'ospf_neighbours');
 }
 
 
