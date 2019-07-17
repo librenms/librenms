@@ -358,6 +358,9 @@ The application should be auto-discovered as described at the top of the page. I
 
 # C.H.I.P
 
+C.H.I.P. is a $9 R8 based tiny computer ideal for small projects.
+Further details: <https://getchip.com/pages/chip>
+
 1: Copy the shell script to the desired host.
 
 ```
