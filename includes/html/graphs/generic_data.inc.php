@@ -100,10 +100,10 @@ $rrd_options .= ' CDEF:inbits_max=inoctets_max,8,*';
 if (Config::get('rrdgraph_real_percentile')) {
     $rrd_options .= ' CDEF:highbits=inoctets,outoctets,MAX,8,*';
     $rrd_options .= ' VDEF:percentilehigh=highbits,' . Config::get('percentile_value') . ',PERCENT';
-	if ($_GET['previous'] == 'yes') {
+    if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' CDEF:highbitsX=inoctetsX,outoctetsX,MAX:start=' . $prev_from . ':end=' . $from . ',8,*';
         $rrd_options .= ' VDEF:percentilehighX=highbitsX,' . Config::get('percentile_value') . ',PERCENT';
-	}
+    }
 }
 
 $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
@@ -117,19 +117,19 @@ $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 if ($format == 'octets' || $format == 'bytes') {
     $rrd_options .= ' VDEF:percentile_in=inoctets,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' VDEF:percentile_out=outoctets,' . Config::get('percentile_value') . ',PERCENT';
-	if ($_GET['previous'] == 'yes') {
-	    $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . Config::get('percentile_value') . ',PERCENT';
-	    $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . Config::get('percentile_value') . ',PERCENT';
-	}
+    if ($_GET['previous'] == 'yes') {
+        $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . Config::get('percentile_value') . ',PERCENT';
+    }
     $units = 'Bps';
     $format = 'octets';
 } else {
     $rrd_options .= ' VDEF:percentile_in=inbits,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
-	if ($_GET['previous'] == 'yes') {
-	    $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
-	    $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
-	}
+    if ($_GET['previous'] == 'yes') {
+        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
+    }
     $units = 'bps';
     $format = 'bits';
 }
