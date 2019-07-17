@@ -760,63 +760,65 @@ function get_graphs(\Illuminate\Http\Request $request)
     });
 }
 
-function list_available_health_graphs()
+function list_available_health_graphs(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    check_device_permission($device_id);
-    if (isset($router['type'])) {
-        list($dump, $type) = explode('device_', $router['type']);
-    }
-    $sensor_id = $router['sensor_id'] ?: null;
-    $graphs    = array();
 
-    if (isset($type)) {
-        if (isset($sensor_id)) {
-              $graphs = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_id` = ?', array($sensor_id));
+    return check_device_permission($device_id, function () use ($device_id, $request) {
+        $input_type = $request->route('type');
+        if ($input_type) {
+            list($dump, $type) = explode('device_', $input_type);
+        }
+        $sensor_id = $request->route('sensor_id');
+        $graphs = array();
+
+        if (isset($type)) {
+            if (isset($sensor_id)) {
+                $graphs = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_id` = ?', array($sensor_id));
+            } else {
+                foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
+                    $graphs[] = array(
+                        'sensor_id' => $graph['sensor_id'],
+                        'desc' => $graph['sensor_descr'],
+                    );
+                }
+            }
         } else {
-            foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
+            foreach (dbFetchRows('SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
                 $graphs[] = array(
-                    'sensor_id' => $graph['sensor_id'],
-                    'desc'      => $graph['sensor_descr'],
+                    'desc' => ucfirst($graph['sensor_class']),
+                    'name' => 'device_' . $graph['sensor_class'],
                 );
             }
-        }
-    } else {
-        foreach (dbFetchRows('SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
-            $graphs[] = array(
-                'desc' => ucfirst($graph['sensor_class']),
-                'name' => 'device_'.$graph['sensor_class'],
-            );
-        }
-        $device = Device::find($device_id);
+            $device = Device::find($device_id);
 
-        if ($device) {
-            if ($device->processors()->count() > 0) {
-                array_push($graphs, array(
-                    'desc' => 'Processors',
-                    'name' => 'device_processor'
-                ));
-            }
+            if ($device) {
+                if ($device->processors()->count() > 0) {
+                    array_push($graphs, array(
+                        'desc' => 'Processors',
+                        'name' => 'device_processor'
+                    ));
+                }
 
-            if ($device->storage()->count() > 0) {
-                array_push($graphs, array(
-                    'desc' => 'Storage',
-                    'name' => 'device_storage'
-                ));
-            }
+                if ($device->storage()->count() > 0) {
+                    array_push($graphs, array(
+                        'desc' => 'Storage',
+                        'name' => 'device_storage'
+                    ));
+                }
 
-            if ($device->mempools()->count() > 0) {
-                array_push($graphs, array(
-                    'desc' => 'Memory Pools',
-                    'name' => 'device_mempool'
-                ));
+                if ($device->mempools()->count() > 0) {
+                    array_push($graphs, array(
+                        'desc' => 'Memory Pools',
+                        'name' => 'device_mempool'
+                    ));
+                }
             }
         }
-    }
 
-    return api_success($graphs, 'graphs');
+        return api_success($graphs, 'graphs');
+    });
 }
 
 function list_available_wireless_graphs()
