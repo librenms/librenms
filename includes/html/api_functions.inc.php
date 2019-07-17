@@ -1882,30 +1882,32 @@ function list_vlans()
 }
 
 
-function list_links()
+function list_links(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $sql        = '';
-    $sql_params = array();
-    $hostname   = $router['hostname'];
+    $hostname   = $request->route('hostname');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    if (is_numeric($device_id)) {
-        check_device_permission($device_id);
+
+    if (!is_numeric($device_id)) {
+        return api_error(400, 'Invalid device has been provided');
+    }
+
+    return check_device_permission($device_id, function () use ($device_id) {
         $sql        = " AND `links`.`local_device_id`=?";
-        $sql_params = array($device_id);
-    }
-    if (!LegacyAuth::user()->hasGlobalRead()) {
-        $sql .= " AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = LegacyAuth::id();
-    }
+        $sql_params = [$device_id];
 
-    $links = dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params);
-    $total_links = count($links);
-    if ($total_links == 0) {
-        api_error(404, 'Links do not exist');
-    }
+        if (!Auth::user()->hasGlobalRead()) {
+            $sql .= " AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+            $sql_params[] = Auth::id();
+        }
 
-    api_success($links, 'links');
+        $links = dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params);
+        $total_links = count($links);
+        if ($total_links == 0) {
+            return api_error(404, 'Links do not exist');
+        }
+
+        return api_success($links, 'links');
+    });
 }
 
 
