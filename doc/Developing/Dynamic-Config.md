@@ -43,7 +43,7 @@ $mail_conf = array(
 echo '
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
-';
+    ' . csrf_field();
 
 echo generate_dynamic_config_panel('Email transport',$config_groups,$mail_conf,'mail');
 

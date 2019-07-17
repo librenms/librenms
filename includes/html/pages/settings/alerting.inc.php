@@ -170,6 +170,7 @@ echo '
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
 ';
+echo csrf_field();
 
 echo generate_dynamic_config_panel('General alert settings', $config_groups, $general_conf);
 

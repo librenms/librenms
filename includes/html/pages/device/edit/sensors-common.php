@@ -19,6 +19,7 @@ echo "<h3>$title</h3>";
 ?>
 
 <form class="form-inline">
+<?php echo csrf_field() ?>
 <table class="table table-hover table-condensed table-bordered">
   <tr class="info">
     <th>Class</th>
@@ -95,6 +96,7 @@ foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_d
 </form>
 <form id="alert-reset">
 <?php
+echo csrf_field();
 foreach ($rollback as $reset_data) {
     echo '
         <input type="hidden" name="sensor_id[]" value="'.$reset_data['sensor_id'].'">

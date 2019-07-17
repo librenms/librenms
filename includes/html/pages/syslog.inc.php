@@ -41,6 +41,7 @@ $pagetitle[] = 'Syslog';
     $('.actionBar').append(
         '<div class="pull-left">' +
         '<form method="post" action="" class="form-inline" role="form" id="result_form">' +
+        '<?php echo csrf_field() ?>'+
         '<div class="form-group">' +
         <?php
         if (!isset($vars['fromdevice'])) {

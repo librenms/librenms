@@ -24,6 +24,7 @@ if (\Auth::user()->hasGlobalAdmin()) {
             </div>
             <div class="modal-body">
                 <form method="post" role="form" id="sched-form" class="form-horizontal schedule-maintenance-form">
+                    <?php echo csrf_field() ?>
                     <input type="hidden" name="schedule_id" id="schedule_id">
                     <input type="hidden" name="type" id="type" value="schedule-maintenance">
                     <input type="hidden" name="sub_type" id="sub_type" value="new-maintenance">

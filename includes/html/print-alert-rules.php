@@ -54,6 +54,7 @@ require_once 'includes/html/modal/alert_rule_collection.inc.php';
 ?>
 <form method="post" action="" id="result_form">
 <?php
+echo csrf_field();
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
     $results = $_POST['results'];
 } else {
@@ -225,6 +226,7 @@ if ($count < 1) {
         echo '<div class="row">
             <div class="col-sm-12">
             <form role="form" method="post">
+            ' . csrf_field() . '
             <p class="text-center">
             <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default"><i class="fa fa-plus"></i> Click here to create the default alert rules!</button>
             </p>

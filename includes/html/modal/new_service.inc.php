@@ -37,6 +37,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
             </div>
             <div class="modal-body">
                 <form method="post" role="form" id="service" class="form-horizontal service-form">
+                    <?php echo csrf_field() ?>
                     <input type="hidden" name="service_id" id="service_id" value="">
                     <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
                     <input type="hidden" name="type" id="type" value="create-service">

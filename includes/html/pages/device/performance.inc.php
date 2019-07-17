@@ -37,6 +37,7 @@ if (empty($vars['dtpickerto'])) {
 <div class="panel panel-default">
     <div class="panel-heading">
         <form method="post" role="form" id="map" class="form-inline">
+            <?php echo csrf_field() ?>
             <div class="form-group">
                 <label for="dtpickerfrom">From</label>
                 <input type="text" class="form-control" id="dtpickerfrom" name="dtpickerfrom" maxlength="16"

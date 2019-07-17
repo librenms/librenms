@@ -1,6 +1,7 @@
 <span id="message"><small><div class="alert alert-danger">n.b For the first time, please click any button twice.</div></small></span>
 
 <form id='components' class='form-inline' method='POST'>
+    <?php echo csrf_field() ?>
     <table id='table' class='table table-condensed table-responsive table-striped'>
         <thead>
             <tr>

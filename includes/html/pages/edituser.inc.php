@@ -87,6 +87,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         // Display devices this user doesn't have access to
         echo '<h4>Grant access to new device</h4>';
         echo "<form class='form-inline' role='form' method='post' action=''>
+            " . csrf_field() . "
             <input type='hidden' value='".$user_data['user_id']."' name='user_id'>
             <input type='hidden' value='edituser' name='page'>
             <input type='hidden' value='adddevperm' name='action'>
@@ -147,6 +148,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         echo '<h4>Grant access to new interface</h4>';
 
         echo "<form action='' method='post' class='form-horizontal' role='form'>
+        " . csrf_field() . "
         <input type='hidden' value='".$user_data['user_id']."' name='user_id'>
         <input type='hidden' value='edituser' name='page'>
         <input type='hidden' value='addifperm' name='action'>
@@ -220,6 +222,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         // Display devices this user doesn't have access to
         echo '<h4>Grant access to new bill</h4>';
         echo "<form method='post' action='' class='form-inline' role='form'>
+            " . csrf_field() . "
             <input type='hidden' value='".$user_data['user_id']."' name='user_id'>
             <input type='hidden' value='edituser' name='page'>
             <input type='hidden' value='addbillperm' name='action'>

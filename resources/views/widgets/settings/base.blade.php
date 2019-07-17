@@ -1,4 +1,5 @@
 <form role="form" class="dashboard-widget-settings" onsubmit="widget_settings(this); return false;">
+    @csrf
     @yield('form')
 
     @hassection('form')

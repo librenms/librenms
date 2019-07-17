@@ -87,7 +87,7 @@ $displayLists .= '</div>';
 if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars['searchbar'])) {
     $output = "<div class='pull-left'>";
     $output .= "<form method='post' action='' class='form-inline' role='form'>";
-
+    $output .= csrf_field();
     $output .= "<div style='margin-bottom:4px;text-align:left;'>";
     $output .= "<div class='form-group'>";
     $output .= "<select name='device_id' id='device_id' class='form-control input-sm'>";
