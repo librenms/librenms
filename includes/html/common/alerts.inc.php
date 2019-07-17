@@ -46,6 +46,7 @@ if (defined('SHOW_SETTINGS')) {
 
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
+  ' . csrf_field() . '
   <div class="form-group row">
     <div class="col-sm-4">
       <label for="acknowledged" class="control-label">Show acknowledged alerts: </label>

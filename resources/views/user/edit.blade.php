@@ -9,6 +9,7 @@
               class="form-horizontal col-md-8 col-md-offset-2">
             <legend>@lang('Edit User'): {{ $user->username }}</legend>
             {{ method_field('PUT') }}
+            @csrf
 
             @include('user.form')
 

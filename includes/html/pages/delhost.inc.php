@@ -28,6 +28,7 @@ if (LegacyAuth::user()->isDemoUser()) {
   <font color="red"></font><i class="fa fa-exclamation-triangle fa-3x"></i></font>
   <br>
   <form name="form1" method="post" action="" class="form-horizontal" role="form">
+    <?php echo csrf_field() ?>
     <div class="form-group">
       <input type="hidden" name="id" value="<?php echo $_REQUEST['id'] ?>" />
       <input type="hidden" name="confirm" value="1" />
@@ -45,6 +46,7 @@ if (LegacyAuth::user()->isDemoUser()) {
 ?>
 
     <form name="form1" method="post" action="" class="form-horizontal" role="form">
+        <?php echo csrf_field() ?>
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-7">
           <div><h2>Delete Device</h2></div>

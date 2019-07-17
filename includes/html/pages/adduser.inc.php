@@ -36,6 +36,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
             }//end if
         }//end if
         echo "<form method='post' action='adduser/' class='form-horizontal' role='form'> <input type='hidden' value='add' name='action'>";
+        echo csrf_field();
         echo "
   <div class='form-group'>
     <label for='new_username' class='col-sm-2 control-label'>Username</label>

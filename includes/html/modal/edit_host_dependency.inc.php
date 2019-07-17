@@ -44,6 +44,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
             </div>
             <div class="modal-footer">
                 <form role="form" class="remove_token_form">
+                    <?php echo csrf_field() ?>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success" id="hostdep-save" data-target="hostdep-save">Save</button>
                     <input type="hidden" name="row_id" id="edit-row_id" value="">
