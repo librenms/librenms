@@ -1,4 +1,5 @@
 <form name="form1" action="" method="post" class="form-horizontal">
+    <?php echo csrf_field() ?>
   <script type="text/javascript">
     function showWarning(checked) {
       $('#warning').toggle();

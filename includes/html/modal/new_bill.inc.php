@@ -36,6 +36,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
         </div>
         <div class="modal-body">
             <form method="post" role="form" action="bills/" class="form-horizontal alerts-form">
+                <?php echo csrf_field() ?>
                 <input type="hidden" name="addbill" value="yes" />
 
                 <div class="form-group">

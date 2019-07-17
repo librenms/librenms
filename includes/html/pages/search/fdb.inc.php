@@ -28,6 +28,7 @@ var grid = $("#fdb-search").bootgrid({
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
                 "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
+                "<?php echo addslashes(csrf_field()) ?>"+
                 "<div class=\"form-group\">"+
                 "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+

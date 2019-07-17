@@ -52,6 +52,7 @@ if ($notifications['count'] > 0 && !isset($vars['archive'])) {
   <div class="row">
     <div class="col-md-12">
       <form class="form-horizontal new-notif-form">
+        <?php echo csrf_field() ?>
         <div class="form-group">
           <label for="notif_title" class="col-sm-2 control-label">Title</label>
           <div class="col-sm-10">

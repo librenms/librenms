@@ -3,6 +3,7 @@
 <span id="message"><small><div class="alert alert-danger">n.b For the first time, please click any button twice.</div></small></span>
 
 <form id='ignoreport' name='ignoreport' method='post' action='' role='form' class='form-inline'>
+    <?php echo csrf_field() ?>
     <input type='hidden' name='ignoreport' value='yes'>
     <input type='hidden' name='type' value='update-ports'>
     <input type='hidden' name='device' value='<?php echo $device['device_id'];?>'>

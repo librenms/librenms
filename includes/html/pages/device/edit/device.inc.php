@@ -75,6 +75,7 @@ if ($_POST['editing']) {
 <div class="row">
     <div class="col-md-1 col-md-offset-2">
         <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
+            <?php echo csrf_field() ?>
             <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
             <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button>
         </form>
@@ -91,6 +92,7 @@ if ($_POST['editing']) {
 </div>
 <br>
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
+<?php echo csrf_field() ?>
 <input type=hidden name="editing" value="yes">
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
         <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
