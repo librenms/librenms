@@ -857,15 +857,11 @@ function list_available_wireless_graphs(\Illuminate\Http\Request $request)
     });
 }
 
-function get_port_graphs()
+function get_port_graphs(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $hostname = $router['hostname'];
-    if (isset($_GET['columns'])) {
-        $columns = $_GET['columns'];
-    } else {
-        $columns = 'ifName';
-    }
+    $hostname = $request->route('hostname');
+    $columns = $request->get('columns', 'ifName');
+
     if ($validate = validate_column_list($columns, 'ports') !== true) {
         return $validate;
     }
@@ -876,7 +872,7 @@ function get_port_graphs()
     $params = array($device_id);
     if (!device_permitted($device_id)) {
         $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
-        array_push($params, LegacyAuth::id());
+        array_push($params, Auth::id());
     }
 
     $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex` ASC", $params);
