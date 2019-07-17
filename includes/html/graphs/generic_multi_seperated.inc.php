@@ -98,8 +98,8 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' VDEF:totinB' . $i . '=inB' . $i . ',TOTAL';
         $rrd_options .= ' VDEF:totoutB' . $i . '=outB' . $i . ',TOTAL';
         $rrd_options .= ' VDEF:tot' . $i . '=octets' . $i . ',TOTAL';
-		
-		if ($_GET['previous']) {
+
+	    if ($_GET['previous']) {
             $in_thingX .= $seperatorX . 'inB' . $i . 'X,UN,0,' . 'inB' . $i . 'X,IF';
             $out_thingX .= $seperatorX . 'outB' . $i . 'X,UN,0,' . 'outB' . $i . 'X,IF';
             $plusesX .= $plusX;
@@ -109,7 +109,7 @@ foreach ($rrd_list as $rrd) {
             $rrd_options .= ' VDEF:totinB' . $i . 'X=inB' . $i . 'X,TOTAL';
             $rrd_options .= ' VDEF:totoutB' . $i . 'X=outB' . $i . 'X,TOTAL';
             $rrd_options .= ' VDEF:tot' . $i . 'X=octets' . $i . 'X,TOTAL';
-		}
+	    }
     }
 
     if ($i) {
@@ -126,13 +126,13 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($_GET['previous'] == 'yes') {
-	    $rrd_options .= " COMMENT:' \t'";
+        $rrd_options .= " COMMENT:' \t'";
 
         $rrd_options .= ' GPRINT:inbits' . $i . 'X:AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:inbits' . $i . 'X:MAX:%6.2lf%s';
-		if (!$args['nototal']) {
-		    $rrd_options .= ' GPRINT:totinB' . $i . 'X' . ":%6.2lf%s$total_units";
-		}
+        if (!$args['nototal']) {
+            $rrd_options .= ' GPRINT:totinB' . $i . 'X' . ":%6.2lf%s$total_units";
+        }
     }
 
     $rrd_options .= " COMMENT:'\\n'";
@@ -152,8 +152,8 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' GPRINT:outbits' . $i . 'X:AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:outbits' . $i . 'X:MAX:%6.2lf%s';
 		if (!$args['nototal']) {
-		    $rrd_options .= ' GPRINT:totoutB' . $i . 'X' . ":%6.2lf%s$total_units";
-		}
+            $rrd_options .= ' GPRINT:totoutB' . $i . 'X' . ":%6.2lf%s$total_units";
+        }
     }
 
     $rrd_options .= " COMMENT:'\\n'";
@@ -236,8 +236,8 @@ if (!$args['nototal']) {
     $rrd_options .= " COMMENT:'\\n'";
 
     if ($_GET['previous'] == 'yes') {
-	$rrd_options .= " COMMENT:' \\n'";
-	$rrd_options .= " COMMENT:' \t\t\t\t\t\t'";
+    $rrd_options .= " COMMENT:' \\n'";
+    $rrd_options .= " COMMENT:' \t\t\t\t\t\t'";
         $rrd_options .= " HRULE:999999999999999#FFFFFF:'" . str_pad('Perv Total', $rrddescr_len + 1) . "In '\t\t";
         //$rrd_options .= ' GPRINT:inbitsX:LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:inbitsX:AVERAGE:%6.2lf%s';
