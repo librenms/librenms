@@ -42,14 +42,19 @@ mpls:
         excluded_fields: [sdp_id, device_id]
         order_by: sdp_oid
     mpls_sdp_binds:
-        excluded_fields: [bind_id, device_id]
-        order_by: sdp_oid, svc_oid
+        excluded_fields: [bind_id, sdp_id, svc_id, device_id]
+        joins:
+            - { left: mpls_sdp_binds.sdp_id, right: mpls_sdps.sdp_id, select: [mpls_sdps.sdp_oid] }
+            - { left: mpls_sdp_binds.svc_id, right: mpls_services.svc_id, select: [mpls_services.svc_oid] }
+        order_by: mpls_sdps.sdp_oid, mpls_services.svc_oid
     mpls_services:
         excluded_fields: [svc_id, device_id]
         order_by: svc_oid
     mpls_saps:
-        excluded_fields: [sap_id, device_id]
-        order_by: svc_oid, sapPortId, sapEncapValue
+        excluded_fields: [sap_id, svc_id, device_id]
+        joins:
+            - { left: mpls_saps.svc_id, right: mpls_services.svc_id, select: [mpls_services.svc_oid] }
+        order_by: mpls_services.svc_oid, mpls_saps.sapPortId, mpls_saps.sapEncapValue
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]

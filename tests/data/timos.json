@@ -10622,8 +10622,6 @@
             ],
             "mpls_sdp_binds": [
                 {
-                    "sdp_id": 36,
-                    "svc_id": 25,
                     "sdp_oid": 10002,
                     "svc_oid": 118208001,
                     "sdpBindRowStatus": "active",
@@ -10639,8 +10637,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 3108152491
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 25,
                     "sdp_oid": 10003,
                     "svc_oid": 118208001,
                     "sdpBindRowStatus": "active",
@@ -10656,8 +10652,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 5375761401
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 26,
                     "sdp_oid": 10003,
                     "svc_oid": 118208002,
                     "sdpBindRowStatus": "active",
@@ -10673,8 +10667,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 11497030416
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 27,
                     "sdp_oid": 10003,
                     "svc_oid": 118208003,
                     "sdpBindRowStatus": "active",
@@ -10690,8 +10682,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 262962167
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 28,
                     "sdp_oid": 10003,
                     "svc_oid": 118208004,
                     "sdpBindRowStatus": "active",
@@ -10707,8 +10697,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 14268643820
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 31,
                     "sdp_oid": 10003,
                     "svc_oid": 118208016,
                     "sdpBindRowStatus": "active",
@@ -10724,8 +10712,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 1611865356827
                 },
                 {
-                    "sdp_id": 38,
-                    "svc_id": 29,
                     "sdp_oid": 10004,
                     "svc_oid": 118208010,
                     "sdpBindRowStatus": "active",
@@ -10741,8 +10727,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 205080634467432
                 },
                 {
-                    "sdp_id": 38,
-                    "svc_id": 30,
                     "sdp_oid": 10004,
                     "svc_oid": 118208012,
                     "sdpBindRowStatus": "active",
@@ -10758,8 +10742,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 74644018584588
                 },
                 {
-                    "sdp_id": 39,
-                    "svc_id": 29,
                     "sdp_oid": 10005,
                     "svc_oid": 118208010,
                     "sdpBindRowStatus": "active",
@@ -10775,8 +10757,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 153942622446859
                 },
                 {
-                    "sdp_id": 39,
-                    "svc_id": 30,
                     "sdp_oid": 10005,
                     "svc_oid": 118208012,
                     "sdpBindRowStatus": "active",
@@ -10936,7 +10916,6 @@
             ],
             "mpls_saps": [
                 {
-                    "svc_id": 25,
                     "svc_oid": 118208001,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -10950,7 +10929,6 @@
                     "sapLastStatusChange": 7256490
                 },
                 {
-                    "svc_id": 26,
                     "svc_oid": 118208002,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -10964,7 +10942,6 @@
                     "sapLastStatusChange": 13038062
                 },
                 {
-                    "svc_id": 27,
                     "svc_oid": 118208003,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -10978,7 +10955,6 @@
                     "sapLastStatusChange": 15315561
                 },
                 {
-                    "svc_id": 28,
                     "svc_oid": 118208004,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -10992,7 +10968,6 @@
                     "sapLastStatusChange": 18844847
                 },
                 {
-                    "svc_id": 29,
                     "svc_oid": 118208010,
                     "sapPortId": 69238784,
                     "ifName": "2/1/1",
@@ -11006,7 +10981,6 @@
                     "sapLastStatusChange": 23308463
                 },
                 {
-                    "svc_id": 30,
                     "svc_oid": 118208012,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -11020,7 +10994,6 @@
                     "sapLastStatusChange": 13559111
                 },
                 {
-                    "svc_id": 31,
                     "svc_oid": 118208016,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -11371,8 +11344,6 @@
             ],
             "mpls_sdp_binds": [
                 {
-                    "sdp_id": 36,
-                    "svc_id": 25,
                     "sdp_oid": 10002,
                     "svc_oid": 118208001,
                     "sdpBindRowStatus": "active",
@@ -11388,8 +11359,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 3108152491
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 25,
                     "sdp_oid": 10003,
                     "svc_oid": 118208001,
                     "sdpBindRowStatus": "active",
@@ -11405,8 +11374,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 5375761401
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 26,
                     "sdp_oid": 10003,
                     "svc_oid": 118208002,
                     "sdpBindRowStatus": "active",
@@ -11422,8 +11389,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 11497030416
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 27,
                     "sdp_oid": 10003,
                     "svc_oid": 118208003,
                     "sdpBindRowStatus": "active",
@@ -11439,8 +11404,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 262962167
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 28,
                     "sdp_oid": 10003,
                     "svc_oid": 118208004,
                     "sdpBindRowStatus": "active",
@@ -11456,8 +11419,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 14268643820
                 },
                 {
-                    "sdp_id": 37,
-                    "svc_id": 31,
                     "sdp_oid": 10003,
                     "svc_oid": 118208016,
                     "sdpBindRowStatus": "active",
@@ -11473,8 +11434,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 1611865356827
                 },
                 {
-                    "sdp_id": 38,
-                    "svc_id": 29,
                     "sdp_oid": 10004,
                     "svc_oid": 118208010,
                     "sdpBindRowStatus": "active",
@@ -11490,8 +11449,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 205080634467432
                 },
                 {
-                    "sdp_id": 38,
-                    "svc_id": 30,
                     "sdp_oid": 10004,
                     "svc_oid": 118208012,
                     "sdpBindRowStatus": "active",
@@ -11507,8 +11464,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 74644018584588
                 },
                 {
-                    "sdp_id": 39,
-                    "svc_id": 29,
                     "sdp_oid": 10005,
                     "svc_oid": 118208010,
                     "sdpBindRowStatus": "active",
@@ -11524,8 +11479,6 @@
                     "sdpBindBaseStatsEgrFwdOctets": 153942622446859
                 },
                 {
-                    "sdp_id": 39,
-                    "svc_id": 30,
                     "sdp_oid": 10005,
                     "svc_oid": 118208012,
                     "sdpBindRowStatus": "active",
@@ -11685,7 +11638,6 @@
             ],
             "mpls_saps": [
                 {
-                    "svc_id": 25,
                     "svc_oid": 118208001,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -11699,7 +11651,6 @@
                     "sapLastStatusChange": 7256490
                 },
                 {
-                    "svc_id": 26,
                     "svc_oid": 118208002,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -11713,7 +11664,6 @@
                     "sapLastStatusChange": 13038062
                 },
                 {
-                    "svc_id": 27,
                     "svc_oid": 118208003,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -11727,7 +11677,6 @@
                     "sapLastStatusChange": 15315561
                 },
                 {
-                    "svc_id": 28,
                     "svc_oid": 118208004,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -11741,7 +11690,6 @@
                     "sapLastStatusChange": 18844847
                 },
                 {
-                    "svc_id": 29,
                     "svc_oid": 118208010,
                     "sapPortId": 69238784,
                     "ifName": "2/1/1",
@@ -11755,7 +11703,6 @@
                     "sapLastStatusChange": 23308463
                 },
                 {
-                    "svc_id": 30,
                     "svc_oid": 118208012,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",
@@ -11769,7 +11716,6 @@
                     "sapLastStatusChange": 13559111
                 },
                 {
-                    "svc_id": 31,
                     "svc_oid": 118208016,
                     "sapPortId": 1342177283,
                     "ifName": "lag-3",

@@ -51,11 +51,14 @@ interface MplsDiscovery
     public function discoverMplsServices();
 
     /**
+     * @param Collection $svcs collecton of synchronized lsp objects from discoverMplsServices()
      * @return Collection MplsSap objects
      */
     public function discoverMplsSaps($svcs);
 
     /**
+     * @param Collection $sdps collecton of synchronized sdp objects from discoverMplsSdps()
+     * @param Collection $svcs collecton of synchronized service objects from discoverMplsServices()
      * @return Collection MplsSdpBind objects
      */
     public function discoverMplsSdpBinds($sdps, $svcs);
