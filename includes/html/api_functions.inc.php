@@ -468,14 +468,12 @@ function del_device(\Illuminate\Http\Request $request)
 }
 
 
-function get_vlans()
+function get_vlans(\Illuminate\Http\Request $request)
 {
-    // This will list all vlans for a given device
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
 
     if (empty($hostname)) {
-        api_error(500, 'No hostname has been provided');
+        return api_error(500, 'No hostname has been provided');
     }
 
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -486,12 +484,13 @@ function get_vlans()
     }
 
     if (!$device) {
-        api_error(404, "Device $hostname not found");
+        return api_error(404, "Device $hostname not found");
     }
-    check_device_permission($device_id);
 
-    $vlans       = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', array($device_id));
-    api_success($vlans, 'vlans');
+    return check_device_permission($device_id, function () use ($device_id) {
+        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', array($device_id));
+        return api_success($vlans, 'vlans');
+    });
 }
 
 

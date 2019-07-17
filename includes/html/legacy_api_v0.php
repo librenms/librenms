@@ -61,7 +61,7 @@ $app->group(
                         // api/v0/devices/$hostname
 //                        $app->patch('/:hostname', 'authToken', 'update_device')->name('update_device_field');
 //                        $app->patch('/:hostname/rename/:new_hostname', 'authToken', 'rename_device')->name('rename_device');
-                        $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');
+//                        $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');
                         // api/v0/devices/$hostname/vlans
                         $app->get('/:hostname/links', 'authToken', 'list_links')->name('get_links');
                         // api/v0/devices/$hostname/links
