@@ -42,6 +42,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/vlans', 'LegacyApiController@get_vlans')->name('get_vlans');
         Route::get('{hostname}/links', 'LegacyApiController@list_links')->name('list_links');
         Route::get('{hostname}/graphs', 'LegacyApiController@get_graphs')->name('get_graphs');
+        Route::get('{hostname}/fdb', 'LegacyApiController@get_fdb')->name('get_fdb');
 
         Route::get('{hostname}/{type}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
         Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');

@@ -1931,34 +1931,33 @@ function get_link()
 }
 
 
-function get_fdb()
+function get_fdb(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
 
     if (empty($hostname)) {
-        api_error(500, 'No hostname has been provided');
+        return api_error(500, 'No hostname has been provided');
     }
 
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $device    = null;
     if ($device_id) {
         // save the current details for returning to the client on successful delete
-        $device = device_by_id_cache($device_id);
+        $device = Device::find($device_id);
     }
 
     if (!$device) {
-        api_error(404, "Device $hostname not found");
-    }
-    check_device_permission($device_id);
-
-    $device = Device::find($device_id);
-    if ($device) {
-        $fdb = $device->portsFdb;
-        api_success($fdb, 'ports_fdb');
+        return api_error(404, "Device $hostname not found");
     }
 
-    api_error(404, 'Device does not exist');
+    return check_device_permission($device_id, function () use ($device) {
+        if ($device) {
+            $fdb = $device->portsFdb;
+            return api_success($fdb, 'ports_fdb');
+        }
+
+        return api_error(404, 'Device does not exist');
+    });
 }
 
 
