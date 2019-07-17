@@ -43,13 +43,13 @@ foreach (Device::pluck('hostname') as $index => $hostname) {
         $cdef[] = 'poller' . $index . $suffix;
         $suffix = ',+';
 	if ($_GET['previous'] == 'yes') {
-        	$rrd_options .= " DEF:pollerRawX$index=$rrd_filename:poller:AVERAGE:start=$prev_from:end=$from";
-        	// change undefined to 0
-        	$rrd_options .= " CDEF:pollerX$index=pollerRawX$index,UN,0,pollerRawX$index,IF";
-        	$rrd_options .= " SHIFT:pollerX$index:$period";
-        	$cdefX[] = 'pollerX' . $index . $suffixX;
-        	$suffixX = ',+';
-	}
+            $rrd_options .= " DEF:pollerRawX$index=$rrd_filename:poller:AVERAGE:start=$prev_from:end=$from";
+            // change undefined to 0
+            $rrd_options .= " CDEF:pollerX$index=pollerRawX$index,UN,0,pollerRawX$index,IF";
+            $rrd_options .= " SHIFT:pollerX$index:$period";
+            $cdefX[] = 'pollerX' . $index . $suffixX;
+            $suffixX = ',+';
+        }
     }
 }
 
@@ -67,4 +67,3 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= " GPRINT:pollerX:MIN:%6.2lf";
     $rrd_options .= " GPRINT:pollerX:MAX:%6.2lf  'GPRINT:pollerX:AVERAGE:%6.2lf\\n'";
 }
-
