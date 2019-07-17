@@ -821,39 +821,40 @@ function list_available_health_graphs(\Illuminate\Http\Request $request)
     });
 }
 
-function list_available_wireless_graphs()
+function list_available_wireless_graphs(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    check_device_permission($device_id);
-    if (isset($router['type'])) {
-        list(, , $type) = explode('_', $router['type']);
-    }
-    $sensor_id = $router['sensor_id'] ?: null;
-    $graphs    = array();
+    return check_device_permission($device_id, function () use ($device_id, $request) {
+        $input_type = $request->route('type');
+        if ($input_type) {
+            list(, , $type) = explode('_', $input_type);
+        }
+        $sensor_id = $request->route('sensor_id');
+        $graphs    = array();
 
-    if (isset($type)) {
-        if (isset($sensor_id)) {
-            $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ?', array($sensor_id));
+        if (isset($type)) {
+            if (isset($sensor_id)) {
+                $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ?', array($sensor_id));
+            } else {
+                foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
+                    $graphs[] = array(
+                        'sensor_id' => $graph['sensor_id'],
+                        'desc'      => $graph['sensor_descr'],
+                    );
+                }
+            }
         } else {
-            foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
+            foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
                 $graphs[] = array(
-                    'sensor_id' => $graph['sensor_id'],
-                    'desc'      => $graph['sensor_descr'],
+                    'desc' => ucfirst($graph['sensor_class']),
+                    'name' => 'device_wireless_'.$graph['sensor_class'],
                 );
             }
         }
-    } else {
-        foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
-            $graphs[] = array(
-                'desc' => ucfirst($graph['sensor_class']),
-                'name' => 'device_wireless_'.$graph['sensor_class'],
-            );
-        }
-    }
 
-    return api_success($graphs, 'graphs');
+        return api_success($graphs, 'graphs');
+    });
 }
 
 function get_port_graphs()

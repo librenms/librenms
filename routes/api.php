@@ -44,6 +44,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/graphs', 'LegacyApiController@get_graphs')->name('get_graphs');
         Route::get('{hostname}/fdb', 'LegacyApiController@get_fdb')->name('get_fdb');
         Route::get('{hostname}/health/{type?}/{sensor_id?}', 'LegacyApiController@list_available_health_graphs')->name('list_available_health_graphs');
+        Route::get('{hostname}/wireless/{type?}/{sensor_id?}', 'LegacyApiController@list_available_wireless_graphs')->name('list_available_wireless_graphs');
 
         Route::get('{hostname}/{type}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
         Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
