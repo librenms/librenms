@@ -28,17 +28,22 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     // admin required
     Route::middleware(['can:admin'])->group(function () {
         Route::group(['prefix' => 'devices'], function () {
-            Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
             Route::post(null, 'LegacyApiController@add_device')->name('add_device');
             Route::delete('{hostname}', 'LegacyApiController@del_device')->name('del_device');
             Route::patch('{hostname}', 'LegacyApiController@update_device')->name('update_device_field');
             Route::patch('{hostname}/rename/{new_hostname}', 'LegacyApiController@rename_device')->name('rename_device');
         });
-
     });
 
     // restricted by access
-    Route::get('devices', 'LegacyApiController@list_devices')->name('list_devices');
+    Route::group(['prefix' => 'devices'], function () {
+        Route::get('{hostname}/graphs/health/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_health_graph');
+        Route::get('{hostname}/graphs/wireless/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_wireless_graph');
+        Route::get('{hostname}/{type}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
+
+        Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
+        Route::get(null, 'LegacyApiController@list_devices')->name('list_devices');
+    });
     Route::get('ports', 'LegacyApiController@get_all_ports')->name('get_all_ports');
 });
 

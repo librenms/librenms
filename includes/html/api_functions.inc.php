@@ -95,11 +95,13 @@ function check_bill_permission($bill_id)
     }
 }
 
-function check_device_permission($device_id)
+function check_device_permission($device_id, $function)
 {
     if (!device_permitted($device_id)) {
-        api_error(403, 'Insufficient permissions to access this device');
+        return api_error(403, 'Insufficient permissions to access this device');
     }
+
+    return $function();
 }
 
 function check_port_permission($port_id, $device_id)
@@ -204,15 +206,14 @@ function get_port_stats_by_port_hostname()
 }
 
 
-function get_graph_generic_by_hostname()
+function get_graph_generic_by_hostname(\Illuminate\Http\Request $request)
 {
     // This will return a graph type given a device id.
-    $router = api_get_params();
-    $hostname     = $router['hostname'];
-    $sensor_id    = $router['sensor_id'] ?: null;
+    $hostname     = $request->route('hostname');
+    $sensor_id    = $request->route('sensor_id');
     $vars         = array();
-    $vars['type'] = $router['type'] ?: 'device_uptime';
-    $vars['output'] = $_GET['output'] ?: 'display';
+    $vars['type'] = $request->route('type', 'device_uptime');
+    $vars['output'] = $request->get('output', 'display');
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
         if (str_contains($vars['type'], '_wireless')) {
@@ -226,29 +227,37 @@ function get_graph_generic_by_hostname()
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $device = device_by_id_cache($device_id);
+    $vars['device'] = $device['device_id'];
 
-    check_device_permission($device_id);
+    return check_device_permission($device_id, function () use ($request, $device, $vars) {
+        if ($request->has('from')) {
+            $vars['from'] = $request->get('from');
+        }
 
-    if (!empty($_GET['from'])) {
-        $vars['from'] = $_GET['from'];
-    }
+        if ($request->has('to')) {
+            $vars['to'] = $request->get('to');
+        }
 
-    if (!empty($_GET['to'])) {
-        $vars['to'] = $_GET['to'];
-    }
+        $vars['width']  = $request->get('width', 1075);
+        $vars['height'] = $request->get('height', 300);
+        $auth           = '1';
+        $base64_output = '';
 
-    $vars['width']  = $_GET['width'] ?: 1075;
-    $vars['height'] = $_GET['height'] ?: 300;
-    $auth           = '1';
-    $vars['device'] = dbFetchCell('SELECT `D`.`device_id` FROM `devices` AS `D` WHERE `D`.`hostname`=?', array($hostname));
-    api_set_header('Content-Type', get_image_type());
-    rrdtool_initialize(false);
-    include 'includes/html/graphs/graph.inc.php';
-    rrdtool_close();
+        ob_start();
 
-    if ($vars['output'] === 'base64') {
-        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
-    }
+        rrdtool_initialize(false);
+        include 'includes/html/graphs/graph.inc.php';
+        rrdtool_close();
+
+        $image = ob_get_contents();
+        ob_end_clean();
+
+        if ($vars['output'] === 'base64') {
+            return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+        }
+
+        return response($image, 200, ['Content-Type' => get_image_type()]);
+    });
 }
 
 
@@ -280,12 +289,13 @@ function get_device(\Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname does not exist");
     }
 
-    check_device_permission($device_id);
-    $host_id = get_vm_parent_id($device);
-    if (is_numeric($host_id)) {
-        $device = array_merge($device, array('parent_id' => $host_id));
-    }
-    return api_success(array($device), 'devices');
+    return check_device_permission($device_id, function () use ($device) {
+        $host_id = get_vm_parent_id($device);
+        if (is_numeric($host_id)) {
+            $device = array_merge($device, array('parent_id' => $host_id));
+        }
+        return api_success(array($device), 'devices');
+    });
 }
 
 function list_devices(\Illuminate\Http\Request $request)
