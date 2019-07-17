@@ -65,7 +65,7 @@ $app->group(
                         // api/v0/devices/$hostname/vlans
 //                        $app->get('/:hostname/links', 'authToken', 'list_links')->name('get_links');
                         // api/v0/devices/$hostname/links
-                        $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');
+//                        $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');
                         // api/v0/devices/$hostname/graphs
                         $app->get('/:hostname/fdb', 'authToken', 'get_fdb')->name('get_fdb');
                         // api/v0/devices/$hostname/fdb

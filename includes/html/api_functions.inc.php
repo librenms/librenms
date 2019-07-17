@@ -731,33 +731,33 @@ function delete_components()
 }
 
 
-function get_graphs()
+function get_graphs(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
 
     // FIXME: this has some overlap with html/pages/device/graphs.inc.php
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    check_device_permission($device_id);
-    $graphs    = array();
-    $graphs[]  = array(
-        'desc' => 'Poller Time',
-        'name' => 'device_poller_perf',
-    );
-    $graphs[]  = array(
-        'desc' => 'Ping Response',
-        'name' => 'device_ping_perf',
-    );
-    foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', array($device_id)) as $graph) {
-        $desc = Config::get("graph_types.device.{$graph['graph']}.descr");
-        $graphs[] = array(
-            'desc' => $desc,
-            'name' => 'device_'.$graph['graph'],
+    return check_device_permission($device_id, function () use ($device_id) {
+        $graphs    = array();
+        $graphs[]  = array(
+            'desc' => 'Poller Time',
+            'name' => 'device_poller_perf',
         );
-    }
+        $graphs[]  = array(
+            'desc' => 'Ping Response',
+            'name' => 'device_ping_perf',
+        );
+        foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', array($device_id)) as $graph) {
+            $desc = Config::get("graph_types.device.{$graph['graph']}.descr");
+            $graphs[] = array(
+                'desc' => $desc,
+                'name' => 'device_'.$graph['graph'],
+            );
+        }
 
-    return api_success($graphs, 'graphs');
+        return api_success($graphs, 'graphs');
+    });
 }
 
 function list_available_health_graphs()

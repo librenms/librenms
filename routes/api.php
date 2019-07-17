@@ -41,6 +41,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/graphs/wireless/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_wireless_graph');
         Route::get('{hostname}/vlans', 'LegacyApiController@get_vlans')->name('get_vlans');
         Route::get('{hostname}/links', 'LegacyApiController@list_links')->name('list_links');
+        Route::get('{hostname}/graphs', 'LegacyApiController@get_graphs')->name('get_graphs');
 
         Route::get('{hostname}/{type}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
         Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
