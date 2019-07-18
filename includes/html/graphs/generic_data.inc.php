@@ -128,7 +128,7 @@ if ($format == 'octets' || $format == 'bytes') {
     $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
     if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
     }
     $units = 'bps';
     $format = 'bits';
