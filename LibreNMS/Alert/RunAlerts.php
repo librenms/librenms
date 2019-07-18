@@ -236,7 +236,7 @@ class RunAlerts
     {
         global $rulescache;
         if (empty($rulescache[$device_id]) || !isset($rulescache[$device_id])) {
-            foreach (AlertUtil::GetRules($device_id) as $chk) {
+            foreach (AlertUtil::getRules($device_id) as $chk) {
                 $rulescache[$device_id][$chk['id']] = true;
             }
         }
@@ -266,7 +266,7 @@ class RunAlerts
             }
             $sql = $alert['query'];
             $qry = dbFetchRows($sql, array($alert['device_id']));
-            $alert['details']['contacts'] = AlertUtil::GetContacts($qry);
+            $alert['details']['contacts'] = AlertUtil::getContacts($qry);
         }
 
         $obj = $this->describeAlert($alert);
@@ -449,7 +449,7 @@ class RunAlerts
                 $noacc = false;
             }
 
-            if (AlertUtil::IsMaintenance($alert['device_id']) > 0) {
+            if (AlertUtil::isMaintenance($alert['device_id']) > 0) {
                 $noiss = true;
                 $noacc = true;
             }
