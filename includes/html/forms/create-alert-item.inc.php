@@ -12,6 +12,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Alert\AlertDB;
 use LibreNMS\Authentication\LegacyAuth;
 
 if (!LegacyAuth::user()->hasGlobalAdmin()) {
@@ -20,7 +21,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 
 $rule     = implode(' ', $_POST['rules']);
 $rule     = rtrim($rule, '&|');
-$query    = GenSQL($rule);
+$query    = AlertDB::genSQL($rule);
 $alert_id = $_POST['alert_id'];
 $count    = mres($_POST['count']);
 $delay    = mres($_POST['delay']);

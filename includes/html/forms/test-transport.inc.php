@@ -12,6 +12,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
@@ -23,9 +24,8 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 $transport = $vars['transport'] ?: null;
 $transport_id = $vars['transport_id'] ?: null;
 
-require_once Config::get('install_dir') . '/includes/alerts.inc.php';
 $tmp = array(dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location_id from devices order by device_id asc limit 1'));
-$tmp['contacts'] = GetContacts($tmp);
+$tmp['contacts'] = AlertUtil::getContacts($tmp);
 $obj = array(
     "hostname"  => $tmp[0]['hostname'],
     "device_id" => $tmp[0]['device_id'],
