@@ -69,6 +69,7 @@ if (isset($_POST['state'])) {
             header: '<div id="{{ctx.id}}" class="{{css.header}}"><div class="row"> \
                 <div class="col-sm-8 actionBar"><span class="pull-left"> \
                 <form method="post" action="" class="form-inline" role="form" id="result_form"> \
+                <?php echo csrf_field() ?> \
                 <input type=hidden name="hostname" id="hostname"> \
                 <div class="form-group"> \
                 <label> \

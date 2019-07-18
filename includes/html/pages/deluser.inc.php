@@ -32,6 +32,7 @@ if (!LegacyAuth::user()->isAdmin()) {
 
         echo '
             <form role="form" class="form-horizontal" method="GET" action="">
+            ' . csrf_field() . '
             <input type="hidden" name="action" value="del">
             <div class="form-group">
             <label for="user_id" class="col-sm-2 control-label">Select User: </label>

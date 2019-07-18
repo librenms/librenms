@@ -9,6 +9,7 @@
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
+use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\MemcacheLock;
@@ -25,13 +26,13 @@ if (isset($options['d'])) {
 }
 
 if ($options['f'] === 'update') {
-    if (!Config::get('base_url')) {
+    if (!Config::get('update')) {
         exit(0);
     }
 
-    if (Config::get('base_url') == 'master') {
+    if (Config::get('update_channel') == 'master') {
         exit(1);
-    } elseif (Config::get('base_url') == 'release') {
+    } elseif (Config::get('update_channel') == 'release') {
         exit(3);
     }
     exit(0);
@@ -243,10 +244,10 @@ if ($options['f'] === 'purgeusers') {
         }
 
         $purge = 0;
-        if (is_numeric(\LibreNMS\Config::get('radius.users_purge')) && Config::get('base_url') === 'radius') {
+        if (is_numeric(\LibreNMS\Config::get('radius.users_purge')) && Config::get('auth_mechanism') === 'radius') {
             $purge = \LibreNMS\Config::get('radius.users_purge');
         }
-        if (is_numeric(\LibreNMS\Config::get('active_directory.users_purge')) && Config::get('base_url') === 'active_directory') {
+        if (is_numeric(\LibreNMS\Config::get('active_directory.users_purge')) && Config::get('auth_mechanism') === 'active_directory') {
             $purge = \LibreNMS\Config::get('active_directory.users_purge');
         }
         if ($purge > 0) {
@@ -275,7 +276,7 @@ if ($options['f'] === 'refresh_alert_rules') {
         foreach ($rules as $rule) {
             $rule_options = json_decode($rule['extra'], true);
             if ($rule_options['options']['override_query'] !== 'on') {
-                $data['query'] = GenSQL($rule['rule'], $rule['builder']);
+                $data['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
                 if (!empty($data['query'])) {
                     dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
                     unset($data);

@@ -21,6 +21,7 @@ modules:
             data:
                 - oid:
                     - entPhysicalName
+                    - hwEntityAdminStatus
                     - hwStackPortTable
         temperature:
             data:
@@ -63,6 +64,10 @@ modules:
                             oid: hwEntityOpticalRxPower
                             op: '<='
                             value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
                 -
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalTxPower
@@ -78,6 +83,10 @@ modules:
                             oid: hwEntityOpticalTxPower
                             op: '<='
                             value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
                 -
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalLaneRxPower
@@ -88,11 +97,17 @@ modules:
                     index: 'lane-rx-{{ $index }}'
                     divisor: 100
                     group: '{{ $entPhysicalName }}'
+                    high_limit: hwEntityOpticalRxHighThreshold
+                    low_limit: hwEntityOpticalRxLowThreshold
                     skip_values:
                         -
                             oid: hwEntityOpticalRxPower
                             op: '>'
                             value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
                 -
                     oid: hwOpticalModuleInfoTable
                     value: hwEntityOpticalLaneTxPower
@@ -102,11 +117,17 @@ modules:
                     entPhysicalIndex_measured: ports
                     index: 'lane-tx-{{ $index }}'
                     group: '{{ $entPhysicalName }}'
+                    high_limit: hwEntityOpticalTxHighThreshold
+                    low_limit: hwEntityOpticalTxLowThreshold
                     skip_values:
                         -
                             oid: hwEntityOpticalTxPower
                             op: '>'
                             value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
                     divisor: 100
         voltage:
             data:

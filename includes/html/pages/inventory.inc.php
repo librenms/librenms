@@ -29,6 +29,7 @@ var grid = $("#inventory").bootgrid({
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\"><form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
+                "<?php echo addslashes(csrf_field()) ?>"+
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"string\" id=\"string\" value=\"<?php echo $_POST['string']; ?>\" placeholder=\"Description\" class=\"form-control input-sm\" />"+
                 "</div>"+

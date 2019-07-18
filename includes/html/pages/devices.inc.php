@@ -285,7 +285,7 @@ if ($format == "graph") {
         </div>
     </div>
     <div class="table-responsive">
-        <table id="devices" class="table table-hover table-condensed table-striped">  
+        <table id="devices" class="table table-hover table-condensed table-striped">
             <thead>
                 <tr>
                     <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>
@@ -318,12 +318,12 @@ if ($format == "graph") {
                     return "<span>" + row.hostname + "</span>";
                 },
                 "uptime": function (column, row) {
-                    if (isNaN(row.uptime.charAt(0))) {
-                        return row.uptime;
-                    } else if (row.status == 'down') {
-                        return "<span class='alert-status-small label-danger'></span><span>" + row.uptime + "</span>";
+                    if (row.status == 'down') {
+                        return "<span class='red'>" + row.uptime + "</span>"
+                    } else if(row.status == 'disabled') {
+                        return '';
                     } else {
-                        return "<span class='alert-status-small label-success'></span><span>" + row.uptime + "</span>";
+                        return row.uptime;
                     }
                 },
             },
@@ -356,6 +356,7 @@ if ($format == "graph") {
         $(".devices-headers-table-menu").append(
             "<div class='pull-left'>" +
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
+            "<?php echo addslashes(csrf_field()) ?>"+
             "<div class='form-group'>" +
             "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery']; ?>'' class='form-control' placeholder='Search'>" +
             "</div>" +

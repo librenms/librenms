@@ -250,6 +250,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                 echo '
                     <div class="col-sm-8">
                         <form class="form-horizontal" action="" method="post">
+                            ' . csrf_field() . '
                             <div class="form-group">
                                 <label for="config" class="col-sm-2 control-label">Config version</label>
                                 <div class="col-sm-6">

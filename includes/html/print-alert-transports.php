@@ -65,7 +65,9 @@ foreach (dbFetchRows($query) as $transport) {
         }
 
         $val = $transport_config[$item['name']];
-
+        if ($item['type'] == 'password') {
+            $val = '<b>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</b>';
+        }
         // Match value to key name for select inputs
         if ($item['type'] == 'select') {
             $val = array_search($val, $item['options']);
