@@ -9,6 +9,7 @@
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
+use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\MemcacheLock;
@@ -275,7 +276,7 @@ if ($options['f'] === 'refresh_alert_rules') {
         foreach ($rules as $rule) {
             $rule_options = json_decode($rule['extra'], true);
             if ($rule_options['options']['override_query'] !== 'on') {
-                $data['query'] = GenSQL($rule['rule'], $rule['builder']);
+                $data['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
                 if (!empty($data['query'])) {
                     dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
                     unset($data);
