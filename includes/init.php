@@ -86,7 +86,7 @@ if (module_selected('polling', $init_modules)) {
 }
 
 if (module_selected('alerts', $init_modules)) {
-    require_once $install_dir . '/includes/alerts.inc.php';
+    require_once $install_dir . '/LibreNMS/Alert/RunAlerts.php';
 }
 
 // Boot Laravel
