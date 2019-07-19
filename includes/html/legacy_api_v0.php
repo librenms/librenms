@@ -72,7 +72,7 @@ $app->group(
 //                        $app->get('/:hostname/health(/:type)(/:sensor_id)', 'authToken', 'list_available_health_graphs')->name('list_available_health_graphs');
 //                        $app->get('/:hostname/wireless(/:type)(/:sensor_id)', 'authToken', 'list_available_wireless_graphs')->name('list_available_wireless_graphs');
 //                        $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
-                        $app->get('/:hostname/ip', 'authToken', 'get_ip_addresses')->name('get_device_ip_addresses');
+//                        $app->get('/:hostname/ip', 'authToken', 'get_ip_addresses')->name('get_device_ip_addresses');
                         $app->get('/:hostname/port_stack', 'authToken', 'get_port_stack')->name('get_port_stack');
                         // api/v0/devices/$hostname/ports
                         $app->get('/:hostname/components', 'authToken', 'get_components')->name('get_components');
@@ -104,8 +104,8 @@ $app->group(
                 $app->group(
                     '/ports',
                     function () use ($app) {
-                        $app->get('/:portid', 'authToken', 'get_port_info')->name('get_port_info');
-                        $app->get('/:portid/ip', 'authToken', 'get_ip_addresses')->name('get_port_ip_info');
+//                        $app->get('/:portid', 'authToken', 'get_port_info')->name('get_port_info');
+//                        $app->get('/:portid/ip', 'authToken', 'get_ip_addresses')->name('get_port_ip_info');
                     }
                 );
                 $app->get('/ports', 'authToken', 'get_all_ports')->name('get_all_ports');
@@ -203,7 +203,7 @@ $app->group(
                                 $app->get('/addresses/', 'authToken', 'list_ip_addresses')->name('list_ip_addresses');
                                 $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp')->conditions(array('ip' => '[^?]+'));
                                 $app->get('/networks/', 'authToken', 'list_ip_networks')->name('list_ip_networks');
-                                $app->get('/networks/:id/ip', 'authToken', 'get_ip_addresses')->name('get_network_ip_addresses');
+//                                $app->get('/networks/:id/ip', 'authToken', 'get_ip_addresses')->name('get_network_ip_addresses');
                             }
                         );
                     }

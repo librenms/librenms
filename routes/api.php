@@ -23,6 +23,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('ospf', 'LegacyApiController@list_ospf')->name('list_ospf');
         Route::get('oxidized/{hostname?}', 'LegacyApiController@list_oxidized')->name('list_oxidized');
 
+        Route::get('resources/ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
     });
 
     // admin required
@@ -46,12 +47,18 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/health/{type?}/{sensor_id?}', 'LegacyApiController@list_available_health_graphs')->name('list_available_health_graphs');
         Route::get('{hostname}/wireless/{type?}/{sensor_id?}', 'LegacyApiController@list_available_wireless_graphs')->name('list_available_wireless_graphs');
         Route::get('{hostname}/ports', 'LegacyApiController@get_port_graphs')->name('get_port_graphs');
+        Route::get('{hostname}/ip', 'LegacyApiController@get_device_ip_addresses')->name('get_ip_addresses');
 
         Route::get('{hostname}/{type}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
         Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
         Route::get(null, 'LegacyApiController@list_devices')->name('list_devices');
     });
-    Route::get('ports', 'LegacyApiController@get_all_ports')->name('get_all_ports');
+
+    Route::group(['prefix' => 'ports'], function () {
+        Route::get('{portid}', 'LegacyApiController@get_port_info')->name('get_port_info');
+        Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
+        Route::get(null, 'LegacyApiController@get_all_ports')->name('get_all_ports');
+    });
 });
 
 // Legacy API

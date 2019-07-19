@@ -95,20 +95,22 @@ function check_bill_permission($bill_id)
     }
 }
 
-function check_device_permission($device_id, $function)
+function check_device_permission($device_id, $callback)
 {
     if (!device_permitted($device_id)) {
         return api_error(403, 'Insufficient permissions to access this device');
     }
 
-    return $function();
+    return $callback();
 }
 
-function check_port_permission($port_id, $device_id)
+function check_port_permission($port_id, $device_id, $callback)
 {
     if (!device_permitted($device_id) && !port_permitted($port_id, $device_id)) {
-        api_error(403, 'Insufficient permissions to access this port');
+        return api_error(403, 'Insufficient permissions to access this port');
     }
+
+    return $callback();
 }
 
 function check_is_admin()
@@ -879,54 +881,59 @@ function get_port_graphs(\Illuminate\Http\Request $request)
     return api_success($ports, 'ports');
 }
 
-function get_ip_addresses()
+function get_device_ip_addresses(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $ipv4 = array();
-    $ipv6 = array();
-    if (isset($router['hostname'])) {
-        $hostname = $router['hostname'];
-        // use hostname as device_id if it's all digits
-        $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-        check_device_permission($device_id);
-        $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
-        $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", array($device_id));
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    return check_device_permission($device_id, function () use ($device_id) {
+        $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", [$device_id]);
+        $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", [$device_id]);
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
         if ($ip_addresses_count == 0) {
-            api_error(404, "Device $device_id does not have any IP addresses");
+            return api_error(404, "Device $device_id does not have any IP addresses");
         }
-    } elseif (isset($router['portid'])) {
-        $port_id = urldecode($router['portid']);
-        check_port_permission($port_id, null);
-        $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", array($port_id));
-        $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", array($port_id));
-        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
-        if ($ip_addresses_count == 0) {
-            api_error(404, "Port $port_id does not have any IP addresses");
-        }
-    } elseif (isset($router['id'])) {
-        check_is_read();
-        $network_id = $router['id'];
-        $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?", array($network_id));
-        $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?", array($network_id));
-        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
-        if ($ip_addresses_count == 0) {
-            api_error(404, "IP network $network_id does not exist or is empty");
-        }
-    }
 
-    api_success(array_merge($ipv4, $ipv6), 'addresses');
+        return api_success(array_merge($ipv4, $ipv6), 'addresses');
+    });
 }
 
-function get_port_info()
+function get_port_ip_addresses(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $port_id  = urldecode($router['portid']);
-    check_port_permission($port_id, null);
+    $port_id = $request->route('portid');
+    return check_port_permission($port_id, null, function () use ($port_id) {
+        $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", [$port_id]);
+        $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", [$port_id]);
+        $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+        if ($ip_addresses_count == 0) {
+            return api_error(404, "Port $port_id does not have any IP addresses");
+        }
 
-    // use hostname as device_id if it's all digits
-    $port   = dbFetchRows("SELECT * FROM `ports` WHERE `port_id` = ? AND `deleted` = 0", array($port_id));
-    api_success($port, 'port');
+        return api_success(array_merge($ipv4, $ipv6), 'addresses');
+    });
+}
+
+function get_network_ip_addresses(\Illuminate\Http\Request $request)
+{
+    $network_id = $request->route('id');
+    $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?", [$network_id]);
+    $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?", [$network_id]);
+    $ip_addresses_count = count(array_merge($ipv4, $ipv6));
+    if ($ip_addresses_count == 0) {
+        return api_error(404, "IP network $network_id does not exist or is empty");
+    }
+
+    return api_success(array_merge($ipv4, $ipv6), 'addresses');
+}
+
+function get_port_info(\Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+    return check_port_permission($port_id, null, function () use ($port_id) {
+        // use hostname as device_id if it's all digits
+        $port = dbFetchRows("SELECT * FROM `ports` WHERE `port_id` = ? AND `deleted` = 0", [$port_id]);
+        return api_success($port, 'port');
+    });
 }
 
 function get_all_ports(\Illuminate\Http\Request $request)
