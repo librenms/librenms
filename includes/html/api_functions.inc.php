@@ -16,6 +16,7 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Component;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv4;
@@ -652,31 +653,32 @@ function get_graph_by_portgroup()
 }
 
 
-function get_components()
+function get_components(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
 
     // Do some filtering if the user requests.
-    $options = array();
-    // We need to specify the label as this is a LIKE query
-    if (isset($_GET['label'])) {
-        // set a label like filter
-        $options['filter']['label'] = array('LIKE',$_GET['label']);
-        unset($_GET['label']);
-    }
+    $options = [];
     // Add the rest of the options with an equals query
-    foreach ($_GET as $k => $v) {
-        $options['filter'][$k] = array('=',$v);
+    foreach ($request->all() as $k => $v) {
+        $options['filter'][$k] = ['=', $v];
+    }
+
+    // We need to specify the label as this is a LIKE query
+    if ($request->has('label')) {
+        // set a label like filter
+        $options['filter']['label'] = ['LIKE', $request->get('label')];
     }
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    check_device_permission($device_id);
-    $COMPONENT = new LibreNMS\Component();
-    $components = $COMPONENT->getComponents($device_id, $options);
+    return check_device_permission($device_id, function () use ($device_id, $options) {
 
-    api_success($components[$device_id], 'components');
+        $COMPONENT = new LibreNMS\Component();
+        $components = $COMPONENT->getComponents($device_id, $options);
+
+        return api_success($components[$device_id], 'components');
+    });
 }
 
 

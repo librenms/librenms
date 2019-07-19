@@ -75,7 +75,7 @@ $app->group(
 //                        $app->get('/:hostname/ip', 'authToken', 'get_ip_addresses')->name('get_device_ip_addresses');
 //                        $app->get('/:hostname/port_stack', 'authToken', 'get_port_stack')->name('get_port_stack');
                         // api/v0/devices/$hostname/ports
-                        $app->get('/:hostname/components', 'authToken', 'get_components')->name('get_components');
+//                        $app->get('/:hostname/components', 'authToken', 'get_components')->name('get_components');
                         $app->post('/:hostname/components/:type', 'authToken', 'add_components')->name('add_components');
                         $app->put('/:hostname/components', 'authToken', 'edit_components')->name('edit_components');
                         $app->delete('/:hostname/components/:component', 'authToken', 'delete_components')->name('delete_components');
