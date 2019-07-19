@@ -955,21 +955,20 @@ function get_all_ports(\Illuminate\Http\Request $request)
     return api_success($ports, 'ports');
 }
 
-function get_port_stack()
+function get_port_stack(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
     $device_id      = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    check_device_permission($device_id);
+    return check_device_permission($device_id, function () use ($device_id, $request) {
+        if ($request->get('valid_mappings')) {
+            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high` ASC", array($device_id));
+        } else {
+            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high` ASC", array($device_id));
+        }
 
-    if (isset($_GET['valid_mappings'])) {
-        $mappings       = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high` ASC", array($device_id));
-    } else {
-        $mappings       = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high` ASC", array($device_id));
-    }
-
-    api_success($mappings, 'mappings');
+        return api_success($mappings, 'mappings');
+    });
 }
 
 function list_alert_rules()

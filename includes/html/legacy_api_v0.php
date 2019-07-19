@@ -73,7 +73,7 @@ $app->group(
 //                        $app->get('/:hostname/wireless(/:type)(/:sensor_id)', 'authToken', 'list_available_wireless_graphs')->name('list_available_wireless_graphs');
 //                        $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
 //                        $app->get('/:hostname/ip', 'authToken', 'get_ip_addresses')->name('get_device_ip_addresses');
-                        $app->get('/:hostname/port_stack', 'authToken', 'get_port_stack')->name('get_port_stack');
+//                        $app->get('/:hostname/port_stack', 'authToken', 'get_port_stack')->name('get_port_stack');
                         // api/v0/devices/$hostname/ports
                         $app->get('/:hostname/components', 'authToken', 'get_components')->name('get_components');
                         $app->post('/:hostname/components/:type', 'authToken', 'add_components')->name('add_components');
