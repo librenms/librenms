@@ -84,13 +84,10 @@ $rrd_options .= " COMMENT:'\\n'";
 
 foreach ($modules as $index => $module) {
     $color = $colors[$index % count($colors)];
-
     $rrd_options .= " AREA:$module#$color:'" . rrdtool_escape($module, 16) ."':STACK";
-
     $rrd_options .= " GPRINT:$module:LAST:%6.2lf  GPRINT:$module:MIN:%6.2lf";
     $rrd_options .= " GPRINT:$module:MAX:%6.2lf  'GPRINT:$module:AVERAGE:%6.2lf'";
     if ($_GET['previous']) {
-
         $rrd_options .= ' AREA:' .$module. 'X#99999999' . $stacked['transparency'] . ':';
         $rrd_options .= ' LINE1.25:' .$module. 'X#666666:';
 
