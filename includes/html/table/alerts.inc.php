@@ -156,11 +156,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $severity .= ' <strong>-</strong>';
     }
 
-    if (Config::get('force_ip_to_sysname')) {
-        $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['sysName'])) . '<br />' . $alert['hostname'] . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
-    } else {
-        $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<br />' . $alert['sysName'] . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
-    }
+    $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
 
     switch ($severity) {
         case 'critical':
