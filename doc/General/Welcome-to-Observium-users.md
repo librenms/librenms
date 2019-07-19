@@ -11,7 +11,10 @@ information about the kind of community we're trying to promote.
 
 LibreNMS was forked from [the last GPL-licensed version of Observium][3].
 
-Thanks to one of our users, Dan Brown, who has written a [migration script][10], you can easily move your Observium install over to LibreNMS. This also takes care of moving from one CPU architecture to another. Give it a try :)
+Thanks to one of our users, Dan Brown, who has written a [migration
+script][10], you can easily move your Observium install over to
+LibreNMS. This also takes care of moving from one CPU architecture to
+another. Give it a try :)
 
 How LibreNMS will be different from Observium:
 
@@ -20,7 +23,7 @@ How LibreNMS will be different from Observium:
   like to see something added, add or comment on the relevant issue in our
   [Community forum][9].
 - Development decisions will be community-driven.  We want to make software
-  that fulfills its users' needs. 
+  that fulfills its users' needs.
 - There are no plans for a paid version, and we don't anticipate this ever
   changing.
 - There are no current plans for paid support, but this may be added later
