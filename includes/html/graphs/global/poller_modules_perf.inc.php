@@ -51,14 +51,14 @@ foreach ($modules as $module_index => $module) {
 
             $cdef[] = $module . $index . $suffix;
             $suffix = ',+';
-	    if ($_GET['previous'] == 'yes') {
+            if ($_GET['previous'] == 'yes') {
                 $rrd_options .= " DEF:{$module}RawX$index=$rrd_filename:poller:AVERAGE:start=$prev_from:end=$from";
                 // change undefined to 0
                 $rrd_options .= " CDEF:{$module}X$index={$module}RawX$index,UN,0,{$module}RawX$index,IF";
                 $rrd_options .= " SHIFT:{$module}X$index:$period";
                 $cdefX[] = $module . 'X' . $index . $suffixX;
                 $suffixX = ',+';
-	    }
+            }
         }
     }
 
