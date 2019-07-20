@@ -33,6 +33,9 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::delete('{hostname}', 'LegacyApiController@del_device')->name('del_device');
             Route::patch('{hostname}', 'LegacyApiController@update_device')->name('update_device_field');
             Route::patch('{hostname}/rename/{new_hostname}', 'LegacyApiController@rename_device')->name('rename_device');
+            Route::post('{hostname}/components/{type}', 'LegacyApiController@add_components')->name('add_components');
+            Route::put('{hostname}/components', 'LegacyApiController@edit_components')->name('edit_components');
+            Route::delete('{hostname}/components/{component}', 'LegacyApiController@delete_components')->name('delete_components');
         });
     });
 
@@ -61,7 +64,8 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
         Route::get(null, 'LegacyApiController@get_all_ports')->name('get_all_ports');
     });
+
+    // Legacy API
+    Route::any('/v0/{path?}', 'LegacyApiController@api_not_found')->where('path', '.*');
 });
 
-// Legacy API
-Route::any('/v0/{path?}', 'LegacyController@api')->where('path', '.*');

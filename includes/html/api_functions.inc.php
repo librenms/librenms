@@ -78,6 +78,11 @@ function api_error($statusCode, $message)
     ], $statusCode, [], JSON_PRETTY_PRINT);
 } // end api_error()
 
+function api_not_found()
+{
+    return api_error(404, "This API route doesn't exist.");
+}
+
 function api_get_params()
 {
     return Request::all();
@@ -682,55 +687,46 @@ function get_components(\Illuminate\Http\Request $request)
 }
 
 
-function add_components()
+function add_components(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-
-    $router = api_get_params();
-    $hostname = $router['hostname'];
-    $ctype = $router['type'];
+    $hostname = $request->route('hostname');
+    $ctype = $request->route('type');
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $COMPONENT = new LibreNMS\Component();
     $component = $COMPONENT->createComponent($device_id, $ctype);
 
-    api_success($component, 'components');
+    return api_success($component, 'components');
 }
 
 
-function edit_components()
+function edit_components(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-
-    $router = api_get_params();
-    $hostname = $router['hostname'];
-    $data = json_decode(file_get_contents('php://input'), true);
+    $hostname = $request->route('hostname');
+    $data = json_decode($request->getContent(), true);
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $COMPONENT = new LibreNMS\Component();
 
     if (!$COMPONENT->setComponentPrefs($device_id, $data)) {
-        api_error(500, 'Components could not be edited.');
+        return api_error(500, 'Components could not be edited.');
     }
 
-    api_success_noresult(200);
+    return api_success_noresult(200);
 }
 
 
-function delete_components()
+function delete_components(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-
-    $router = api_get_params();
-    $cid = $router['component'];
+    $cid = $request->route('component');
 
     $COMPONENT = new LibreNMS\Component();
     if ($COMPONENT->deleteComponent($cid)) {
-        api_success_noresult(200);
+        return api_success_noresult(200);
     } else {
-        api_error(500, 'Components could not be deleted.');
+        return api_error(500, 'Components could not be deleted.');
     }
 }
 
