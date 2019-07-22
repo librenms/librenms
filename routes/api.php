@@ -42,6 +42,10 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::put('{hostname}/components', 'LegacyApiController@edit_components')->name('edit_components');
             Route::delete('{hostname}/components/{component}', 'LegacyApiController@delete_components')->name('delete_components');
         });
+        Route::group(['prefix' => 'bills'], function () {
+            Route::post(null, 'LegacyApiController@create_edit_bill')->name('create_bill');
+            Route::delete('{bill_id}', 'LegacyApiController@delete_bill')->name('delete_bill');
+        });
     });
 
     // restricted by access
@@ -74,11 +78,13 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     });
 
     Route::group(['prefix' => 'bills'], function () {
+        Route::get(null, 'LegacyApiController@list_bills')->name('list_bills');
         Route::get('{bill_id}', 'LegacyApiController@list_bills')->name('get_bill');
         Route::get('{bill_id}/graphs/{graph_type}', 'LegacyApiController@get_bill_graph')->name('get_bill_graph');
         Route::get('{bill_id}/graphdata/{graph_type}', 'LegacyApiController@get_bill_graphdata')->name('get_bill_graphdata');
         Route::get('{bill_id}/history', 'LegacyApiController@get_bill_history')->name('get_bill_history');
         Route::get('{bill_id}/history/{bill_hist_id}/graphs/{graph_type}', 'LegacyApiController@get_bill_history_graph')->name('get_bill_history_graph');
+        Route::get('{bill_id}/history/{bill_hist_id}/graphdata/{graph_type}', 'LegacyApiController@get_bill_history_graphdata')->name('get_bill_history_graphdata');
     });
 
     // Route not found

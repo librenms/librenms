@@ -1438,44 +1438,38 @@ function get_bill_history_graph(\Illuminate\Http\Request $request)
     });
 }
 
-function get_bill_history_graphdata()
+function get_bill_history_graphdata(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $bill_id = mres($router['bill_id']);
-    $bill_hist_id = mres($router['bill_hist_id']);
-    $graph_type = $router['graph_type'];
+    $bill_id = $request->route('bill_id');
 
-    if (!LegacyAuth::user()->hasGlobalRead()) {
-        check_bill_permission($bill_id);
-    }
+    return check_bill_permission($bill_id, function ($bill_id) use ($request) {
+        $bill_hist_id = $request->route('bill_hist_id');
+        $graph_type = $request->route('graph_type');
 
-    switch ($graph_type) {
-        case 'bits':
-            $reducefactor = $_GET['reducefactor'];
+        switch ($graph_type) {
+            case 'bits':
+                $reducefactor = $request->get('reducefactor');
 
-            $graph_data = getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
-            break;
-        case 'day':
-        case 'hour':
-            $graph_data = getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
-            break;
-    }
+                $graph_data = getBillingHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor);
+                break;
+            case 'day':
+            case 'hour':
+                $graph_data = getBillingBandwidthGraphData($bill_id, $bill_hist_id, null, null, $graph_type);
+                break;
+        }
 
-    if (!isset($graph_data)) {
-        api_error(400, "Unsupported graph type $graph_type");
-    } else {
-        api_success($graph_data, 'graph_data');
-    }
+        return !isset($graph_data) ?
+            api_error(400, "Unsupported graph type $graph_type") :
+            api_success($graph_data, 'graph_data');
+    });
 }
 
-function delete_bill()
+function delete_bill(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-    $router = api_get_params();
-    $bill_id = (int)$router['id'];
+    $bill_id = $request->route('bill_id');
 
     if ($bill_id < 1) {
-        api_error(400, 'Could not remove bill with id '.$bill_id.'. Invalid id');
+        return api_error(400, 'Could not remove bill with id '.$bill_id.'. Invalid id');
     }
 
     $res = dbDelete('bills', '`bill_id` =  ? LIMIT 1', [ $bill_id ]);
@@ -1485,58 +1479,47 @@ function delete_bill()
         dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ]);
         dbDelete('bill_history', '`bill_id` =  ? ', [ $bill_id ]);
         dbDelete('bill_perms', '`bill_id` =  ? ', [ $bill_id ]);
-        api_success_noresult(200, 'Bill has been removed');
+        return api_success_noresult(200, 'Bill has been removed');
     }
-    api_error(400, 'Could not remove bill with id '.$bill_id);
+    return api_error(400, 'Could not remove bill with id '.$bill_id);
 }
 
 function check_bill_key_value($bill_key, $bill_value)
 {
-    $return_value = null;
     $bill_types = ['quota', 'cdr'];
+
     switch ($bill_key) {
         case "bill_type":
-            if (in_array($bill_value, $bill_types)) {
-                $return_value = mres($bill_value);
-            } else {
-                api_error(400, "Invalid value for $bill_key: $bill_value. Allowed: quota,cdr");
+            if (!in_array($bill_value, $bill_types)) {
+                return api_error(400, "Invalid value for $bill_key: $bill_value. Allowed: quota,cdr");
             }
             break;
         case "bill_cdr":
-            if (is_numeric($bill_value)) {
-                $return_value = mres($bill_value);
-            } else {
-                api_error(400, "Invalid value for $bill_key. Must be numeric.");
+            if (!is_numeric($bill_value)) {
+                return api_error(400, "Invalid value for $bill_key. Must be numeric.");
             }
             break;
         case "bill_day":
-            if ($bill_value > 0 && $bill_value <= 31) {
-                $return_value = mres($bill_value);
-            } else {
-                api_error(400, "Invalid value for $bill_key. range: 1-31");
+            if ($bill_value < 1 || $bill_value > 31) {
+                return api_error(400, "Invalid value for $bill_key. range: 1-31");
             }
             break;
         case "bill_quota":
-            if (is_numeric($bill_value)) {
-                $return_value = mres($bill_value);
-            } else {
-                api_error(400, "Invalid value for $bill_key. Must be numeric");
+            if (!is_numeric($bill_value)) {
+                return api_error(400, "Invalid value for $bill_key. Must be numeric");
             }
             break;
         default:
-            $return_value = mres($bill_value);
-            break;
     }
 
-    return $return_value;
+    return true;
 }
 
-function create_edit_bill()
+function create_edit_bill(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode($request->getContent(), true);
     if (!$data) {
-        api_error(500, 'Invalid JSON data');
+        return api_error(500, 'Invalid JSON data');
     }
     //check ports
     $ports_add = null;
@@ -1547,7 +1530,7 @@ function create_edit_bill()
             $result = dbFetchRows('SELECT port_id FROM `ports` WHERE `port_id` = ?  LIMIT 1', [ $port_id ]);
             $result = $result[0];
             if (!is_array($result) || !array_key_exists('port_id', $result)) {
-                api_error(500, 'Port ' . $port_id . ' does not exists');
+                return api_error(500, 'Port ' . $port_id . ' does not exists');
             }
             $ports_add[] = $port_id;
         }
@@ -1563,7 +1546,12 @@ function create_edit_bill()
         $bill = $bills[0];
 
         foreach ($data as $bill_key => $bill_value) {
-                $bill[$bill_key] = check_bill_key_value($bill_key, $bill_value);
+            $res = check_bill_key_value($bill_key, $bill_value);
+            if ($res === true) {
+                $bill[$bill_key] = $bill_value;
+            } else {
+                return $res;
+            }
         }
         $update_data = [
             'bill_name' => $bill['bill_name'],
@@ -1577,12 +1565,12 @@ function create_edit_bill()
         ];
         $update = dbUpdate($update_data, 'bills', 'bill_id=?', array($bill_id));
         if ($update === false || $update < 0) {
-            api_error(500, 'Failed to update existing bill');
+            return api_error(500, 'Failed to update existing bill');
         }
     } else {
         // create new bill
         if (array_key_exists('bill_id', $data)) {
-            api_error(500, 'Argument bill_id is not allowed on bill create (auto assigned)');
+            return api_error(500, 'Argument bill_id is not allowed on bill create (auto assigned)');
         }
 
         $bill_keys = [
@@ -1609,11 +1597,16 @@ function create_edit_bill()
             foreach ($missing as $missing_key => $dummy) {
                 $missing_keys .= " $missing_key";
             }
-            api_error(500, 'Missing parameters: ' . $missing_keys);
+            return api_error(500, 'Missing parameters: ' . $missing_keys);
         }
 
         foreach ($bill_keys as $bill_key) {
-            $bill[$bill_key] = check_bill_key_value($bill_key, $data[$bill_key]);
+            $res = check_bill_key_value($bill_key, $data[$bill_key]);
+            if ($res === true) {
+                $bill[$bill_key] = $data[$bill_key];
+            } else {
+                return $res;
+            }
         }
 
         $bill_id = dbInsert(
@@ -1631,7 +1624,7 @@ function create_edit_bill()
         );
 
         if ($bill_id === null) {
-            api_error(500, 'Failed to create new bill');
+            return api_error(500, 'Failed to create new bill');
         }
     }
 
@@ -1645,7 +1638,7 @@ function create_edit_bill()
         }
     }
 
-    api_success($bill_id, 'bill_id');
+    return api_success($bill_id, 'bill_id');
 }
 
 function update_device(\Illuminate\Http\Request $request)
