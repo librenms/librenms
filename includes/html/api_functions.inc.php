@@ -538,9 +538,9 @@ function list_cbgp(\Illuminate\Http\Request $request)
     $hostname   = $request->get('hostname');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $perm = check_device_permission($device_id);
-        if ($perm !== true) {
-            return $perm; // permission error
+        $permission = check_device_permission($device_id);
+        if ($permission !== true) {
+            return $permission; // permission error
         }
         $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
@@ -1778,29 +1778,32 @@ function list_ipsec(\Illuminate\Http\Request $request)
 }
 
 
-function list_vlans()
+function list_vlans(\Illuminate\Http\Request $request)
 {
     $sql        = '';
-    $sql_params = array();
-    $hostname   = $_GET['hostname'] ?: '';
+    $sql_params = [];
+    $hostname   = $request->get('hostname');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        check_device_permission($device_id);
+        $permission = check_device_permission($device_id);
+        if ($permission !== true) {
+            return $permission;
+        }
         $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
     }
-    if (!LegacyAuth::user()->hasGlobalRead()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql .= " AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = LegacyAuth::id();
+        $sql_params[] = Auth::id();
     }
 
     $vlans = dbFetchRows("SELECT `vlans`.* FROM `vlans` LEFT JOIN `devices` ON `vlans`.`device_id` = `devices`.`device_id` WHERE `vlans`.`vlan_vlan` IS NOT NULL $sql", $sql_params);
     $vlans_count = count($vlans);
     if ($vlans_count == 0) {
-        api_error(404, 'VLANs do not exist');
+        return api_error(404, 'VLANs do not exist');
     }
 
-    api_success($vlans, 'vlans');
+    return api_success($vlans, 'vlans');
 }
 
 
