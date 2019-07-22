@@ -1885,12 +1885,9 @@ function get_fdb(\Illuminate\Http\Request $request)
 }
 
 
-function list_fdb()
+function list_fdb(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-
-    $router = api_get_params();
-    $mac        = $router['mac'];
+    $mac = $request->route('mac');
 
     $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())
         ->when(!empty($mac), function ($query) use ($mac) {
@@ -1899,10 +1896,10 @@ function list_fdb()
         ->get();
 
     if ($fdb->isEmpty()) {
-        api_error(404, 'Fdb do not exist');
+        return api_error(404, 'Fdb do not exist');
     }
 
-    api_success($fdb, 'ports_fdb');
+    return api_success($fdb, 'ports_fdb');
 }
 
 
