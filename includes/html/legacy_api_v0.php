@@ -84,7 +84,7 @@ $app->group(
 //                        $app->get('/:hostname/graphs/wireless/:type(/:sensor_id)', 'authToken', 'get_graph_generic_by_hostname')->name('get_wireless_graph');
 //                        $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
                         // api/v0/devices/$hostname/$type
-                        $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');
+//                        $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');
                         // api/v0/devices/$hostname/ports/$ifName
                         $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
                         // api/v0/devices/$hostname/ports/$ifName/$type

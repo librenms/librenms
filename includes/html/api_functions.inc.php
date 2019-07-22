@@ -180,37 +180,36 @@ function get_graph_by_port_hostname()
 }
 
 
-function get_port_stats_by_port_hostname()
+function get_port_stats_by_port_hostname(\Illuminate\Http\Request $request)
 {
     // This will return port stats based on a devices hostname and ifName
-    $router = api_get_params();
-    $hostname  = $router['hostname'];
+    $hostname  = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $ifName    = urldecode($router['ifname']);
-    $port     = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', array($device_id, $ifName));
+    $ifName    = $request->route('ifname');
+    $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', [$device_id, $ifName]);
 
-    check_port_permission($port['port_id'], $device_id);
+    return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
+        $in_rate = $port['ifInOctets_rate'] * 8;
+        $out_rate = $port['ifOutOctets_rate'] * 8;
+        $port['in_rate'] = formatRates($in_rate);
+        $port['out_rate'] = formatRates($out_rate);
+        $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
+        $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
+        $port['in_pps'] = format_bi($port['ifInUcastPkts_rate']);
+        $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
 
-    $in_rate = $port['ifInOctets_rate'] * 8;
-    $out_rate = $port['ifOutOctets_rate'] * 8;
-    $port['in_rate'] = formatRates($in_rate);
-    $port['out_rate'] = formatRates($out_rate);
-    $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
-    $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
-    $port['in_pps'] = format_bi($port['ifInUcastPkts_rate']);
-    $port['out_pps'] = format_bi($port['ifOutUcastPkts_rate']);
-
-    //only return requested columns
-    if (isset($_GET['columns'])) {
-        $cols = explode(",", $_GET['columns']);
-        foreach (array_keys($port) as $c) {
-            if (!in_array($c, $cols)) {
-                unset($port[$c]);
+        //only return requested columns
+        if ($request->has('columns')) {
+            $cols = explode(",", $request->get('columns'));
+            foreach (array_keys($port) as $c) {
+                if (!in_array($c, $cols)) {
+                    unset($port[$c]);
+                }
             }
         }
-    }
 
-    api_success($port, 'port');
+        return api_success($port, 'port');
+    });
 }
 
 
