@@ -1943,17 +1943,15 @@ function list_ip_networks()
 }
 
 
-function list_arp()
+function list_arp(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-    $router = api_get_params();
-    $ip       = $router['ip'];
-    $hostname = $_GET['device'];
-    $total    = 0;
+    $ip       = $request->route('ip');
+    $hostname = $request->get('device');
+
     if (empty($ip)) {
-        api_error(400, "No valid IP provided");
+        return api_error(400, "No valid IP provided");
     } elseif ($ip === "all" && empty($hostname)) {
-        api_error(400, "Device argument is required when requesting all entries");
+        return api_error(400, "Device argument is required when requesting all entries");
     }
 
     if ($ip === "all") {
@@ -1967,12 +1965,12 @@ function list_arp()
                 [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())]
             );
         } catch (InvalidIpException $e) {
-            api_error(400, "Invalid Network Address");
+            return api_error(400, "Invalid Network Address");
         }
     } else {
         $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", [$ip]);
     }
-    api_success($arp, 'arp');
+    return api_success($arp, 'arp');
 }
 
 function list_services()

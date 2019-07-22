@@ -201,7 +201,7 @@ $app->group(
                             '/ip',
                             function () use ($app) {
 //                                $app->get('/addresses/', 'authToken', 'list_ip_addresses')->name('list_ip_addresses');
-                                $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp')->conditions(array('ip' => '[^?]+'));
+//                                $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp')->conditions(array('ip' => '[^?]+'));
                                 $app->get('/networks/', 'authToken', 'list_ip_networks')->name('list_ip_networks');
 //                                $app->get('/networks/:id/ip', 'authToken', 'get_ip_addresses')->name('get_network_ip_addresses');
                             }
