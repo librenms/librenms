@@ -108,12 +108,12 @@ $app->group(
 //                        $app->get('/:portid/ip', 'authToken', 'get_ip_addresses')->name('get_port_ip_info');
                     }
                 );
-                $app->get('/ports', 'authToken', 'get_all_ports')->name('get_all_ports');
+//                $app->get('/ports', 'authToken', 'get_all_ports')->name('get_all_ports');
                 $app->group(
                     '/portgroups',
                     function () use ($app) {
-                        $app->get('/multiport/bits/:id', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup_multiport_bits');
-                        $app->get('/:group', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup');
+//                        $app->get('/multiport/bits/:id', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup_multiport_bits');
+//                        $app->get('/:group', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup');
                     }
                 );
                 $app->group(

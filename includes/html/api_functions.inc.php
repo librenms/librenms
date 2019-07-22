@@ -615,51 +615,52 @@ function list_ospf(\Illuminate\Http\Request $request)
 }
 
 
-function get_graph_by_portgroup()
+function get_graph_by_portgroup(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-    $router = api_get_params();
-    $group  = $router['group'] ?: '';
-    $id     = $router['id'] ?: '';
-    $vars   = array();
-    $vars['output'] = $_GET['output'] ?: 'display';
-    if (!empty($_GET['from'])) {
-        $vars['from'] = $_GET['from'];
+    $group  = $request->route('group');
+    $id     = $request->route('id');
+    $vars   = [
+        'output' => $request->get('output', 'display'),
+        'width'  => $request->get('width', 1075),
+        'height' => $request->get('height', 300),
+        'type'   => 'multiport_bits_separate',
+    ];
+    if ($request->has('from')) {
+        $vars['from'] = $request->get('from');
     }
 
-    if (!empty($_GET['to'])) {
-        $vars['to'] = $_GET['to'];
+    if ($request->has('to')) {
+        $vars['to'] = $request->get('to');
     }
 
-    $vars['width']  = $_GET['width'] ?: 1075;
-    $vars['height'] = $_GET['height'] ?: 300;
-    $auth           = '1';
     $if_list        = '';
-    $ports          = array();
+    $ports          = [];
 
-    if (!empty($id)) {
-        $if_list = $id;
-    } else {
+    if (empty($id)) {
         $ports = get_ports_from_type(explode(',', $group));
+        $if_list = implode(',', array_pluck($ports, 'port_id'));
+    } else {
+        $if_list = $id;
     }
-    if (empty($if_list)) {
-        $seperator   = '';
-        foreach ($ports as $port) {
-            $if_list  .= $seperator.$port['port_id'];
-            $seperator = ',';
-        }
-    }
+    $vars['id'] = $if_list;
 
-    unset($seperator);
-    $vars['type'] = 'multiport_bits_separate';
-    $vars['id']   = $if_list;
-    api_set_header('Content-Type', get_image_type());
+    $auth = '1';
+    $base64_output = '';
+
+    ob_start();
+
     rrdtool_initialize(false);
     include 'includes/html/graphs/graph.inc.php';
     rrdtool_close();
+
+    $image = ob_get_contents();
+    ob_end_clean();
+
     if ($vars['output'] === 'base64') {
-        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+        return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
     }
+
+    return response($image, 200, ['Content-Type' => get_image_type()]);
 }
 
 
