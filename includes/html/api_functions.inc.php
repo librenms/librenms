@@ -185,7 +185,7 @@ function get_graph_generic_by_hostname(\Illuminate\Http\Request $request)
     // This will return a graph type given a device id.
     $hostname     = $request->route('hostname');
     $sensor_id    = $request->route('sensor_id');
-    $vars         = array();
+    $vars         = [];
     $vars['type'] = $request->route('type', 'device_uptime');
     $vars['output'] = $request->get('output', 'display');
     if (isset($sensor_id)) {
@@ -249,9 +249,9 @@ function get_device(\Illuminate\Http\Request $request)
     return check_device_permission($device_id, function () use ($device) {
         $host_id = get_vm_parent_id($device);
         if (is_numeric($host_id)) {
-            $device = array_merge($device, array('parent_id' => $host_id));
+            $device = array_merge($device, ['parent_id' => $host_id]);
         }
-        return api_success(array($device), 'devices');
+        return api_success([$device], 'devices');
     });
 }
 
@@ -262,7 +262,7 @@ function list_devices(\Illuminate\Http\Request $request)
     $order = $request->get('order');
     $type  = $request->get('type');
     $query = $request->get('query');
-    $param = array();
+    $param = [];
 
     if (empty($order)) {
         $order = 'hostname';
@@ -306,7 +306,7 @@ function list_devices(\Illuminate\Http\Request $request)
         $join .= " LEFT JOIN `ports` AS p ON d.`device_id` = p.`device_id` LEFT JOIN `ipv6_addresses` AS a ON p.`port_id` = a.`port_id` ";
         $sql = "a.`ipv6_address`=? OR a.`ipv6_compressed`=?";
         $select .= ",p.* ";
-        $param = array($query, $query);
+        $param = [$query, $query];
     } else {
         $sql = '1';
     }
@@ -316,7 +316,7 @@ function list_devices(\Illuminate\Http\Request $request)
         $sql .= " AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
         $param[] = Auth::id();
     }
-    $devices = array();
+    $devices = [];
     $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
     foreach (dbFetchRows($dev_query, $param) as $device) {
         $host_id = get_vm_parent_id($device);
@@ -337,7 +337,7 @@ function add_device(\Illuminate\Http\Request $request)
     // FIXME: Execution flow through this function could be improved
     $data = json_decode($request->getContent(), true);
 
-    $additional = array();
+    $additional = [];
     // keep scrutinizer from complaining about snmpver not being set for all execution paths
     $snmpver = 'v2c';
     if (empty($data)) {
@@ -354,12 +354,12 @@ function add_device(\Illuminate\Http\Request $request)
     $force_add    = $data['force_add'] ? true : false;
     $snmp_disable = ($data['snmp_disable']);
     if ($snmp_disable) {
-        $additional = array(
+        $additional = [
             'sysName'      => $data['sysName'] ?: '',
             'os'           => $data['os'] ?: 'ping',
             'hardware'     => $data['hardware'] ?: '',
             'snmp_disable' => 1,
-        );
+        ];
     } elseif ($data['version'] == 'v1' || $data['version'] == 'v2c') {
         if ($data['community']) {
             Config::set('snmp.community', [$data['community']]);
@@ -367,14 +367,14 @@ function add_device(\Illuminate\Http\Request $request)
 
         $snmpver = $data['version'];
     } elseif ($data['version'] == 'v3') {
-        $v3 = array(
+        $v3 = [
             'authlevel'  => $data['authlevel'],
             'authname'   => $data['authname'],
             'authpass'   => $data['authpass'],
             'authalgo'   => $data['authalgo'],
             'cryptopass' => $data['cryptopass'],
             'cryptoalgo' => $data['cryptoalgo'],
-        );
+        ];
 
         $v3_config = Config::get('snmp.v3');
         array_unshift($v3_config, $v3);
@@ -445,7 +445,7 @@ function get_vlans(\Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device_id, function ($device_id) {
-        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', array($device_id));
+        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', [$device_id]);
         return api_success($vlans, 'vlans');
     });
 }
@@ -471,7 +471,7 @@ function show_endpoints(\Illuminate\Http\Request $request, Router $router)
 function list_bgp(\Illuminate\Http\Request $request)
 {
     $sql        = '';
-    $sql_params = array();
+    $sql_params = [];
     $hostname   = $request->get('hostname');
     $asn        = $request->get('asn');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -501,7 +501,7 @@ function get_bgp(\Illuminate\Http\Request $request)
         return api_error(400, 'Invalid id has been provided');
     }
 
-    $bgp_session       = dbFetchRows("SELECT * FROM `bgpPeers` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' AND bgpPeer_id = ?", array($bgpPeerId));
+    $bgp_session       = dbFetchRows("SELECT * FROM `bgpPeers` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' AND bgpPeer_id = ?", [$bgpPeerId]);
     $bgp_session_count = count($bgp_session);
     if (!is_numeric($bgp_session_count)) {
         return api_error(500, 'Error retrieving BGP peer');
@@ -546,12 +546,12 @@ function list_cbgp(\Illuminate\Http\Request $request)
 function list_ospf(\Illuminate\Http\Request $request)
 {
     $sql        = '';
-    $sql_params = array();
+    $sql_params = [];
     $hostname   = $request->get('hostname');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql        = ' AND `device_id`=?';
-        $sql_params = array($device_id);
+        $sql_params = [$device_id];
     }
 
     $ospf_neighbours       = dbFetchRows("SELECT * FROM ospf_nbrs WHERE `ospfNbrState` IS NOT NULL AND `ospfNbrState` != '' $sql", $sql_params);
@@ -674,21 +674,21 @@ function get_graphs(\Illuminate\Http\Request $request)
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     return check_device_permission($device_id, function ($device_id) {
-        $graphs    = array();
-        $graphs[]  = array(
+        $graphs    = [];
+        $graphs[]  = [
             'desc' => 'Poller Time',
             'name' => 'device_poller_perf',
-        );
-        $graphs[]  = array(
+        ];
+        $graphs[]  = [
             'desc' => 'Ping Response',
             'name' => 'device_ping_perf',
-        );
-        foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', array($device_id)) as $graph) {
+        ];
+        foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', [$device_id]) as $graph) {
             $desc = Config::get("graph_types.device.{$graph['graph']}.descr");
-            $graphs[] = array(
+            $graphs[] = [
                 'desc' => $desc,
                 'name' => 'device_'.$graph['graph'],
-            );
+            ];
         }
 
         return api_success($graphs, 'graphs');
@@ -706,48 +706,48 @@ function list_available_health_graphs(\Illuminate\Http\Request $request)
             $type = preg_replace('/^device_/', '', $input_type);
         }
         $sensor_id = $request->route('sensor_id');
-        $graphs = array();
+        $graphs = [];
 
         if (isset($type)) {
             if (isset($sensor_id)) {
-                $graphs = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_id` = ?', array($sensor_id));
+                $graphs = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_id` = ?', [$sensor_id]);
             } else {
-                foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
-                    $graphs[] = array(
+                foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
+                    $graphs[] = [
                         'sensor_id' => $graph['sensor_id'],
                         'desc' => $graph['sensor_descr'],
-                    );
+                    ];
                 }
             }
         } else {
-            foreach (dbFetchRows('SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
-                $graphs[] = array(
+            foreach (dbFetchRows('SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', [$device_id]) as $graph) {
+                $graphs[] = [
                     'desc' => ucfirst($graph['sensor_class']),
                     'name' => 'device_' . $graph['sensor_class'],
-                );
+                ];
             }
             $device = Device::find($device_id);
 
             if ($device) {
                 if ($device->processors()->count() > 0) {
-                    array_push($graphs, array(
+                    array_push($graphs, [
                         'desc' => 'Processors',
                         'name' => 'device_processor'
-                    ));
+                    ]);
                 }
 
                 if ($device->storage()->count() > 0) {
-                    array_push($graphs, array(
+                    array_push($graphs, [
                         'desc' => 'Storage',
                         'name' => 'device_storage'
-                    ));
+                    ]);
                 }
 
                 if ($device->mempools()->count() > 0) {
-                    array_push($graphs, array(
+                    array_push($graphs, [
                         'desc' => 'Memory Pools',
                         'name' => 'device_mempool'
-                    ));
+                    ]);
                 }
             }
         }
@@ -766,25 +766,25 @@ function list_available_wireless_graphs(\Illuminate\Http\Request $request)
             list(, , $type) = explode('_', $input_type);
         }
         $sensor_id = $request->route('sensor_id');
-        $graphs    = array();
+        $graphs    = [];
 
         if (isset($type)) {
             if (isset($sensor_id)) {
-                $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ?', array($sensor_id));
+                $graphs = dbFetchRows('SELECT * FROM `wireless_sensors` WHERE `sensor_id` = ?', [$sensor_id]);
             } else {
-                foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', array($device_id, $type)) as $graph) {
-                    $graphs[] = array(
+                foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
+                    $graphs[] = [
                         'sensor_id' => $graph['sensor_id'],
                         'desc'      => $graph['sensor_descr'],
-                    );
+                    ];
                 }
             }
         } else {
-            foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', array($device_id)) as $graph) {
-                $graphs[] = array(
+            foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', [$device_id]) as $graph) {
+                $graphs[] = [
                     'desc' => ucfirst($graph['sensor_class']),
                     'name' => 'device_wireless_'.$graph['sensor_class'],
-                );
+                ];
             }
         }
 
@@ -804,7 +804,7 @@ function get_port_graphs(\Illuminate\Http\Request $request)
     // use hostname as device_id if it's all digits
     $device_id   = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $sql = '';
-    $params = array($device_id);
+    $params = [$device_id];
     if (!device_permitted($device_id)) {
         $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
         array_push($params, Auth::id());
@@ -876,7 +876,7 @@ function get_all_ports(\Illuminate\Http\Request $request)
         return $validate;
     }
 
-    $params = array();
+    $params = [];
     $sql = '';
     if (!Auth::user()->hasGlobalRead()) {
         $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
@@ -895,9 +895,9 @@ function get_port_stack(\Illuminate\Http\Request $request)
     $device_id      = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     return check_device_permission($device_id, function ($device_id) use ($request) {
         if ($request->get('valid_mappings')) {
-            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high`", array($device_id));
+            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high`", [$device_id]);
         } else {
-            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high`", array($device_id));
+            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high`", [$device_id]);
         }
 
         return api_success($mappings, 'mappings');
@@ -1001,11 +1001,11 @@ function add_edit_rule(\Illuminate\Http\Request $request)
     }
 
     $severity = $data['severity'];
-    $sevs     = array(
+    $sevs     = [
         'ok',
         'warning',
         'critical',
-    );
+    ];
     if (!in_array($severity, $sevs)) {
         return api_error(400, 'Missing the severity');
     }
@@ -1048,18 +1048,18 @@ function add_edit_rule(\Illuminate\Http\Request $request)
     }
 
     if (!isset($rule_id)) {
-        if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
+        if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', [$name]) == $name) {
             return api_error(500, 'Addition failed : Name has already been used');
         }
-    } elseif (dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", array($name, $rule_id)) == $name) {
+    } elseif (dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", [$name, $rule_id]) == $name) {
             return api_error(500, 'Update failed : Invalid rule id');
     }
 
     if (is_numeric($rule_id)) {
-        if (!(dbUpdate(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules', 'id=?', array($rule_id)) >= 0)) {
+        if (!(dbUpdate(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json], 'alert_rules', 'id=?', [$rule_id]) >= 0)) {
             return api_error(500, 'Failed to update existing alert rule');
         }
-    } elseif (!$rule_id = dbInsert(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
+    } elseif (!$rule_id = dbInsert(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json], 'alert_rules')) {
         return api_error(500, 'Failed to create new alert rule');
     }
 
@@ -1142,7 +1142,7 @@ function get_inventory(\Illuminate\Http\Request $request)
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     return check_device_permission($device_id, function ($device_id) use ($request) {
         $sql       = '';
-        $params    = array();
+        $params    = [];
         if ($request->get('entPhysicalClass')) {
             $sql     .= ' AND entPhysicalClass=?';
             $params[] = $request->get('entPhysicalClass');
@@ -1170,15 +1170,15 @@ function get_inventory(\Illuminate\Http\Request $request)
 function list_oxidized(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $devices = array();
+    $devices = [];
     $device_types = "'" . implode("','", Config::get('oxidized.ignore_types')) . "'";
     $device_os = "'" . implode("','", Config::get('oxidized.ignore_os')) . "'";
 
     $sql = '';
-    $params = array();
+    $params = [];
     if ($hostname) {
         $sql = " AND hostname = ?";
-        $params = array($hostname);
+        $params = [$hostname];
     }
 
     foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,locations.location,ip AS ip FROM `devices` LEFT JOIN locations ON devices.location_id = locations.id LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
@@ -1292,7 +1292,7 @@ function list_bills(\Illuminate\Http\Request $request)
         $bill['percent'] = $percent;
         $bill['overuse'] = $overuse;
 
-        $bill['ports'] = dbFetchRows("SELECT `D`.`device_id`,`P`.`port_id`,`P`.`ifName` FROM `bill_ports` AS `B`, `ports` AS `P`, `devices` AS `D` WHERE `B`.`bill_id` = ? AND `P`.`port_id` = `B`.`port_id` AND `D`.`device_id` = `P`.`device_id`", array($bill["bill_id"]));
+        $bill['ports'] = dbFetchRows("SELECT `D`.`device_id`,`P`.`port_id`,`P`.`ifName` FROM `bill_ports` AS `B`, `ports` AS `P`, `devices` AS `D` WHERE `B`.`bill_id` = ? AND `P`.`port_id` = `B`.`port_id` AND `D`.`device_id` = `P`.`device_id`", [$bill["bill_id"]]);
 
         $bills[] = $bill;
     }
@@ -1513,7 +1513,7 @@ function create_edit_bill(\Illuminate\Http\Request $request)
             'bill_ref' => $bill['bill_ref'],
             'bill_notes' => $bill['bill_notes']
         ];
-        $update = dbUpdate($update_data, 'bills', 'bill_id=?', array($bill_id));
+        $update = dbUpdate($update_data, 'bills', 'bill_id=?', [$bill_id]);
         if ($update === false || $update < 0) {
             return api_error(500, 'Failed to update existing bill');
         }
@@ -1597,7 +1597,7 @@ function update_device(\Illuminate\Http\Request $request)
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $data = json_decode($request->getContent(), true);
-    $bad_fields = array('device_id','hostname');
+    $bad_fields = ['device_id','hostname'];
     if (empty($data['field'])) {
         return api_error(400, 'Device field to patch has not been supplied');
     } elseif (in_array($data['field'], $bad_fields)) {
@@ -1613,9 +1613,9 @@ function update_device(\Illuminate\Http\Request $request)
         if (count($data['field']) == count($data['data'])) {
             $update = [];
             for ($x=0; $x<count($data['field']); $x++) {
-                $update[mres($data['field'][$x])] = mres($data['data'][$x]);
+                $update[$data['field'][$x]] = $data['data'][$x];
             }
-            if (dbUpdate($update, 'devices', '`device_id`=?', array($device_id)) >= 0) {
+            if (dbUpdate($update, 'devices', '`device_id`=?', [$device_id]) >= 0) {
                 return api_success_noresult(200, 'Device fields have been updated');
             } else {
                 return api_error(500, 'Device fields failed to be updated');
@@ -1623,10 +1623,10 @@ function update_device(\Illuminate\Http\Request $request)
         } else {
             return api_error(500, 'Device fields failed to be updated as the number of fields ('.count($data['field']).') does not match the supplied data ('.count($data['data']).')');
         }
-    } elseif (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id)) >= 0) {
-        return api_success_noresult(200, 'Device ' . mres($data['field']) . ' field has been updated');
+    } elseif (dbUpdate([$data['field'] => $data['data']], 'devices', '`device_id`=?', [$device_id]) >= 0) {
+        return api_success_noresult(200, 'Device ' . $data['field'] . ' field has been updated');
     } else {
-        return api_error(500, 'Device ' . mres($data['field']) . ' field failed to be updated');
+        return api_error(500, 'Device ' . $data['field'] . ' field failed to be updated');
     }
 }
 
@@ -1737,7 +1737,7 @@ function get_vrf(\Illuminate\Http\Request $request)
         return api_error(400, 'Invalid id has been provided');
     }
 
-    $vrf       = dbFetchRows("SELECT * FROM `vrfs` WHERE `vrf_id` IS NOT NULL AND `vrf_id` = ?", array($vrfId));
+    $vrf       = dbFetchRows("SELECT * FROM `vrfs` WHERE `vrf_id` IS NOT NULL AND `vrf_id` = ?", [$vrfId]);
     $vrf_count = count($vrf);
     if ($vrf_count == 0) {
         return api_error(404, "VRF $vrfId does not exist");
@@ -1756,7 +1756,7 @@ function list_ipsec(\Illuminate\Http\Request $request)
         return api_error(400, "No valid hostname or device ID provided");
     }
 
-    $ipsec  = dbFetchRows("SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`", array($device_id));
+    $ipsec  = dbFetchRows("SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`", [$device_id]);
     return api_success($ipsec, 'ipsec');
 }
 
@@ -1825,7 +1825,7 @@ function get_link(\Illuminate\Http\Request $request)
         return api_error(400, 'Invalid id has been provided');
     }
 
-    $link       = dbFetchRows("SELECT * FROM `links` WHERE `id` IS NOT NULL AND `id` = ?", array($linkId));
+    $link       = dbFetchRows("SELECT * FROM `links` WHERE `id` IS NOT NULL AND `id` = ?", [$linkId]);
     $link_count = count($link);
     if ($link_count == 0) {
         return api_error(404, "Link $linkId does not exist");
@@ -2058,7 +2058,7 @@ function list_logs(\Illuminate\Http\Request $request, Router $router)
         }
     }
 
-    return api_success($logs, 'logs', null, 200, null, array('total' => $count));
+    return api_success($logs, 'logs', null, 200, null, ['total' => $count]);
 }
 
 function validate_column_list($columns, $tableName)
@@ -2108,8 +2108,8 @@ function add_service_for_host(\Illuminate\Http\Request $request)
     // Get parameters
     $service_type = $data['type'];
     $service_ip   = $data['ip'];
-    $service_desc = $data['desc'] ? mres($data['desc']) : '';
-    $service_param = $data['param'] ? mres($data['param']) : '';
+    $service_desc = $data['desc'] ? $data['desc'] : '';
+    $service_param = $data['param'] ? $data['param'] : '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
 
     // Set the service
