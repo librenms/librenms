@@ -14,6 +14,9 @@
 
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\PortsFdb;
+use App\Models\Sensor;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
@@ -1886,8 +1889,8 @@ function list_fdb(\Illuminate\Http\Request $request)
 {
     $mac = $request->route('mac');
 
-    $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())
-        ->when(!empty($mac), function ($query) use ($mac) {
+    $fdb = PortsFdb::hasAccess(Auth::user())
+        ->when(!empty($mac), function (Builder $query) use ($mac) {
             return $query->where('mac_address', $mac);
         })
         ->get();
@@ -1902,7 +1905,7 @@ function list_fdb(\Illuminate\Http\Request $request)
 
 function list_sensors()
 {
-    $sensors = \App\Models\Sensor::hasAccess(Auth::user())->get();
+    $sensors = Sensor::hasAccess(Auth::user())->get();
     $total_sensors = $sensors->count();
     if ($total_sensors == 0) {
         return api_error(404, 'Sensors do not exist');
