@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f87282913b460c1b5a54827589e51903",
+    "content-hash": "1850141bfe259b502a3138f4f0ff2f4a",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -2123,50 +2123,6 @@
             "time": "2018-04-30T05:58:02+00:00"
         },
         {
-            "name": "palanik/corsslim",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/palanik/CorsSlim.git",
-                "reference": "ebd2bca1fcf4711a69db43f65bb63d10c7016030"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/palanik/CorsSlim/zipball/ebd2bca1fcf4711a69db43f65bb63d10c7016030",
-                "reference": "ebd2bca1fcf4711a69db43f65bb63d10c7016030",
-                "shasum": ""
-            },
-            "require": {
-                "slim/slim": ">=2.4.0 <3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "CorsSlim\\": "."
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "palanik"
-                }
-            ],
-            "description": "Cross-origin resource sharing (CORS) middleware for PHP Slim.",
-            "homepage": "https://github.com/palanik/CorsSlim",
-            "keywords": [
-                "cors",
-                "corsslim",
-                "cross-origin",
-                "preflight",
-                "slim",
-                "slimphp"
-            ],
-            "time": "2015-12-16T23:57:06+00:00"
-        },
-        {
             "name": "paragonie/random_compat",
             "version": "v9.99.99",
             "source": {
@@ -3078,53 +3034,6 @@
                 "sockets"
             ],
             "time": "2016-10-13T00:11:37+00:00"
-        },
-        {
-            "name": "slim/slim",
-            "version": "2.6.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/slimphp/Slim.git",
-                "reference": "9224ed81ac1c412881e8d762755e3d76ebf580c0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/slimphp/Slim/zipball/9224ed81ac1c412881e8d762755e3d76ebf580c0",
-                "reference": "9224ed81ac1c412881e8d762755e3d76ebf580c0",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "suggest": {
-                "ext-mcrypt": "Required for HTTP cookie encryption",
-                "phpseclib/mcrypt_compat": "Polyfil for mcrypt extension"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Slim": "."
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Josh Lockhart",
-                    "email": "info@joshlockhart.com",
-                    "homepage": "http://www.joshlockhart.com/"
-                }
-            ],
-            "description": "Slim Framework, a PHP micro framework",
-            "homepage": "http://github.com/codeguy/Slim",
-            "keywords": [
-                "microframework",
-                "rest",
-                "router"
-            ],
-            "time": "2017-01-07T12:21:41+00:00"
         },
         {
             "name": "spatie/laravel-cors",
@@ -4919,7 +4828,7 @@
                 "password",
                 "security"
             ],
-            "time": "2014-07-16T15:38:21+00:00"
+            "time": "2012-08-31T00:00:00+00:00"
         },
         {
             "name": "zendframework/zend-diactoros",
