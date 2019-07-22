@@ -44,6 +44,13 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::get('ip/networks', 'LegacyApiController@list_ip_networks')->name('list_ip_networks');
             Route::get('ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
         });
+
+        Route::group(['prefix' => 'logs'], function () {
+            Route::get('eventlog/{hostname?}', 'LegacyApiController@list_logs')->name('list_eventlog');
+            Route::get('syslog/{hostname?}', 'LegacyApiController@list_logs')->name('list_syslog');
+            Route::get('alertlog/{hostname?}', 'LegacyApiController@list_logs')->name('list_alertlog');
+            Route::get('authlog', 'LegacyApiController@list_logs')->name('list_authlog');
+        });
     });
 
     // admin required

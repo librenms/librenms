@@ -2017,43 +2017,40 @@ function list_services(\Illuminate\Http\Request $request)
     return api_success($services, 'services');
 }
 
-function list_logs()
+function list_logs(\Illuminate\Http\Request $request, Router $router)
 {
-    check_is_read();
-
-    $router = api_get_params();
-    $type = \Slim\Slim::getInstance()->router()->getCurrentRoute()->getName();
-    $hostname = $router['hostname'];
+    $type = $router->current()->getName();
+    $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $count_query = 'SELECT COUNT(*)';
+    $param = [];
     if ($type === 'list_eventlog') {
-        $table = 'eventlog';
-        $select = '`eventlog`.`device_id` as `host`, `eventlog`.*'; // inject host for backward compat
+        $query = ' FROM eventlog LEFT JOIN `devices` ON `eventlog`.`device_id`=`devices`.`device_id` WHERE 1';
+        $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `eventlog`.`device_id` as `host`, `eventlog`.*'; // inject host for backward compat
         $timestamp = 'datetime';
     } elseif ($type === 'list_syslog') {
-        $table = 'syslog';
+        $query = ' FROM syslog LEFT JOIN `devices` ON `syslog`.`device_id`=`devices`.`device_id` WHERE 1';
+        $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `syslog`.*';
         $timestamp = 'timestamp';
     } elseif ($type === 'list_alertlog') {
-        $table = 'alert_log';
+        $query = ' FROM alert_log LEFT JOIN `devices` ON `alert_log`.`device_id`=`devices`.`device_id` WHERE 1';
+        $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `alert_log`.*';
         $timestamp = 'time_logged';
     } elseif ($type === 'list_authlog') {
-        $table = 'authlog';
+        $query = ' FROM authlog WHERE 1';
+        $full_query = 'SELECT `authlog`.*';
         $timestamp = 'datetime';
     } else {
-        $table = 'eventlog';
+        $query = ' FROM eventlog LEFT JOIN `devices` ON `eventlog`.`device_id`=`devices`.`device_id` WHERE 1';
+        $full_query = 'SELECT `devices`.`hostname`, `devices`.`sysName`, `eventlog`.*';
         $timestamp = 'datetime';
     }
 
-    $start = (int)$_GET['start'] ?: 0;
-    $limit = (int)$_GET['limit'] ?: 50;
-    $from = $_GET['from'];
-    $to = $_GET['to'];
-
-    $count_query = 'SELECT COUNT(*)';
-    $full_query = "SELECT `devices`.`hostname`, `devices`.`sysName`, ";
-    $full_query .= isset($select) ? $select : "`$table`.*";
-
-    $param = array();
-    $query = " FROM $table LEFT JOIN `devices` ON `$table`.`device_id`=`devices`.`device_id` WHERE 1";
+    $start = (int)$request->get('start', 0);
+    $limit = (int)$request->get('limit', 50);
+    $from = $request->get('from');
+    $to = $request->get('to');
 
     if (is_numeric($device_id)) {
         $query .= " AND `devices`.`device_id` = ?";
@@ -2081,7 +2078,7 @@ function list_logs()
         }
     }
 
-    api_success($logs, 'logs', null, 200, null, array('total' => $count));
+    return api_success($logs, 'logs', null, 200, null, array('total' => $count));
 }
 
 function validate_column_list($columns, $tableName)
