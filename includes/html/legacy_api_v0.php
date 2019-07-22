@@ -138,9 +138,9 @@ $app->group(
                     function () use ($app) {
 //                        $app->get('/:id', 'authToken', 'list_alerts')->name('get_alert');
                         // api/v0/alerts
-                        $app->put('/:id', 'authToken', 'ack_alert')->name('ack_alert');
+//                        $app->put('/:id', 'authToken', 'ack_alert')->name('ack_alert');
                         // api/v0/alerts/$id (PUT)
-                        $app->put('/unmute/:id', 'authToken', 'unmute_alert')->name('unmute_alert');
+//                        $app->put('/unmute/:id', 'authToken', 'unmute_alert')->name('unmute_alert');
                         // api/v0/alerts/unmute/$id (PUT)
                     }
                 );

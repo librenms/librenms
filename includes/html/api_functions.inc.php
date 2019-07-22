@@ -1137,16 +1137,13 @@ function delete_rule()
 }
 
 
-function ack_alert()
+function ack_alert(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-
-    $router = api_get_params();
-    $alert_id = mres($router['id']);
-    $data = json_decode(file_get_contents('php://input'), true);
+    $alert_id = $request->route('id');
+    $data = json_decode($request->getContent(), true);
 
     if (!is_numeric($alert_id)) {
-        api_error(400, 'Invalid alert has been provided');
+        return api_error(400, 'Invalid alert has been provided');
     }
 
     $alert = dbFetchRow('SELECT note, info FROM alerts WHERE id=?', [$alert_id]);
@@ -1160,36 +1157,33 @@ function ack_alert()
     $info = json_encode($info);
 
     if (dbUpdate(['state' => 2, 'note' => $note, 'info' => $info], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
-        api_success_noresult(200, 'Alert has been acknowledged');
+        return api_success_noresult(200, 'Alert has been acknowledged');
     } else {
-        api_success_noresult(200, 'No Alert by that ID');
+        return api_success_noresult(200, 'No Alert by that ID');
     }
 }
 
-function unmute_alert()
+function unmute_alert(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-
-    $router = api_get_params();
-    $alert_id = mres($router['id']);
-    $data = json_decode(file_get_contents('php://input'), true);
+    $alert_id = $request->route('id');
+    $data = json_decode($request->getContent(), true);
 
     if (!is_numeric($alert_id)) {
-        api_error(400, 'Invalid alert has been provided');
+        return api_error(400, 'Invalid alert has been provided');
     }
 
     $alert = dbFetchRow('SELECT note, info FROM alerts WHERE id=?', [$alert_id]);
     $note  = $alert['note'];
-    $info  = json_decode($alert['info'], true);
+
     if (!empty($note)) {
         $note .= PHP_EOL;
     }
     $note .= date(Config::get('dateformat.long')) . " - Ack (" . Auth::user()->username . ") {$data['note']}";
 
     if (dbUpdate(['state' => 1, 'note' => $note], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
-        api_success_noresult(200, 'Alert has been unmuted');
+        return api_success_noresult(200, 'Alert has been unmuted');
     } else {
-        api_success_noresult(200, 'No alert by that ID');
+        return api_success_noresult(200, 'No alert by that ID');
     }
 }
 

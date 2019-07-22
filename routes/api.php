@@ -44,10 +44,11 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::put('{hostname}/components', 'LegacyApiController@edit_components')->name('edit_components');
             Route::delete('{hostname}/components/{component}', 'LegacyApiController@delete_components')->name('delete_components');
         });
-        Route::group(['prefix' => 'bills'], function () {
-            Route::post(null, 'LegacyApiController@create_edit_bill')->name('create_bill');
-            Route::delete('{bill_id}', 'LegacyApiController@delete_bill')->name('delete_bill');
-        });
+
+        Route::post('bills', 'LegacyApiController@create_edit_bill')->name('create_bill');
+        Route::delete('bills/{bill_id}', 'LegacyApiController@delete_bill')->name('delete_bill');
+        Route::put('alerts/{id}', 'LegacyApiController@ack_alert')->name('ack_alert');
+        Route::put('alerts/unmute/{id}', 'LegacyApiController@unmute_alert')->name('unmute_alert');
     });
 
     // restricted by access
