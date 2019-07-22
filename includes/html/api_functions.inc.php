@@ -85,6 +85,8 @@ function api_not_found()
 
 function api_get_graph(array $vars)
 {
+    global $dur;        // Needed for callback within graph code
+
     $auth = '1';
     $base64_output = '';
 
@@ -1401,44 +1403,39 @@ function get_bill_history(\Illuminate\Http\Request $request)
     });
 }
 
-function get_bill_history_graph()
+function get_bill_history_graph(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $bill_id = mres($router['bill_id']);
-    $bill_hist_id = mres($router['bill_hist_id']);
-    $graph_type = $router['graph_type'];
+    $bill_id = $request->route('bill_id');
+    $bill_hist_id = $request->route('bill_hist_id');
+    $graph_type = $request->route('graph_type');
 
-    if (!LegacyAuth::user()->hasGlobalRead()) {
-        check_bill_permission($bill_id);
-    }
-
-    $vars = array();
+    $vars = [
+        'type' => "bill_$graph_type",
+        'id' => $bill_id,
+        'bill_hist_id' => $bill_hist_id,
+        'width' => $request->get('width', 1075),
+        'height' => $request->get('height', 300),
+    ];
 
     switch ($graph_type) {
         case 'bits':
-            $graph_type = 'historicbits';
-            $vars['reducefactor'] = $_GET['reducefactor'];
+            $vars['type'] = "bill_historicbits";
+            $vars['reducefactor'] = $request->get('reducefactor');
             break;
 
         case 'day':
         case 'hour':
             $vars['imgtype'] = $graph_type;
-            $graph_type = 'historictransfer';
+            $vars['type'] = "bill_historictransfer";
             break;
 
         default:
-            api_error(400, "Unknown Graph Type $graph_type");
-            break;
+            return api_error(400, "Unknown Graph Type $graph_type");
     }
 
-    global $dur;        // Needed for callback within graph code
-    $vars['type'] = "bill_$graph_type";
-    $vars['id'] = $bill_id;
-    $vars['bill_hist_id'] = $bill_hist_id;
-    $vars['width']  = $_GET['width'] ?: 1075;
-    $vars['height'] = $_GET['height'] ?: 300;
-
-    return api_get_graph($vars);
+    return check_bill_permission($bill_id, function () use ($vars){
+        return api_get_graph($vars);
+    });
 }
 
 function get_bill_history_graphdata()

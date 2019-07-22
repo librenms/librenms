@@ -125,7 +125,7 @@ $app->group(
 //                        $app->get('/:bill_id/graphs/:graph_type', 'authToken', 'get_bill_graph')->name('get_bill_graph');
 //                        $app->get('/:bill_id/graphdata/:graph_type', 'authToken', 'get_bill_graphdata')->name('get_bill_graphdata');
 //                        $app->get('/:bill_id/history', 'authToken', 'get_bill_history')->name('get_bill_history');
-                        $app->get('/:bill_id/history/:bill_hist_id/graphs/:graph_type', 'authToken', 'get_bill_history_graph')->name('get_bill_history_graph');
+//                        $app->get('/:bill_id/history/:bill_hist_id/graphs/:graph_type', 'authToken', 'get_bill_history_graph')->name('get_bill_history_graph');
                         $app->get('/:bill_id/history/:bill_hist_id/graphdata/:graph_type', 'authToken', 'get_bill_history_graphdata')->name('get_bill_history_graphdata');
                     }
                 );
