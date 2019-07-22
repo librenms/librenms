@@ -97,10 +97,10 @@ $app->group(
                 $app->group(
                     '/devicegroups',
                     function () use ($app) {
-                        $app->get('/:name', 'authToken', 'get_devices_by_group')->name('get_devices_by_group');
+//                        $app->get('/:name', 'authToken', 'get_devices_by_group')->name('get_devices_by_group');
                     }
                 );
-                $app->get('/devicegroups', 'authToken', 'get_device_groups')->name('get_devicegroups');
+//                $app->get('/devicegroups', 'authToken', 'get_device_groups')->name('get_devicegroups');
                 $app->group(
                     '/ports',
                     function () use ($app) {

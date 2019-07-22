@@ -1771,29 +1771,26 @@ function get_device_groups(\Illuminate\Http\Request $request)
     return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' device groups');
 }
 
-function get_devices_by_group()
+function get_devices_by_group(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-    $router = api_get_params();
-
-    if (empty($router['name'])) {
-        api_error(400, 'No device group name provided');
+    $name = $request->route('name');
+    if (!$name) {
+        return api_error(400, 'No device group name provided');
     }
-    $name = urldecode($router['name']);
 
     $device_group = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
 
     if (empty($device_group)) {
-        api_error(404, 'Device group not found');
+        return api_error(404, 'Device group not found');
     }
 
-    $devices = $device_group->devices()->get(empty($_GET['full']) ? ['devices.device_id'] : ['*']);
+    $devices = $device_group->devices()->get($request->get('full') ? ['*'] : ['devices.device_id']);
 
     if ($devices->isEmpty()) {
-        api_error(404, 'No devices found in group ' . $name);
+        return api_error(404, 'No devices found in group ' . $name);
     }
 
-    api_success($devices->makeHidden('pivot')->toArray(), 'devices');
+    return api_success($devices->makeHidden('pivot')->toArray(), 'devices');
 }
 
 
