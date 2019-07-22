@@ -33,6 +33,8 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('rules', 'LegacyApiController@list_alert_rules')->name('list_alert_rules');
         Route::get('routing/vrf/{id}', 'LegacyApiController@get_vrf')->name('get_vrf');
         Route::get('routing/ipsec/data/{hostname}', 'LegacyApiController@list_ipsec')->name('list_ipsec');
+        Route::get('services', 'LegacyApiController@list_services')->name('list_services');
+        Route::get('services/{hostname}', 'LegacyApiController@list_services')->name('list_services');
 
         Route::group(['prefix' => 'resources'], function () {
             Route::get('links/{id}', 'LegacyApiController@get_link')->name('get_link');
@@ -63,6 +65,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::post('rules', 'LegacyApiController@add_edit_rule')->name('add_rule');
         Route::put('rules', 'LegacyApiController@add_edit_rule')->name('edit_rule');
         Route::delete('rules/{id}', 'LegacyApiController@delete_rule')->name('delete_rule');
+        Route::post('services/{hostname}', 'LegacyApiController@add_service_for_host')->name('add_service_for_host');
     });
 
     // restricted by access

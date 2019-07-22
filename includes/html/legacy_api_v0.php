@@ -213,11 +213,11 @@ $app->group(
                 $app->group(
                     '/services',
                     function () use ($app) {
-                        $app->get('/:hostname', 'authToken', 'list_services')->name('get_service_for_host');
-                        $app->post('/:hostname', 'authToken', 'add_service_for_host')->name('add_service_for_host');
+//                        $app->get('/:hostname', 'authToken', 'list_services')->name('get_service_for_host');
+//                        $app->post('/:hostname', 'authToken', 'add_service_for_host')->name('add_service_for_host');
                     }
                 );
-                $app->get('/services', 'authToken', 'list_services')->name('list_services');
+//                $app->get('/services', 'authToken', 'list_services')->name('list_services');
                 // End Service
                 $app->group(
                     '/logs',

@@ -1971,41 +1971,38 @@ function list_arp(\Illuminate\Http\Request $request)
     return api_success($arp, 'arp');
 }
 
-function list_services()
+function list_services(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-    $router = api_get_params();
-    $services = array();
-    $where    = array();
-    $params   = array();
+    $where    = [];
+    $params   = [];
 
     // Filter by State
-    if (isset($_GET['state'])) {
+    if ($request->has('state')) {
         $where[] = '`service_status`=?';
-        $params[] = $_GET['state'];
+        $params[] = $request->get('state');
         $where[] = "`service_disabled`='0'";
         $where[] = "`service_ignore`='0'";
 
-        if (!is_numeric($_GET['state'])) {
-            api_error(400, "No valid service state provided, valid option is 0=Ok, 1=Warning, 2=Critical");
+        if (!is_numeric($request->get('state'))) {
+            return api_error(400, "No valid service state provided, valid option is 0=Ok, 1=Warning, 2=Critical");
         }
     }
 
     //Filter by Type
-    if (isset($_GET['type'])) {
+    if ($request->has('type')) {
         $where[] = '`service_type` LIKE ?';
-        $params[] = $_GET['type'];
+        $params[] = $request->get('type');
     }
 
     //GET by Host
-    if (isset($router['hostname'])) {
-        $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
+    if ($hostname) {
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
         $where[] = '`device_id` = ?';
         $params[] = $device_id;
 
         if (!is_numeric($device_id)) {
-            api_error(500, "No valid hostname or device id provided");
+            return api_error(500, "No valid hostname or device id provided");
         }
     }
 
@@ -2015,9 +2012,9 @@ function list_services()
         $query .= ' WHERE ' . implode(' AND ', $where);
     }
     $query .= ' ORDER BY `service_ip`';
-    $services = array(dbFetchRows($query, $params)); // double array for backwards compat :(
+    $services = [dbFetchRows($query, $params)]; // double array for backwards compat :(
 
-    api_success($services, 'services');
+    return api_success($services, 'services');
 }
 
 function list_logs()
@@ -2101,15 +2098,14 @@ function validate_column_list($columns, $tableName)
     return true;
 }
 
-function add_service_for_host()
+function add_service_for_host(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    check_device_permission($device_id);
-    $data = json_decode(file_get_contents('php://input'), true);
-    $missing_fields = array();
+
+    $data = json_decode($request->getContent(), true);
+    $missing_fields = [];
 
     // Check if some required fields are empty
     if (empty($data['type'])) {
@@ -2121,15 +2117,15 @@ function add_service_for_host()
 
     // Print error if required fields are missing
     if (!empty($missing_fields)) {
-        api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
+        return api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
     }
     if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
-        api_error(400, 'service_ip is not a valid IP address.');
+        return api_error(400, 'service_ip is not a valid IP address.');
     }
 
     // Check if service type exists
     if (!in_array($data['type'], list_available_services())) {
-        api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
+        return api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
     }
 
     // Get parameters
@@ -2142,10 +2138,10 @@ function add_service_for_host()
     // Set the service
     $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore);
     if ($service_id != false) {
-        api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
-    } else {
-        api_error(500, 'Failed to add the service');
+        return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
     }
+
+    return api_error(500, 'Failed to add the service');
 }
 
 /**
