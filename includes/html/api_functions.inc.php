@@ -14,6 +14,7 @@
 
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use Illuminate\Routing\Router;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
@@ -470,7 +471,7 @@ function get_vlans(\Illuminate\Http\Request $request)
 }
 
 
-function show_endpoints(\Illuminate\Http\Request $request, \Illuminate\Routing\Router $router)
+function show_endpoints(\Illuminate\Http\Request $request, Router $router)
 {
     $output = [];
     $base = str_replace('api/v0', '', $request->url());
@@ -687,7 +688,6 @@ function get_graphs(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
 
-    // FIXME: this has some overlap with html/pages/device/graphs.inc.php
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     return check_device_permission($device_id, function () use ($device_id) {
@@ -720,7 +720,7 @@ function list_available_health_graphs(\Illuminate\Http\Request $request)
     return check_device_permission($device_id, function () use ($device_id, $request) {
         $input_type = $request->route('type');
         if ($input_type) {
-            list($dump, $type) = explode('device_', $input_type);
+            $type = preg_replace('/^device_/', '', $input_type);
         }
         $sensor_id = $request->route('sensor_id');
         $graphs = array();
