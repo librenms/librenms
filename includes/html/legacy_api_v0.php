@@ -152,15 +152,15 @@ $app->group(
                     function () use ($app) {
 //                        $app->get('/:id', 'authToken', 'list_alert_rules')->name('get_alert_rule');
                         // api/v0/rules/$id
-                        $app->delete('/:id', 'authToken', 'delete_rule')->name('delete_rule');
+//                        $app->delete('/:id', 'authToken', 'delete_rule')->name('delete_rule');
                         // api/v0/rules/$id (DELETE)
                     }
                 );
 //                $app->get('/rules', 'authToken', 'list_alert_rules')->name('list_alert_rules');
                 // api/v0/rules
-                $app->post('/rules', 'authToken', 'add_edit_rule')->name('add_rule');
+//                $app->post('/rules', 'authToken', 'add_edit_rule')->name('add_rule');
                 // api/v0/rules (json data needs to be passed)
-                $app->put('/rules', 'authToken', 'add_edit_rule')->name('edit_rule');
+//                $app->put('/rules', 'authToken', 'add_edit_rule')->name('edit_rule');
                 // api/v0/rules (json data needs to be passed)
                 // Inventory section
                 $app->group(

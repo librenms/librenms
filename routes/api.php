@@ -51,6 +51,9 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::delete('bills/{bill_id}', 'LegacyApiController@delete_bill')->name('delete_bill');
         Route::put('alerts/{id}', 'LegacyApiController@ack_alert')->name('ack_alert');
         Route::put('alerts/unmute/{id}', 'LegacyApiController@unmute_alert')->name('unmute_alert');
+        Route::post('rules', 'LegacyApiController@add_edit_rule')->name('add_rule');
+        Route::put('rules', 'LegacyApiController@add_edit_rule')->name('edit_rule');
+        Route::delete('rules/{id}', 'LegacyApiController@delete_rule')->name('delete_rule');
     });
 
     // restricted by access

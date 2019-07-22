@@ -980,19 +980,18 @@ function list_alerts(\Illuminate\Http\Request $request)
 }
 
 
-function add_edit_rule()
+function add_edit_rule(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (json_last_error()) {
-        api_error(500, "We couldn't parse the provided json");
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || !is_array($data)) {
+        return api_error(500, "We couldn't parse the provided json");
     }
 
-    $rule_id = mres($data['rule_id']);
-    $tmp_devices = (array)mres($data['devices']);
+    $rule_id = $data['rule_id'];
+    $tmp_devices = (array)$data['devices'];
     $groups  = (array)$data['groups'];
     if (empty($tmp_devices) && !isset($rule_id)) {
-        api_error(400, 'Missing the devices or global device (-1)');
+        return api_error(400, 'Missing the devices or global device (-1)');
     }
 
     $devices = [];
@@ -1003,34 +1002,39 @@ function add_edit_rule()
         $devices[] = ctype_digit($device) ? $device : getidbyname($device);
     }
 
-    $builder = $data['builder'] ?: $data['rule'];
+    if (isset($data['builder'])) {
+        // accept inline json or json as a string
+        $builder = is_array($data['builder']) ? json_encode($data['builder']) : $data['builder'];
+    } else {
+        $builder = $data['rule'];
+    }
     if (empty($builder)) {
-        api_error(400, 'Missing the alert builder rule');
+        return api_error(400, 'Missing the alert builder rule');
     }
 
-    $name = mres($data['name']);
+    $name = $data['name'];
     if (empty($name)) {
-        api_error(400, 'Missing the alert rule name');
+        return api_error(400, 'Missing the alert rule name');
     }
 
-    $severity = mres($data['severity']);
+    $severity = $data['severity'];
     $sevs     = array(
         'ok',
         'warning',
         'critical',
     );
     if (!in_array($severity, $sevs)) {
-        api_error(400, 'Missing the severity');
+        return api_error(400, 'Missing the severity');
     }
 
-    $disabled = mres($data['disabled']);
+    $disabled = $data['disabled'];
     if ($disabled != '0' && $disabled != '1') {
         $disabled = 0;
     }
 
-    $count     = mres($data['count']);
-    $mute      = mres($data['mute']);
-    $delay     = mres($data['delay']);
+    $count     = $data['count'];
+    $mute      = $data['mute'];
+    $delay     = $data['delay'];
     $override_query = $data['override_query'];
     $adv_query = $data['adv_query'];
     $delay_sec = convert_delay($delay);
@@ -1056,48 +1060,44 @@ function add_edit_rule()
     } else {
         $query = QueryBuilderParser::fromJson($builder)->toSql();
         if (empty($query)) {
-            api_error(500, "We couldn't parse your rule");
+            return api_error(500, "We couldn't parse your rule");
         }
     }
 
     if (!isset($rule_id)) {
         if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
-            api_error(500, 'Addition failed : Name has already been used');
+            return api_error(500, 'Addition failed : Name has already been used');
         }
-    } else {
-        if (dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", array($name, $rule_id)) == $name) {
-            api_error(500, 'Update failed : Invalid rule id');
-        }
+    } elseif (dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", array($name, $rule_id)) == $name) {
+            return api_error(500, 'Update failed : Invalid rule id');
     }
 
     if (is_numeric($rule_id)) {
         if (!(dbUpdate(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules', 'id=?', array($rule_id)) >= 0)) {
-            api_error(500, 'Failed to update existing alert rule');
+            return api_error(500, 'Failed to update existing alert rule');
         }
     } elseif (!$rule_id = dbInsert(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
-        api_error(500, 'Failed to create new alert rule');
+        return api_error(500, 'Failed to create new alert rule');
     }
 
     dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
     dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
-    api_success_noresult(200);
+    return api_success_noresult(200);
 }
 
 
-function delete_rule()
+function delete_rule(\Illuminate\Http\Request $request)
 {
-    check_is_admin();
-    $router = api_get_params();
-    $rule_id = mres($router['id']);
+    $rule_id = $request->route('id');
     if (is_numeric($rule_id)) {
-        if (dbDelete('alert_rules', '`id` =  ? LIMIT 1', array($rule_id))) {
-            api_success_noresult(200, 'Alert rule has been removed');
+        if (dbDelete('alert_rules', '`id` =  ? LIMIT 1', [$rule_id])) {
+            return api_success_noresult(200, 'Alert rule has been removed');
         } else {
-            api_success_noresult(200, 'No alert rule by that ID');
+            return api_success_noresult(200, 'No alert rule by that ID');
         }
-    } else {
-        api_error(400, 'Invalid rule id has been provided');
     }
+
+    return api_error(400, 'Invalid rule id has been provided');
 }
 
 
