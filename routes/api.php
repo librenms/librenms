@@ -31,6 +31,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('alerts', 'LegacyApiController@list_alerts')->name('list_alerts');
         Route::get('rules/{id}', 'LegacyApiController@list_alert_rules')->name('get_alert_rule');
         Route::get('rules', 'LegacyApiController@list_alert_rules')->name('list_alert_rules');
+        Route::get('routing/vrf/{id}', 'LegacyApiController@get_vrf')->name('get_vrf');
 
         Route::get('resources/ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
     });
@@ -97,6 +98,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
 
     Route::group(['prefix' => 'routing'], function () {
         Route::get('bgp/cbgp', 'LegacyApiController@list_cbgp')->name('list_cbgp');
+        Route::get('vrf', 'LegacyApiController@list_vrf')->name('list_vrf');
     });
 
     Route::get('inventory/{hostname}', 'LegacyApiController@get_inventory')->name('get_inventory');

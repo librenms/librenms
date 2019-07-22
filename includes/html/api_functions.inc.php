@@ -102,13 +102,13 @@ function check_bill_permission($bill_id, $callback)
     return $callback($bill_id);
 }
 
-function check_device_permission($device_id, $callback)
+function check_device_permission($device_id, $callback = null)
 {
     if (!device_permitted($device_id)) {
         return api_error(403, 'Insufficient permissions to access this device');
     }
 
-    return $callback($device_id);
+    return is_callable($callback) ? $callback($device_id) : true;
 }
 
 function check_port_permission($port_id, $device_id, $callback)
@@ -540,9 +540,7 @@ function list_cbgp(\Illuminate\Http\Request $request)
     $hostname   = $request->get('hostname');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $perm = check_device_permission($device_id, function () {
-            return true;
-        });
+        $perm = check_device_permission($device_id);
         if ($perm !== true) {
             return $perm; // permission error
         }
@@ -1717,54 +1715,54 @@ function get_devices_by_group(\Illuminate\Http\Request $request)
 }
 
 
-function list_vrf()
+function list_vrf(\Illuminate\Http\Request $request)
 {
     $sql        = '';
-    $sql_params = array();
-    $hostname   = $_GET['hostname'];
-    $vrfname    = $_GET['vrfname'];
+    $sql_params = [];
+    $hostname   = $request->get('hostname');
+    $vrfname    = $request->get('vrfname');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        check_device_permission($device_id);
+        $permission = check_device_permission($device_id);
+        if ($permission !== true) {
+            return $permission;
+        }
         $sql        = " AND `devices`.`device_id`=?";
-        $sql_params = array($device_id);
+        $sql_params = [$device_id];
     }
     if (!empty($vrfname)) {
         $sql        = "  AND `vrfs`.`vrf_name`=?";
-        $sql_params = array($vrfname);
+        $sql_params = [$vrfname];
     }
-    if (!LegacyAuth::user()->hasGlobalRead()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql .= " AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = LegacyAuth::id();
+        $sql_params[] = Auth::id();
     }
 
     $vrfs = dbFetchRows("SELECT `vrfs`.* FROM `vrfs` LEFT JOIN `devices` ON `vrfs`.`device_id` = `devices`.`device_id` WHERE `vrfs`.`vrf_name` IS NOT NULL $sql", $sql_params);
     $total_vrfs = count($vrfs);
     if ($total_vrfs == 0) {
-        api_error(404, 'VRFs do not exist');
+        return api_error(404, 'VRFs do not exist');
     }
 
-    api_success($vrfs, 'vrfs');
+    return api_success($vrfs, 'vrfs');
 }
 
 
-function get_vrf()
+function get_vrf(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-
-    $router = api_get_params();
-    $vrfId  = $router['id'];
+    $vrfId  = $request->route('id');
     if (!is_numeric($vrfId)) {
-        api_error(400, 'Invalid id has been provided');
+        return api_error(400, 'Invalid id has been provided');
     }
 
     $vrf       = dbFetchRows("SELECT * FROM `vrfs` WHERE `vrf_id` IS NOT NULL AND `vrf_id` = ?", array($vrfId));
     $vrf_count = count($vrf);
     if ($vrf_count == 0) {
-        api_error(404, "VRF $vrfId does not exist");
+        return api_error(404, "VRF $vrfId does not exist");
     }
 
-    api_success($vrf, 'vrf');
+    return api_success($vrf, 'vrf');
 }
 
 
