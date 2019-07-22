@@ -1914,19 +1914,14 @@ function list_sensors()
 
 function list_ip_addresses()
 {
-    check_is_read();
-
-    $ipv4_addresses = array();
-    $ipv6_addresses = array();
-
     $ipv4_addresses   = dbFetchRows("SELECT * FROM `ipv4_addresses`");
     $ipv6_addresses   = dbFetchRows("SELECT * FROM `ipv6_addresses`");
     $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
     if ($ip_addresses_count == 0) {
-        api_error(404, 'IP addresses do not exist');
+        return api_error(404, 'IP addresses do not exist');
     }
 
-    api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
+    return api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
 }
 
 
