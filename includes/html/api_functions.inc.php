@@ -1927,19 +1927,14 @@ function list_ip_addresses()
 
 function list_ip_networks()
 {
-    check_is_read();
-
-    $ipv4_networks = array();
-    $ipv6_networks = array();
-
     $ipv4_networks   = dbFetchRows("SELECT * FROM `ipv4_networks`");
     $ipv6_networks   = dbFetchRows("SELECT * FROM `ipv6_networks`");
     $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
     if ($ip_networks_count == 0) {
-        api_error(404, 'IP networks do not exist');
+        return api_error(404, 'IP networks do not exist');
     }
 
-    api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
+    return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
 }
 
 
