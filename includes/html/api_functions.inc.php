@@ -16,28 +16,9 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Component;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv4;
-
-function authToken(\Slim\Route $route)
-{
-    if (Auth::check()) {
-        $user = Auth::user();
-
-        // Fake session so the standard auth/permissions checks work
-        $_SESSION = [
-            'username' => $user->username,
-            'user_id' => $user->user_id,
-            'userlevel' => $user->level
-        ];
-
-        return;
-    }
-
-    api_error(401, 'API Token is missing or invalid; please supply a valid token');
-}
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
 {
@@ -112,11 +93,6 @@ function api_get_params()
     return \Slim\Slim::getInstance()->router()->getCurrentRoute()->getParams();
 }
 
-function api_set_header($header, $data)
-{
-    \Slim\Slim::getInstance()->response->headers->set($header, $data);
-}
-
 function check_bill_permission($bill_id, $callback)
 {
     if (!bill_permitted($bill_id)) {
@@ -155,13 +131,6 @@ function check_is_read()
 {
     if (!Auth::user()->hasGlobalRead()) {
         api_error(403, 'Insufficient privileges');
-    }
-}
-
-function check_not_demo()
-{
-    if (Config::get('api_demo') == 1) {
-        api_error(500, 'This feature isn\'t available in the demo');
     }
 }
 
@@ -629,9 +598,6 @@ function get_graph_by_portgroup(\Illuminate\Http\Request $request)
         $vars['to'] = $request->get('to');
     }
 
-    $if_list        = '';
-    $ports          = [];
-
     if (empty($id)) {
         $ports = get_ports_from_type(explode(',', $group));
         $if_list = implode(',', array_pluck($ports, 'port_id'));
@@ -861,7 +827,7 @@ function get_port_graphs(\Illuminate\Http\Request $request)
         array_push($params, Auth::id());
     }
 
-    $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex` ASC", $params);
+    $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex`", $params);
     return api_success($ports, 'ports');
 }
 
@@ -946,9 +912,9 @@ function get_port_stack(\Illuminate\Http\Request $request)
     $device_id      = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     return check_device_permission($device_id, function () use ($device_id, $request) {
         if ($request->get('valid_mappings')) {
-            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high` ASC", array($device_id));
+            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high`", array($device_id));
         } else {
-            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high` ASC", array($device_id));
+            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high`", array($device_id));
         }
 
         return api_success($mappings, 'mappings');
