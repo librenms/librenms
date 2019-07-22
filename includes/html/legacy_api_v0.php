@@ -174,7 +174,7 @@ $app->group(
                 $app->group(
                     '/routing',
                     function () use ($app) {
-                        $app->get('/bgp/cbgp', 'authToken', 'list_cbgp')->name('list_cbgp');
+//                        $app->get('/bgp/cbgp', 'authToken', 'list_cbgp')->name('list_cbgp');
                         $app->get('/vrf', 'authToken', 'list_vrf')->name('list_vrf');
                         $app->get('/vrf/:id', 'authToken', 'get_vrf')->name('get_vrf');
                         $app->group(

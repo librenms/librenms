@@ -16,7 +16,6 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Routing\Router;
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv4;
@@ -534,29 +533,34 @@ function get_bgp(\Illuminate\Http\Request $request)
 }
 
 
-function list_cbgp()
+function list_cbgp(\Illuminate\Http\Request $request)
 {
     $sql        = '';
-    $sql_params = array();
-    $hostname   = $_GET['hostname'] ?: '';
+    $sql_params = [];
+    $hostname   = $request->get('hostname');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        check_device_permission($device_id);
+        $perm = check_device_permission($device_id, function () {
+            return true;
+        });
+        if ($perm !== true) {
+            return $perm; // permission error
+        }
         $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
     }
-    if (!LegacyAuth::user()->hasGlobalRead()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = LegacyAuth::id();
+        $sql_params[] = Auth::id();
     }
 
     $bgp_counters = dbFetchRows("SELECT `bgpPeers_cbgp`.* FROM `bgpPeers_cbgp` LEFT JOIN `devices` ON `bgpPeers_cbgp`.`device_id` = `devices`.`device_id` WHERE `bgpPeers_cbgp`.`device_id` IS NOT NULL $sql", $sql_params);
     $total_bgp_counters = count($bgp_counters);
     if ($total_bgp_counters == 0) {
-        api_error(404, 'BGP counters does not exist');
+        return api_error(404, 'BGP counters does not exist');
     }
 
-    api_success($bgp_counters, 'bgp_counters');
+    return api_success($bgp_counters, 'bgp_counters');
 }
 
 
