@@ -180,7 +180,7 @@ $app->group(
                         $app->group(
                             '/ipsec',
                             function () use ($app) {
-                                $app->get('/data/:hostname', 'authToken', 'list_ipsec')->name('list_ipsec');
+//                                $app->get('/data/:hostname', 'authToken', 'list_ipsec')->name('list_ipsec');
                             }
                         );
                     }

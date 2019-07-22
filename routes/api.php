@@ -32,6 +32,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('rules/{id}', 'LegacyApiController@list_alert_rules')->name('get_alert_rule');
         Route::get('rules', 'LegacyApiController@list_alert_rules')->name('list_alert_rules');
         Route::get('routing/vrf/{id}', 'LegacyApiController@get_vrf')->name('get_vrf');
+        Route::get('routing/ipsec/data/{hostname}', 'LegacyApiController@list_ipsec')->name('list_ipsec');
 
         Route::get('resources/ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
     });

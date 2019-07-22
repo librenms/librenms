@@ -1766,19 +1766,17 @@ function get_vrf(\Illuminate\Http\Request $request)
 }
 
 
-function list_ipsec()
+function list_ipsec(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-    $router = api_get_params();
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (!is_numeric($device_id)) {
-        api_error(400, "No valid hostname or device ID provided");
+        return api_error(400, "No valid hostname or device ID provided");
     }
 
     $ipsec  = dbFetchRows("SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`", array($device_id));
-    api_success($ipsec, 'ipsec');
+    return api_success($ipsec, 'ipsec');
 }
 
 
