@@ -121,7 +121,7 @@ function check_bill_permission($bill_id, $callback)
         return api_error(403, 'Insufficient permissions to access this bill');
     }
 
-    return $callback();
+    return $callback($bill_id);
 }
 
 function check_device_permission($device_id, $callback)
@@ -130,7 +130,7 @@ function check_device_permission($device_id, $callback)
         return api_error(403, 'Insufficient permissions to access this device');
     }
 
-    return $callback();
+    return $callback($device_id);
 }
 
 function check_port_permission($port_id, $device_id, $callback)
@@ -139,7 +139,7 @@ function check_port_permission($port_id, $device_id, $callback)
         return api_error(403, 'Insufficient permissions to access this port');
     }
 
-    return $callback();
+    return $callback($port_id);
 }
 
 function check_is_admin()
@@ -1371,7 +1371,7 @@ function get_bill_graphdata(\Illuminate\Http\Request $request)
 {
     $bill_id = $request->route('bill_id');
 
-    return check_bill_permission($bill_id, function () use ($bill_id, $request) {
+    return check_bill_permission($bill_id, function ($bill_id) use ($request) {
         $graph_type = $request->route('graph_type');
         if ($graph_type == 'bits') {
             $from = $request->get('from',time() - 60 * 60 * 24);
@@ -1391,21 +1391,14 @@ function get_bill_graphdata(\Illuminate\Http\Request $request)
     });
 }
 
-function get_bill_history()
+function get_bill_history(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $bill_id = mres($router['bill_id']);
+    $bill_id = $request->route('bill_id');
 
-    if (!LegacyAuth::user()->hasGlobalRead()) {
-        check_bill_permission($bill_id);
-    }
-
-    $result = [];
-    foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24', array($bill_id)) as $history) {
-        $result[] = $history;
-    }
-
-    api_success($result, 'bill_history');
+    return check_bill_permission($bill_id, function ($bill_id) {
+        $result = dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24', [$bill_id]);
+        return api_success($result, 'bill_history');
+    });
 }
 
 function get_bill_history_graph()
