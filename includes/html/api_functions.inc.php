@@ -115,11 +115,13 @@ function api_set_header($header, $data)
     \Slim\Slim::getInstance()->response->headers->set($header, $data);
 }
 
-function check_bill_permission($bill_id)
+function check_bill_permission($bill_id, $callback)
 {
     if (!bill_permitted($bill_id)) {
-        api_error(403, 'Insufficient permissions to access this bill');
+        return api_error(403, 'Insufficient permissions to access this bill');
     }
+
+    return $callback();
 }
 
 function check_device_permission($device_id, $callback)
@@ -1345,27 +1347,24 @@ function list_bills(\Illuminate\Http\Request $request)
     return api_success($bills, 'bills');
 }
 
-function get_bill_graph()
+function get_bill_graph(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $bill_id = mres($router['bill_id']);
-    $graph_type = $router['graph_type'];
-
-    if (!LegacyAuth::user()->hasGlobalRead()) {
-        check_bill_permission($bill_id);
-    }
-
+    $bill_id = $request->route('bill_id');
+    $graph_type = $request->route('graph_type');
     if ($graph_type == 'monthly') {
         $graph_type = 'historicmonthly';
     }
 
-    $vars = array();
-    $vars['type'] = "bill_$graph_type";
-    $vars['id'] = $bill_id;
-    $vars['width']  = $_GET['width'] ?: 1075;
-    $vars['height'] = $_GET['height'] ?: 300;
+    $vars = [
+        'type' => "bill_$graph_type",
+        'id' => $bill_id,
+        'width' => $request->get('width', 1075),
+        'height' => $request->get('height', 300),
+    ];
 
-    return api_get_graph($vars);
+    return check_bill_permission($bill_id, function () use ($vars) {
+        return api_get_graph($vars);
+    });
 }
 
 function get_bill_graphdata()

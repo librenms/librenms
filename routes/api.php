@@ -75,6 +75,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
 
     Route::group(['prefix' => 'bills'], function () {
         Route::get('{bill_id}', 'LegacyApiController@list_bills')->name('get_bill');
+        Route::get('{bill_id}/graphs/{graph_type}', 'LegacyApiController@get_bill_graph')->name('get_bill_graph');
     });
 
     // Route not found
