@@ -1273,16 +1273,14 @@ function list_oxidized(\Illuminate\Http\Request $request)
     return response()->json($devices, 200, [], JSON_PRETTY_PRINT);
 }
 
-function list_bills()
+function list_bills(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-
-    $bills = array();
-    $bill_id = mres($router['bill_id']);
-    $bill_ref = mres($_GET['ref']);
-    $bill_custid = mres($_GET['custid']);
-    $period = $_GET['period'];
-    $param = array();
+    $bills = [];
+    $bill_id = $request->route('bill_id');
+    $bill_ref = $request->get('ref');
+    $bill_custid = $request->get('custid');
+    $period = $request->get('period');
+    $param = [];
     $sql = '';
 
     if (!empty($bill_custid)) {
@@ -1297,9 +1295,9 @@ function list_bills()
     } else {
         $sql = '1';
     }
-    if (!LegacyAuth::user()->hasGlobalRead()) {
+    if (!Auth::user()->hasGlobalRead()) {
         $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
-        $param[] = LegacyAuth::id();
+        $param[] = Auth::id();
     }
 
     if ($period === 'previous') {
@@ -1344,7 +1342,7 @@ function list_bills()
 
         $bills[] = $bill;
     }
-    api_success($bills, 'bills');
+    return api_success($bills, 'bills');
 }
 
 function get_bill_graph()

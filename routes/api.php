@@ -73,6 +73,10 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get(null, 'LegacyApiController@get_all_ports')->name('get_all_ports');
     });
 
+    Route::group(['prefix' => 'bills'], function () {
+        Route::get('{bill_id}', 'LegacyApiController@list_bills')->name('get_bill');
+    });
+
     // Route not found
     Route::any('/{path?}', 'LegacyApiController@api_not_found')->where('path', '.*');
 });
