@@ -1743,27 +1743,27 @@ function rename_device(\Illuminate\Http\Request $request)
     }
 }
 
-function get_device_groups()
+function get_device_groups(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
+    $hostname = $request->route('hostname');
 
-    if (!empty($router['hostname'])) {
-        $device = ctype_digit($router['hostname']) ? Device::find($router['hostname']) : Device::findByHostname($router['hostname']);
+    if ($hostname) {
+        $device = ctype_digit($hostname) ? Device::find($hostname) : Device::findByHostname($hostname);
         if (is_null($device)) {
-            api_error(404, 'Device not found');
+            return api_error(404, 'Device not found');
         }
         $query = $device->groups();
     } else {
         $query = DeviceGroup::query();
     }
 
-    $groups = $query->orderBy('name')->get();
+    $groups = $query->hasAccess(Auth::user())->orderBy('name')->get();
 
     if ($groups->isEmpty()) {
-        api_error(404, 'No device groups found');
+        return api_error(404, 'No device groups found');
     }
 
-    api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' device groups');
+    return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' device groups');
 }
 
 function get_devices_by_group()

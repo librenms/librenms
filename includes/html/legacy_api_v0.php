@@ -79,7 +79,7 @@ $app->group(
 //                        $app->post('/:hostname/components/:type', 'authToken', 'add_components')->name('add_components');
 //                        $app->put('/:hostname/components', 'authToken', 'edit_components')->name('edit_components');
 //                        $app->delete('/:hostname/components/:component', 'authToken', 'delete_components')->name('delete_components');
-                        $app->get('/:hostname/groups', 'authToken', 'get_device_groups')->name('get_device_groups');
+//                        $app->get('/:hostname/groups', 'authToken', 'get_device_groups')->name('get_device_groups');
 //                        $app->get('/:hostname/graphs/health/:type(/:sensor_id)', 'authToken', 'get_graph_generic_by_hostname')->name('get_health_graph');
 //                        $app->get('/:hostname/graphs/wireless/:type(/:sensor_id)', 'authToken', 'get_graph_generic_by_hostname')->name('get_wireless_graph');
 //                        $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');

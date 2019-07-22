@@ -41,6 +41,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
 
     // restricted by access
     Route::group(['prefix' => 'devices'], function () {
+        Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
         Route::get('{hostname}/graphs/health/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_health_graph');
         Route::get('{hostname}/graphs/wireless/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_wireless_graph');
         Route::get('{hostname}/vlans', 'LegacyApiController@get_vlans')->name('get_vlans');
@@ -53,9 +54,9 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/ip', 'LegacyApiController@get_device_ip_addresses')->name('get_ip_addresses');
         Route::get('{hostname}/port_stack', 'LegacyApiController@get_port_stack')->name('get_port_stack');
         Route::get('{hostname}/components', 'LegacyApiController@get_components')->name('get_components');
+        Route::get('{hostname}/groups', 'LegacyApiController@get_device_groups')->name('get_device_groups');
 
         Route::get('{hostname}/{type}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
-        Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
         Route::get(null, 'LegacyApiController@list_devices')->name('list_devices');
     });
 
@@ -65,7 +66,6 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get(null, 'LegacyApiController@get_all_ports')->name('get_all_ports');
     });
 
-    // Legacy API
-    Route::any('/v0/{path?}', 'LegacyApiController@api_not_found')->where('path', '.*');
+    // Route not found
+    Route::any('/{path?}', 'LegacyApiController@api_not_found')->where('path', '.*');
 });
-
