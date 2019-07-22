@@ -921,20 +921,18 @@ function get_port_stack(\Illuminate\Http\Request $request)
     });
 }
 
-function list_alert_rules()
+function list_alert_rules(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-    $router = api_get_params();
+    $id = $request->route('id');
     $sql    = '';
-    $param  = array();
-    if (isset($router['id']) && $router['id'] > 0) {
-        $rule_id = mres($router['id']);
+    $param  = [];
+    if ($id > 0) {
         $sql     = 'WHERE id=?';
-        $param   = array($rule_id);
+        $param   = [$id];
     }
 
-    $rules       = dbFetchRows("SELECT * FROM `alert_rules` $sql", $param);
-    api_success($rules, 'rules');
+    $rules = dbFetchRows("SELECT * FROM `alert_rules` $sql", $param);
+    return api_success($rules, 'rules');
 }
 
 
