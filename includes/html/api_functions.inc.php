@@ -90,12 +90,6 @@ function api_get_graph(array $vars)
     return response($image, 200, ['Content-Type' => get_image_type()]);
 }
 
-function api_get_params()
-{
-    return Request::all();
-    return \Slim\Slim::getInstance()->router()->getCurrentRoute()->getParams();
-}
-
 function check_bill_permission($bill_id, $callback)
 {
     if (!bill_permitted($bill_id)) {
@@ -121,20 +115,6 @@ function check_port_permission($port_id, $device_id, $callback)
     }
 
     return $callback($port_id);
-}
-
-function check_is_admin()
-{
-    if (!LegacyAuth::user()->hasGlobalAdmin()) {
-        api_error(403, 'Insufficient privileges');
-    }
-}
-
-function check_is_read()
-{
-    if (!Auth::user()->hasGlobalRead()) {
-        api_error(403, 'Insufficient privileges');
-    }
 }
 
 function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
@@ -464,7 +444,7 @@ function get_vlans(\Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    return check_device_permission($device_id, function () use ($device_id) {
+    return check_device_permission($device_id, function ($device_id) {
         $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', array($device_id));
         return api_success($vlans, 'vlans');
     });
@@ -488,12 +468,12 @@ function show_endpoints(\Illuminate\Http\Request $request, Router $router)
 }
 
 
-function list_bgp()
+function list_bgp(\Illuminate\Http\Request $request)
 {
     $sql        = '';
     $sql_params = array();
-    $hostname   = $_GET['hostname'] ?: '';
-    $asn        = $_GET['asn'] ?: '';
+    $hostname   = $request->get('hostname');
+    $asn        = $request->get('asn');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql        = ' AND `devices`.`device_id` = ?';
@@ -633,7 +613,7 @@ function get_components(\Illuminate\Http\Request $request)
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    return check_device_permission($device_id, function () use ($device_id, $options) {
+    return check_device_permission($device_id, function ($device_id) use ($options) {
 
         $COMPONENT = new LibreNMS\Component();
         $components = $COMPONENT->getComponents($device_id, $options);
@@ -693,7 +673,7 @@ function get_graphs(\Illuminate\Http\Request $request)
 
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    return check_device_permission($device_id, function () use ($device_id) {
+    return check_device_permission($device_id, function ($device_id) {
         $graphs    = array();
         $graphs[]  = array(
             'desc' => 'Poller Time',
@@ -720,7 +700,7 @@ function list_available_health_graphs(\Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
-    return check_device_permission($device_id, function () use ($device_id, $request) {
+    return check_device_permission($device_id, function ($device_id) use ($request) {
         $input_type = $request->route('type');
         if ($input_type) {
             $type = preg_replace('/^device_/', '', $input_type);
@@ -780,7 +760,7 @@ function list_available_wireless_graphs(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    return check_device_permission($device_id, function () use ($device_id, $request) {
+    return check_device_permission($device_id, function ($device_id) use ($request) {
         $input_type = $request->route('type');
         if ($input_type) {
             list(, , $type) = explode('_', $input_type);
@@ -839,7 +819,7 @@ function get_device_ip_addresses(\Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    return check_device_permission($device_id, function () use ($device_id) {
+    return check_device_permission($device_id, function ($device_id) {
         $ipv4   = dbFetchRows("SELECT `ipv4_addresses`.* FROM `ipv4_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", [$device_id]);
         $ipv6   = dbFetchRows("SELECT `ipv6_addresses`.* FROM `ipv6_addresses` JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ports`.`device_id` = ? AND `deleted` = 0", [$device_id]);
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
@@ -854,7 +834,7 @@ function get_device_ip_addresses(\Illuminate\Http\Request $request)
 function get_port_ip_addresses(\Illuminate\Http\Request $request)
 {
     $port_id = $request->route('portid');
-    return check_port_permission($port_id, null, function () use ($port_id) {
+    return check_port_permission($port_id, null, function ($port_id) {
         $ipv4   = dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?", [$port_id]);
         $ipv6   = dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?", [$port_id]);
         $ip_addresses_count = count(array_merge($ipv4, $ipv6));
@@ -882,7 +862,7 @@ function get_network_ip_addresses(\Illuminate\Http\Request $request)
 function get_port_info(\Illuminate\Http\Request $request)
 {
     $port_id = $request->route('portid');
-    return check_port_permission($port_id, null, function () use ($port_id) {
+    return check_port_permission($port_id, null, function ($port_id) {
         // use hostname as device_id if it's all digits
         $port = dbFetchRows("SELECT * FROM `ports` WHERE `port_id` = ? AND `deleted` = 0", [$port_id]);
         return api_success($port, 'port');
@@ -913,7 +893,7 @@ function get_port_stack(\Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
     $device_id      = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    return check_device_permission($device_id, function () use ($device_id, $request) {
+    return check_device_permission($device_id, function ($device_id) use ($request) {
         if ($request->get('valid_mappings')) {
             $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high`", array($device_id));
         } else {
