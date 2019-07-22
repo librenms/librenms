@@ -136,7 +136,7 @@ $app->group(
                 $app->group(
                     '/alerts',
                     function () use ($app) {
-                        $app->get('/:id', 'authToken', 'list_alerts')->name('get_alert');
+//                        $app->get('/:id', 'authToken', 'list_alerts')->name('get_alert');
                         // api/v0/alerts
                         $app->put('/:id', 'authToken', 'ack_alert')->name('ack_alert');
                         // api/v0/alerts/$id (PUT)
@@ -144,7 +144,7 @@ $app->group(
                         // api/v0/alerts/unmute/$id (PUT)
                     }
                 );
-                $app->get('/alerts', 'authToken', 'list_alerts')->name('list_alerts');
+//                $app->get('/alerts', 'authToken', 'list_alerts')->name('list_alerts');
                 // api/v0/alerts
                 // /api/v0/rules
                 $app->group(

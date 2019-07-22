@@ -972,37 +972,47 @@ function list_alert_rules()
 }
 
 
-function list_alerts()
+function list_alerts(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-    $router = api_get_params();
+    $id = $request->route('id');
 
-    $sql = "SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` AND `A`.`state` IN ";
-    if (isset($_GET['state'])) {
-        $param = explode(',', $_GET['state']);
+    $sql = "SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ";
+    $sql .= 'AND `A`.`state` IN ';
+    if ($request->has('state')) {
+        $param = explode(',', $request->get('state'));
     } else {
         $param = [1];
     }
     $sql .= dbGenPlaceholders(count($param));
 
-    if (isset($router['id']) && $router['id'] > 0) {
-        $param[] = $router['id'];
+    if ($id > 0) {
+        $param[] = $id;
         $sql .= 'AND `A`.id=?';
     }
 
-    $severity = $_GET['severity'];
-    if (isset($severity)) {
+    $severity = $request->get('severity');
+    if ($severity) {
         if (in_array($severity, ['ok', 'warning', 'critical'])) {
             $param[] = $severity;
             $sql .= ' AND `R`.severity=?';
         }
     }
     
-    $order = $_GET['order'] ?: "timestamp desc";
+    $order = 'timestamp desc';
+
+    if ($request->has('order')) {
+        list($sort_column, $sort_order) = explode(' ', $request->get('order'), 2);
+        if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
+            return $res;
+        }
+        if (in_array($sort_order, ['asc', 'desc'])) {
+            $order = $request->get('order');
+        }
+    }
     $sql .= ' ORDER BY A.'.$order;
 
     $alerts = dbFetchRows($sql, $param);
-    api_success($alerts, 'alerts');
+    return api_success($alerts, 'alerts');
 }
 
 
@@ -2141,9 +2151,9 @@ function list_logs()
 
 function validate_column_list($columns, $tableName)
 {
+    $schema = new \LibreNMS\DB\Schema();
     $column_names = explode(',', $columns);
-    $db_schema = Symfony\Component\Yaml\Yaml::parse(file_get_contents(Config::get('install_dir') . '/misc/db_schema.yaml'));
-    $valid_columns = array_column($db_schema[$tableName]['Columns'], 'Field');
+    $valid_columns = $schema->getColumns($tableName);
     $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
 
     if (count($invalid_columns) > 0) {
