@@ -15,6 +15,7 @@
 
 Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function () {
     Route::get('system', 'LegacyApiController@server_info')->name('server_info');
+    Route::get(null, 'LegacyApiController@show_endpoints');
 
     // global read only access required
     Route::middleware(['can:global-read'])->group(function () {

@@ -230,7 +230,7 @@ $app->group(
                 );
             }
         );
-        $app->get('/v0', 'authToken', 'show_endpoints');
+//        $app->get('/v0', 'authToken', 'show_endpoints');
         // api/v0
     }
 );

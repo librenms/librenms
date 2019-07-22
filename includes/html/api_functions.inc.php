@@ -497,18 +497,20 @@ function get_vlans(\Illuminate\Http\Request $request)
 }
 
 
-function show_endpoints()
+function show_endpoints(\Illuminate\Http\Request $request, \Illuminate\Routing\Router $router)
 {
-    $app    = \Slim\Slim::getInstance();
-    $routes = $app->router()->getNamedRoutes();
-    $output = array();
-    foreach ($routes as $route) {
-        $output[$route->getName()] = Config::get('base_url') . $route->getPattern();
+    $output = [];
+    $base = str_replace('api/v0', '', $request->url());
+    foreach ($router->getRoutes() as $route) {
+        /** @var \Illuminate\Routing\Route $route */
+        if (starts_with($route->getPrefix(), 'api/v0') && $route->getName()) {
+            $output[$route->getName()] = $base . $route->uri();
+        }
     }
 
-    $app->response->setStatus('200');
-    api_set_header('Content-Type', 'application/json');
-    echo _json_encode($output);
+    ksort($output);
+
+    return response()->json($output, 200, [], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
 }
 
 
