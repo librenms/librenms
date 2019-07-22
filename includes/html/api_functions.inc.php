@@ -1152,36 +1152,35 @@ function unmute_alert(\Illuminate\Http\Request $request)
 }
 
 
-function get_inventory()
+function get_inventory(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-
-    $hostname = $router['hostname'];
+    $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    check_device_permission($device_id);
-    $sql       = '';
-    $params    = array();
-    if (isset($_GET['entPhysicalClass']) && !empty($_GET['entPhysicalClass'])) {
-        $sql     .= ' AND entPhysicalClass=?';
-        $params[] = mres($_GET['entPhysicalClass']);
-    }
+    return check_device_permission($device_id, function ($device_id) use ($request) {
+        $sql       = '';
+        $params    = array();
+        if ($request->get('entPhysicalClass')) {
+            $sql     .= ' AND entPhysicalClass=?';
+            $params[] = $request->get('entPhysicalClass');
+        }
 
-    if (isset($_GET['entPhysicalContainedIn']) && !empty($_GET['entPhysicalContainedIn'])) {
-        $sql     .= ' AND entPhysicalContainedIn=?';
-        $params[] = mres($_GET['entPhysicalContainedIn']);
-    } else {
-        $sql .= ' AND entPhysicalContainedIn="0"';
-    }
+        if ($request->get('entPhysicalContainedIn')) {
+            $sql     .= ' AND entPhysicalContainedIn=?';
+            $params[] = $request->get('entPhysicalContainedIn');
+        } else {
+            $sql .= ' AND entPhysicalContainedIn="0"';
+        }
 
-    if (!is_numeric($device_id)) {
-        api_error(400, 'Invalid device provided');
-    }
-    $sql .= ' AND `device_id`=?';
-    $params[] = $device_id;
-    $inventory = dbFetchRows("SELECT * FROM `entPhysical` WHERE 1 $sql", $params);
+        if (!is_numeric($device_id)) {
+            return api_error(400, 'Invalid device provided');
+        }
+        $sql .= ' AND `device_id`=?';
+        $params[] = $device_id;
+        $inventory = dbFetchRows("SELECT * FROM `entPhysical` WHERE 1 $sql", $params);
 
-    api_success($inventory, 'inventory');
+        return api_success($inventory, 'inventory');
+    });
 }
 
 

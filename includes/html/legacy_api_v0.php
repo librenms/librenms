@@ -166,7 +166,7 @@ $app->group(
                 $app->group(
                     '/inventory',
                     function () use ($app) {
-                        $app->get('/:hostname', 'authToken', 'get_inventory')->name('get_inventory');
+//                        $app->get('/:hostname', 'authToken', 'get_inventory')->name('get_inventory');
                     }
                 );
                 // End Inventory
