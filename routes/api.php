@@ -34,8 +34,11 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('routing/vrf/{id}', 'LegacyApiController@get_vrf')->name('get_vrf');
         Route::get('routing/ipsec/data/{hostname}', 'LegacyApiController@list_ipsec')->name('list_ipsec');
 
-        Route::get('resources/links/{id}', 'LegacyApiController@get_link')->name('get_link');
-        Route::get('resources/ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
+        Route::group(['prefix' => 'resources'], function () {
+            Route::get('links/{id}', 'LegacyApiController@get_link')->name('get_link');
+            Route::get('locations', 'LegacyApiController@list_locations')->name('list_locations');
+            Route::get('ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
+        });
     });
 
     // admin required

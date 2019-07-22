@@ -239,15 +239,13 @@ function get_graph_generic_by_hostname(\Illuminate\Http\Request $request)
 
 function list_locations()
 {
-    check_is_read();
-
     $locations   = dbFetchRows("SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL");
     $total_locations = count($locations);
     if ($total_locations == 0) {
-        api_error(404, 'Locations do not exist');
+        return api_error(404, 'Locations do not exist');
     }
 
-    api_success($locations, 'locations');
+    return api_success($locations, 'locations');
 }
 
 
