@@ -1809,49 +1809,45 @@ function list_vlans()
 function list_links(\Illuminate\Http\Request $request)
 {
     $hostname   = $request->route('hostname');
+    $sql = '';
+    $sql_params = [];
+
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
-    if (!is_numeric($device_id)) {
-        return api_error(400, 'Invalid device has been provided');
-    }
-
-    return check_device_permission($device_id, function () use ($device_id) {
+    if (is_numeric($device_id)) {
+        $permission  = check_device_permission($device_id);
+        if ($permission !== true) {
+            return $permission;
+        }
         $sql        = " AND `links`.`local_device_id`=?";
         $sql_params = [$device_id];
-
-        if (!Auth::user()->hasGlobalRead()) {
-            $sql .= " AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-            $sql_params[] = Auth::id();
-        }
-
-        $links = dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params);
-        $total_links = count($links);
-        if ($total_links == 0) {
-            return api_error(404, 'Links do not exist');
-        }
-
-        return api_success($links, 'links');
-    });
+    }
+    if (!Auth::user()->hasGlobalRead()) {
+        $sql .= " AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = Auth::id();
+    }
+    $links = dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params);
+    $total_links = count($links);
+    if ($total_links == 0) {
+        return api_error(404, 'Links do not exist');
+    }
+    return api_success($links, 'links');
 }
 
 
-function get_link()
+function get_link(\Illuminate\Http\Request $request)
 {
-    check_is_read();
-
-    $router = api_get_params();
-    $linkId  = $router['id'];
+    $linkId  = $request->route('id');
     if (!is_numeric($linkId)) {
-        api_error(400, 'Invalid id has been provided');
+        return api_error(400, 'Invalid id has been provided');
     }
 
     $link       = dbFetchRows("SELECT * FROM `links` WHERE `id` IS NOT NULL AND `id` = ?", array($linkId));
     $link_count = count($link);
     if ($link_count == 0) {
-        api_error(404, "Link $linkId does not exist");
+        return api_error(404, "Link $linkId does not exist");
     }
 
-    api_success($link, 'link');
+    return api_success($link, 'link');
 }
 
 

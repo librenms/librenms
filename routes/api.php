@@ -34,12 +34,8 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('routing/vrf/{id}', 'LegacyApiController@get_vrf')->name('get_vrf');
         Route::get('routing/ipsec/data/{hostname}', 'LegacyApiController@list_ipsec')->name('list_ipsec');
 
-        Route::group(['prefix' => 'resources'], function () {
-            Route::get('fdb', 'LegacyApiController@list_fdb')->name('list_fdb');
-            Route::get('fdb/{mac}', 'LegacyApiController@list_fdb')->name('list_fdb_mac');
-
-            Route::get('ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
-        });
+        Route::get('resources/links/{id}', 'LegacyApiController@get_link')->name('get_link');
+        Route::get('resources/ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
     });
 
     // admin required
@@ -105,6 +101,12 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     Route::group(['prefix' => 'routing'], function () {
         Route::get('bgp/cbgp', 'LegacyApiController@list_cbgp')->name('list_cbgp');
         Route::get('vrf', 'LegacyApiController@list_vrf')->name('list_vrf');
+    });
+
+    Route::group(['prefix' => 'resources'], function () {
+        Route::get('fdb', 'LegacyApiController@list_fdb')->name('list_fdb');
+        Route::get('fdb/{mac}', 'LegacyApiController@list_fdb')->name('list_fdb_mac');
+        Route::get('links', 'LegacyApiController@list_links')->name('list_links');
     });
 
     Route::get('inventory/{hostname}', 'LegacyApiController@get_inventory')->name('get_inventory');
