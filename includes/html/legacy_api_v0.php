@@ -86,7 +86,7 @@ $app->group(
                         // api/v0/devices/$hostname/$type
 //                        $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');
                         // api/v0/devices/$hostname/ports/$ifName
-                        $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
+//                        $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
                         // api/v0/devices/$hostname/ports/$ifName/$type
                     }
                 );

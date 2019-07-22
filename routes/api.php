@@ -56,6 +56,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/components', 'LegacyApiController@get_components')->name('get_components');
         Route::get('{hostname}/groups', 'LegacyApiController@get_device_groups')->name('get_device_groups');
         Route::get('{hostname}/ports/{ifname}', 'LegacyApiController@get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');
+        Route::get('{hostname}/ports/{ifname}/{type}', 'LegacyApiController@get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
 
         Route::get('{hostname}/{type}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
         Route::get(null, 'LegacyApiController@list_devices')->name('list_devices');

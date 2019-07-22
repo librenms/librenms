@@ -140,43 +140,49 @@ function check_not_demo()
     }
 }
 
-function get_graph_by_port_hostname()
+function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
 {
     // This will return a graph for a given port by the ifName
-    $router = api_get_params();
-    $hostname     = $router['hostname'];
+    $hostname     = $request->route('hostname');
     $device_id    = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $vars         = array();
-    $vars['port'] = urldecode($router['ifname']);
-    $vars['type'] = $router['type'] ?: 'port_bits';
-    $vars['output'] = $_GET['output'] ?: 'display';
-    if (!empty($_GET['from'])) {
-        $vars['from'] = $_GET['from'];
+    $vars = [
+        'port'   => $request->route('ifname'),
+        'type'   => $request->route('type', 'port_bits'),
+        'output' => $request->get('output', 'display'),
+        'width'  => $request->get('width', 1075),
+        'height' => $request->get('height', 300),
+    ];
+
+    if ($request->has('from')) {
+        $vars['from'] = $request->get('from');
     }
 
-    if (!empty($_GET['to'])) {
-        $vars['to'] = $_GET['to'];
+    if ($request->has('to')) {
+        $vars['to'] = $request->get('to');
     }
 
-    if ($_GET['ifDescr'] == true) {
-        $port = 'ifDescr';
-    } else {
-        $port = 'ifName';
-    }
+    $port = $request->get('ifDescr') ? 'ifDescr' : 'ifName';
+    $vars['id'] = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", [$device_id, $vars['port']]);
 
-    $vars['width']  = $_GET['width'] ?: 1075;
-    $vars['height'] = $_GET['height'] ?: 300;
-    $auth           = '1';
-    $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", array($device_id, $vars['port']));
+    return check_port_permission($vars['id'], $device_id, function () use ($vars) {
+        $auth = '1';
+        $base64_output = '';
 
-    check_port_permission($vars['id'], $device_id);
-    api_set_header('Content-Type', get_image_type());
-    rrdtool_initialize(false);
-    include 'includes/html/graphs/graph.inc.php';
-    rrdtool_close();
-    if ($vars['output'] === 'base64') {
-        api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
-    }
+        ob_start();
+
+        rrdtool_initialize(false);
+        include 'includes/html/graphs/graph.inc.php';
+        rrdtool_close();
+
+        $image = ob_get_contents();
+        ob_end_clean();
+
+        if ($vars['output'] === 'base64') {
+            return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+        }
+
+        return response($image, 200, ['Content-Type' => get_image_type()]);
+    });
 }
 
 
