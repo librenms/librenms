@@ -1367,31 +1367,28 @@ function get_bill_graph(\Illuminate\Http\Request $request)
     });
 }
 
-function get_bill_graphdata()
+function get_bill_graphdata(\Illuminate\Http\Request $request)
 {
-    $router = api_get_params();
-    $bill_id = mres($router['bill_id']);
-    $graph_type = $router['graph_type'];
+    $bill_id = $request->route('bill_id');
 
-    if (!LegacyAuth::user()->hasGlobalRead()) {
-        check_bill_permission($bill_id);
-    }
+    return check_bill_permission($bill_id, function () use ($bill_id, $request) {
+        $graph_type = $request->route('graph_type');
+        if ($graph_type == 'bits') {
+            $from = $request->get('from',time() - 60 * 60 * 24);
+            $to   = $request->get('to', time());
+            $reducefactor = $request->get('reducefactor');
 
-    if ($graph_type == 'bits') {
-        $from = (isset($_GET['from']) ? $_GET['from'] : time() - 60 * 60 * 24);
-        $to   = (isset($_GET['to']) ? $_GET['to'] : time());
-        $reducefactor = $_GET['reducefactor'];
+            $graph_data = getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
+        } elseif ($graph_type == 'monthly') {
+            $graph_data = getHistoricTransferGraphData($bill_id);
+        }
 
-        $graph_data = getBillingBitsGraphData($bill_id, $from, $to, $reducefactor);
-    } elseif ($graph_type == 'monthly') {
-        $graph_data = getHistoricTransferGraphData($bill_id);
-    }
-
-    if (!isset($graph_data)) {
-        api_error(400, "Unsupported graph type $graph_type");
-    } else {
-        api_success($graph_data, 'graph_data');
-    }
+        if (!isset($graph_data)) {
+            return api_error(400, "Unsupported graph type $graph_type");
+        } else {
+            return api_success($graph_data, 'graph_data');
+        }
+    });
 }
 
 function get_bill_history()
