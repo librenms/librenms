@@ -83,6 +83,27 @@ function api_not_found()
     return api_error(404, "This API route doesn't exist.");
 }
 
+function api_get_graph(array $vars)
+{
+    $auth = '1';
+    $base64_output = '';
+
+    ob_start();
+
+    rrdtool_initialize(false);
+    include 'includes/html/graphs/graph.inc.php';
+    rrdtool_close();
+
+    $image = ob_get_contents();
+    ob_end_clean();
+
+    if ($vars['output'] === 'base64') {
+        return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
+    }
+
+    return response($image, 200, ['Content-Type' => get_image_type()]);
+}
+
 function api_get_params()
 {
     return Request::all();
@@ -165,23 +186,7 @@ function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
     $vars['id'] = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", [$device_id, $vars['port']]);
 
     return check_port_permission($vars['id'], $device_id, function () use ($vars) {
-        $auth = '1';
-        $base64_output = '';
-
-        ob_start();
-
-        rrdtool_initialize(false);
-        include 'includes/html/graphs/graph.inc.php';
-        rrdtool_close();
-
-        $image = ob_get_contents();
-        ob_end_clean();
-
-        if ($vars['output'] === 'base64') {
-            return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
-        }
-
-        return response($image, 200, ['Content-Type' => get_image_type()]);
+        return api_get_graph($vars);
     });
 }
 
@@ -253,23 +258,8 @@ function get_graph_generic_by_hostname(\Illuminate\Http\Request $request)
 
         $vars['width']  = $request->get('width', 1075);
         $vars['height'] = $request->get('height', 300);
-        $auth           = '1';
-        $base64_output = '';
 
-        ob_start();
-
-        rrdtool_initialize(false);
-        include 'includes/html/graphs/graph.inc.php';
-        rrdtool_close();
-
-        $image = ob_get_contents();
-        ob_end_clean();
-
-        if ($vars['output'] === 'base64') {
-            return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
-        }
-
-        return response($image, 200, ['Content-Type' => get_image_type()]);
+        return api_get_graph($vars);
     });
 }
 
@@ -644,23 +634,7 @@ function get_graph_by_portgroup(\Illuminate\Http\Request $request)
     }
     $vars['id'] = $if_list;
 
-    $auth = '1';
-    $base64_output = '';
-
-    ob_start();
-
-    rrdtool_initialize(false);
-    include 'includes/html/graphs/graph.inc.php';
-    rrdtool_close();
-
-    $image = ob_get_contents();
-    ob_end_clean();
-
-    if ($vars['output'] === 'base64') {
-        return api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
-    }
-
-    return response($image, 200, ['Content-Type' => get_image_type()]);
+    return api_get_graph($vars);
 }
 
 
@@ -1391,8 +1365,7 @@ function get_bill_graph()
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
 
-    api_set_header('Content-Type', 'image/png');
-    include 'includes/html/graphs/graph.inc.php';
+    return api_get_graph($vars);
 }
 
 function get_bill_graphdata()
@@ -1476,8 +1449,7 @@ function get_bill_history_graph()
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
 
-    api_set_header('Content-Type', 'image/png');
-    include 'includes/html/graphs/graph.inc.php';
+    return api_get_graph($vars);
 }
 
 function get_bill_history_graphdata()
