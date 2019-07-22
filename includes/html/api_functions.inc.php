@@ -2063,8 +2063,12 @@ function list_logs(\Illuminate\Http\Request $request, Router $router)
 
 function validate_column_list($columns, $tableName)
 {
-    $schema = new \LibreNMS\DB\Schema();
-    $column_names = explode(',', $columns);
+    static $schema;
+    if (is_null($schema)) {
+        $schema = new \LibreNMS\DB\Schema();
+    }
+
+    $column_names = is_array($columns) ? $columns : explode(',', $columns);
     $valid_columns = $schema->getColumns($tableName);
     $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
 
