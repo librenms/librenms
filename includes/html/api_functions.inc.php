@@ -1899,17 +1899,13 @@ function list_fdb(\Illuminate\Http\Request $request)
 
 function list_sensors()
 {
-    check_is_read();
-
-    $router = api_get_params();
-
     $sensors = \App\Models\Sensor::hasAccess(Auth::user())->get();
     $total_sensors = $sensors->count();
     if ($total_sensors == 0) {
-        api_error(404, 'Sensors do not exist');
+        return api_error(404, 'Sensors do not exist');
     }
 
-    api_success($sensors, 'sensors');
+    return api_success($sensors, 'sensors');
 }
 
 

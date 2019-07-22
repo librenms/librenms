@@ -110,6 +110,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('fdb', 'LegacyApiController@list_fdb')->name('list_fdb');
         Route::get('fdb/{mac}', 'LegacyApiController@list_fdb')->name('list_fdb_mac');
         Route::get('links', 'LegacyApiController@list_links')->name('list_links');
+        Route::get('sensors', 'LegacyApiController@list_sensors')->name('list_sensors');
     });
 
     Route::get('inventory/{hostname}', 'LegacyApiController@get_inventory')->name('get_inventory');

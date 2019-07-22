@@ -195,7 +195,7 @@ $app->group(
 //                        $app->get('/links', 'authToken', 'list_links')->name('list_links');
 //                        $app->get('/links/:id', 'authToken', 'get_link')->name('get_link');
 //                        $app->get('/locations', 'authToken', 'list_locations')->name('list_locations');
-                        $app->get('/sensors', 'authToken', 'list_sensors')->name('list_sensors');
+//                        $app->get('/sensors', 'authToken', 'list_sensors')->name('list_sensors');
                         $app->get('/vlans', 'authToken', 'list_vlans')->name('list_vlans');
                         $app->group(
                             '/ip',
