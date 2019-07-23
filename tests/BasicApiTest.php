@@ -26,24 +26,26 @@
 namespace LibreNMS\Tests;
 
 use App\Models\ApiToken;
+use App\Models\Device;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class BasicApiTest extends LaravelTestCase
+class BasicApiTest extends DBTestCase
 {
     use DatabaseTransactions;
 
     public function testListDevices()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         $token = ApiToken::generateToken($user);
-        $response = $this->json('POST', '/api/v0/devices', [], ['X-Auth-Token' => $token->token_hash]);
-        dd($response);
+        $device = factory(Device::class)->create();
 
-        $response
-            ->assertStatus(201)
+        $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $token->token_hash])
+            ->assertStatus(200)
             ->assertJson([
-                'created' => true,
+                "status" => "ok",
+                "devices" => [$device->toArray()],
+                "count"=> 1
             ]);
     }
 }
