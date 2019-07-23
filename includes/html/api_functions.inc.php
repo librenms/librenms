@@ -1326,7 +1326,7 @@ function get_bill_graphdata(\Illuminate\Http\Request $request)
     return check_bill_permission($bill_id, function ($bill_id) use ($request) {
         $graph_type = $request->route('graph_type');
         if ($graph_type == 'bits') {
-            $from = $request->get('from',time() - 60 * 60 * 24);
+            $from = $request->get('from', time() - 60 * 60 * 24);
             $to   = $request->get('to', time());
             $reducefactor = $request->get('reducefactor');
 
@@ -1383,7 +1383,7 @@ function get_bill_history_graph(\Illuminate\Http\Request $request)
             return api_error(400, "Unknown Graph Type $graph_type");
     }
 
-    return check_bill_permission($bill_id, function () use ($vars){
+    return check_bill_permission($bill_id, function () use ($vars) {
         return api_get_graph($vars);
     });
 }
