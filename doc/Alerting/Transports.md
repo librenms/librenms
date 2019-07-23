@@ -64,28 +64,57 @@ entered as a new line.
 
 ## API
 
-API transports definitions are a bit more complex than the E-Mail configuration. It
-allows to reach any service provider using POST or GET URLs (Like SMS provider, etc).
+The API transport allows to reach any service provider using POST or GET URLs
+(Like SMS provider, etc). It can be used in multiple ways:
+- The same text built from the Alert template is available in the variable 
+``` $msg ```, which can then be sent as an option to the API. Be carefull that
+HTTP GET requests are usually limited in length.
+- The API-Option fields can be directly built from the variables defined in
+[Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
+For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the 
+API transport
 
-The API-Option field can have the same placeholders as defined in the
-[Template-Syntax](Templates.md#syntax).
+A few variables commonly used :
 
-__Note__: it is highly recommended to define your own
-[Templates](Templates.md) when you want to use the API transport.
-You have to be carefull with length (for HTTP GET requests) and
-should adapt to the Service Provider limits.
+| Variable            | Description |
+| ------------------  | ----------- |
+| {{ $hostname }}     | Hostname |
+| {{ $sysName }}      | SysName |
+| {{ $sysDescr }}     | SysDescr |
+| {{ $os }}           | OS of device (librenms defined) |
+| {{ $type }}         | Type of device (librenms defined) |
+| {{ $ip }}           | IP Address |
+| {{ $hardware }}     | Hardware |
+| {{ $version }}      | Version |
+| {{ $uptime }}       | Uptime in seconds |
+| {{ $uptime_short }} | Uptime in human-readable format |
+| {{ $timestamp }}    | Timestamp of alert |
+| {{ $description }}  | Description of device |
+| {{ $title }}        | Title (as built from the Alert Template) |
+| {{ $msg }}          | Body text (as built from the Alert Template) |
 
 **Example:**
 
-The exemple below will use the API named sms-api of my.example.com and send the title of the alert to the provided number using the provided service key. Refer to your service documentation to configure it properly.
+The example below will use the API named sms-api of my.example.com and send
+the title of the alert to the provided number using the provided service key. 
+Refer to your service documentation to configure it properly.
 
 | Config | Example |
 | ------ | ------- |
-| API Method    | get |
+| API Method    | GET |
 | API URL       | http://my.example.com/sms-api
 | API Options   | rcpt=0123456789 <br/> key=0987654321abcdef <br/> msg=(LNMS) {{ $title }} |
 | API Username  | myUsername |
 | API Password  | myPassword |
+
+The example below will use the API named wall-display of my.example.com and send
+the title and text of the alert to a screen in the Network Operation Center.
+
+| Config | Example |
+| ------ | ------- |
+| API Method    | POST |
+| API URL       | http://my.example.com/wall-display
+| API Options   | title={{ $title }} <br/> msg={{ $msg }}|
 
 ## Boxcar
 
