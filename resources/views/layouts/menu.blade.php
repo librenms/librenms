@@ -462,6 +462,7 @@
 
 {{-- User --}}
             <form role="search" class="navbar-form navbar-right global-search">
+                @csrf
                 <div class="form-group">
                     <input class="form-control typeahead" type="search" id="gsearch" name="gsearch"
                            placeholder="Global Search" autocomplete="off">

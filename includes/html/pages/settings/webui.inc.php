@@ -84,6 +84,7 @@ echo '
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
 ';
+echo csrf_field();
 
 echo generate_dynamic_config_panel('Graph settings', $config_groups, $graph_conf);
 echo generate_dynamic_config_panel('Search settings', $config_groups, $search_conf);

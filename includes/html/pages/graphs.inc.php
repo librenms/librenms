@@ -67,6 +67,7 @@ if (!$auth) {
     // FIXME allow switching between types for sensor and wireless also restrict types to ones that have data
     if ($type != 'sensor') {
         echo '<div style="float: right;"><form action="">';
+        echo csrf_field();
         echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" >";
 
         foreach (get_graph_subtypes($type, $device) as $avail_type) {

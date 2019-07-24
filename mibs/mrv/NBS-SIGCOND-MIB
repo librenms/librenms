@@ -13,7 +13,7 @@ IMPORTS
 
 
 nbsSigCondMib  MODULE-IDENTITY
-    LAST-UPDATED "201310160000Z"  -- October 16, 2013
+    LAST-UPDATED "201707270000Z"  -- July 27, 2017
     ORGANIZATION "NBS"
     CONTACT-INFO
       "For technical support, please contact your service channel"
@@ -68,6 +68,12 @@ nbsSigCondChannelGrp   OBJECT-IDENTITY
     DESCRIPTION
       "Signal info for WDM channels within a WDM port"
     ::= { nbsSigCondMib 50 }
+
+nbsSigCondVodPortGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Dispersion compensation at the port level."
+    ::= { nbsSigCondMib 60 }
 
 
 nbsSigCondTraps  OBJECT-IDENTITY
@@ -577,7 +583,10 @@ NbsSigCondPortEntry ::= SEQUENCE {
         nbsSigCondPortIfIndex      InterfaceIndex,
         nbsSigCondPortRxPower      INTEGER,
         nbsSigCondPortTxPower      INTEGER,
-        nbsSigCondPortReflection   INTEGER
+        nbsSigCondPortReflection   INTEGER,
+        nbsSigCondPortRxPowerMin   INTEGER,
+        nbsSigCondPortRxPowerMax   INTEGER,
+        nbsSigCondPortNoiseFigure  INTEGER
 }
 
 nbsSigCondPortEntry      OBJECT-TYPE
@@ -626,6 +635,37 @@ nbsSigCondPortReflection OBJECT-TYPE
            User interfaces should show this in decibels (dBm).
            Not supported value:  -100000"
         ::= { nbsSigCondPortEntry 4}
+
+nbsSigCondPortRxPowerMin OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Measured minimum receiver power, in millidecibels (mdBm).
+           User interfaces should show this in decibels (dBm).
+           Not supported value:  -100000"
+        ::= { nbsSigCondPortEntry 5 }
+
+nbsSigCondPortRxPowerMax OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Measured maximum receiver power, in millidecibels (mdBm).
+           User interfaces should show this in decibels (dBm).
+           Not supported value:  -100000"
+        ::= { nbsSigCondPortEntry 6 }
+
+nbsSigCondPortNoiseFigure OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Measured Noise Figure value, in millidecibels (mdB).
+           User interfaces should show this in decibels (dB).
+           Not supported value: -100000"
+        ::= { nbsSigCondPortEntry 7 }
+
 
 
 -- *******************************************************************
@@ -721,7 +761,193 @@ nbsSigCondChannelRxAttenu   OBJECT-TYPE
         nbsSigCondEqualizeState is enabled for this IfIndex."
     ::= { nbsSigCondChannelEntry 15 }
 
+-- *******************************************************************
+--
+-- the nbsSigCondVodPortTable
+--
+-- *******************************************************************
 
+nbsSigCondVodPortTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of ports supporting variable optical dispersion
+           at the port level."
+        ::= { nbsSigCondVodPortGrp 1 }
+
+nbsSigCondVodPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsSigCondVodPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "List of ports supporting variable optical attenuation at the
+           port level."
+        ::= { nbsSigCondVodPortGrp 2 }
+
+NbsSigCondVodPortEntry ::= SEQUENCE {
+        nbsSigCondVodPortIfIndex                      InterfaceIndex,
+        nbsSigCondVodPortDispersionMin                INTEGER,
+        nbsSigCondVodPortDispersionMax                INTEGER,
+        nbsSigCondVodPortDispersionAdmin              INTEGER,
+        nbsSigCondVodPortDispersionOper               INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetCenter   INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetMin      INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetMax      INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetStep     INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetExponent INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetAdmin    INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetOper     INTEGER
+}
+
+nbsSigCondVodPortEntry      OBJECT-TYPE
+        SYNTAX      NbsSigCondVodPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          ""
+        INDEX { nbsSigCondVodPortIfIndex }
+        ::= { nbsSigCondVodPortTable 1 }
+
+nbsSigCondVodPortIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the dispersion compensation port."
+        ::= { nbsSigCondVodPortEntry 1 }
+
+nbsSigCondVodPortDispersionMin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Minimum allowed dispersion compensation in ps/nm.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 0 }
+        ::= { nbsSigCondVodPortEntry 2 }
+
+nbsSigCondVodPortDispersionMax OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Maximum allowed dispersion compensation in ps/nm.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 0 }
+        ::= { nbsSigCondVodPortEntry 3 }
+
+nbsSigCondVodPortDispersionAdmin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Desired dispersion compensation in ps/nm.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 0 }
+        ::= { nbsSigCondVodPortEntry 4 }
+
+nbsSigCondVodPortDispersionOper OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Actual dispersion in ps/nm
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 0 }
+        ::= { nbsSigCondVodPortEntry 5}
+
+nbsSigCondVodPortDispersionGridOffsetCenter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The center frequency of the offset, in GigaHertz
+           (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0"
+
+        ::= { nbsSigCondVodPortEntry 10 }
+
+nbsSigCondVodPortDispersionGridOffsetMin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "In GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { -100 }
+        ::= { nbsSigCondVodPortEntry 11 }
+
+nbsSigCondVodPortDispersionGridOffsetMax OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "In GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 100 }
+        ::= { nbsSigCondVodPortEntry 12 }
+
+nbsSigCondVodPortDispersionGridOffsetStep OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The spacing of the allowable grid offsets that this port
+           supports, in GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0"
+
+        DEFVAL { 1 }
+        ::= { nbsSigCondVodPortEntry 13 }
+
+nbsSigCondVodPortDispersionGridOffsetExponent OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The exponent of all the GridOffset values (including
+           GridOffsetStep).
+
+           9 (the default) indicates all units are in GigaHertz (GHz)."
+
+        DEFVAL { 9 }
+        ::= { nbsSigCondVodPortEntry 14 }
+
+nbsSigCondVodPortDispersionGridOffsetAdmin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "In GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0x80000000"
+
+        ::= { nbsSigCondVodPortEntry 15 }
+
+nbsSigCondVodPortDispersionGridOffsetOper OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "In GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0x80000000"
+
+        ::= { nbsSigCondVodPortEntry 16 }
 
 
 -- *******************************************************************
@@ -771,6 +997,5 @@ nbsSigCondEventEqualizeTooHigh  NOTIFICATION-TYPE
         be emitted unless disabled or nbsCmmcSysTrapTblEntLevel is set
         to a severity worse than error(3)."
     ::= { nbsSigCondEvent 22 }
-
 
 END

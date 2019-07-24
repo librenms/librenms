@@ -50,6 +50,7 @@
                 formatters: {
                     actions: function (column, row) {
                         var edit_button = '<form action="{{ route('users.edit', ':user_id') }}'.replace(':user_id', row['user_id']) + '" method="GET">' +
+                            '@csrf' +
                             '<button type="submit" title="@lang('Edit')" class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i></button>' +
                             '</form> ';
 
@@ -62,7 +63,7 @@
                             manage_button += ' style="visibility:hidden;"'
                         }
 
-                        manage_button += '><input type="hidden" name="user_id" value="' + row['user_id'] +
+                        manage_button += '>@csrf<input type="hidden" name="user_id" value="' + row['user_id'] +
                             '"><button type="submit" title="@lang('Manage Access')" class="btn btn-sm btn-primary"><i class="fa fa-tasks"></i></button>' +
                             '</form> ';
 

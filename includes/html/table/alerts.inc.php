@@ -14,6 +14,7 @@
 */
 
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 $where = ' `devices`.`disabled` = 0';
 
@@ -155,7 +156,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $severity .= ' <strong>-</strong>';
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
+    $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
 
     switch ($severity) {
         case 'critical':
@@ -198,6 +199,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(array('page' => 'alert-rules')) . '">' . htmlentities($alert['name']) . '</a></i>',
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
         'hostname' => $hostname,
+        'location' => generate_link($alert['location'], array('page' => 'devices', 'location' => $alert['location'])),
         'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],

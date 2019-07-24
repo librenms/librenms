@@ -2,7 +2,7 @@ NBS-SIGLANE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     OBJECT-TYPE,
-    MODULE-IDENTITY, OBJECT-IDENTITY
+    MODULE-IDENTITY, OBJECT-IDENTITY, Counter64
         FROM SNMPv2-SMI
 
     InterfaceIndex
@@ -18,7 +18,7 @@ IMPORTS
         FROM NBS-MIB;
 
 nbsSigLaneMib  MODULE-IDENTITY
-    LAST-UPDATED "201503120000Z"  -- March 12, 2015
+    LAST-UPDATED "201710180000Z"  -- Oct 18, 2017
     ORGANIZATION  "NBS"
     CONTACT-INFO
        "For technical support, please contact your service channel"
@@ -163,14 +163,25 @@ NbsSigLaneLaneEntry ::= SEQUENCE {
     nbsSigLaneLaneWavelengthX     DisplayString,
     nbsSigLaneLaneChannelBand     NbsCmmcChannelBand,
     nbsSigLaneLaneChannelNumber   INTEGER,
+    nbsSigLaneLaneTxDisable       INTEGER,
+    nbsSigLaneLaneFaultsCaps      OCTET STRING,
+    nbsSigLaneLaneFaultsOper      OCTET STRING,
+
     nbsSigLaneLaneTxPowerLevel    INTEGER,
     nbsSigLaneLaneTxPower         NbsTcMilliDb,
+    nbsSigLaneLaneTxPowerAdmin    NbsTcMilliDb,
     nbsSigLaneLaneRxPowerLevel    INTEGER,
     nbsSigLaneLaneRxPower         NbsTcMilliDb,
     nbsSigLaneLaneBiasAmpsLevel   INTEGER,
     nbsSigLaneLaneBiasAmps        NbsTcMicroAmp,
     nbsSigLaneLaneLaserTempLevel  INTEGER,
-    nbsSigLaneLaneLaserTemp       NbsTcTemperature
+    nbsSigLaneLaneLaserTemp       NbsTcTemperature,
+
+    nbsSigLaneLaneEthTxAllOctets  Counter64,
+    nbsSigLaneLaneEthTxAllFrames  Counter64,
+
+    nbsSigLaneLaneEthRxAllOctets  Counter64,
+    nbsSigLaneLaneEthRxAllFrames  Counter64
 }
 
 nbsSigLaneLaneIfIndex OBJECT-TYPE
@@ -243,6 +254,62 @@ nbsSigLaneLaneChannelNumber OBJECT-TYPE
            digits from the six digit frequency in GHz."
         ::= { nbsSigLaneLaneEntry 13 }
 
+nbsSigLaneLaneTxDisable  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        no           (2),
+        yes          (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the lane's transmitter:
+
+        notSupported(1), returned if transmitter not configurable, i.e. always
+          enabled;
+
+        no(2), to enable the transmitter;
+
+        yes(3), to disable the transmitter"
+    ::= { nbsSigLaneLaneEntry 14 }
+
+nbsSigLaneLaneFaultsCaps OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the supported nbsSigLaneLaneFaultsOper bit(s).
+
+        A zero length OCTET STRING indicates this information is not provided."
+    ::= { nbsSigLaneLaneEntry 15 }
+
+nbsSigLaneLaneFaultsOper OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object provides operational lane fault conditions:
+
+        The first octet provides Tx information:
+
+            Bit 0: Tx LOS if set
+
+            Bit 1: Tx Fault if set
+
+            Bit 2: Tx LOL if set
+
+            Bit 3: Tx Adaptive EQ Fault if set
+
+        The second octet provides Rx information:
+
+            Bit 0: Rx LOS if set
+
+            Bit 2: Rx LOL if set
+
+        OCTET STRING bitmasks count the leftmost bit (MSB) as 0.
+
+        A zero length OCTET STRING indicates this information is not provided."
+    ::= { nbsSigLaneLaneEntry 16 }
 
 nbsSigLaneLaneTxPowerLevel  OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -289,6 +356,20 @@ nbsSigLaneLaneTxPower OBJECT-TYPE
         Not supported value: 0x80000000"
     DEFVAL { -2147483648 }
     ::= { nbsSigLaneLaneEntry 21 }
+
+nbsSigLaneLaneTxPowerAdmin OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The desired output power (in milli dBm) for this lane; the value
+        should be within the supported bounds of the given pluggable.
+        For a CFP/CFP2 supporting configurable Tx power, this is applied
+        in the corresponding MSA B41x register.
+
+        Not supported value: 0x80000000"
+    DEFVAL { -2147483648 }
+    ::= { nbsSigLaneLaneEntry 22 }
 
 nbsSigLaneLaneRxPowerLevel  OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -407,6 +488,46 @@ nbsSigLaneLaneLaserTemp OBJECT-TYPE
         Not supported value: 0x80000000"
     DEFVAL { -2147483648 }
     ::= { nbsSigLaneLaneEntry 51 }
+
+nbsSigLaneLaneEthTxAllOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The count of bytes in all Ethernet frames transmitted.
+
+        Not supported value: 0xFFFFFFFFFFFFFFFF"
+    ::= { nbsSigLaneLaneEntry 60 }
+
+nbsSigLaneLaneEthTxAllFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The count of all Ethernet frames transmitted.
+
+        Not supported value: 0xFFFFFFFFFFFFFFFF"
+    ::= { nbsSigLaneLaneEntry 61 }
+
+nbsSigLaneLaneEthRxAllOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The count of bytes in all Ethernet frames received.
+
+        Not supported value: 0xFFFFFFFFFFFFFFFF"
+    ::= { nbsSigLaneLaneEntry 70 }
+
+nbsSigLaneLaneEthRxAllFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The count of all Ethernet frames received.
+
+        Not supported value: 0xFFFFFFFFFFFFFFFF"
+    ::= { nbsSigLaneLaneEntry 71 }
 
 
 END

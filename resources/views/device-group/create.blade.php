@@ -8,6 +8,7 @@
             <form action="{{ route('device-groups.store') }}" method="POST" role="form"
                   class="form-horizontal device-group-form col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 col-sm-12">
                 <legend>@lang('Create Device Group')</legend>
+                @csrf
 
                 @include('device-group.form')
 

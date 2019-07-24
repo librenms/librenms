@@ -1,0 +1,103 @@
+mib: TELTONIKA-MIB
+modules:
+  sensors:
+    pre-cache:
+      data:
+        - oid:
+            - Operator
+    temperature:
+      data:
+        - 
+          oid: Temperature
+          num_oid: ".1.3.6.1.4.1.48690.2.9.{{ $index }}"
+          descr: Module Temp
+          group: Modem
+          index: "Temperature.{{ $index }}"
+          divisor: 10
+    state:
+      data:
+        - 
+          oid: SimState
+          num_oid: ".1.3.6.1.4.1.48690.2.1.{{ $index }}"
+          descr: SIM State
+          group: Mobile
+          state_name: simState
+          states:
+            - { descr: inserted, graph: 1, value: 0, generic: 0 }
+            - { descr: not inserted, graph: 1, value: 1, generic: 2 }
+            - { descr: unknown, graph: 1, value: 2, generic: 3 }
+        - 
+          oid: PinState
+          num_oid: ".1.3.6.1.4.1.48690.2.2.{{ $index }}"
+          descr: Pin State
+          group: Mobile
+          state_name: pinState
+          states:
+            - { descr: PIN REQUIRED, graph: 1, value: 0, generic: 2 }
+            - { descr: NOT READY, graph: 1, value: 1, generic: 1 }
+            - { descr: READY, graph: 1, value: 2, generic: 0 }
+            - { descr: unknown, graph: 1, value: 3, generic: 3 }
+        - 
+          oid: NetState
+          num_oid: ".1.3.6.1.4.1.48690.2.3.{{ $index }}"
+          descr: Mobile Net State
+          group: Mobile
+          state_name: NetState
+          states:
+            - { descr: searching, graph: 1, value: 0, generic: 1 }
+            - { descr: registered (home), graph: 1, value: 1, generic: 0 }
+            - { descr: registered (roaming), graph: 1, value: 2, generic: 1 }
+            - { descr: unknown, graph: 1, value: 3, generic: 3 }
+            - { descr: unregistered, graph: 1, value: 4, generic: 2 }
+        - 
+          oid: ConnectionState
+          num_oid: ".1.3.6.1.4.1.48690.2.7.{{ $index }}"
+          descr: "Connection State ({{ $Operator }})"
+          group: Mobile
+          index: "ConnectionState.{{ $index }}"
+          state_name: ConnectionState
+          states:
+            - { descr: connected, graph: 1, value: 0, generic: 0 }
+            - { descr: not connected, graph: 1, value: 1, generic: 2 }
+            - { descr: disconnected, graph: 1, value: 2, generic: 2 }
+        - 
+          oid: ConnectionType
+          num_oid: ".1.3.6.1.4.1.48690.2.8.{{ $index }}"
+          descr: "Connection Type ({{ $Operator }})"
+          group: Mobile
+          index: "ConnectionType.{{ $index }}"
+          state_name: ConnectionType
+          states:
+            - { descr: LTE, graph: 1, value: 0, generic: 0 }
+            - { descr: 4G, graph: 1, value: 1, generic: 0 }
+            - { descr: 3G, graph: 1, value: 2, generic: 1 }
+            - { descr: 2G, graph: 1, value: 3, generic: 1 }
+            - { descr: WCDMA, graph: 1, value: 4, generic: 0 }
+            - { descr: unknown, graph: 1, value: 5, generic: 3 }
+    signal:
+      data:
+        - 
+          oid: Signal
+          num_oid: ".1.3.6.1.4.1.48690.2.4.{{ $index }}"
+          entPhysicalIndex: "{{ $index }}"
+          entPhysicalIndex_measured: "Signal"
+          descr: "Signal Level"
+          group: Mobile
+          index: "Signal.{{ $index }}"
+    count:
+      data:
+        - 
+          oid: SimSlot
+          num_oid: ".1.3.6.1.4.1.48690.2.15.{{ $index }}"
+          descr: "Number of SIM Slots"
+          group: Mobile
+          index: "simSlot.{{ $index }}"
+    runtime:
+      data:
+        - 
+          oid: ConnectionUptime
+          num_oid: ".1.3.6.1.4.1.48690.2.17.{{ $index }}"
+          descr: "Connection Uptime "
+          group: Mobile
+          index: "ConnectionUptime.{{ $index }}"
+          divisor: 60
