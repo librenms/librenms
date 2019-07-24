@@ -20,7 +20,7 @@ IMPORTS
     ;
 
 nbsCmmcMib  MODULE-IDENTITY
-    LAST-UPDATED  "201601250000Z"  -- January 25, 2016
+    LAST-UPDATED  "201707120000Z"  -- July 12, 2017
     ORGANIZATION  "NBS"
     CONTACT-INFO
       "For technical support, please contact your service channel"
@@ -1022,7 +1022,7 @@ nbsCmmcSysProtoFamily OBJECT-TYPE
         ::= { nbsCmmcSysProtoEntry 2 }
 
 nbsCmmcSysProtoRate OBJECT-TYPE
-        SYNTAX      DisplayString(SIZE(2..30))
+        SYNTAX      DisplayString(SIZE(2..60))
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -2195,33 +2195,6 @@ nbsCmmcSysScpServer OBJECT-TYPE
              be changed from SNMP."
         DEFVAL { disabled }
         ::= { nbsCmmcIpCfg 30 }
-
-nbsCmmcSysNetconfServer OBJECT-TYPE
-        SYNTAX      INTEGER {
-                notSupported (1),
-                disabled     (2),
-                enabled      (3)
-        }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION
-            "The Netconf server ships disabled by default.
-             Not supported means that the Netconf server status cannot
-             be changed from SNMP."
-        DEFVAL { disabled }
-        ::= { nbsCmmcIpCfg 31 }
-
-nbsCmmcSysNetconfPort    OBJECT-TYPE
-        SYNTAX      INTEGER (1..65535)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION
-            "The TCP/UDP/IP port the Agent will listen on for Netconf 
-            traffic if nbsCmmcSysNetconfServer is enabled(3).
-
-             Not supported value: -1"
-        DEFVAL { 830 }
-        ::= { nbsCmmcIpCfg 32 }
 
 
 --
@@ -3639,7 +3612,10 @@ NbsCmmcSlotEntry ::= SEQUENCE {
         nbsCmmcSlotCountersState    INTEGER,
         nbsCmmcSlotRedundancyOper   INTEGER,
         nbsCmmcSlotIfIndex          InterfaceIndex,
-        nbsCmmcSlotModuleStatus     INTEGER
+        nbsCmmcSlotModuleStatus     INTEGER,
+        nbsCmmcSlotManagementPort   INTEGER,
+        nbsCmmcSlotTemperatureLimit INTEGER,
+        nbsCmmcSlotTemperatureMin   INTEGER
 }
 
 nbsCmmcSlotChassisIndex OBJECT-TYPE
@@ -4183,6 +4159,40 @@ nbsCmmcSlotModuleStatus     OBJECT-TYPE
             the status notSupported (1)."
         DEFVAL { empty }
         ::= { nbsCmmcSlotEntry 38 }
+
+nbsCmmcSlotManagementPort OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object, if set, reports the direct slot management port number.
+           For cards that do not support this feature the response will be 0."
+        DEFVAL { 0 }
+        ::= { nbsCmmcSlotEntry 39 }
+
+nbsCmmcSlotTemperatureLimit OBJECT-TYPE
+        SYNTAX      INTEGER ( -100..100)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "The maximum safe temperature (degrees Celsius) of the
+                 Slot.
+
+                 Not supported value: 0x80000000"
+        DEFVAL { 85 }
+        ::= {nbsCmmcSlotEntry  40 }
+
+nbsCmmcSlotTemperatureMin OBJECT-TYPE
+        SYNTAX      INTEGER ( -100..100)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "The minimum safe temperature (degrees Celsius) of the
+                 Slot.
+
+                 Not supported value: 0x80000000"
+        DEFVAL { 0 }
+        ::= {nbsCmmcSlotEntry  41 }
 
 -- *******************************************************************
 
@@ -7271,7 +7281,7 @@ nbsCmmcTrapFanRestored  NOTIFICATION-TYPE
                  This Notification should be of Severity WARNING."
         ::= { nbsCmmcTraps0 9 }
 
-nbsCmmcTrapChassisTooHot  NOTIFICATION-TYPE
+nbsCmmcTrapChassisTempTooHigh  NOTIFICATION-TYPE
         OBJECTS   { nbsCmmcTrapLastMessage, nbsCmmcChassisIndex,
                      nbsCmmcChassisTemperature,
                      nbsCmmcChassisTemperatureLimit, nbsCmmcChassisName }
@@ -7283,7 +7293,7 @@ nbsCmmcTrapChassisTooHot  NOTIFICATION-TYPE
                  This Notification should be of Severity ERROR."
         ::= { nbsCmmcTraps0 10 }
 
-nbsCmmcTrapChassisTooCold  NOTIFICATION-TYPE
+nbsCmmcTrapChassisTempTooLow  NOTIFICATION-TYPE
         OBJECTS   { nbsCmmcTrapLastMessage, nbsCmmcChassisIndex,
                      nbsCmmcChassisTemperature,
                      nbsCmmcChassisTemperatureMin, nbsCmmcChassisName }
@@ -7864,6 +7874,7 @@ nbsCmmcTrapPortVoltsOk  NOTIFICATION-TYPE
 nbsCmmcTrapSlotTempTooLow  NOTIFICATION-TYPE
         OBJECTS   { nbsCmmcTrapLastMessage, nbsCmmcChassisIndex,
                       nbsCmmcSlotIndex, nbsCmmcSlotTemperature,
+                      nbsCmmcSlotTemperatureMin,
                       nbsCmmcChassisName, nbsCmmcSlotName }
         STATUS      current
         DESCRIPTION
@@ -7875,6 +7886,7 @@ nbsCmmcTrapSlotTempTooLow  NOTIFICATION-TYPE
 nbsCmmcTrapSlotTempTooHigh  NOTIFICATION-TYPE
         OBJECTS   { nbsCmmcTrapLastMessage, nbsCmmcChassisIndex,
                       nbsCmmcSlotIndex, nbsCmmcSlotTemperature,
+                      nbsCmmcSlotTemperatureLimit,
                       nbsCmmcChassisName, nbsCmmcSlotName }
         STATUS      current
         DESCRIPTION

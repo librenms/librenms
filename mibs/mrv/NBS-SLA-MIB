@@ -1,19 +1,20 @@
 NBS-SLA-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY,
+    Unsigned32, Counter32, Counter64
         FROM SNMPv2-SMI
 
     InterfaceIndex
         FROM IF-MIB
 
-    nbs, Unsigned64
+    nbs
         FROM NBS-MIB
     ;
 
 nbsSlaMib  MODULE-IDENTITY
-    LAST-UPDATED "201209260000Z"  -- Sep 26, 2012
-    ORGANIZATION  "NBS"
+    LAST-UPDATED "201610190000Z" -- October 19, 2016
+    ORGANIZATION "NBS"
     CONTACT-INFO
       "For technical support, please contact your service channel"
     DESCRIPTION
@@ -341,55 +342,55 @@ NbsSlaLossGainEntry ::= SEQUENCE {
 
         -- Discrepancies in the most recent interval,
         -- between select counters on two modules (Tx - Rx);
-        -- while these deltas are declared as 'Unsigned64',
+        -- while these deltas are declared as 'Counter64',
         -- they are actually signed 64-bit integer values
-        nbsSlaLossGainRdAllFrames        Unsigned64, -- Integer64,
-        nbsSlaLossGainRdBadFrames        Unsigned64, -- Integer64,
-        nbsSlaLossGainRdDiscards         Unsigned64, -- Integer64,
-        nbsSlaLossGainRdUcastFrames      Unsigned64, -- Integer64,
-        nbsSlaLossGainRdMcastFrames      Unsigned64, -- Integer64,
-        nbsSlaLossGainRdBcastFrames      Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSize64           Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSize65to127      Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSize128to255     Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSize256to511     Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSize512to1023    Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSize1024toEthMax Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSizeEthMaxto2047 Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSize2048to4095   Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSize4096to8191   Unsigned64, -- Integer64,
-        nbsSlaLossGainRdSize8192orMore   Unsigned64, -- Integer64,
-        nbsSlaLossGainRdFrameDivisor     Unsigned64,
-        nbsSlaLossGainRdAllOctets        Unsigned64, -- Integer64,
-        nbsSlaLossGainRdBadOctets        Unsigned64, -- Integer64,
-        nbsSlaLossGainRdOctetDivisor     Unsigned64,
-        nbsSlaLossGainRdTimeSpan         Unsigned32,
+        nbsSlaLossGainRdAllFrames        Counter64, -- Integer64,
+        nbsSlaLossGainRdBadFrames        Counter64, -- Integer64,
+        nbsSlaLossGainRdDiscards         Counter64, -- Integer64,
+        nbsSlaLossGainRdUcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainRdMcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainRdBcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainRdSize64           Counter64, -- Integer64,
+        nbsSlaLossGainRdSize65to127      Counter64, -- Integer64,
+        nbsSlaLossGainRdSize128to255     Counter64, -- Integer64,
+        nbsSlaLossGainRdSize256to511     Counter64, -- Integer64,
+        nbsSlaLossGainRdSize512to1023    Counter64, -- Integer64,
+        nbsSlaLossGainRdSize1024toEthMax Counter64, -- Integer64,
+        nbsSlaLossGainRdSizeEthMaxto2047 Counter64, -- Integer64,
+        nbsSlaLossGainRdSize2048to4095   Counter64, -- Integer64,
+        nbsSlaLossGainRdSize4096to8191   Counter64, -- Integer64,
+        nbsSlaLossGainRdSize8192orMore   Counter64, -- Integer64,
+        nbsSlaLossGainRdFrameDivisor     Counter64,
+        nbsSlaLossGainRdAllOctets        Counter64, -- Integer64,
+        nbsSlaLossGainRdBadOctets        Counter64, -- Integer64,
+        nbsSlaLossGainRdOctetDivisor     Counter64,
+        nbsSlaLossGainRdTimeSpan         Counter32,
 
         -- Discrepancies accumulated over all intervals,
         -- between select counters on two modules (Tx - Rx);
-        -- while these deltas are declared as 'Unsigned64',
+        -- while these deltas are declared as 'Counter64',
         -- they are actually signed 64-bit integer values
-        nbsSlaLossGainAdAllFrames        Unsigned64, -- Integer64,
-        nbsSlaLossGainAdBadFrames        Unsigned64, -- Integer64,
-        nbsSlaLossGainAdDiscards         Unsigned64, -- Integer64,
-        nbsSlaLossGainAdUcastFrames      Unsigned64, -- Integer64,
-        nbsSlaLossGainAdMcastFrames      Unsigned64, -- Integer64,
-        nbsSlaLossGainAdBcastFrames      Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSize64           Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSize65to127      Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSize128to255     Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSize256to511     Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSize512to1023    Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSize1024toEthMax Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSizeEthMaxto2047 Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSize2048to4095   Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSize4096to8191   Unsigned64, -- Integer64,
-        nbsSlaLossGainAdSize8192orMore   Unsigned64, -- Integer64,
-        nbsSlaLossGainAdFrameDivisor     Unsigned64,
-        nbsSlaLossGainAdAllOctets        Unsigned64, -- Integer64,
-        nbsSlaLossGainAdBadOctets        Unsigned64, -- Integer64,
-        nbsSlaLossGainAdOctetDivisor     Unsigned64,
-        nbsSlaLossGainAdTimeSpan         Unsigned32
+        nbsSlaLossGainAdAllFrames        Counter64, -- Integer64,
+        nbsSlaLossGainAdBadFrames        Counter64, -- Integer64,
+        nbsSlaLossGainAdDiscards         Counter64, -- Integer64,
+        nbsSlaLossGainAdUcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainAdMcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainAdBcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainAdSize64           Counter64, -- Integer64,
+        nbsSlaLossGainAdSize65to127      Counter64, -- Integer64,
+        nbsSlaLossGainAdSize128to255     Counter64, -- Integer64,
+        nbsSlaLossGainAdSize256to511     Counter64, -- Integer64,
+        nbsSlaLossGainAdSize512to1023    Counter64, -- Integer64,
+        nbsSlaLossGainAdSize1024toEthMax Counter64, -- Integer64,
+        nbsSlaLossGainAdSizeEthMaxto2047 Counter64, -- Integer64,
+        nbsSlaLossGainAdSize2048to4095   Counter64, -- Integer64,
+        nbsSlaLossGainAdSize4096to8191   Counter64, -- Integer64,
+        nbsSlaLossGainAdSize8192orMore   Counter64, -- Integer64,
+        nbsSlaLossGainAdFrameDivisor     Counter64,
+        nbsSlaLossGainAdAllOctets        Counter64, -- Integer64,
+        nbsSlaLossGainAdBadOctets        Counter64, -- Integer64,
+        nbsSlaLossGainAdOctetDivisor     Counter64,
+        nbsSlaLossGainAdTimeSpan         Counter32
 }
 
 nbsSlaLossGainEntry  OBJECT-TYPE
@@ -448,7 +449,7 @@ nbsSlaLossGainEthMax OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 4 }
 
 nbsSlaLossGainRdAllFrames  OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -459,7 +460,7 @@ nbsSlaLossGainRdAllFrames  OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 5 }
 
 nbsSlaLossGainRdBadFrames  OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -470,7 +471,7 @@ nbsSlaLossGainRdBadFrames  OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 6 }
 
 nbsSlaLossGainRdDiscards  OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -481,7 +482,7 @@ nbsSlaLossGainRdDiscards  OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 7 }
 
 nbsSlaLossGainRdUcastFrames   OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -492,7 +493,7 @@ nbsSlaLossGainRdUcastFrames   OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 8 }
 
 nbsSlaLossGainRdMcastFrames  OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -503,7 +504,7 @@ nbsSlaLossGainRdMcastFrames  OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 9 }
 
 nbsSlaLossGainRdBcastFrames   OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -514,7 +515,7 @@ nbsSlaLossGainRdBcastFrames   OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 10 }
 
 nbsSlaLossGainRdSize64     OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -525,7 +526,7 @@ nbsSlaLossGainRdSize64     OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 11 }
 
 nbsSlaLossGainRdSize65to127 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -536,7 +537,7 @@ nbsSlaLossGainRdSize65to127 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 12 }
 
 nbsSlaLossGainRdSize128to255 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -547,7 +548,7 @@ nbsSlaLossGainRdSize128to255 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 13 }
 
 nbsSlaLossGainRdSize256to511 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -558,7 +559,7 @@ nbsSlaLossGainRdSize256to511 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 14 }
 
 nbsSlaLossGainRdSize512to1023 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -569,7 +570,7 @@ nbsSlaLossGainRdSize512to1023 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 15 }
 
 nbsSlaLossGainRdSize1024toEthMax OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -580,7 +581,7 @@ nbsSlaLossGainRdSize1024toEthMax OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 16 }
 
 nbsSlaLossGainRdSizeEthMaxto2047 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -591,7 +592,7 @@ nbsSlaLossGainRdSizeEthMaxto2047 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 17 }
 
 nbsSlaLossGainRdSize2048to4095 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -602,7 +603,7 @@ nbsSlaLossGainRdSize2048to4095 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 18 }
 
 nbsSlaLossGainRdSize4096to8191 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -613,7 +614,7 @@ nbsSlaLossGainRdSize4096to8191 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 19 }
 
 nbsSlaLossGainRdSize8192orMore OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -624,7 +625,7 @@ nbsSlaLossGainRdSize8192orMore OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 20 }
 
 nbsSlaLossGainRdFrameDivisor OBJECT-TYPE
-        SYNTAX      Unsigned64
+        SYNTAX      Counter64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -633,7 +634,7 @@ nbsSlaLossGainRdFrameDivisor OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 21 }
 
 nbsSlaLossGainRdAllOctets OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -644,7 +645,7 @@ nbsSlaLossGainRdAllOctets OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 22 }
 
 nbsSlaLossGainRdBadOctets OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -655,7 +656,7 @@ nbsSlaLossGainRdBadOctets OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 23 }
 
 nbsSlaLossGainRdOctetDivisor OBJECT-TYPE
-        SYNTAX      Unsigned64
+        SYNTAX      Counter64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -664,7 +665,7 @@ nbsSlaLossGainRdOctetDivisor OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 24 }
 
 nbsSlaLossGainRdTimeSpan OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -673,7 +674,7 @@ nbsSlaLossGainRdTimeSpan OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 25 }
 
 nbsSlaLossGainAdAllFrames  OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -684,7 +685,7 @@ nbsSlaLossGainAdAllFrames  OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 26 }
 
 nbsSlaLossGainAdBadFrames  OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -695,7 +696,7 @@ nbsSlaLossGainAdBadFrames  OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 27 }
 
 nbsSlaLossGainAdDiscards  OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -706,7 +707,7 @@ nbsSlaLossGainAdDiscards  OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 28 }
 
 nbsSlaLossGainAdUcastFrames   OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -717,7 +718,7 @@ nbsSlaLossGainAdUcastFrames   OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 29 }
 
 nbsSlaLossGainAdMcastFrames  OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -728,7 +729,7 @@ nbsSlaLossGainAdMcastFrames  OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 30 }
 
 nbsSlaLossGainAdBcastFrames   OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -739,7 +740,7 @@ nbsSlaLossGainAdBcastFrames   OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 31 }
 
 nbsSlaLossGainAdSize64     OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -750,7 +751,7 @@ nbsSlaLossGainAdSize64     OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 32 }
 
 nbsSlaLossGainAdSize65to127 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -761,7 +762,7 @@ nbsSlaLossGainAdSize65to127 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 33 }
 
 nbsSlaLossGainAdSize128to255 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -772,7 +773,7 @@ nbsSlaLossGainAdSize128to255 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 34 }
 
 nbsSlaLossGainAdSize256to511 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -783,7 +784,7 @@ nbsSlaLossGainAdSize256to511 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 35 }
 
 nbsSlaLossGainAdSize512to1023 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -794,7 +795,7 @@ nbsSlaLossGainAdSize512to1023 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 36 }
 
 nbsSlaLossGainAdSize1024toEthMax OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -805,7 +806,7 @@ nbsSlaLossGainAdSize1024toEthMax OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 37 }
 
 nbsSlaLossGainAdSizeEthMaxto2047 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -816,7 +817,7 @@ nbsSlaLossGainAdSizeEthMaxto2047 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 38 }
 
 nbsSlaLossGainAdSize2048to4095 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -827,7 +828,7 @@ nbsSlaLossGainAdSize2048to4095 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 39 }
 
 nbsSlaLossGainAdSize4096to8191 OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -838,7 +839,7 @@ nbsSlaLossGainAdSize4096to8191 OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 40 }
 
 nbsSlaLossGainAdSize8192orMore OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -849,7 +850,7 @@ nbsSlaLossGainAdSize8192orMore OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 41 }
 
 nbsSlaLossGainAdFrameDivisor OBJECT-TYPE
-        SYNTAX      Unsigned64
+        SYNTAX      Counter64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -857,7 +858,7 @@ nbsSlaLossGainAdFrameDivisor OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 42 }
 
 nbsSlaLossGainAdAllOctets OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -868,7 +869,7 @@ nbsSlaLossGainAdAllOctets OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 43 }
 
 nbsSlaLossGainAdBadOctets OBJECT-TYPE
-        SYNTAX      Unsigned64 -- Integer64
+        SYNTAX      Counter64 -- Integer64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -879,7 +880,7 @@ nbsSlaLossGainAdBadOctets OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 44 }
 
 nbsSlaLossGainAdOctetDivisor OBJECT-TYPE
-        SYNTAX      Unsigned64
+        SYNTAX      Counter64
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -887,7 +888,7 @@ nbsSlaLossGainAdOctetDivisor OBJECT-TYPE
         ::= { nbsSlaLossGainEntry 45 }
 
 nbsSlaLossGainAdTimeSpan OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -899,7 +900,7 @@ nbsSlaLossGainAdTimeSpan OBJECT-TYPE
 -- ********************************************************************
 
 nbsSlaPerfMonTableSize OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -924,43 +925,43 @@ NbsSlaPerfMonEntry ::= SEQUENCE {
         nbsSlaPerfMonEthMax              INTEGER,
 
         -- Average
-        nbsSlaPerfMonAvgAllSizes         Unsigned32,
-        nbsSlaPerfMonAvg64               Unsigned32,
-        nbsSlaPerfMonAvg65to127          Unsigned32,
-        nbsSlaPerfMonAvg128to255         Unsigned32,
-        nbsSlaPerfMonAvg256to511         Unsigned32,
-        nbsSlaPerfMonAvg512to1023        Unsigned32,
-        nbsSlaPerfMonAvg1024toEthMax     Unsigned32,
-        nbsSlaPerfMonAvgEthMaxto2047     Unsigned32,
-        nbsSlaPerfMonAvg2048to4095       Unsigned32,
-        nbsSlaPerfMonAvg4096to8191       Unsigned32,
-        nbsSlaPerfMonAvg8192orMore       Unsigned32,
+        nbsSlaPerfMonAvgAllSizes         Counter32,
+        nbsSlaPerfMonAvg64               Counter32,
+        nbsSlaPerfMonAvg65to127          Counter32,
+        nbsSlaPerfMonAvg128to255         Counter32,
+        nbsSlaPerfMonAvg256to511         Counter32,
+        nbsSlaPerfMonAvg512to1023        Counter32,
+        nbsSlaPerfMonAvg1024toEthMax     Counter32,
+        nbsSlaPerfMonAvgEthMaxto2047     Counter32,
+        nbsSlaPerfMonAvg2048to4095       Counter32,
+        nbsSlaPerfMonAvg4096to8191       Counter32,
+        nbsSlaPerfMonAvg8192orMore       Counter32,
 
         -- Minimum
-        nbsSlaPerfMonMinAllSizes         Unsigned32,
-        nbsSlaPerfMonMin64               Unsigned32,
-        nbsSlaPerfMonMin65to127          Unsigned32,
-        nbsSlaPerfMonMin128to255         Unsigned32,
-        nbsSlaPerfMonMin256to511         Unsigned32,
-        nbsSlaPerfMonMin512to1023        Unsigned32,
-        nbsSlaPerfMonMin1024toEthMax     Unsigned32,
-        nbsSlaPerfMonMinEthMaxto2047     Unsigned32,
-        nbsSlaPerfMonMin2048to4095       Unsigned32,
-        nbsSlaPerfMonMin4096to8191       Unsigned32,
-        nbsSlaPerfMonMin8192orMore       Unsigned32,
+        nbsSlaPerfMonMinAllSizes         Counter32,
+        nbsSlaPerfMonMin64               Counter32,
+        nbsSlaPerfMonMin65to127          Counter32,
+        nbsSlaPerfMonMin128to255         Counter32,
+        nbsSlaPerfMonMin256to511         Counter32,
+        nbsSlaPerfMonMin512to1023        Counter32,
+        nbsSlaPerfMonMin1024toEthMax     Counter32,
+        nbsSlaPerfMonMinEthMaxto2047     Counter32,
+        nbsSlaPerfMonMin2048to4095       Counter32,
+        nbsSlaPerfMonMin4096to8191       Counter32,
+        nbsSlaPerfMonMin8192orMore       Counter32,
 
         -- Maximum
-        nbsSlaPerfMonMaxAllSizes         Unsigned32,
-        nbsSlaPerfMonMax64               Unsigned32,
-        nbsSlaPerfMonMax65to127          Unsigned32,
-        nbsSlaPerfMonMax128to255         Unsigned32,
-        nbsSlaPerfMonMax256to511         Unsigned32,
-        nbsSlaPerfMonMax512to1023        Unsigned32,
-        nbsSlaPerfMonMax1024toEthMax     Unsigned32,
-        nbsSlaPerfMonMaxEthMaxto2047     Unsigned32,
-        nbsSlaPerfMonMax2048to4095       Unsigned32,
-        nbsSlaPerfMonMax4096to8191       Unsigned32,
-        nbsSlaPerfMonMax8192orMore       Unsigned32,
+        nbsSlaPerfMonMaxAllSizes         Counter32,
+        nbsSlaPerfMonMax64               Counter32,
+        nbsSlaPerfMonMax65to127          Counter32,
+        nbsSlaPerfMonMax128to255         Counter32,
+        nbsSlaPerfMonMax256to511         Counter32,
+        nbsSlaPerfMonMax512to1023        Counter32,
+        nbsSlaPerfMonMax1024toEthMax     Counter32,
+        nbsSlaPerfMonMaxEthMaxto2047     Counter32,
+        nbsSlaPerfMonMax2048to4095       Counter32,
+        nbsSlaPerfMonMax4096to8191       Counter32,
+        nbsSlaPerfMonMax8192orMore       Counter32,
 
         -- Count of frames
         nbsSlaPerfMonFramesAllSizes      Counter64,
@@ -1074,7 +1075,7 @@ nbsSlaPerfMonEthMax OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 6 }
 
 nbsSlaPerfMonAvgAllSizes OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1082,7 +1083,7 @@ nbsSlaPerfMonAvgAllSizes OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 7 }
 
 nbsSlaPerfMonAvg64 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1091,7 +1092,7 @@ nbsSlaPerfMonAvg64 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 8 }
 
 nbsSlaPerfMonAvg65to127  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1100,7 +1101,7 @@ nbsSlaPerfMonAvg65to127  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 9 }
 
 nbsSlaPerfMonAvg128to255 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1109,7 +1110,7 @@ nbsSlaPerfMonAvg128to255 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 10 }
 
 nbsSlaPerfMonAvg256to511  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1118,7 +1119,7 @@ nbsSlaPerfMonAvg256to511  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 11 }
 
 nbsSlaPerfMonAvg512to1023 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1127,7 +1128,7 @@ nbsSlaPerfMonAvg512to1023 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 12 }
 
 nbsSlaPerfMonAvg1024toEthMax  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1136,7 +1137,7 @@ nbsSlaPerfMonAvg1024toEthMax  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 13 }
 
 nbsSlaPerfMonAvgEthMaxto2047 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1145,7 +1146,7 @@ nbsSlaPerfMonAvgEthMaxto2047 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 14 }
 
 nbsSlaPerfMonAvg2048to4095 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1154,7 +1155,7 @@ nbsSlaPerfMonAvg2048to4095 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 15 }
 
 nbsSlaPerfMonAvg4096to8191 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1163,7 +1164,7 @@ nbsSlaPerfMonAvg4096to8191 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 16 }
 
 nbsSlaPerfMonAvg8192orMore  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1172,7 +1173,7 @@ nbsSlaPerfMonAvg8192orMore  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 17 }
 
 nbsSlaPerfMonMinAllSizes OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1180,7 +1181,7 @@ nbsSlaPerfMonMinAllSizes OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 18 }
 
 nbsSlaPerfMonMin64 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1189,7 +1190,7 @@ nbsSlaPerfMonMin64 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 19 }
 
 nbsSlaPerfMonMin65to127  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1198,7 +1199,7 @@ nbsSlaPerfMonMin65to127  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 20 }
 
 nbsSlaPerfMonMin128to255 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1207,7 +1208,7 @@ nbsSlaPerfMonMin128to255 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 21 }
 
 nbsSlaPerfMonMin256to511  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1216,7 +1217,7 @@ nbsSlaPerfMonMin256to511  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 22 }
 
 nbsSlaPerfMonMin512to1023 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1225,7 +1226,7 @@ nbsSlaPerfMonMin512to1023 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 23 }
 
 nbsSlaPerfMonMin1024toEthMax  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1234,7 +1235,7 @@ nbsSlaPerfMonMin1024toEthMax  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 24 }
 
 nbsSlaPerfMonMinEthMaxto2047 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1243,7 +1244,7 @@ nbsSlaPerfMonMinEthMaxto2047 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 25 }
 
 nbsSlaPerfMonMin2048to4095 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1252,7 +1253,7 @@ nbsSlaPerfMonMin2048to4095 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 26 }
 
 nbsSlaPerfMonMin4096to8191 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1261,7 +1262,7 @@ nbsSlaPerfMonMin4096to8191 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 27 }
 
 nbsSlaPerfMonMin8192orMore  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1270,7 +1271,7 @@ nbsSlaPerfMonMin8192orMore  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 28 }
 
 nbsSlaPerfMonMaxAllSizes OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1278,7 +1279,7 @@ nbsSlaPerfMonMaxAllSizes OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 29 }
 
 nbsSlaPerfMonMax64 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1287,7 +1288,7 @@ nbsSlaPerfMonMax64 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 30 }
 
 nbsSlaPerfMonMax65to127  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1296,7 +1297,7 @@ nbsSlaPerfMonMax65to127  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 31 }
 
 nbsSlaPerfMonMax128to255 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1305,7 +1306,7 @@ nbsSlaPerfMonMax128to255 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 32 }
 
 nbsSlaPerfMonMax256to511  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1314,7 +1315,7 @@ nbsSlaPerfMonMax256to511  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 33 }
 
 nbsSlaPerfMonMax512to1023 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1323,7 +1324,7 @@ nbsSlaPerfMonMax512to1023 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 34 }
 
 nbsSlaPerfMonMax1024toEthMax  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1332,7 +1333,7 @@ nbsSlaPerfMonMax1024toEthMax  OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 35 }
 
 nbsSlaPerfMonMaxEthMaxto2047 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1341,7 +1342,7 @@ nbsSlaPerfMonMaxEthMaxto2047 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 36 }
 
 nbsSlaPerfMonMax2048to4095 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1350,7 +1351,7 @@ nbsSlaPerfMonMax2048to4095 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 37 }
 
 nbsSlaPerfMonMax4096to8191 OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -1359,7 +1360,7 @@ nbsSlaPerfMonMax4096to8191 OBJECT-TYPE
         ::= { nbsSlaPerfMonEntry 38 }
 
 nbsSlaPerfMonMax8192orMore  OBJECT-TYPE
-        SYNTAX      Unsigned32
+        SYNTAX      Counter32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
