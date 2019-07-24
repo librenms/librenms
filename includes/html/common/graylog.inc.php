@@ -43,7 +43,7 @@ $tmp_output = '
 
 searchbar = "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
             "<div class=\"col-sm-8\"><form method=\"post\" action=\"\" class=\"form-inline\">"+
-            ' . addslashes(csrf_field()) . ' +
+            "' . addslashes(csrf_field()) . '" +
             "Filter: "+
 ';
 
