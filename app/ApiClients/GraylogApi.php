@@ -130,19 +130,7 @@ class GraylogApi
             }
             
             if (Config::get('graylog.match-any-address') == "true" && isset($device)) {
-                $devports = $device->ports()->get();
-                foreach ($devports as $port) {
-                    $ipv4 = $port->ipv4()->get();
-                    foreach ($ipv4 as $ip) {
-                        $device_query .= ' || source:"' . $ip->ipv4_address . '"';
-                    }
-                }
-                foreach ($devports as $port) {
-                    $ipv6 = $port->ipv6()->get();
-                    foreach ($ipv6 as $ip) {
-                        $device_query .= ' || source:"' . $ip->ipv6_address . '"';
-                    }
-                }
+                $device_query .= $this->anyAddressQueryBuilder($device);
             }
 
             $query[] = '(' . $device_query . ')';
@@ -153,6 +141,25 @@ class GraylogApi
         }
 
         return implode('&&', $query);
+    }
+
+    public function anyAddressQueryBuilder($device)
+    {
+        $ipquery = "";
+        $devports = $device->ports()->get();
+        foreach ($devports as $port) {
+            $ipv4 = $port->ipv4()->get();
+            foreach ($ipv4 as $ip) {
+                $ipquery .= ' || source:"' . $ip->ipv4_address . '"';
+            }
+        }
+        foreach ($devports as $port) {
+            $ipv6 = $port->ipv6()->get();
+            foreach ($ipv6 as $ip) {
+                $ipquery .= ' || source:"' . $ip->ipv6_address . '"';
+            }
+        }
+        return $ipquery;
     }
 
     public function isConfigured()

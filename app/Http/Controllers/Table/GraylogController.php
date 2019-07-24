@@ -109,128 +109,37 @@ class GraylogController extends SimpleTableController
         /* Get Log Level (Severity) and parse Severity Name */
         $level = isset($message['message']['level']) ? $message['message']['level'] : '';
         $severityLabel = $this->severityLabel($level);
-        if (Config::get('graylog.severity-names') == "true" && is_numeric($level) && $level >= 0 && $level <= 7) {
-            switch ($level) {
-                case 0:
-                    $level = "Emergency";
-                    break;
-                case 1:
-                    $level = "Alert";
-                    break;
-                case 2:
-                    $level = "Critical";
-                    break;
-                case 3:
-                    $level = "Error";
-                    break;
-                case 4:
-                    $level = "Warning";
-                    break;
-                case 5:
-                    $level = "Notice";
-                    break;
-                case 6:
-                    $level = "Informational";
-                    break;
-                case 7:
-                    $level = "Debug";
-                    break;
-            }
+        if (Config::get('graylog.severity-names') == "true") {
+            $level = $this->severityName($level);
         }
 
         /* Get Facility and parse Facility Name */
         $facility = isset($message['message']['facility']) ? $message['message']['facility'] : '';
-        if (Config::get('graylog.facility-names') == "true" && is_numeric($facility) && $facility >= 0 && $facility <= 23) {
-            switch ($facility) {
-                case 0:
-                    $facility = "kernel messages";
-                    break;
-                case 1:
-                    $facility = "user-level messages";
-                    break;
-                case 2:
-                    $facility = "mail-system";
-                    break;
-                case 3:
-                    $facility = "system daemons";
-                    break;
-                case 4:
-                    $facility = "security/authorization messages";
-                    break;
-                case 5:
-                    $facility = "messages generated internally by syslogd";
-                    break;
-                case 6:
-                    $facility = "line printer subsystem";
-                    break;
-                case 7:
-                    $facility = "network news subsystem";
-                    break;
-                case 8:
-                    $facility = "UUCP subsystem";
-                    break;
-                case 9:
-                    $facility = "clock daemon";
-                    break;
-                case 10:
-                    $facility = "security/authorization messages";
-                    break;
-                case 11:
-                    $facility = "FTP daemon";
-                    break;
-                case 12:
-                    $facility = "NTP subsystem";
-                    break;
-                case 13:
-                    $facility = "log audit";
-                    break;
-                case 14:
-                    $facility = "log alert";
-                    break;
-                case 15:
-                    $facility = "clock daemon (note 2)";
-                    break;
-                case 16:
-                    $facility = "local use 0  (local0)";
-                    break;
-                case 17:
-                    $facility = "local use 1  (local1)";
-                    break;
-                case 18:
-                    $facility = "local use 2  (local2)";
-                    break;
-                case 19:
-                    $facility = "local use 3  (local3)";
-                    break;
-                case 20:
-                    $facility = "local use 4  (local4)";
-                    break;
-                case 21:
-                    $facility = "local use 5  (local5)";
-                    break;
-                case 22:
-                    $facility = "local use 6  (local6)";
-                    break;
-                case 23:
-                    $facility = "local use 7  (local7)";
-                    break;
-            }
+        if (Config::get('graylog.facility-names') == "true") {
+            $facility = $this->facilityName($facility);
         }
 
         /* Find Device by IP and Generate Link, otherwhise only show  */
         $dev = Device::findByHostnameOrIp($message['message']['source']);
-        
+
+        $hostOrAddress =
+            '<a href="'.
+            Url::generate(
+                ['page'=>'device', 'device'=>$message['message']['source']]
+            ).
+            '">'.
+            $message['message']['source'].
+            '</a>';
         if (isset($dev)) {
             $hostOrAddress = Url::deviceLink($dev);
-        } else {
-            $hostOrAddress = '<a href="'.Url::generate(['page'=>'device', 'device'=>$message['message']['source']]).'">'.$message['message']['source'].'</a>';
         }
 
         return [
             'severity'  => $severityLabel,
             'timestamp' => $displayTime,
             'source'    => $hostOrAddress,
-            'message'   => isset($message['message']['message']) ? $message['message']['message'] : '',
+            'message'   => isset($message['message']['message']) ?
+                $message['message']['message'] : '',
             'facility'  => $facility,
             'level'     => $level,
         ];
@@ -251,5 +160,51 @@ class GraylogController extends SimpleTableController
         ];
         $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
         return '<span class="alert-status '.$barColor .'" style="margin-right:8px;float:left;"></span>';
+    }
+
+    private function severityName($severity)
+    {
+        $map = [
+            "0" => "Emergency",
+            "1" => "Alert",
+            "2" => "Critical",
+            "3" => "Error",
+            "4" => "Warning",
+            "5" => "Notice",
+            "6" => "Informational",
+            "7" => "Debug",
+        ];
+        return (isset($map[$severity])) ? $map[$severity] : $severity;
+    }
+
+    private function facilityName($facility)
+    {
+        $map = [
+            "0" => "kernel messages",
+            "1" => "user-level messages",
+            "2" => "mail-system",
+            "3" => "system daemons",
+            "4" => "security/authorization messages",
+            "5" => "messages generated internally by syslogd",
+            "6" => "line printer subsystem",
+            "7" => "network news subsystem",
+            "8" => "UUCP subsystem",
+            "9" => "clock daemon",
+            "10" => "security/authorization messages",
+            "11" => "FTP daemon",
+            "12" => "NTP subsystem",
+            "13" => "log audit",
+            "14" => "log alert",
+            "15" => "clock daemon (note 2)",
+            "16" => "local use 0  (local0)",
+            "17" => "local use 1  (local1)",
+            "18" => "local use 2  (local2)",
+            "19" => "local use 3  (local3)",
+            "20" => "local use 4  (local4)",
+            "21" => "local use 5  (local5)",
+            "22" => "local use 6  (local6)",
+            "23" => "local use 7  (local7)",
+        ];
+        return (isset($map[$facility])) ? $map[$facility] : $facility;
     }
 }
