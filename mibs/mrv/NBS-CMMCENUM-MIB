@@ -13,7 +13,7 @@ IMPORTS
 
 
 nbsCmmcEnumMib MODULE-IDENTITY
-    LAST-UPDATED "201606140000Z"  -- June 14, 2016
+    LAST-UPDATED "201705240000Z" -- May 24, 2017
     ORGANIZATION "NBS"
     CONTACT-INFO
        "For technical support, please contact your service channel"
@@ -128,8 +128,17 @@ NbsCmmcEnumSlotOperationType  ::= TEXTUAL-CONVENTION
         muxponder          (42),
         addWssDropSplitter (43),
         dropWssAddCombiner (44),
-        dualAddWssDropSplitter(45),
-        opticalServiceChannel(46)
+        dualAddWssDropSplitter     (45),
+        opticalServiceChannel      (46),
+        optAmpMidstageVariableGain (50),
+        optAmpVariableGainMidstageInlinePreamp (51),
+        optAmpVariableGainMidstageInline       (52),
+        optAmpVariableGainMidstageBooster      (53),
+        optAmpRaman        (54),  -- Raman
+        optAmpPreampRaman  (55),  -- Backward Raman
+        optAmpBoosterRaman (56),  -- Forward Raman
+        optVariableDispersionCompensation      (57),
+        midPointRepeater   (58)
     }
 
 
@@ -894,9 +903,9 @@ NbsCmmcEnumSlotType ::= TEXTUAL-CONVENTION
         ns746           (746),
         em316twoxfp16g  (747),
         od2hdwss4dws    (748),
-        ns749           (749),
-        ns750           (750),
-        ns751           (751),
+        odedfa          (749),
+        odedfam         (750),
+        odraman         (751),
         ns752           (752),
         od2hdmx10g      (753),
         ns754           (754),
@@ -910,7 +919,7 @@ NbsCmmcEnumSlotType ::= TEXTUAL-CONVENTION
         ns762           (762),
         odoscx1addxd    (763),
         ns764           (764),
-        ns765           (765),
+        odeusm          (765),
         ns766           (766),
         ns767           (767),
         ns768           (768),
@@ -920,7 +929,19 @@ NbsCmmcEnumSlotType ::= TEXTUAL-CONVENTION
         odceon226f      (782),
         ns783           (783),
         odtxp100gfq     (784),
-        odtxp100gq      (785)
+        odtxp100gq      (785),
+        ns786           (786),
+        ns787           (787),
+        ns788           (788),
+        ns789           (789),
+        ns790           (790),
+        odedfavm        (791),
+        odedfavmosc     (792),
+        odedfa2xfp      (793),
+        od2xfp          (794),
+        odtundcm        (795),
+        oduxg           (796),
+        odedfavmosc2    (805)
     }
 
 -- *******************************************************************
