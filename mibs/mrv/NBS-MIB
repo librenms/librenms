@@ -14,7 +14,7 @@ IMPORTS
 
 
 nbsMib  MODULE-IDENTITY
-    LAST-UPDATED  "201309170000Z"   -- September 17, 2013
+    LAST-UPDATED  "201706280000Z" -- June 28, 2017
     ORGANIZATION  "NBS"
     CONTACT-INFO
       "For technical support, please contact your service channel"
@@ -64,13 +64,13 @@ nbs OBJECT-IDENTITY
 -- *******************************************************************
 
 
-Unsigned16 ::= TEXTUAL-CONVENTION
+Unsigned16TC ::= TEXTUAL-CONVENTION
      STATUS       current
      DESCRIPTION
         "Used to represent an unsigned two-octet integer"
-     SYNTAX    INTEGER (0..65535)
+     SYNTAX     Unsigned32 (0..65535)
 
-Unsigned64 ::= TEXTUAL-CONVENTION
+Unsigned64TC ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "Used to represent an unsigned eight-octet integer"
@@ -137,7 +137,7 @@ NbsTcMHz ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
        "Frequency in units of MHz.  When writable, persistent.
-        Not supported value: 1"
+        Not supported value: 0"
     SYNTAX      Unsigned32 (1..4294967295)
 
 NbsTcStatusSimple ::= TEXTUAL-CONVENTION

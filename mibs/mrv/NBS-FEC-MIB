@@ -43,8 +43,10 @@ NbsFecCode  ::= TEXTUAL-CONVENTION
         sdfec1       (9),
         sdfec2       (10),
         sdfec3       (11),
-        strong1dot4  (12),
-        strong1dot7  (13)
+        g975i4       (12),
+        g975i7       (13),
+        xfec7        (14),
+        sdfec15      (15)
     }
 
 -- *******************************************************************
