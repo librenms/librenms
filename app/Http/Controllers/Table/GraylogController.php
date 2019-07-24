@@ -93,7 +93,7 @@ class GraylogController extends SimpleTableController
     }
 
     private function formatMessage($message)
-    {
+    {       
         if ($this->timezone) {
             $graylogTime = new DateTime($message['message']['timestamp']);
             $offset = $this->timezone->getOffset($graylogTime);
@@ -104,14 +104,66 @@ class GraylogController extends SimpleTableController
         } else {
             $displayTime = $message['message']['timestamp'];
         }
-
+	
+        
+        /* Get Log Level (Severity) and parse Severity Name */
         $level = isset($message['message']['level']) ? $message['message']['level'] : '';
+        if (Config::get('graylog.severity-names') == "true" && is_numeric($level) && $level >= 0 && $level <= 7)
+            switch($level){
+                case 0: $level = "Emergency"; break;
+                case 1: $level = "Alert"; break;
+                case 2: $level = "Critical"; break;
+                case 3: $level = "Error"; break;
+                case 4: $level = "Warning"; break;
+                case 5: $level = "Notice"; break;
+                case 6: $level = "Informational"; break;
+                case 7: $level = "Debug"; break;
+            }
+
+        /* Get Facility and parse Facility Name */
+        $facility = isset($message['message']['facility']) ? $message['message']['facility'] : '';
+        if (Config::get('graylog.facility-names') == "true" && is_numeric($facility) && $facility >= 0 && $facility <= 23)
+            switch($facility){
+                case 0: $facility = "kernel messages"; break;
+                case 1: $facility = "user-level messages"; break;
+                case 2: $facility = "mail-system"; break;
+                case 3: $facility = "system daemons"; break;
+                case 4: $facility = "security/authorization messages"; break;
+                case 5: $facility = "messages generated internally by syslogd"; break;
+                case 6: $facility = "line printer subsystem"; break;
+                case 7: $facility = "network news subsystem"; break;
+                case 8: $facility = "UUCP subsystem"; break;
+                case 9: $facility = "clock daemon"; break;
+                case 10: $facility = "security/authorization messages"; break;
+                case 11: $facility = "FTP daemon"; break;
+                case 12: $facility = "NTP subsystem"; break;
+                case 13: $facility = "log audit"; break;
+                case 14: $facility = "log alert"; break;
+                case 15: $facility = "clock daemon (note 2)"; break;
+                case 16: $facility = "local use 0  (local0)"; break;
+                case 17: $facility = "local use 1  (local1)"; break;
+                case 18: $facility = "local use 2  (local2)"; break;
+                case 19: $facility = "local use 3  (local3)"; break;
+                case 20: $facility = "local use 4  (local4)"; break;
+                case 21: $facility = "local use 5  (local5)"; break;
+                case 22: $facility = "local use 6  (local6)"; break;
+                case 23: $facility = "local use 7  (local7)"; break;
+            }
+
+
+        /* Find Device by IP and Generate Link, otherwhise only show  */
+        $device = Device::findByHostnameOrIp($message['message']['source']);
+        if (isset($device))
+            $hostOrAddress = Url::deviceLink($device);
+        else
+            $hostOrAddress = '<a href="'.Url::generate(['page'=>'device', 'device'=>$message['message']['source']]).'">'.$message['message']['source'].'</a>';
+
         return [
             'severity'  => $this->severityLabel($level),
             'timestamp' => $displayTime,
-            'source'    => '<a href="'.Url::generate(['page'=>'device', 'device'=>$message['message']['source']]).'">'.$message['message']['source'].'</a>',
+            'source'    => $hostOrAddress,
             'message'   => isset($message['message']['message']) ? $message['message']['message'] : '',
-            'facility'  => isset($message['message']['facility']) ? $message['message']['facility'] : '',
+            'facility'  => $facility,
             'level'     => $level,
         ];
     }
