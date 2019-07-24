@@ -142,13 +142,16 @@ class Device extends BaseModel
         return null;
     }
     
-    public static function findByHostnameOrIp($hostnameOrIp){
+    public static function findByHostnameOrIp($hostnameOrIp)
+    {
         $device = Device::findByHostname($hostnameOrIp);
-        if (isset($device))
+        if (isset($device)) {
             return $device;
+        }
         $device = Device::findByIp($hostnameOrIp);
-        if (isset($device))
+        if (isset($device)) {
             return $device;
+        }
         return null;
     }
 
