@@ -148,12 +148,10 @@ class GraylogApi
         $ipquery = "";
         $devports = $device->ports()->get();
         foreach ($devports as $port) {
-            $ipv4 = $port->ipv4()->get();
+            $ipv4 = $port->ipv4()->get();          
             foreach ($ipv4 as $ip) {
                 $ipquery .= ' || source:"' . $ip->ipv4_address . '"';
             }
-        }
-        foreach ($devports as $port) {
             $ipv6 = $port->ipv6()->get();
             foreach ($ipv6 as $ip) {
                 $ipquery .= ' || source:"' . $ip->ipv6_address . '"';

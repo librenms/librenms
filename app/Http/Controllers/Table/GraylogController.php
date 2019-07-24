@@ -121,15 +121,9 @@ class GraylogController extends SimpleTableController
 
         /* Find Device by IP and Generate Link, otherwhise only show  */
         $dev = Device::findByHostnameOrIp($message['message']['source']);
-
         $hostOrAddress =
-            '<a href="'.
-            Url::generate(
-                ['page'=>'device', 'device'=>$message['message']['source']]
-            ).
-            '">'.
-            $message['message']['source'].
-            '</a>';
+            '<a href="'.Url::generate(['page'=>'device', 'device'=>$message['message']['source']]).'">'.
+            $message['message']['source'].'</a>';
         if (isset($dev)) {
             $hostOrAddress = Url::deviceLink($dev);
         }
@@ -138,8 +132,7 @@ class GraylogController extends SimpleTableController
             'severity'  => $severityLabel,
             'timestamp' => $displayTime,
             'source'    => $hostOrAddress,
-            'message'   => isset($message['message']['message']) ?
-                $message['message']['message'] : '',
+            'message'   => isset($message['message']['message']) ? $message['message']['message'] : '',
             'facility'  => $facility,
             'level'     => $level,
         ];

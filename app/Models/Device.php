@@ -144,15 +144,14 @@ class Device extends BaseModel
     
     public static function findByHostnameOrIp($hostnameOrIp)
     {
+        if (IP::isValid($hostnameOrIp)) {
+            $device = Device::findByIp($hostnameOrIp);
+            if (isset($device)) {
+                return $device;
+            }
+        }
         $device = Device::findByHostname($hostnameOrIp);
-        if (isset($device)) {
-            return $device;
-        }
-        $device = Device::findByIp($hostnameOrIp);
-        if (isset($device)) {
-            return $device;
-        }
-        return null;
+        return $device;
     }
 
     /**
