@@ -122,7 +122,7 @@ class GraylogApi
         }
 
         if ($device) {
-            $query[] = 'source: (' . $this->getAddresses($device)->implode(' OR ') . ')';
+            $query[] = 'source: ("' . $this->getAddresses($device)->implode('" OR "') . '")';
         }
 
         if (empty($query)) {
