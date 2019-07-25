@@ -148,7 +148,7 @@ class GraylogApi
         $ipquery = "";
         $devports = $device->ports()->get();
         foreach ($devports as $port) {
-            $ipv4 = $port->ipv4()->get();          
+            $ipv4 = $port->ipv4()->get();
             foreach ($ipv4 as $ip) {
                 $ipquery .= ' || source:"' . $ip->ipv4_address . '"';
             }

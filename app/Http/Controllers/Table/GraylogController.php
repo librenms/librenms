@@ -109,15 +109,11 @@ class GraylogController extends SimpleTableController
         /* Get Log Level (Severity) and parse Severity Name */
         $level = isset($message['message']['level']) ? $message['message']['level'] : '';
         $severityLabel = $this->severityLabel($level);
-        if (Config::get('graylog.severity-names') == "true") {
-            $level = $this->severityName($level);
-        }
+        $level = $this->syslogPrioParser("severity", $level);
 
         /* Get Facility and parse Facility Name */
-        $facility = isset($message['message']['facility']) ? $message['message']['facility'] : '';
-        if (Config::get('graylog.facility-names') == "true") {
-            $facility = $this->facilityName($facility);
-        }
+        $facility = isset($message['message']['facility']) ?
+            $this->syslogPrioParser("facility", $message['message']['facility']) : '';
 
         /* Find Device by IP and Generate Link, otherwhise only show  */
         $dev = Device::findByHostnameOrIp($message['message']['source']);
@@ -155,49 +151,13 @@ class GraylogController extends SimpleTableController
         return '<span class="alert-status '.$barColor .'" style="margin-right:8px;float:left;"></span>';
     }
 
-    private function severityName($severity)
+    private function syslogPrioParser($type, $value)
     {
-        $map = [
-            "0" => "Emergency",
-            "1" => "Alert",
-            "2" => "Critical",
-            "3" => "Error",
-            "4" => "Warning",
-            "5" => "Notice",
-            "6" => "Informational",
-            "7" => "Debug",
-        ];
-        return (isset($map[$severity])) ? $map[$severity] : $severity;
-    }
-
-    private function facilityName($facility)
-    {
-        $map = [
-            "0" => "kernel messages",
-            "1" => "user-level messages",
-            "2" => "mail-system",
-            "3" => "system daemons",
-            "4" => "security/authorization messages",
-            "5" => "messages generated internally by syslogd",
-            "6" => "line printer subsystem",
-            "7" => "network news subsystem",
-            "8" => "UUCP subsystem",
-            "9" => "clock daemon",
-            "10" => "security/authorization messages",
-            "11" => "FTP daemon",
-            "12" => "NTP subsystem",
-            "13" => "log audit",
-            "14" => "log alert",
-            "15" => "clock daemon (note 2)",
-            "16" => "local use 0  (local0)",
-            "17" => "local use 1  (local1)",
-            "18" => "local use 2  (local2)",
-            "19" => "local use 3  (local3)",
-            "20" => "local use 4  (local4)",
-            "21" => "local use 5  (local5)",
-            "22" => "local use 6  (local6)",
-            "23" => "local use 7  (local7)",
-        ];
-        return (isset($map[$facility])) ? $map[$facility] : $facility;
+        $map = __('syslog.' . $type);
+        return (isset($map[$value])) ?
+            (is_numeric($value)) ?
+                $value . ' (' . $map[$value] . ')' :
+                $map[$value] . ' (' . $value . ')' :
+            $value;
     }
 }
