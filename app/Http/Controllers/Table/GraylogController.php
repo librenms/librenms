@@ -106,31 +106,17 @@ class GraylogController extends SimpleTableController
             $displayTime = $message['message']['timestamp'];
         }
 
-        /* Get Log Level (Severity) and parse Severity Name */
-        $level = isset($message['message']['level']) ? $message['message']['level'] : '';
-        $severityLabel = $this->severityLabel($level);
-        $level = $this->syslogPrioParser("severity", $level);
-
-        /* Get Facility and parse Facility Name */
-        $facility = isset($message['message']['facility']) ?
-            $this->syslogPrioParser("facility", $message['message']['facility']) : '';
-
-        /* Find Device by IP and Generate Link, otherwhise only show  */
         $dev = Device::findByHostnameOrIp($message['message']['source']);
-        $hostOrAddress =
-            '<a href="'.Url::generate(['page'=>'device', 'device'=>$message['message']['source']]).'">'.
-            $message['message']['source'].'</a>';
-        if (isset($dev)) {
-            $hostOrAddress = Url::deviceLink($dev);
-        }
+        $level = $message['message']['level'] ?? '';
+        $facility = $message['message']['facility'] ?? '';
 
         return [
-            'severity'  => $severityLabel,
+            'severity'  => $this->severityLabel($level),
             'timestamp' => $displayTime,
-            'source'    => $hostOrAddress,
-            'message'   => isset($message['message']['message']) ? $message['message']['message'] : '',
-            'facility'  => $facility,
-            'level'     => $level,
+            'source'    => $dev ? Url::deviceLink($dev) : $message['message']['source'],
+            'message'   => $message['message']['message'] ?? '',
+            'facility'  => is_numeric($facility) ? "($facility) " . __("syslog.facility.$facility"): $facility,
+            'level'     => is_numeric($level) ? "($level) " . __("syslog.severity.$level") : $level,
         ];
     }
 
@@ -149,15 +135,5 @@ class GraylogController extends SimpleTableController
         ];
         $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
         return '<span class="alert-status '.$barColor .'" style="margin-right:8px;float:left;"></span>';
-    }
-
-    private function syslogPrioParser($type, $value)
-    {
-        $map = __('syslog.' . $type);
-        return (isset($map[$value])) ?
-            (is_numeric($value)) ?
-                $value . ' (' . $map[$value] . ')' :
-                $map[$value] . ' (' . $value . ')' :
-            $value;
     }
 }

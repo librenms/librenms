@@ -26,7 +26,6 @@
 namespace App\ApiClients;
 
 use App\Models\Device;
-use App\Models\Port;
 use GuzzleHttp\Client;
 use LibreNMS\Config;
 
@@ -123,17 +122,7 @@ class GraylogApi
         }
 
         if ($device) {
-            $ip = gethostbyname($device->hostname);
-            $device_query = 'source:"' . $device->hostname . '" || source:"' . $ip . '"';
-            if ($device->ip && $ip != $device->ip) {
-                $device_query .= ' || source:"' . $device->ip . '"';
-            }
-            
-            if (Config::get('graylog.match-any-address') == "true" && isset($device)) {
-                $device_query .= $this->anyAddressQueryBuilder($device);
-            }
-
-            $query[] = '(' . $device_query . ')';
+            $query[] = 'source: (' . $this->getAddresses($device)->implode(' OR ') . ')';
         }
 
         if (empty($query)) {
@@ -143,21 +132,20 @@ class GraylogApi
         return implode('&&', $query);
     }
 
-    public function anyAddressQueryBuilder($device)
+    public function getAddresses(Device $device)
     {
-        $ipquery = "";
-        $devports = $device->ports()->get();
-        foreach ($devports as $port) {
-            $ipv4 = $port->ipv4()->get();
-            foreach ($ipv4 as $ip) {
-                $ipquery .= ' || source:"' . $ip->ipv4_address . '"';
-            }
-            $ipv6 = $port->ipv6()->get();
-            foreach ($ipv6 as $ip) {
-                $ipquery .= ' || source:"' . $ip->ipv6_address . '"';
-            }
+        $addresses = collect([
+            gethostbyname($device->hostname),
+            $device->hostname,
+            $device->ip,
+        ]);
+
+        if (Config::get('graylog.match-any-address')) {
+            $addresses = $addresses->merge($device->ipv4->pluck('ipv4_address'))
+                ->merge($device->ipv6->pluck('ipv6_address'));
         }
-        return $ipquery;
+
+        return $addresses->filter()->unique();
     }
 
     public function isConfigured()

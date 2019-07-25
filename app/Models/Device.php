@@ -145,7 +145,7 @@ class Device extends BaseModel
     /**
      * Find device by Hostname or IP Address
      * @param string $hostnameOrIp Hostname or IP Address to search
-     * @return App\Models\Device.php
+     * @return Device|null
      */
     public static function findByHostnameOrIp($hostnameOrIp)
     {
@@ -484,6 +484,16 @@ class Device extends BaseModel
     public function groups()
     {
         return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
+    }
+
+    public function ipv4()
+    {
+        return $this->hasManyThrough('App\Models\Ipv4Address', 'App\Models\Port', 'device_id', 'port_id', 'device_id', 'port_id');
+    }
+
+    public function ipv6()
+    {
+        return $this->hasManyThrough('App\Models\Ipv6Address', 'App\Models\Port', 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
     public function location()

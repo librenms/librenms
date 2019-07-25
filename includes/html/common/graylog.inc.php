@@ -30,10 +30,10 @@ $tmp_output = '
             <tr>
             <th data-column-id="severity" data-sortable="false"></th>
             <th data-column-id="timestamp" data-formatter="browserTime">Timestamp</th>
-            <th data-column-id="level" data-sortable="false">Level</th>
+            <th data-column-id="level">Level</th>
             <th data-column-id="source">Source</th>
             <th data-column-id="message" data-sortable="false">Message</th>
-            <th data-column-id="facility" data-sortable="false">Facility</th>
+            <th data-column-id="facility">Facility</th>
             </tr>
         </thead>
     </table>
