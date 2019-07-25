@@ -40,6 +40,7 @@ path: blob/master/doc/
 - [My reverse proxy is not working](#my-reverse-proxy-is-not-working)
 - [My alerts aren't being delivered on time](#my-alerts-aren't-being-delivered-on-time)
 - [My alert templates stopped working](#my-alert-templates-stopped-working)
+- [How do I move only the DB to another server](#move-db-to-another-server)
 
 # Developing
 
@@ -313,7 +314,7 @@ architecture then the following steps should be all that's needed:
 - Stop cron by commenting out all lines in `/etc/cron.d/librenms`
 - Dump the MySQL database `librenms` from your old server (`mysqldump
   librenms -u root -p > librenms.sql`)...
-- and import it into your new server (`mysql -u root -p < librenms.sql`).
+- and import it into your new server (`mysql -u root -p librenms < librenms.sql`).
 - Copy the `rrd/` folder to the new server.
 - Copy the `config.php` file to the new server.
 - Ensure ownership of the copied files and folders (substitute your
@@ -570,4 +571,25 @@ new template syntax:
 syntax changed, and you basically need to convert your templates to
 this new syntax (including the titles).
 
+## <a name='move-db-to-another-server'>How do I move only the DB to another server?</a>
 
+There is already a reference how to move your whole LNMS installation to another server. But the following steps will help you to split up an "All-in-one" installation to one LibreNMS installation with a seperate database install. 
+*Note: This section assumes you have a MySQL/MariaDB instance
+
+- Stop the apache and mysql service in you LibreNMS installation.
+- Edit out all the cron entries in `/etc/cron.d/librenms`. 
+- Dump your `librenms`database on your current install by issuing `mysqldump librenms -u root -p > librenms.sql`.
+- Stop and disable the MySQL server on your current install.
+- On your new server make sure you create a new database with the standard install command, no need to add a user for localhost though.
+- Copy this over to your new database server and import it with `mysql -u root -p librenms < librenms.sql`.
+- Enter to mysql and add permissions with the following two commands:
+```
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'IP_OF_YOUR_LNMS_SERVER' IDENTIFIED BY 'PASSWORD' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'FQDN_OF_YOUR_LNMS_SERVER' IDENTIFIED BY 'PASSWORD' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+exit;
+```
+- Enable and restart MySQL server.
+- Edit your `config.php` file to point the install to the new database server location.
+- **Very important**: On your LibreNMS server, inside your install directory is a `.env` file, in it you need to edit the `DBHOST` paramater to point to your new server location. 
+- After all this is done, enable all the cron entries again and start apache.
