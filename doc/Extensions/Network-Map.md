@@ -22,8 +22,8 @@ Network maps for individual devices are available showing the relationship with 
 Also you can Build Device Groups and those Device Groups can be drawn with Network Map.
 
 ### Network Map Configurator. 
-This link will show you all the options and explain what they do. [Link](http://visjs.org/docs/network/)  
-You may also access the dyanamic configuration interface [example here](http://visjs.org/examples/network/other/configuration.html) from within LibreNMS by adding the following to config.php
+This link will show you all the options and explain what they do. [Link](https://visjs.github.io/vis-network/docs/network/)  
+You may also access the dyanamic configuration interface [example here](https://visjs.github.io/vis-network/examples/network/other/configuration.html) from within LibreNMS by adding the following to config.php
 ```php
 $config['network_map_vis_options'] = '{
   "configure": { "enabled": true},
