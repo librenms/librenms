@@ -43,6 +43,10 @@ If you choose to use another user besides the admin user, please note that curre
 If you have enabled TLS for the Graylog API and you are using a self-signed certificate, please make sure that the certificate is trusted by your LibreNMS host, otherwise the connection will fail.
 Additionally, the certificate's Common Name (CN) has to match the FQDN or IP address specified in `$config['graylog']['server']`.
 
+If you want to match the source address of the log entries against any IP address of a device instead of only against 
+the primary address and the host name to assign the log entries to a device, you can activate this function using
+$config['graylog']['match-any-address'] = 'true';
+
 ## Suppressing/enabling the domain part of a hostname for specific platforms
 You should see if what you get in syslog/Graylog matches up with your configured hosts first. If you need to modify the syslog messages from specific platforms, this may be of assistance:
 
