@@ -143,16 +143,6 @@ class Device extends BaseModel
     }
 
     /**
-     * Find device by Hostname or IP Address
-     * @param string $hostnameOrIp Hostname or IP Address to search
-     * @return Device|null
-     */
-    public static function findByHostnameOrIp($hostnameOrIp)
-    {
-        return Device::findByIp($hostnameOrIp) ?: Device::findByHostname($hostnameOrIp);
-    }
-
-    /**
      * Get the display name of this device (hostname) unless force_ip_to_sysname is set
      * and hostname is an IP and sysName is set
      *

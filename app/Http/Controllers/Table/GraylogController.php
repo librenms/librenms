@@ -38,6 +38,7 @@ use LibreNMS\Util\Url;
 class GraylogController extends SimpleTableController
 {
     private $timezone;
+    private $deviceCache = [];
 
     public function __construct()
     {
@@ -106,14 +107,14 @@ class GraylogController extends SimpleTableController
             $displayTime = $message['message']['timestamp'];
         }
 
-        $dev = Device::findByHostnameOrIp($message['message']['source']);
+        $device = $this->deviceFromSource($message['message']['source']);
         $level = $message['message']['level'] ?? '';
         $facility = $message['message']['facility'] ?? '';
 
         return [
             'severity'  => $this->severityLabel($level),
             'timestamp' => $displayTime,
-            'source'    => $dev ? Url::deviceLink($dev) : $message['message']['source'],
+            'source'    => $device ? Url::deviceLink($device) : $message['message']['source'],
             'message'   => $message['message']['message'] ?? '',
             'facility'  => is_numeric($facility) ? "($facility) " . __("syslog.facility.$facility"): $facility,
             'level'     => is_numeric($level) ? "($level) " . __("syslog.severity.$level") : $level,
@@ -135,5 +136,19 @@ class GraylogController extends SimpleTableController
         ];
         $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
         return '<span class="alert-status '.$barColor .'" style="margin-right:8px;float:left;"></span>';
+    }
+
+    /**
+     * Cache device lookups so we don't lookup for every entry
+     * @param $source
+     * @return mixed
+     */
+    private function deviceFromSource($source)
+    {
+        if (!isset($this->deviceCache[$source])) {
+            $this->deviceCache[$source] = Device::findByIp($source) ?: Device::findByHostname($source);
+        }
+
+        return $this->deviceCache[$source];
     }
 }
