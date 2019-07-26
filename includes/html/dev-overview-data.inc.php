@@ -127,7 +127,7 @@ if ($device['location_id']) {
 
     echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
     if ($location_valid) {
-        echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
+        echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . ',+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     }
     echo '</div>
         </div>
@@ -151,7 +151,7 @@ if ($device['location_id']) {
                         update_location(' . $location->id . ', new_location, function(success) {
                             if (success) {
                                 $("#coordinates-text").text(new_location.lat.toFixed(5) + ", " + new_location.lng.toFixed(5));
-                                $("#map-it-button").attr("href", "https://maps.google.com/?q=" + new_location.lat + "+" + new_location.lng );
+                                $("#map-it-button").attr("href", "https://maps.google.com/?q=" + new_location.lat + ",+" + new_location.lng );
                             }
                         });
                     }
