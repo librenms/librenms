@@ -476,6 +476,16 @@ class Device extends BaseModel
         return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
     }
 
+    public function ipv4()
+    {
+        return $this->hasManyThrough('App\Models\Ipv4Address', 'App\Models\Port', 'device_id', 'port_id', 'device_id', 'port_id');
+    }
+
+    public function ipv6()
+    {
+        return $this->hasManyThrough('App\Models\Ipv6Address', 'App\Models\Port', 'device_id', 'port_id', 'device_id', 'port_id');
+    }
+
     public function location()
     {
         return $this->belongsTo('App\Models\Location', 'location_id', 'id');
