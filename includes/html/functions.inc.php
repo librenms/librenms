@@ -1450,6 +1450,34 @@ function get_arrays_with_mdadm($device, $app_id)
 }
 
 /**
+ * Get all seafile data from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @param string  $category which category of seafile graphs are searched
+ * @return array list of seafile data
+ */
+function get_arrays_with_seafile($device, $app_id, $category)
+{
+    $arrays = array();
+
+    $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'seafile', $app_id, $category);
+
+    foreach (glob($pattern) as $rrd) {
+        $filename = basename($rrd, '.rrd');
+
+        list(,,, $account_name) = explode("-", $filename, 4);
+
+        if ($account_name) {
+            array_push($arrays, $account_name);
+        }
+    }
+
+    return $arrays;
+}
+
+/**
  * Get all disks (disk serial numbers) from the collected
  * rrd files.
  *
