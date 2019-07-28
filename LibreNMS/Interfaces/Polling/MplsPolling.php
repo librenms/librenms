@@ -39,4 +39,27 @@ interface MplsPolling
      * @return Collection MplsLspPath objects
      */
     public function pollMplsPaths($lsps);
+
+    /**
+     * @return Collection MplsSdp objects
+     */
+    public function pollMplsSdps();
+
+    /**
+     * @return Collection MplsService objects
+     */
+    public function pollMplsServices();
+
+    /**
+     * @param Collection $svcs collecton of synchronized service objects from pollMplsServices()
+     * @return Collection MplsSap objects
+     */
+    public function pollMplsSaps($svcs);
+
+    /**
+     * @param Collection $sdps collecton of synchronized sdp objects from pollMplsSdps()
+     * @param Collection $svcs collecton of synchronized service objects from pollMplsServices()
+     * @return Collection MplsSdpBind objects
+     */
+    public function pollMplsSdpBinds($sdps, $svcs);
 }

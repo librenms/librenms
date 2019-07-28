@@ -55,6 +55,22 @@ class Mpls implements Module
             ModuleModelObserver::observe('\App\Models\MplsLspPath');
             $this->syncModels($os->getDeviceModel(), 'mplsLspPaths', $os->discoverMplsPaths($lsps));
 
+            echo "\nMPLS SDPs: ";
+            ModuleModelObserver::observe('\App\Models\MplsSdp');
+            $sdps = $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->discoverMplsSdps());
+
+            echo "\nMPLS Services: ";
+            ModuleModelObserver::observe('\App\Models\MplsService');
+            $svcs = $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->discoverMplsServices());
+
+            echo "\nMPLS SAPs: ";
+            ModuleModelObserver::observe('\App\Models\MplsSap');
+            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->discoverMplsSaps($svcs));
+
+            echo "\nMPLS SDP Bindings: ";
+            ModuleModelObserver::observe('\App\Models\MplsSdpBind');
+            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->discoverMplsSdpBinds($sdps, $svcs));
+
             echo PHP_EOL;
         }
     }
@@ -77,6 +93,22 @@ class Mpls implements Module
             ModuleModelObserver::observe('\App\Models\MplsLspPath');
             $this->syncModels($os->getDeviceModel(), 'mplsLspPaths', $os->pollMplsPaths($lsps));
 
+            echo "\nMPLS SDPs: ";
+            ModuleModelObserver::observe('\App\Models\MplsSdp');
+            $sdps = $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->pollMplsSdps());
+
+            echo "\nMPLS Services: ";
+            ModuleModelObserver::observe('\App\Models\MplsService');
+            $svcs = $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->pollMplsServices());
+
+            echo "\nMPLS SAPs: ";
+            ModuleModelObserver::observe('\App\Models\MplsSap');
+            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->pollMplsSaps($svcs));
+
+            echo "\nMPLS SDP Bindings: ";
+            ModuleModelObserver::observe('\App\Models\MplsSdpBind');
+            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->pollMplsSdpBinds($sdps, $svcs));
+
             echo PHP_EOL;
         }
     }
@@ -91,5 +123,9 @@ class Mpls implements Module
     {
         $os->getDeviceModel()->mplsLsps()->delete();
         $os->getDeviceModel()->mplsLspPaths()->delete();
+        $os->getDeviceModel()->mplsSdps()->delete();
+        $os->getDeviceModel()->mplsServices()->delete();
+        $os->getDeviceModel()->mplsSaps()->delete();
+        $os->getDeviceModel()->mplsSdpBinds()->delete();
     }
 }

@@ -566,6 +566,26 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\MplsLspPath', 'device_id');
     }
 
+    public function mplsSdps()
+    {
+        return $this->hasMany('App\Models\MplsSdp', 'device_id');
+    }
+
+    public function mplsServices()
+    {
+        return $this->hasMany('App\Models\MplsService', 'device_id');
+    }
+
+    public function mplsSaps()
+    {
+        return $this->hasMany('App\Models\MplsSap', 'device_id');
+    }
+
+    public function mplsSdpBinds()
+    {
+        return $this->hasMany('App\Models\MplsSdpBind', 'device_id');
+    }
+
     public function syslogs()
     {
         return $this->hasMany('App\Models\Syslog', 'device_id', 'device_id');
