@@ -4,7 +4,7 @@ use LibreNMS\Config;
 
 session_start();
 $librenms_dir = realpath(__DIR__ . '/..');
-$php_temp_dir = sys_get_temp_dir();
+$php_temp_dir = sys_get_temp_dir() ? sys_get_temp_dir() : '/tmp';
 
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
