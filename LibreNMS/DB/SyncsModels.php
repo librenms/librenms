@@ -41,14 +41,14 @@ trait SyncsModels
         $models = $models->keyBy->getCompositeKey();
         $existing = $device->$relationship->keyBy->getCompositeKey();
 
-        foreach ($existing as $key => $existing_lsp) {
-            if ($models->offsetExists($key)) {
+        foreach ($existing as $exist_key => $exist_value) {
+            if ($models->offsetExists($exist_key)) {
                 // update
-                $existing_lsp->fill($models->get($key)->getAttributes())->save();
+                $exist_value->fill($models->get($exist_key)->getAttributes())->save();
             } else {
                 // delete
-                $existing_lsp->delete();
-                $existing->forget($key);
+                $exist_value->delete();
+                $existing->forget($exist_key);
             }
         }
 
