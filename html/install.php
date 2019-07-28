@@ -391,9 +391,6 @@ $config_file = <<<"EOD"
 //Please ensure this user is created and has the correct permissions to your install
 \$config['user'] = 'librenms';
 
-// This is the temporary directory used by php, set by php_admin_value[sys_temp_dir], defaults to /tmp when not set.
-\$config['temp_dir'] = '$php_temp_dir';
-
 ### Locations - it is recommended to keep the default
 #\$config\['install_dir'\]  = "$install_dir";
 
