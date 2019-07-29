@@ -168,12 +168,7 @@ if ($error_msg) {
                         }
                     } else {
                         if ($output === 'base64') {
-                            $fd = fopen($graphfile, 'r');
-                            ob_start();
-                                fpassthru($fd);
-                                $imagedata = ob_get_contents();
-                                fclose($fd);
-                            ob_end_clean();
+                            $imagedata = file_get_contents($graphfile);
                             $base64_output =  base64_encode($imagedata);
                         } else {
                             $fd = fopen($graphfile, 'r');
