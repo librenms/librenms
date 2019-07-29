@@ -49,7 +49,8 @@ class Kernel extends HttpKernel
 
         'api' => [
             'bindings',
-            'auth:token'
+            'auth:token',
+            \Spatie\Cors\Cors::class,
         ],
     ];
 
