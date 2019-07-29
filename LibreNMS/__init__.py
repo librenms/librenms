@@ -8,6 +8,7 @@ from logging import critical, info, debug, exception
 from math import ceil
 from queue import Queue
 from time import time
+import time as times
 
 from .service import Service, ServiceConfig
 from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager, ServicesQueueManager, \
@@ -81,6 +82,10 @@ class DB:
             conn.autocommit(True)
             conn.ping(True)
             self._db[threading.get_ident()] = conn
+        except (pymysql.err.MySQLError, pymysql.err.DatabaseError) as e:
+            critical("ERROR: Mysql databse has problem !{}".format(e))
+            times.sleep(20)
+            self.connect()
         except Exception as e:
             critical("ERROR: Could not connect to MySQL database! {}".format(e))
             raise
@@ -93,9 +98,28 @@ class DB:
 
         # Does a connection exist for this thread
         if threading.get_ident() not in self._db.keys():
+            info('Create new connection for {}.'.format(threading.get_ident()))
+            self.connect()
+        try:
+            self._db[threading.get_ident()].ping()
+        except Exception as e:
+            critical("ERROR: Database is down. {}".format(e))
             self.connect()
 
         return self._db[threading.get_ident()]
+
+    def __query__(self, query, args):
+        """
+        Open a cursor, fetch the query with args, close the cursor and return it.
+        :rtype: MySQLdb.Cursor
+        :param query:
+        :param args:
+        :return: the cursor with results
+        """
+        cursor = self.db_conn().cursor()
+        cursor.execute(query, args)
+        cursor.close()
+        return cursor
 
     def query(self, query, args=None):
         """
@@ -106,14 +130,11 @@ class DB:
         :return: the cursor with results
         """
         try:
-            cursor = self.db_conn().cursor()
-            cursor.execute(query, args)
-            cursor.close()
-            return cursor
+            return self.__query__(query, args)
         except Exception as e:
-            critical("DB Connection exception {}".format(e))
-            self.close()
-            raise
+            critical("ERROR: Mysql databse has problem !{}".format(e))
+            times.sleep(20)
+            return self.__query__(query, args)
 
     def close(self):
         """
