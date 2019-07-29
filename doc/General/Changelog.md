@@ -1,3 +1,119 @@
+## 1.54
+*(2019-07-28)*
+
+A big thank you to the following 32 contributors this last month:
+
+  - murrant (7)
+  - CirnoT (6)
+  - PipoCanaja (5)
+  - jozefrebjak (5)
+  - h-barnhart (2)
+  - vitalisator (2)
+  - VVelox (2)
+  - N-Mi (2)
+  - rsys-dev (2)
+  - arrmo (2)
+  - jasoncheng7115 (1)
+  - xorrkaz (1)
+  - tgregory86 (1)
+  - sthen (1)
+  - steffann (1)
+  - sajanp (1)
+  - SourceDoctor (1)
+  - ospfbgp (1)
+  - awarre (1)
+  - filippog (1)
+  - Serazio (1)
+  - bergroth (1)
+  - rmedlyn (1)
+  - bestlong (1)
+  - djamp42 (1)
+  - VirTechSystems (1)
+  - MinePlugins (1)
+  - ig0rb (1)
+  - ifred16 (1)
+  - martijn-schmidt (1)
+  - Derova (1)
+  - abuzze (1)
+
+#### Feature
+* MPLS Services ([#10421](https://github.com/librenms/librenms/pull/10421)) - [vitalisator](https://github.com/vitalisator)
+* Graylog entry matching device if source is not hostname or primary ip ([#10458](https://github.com/librenms/librenms/pull/10458)) - [rsys-dev](https://github.com/rsys-dev)
+* Allow filtering of getUserlist LDAP function ([#10399](https://github.com/librenms/librenms/pull/10399)) - [ifred16](https://github.com/ifred16)
+
+#### Breaking Change
+* Refactor Api transport to use Guzzle (and new variables syntax) ([#10070](https://github.com/librenms/librenms/pull/10070)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Security
+* Enable CSRF protection ([#10447](https://github.com/librenms/librenms/pull/10447)) - [murrant](https://github.com/murrant)
+
+#### Device
+* Add OpenWrt OS support (discovery, poller) ([#10454](https://github.com/librenms/librenms/pull/10454)) - [arrmo](https://github.com/arrmo)
+* Temperature limits from MIB ([#10326](https://github.com/librenms/librenms/pull/10326)) - [martijn-schmidt](https://github.com/martijn-schmidt)
+* FS.net pdu ([#10424](https://github.com/librenms/librenms/pull/10424)) - [ig0rb](https://github.com/ig0rb)
+* Added Support For Teltonika RUT2XX Devices ([#10358](https://github.com/librenms/librenms/pull/10358)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Fix NetAgent II battery voltage ([#10427](https://github.com/librenms/librenms/pull/10427)) - [CirnoT](https://github.com/CirnoT)
+* Add phase2 name to fortigate IPSEC sensor. ([#10423](https://github.com/librenms/librenms/pull/10423)) - [VirTechSystems](https://github.com/VirTechSystems)
+* Add svg image for Roku ([#10448](https://github.com/librenms/librenms/pull/10448)) - [arrmo](https://github.com/arrmo)
+* Added VRP SFPs thresholds and map entPhysical to ifIndexes ([#10363](https://github.com/librenms/librenms/pull/10363)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added F5 ssl tps, global server/client connection rate and active connections ([#9883](https://github.com/librenms/librenms/pull/9883)) - [Serazio](https://github.com/Serazio)
+* Updating RAPID-CITY mib for Extreme VSP ([#10406](https://github.com/librenms/librenms/pull/10406)) - [ospfbgp](https://github.com/ospfbgp)
+* Update $rancid_map For Mikrotik ([#10426](https://github.com/librenms/librenms/pull/10426)) - [sajanp](https://github.com/sajanp)
+* New Sensor Data, Nokia Subscriber Statistics ([#10422](https://github.com/librenms/librenms/pull/10422)) - [vitalisator](https://github.com/vitalisator)
+* Added detection for ZTE zxdsl devices ([#10344](https://github.com/librenms/librenms/pull/10344)) - [rsys-dev](https://github.com/rsys-dev)
+* Added Support for Unitrends Backup ([#10411](https://github.com/librenms/librenms/pull/10411)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added VPN sensors for Fortinet Fortigate ([#10384](https://github.com/librenms/librenms/pull/10384)) - [jozefrebjak](https://github.com/jozefrebjak)
+
+#### Webui
+* Fix Google maps lat/lon query string ([#10463](https://github.com/librenms/librenms/pull/10463)) - [filippog](https://github.com/filippog)
+* Fix 2fa enable ([#10462](https://github.com/librenms/librenms/pull/10462)) - [murrant](https://github.com/murrant)
+* Add more detail to webgui alerts ([#10388](https://github.com/librenms/librenms/pull/10388)) - [djamp42](https://github.com/djamp42)
+* Fix Nan value broken maps network graph ([#10408](https://github.com/librenms/librenms/pull/10408)) - [bestlong](https://github.com/bestlong)
+* Fix structure of network_map_legend default ([#10429](https://github.com/librenms/librenms/pull/10429)) - [rmedlyn](https://github.com/rmedlyn)
+* Smoking outgoing graphs fix ([#10415](https://github.com/librenms/librenms/pull/10415)) - [steffann](https://github.com/steffann)
+* Set Service Ignore and Disabled in UI ([#10334](https://github.com/librenms/librenms/pull/10334)) - [h-barnhart](https://github.com/h-barnhart)
+* Replace color indicator near uptime counter with colored text and change color of status indicator to black on disabled devices instead of gray (matches availablity map with show ignored/disabled enabled) ([#10372](https://github.com/librenms/librenms/pull/10372)) - [CirnoT](https://github.com/CirnoT)
+* Ignore disabled components in component widget ([#10369](https://github.com/librenms/librenms/pull/10369)) - [abuzze](https://github.com/abuzze)
+
+#### Alerting
+* Fix alert and template test scripts ([#10464](https://github.com/librenms/librenms/pull/10464)) - [murrant](https://github.com/murrant)
+* Alert Subsys to OOP and SNMPTraps trigger Alert Rules ([#9765](https://github.com/librenms/librenms/pull/9765)) - [h-barnhart](https://github.com/h-barnhart)
+* Add support for using Markdown for the Ciscospark transport ([#10442](https://github.com/librenms/librenms/pull/10442)) - [xorrkaz](https://github.com/xorrkaz)
+
+#### Billing
+* Don't display INF% for percentage of used transfer when billing is CDR ([#10446](https://github.com/librenms/librenms/pull/10446)) - [CirnoT](https://github.com/CirnoT)
+* Properly format 95th CDR as SI Mbps in billing ([#10444](https://github.com/librenms/librenms/pull/10444)) - [CirnoT](https://github.com/CirnoT)
+* Fix missing background on progress-bar for 95th bills ([#10443](https://github.com/librenms/librenms/pull/10443)) - [CirnoT](https://github.com/CirnoT)
+
+#### Discovery
+* Added support for DGD and BER on newer infinera-groove FW ([#10435](https://github.com/librenms/librenms/pull/10435)) - [bergroth](https://github.com/bergroth)
+* Ensure that sysName is trimmed on discovery ([#10434](https://github.com/librenms/librenms/pull/10434)) - [CirnoT](https://github.com/CirnoT)
+* Added skip_values operator and documentation ([#10419](https://github.com/librenms/librenms/pull/10419)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Bug
+* Typo in Spelling prevented new services from being added. ([#10420](https://github.com/librenms/librenms/pull/10420)) - [tgregory86](https://github.com/tgregory86)
+* Fix doc test after changelog split ([#10412](https://github.com/librenms/librenms/pull/10412)) - [N-Mi](https://github.com/N-Mi)
+
+#### Documentation
+* Fix docs build ([#10461](https://github.com/librenms/librenms/pull/10461)) - [murrant](https://github.com/murrant)
+* Fixed broken links ([#10459](https://github.com/librenms/librenms/pull/10459)) - [Derova](https://github.com/Derova)
+* Transport API - Doc for placeholders ([#10416](https://github.com/librenms/librenms/pull/10416)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Mistake in url API ([#10455](https://github.com/librenms/librenms/pull/10455)) - [MinePlugins](https://github.com/MinePlugins)
+* More md linting ([#10371](https://github.com/librenms/librenms/pull/10371)) - [VVelox](https://github.com/VVelox)
+* Fixed typo: Administartor ([#10437](https://github.com/librenms/librenms/pull/10437)) - [awarre](https://github.com/awarre)
+* Mdadm application documentation ([#10430](https://github.com/librenms/librenms/pull/10430)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Make Applications.md more lint happy and add a section on sudo at the top ([#10367](https://github.com/librenms/librenms/pull/10367)) - [VVelox](https://github.com/VVelox)
+* Split 2017 and 2018 changelogs ([#10404](https://github.com/librenms/librenms/pull/10404)) - [N-Mi](https://github.com/N-Mi)
+* Update Smokeping.md ([#10407](https://github.com/librenms/librenms/pull/10407)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Update Portactivity Applications.md ([#10394](https://github.com/librenms/librenms/pull/10394)) - [jozefrebjak](https://github.com/jozefrebjak)
+
+#### Translation
+* Make Disabled/Shutdown to be translatable ([#10398](https://github.com/librenms/librenms/pull/10398)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+
+#### Misc
+* Avoid unnecessary net-snmp long options for version info ([#10405](https://github.com/librenms/librenms/pull/10405)) - [sthen](https://github.com/sthen)
+
+
 ## 1.53
 *(2019-07-01)*
 
