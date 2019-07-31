@@ -28,7 +28,7 @@ $serialOIDList = [
 foreach ($serialOIDList as $oid) {
         $serial_tmp = snmp_get($device, $oid, '-Oqv');
     if (!empty($serial_tmp)) {
-	   $serial = $serial_tmp;
+        $serial = $serial_tmp;
         break;
-    }	
+    }
 }
