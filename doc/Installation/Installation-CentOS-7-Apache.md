@@ -8,9 +8,18 @@ path: blob/master/doc/
 
     yum install epel-release
 
+Running with webmatic php
+
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
     yum install composer cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
+
+Running with CentOS SCL php-fpm
+
+    yum install centos-release-scl
+    yum install rh-php72-php-fpm rh-php72-php-cli rh-php72-php-common rh-php72-php-curl rh-php72-php-gd rh-php72-php-mbstring rh-php72-php-process rh-php72-php-snmp rh-php72-php-xml rh-php72-php-zip rh-php72-php-memcached rh-php72-php-mysqlnd
+
+    ln -s /opt/rh/rh-php72/root/usr/bin/php /usr/bin/php
 
 #### Add librenms user
 
@@ -26,8 +35,9 @@ path: blob/master/doc/
 
     chown -R librenms:librenms /opt/librenms
     chmod 770 /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/ /opt/librenms/cache
+    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/ /opt/librenms/cache
+
 
 #### Install PHP dependencies
 
@@ -69,6 +79,14 @@ lower_case_table_names=0
 Ensure date.timezone is set in php.ini to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 
     vi  /etc/php.ini
+    
+or
+
+    vi /etc/opt/rh/rh-php72/php.ini
+
+When PHP is configured with open_basedir, be sure to allow the following paths for LibreNMS to work:
+
+    php_admin_value[open_basedir] = /opt/librenms:/dev/urandom:/usr/sbin/fping:/usr/sbin/fping6:/usr/bin/snmpgetnext:/usr/bin/rrdtool:/usr/bin/snmpwalk:/usr/bin/snmpget:/usr/bin/snmpbulkwalk:/usr/bin/traceroute
 
 ### Configure Apache
 
@@ -118,7 +136,14 @@ Install the policy tool for SELinux:
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/bootstrap/cache(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/bootstrap/cache(/.*)?'
     restorecon -RFvv /opt/librenms/bootstrap/cache/
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/cache(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/cache(/.*)?'
+    restorecon -RFvv /var/www/opt/librenms/cache/
     setsebool -P httpd_can_sendmail=1
+
+Additional SELinux problems may be found by executing the following command
+
+    cat /var/log/audit/audit.log | audit2why
 
 ##### Allow fping
 Create the file http_fping.tt with the following contents. You can create this file anywhere, as it is a throw-away file. The last step in this install procedure will install the module in the proper location.
@@ -168,6 +193,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ### Cron job
 
     cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
+    chmod 644 /etc/cron.d/librenms
 
 > NOTE: Keep in mind  that cron, by default, only uses a very limited set of environment variables. You may need to configure proxy variables for the cron invocation. Alternatively adding the proxy settings in config.php is possible too. The config.php file will be created in the upcoming steps. Review the following URL after you finished librenms install steps: https://docs.librenms.org/Support/Configuration/#proxy-support
 
@@ -176,6 +202,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
 
     cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
+    chmod 644 /etc/logrotate.d/librenms
 
 ## Web installer ##
 
