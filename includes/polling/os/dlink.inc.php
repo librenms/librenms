@@ -12,12 +12,12 @@ $versionOIDList = [
 ];
 
 foreach ($versionOIDList as $oid) {
-    $version_tmp = snmp_get($device, $oid, '-Oqv');
+        $version_tmp = snmp_get($device, $oid, '-Oqv');
      
-	if (!empty($version_tmp)) {
-	   $version = $version_tmp;
-           break;
-     	}
+    if (!empty($version_tmp)) {
+        $version = $version_tmp;
+        break;
+    }
 }
 
 $serialOIDList = [
@@ -26,9 +26,9 @@ $serialOIDList = [
 ];
 
 foreach ($serialOIDList as $oid) {
-    $serial_tmp = snmp_get($device, $oid, '-Oqv');
-	if (!empty($serial_tmp)) {
+        $serial_tmp = snmp_get($device, $oid, '-Oqv');
+    if (!empty($serial_tmp)) {
 	   $serial = $serial_tmp;
-           break;
-    	}	
+        break;
+    }	
 }
