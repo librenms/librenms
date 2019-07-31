@@ -17,7 +17,7 @@ To have devices automatically added, you will need to configure oxidized to pull
 
 LibreNMS will automatically map the OS to the Oxidized model name if they don't match. this means you shouldn't need to use the model_map config option within Oxidized.
 
-### Detailed integration information
+## Detailed integration information
 ---
 
 This is a straight forward use of Oxidized, it relies on you having a working Oxidized setup which is already taking config snapshots for your devices.
@@ -167,5 +167,29 @@ next_adds_job: true
 
 You can perform basic validation of the Oxidized configuration by going to the Overview -> Tools -> Oxidized link and in the Oxidized config validation page, paste your 
  yaml file into the input box and click 'Validate YAML'.
- 
+
 We check for yaml syntax errors and also actual config values to ensure they are used in the correct location.
+
+## Accessing configuration of a disabled/removed device
+
+When you're disabling or removing a device from LibreNMS, Oxidized will no longer shows it in the web interface the configuration. You can access directly to this information in the Git repository of Oxidized (if using Git to store versions).
+
+1. Check in your Oxidized where are stored your Git repositories:
+
+   - ```
+     /home/oxidized/.config/oxidized/config
+     ```
+
+2. Go the correct Git repository for the needed device (the .git one) and get the list of devices using this command:
+
+   - ```
+     git ls-files -s
+     ```
+
+3. Save the object ID of the device, and run the command to get the file content:
+
+   1. ```
+      git cat-file -p <object id>
+      ```
+
+      
