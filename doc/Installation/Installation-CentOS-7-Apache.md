@@ -7,17 +7,18 @@ path: blob/master/doc/
 ## Install Required Packages ##
 
     yum install epel-release
+    yum install git cronie fping jwhois ImageMagick mtr MySQL-python MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server
 
 Running with webmatic php
 
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-    yum install composer cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
+    yum install composer php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
 
 Running with CentOS SCL php-fpm
 
     yum install centos-release-scl
-    yum install rh-php72-php-fpm rh-php72-php-cli rh-php72-php-common rh-php72-php-curl rh-php72-php-gd rh-php72-php-mbstring rh-php72-php-process rh-php72-php-snmp rh-php72-php-xml rh-php72-php-zip rh-php72-php-memcached rh-php72-php-mysqlnd
+    yum install composer rh-php72-php-fpm rh-php72-php-cli rh-php72-php-common rh-php72-php-curl rh-php72-php-gd rh-php72-php-mbstring rh-php72-php-process rh-php72-php-snmp rh-php72-php-xml rh-php72-php-zip rh-php72-php-memcached rh-php72-php-mysqlnd
 
     ln -s /opt/rh/rh-php72/root/usr/bin/php /usr/bin/php
 
