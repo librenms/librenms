@@ -33,6 +33,7 @@ use App\Models\Port;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
@@ -65,12 +66,28 @@ class RoutesTablesController extends TableController
      */
     protected function baseQuery($request)
     {
-        if ($request->device_id) {
-            return InetCidrRoute::hasAccess($request->user())
-                ->where('device_id', $request->device_id);
-        } else {
-            return InetCidrRoute::hasAccess($request->user());
+        $join =  function ($query) {
+            $query->on('ports.port_id', 'inetCidrRoute.port_id');
+        };
+        $showAllRoutes = trim(\Request::get('showAllRoutes'));
+        if ($request->device_id && $showAllRoutes == 'false') {
+            $query=InetCidrRoute::hasAccess($request->user())
+                ->leftJoin('ports', $join)
+                ->where('inetCidrRoute.device_id', $request->device_id)
+                ->where('updated_at', InetCidrRoute::hasAccess($request->user())
+                    ->where('inetCidrRoute.device_id', $request->device_id)
+                    ->select('updated_at')
+                    ->max('updated_at'));
+            return $query;
         }
+        if ($request->device_id && $showAllRoutes == 'true') {
+            $query=InetCidrRoute::hasAccess($request->user())
+                ->leftJoin('ports', $join)
+                ->where('inetCidrRoute.device_id', $request->device_id);
+            return $query;
+        }
+        return InetCidrRoute::hasAccess($request->user())
+            ->leftJoin('ports', $join);
     }
 
     /**
@@ -99,10 +116,8 @@ class RoutesTablesController extends TableController
     {
         $sort = $request->get('sort');
         if (isset($sort['inetCidrRouteIfIndex'])) {
-            $query->join('ports', function ($join) {
-                    $join->on('inetCidrRoute.port_id', 'ports.port_id');
-            })
-            ->orderBy('ports.ifDescr', $sort['inetCidrRouteIfIndex']);
+            $query->orderBy('ifDescr', $sort['inetCidrRouteIfIndex'])
+                ->orderBy('inetCidrRouteIfIndex', $sort['inetCidrRouteIfIndex']);
         }
         // Simple fields to sort
         $s_fields = [
@@ -113,7 +128,8 @@ class RoutesTablesController extends TableController
             'inetCidrRouteNextHop',
             'updated_at',
             'created_at',
-            'context_name'
+            'context_name',
+            'inetCidrRouteDest'
         ];
         foreach ($s_fields as $s_field) {
             if (isset($sort[$s_field])) {
@@ -136,12 +152,13 @@ class RoutesTablesController extends TableController
         if ($item['inetCidrRouteIfIndex'] == 0) {
             $item['inetCidrRouteIfIndex'] = 'Undefined';
         }
+        $item['inetCidrRouteIfIndex'] = 'ifIndex ' . $item['inetCidrRouteIfIndex'];
         if ($port = $route_entry->port()->first()) {
             $item['inetCidrRouteIfIndex'] = Url::portLink($port, $port->getShortLabel());
         }
         $device = Device::findByIp($route_entry->inetCidrRouteNextHop);
         if ($device) {
-            if ($device->device_id == $route_entry->device_id) {
+            if ($device->device_id == $route_entry->device_id || in_array($route_entry->inetCidrRouteNextHop, ['127.0.0.1', '::1'])) {
                 $item['inetCidrRouteNextHop'] = Url::deviceLink($device, "localhost");
             } else {
                 $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . "<br>(" . Url::deviceLink($device) . ")";

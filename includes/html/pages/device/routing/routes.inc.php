@@ -23,15 +23,43 @@ $no_refresh = true;
 <div>Warning: Routing Table is only retrieved during device discovery. Devices are skipped if they have more than <?php echo Config::get('routes.max_number');?> routes.</div>
 <script>
 
+
 var grid = $("#routes").bootgrid({
     ajax: true,
     post: function ()
     {
+        var check_showAllRoutes = document.getElementById('check_showAllRoutes');
+        if (check_showAllRoutes) {
+            var showAllRoutes = document.getElementById('check_showAllRoutes').checked;
+        } else {
+            var showAllRoutes = false;
+        }
         return {
             device_id: "<?php echo $device['device_id']; ?>",
+            showAllRoutes: showAllRoutes,
         };
     },
     url: "ajax/table/routes"
 });
+
+var add = $(".actionBar").append(
+        '<div class="pull-left">' +
+        '<?php echo csrf_field() ?>'+
+        '<div class="form-group"><div class="input-group">' + '<span class=" input-group-addon icon">' +
+        '<input type="checkbox" name="check_showAllRoutes" id="check_showAllRoutes"></span>' +
+        '<span class=" input-group-addon icon">' +
+        '<label class="form-check-label col-form-label col-form-label-sm"" for="check_showAllRoutes">' +
+        'Show all routes including history.' +
+        '</label>' +
+        '</span>' +
+        '</div></div>' +
+        '</div>');
+
+
+const check_showAllRoutes = document.getElementById('check_showAllRoutes')
+
+check_showAllRoutes.addEventListener('change', (event) => {
+    $('#routes').bootgrid('reload');    
+})
 
 </script>
