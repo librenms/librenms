@@ -1331,7 +1331,7 @@ function can_skip_sensor($device, $sensor_type = '', $sensor_descr = '')
     if (! $device) {
         return false;
     }
-    if (! empty($sensor_type) && Config::getCombined($device['os'], "disabled_sensors.$sensor_type",false)) {
+    if (! empty($sensor_type) && Config::getCombined($device['os'], "disabled_sensors.$sensor_type", false)) {
         return true;
     }
     foreach (Config::getCombined($device['os'], "disabled_sensors_regex", []) as $skipRegex) {
