@@ -54,6 +54,13 @@
         </select>
     </div>
     <div class="form-group row">
+        <label for="location-{{ $id }}" class="control-label">@lang('Show Location field'):</label>
+        <select class="form-control" name="location" id="location-{{ $id }}">
+            <option value="1" @if($location == 1) selected @endif>@lang('show')</option>
+            <option value="0" @if($location == 0) selected @endif>@lang('hide')</option>
+        </select>
+    </div>
+    <div class="form-group row">
         <label for="sort-{{ $id }}" class="control-label">@lang('Sort alerts by'):</label>
         <select class="form-control" name="sort" id="sort-{{ $id }}">
             <option value="" @if($sort == 1) selected @endif>@lang('timestamp, descending')</option>
