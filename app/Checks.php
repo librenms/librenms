@@ -37,16 +37,16 @@ use Toastr;
 
 class Checks
 {
-    public static function preBoot()
+    public static function preAutoload()
     {
-        // check php extensions
-        if ($missing = self::missingPhpExtensions()) {
+        // Check PHP version otherwise it will just say server error
+        if (version_compare('7.1.3', PHP_VERSION, '>=')) {
             self::printMessage(
-                "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
-                $missing,
+                'PHP version 7.1.3 or newer is required to run LibreNMS',
+                null,
                 true
             );
-        }
+        };
     }
 
     /**
@@ -58,6 +58,18 @@ class Checks
             self::printMessage(
                 'Error: Missing dependencies! Run the following command to fix:',
                 './scripts/composer_wrapper.php install --no-dev',
+                true
+            );
+        }
+    }
+
+    public static function preBoot()
+    {
+        // check php extensions
+        if ($missing = self::missingPhpExtensions()) {
+            self::printMessage(
+                "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
+                $missing,
                 true
             );
         }
