@@ -322,7 +322,7 @@ function application_permitted($app_id, $device_id = null)
 
 function device_permitted($device_id)
 {
-    if (Auth::user()->hasGlobalRead()) {
+    if (Auth::user() && Auth::user()->hasGlobalRead()) {
         return true;
     }
     return \Permissions::canAccessDevice($device_id, Auth::id());
