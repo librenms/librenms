@@ -228,6 +228,9 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     if (!is_numeric($divisor)) {
         $divisor  = 1;
     }
+    if (can_skip_sensor($device, $type, $descr)) {
+        return false;
+    }
 
     d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current, (limits: LL: $low_limit, LW: $low_warn_limit, W: $warn_limit, H: $high_limit)\n");
 
@@ -991,7 +994,7 @@ function ignore_storage($os, $descr)
  */
 function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 {
-    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]) {
+    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type] && ! can_skip_sensor($device, $sensor_type, '')) {
         $sensor_options = array();
         if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'])) {
             $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
@@ -1041,7 +1044,8 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 d_echo("Final sensor value: $value\n");
 
-                if (YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache) === false && is_numeric($value)) {
+                $skippedFromYaml = YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache);
+                if ($skippedFromYaml === false && is_numeric($value)) {
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
 
                     // process the description
@@ -1314,6 +1318,30 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
         dbInsert($cbgp, 'bgpPeers_cbgp');
     }
 }
+
+/**
+ * check if we should skip this sensor from discovery
+ * @param $device
+ * @param string $sensor_type
+ * @param string $sensor_descr
+ * @return bool
+ */
+function can_skip_sensor($device, $sensor_type = '', $sensor_descr = '')
+{
+    if (! $device) {
+        return false;
+    }
+    if (! empty($sensor_type) && Config::getCombined($device['os'], "disabled_sensors.$sensor_type",false)) {
+        return true;
+    }
+    foreach (Config::getCombined($device['os'], "disabled_sensors_regex", []) as $skipRegex) {
+        if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 /**
  * check if we should skip this device from discovery

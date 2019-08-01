@@ -16,6 +16,31 @@ For example, to set an alternate icon for ios:
 $config['os']['ios']['icon'] = 'fuzzybunny';
 ```
 
+### Ignoring Sensors
+
+It is possible to filter some sensors from the configuration:
+
+- Filter all 'current' sensors for Operating System 'vrp'.
+```
+$config['os']['vrp']['disabled_sensors']['current'] = true;
+```
+
+- Filter all sensors matching regexp ``` '/PEM Iout/' ``` for Operating System iosxe. 
+```
+$config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';
+```
+
+- Ignore all temperature sensors
+```
+$config['disabled_sensors']['current'] = true;
+```
+
+- Filter all sensors matching regexp ``` '/PEM Iout/' ```.
+```
+$config['disabled_sensors_regex'][] = '/PEM Iout/';
+```
+
+
 ### Ignoring Interfaces
 See also: [Global Ignoring Interfaces Config](../../Support/Configuration.md#interfaces-to-be-ignored)
 
