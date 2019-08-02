@@ -151,7 +151,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 
 ```
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
-hmod +x /usr/bin/distro
+chmod +x /usr/bin/distro
 systemctl restart snmpd
 ```
 
