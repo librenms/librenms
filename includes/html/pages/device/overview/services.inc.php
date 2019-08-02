@@ -20,7 +20,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
             // Unknown
             $status = 'grey';
         }
-        $output .= $break . '<div title='  . str_replace(' ','&nbsp;&nbsp;',$data['service_message']) . '><a class=' . $status . '>' . strtolower($data['service_type']) . '</a></div>';
+        $output .= $break . '<div title=' . str_replace(' ','&nbsp;&nbsp;',$data['service_message']) . '><a class=' . $status . '>' . strtolower($data['service_type']) . '</a></div>';
         $break = ', ';
     }
 
