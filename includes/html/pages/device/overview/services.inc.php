@@ -20,7 +20,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
             // Unknown
             $status = 'grey';
         }
-        $output .= $break . '<a class=' . $status . '>' . strtolower($data['service_type']) . '</a>';
+        $output .= $break . '<div title='  . str_replace(' ','&nbsp;&nbsp;',$data['service_message']) . '><a class=' . $status . '>' . strtolower($data['service_type']) . '</a></div>';
         $break = ', ';
     }
 
@@ -30,7 +30,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
             <div class="col-md-12">
                 <div class="panel panel-default panel-condensed">
                     <div class="panel-heading">
-                    <i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong>
+                    <?php echo '<a href="device/device='.$device['device_id'].'/tab=services">'?><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong><?php echo '</a>'?>
                     </div>
                     <table class="table table-hover table-condensed table-striped">
                         <tr>
