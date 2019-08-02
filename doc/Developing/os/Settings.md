@@ -21,25 +21,29 @@ $config['os']['ios']['icon'] = 'fuzzybunny';
 It is possible to filter some sensors from the configuration:
 
 - Filter all 'current' sensors for Operating System 'vrp'.
-```
+
+```php
 $config['os']['vrp']['disabled_sensors']['current'] = true;
 ```
 
-- Filter all sensors matching regexp ``` '/PEM Iout/' ``` for Operating System iosxe. 
-```
+- Filter all sensors matching regexp ``` '/PEM Iout/' ``` for
+Operating System iosxe.
+
+```php
 $config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';
 ```
 
 - Ignore all temperature sensors
-```
+
+```php
 $config['disabled_sensors']['current'] = true;
 ```
 
 - Filter all sensors matching regexp ``` '/PEM Iout/' ```.
-```
+
+```php
 $config['disabled_sensors_regex'][] = '/PEM Iout/';
 ```
-
 
 ### Ignoring Interfaces
 See also: [Global Ignoring Interfaces Config](../../Support/Configuration.md#interfaces-to-be-ignored)
