@@ -17,7 +17,7 @@ foreach ($versionOIDList as $oid) {
     if (!empty($version_tmp)) {
         $version = $version_tmp;
         break;
-     	}
+    }
 }
 
 $serialOIDList = [
@@ -30,5 +30,5 @@ foreach ($serialOIDList as $oid) {
     if (!empty($serial_tmp)) {
         $serial = $serial_tmp;
         break;
-    	}
+    }
 }
