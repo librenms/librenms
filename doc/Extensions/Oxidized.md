@@ -40,7 +40,7 @@ LibreNMS currently supports sending groups back to Oxidized so that you can then
 $config['oxidized']['group_support'] = true;
 ```
 
-You can set a default group that devices will fall back to with:
+You must set a default group that devices will fall back to with:
 
 ```php
 $config['oxidized']['default_group'] = 'default';
