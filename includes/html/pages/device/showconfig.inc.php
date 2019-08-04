@@ -1,11 +1,10 @@
 <?php
 
 // FIXME svn stuff still using optc etc, won't work, needs updating!
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use Symfony\Component\Process\Process;
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     if (!is_array(Config::get('rancid_configs'))) {
         Config::set('rancid_configs', array(Config::get('rancid_configs')));
     }

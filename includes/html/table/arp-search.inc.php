@@ -1,15 +1,13 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $param = array();
 
 $sql .= ' FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D ';
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = LegacyAuth::id();
+    $param[] = Auth::id();
 }
 
 $sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where ";

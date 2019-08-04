@@ -74,50 +74,10 @@ class LegacyAuth
         return static::get();
     }
 
-    public static function check()
-    {
-        self::checkInitSession();
-        return isset($_SESSION['authenticated']) && $_SESSION['authenticated'];
-    }
-
-    public static function user()
-    {
-        self::checkInitSession();
-        return new UserProxy();
-    }
-
-    public static function id()
-    {
-        self::checkInitSession();
-        return isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
-    }
-
-    protected static function checkInitSession()
+    public static function setUpLegacySession()
     {
         if (!isset($_SESSION)) {
             @session_start();
-            session_write_close();
-        }
-    }
-
-    public static function setUpLegacySession()
-    {
-        if (Auth::check()) {
-            $user = Auth::user();
-
-            @session_start();
-            $_SESSION['username'] = $user->username;
-
-            // set up legacy variables, but don't override existing ones (ad anonymous bind can only get user_id at login)
-            if (!isset($_SESSION['userlevel'])) {
-                $_SESSION['userlevel'] = $user->level;
-            }
-
-            if (!isset($_SESSION['user_id'])) {
-                $_SESSION['user_id'] = $user->user_id;
-            }
-
-            $_SESSION['authenticated'] = true;
             session_write_close();
         }
     }

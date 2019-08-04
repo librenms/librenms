@@ -12,13 +12,11 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $where = 1;
 
 $sql = " FROM `alert_schedule` AS S WHERE $where";
-if (!LegacyAuth::user()->hasGlobalRead()) {
-    $param[] = LegacyAuth::id();
+if (!Auth::user()->hasGlobalRead()) {
+    $param[] = Auth::id();
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {

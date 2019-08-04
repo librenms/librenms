@@ -12,8 +12,6 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 session_start();
 if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
     $init_modules = array('web', 'nodb');
@@ -22,7 +20,7 @@ if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
     $init_modules = array('web', 'auth', 'alerts');
     require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-    if (!LegacyAuth::check()) {
+    if (!Auth::check()) {
         die('Unauthorized');
     }
 }

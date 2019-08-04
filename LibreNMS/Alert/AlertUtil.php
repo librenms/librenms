@@ -26,7 +26,7 @@
 namespace LibreNMS\Alert;
 
 use App\Models\Device;
-use LibreNMS\Authentication\LegacyAuth;
+use App\Models\User;
 use LibreNMS\Config;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -85,7 +85,7 @@ class AlertUtil
             $email = Config::get('alert.default_mail', Config::get('alerts.email.default'));
             return $email ? [$email => ''] : [];
         }
-        $users = LegacyAuth::get()->getUserlist();
+        $users = User::query()->thisAuth()->get();
         $contacts = array();
         $uids = array();
         foreach ($results as $result) {
@@ -125,9 +125,6 @@ class AlertUtil
             }
             if (empty($user['realname'])) {
                 $user['realname'] = $user['username'];
-            }
-            if (empty($user['level'])) {
-                $user['level'] = LegacyAuth::get()->getUserlevel($user['username']);
             }
             if (Config::get('alert.globals') && ( $user['level'] >= 5 && $user['level'] < 10 )) {
                             $contacts[$user['email']] = $user['realname'];

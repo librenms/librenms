@@ -3,7 +3,6 @@
     <td bgcolor=#e5e5e5 valign=top>
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 $nodes     = array();
@@ -112,7 +111,7 @@ echo '</div>
     <td bgcolor=#e5e5e5 width=470 valign=top>';
 
 // this stuff can be customised to show whatever you want....
-if (LegacyAuth::user()->hasGlobalRead()) {
+if (Auth::user()->hasGlobalRead()) {
     $sql = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
     unset($seperator);
     foreach (dbFetchRows($sql) as $interface) {
