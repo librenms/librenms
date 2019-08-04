@@ -40,6 +40,7 @@ class AlertsController extends WidgetController
         'state' => null,
         'group' => null,
         'proc' => 0,
+        'location' => 1,
         'sort' => 1,
     ];
 
