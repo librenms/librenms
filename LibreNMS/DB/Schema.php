@@ -25,6 +25,7 @@
 
 namespace LibreNMS\DB;
 
+use Cache;
 use LibreNMS\Config;
 use LibreNMS\Util\Version;
 use Symfony\Component\Yaml\Yaml;
@@ -146,11 +147,10 @@ class Schema
     public function getAllRelationshipPaths($base = 'devices')
     {
         $update_cache = true;
-        $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
+        $key = "{$base}_relationships";
         $db_version = Version::get()->database();
 
-        if (is_file($cache_file)) {
-            $cache = unserialize(file_get_contents($cache_file));
+        if ($cache = Cache::get($key)) {
             if ($cache['version'] == $db_version) {
                 $update_cache = false;  // cache is valid skip update
             }
@@ -170,7 +170,7 @@ class Schema
                 $base => $paths
             ];
 
-            file_put_contents($cache_file, serialize($cache));
+            Cache::forever($key, $cache);
         }
 
         return $cache[$base];

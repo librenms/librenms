@@ -30,7 +30,6 @@ class GitIgnoreTest extends TestCase
     private $gitIgnoreFiles = [
         '.gitignore',
         'bootstrap/cache/.gitignore',
-        'cache/.gitignore',
         'logs/.gitignore',
         'resources/views/alerts/templates/.gitignore',
         'rrd/.gitignore',

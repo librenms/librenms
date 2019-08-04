@@ -1554,11 +1554,9 @@ function load_os(&$device)
 function load_all_os($existing = false, $cached = true)
 {
     $install_dir = Config::get('install_dir');
-    $cache_file = $install_dir . '/cache/os_defs.cache';
 
-    if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < Config::get('os_def_cache_time'))) {
+    if ($cached && $os_defs = Cache::get('os_defs')) {
         // Cached
-        $os_defs = unserialize(file_get_contents($cache_file));
 
         if ($existing) {
             // remove unneeded os
@@ -1587,28 +1585,24 @@ function load_all_os($existing = false, $cached = true)
 }
 
 /**
- * * Update the OS cache file cache/os_defs.cache
+ * * Update the OS cache in the Laravel cache
  * @param bool $force
  * @return bool true if the cache was updated
  */
 function update_os_cache($force = false)
 {
-    $install_dir = Config::get('install_dir');
-    $cache_file = "$install_dir/cache/os_defs.cache";
-    $cache_keep_time = Config::get('os_def_cache_time', 86400) - 7200; // 2hr buffer
-
-    if ($force === true || !is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
-        d_echo('Updating os_def.cache... ');
+    if ($force === true || !Cache::has('os_defs')) {
+        d_echo('Updating os_def cache... ');
 
         // remove previously cached os settings and replace with user settings
         $config = ['os' => []]; // local $config variable, not global
-        include "$install_dir/config.php";
+        include Config::get('install_dir') . '/config.php';
         Config::set('os', $config['os']);
 
         // load the os defs fresh from cache (merges with existing OS settings)
         load_all_os(false, false);
 
-        file_put_contents($cache_file, serialize(Config::get('os')));
+        Cache::put('os_defs', Config::get('os'), Config::get('os_def_cache_time', 86400));
         d_echo("Done\n");
         return true;
     }
