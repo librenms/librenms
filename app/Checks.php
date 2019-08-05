@@ -85,7 +85,7 @@ class Checks
             return;
         }
 
-        Cache::put('checks_popup_timeout', true, Config::get('checks_popup_timer', 5));
+        Cache::put('checks_popup_timeout', true, Config::get('checks_popup_timer', 5) * 60);
 
         $user = Auth::user();
 
