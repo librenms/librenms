@@ -4,7 +4,7 @@ use LibreNMS\Authentication\LegacyAuth;
 
 echo '<div style="margin: 10px;">';
 
-if (!LegacyAuth::user()->isAdmin()) {
+if (!Auth::user()->isAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     echo '<h3>Delete User</h3>';

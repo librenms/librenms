@@ -13,9 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
-
 $where = ' `devices`.`disabled` = 0';
 
 $alert_states = array(
@@ -85,10 +82,10 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where .= ' AND `DP`.`user_id`=?';
-    $param[] = LegacyAuth::id();
+    $param[] = Auth::id();
 }
 
 $sql .= " LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id`";

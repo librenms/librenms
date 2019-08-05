@@ -34,16 +34,14 @@ var grid = $("#fdb-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 // Select the devices only with FDB tables
 $sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
 
 $param = array();
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = LegacyAuth::id();
+    $param[] = Auth::id();
 }
 
 $sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";

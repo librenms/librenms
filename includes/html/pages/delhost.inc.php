@@ -1,15 +1,13 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     require 'includes/html/error-no-perm.inc.php';
     exit;
 }
 
 $pagetitle[] = "Delete device";
 
-if (LegacyAuth::user()->isDemoUser()) {
+if (Auth::user()->isDemoUser()) {
     demo_account();
 } else {
     if (is_numeric($_REQUEST['id'])) {

@@ -11,9 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     // Build the types list.
     $dir = \LibreNMS\Config::get('nagios_plugins');
     if (file_exists($dir) && is_dir($dir)) {

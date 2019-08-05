@@ -1,14 +1,13 @@
 <?php
 
 use LibreNMS\Util\IP;
-use LibreNMS\Authentication\LegacyAuth;
 
 $param = array();
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $perms_sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where     .= ' AND `DP`.`user_id`=?';
-    $param[]    = array(LegacyAuth::id());
+    $param[]    = array(Auth::id());
 }
 
 list($address,$prefix) = explode('/', $vars['address']);
