@@ -34,7 +34,7 @@ class AuthSSOTest extends DBTestCase
     private $original_auth_mech = null;
     private $server;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
