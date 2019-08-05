@@ -31,7 +31,7 @@ class DBSetupTest extends DBTestCase
 {
     protected $db_name;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->db_name = dbFetchCell('SELECT DATABASE()');

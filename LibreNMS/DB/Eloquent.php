@@ -42,7 +42,7 @@ class Eloquent
         if (!Laravel::isBooted() && is_null(self::$capsule)) {
             $install_dir = realpath(__DIR__ . '/../../');
 
-            (new Dotenv($install_dir))->load();
+            Dotenv::create($install_dir)->load();
 
             $db_config = include($install_dir . '/config/database.php');
             $settings = $db_config['connections'][$db_config['default']];

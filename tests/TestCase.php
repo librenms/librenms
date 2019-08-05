@@ -42,7 +42,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $this->snmpsim = $snmpsim;
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         set_debug(false); // prevent warnings from stopping execution for legacy code
