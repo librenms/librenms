@@ -1213,6 +1213,7 @@ function list_oxidized(\Illuminate\Http\Request $request)
             'arista_eos' => 'eos',
             'vyos'       => 'vyatta',
             'slms'       => 'zhoneolt',
+            'fireware'   => 'firewareos',
         ];
 
         $device['os'] = str_replace(array_keys($models), array_values($models), $device['os']);
