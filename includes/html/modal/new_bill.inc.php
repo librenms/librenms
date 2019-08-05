@@ -11,10 +11,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     require 'includes/html/javascript-interfacepicker.inc.php';
 
     $port_device_id = -1;

@@ -2,12 +2,11 @@
 
 use App\Models\Device;
 use App\Models\Location;
-use LibreNMS\Authentication\LegacyAuth;
 
 $device_model = Device::find($device['device_id']);
 
 if ($_POST['editing']) {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         if (isset($_POST['parent_id'])) {
             $parents = array_diff((array)$_POST['parent_id'], ['0']);
             // TODO avoid loops!
@@ -48,7 +47,7 @@ if ($_POST['editing']) {
         }
 
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
-            if (LegacyAuth::user()->hasGlobalAdmin()) {
+            if (Auth::user()->hasGlobalAdmin()) {
                 $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
                 if ($result == "") {
                     Toastr::success("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");

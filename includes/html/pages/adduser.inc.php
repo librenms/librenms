@@ -4,9 +4,9 @@ use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
-} elseif (LegacyAuth::user()->isDemoUser()) {
+} elseif (Auth::user()->isDemoUser()) {
     demo_account();
 } else {
     echo '<h3>Add User</h3>';

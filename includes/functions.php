@@ -11,8 +11,6 @@
  *
  */
 
-use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -24,9 +22,9 @@ use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
-use Symfony\Component\Process\Process;
-use PHPMailer\PHPMailer\PHPMailer;
 use LibreNMS\Util\Time;
+use PHPMailer\PHPMailer\PHPMailer;
+use Symfony\Component\Process\Process;
 
 if (!function_exists('set_debug')) {
     /**
@@ -886,7 +884,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => \Carbon\Carbon::now(),
         'severity' => $severity,
         'message' => $text,
-        'username'  => isset(LegacyAuth::user()->username) ? LegacyAuth::user()->username : '',
+        'username'  => Auth::user()->username ?? '',
     ], 'eventlog');
 }
 

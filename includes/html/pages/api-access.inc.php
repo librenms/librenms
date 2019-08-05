@@ -16,7 +16,7 @@ use App\Models\ApiToken;
 use App\Models\User;
 use LibreNMS\Authentication\LegacyAuth;
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     if (empty($_POST['token'])) {
         $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
     }
