@@ -23,8 +23,6 @@
  * @subpackage Search
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 print_optionbar_start(28);
 ?>
 <form method="post" action="" class="form-inline" role="form">
@@ -78,10 +76,10 @@ $full_query = "";
 $query = 'SELECT packages.name FROM packages,devices ';
 $param = array();
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $query .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
     $sql_where .= " AND `DP`.`user_id`=?";
-    $param[] = LegacyAuth::id();
+    $param[] = Auth::id();
 }
 
 $query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%".mres($_POST['package'])."%' $sql_where GROUP BY packages.name";

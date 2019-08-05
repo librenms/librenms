@@ -1,8 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     // Scan for new plugins and add to the database
     $new_plugins = scan_new_plugins();
 

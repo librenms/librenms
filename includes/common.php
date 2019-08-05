@@ -16,11 +16,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Git;
-use LibreNMS\Util\Html;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 
@@ -1704,7 +1702,7 @@ function get_user_pref($name, $default = null, $user_id = null)
     }
 
     if (is_null($user_id)) {
-        $user_id = LegacyAuth::id();
+        $user_id = Auth::id();
     }
 
     $pref = dbFetchCell(
@@ -1733,7 +1731,7 @@ function set_user_pref($name, $value, $user_id = null)
 {
     global $user_prefs;
     if (is_null($user_id)) {
-        $user_id = LegacyAuth::id();
+        $user_id = Auth::id();
     }
 
     $pref = array(

@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 

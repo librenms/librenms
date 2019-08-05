@@ -8,8 +8,6 @@
 ?>
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $nodes = array();
 
 $sql = "SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'";
@@ -105,7 +103,7 @@ echo '</div>
     <td bgcolor=#e5e5e5 width=275 valign=top>';
 
 // this stuff can be customised to show whatever you want....
-if (LegacyAuth::user()->hasGlobalRead()) {
+if (Auth::user()->hasGlobalRead()) {
     $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'L2TP: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
     $sql .= \LibreNMS\Config::get('mydomain') . "' ORDER BY I.ifAlias";
     unset($seperator);

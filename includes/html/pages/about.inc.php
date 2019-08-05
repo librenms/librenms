@@ -1,7 +1,5 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $pagetitle[] = 'About';
 $git_log = `git log -10`;
 ?>
@@ -90,7 +88,7 @@ echo "
     <table class='table table-condensed'>
       <tr>";
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo "        <td colspan='4'><span class='bg-danger'>$callback</span><br />
           Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
         <tr>
