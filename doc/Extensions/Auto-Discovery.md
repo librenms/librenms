@@ -19,8 +19,8 @@ To add devices automatically we need to know your snmp details, examples of SNMP
 
 ```php
 // v1 or v2c
-$config['snmp']['community'][] = "my_custom_community";
-$config['snmp']['community'][] = "another_community";
+$config['snmp']['community'][] = ['my_custom_community'];
+$config['snmp']['community'][] = ['another_community'];
 
 // v3
 $config['snmp']['v3'][0]['authlevel'] = 'authPriv';
@@ -29,6 +29,14 @@ $config['snmp']['v3'][0]['authpass'] = 'my_password';
 $config['snmp']['v3'][0]['authalgo'] = 'MD5';
 $config['snmp']['v3'][0]['cryptopass'] = 'my_crypto';
 $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
+
+// v3
+$config['snmp']['v3'][0]['authlevel'] = 'authPriv';
+$config['snmp']['v3'][0]['authname'] = 'another_username';
+$config['snmp']['v3'][0]['authpass'] = 'another_password';
+$config['snmp']['v3'][0]['authalgo'] = 'SHA';
+$config['snmp']['v3'][0]['cryptopass'] = 'another_crypto';
+$config['snmp']['v3'][0]['cryptoalgo'] = 'DES';
 ```
 
 These details will be attempted when adding devices, you can specify any mixture of these.
