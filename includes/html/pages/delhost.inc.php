@@ -7,7 +7,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
 
 $pagetitle[] = "Delete device";
 
-if (Auth::user()->isDemoUser()) {
+if (Auth::user()->isDemo()) {
     demo_account();
 } else {
     if (is_numeric($_REQUEST['id'])) {
