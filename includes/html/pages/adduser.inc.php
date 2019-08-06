@@ -6,7 +6,7 @@ $no_refresh = true;
 
 if (!Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
-} elseif (Auth::user()->isDemoUser()) {
+} elseif (Auth::user()->isDemo()) {
     demo_account();
 } else {
     echo '<h3>Add User</h3>';
