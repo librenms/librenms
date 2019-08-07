@@ -123,7 +123,7 @@ function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
     $hostname     = $request->route('hostname');
     $device_id    = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $vars = [
-        'port'   => $request->route('ifname'),
+        'port'   => $request->get('ifName', $request->route('ifname')),
         'type'   => $request->route('type', 'port_bits'),
         'output' => $request->get('output', 'display'),
         'width'  => $request->get('width', 1075),
@@ -138,8 +138,8 @@ function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
         $vars['to'] = $request->get('to');
     }
 
-    $port = $request->get('ifDescr') ? 'ifDescr' : 'ifName';
-    $vars['id'] = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", [$device_id, $vars['port']]);
+    $id = (ctype_digit($vars['port']) && !$request->has('ifName')) ? 'port_id' : ($request->get('ifDescr') ? 'ifDescr' : 'ifName');
+    $vars['id'] = dbFetchCell('SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`' . $id . '`=? AND `deleted` = 0 LIMIT 1', [$device_id, $vars['port']]);
 
     return check_port_permission($vars['id'], $device_id, function () use ($vars) {
         return api_get_graph($vars);
@@ -152,8 +152,9 @@ function get_port_stats_by_port_hostname(\Illuminate\Http\Request $request)
     // This will return port stats based on a devices hostname and ifName
     $hostname  = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $ifName    = $request->route('ifname');
-    $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', [$device_id, $ifName]);
+    $ifName    = $request->get('ifName', $request->route('ifname'));
+    $id = (ctype_digit($ifName) && !$request->has('ifName')) ? 'port_id' : 'ifName';
+    $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `' . $id . '`=? AND `deleted` = 0', [$device_id, $ifName]);
 
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
@@ -795,7 +796,7 @@ function list_available_wireless_graphs(\Illuminate\Http\Request $request)
 function get_port_graphs(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $columns = $request->get('columns', 'ifName');
+    $columns = $request->get('columns', 'ifName,port_id');
 
     if ($validate = validate_column_list($columns, 'ports') !== true) {
         return $validate;
