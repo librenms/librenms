@@ -183,10 +183,10 @@ class ComposerHelper
         return implode(PHP_EOL, array_map(function ($line) {
             $parts = explode('=', $line, 2);
             if (isset($parts[1])
-                && preg_match('/(?<! )#/', $parts[1]) // number symbol without a space before it
+                && preg_match('/(?<!\s)#/', $parts[1]) // number symbol without a space before it
                 && !preg_match('/^(".*"|\'.*\')$/', $parts[1]) // not already quoted
             ) {
-                return $parts[0] . '="' . $parts[1] . '"';
+                return trim($parts[0]) . '="' . trim($parts[1]) . '"';
             }
 
             return $line;
