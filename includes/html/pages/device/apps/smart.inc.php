@@ -35,7 +35,7 @@ if (isset($vars['disk'])) {
         'smart_other'       => 'Other',
         'smart_tests_status'=> 'S.M.A.R.T self-tests results',
         'smart_tests_ran'   => 'S.M.A.R.T self-tests run count',
-        'smart_runtime'         => 'Power On Hours',
+        'smart_runtime'     => 'Power On Hours',
     );
 } else {
     $graphs = array(
