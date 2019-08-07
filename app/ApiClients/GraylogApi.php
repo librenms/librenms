@@ -145,7 +145,11 @@ class GraylogApi
                 ->merge($device->ipv6->pluck('ipv6_address'));
         }
 
-        return $addresses->filter()->unique();
+        return $addresses->filter(
+            function ($address) {
+                return $address != "127.0.0.1" && $address != "::1";
+            }
+        )->unique();
     }
 
     public function isConfigured()
