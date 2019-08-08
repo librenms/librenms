@@ -25,7 +25,6 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 
 class AlertsController extends WidgetController
@@ -38,7 +37,7 @@ class AlertsController extends WidgetController
         'fired' => null,
         'min_severity' => null,
         'state' => null,
-        'group' => null,
+        'device_group' => null,
         'proc' => 0,
         'location' => 1,
         'sort' => 1,
@@ -51,7 +50,7 @@ class AlertsController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        $data = $this->getSettings();
+        $data = $this->getSettings(true);
         $data['severities'] = [
             // alert_rules.status is enum('ok','warning','critical')
             'ok' => 1,
@@ -69,7 +68,6 @@ class AlertsController extends WidgetController
             'worse' => '3',
             'better' => '4',
         ];
-        $data['device_group'] = DeviceGroup::find($data['group']);
 
         return view('widgets.settings.alerts', $data);
     }

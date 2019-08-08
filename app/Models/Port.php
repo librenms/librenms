@@ -6,7 +6,7 @@ use DB;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Rewrite;
 
-class Port extends BaseModel
+class Port extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'port_id';
@@ -210,11 +210,6 @@ class Port extends BaseModel
     }
 
     // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
-    }
 
     public function events()
     {
