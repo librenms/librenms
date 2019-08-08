@@ -210,7 +210,7 @@ if ($stage == 0) {
         }
     }
     echo "</td></tr>";
-    
+
     if (is_writable(Config::get('temp_dir'))) {
         $status = 'yes';
         $row_class = 'success';
@@ -378,7 +378,8 @@ if ($stage == 0) {
     <?php
 
     // Create the .env file we will write or display
-    $app_key = trim(`php artisan key:generate --show`);
+    Artisan::call('key:generate', ['--show' => true, '--no-ansi' => true, '--no-interaction' => true]);
+    $app_key = trim(Artisan::output());
     $node_id = uniqid();
     $dot_env = <<<"EOD"
 APP_KEY=$app_key
@@ -386,7 +387,7 @@ NODE_ID=$node_id
 DB_HOST=$dbhost
 DB_DATABASE=$dbname
 DB_USERNAME=$dbuser
-DB_PASSWORD=$dbpass
+DB_PASSWORD="$dbpass"
 
 EOD;
 
