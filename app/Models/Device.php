@@ -431,7 +431,7 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereIn('device_id', function ($query) use ($deviceGroup) {
+        return $query->whereIn($query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
             $query->select('device_id')
                 ->from('device_group_device')
                 ->where('device_group_id', $deviceGroup);
