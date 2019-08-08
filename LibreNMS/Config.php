@@ -538,4 +538,16 @@ class Config
         self::set('time.year', $now - 31536000); // time() - (365 * 24 * 60 * 60);
         self::set('time.twoyear', $now - 63072000); // time() - (2 * 365 * 24 * 60 * 60);
     }
+
+    public static function populateLegacyDbCredentials()
+    {
+        $db = config('database.default');
+
+        self::set('db_host', config("database.connections.$db.host", 'localhost'));
+        self::set('db_name', config("database.connections.$db.database", 'librenms'));
+        self::set('db_user', config("database.connections.$db.username", 'librenms'));
+        self::set('db_pass', config("database.connections.$db.password"));
+        self::set('db_port', config("database.connections.$db.port", 3306));
+        self::set('db_socket', config("database.connections.$db.unix_socket"));
+    }
 }
