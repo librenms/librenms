@@ -24,4 +24,18 @@
         <label for="region-{{ $id }}" class="control-label">@lang('Region') <a target="_blank" href="https://developers.google.com/chart/interactive/docs/gallery/geochart#configuration-options">@lang('Help')</a></label>
         <input type="text" class="form-control" name="region" id="region-{{ $id }}" value="{{ $region }}">
     </div>
+    <div class="form-group">
+        <label for="device_group-{{ $id }}" class="control-label">@lang('Device group')</label>
+        <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="@lang('All Devices')">
+            @if($device_group)
+                <option value="{{ $device_group->id }}" selected>{{ $device_group->name }}</option>
+            @endif
+        </select>
+    </div>
+@endsection
+
+@section('javascript')
+    <script type="text/javascript">
+        init_select2('#device_group-{{ $id }}', 'device-group', {});
+    </script>
 @endsection

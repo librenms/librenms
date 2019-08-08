@@ -51,7 +51,7 @@ class GraylogController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        $data = $this->getSettings();
+        $data = $this->getSettings(true);
 
         if ($data['device']) {
             $data['device'] = Device::find($data['device']);

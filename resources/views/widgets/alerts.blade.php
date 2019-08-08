@@ -30,7 +30,7 @@
                 acknowledged: '{{ $acknowledged }}',
                 fired: '{{ $fired }}',
                 min_severity: '{{ $min_severity }}',
-                group: '{{ $group }}',
+                group: '{{ $device_group }}',
                 proc: '{{ $proc }}',
                 sort: '{{ $sort }}',
                 device_id: '{{ $device }}'
