@@ -8,7 +8,7 @@ if ($device['os_group'] == 'cisco') {
 
     // Not sure why we check for VTP, but this data comes from that MIB, so...
     $vtpversion = snmp_get($device, 'vtpVersion.0', '-OnvQ', 'CISCO-VTP-MIB');
-    if ($vtpversion == '1' || $vtpversion == '2' || $vtpversion == '3' || $vtpversion == 'one' || $vtpversion == 'two' || $vtpversion == 'three' || $vtpversion == 'none') {
+    if (in_array($vtpversion, ['1', '2', '3', 'one', 'two', 'three', 'none'])) {
         // FIXME - can have multiple VTP domains.
         $vtpdomains = snmpwalk_cache_oid($device, 'vlanManagementDomains', [], 'CISCO-VTP-MIB');
         $vlans      = snmpwalk_cache_twopart_oid($device, 'vtpVlanName', [], 'CISCO-VTP-MIB');
@@ -44,7 +44,7 @@ if ($device['os_group'] == 'cisco') {
 
                     // may need to fetch additional dot1dBasePortIfIndex mappings
                     $tmp_vlan_data = snmpwalk_cache_oid($vlan_device, 'dot1dBasePortIfIndex', $tmp_vlan_data, 'BRIDGE-MIB');
-                    $vlan_data = array();
+                    $vlan_data = [];
                     // flatten the array, use ifIndex instead of dot1dBasePortId
                     foreach ($tmp_vlan_data as $index => $array) {
                         if (isset($array['dot1dBasePortIfIndex'])) {
