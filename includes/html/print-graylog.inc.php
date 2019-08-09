@@ -36,8 +36,8 @@ $tmp_output = '
 <script>
 ';
 
-$rowCount = \LibreNMS\Config::get('graylog.device-page.rowCount');
-$loglevel = \LibreNMS\Config::get('graylog.device-page.loglevel');
+$rowCount = \LibreNMS\Config::get('graylog.device-page.rowCount') ?? 10;
+$loglevel = \LibreNMS\Config::get('graylog.device-page.loglevel') ?? 7;
 
 $tmp_output .= '
     $.ajax({
