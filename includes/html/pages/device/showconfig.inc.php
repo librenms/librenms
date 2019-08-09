@@ -318,8 +318,8 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
     if (!empty($text)) {
         if (isset($previous_config)) {
             $language = 'diff';
-        } elseif (isset($device['config_highlighting'])) {
-            $language = $device['config_highlighting'];
+        } elseif (isset(Config::get('os')[$device['os']]['config_highlighting'])) {
+            $language = Config::get('os')[$device['os']]['config_highlighting'];
         } else {
             $language = 'ios';
         }
