@@ -1322,14 +1322,7 @@ https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-recursor
 extend powerdns-recursor /etc/snmp/powerdns-recursor
 ```
 
-4: Create the cache directory, '/var/cache/librenms/' and make sure
-that it is owned by the user running the SNMP daemon.
-
-```
-mkdir -p /var/cache/librenms/
-```
-
-5: Restart snmpd on your host
+4: Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
