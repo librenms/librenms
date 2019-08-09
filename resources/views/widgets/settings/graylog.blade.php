@@ -30,6 +30,22 @@
     </div>
 
     <div class="form-group">
+        <label for="maxLevel-{{ $id }}" class="control-label">@lang('Max Level')</label>
+        <select name="maxLevel" id="maxLevel-{{ $id }}" class="form-control">
+            <option value="" disabled @if($maxLevel == null) selected @endif>@lang('Max Level')</option>
+            <option value="0" @if($maxLevel === 0) selected @endif>@lang('(0) Emergency')</option>
+            <option value="1" @if($maxLevel == 1) selected @endif>@lang('(1) Alert')</option>
+            <option value="2" @if($maxLevel == 2) selected @endif>@lang('(2) Critical')</option>
+            <option value="3" @if($maxLevel == 3) selected @endif>@lang('(3) Error')</option>
+            <option value="4" @if($maxLevel == 4) selected @endif>@lang('(4) Warning')</option>
+            <option value="5" @if($maxLevel == 5) selected @endif>@lang('(5) Notice')</option>
+            <option value="6" @if($maxLevel == 6) selected @endif>@lang('(6) Informational')</option>
+            <option value="7" @if($maxLevel == 7) selected @endif>@lang('(7) Debug')</option>
+        </select>
+    </div>
+
+
+    <div class="form-group">
         <label for="range-{{ $id }}" class="control-label">@lang('Time Range')</label>
         <select name="range" id="range-{{ $id }}" class="form-control">
             <option value="0" @if($range == 0) selected @endif>@lang('Search all time')</option>
