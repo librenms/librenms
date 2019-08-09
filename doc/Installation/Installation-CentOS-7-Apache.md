@@ -16,6 +16,9 @@ yum install epel-release
 
 ```
 rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+```
+
+```
 yum install composer cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
 ```
 
@@ -35,7 +38,7 @@ git clone https://github.com/librenms/librenms.git
 
 # Set permissions
 
-````
+```
 chown -R librenms:librenms /opt/librenms
 chmod 770 /opt/librenms
 setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
@@ -302,3 +305,4 @@ If you would like to help make LibreNMS better there are [many ways to
 help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You
 can also [back LibreNMS on Open
 Collective](https://t.libren.ms/donations).
+ 
