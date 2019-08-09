@@ -146,7 +146,14 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apach
 
 2: Make the script executable (chmod +x /etc/snmp/apache-stats.py)
 
-3: Verify it is working by running /etc/snmp/apache-stats.py In some
+3: Create the cache directory, '/var/cache/librenms/' and make sure
+that it is owned by the user running the SNMP daemon.
+
+```
+mkdir -p /var/cache/librenms/
+```
+
+4: Verify it is working by running /etc/snmp/apache-stats.py In some
 cases urlgrabber and pycurl needs to be installed, in Debian this can
 be achieved by:
 
@@ -154,17 +161,15 @@ be achieved by:
 apt-get install python-urlgrabber python-pycurl
 ```
 
-Make sure to remove /tmp/apache-snmp afterwards.
-
-4: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+5: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
 ```
 extend apache /etc/snmp/apache-stats.py
 ```
 
-5: Restart snmpd on your host
+6: Restart snmpd on your host
 
-6: Test by running
+7: Test by running
 
 ```
 snmpwalk <various options depending on your setup> localhost NET-SNMP-EXTEND-MIB::nsExtendOutput2Table
@@ -179,8 +184,16 @@ and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
 (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs
 to be installed: apt-get install libwww-perl)
 
-2: On the device page in Librenms, edit your host and check the
+2: Create the cache directory, '/var/cache/librenms/' and make sure
+that it is owned by the user running the SNMP daemon.
+
+```
+mkdir -p /var/cache/librenms/
+```
+
+3: On the device page in Librenms, edit your host and check the
 `Apache` under the Applications tab.
+
 
 # Asterisk
 
@@ -794,6 +807,13 @@ echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
 [Install the agent](Agent-Setup.md) on this device if it isn't already
 and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
+Create the cache directory, '/var/cache/librenms/' and make sure
+that it is owned by the user running the SNMP daemon.
+
+```
+mkdir -p /var/cache/librenms/
+```
+
 The MySQL script requires PHP-CLI and the PHP MySQL extension, so
 please verify those are installed.
 
@@ -830,7 +850,14 @@ https://github.com/librenms/librenms-agent/raw/master/snmp/mysql -O /etc/snmp/my
 
 2: Run `chmod +x /etc/snmp/mysql`
 
-3: Unlike most other scripts, the MySQL script requires a
+3: Create the cache directory, '/var/cache/librenms/' and make sure
+that it is owned by the user running the SNMP daemon.
+
+```
+mkdir -p /var/cache/librenms/
+```
+
+4: Unlike most other scripts, the MySQL script requires a
 configuration file `mysql.cnf` in `/etc/snmp/` with following content:
 
 ```php
@@ -841,15 +868,15 @@ $mysql_host = 'localhost';
 $mysql_port = 3306;
 ```
 
-4: Edit your snmpd.conf file and add:
+5: Edit your snmpd.conf file and add:
 
 ```
 extend mysql /etc/snmp/mysql
 ```
 
-5: Restart snmpd.
+6: Restart snmpd.
 
-6: Install the PHP CLI language and your MySQL module of choice for
+7: Install the PHP CLI language and your MySQL module of choice for
 PHP.
 
 The application should be auto-discovered as described at the top of
