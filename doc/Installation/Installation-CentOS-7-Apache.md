@@ -12,8 +12,13 @@ path: blob/master/doc/
 
 ```
 yum install epel-release
+```
 
+```
 rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+```
+
+```
 yum install composer cronie fping git httpd ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nmap php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
 ```
 
