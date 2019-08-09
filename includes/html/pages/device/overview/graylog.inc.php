@@ -1,7 +1,7 @@
 <?php
 
 if (\LibreNMS\Config::get('graylog.server')) {
-    echo 
+    echo
         '<div class="row" id="graylog-card">'.
         '  <div class="col-md-12">'.
         '    <div class="panel panel-default panel-condensed">'.
@@ -17,7 +17,7 @@ if (\LibreNMS\Config::get('graylog.server')) {
     require_once 'includes/html/print-graylog.inc.php';
     echo implode('', $common_output);
     unset($no_form);
-    echo 
+    echo
         '      </table>'.
         '    </div>'.
         '  </div>'.
