@@ -146,7 +146,14 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apach
 
 2: Make the script executable (chmod +x /etc/snmp/apache-stats.py)
 
-3: Verify it is working by running /etc/snmp/apache-stats.py In some
+3: Create the cache directory, '/var/cache/librenms/' and make sure
+that it is owned by the user running the SNMP daemon.
+
+```
+mkdir -p /var/cache/librenms/
+```
+
+4: Verify it is working by running /etc/snmp/apache-stats.py In some
 cases urlgrabber and pycurl needs to be installed, in Debian this can
 be achieved by:
 
@@ -154,17 +161,15 @@ be achieved by:
 apt-get install python-urlgrabber python-pycurl
 ```
 
-Make sure to remove /tmp/apache-snmp afterwards.
-
-4: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+5: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
 ```
 extend apache /etc/snmp/apache-stats.py
 ```
 
-5: Restart snmpd on your host
+6: Restart snmpd on your host
 
-6: Test by running
+7: Test by running
 
 ```
 snmpwalk <various options depending on your setup> localhost NET-SNMP-EXTEND-MIB::nsExtendOutput2Table
@@ -179,8 +184,16 @@ and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
 (If you get error like "Can't locate LWP/Simple.pm". libwww-perl needs
 to be installed: apt-get install libwww-perl)
 
-2: On the device page in Librenms, edit your host and check the
+2: Create the cache directory, '/var/cache/librenms/' and make sure
+that it is owned by the user running the SNMP daemon.
+
+```
+mkdir -p /var/cache/librenms/
+```
+
+3: On the device page in Librenms, edit your host and check the
 `Apache` under the Applications tab.
+
 
 # Asterisk
 
@@ -1295,7 +1308,14 @@ https://github.com/librenms/librenms-agent/raw/master/snmp/powerdns-recursor
 extend powerdns-recursor /etc/snmp/powerdns-recursor
 ```
 
-4: Restart snmpd on your host
+4: Create the cache directory, '/var/cache/librenms/' and make sure
+that it is owned by the user running the SNMP daemon.
+
+```
+mkdir -p /var/cache/librenms/
+```
+
+5: Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
