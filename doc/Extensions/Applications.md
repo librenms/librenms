@@ -807,6 +807,13 @@ echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
 [Install the agent](Agent-Setup.md) on this device if it isn't already
 and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
+Create the cache directory, '/var/cache/librenms/' and make sure
+that it is owned by the user running the SNMP daemon.
+
+```
+mkdir -p /var/cache/librenms/
+```
+
 The MySQL script requires PHP-CLI and the PHP MySQL extension, so
 please verify those are installed.
 
@@ -843,7 +850,14 @@ https://github.com/librenms/librenms-agent/raw/master/snmp/mysql -O /etc/snmp/my
 
 2: Run `chmod +x /etc/snmp/mysql`
 
-3: Unlike most other scripts, the MySQL script requires a
+3: Create the cache directory, '/var/cache/librenms/' and make sure
+that it is owned by the user running the SNMP daemon.
+
+```
+mkdir -p /var/cache/librenms/
+```
+
+4: Unlike most other scripts, the MySQL script requires a
 configuration file `mysql.cnf` in `/etc/snmp/` with following content:
 
 ```php
@@ -854,15 +868,15 @@ $mysql_host = 'localhost';
 $mysql_port = 3306;
 ```
 
-4: Edit your snmpd.conf file and add:
+5: Edit your snmpd.conf file and add:
 
 ```
 extend mysql /etc/snmp/mysql
 ```
 
-5: Restart snmpd.
+6: Restart snmpd.
 
-6: Install the PHP CLI language and your MySQL module of choice for
+7: Install the PHP CLI language and your MySQL module of choice for
 PHP.
 
 The application should be auto-discovered as described at the top of
