@@ -58,6 +58,7 @@ class GraylogController extends SimpleTableController
             'stream' => 'nullable|alpha_num',
             'device' => 'nullable|int',
             'range' => 'nullable|int',
+            'maxLevel' => 'nullable|int|min:0|max:7',
         ]);
 
         $search = $request->get('searchPhrase');
@@ -67,7 +68,9 @@ class GraylogController extends SimpleTableController
         $limit = $request->get('rowCount', 10);
         $page = $request->get('current', 1);
         $offset = ($page - 1) * $limit;
-        $query = $api->buildSimpleQuery($search, $device);
+        $maxLevel = $request->get('maxLevel', 7);
+        $query = $api->buildSimpleQuery($search, $device).
+            ($maxLevel !== null ? ' AND level: <='. $maxLevel : '');
 
         $sort = null;
         foreach ($request->get('sort', []) as $field => $direction) {

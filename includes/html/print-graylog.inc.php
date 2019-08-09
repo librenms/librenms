@@ -38,14 +38,23 @@ $tmp_output = '
 <script>
 ';
 
+$rowCount = \LibreNMS\Config::get('graylog.device-page.rowCount');
+$maxLevel = \LibreNMS\Config::get('graylog.device-page.maxLevel');
+
 $tmp_output .= '
     $.ajax({
         type: "post",
         data: {
-            device: "' . (isset($filter_device) ? $filter_device : '') . '"
+            device: "' . (isset($filter_device) ? $filter_device : '') . '",
+            '. ($rowCount? 'rowCount: '.$rowCount .',' : '') .'
+            '. ($maxLevel? 'maxLevel: '.$maxLevel .',' : '') .'
         },
         url: "' . url('/ajax/table/graylog') . '",
         success: function(data){
+            if (data.rowCount == 0) {
+                $("#graylog-card").remove();
+                return;
+            }
             var html = "<tbody>";
             $("#graylog").append("<tbody></tbody>");
             $.each(data.rows, function(i,v){
