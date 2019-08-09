@@ -81,8 +81,8 @@ if (\LibreNMS\Config::has('graylog.timezone')) {
 
 $tmp_output .= '
                 "<div class=\"form-group\">"+
-                "<select name=\"maxLevel\" id=\"maxLevel\" class=\"form-control\">"+
-                "<option value=\"\" disabled selected>Max Level</option>"+
+                "<select name=\"loglevel\" id=\"loglevel\" class=\"form-control\">"+
+                "<option value=\"\" disabled selected>Log Level</option>"+
                 "<option value=\"0\">'.("(0) " . __("syslog.severity.0")).'</option>"+
                 "<option value=\"1\">'.("(1) " . __("syslog.severity.1")).'</option>"+
                 "<option value=\"2\">'.("(2) " . __("syslog.severity.2")).'</option>"+
@@ -136,7 +136,7 @@ $tmp_output .= '
                 stream: "' . (isset($_POST['stream']) ? mres($_POST['stream']) : '') . '",
                 device: "' . (isset($filter_device) ? $filter_device : '') . '",
                 range: "' . (isset($_POST['range']) ? mres($_POST['range']) : '')  . '",
-                maxLevel: "' . (isset($_POST['maxLevel']) ? mres($_POST['maxLevel']) : '')  . '",
+                loglevel: "' . (isset($_POST['loglevel']) ? mres($_POST['loglevel']) : '')  . '",
             };
         },
         url: "' . url('/ajax/table/graylog') . '",

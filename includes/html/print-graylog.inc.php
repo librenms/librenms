@@ -17,8 +17,6 @@
  * @author     LibreNMS Contributors
 */
 
-#use App\Models\Device;
-
 $tmp_output = '
 
 <div class="table-responsive">
@@ -39,7 +37,7 @@ $tmp_output = '
 ';
 
 $rowCount = \LibreNMS\Config::get('graylog.device-page.rowCount');
-$maxLevel = \LibreNMS\Config::get('graylog.device-page.maxLevel');
+$loglevel = \LibreNMS\Config::get('graylog.device-page.loglevel');
 
 $tmp_output .= '
     $.ajax({
@@ -47,7 +45,7 @@ $tmp_output .= '
         data: {
             device: "' . (isset($filter_device) ? $filter_device : '') . '",
             '. ($rowCount? 'rowCount: '.$rowCount .',' : '') .'
-            '. ($maxLevel? 'maxLevel: '.$maxLevel .',' : '') .'
+            '. ($loglevel? 'loglevel: '.$loglevel .',' : '') .'
         },
         url: "' . url('/ajax/table/graylog') . '",
         success: function(data){

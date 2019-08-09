@@ -32,7 +32,7 @@
                 stream: "{{ $stream }}",
                 device: "{{ $device }}",
                 range: "{{ $range }}",
-                maxLevel: "{{ $maxLevel }}",
+                loglevel: "{{ $loglevel }}",
             };
         },
         url: "{{ url('/ajax/table/graylog') }}"

@@ -38,7 +38,7 @@ class GraylogController extends WidgetController
         'device' => null,
         'range' => null,
         'limit' => 15,
-        'maxLevel' => null,
+        'loglevel' => null,
     ];
 
     /**
