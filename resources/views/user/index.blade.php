@@ -17,6 +17,7 @@
                         <th data-column-id="level" data-formatter="level" data-type="numeric">@lang('Access')</th>
                         <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">@lang('Auth')</th>
                         <th data-column-id="email">@lang('Email')</th>
+                        <th data-column-id="enabled">@lang('Enabled')</th>
                         <th data-column-id="descr">@lang('Description')</th>
                         <th data-column-id="action" data-formatter="actions" data-sortable="false" data-searchable="false">@lang('Actions')</th>
                     </tr>
@@ -30,6 +31,7 @@
                                 <td>{{ $user->level }}</td>
                                 <td>{{ $user->auth_type }}</td>
                                 <td>{{ $user->email }}</td>
+                                <td>{{ $user->enabled }}</td>
                                 <td>{{ $user->descr }}</td>
                                 <td></td>
                             </tr>

@@ -21,6 +21,11 @@ class MysqlAuthorizer extends AuthorizerBase
         $password = $credentials['password'] ?? null;
 
         $hash = User::thisAuth()->where(['username' => $username])->value('password');
+        $enabled = User::thisAuth()->where(['username' => $username])->value('enabled');
+
+        if (! $enabled) {
+            throw new AuthenticationException($message = 'login denied');
+        }
 
         // check for old passwords
         if (strlen($hash) == 32) {

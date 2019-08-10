@@ -14,6 +14,18 @@
     </div>
 </div>
 
+<div class="form-group @if($errors->has('enabled')) has-error @endif">
+    <div class="col-sm-9 col-sm-offset-3">
+        <div class="checkbox">
+            <label class="checkbox-inline">
+                <input type="hidden" value="0" name="enabled">
+                <input type="checkbox" id="enabled" name="enabled" @if(old('enabled', $user->enabled)) checked @endif> @lang('Enabled')
+            </label>
+        </div>
+        <span class="help-block">{{ $errors->first('enabled') }}</span>
+    </div>
+</div>
+
 <div class="form-group @if($errors->has('descr')) has-error @endif">
     <label for="descr" class="control-label col-sm-3">@lang('Description')</label>
     <div class="col-sm-9">
