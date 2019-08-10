@@ -109,18 +109,21 @@ foreach ($sdbMgmtCtrlDevUnitAddressArray as $sdbMgmtCtrlDevUnitAddress => $sdbDe
 
         foreach ($sdbDevSnsNameArray[$sdbDevIdIndex] as $sdbDevSnsIndex => $sdbDevSnsName) {
             $sensorIndex      = $sdbMgmtCtrlDevUnitAddress * 1000000 + 300000 + $sdbDevSnsIndex * 1000; // +300k for the third top-level index namespace. Add 1000 * sdbDevSnsIndex which goes up to 16. Leave 3 variable digits at the end.
-            $entPhysicalName  = "External Sensor #". $sdbDevSnsIndex;
             switch ($sdbDevSnsTypeArray[$sdbDevIdIndex][$sdbDevSnsIndex]) {
                 case ('T'):
-                    $entPhysicalDescr = "Temperature sensor (°C)";
+                    $class = 'temperature';
                     break;
                 case ('H'):
-                    $entPhysicalDescr = "Humidity sensor (%)";
+                    $class = 'humidity';
                     break;
                 case ('I'):
-                    $entPhysicalDescr = "Dry switch contact (binary)";
+                    $class = 'state';
                     break;
             }
+            $unit  = __('sensors.' . $class . '.unit');
+            $short = __('sensors.' . $class . '.short');
+            $entPhysicalName  = "External $short Sensor";
+            $entPhysicalDescr = $class == 'state' ? "Dry switch contact (binary)" : "$short sensor ($unit)";
 
             discover_entity_physical($valid, $device, $sensorIndex, $entPhysicalDescr, 'sensor', $entPhysicalName, null, null, $sensorContainerIndex, 'Schleifenbauer Products B.V.', $sdbDevSnsIndex, null, null, null, null, 'true', $sdbDevSnsName, null, null);
         } // end external Sensor discovery foreach sdbDevSnsNameArray
