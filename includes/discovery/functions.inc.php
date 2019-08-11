@@ -1095,6 +1095,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     } else {
                         $uindex = YamlDiscovery::replaceValues('index', $index, null, $data, $pre_cache);
                     }
+
                     discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group);
 
                     if ($sensor_type === 'state') {
@@ -1126,6 +1127,10 @@ function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache,
         return $pre_cache[$discovery_data['oid']][$index][$name];
     }
 
+    if (str_contains($index, '.')) {
+        list($index) = explode('.', $index);
+    }
+
     if (isset($pre_cache[$name])) {
         if (is_array($pre_cache[$name])) {
             if (isset($pre_cache[$name][$index][$name])) {
@@ -1134,11 +1139,6 @@ function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache,
                 return $pre_cache[$index][$name];
             } elseif (count($pre_cache[$name]) === 1) {
                 return current($pre_cache[$name]);
-            } elseif (str_contains($index, '.')) {
-                list($left, $right) = explode('.', $index);
-                if (isset($pre_cache[$name][$left])) {
-                    return $pre_cache[$name][$left];
-                }
             }
         } else {
             return $pre_cache[$name];
