@@ -1127,22 +1127,26 @@ function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache,
         return $pre_cache[$discovery_data['oid']][$index][$name];
     }
 
-    if (str_contains($index, '.')) {
-        list($index) = explode('.', $index);
-    }
-
     if (isset($pre_cache[$name])) {
         if (is_array($pre_cache[$name])) {
             if (isset($pre_cache[$name][$index][$name])) {
                 return $pre_cache[$name][$index][$name];
-            } elseif (isset($pre_cache[$index][$name])) {
+            }
+            if (isset($pre_cache[$index][$name])) {
                 return $pre_cache[$index][$name];
-            } elseif (count($pre_cache[$name]) === 1) {
+            }
+            if (count($pre_cache[$name]) === 1) {
                 return current($pre_cache[$name]);
             }
-        } else {
-            return $pre_cache[$name];
+            if (str_contains($index, '.')) {
+                list($index) = explode('.', $index);
+                if (isset($pre_cache[$name][$index][$name])) {
+                    return $pre_cache[$name][$index][$name];
+                }
+            }
         }
+
+        return $pre_cache[$name];
     }
 
     return $default;
