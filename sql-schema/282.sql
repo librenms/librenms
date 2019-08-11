@@ -1,1 +1,0 @@
-ALTER TABLE `users` ADD `enabled` TINYINT NOT NULL DEFAULT '1';
