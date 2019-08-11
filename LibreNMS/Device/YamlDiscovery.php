@@ -131,6 +131,10 @@ class YamlDiscovery
             // search discovery data for values
             $value = preg_replace_callback('/{{ \$([a-zA-Z0-9.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
                 $replace = dynamic_discovery_get_value($matches[1], $index, $data, $pre_cache, null);
+                if (is_null($replace) && str_contains($index, '.')) {
+                    list($index) = explode('.', $index);
+                    $replace = dynamic_discovery_get_value($matches[1], $index, $data, $pre_cache, null);
+                }
                 if (is_null($replace)) {
                     d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
                     return ''; // remove the unavailable variable

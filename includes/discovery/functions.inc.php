@@ -1131,22 +1131,16 @@ function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache,
         if (is_array($pre_cache[$name])) {
             if (isset($pre_cache[$name][$index][$name])) {
                 return $pre_cache[$name][$index][$name];
-            }
-            if (isset($pre_cache[$index][$name])) {
+            } elseif (isset($pre_cache[$index][$name])) {
                 return $pre_cache[$index][$name];
-            }
-            if (count($pre_cache[$name]) === 1) {
+            } elseif (isset($pre_cache[$name][$index])) {
+                return $pre_cache[$name][$index];
+            } elseif (count($pre_cache[$name]) === 1) {
                 return current($pre_cache[$name]);
             }
-            if (str_contains($index, '.')) {
-                list($index) = explode('.', $index);
-                if (isset($pre_cache[$name][$index][$name])) {
-                    return $pre_cache[$name][$index][$name];
-                }
-            }
+        } else {
+            return $pre_cache[$name];
         }
-
-        return $pre_cache[$name];
     }
 
     return $default;
