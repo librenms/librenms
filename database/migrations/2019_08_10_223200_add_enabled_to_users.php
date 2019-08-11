@@ -30,4 +30,3 @@ class AddEnabledToUsers extends Migration
         });
     }
 }
-
