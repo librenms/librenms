@@ -1088,7 +1088,13 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $value = $user_function($value);
                     }
 
-                    $uindex = YamlDiscovery::replaceValues('index', $index, null, $data, $pre_cache) ?: $index;
+                    if (!isset($data['index'])) {
+                        $uindex = $index;
+                    } elseif ($data['index'] == $data['oid']) {
+                        $uindex = $data['index'];
+                    } else {
+                        $uindex = YamlDiscovery::replaceValues('index', $index, null, $data, $pre_cache);
+                    }
                     discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group);
 
                     if ($sensor_type === 'state') {
