@@ -74,6 +74,12 @@ function api_get_graph(array $vars)
     $auth = '1';
     $base64_output = '';
 
+    // prevent ugly error for undefined graphs from being passed to the user
+    list($type, $subtype) = extract_graph_type($vars['type']);
+    if (!is_file(base_path("includes/html/graphs/$type/auth.inc.php"))) {
+        return api_error(400, 'Invalid graph type');
+    }
+
     ob_start();
 
     rrdtool_initialize(false);
@@ -117,14 +123,14 @@ function check_port_permission($port_id, $device_id, $callback)
     return $callback($port_id);
 }
 
-function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
+function get_graph_by_port_hostname(\Illuminate\Http\Request $request, $ifname = null, $type = 'port_bits')
 {
     // This will return a graph for a given port by the ifName
     $hostname     = $request->route('hostname');
     $device_id    = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $vars = [
-        'port'   => $request->get('ifName', $request->route('ifname')),
-        'type'   => $request->route('type', 'port_bits'),
+        'port'   => $ifname ?: $request->route('ifname'),
+        'type'   => $request->route('type', $type),
         'output' => $request->get('output', 'display'),
         'width'  => $request->get('width', 1075),
         'height' => $request->get('height', 300),
@@ -138,8 +144,8 @@ function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
         $vars['to'] = $request->get('to');
     }
 
-    $id = (ctype_digit($vars['port']) && !$request->has('ifName')) ? 'port_id' : ($request->get('ifDescr') ? 'ifDescr' : 'ifName');
-    $vars['id'] = dbFetchCell('SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`' . $id . '`=? AND `deleted` = 0 LIMIT 1', [$device_id, $vars['port']]);
+    $port = $request->get('ifDescr') ? 'ifDescr' : 'ifName';
+    $vars['id'] = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", [$device_id, $vars['port']]);
 
     return check_port_permission($vars['id'], $device_id, function () use ($vars) {
         return api_get_graph($vars);
@@ -149,12 +155,24 @@ function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
 
 function get_port_stats_by_port_hostname(\Illuminate\Http\Request $request)
 {
+    $ifName = $request->route('ifname');
+
+    // handle %2f in paths and pass to get_graph_by_port_hostname if needed
+    if (str_contains($ifName, '/')) {
+        $parts = explode('/', $request->path());
+
+        if (isset($parts[5])) {
+            $ifName = urldecode($parts[5]);
+            if (isset($parts[6])) {
+                return get_graph_by_port_hostname($request, $ifName, $parts[6]);
+            }
+        }
+    }
+
     // This will return port stats based on a devices hostname and ifName
     $hostname  = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $ifName    = $request->get('ifName', $request->route('ifname'));
-    $id = (ctype_digit($ifName) && !$request->has('ifName')) ? 'port_id' : 'ifName';
-    $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `' . $id . '`=? AND `deleted` = 0', [$device_id, $ifName]);
+    $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', [$device_id, $ifName]);
 
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
@@ -796,7 +814,7 @@ function list_available_wireless_graphs(\Illuminate\Http\Request $request)
 function get_port_graphs(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $columns = $request->get('columns', 'ifName,port_id');
+    $columns = $request->get('columns', 'ifName');
 
     if ($validate = validate_column_list($columns, 'ports') !== true) {
         return $validate;

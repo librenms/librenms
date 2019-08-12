@@ -469,16 +469,13 @@ Output:
     "count": 3,
     "ports": [
         {
-            "ifName": "lo",
-            "port_id": 1
+            "ifName": "lo"
         },
         {
-            "ifName": "eth0",
-            "port_id": 2
+            "ifName": "eth0"
         },
         {
-            "ifName": "eth1",
-            "port_id": 14
+            "ifName": "eth1"
         }
     ]
 }
@@ -750,11 +747,10 @@ Get information about a particular port for a device.
 Route: `/api/v0/devices/:hostname/ports/:ifname`
 
 - hostname can be either the device hostname or id
-- port_id or ifname of any of the interfaces of the device which can be
-  obtained using [`get_port_graphs`](#function-get_port_graphs).
->  If ifName contains `/`, you must pass it as the ifName GET variable
-  and put a dummy value in ifname. For example: 
-  `/api/v0/devices/1/ports/none?ifName=Gi0/1/0`
+- ifname can be any of the interface names for the device which can be
+  obtained using
+  [`get_port_graphs`](#function-get_port_graphs). Please ensure that
+  the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
 
 Input:
 
@@ -788,12 +784,11 @@ Get a graph of a port for a particular device.
 Route: `/api/v0/devices/:hostname/ports/:ifname/:type`
 
 - hostname can be either the device hostname or id
-- port_id or ifname of any of the ports of the device which can be
-  obtained using [`get_port_graphs`](#function-get_port_graphs). 
->  If ifName contains `/`, you must pass it as the ifName GET variable
-  and put a dummy value in ifname. For example: 
-  `/api/v0/devices/1/ports/none/port_bits?ifName=Gi0/1/0`
-
+- ifname can be any of the interface names for the device which can be
+  obtained using
+  [`get_port_graphs`](#function-get_port_graphs). Please ensure that
+  the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need
+  to be urlencoded.
 - type is the port type you want the graph for, you can request a list
   of ports for a device with [`get_port_graphs`](#function-get_port graphs).
 
