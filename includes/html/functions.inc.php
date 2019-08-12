@@ -455,6 +455,18 @@ function generate_entity_link($type, $entity, $text = null, $graph_type = null)
     return ($link);
 }//end generate_entity_link()
 
+/**
+ * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
+ * @param string $type
+ * @return array [type, subtype]
+ */
+function extract_graph_type($type): array
+{
+    preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $type, $graphtype);
+    $type = basename($graphtype['type']);
+    $subtype = basename($graphtype['subtype']);
+    return [$type, $subtype];
+}
 
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {

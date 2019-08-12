@@ -7,9 +7,7 @@ foreach ($_GET as $name => $value) {
     $vars[$name] = $value;
 }
 
-preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
-$type    = basename($graphtype['type']);
-$subtype = basename($graphtype['subtype']);
+list($type, $subtype) = extract_graph_type($vars['type']);
 
 if (is_numeric($vars['device'])) {
     $device = device_by_id_cache($vars['device']);
