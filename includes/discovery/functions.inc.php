@@ -1071,8 +1071,11 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     }
 
                     echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit".PHP_EOL;
-                    $expressionLanguage = new ExpressionLanguage();
-                    $entPhysicalIndex = $expressionLanguage->evaluate(YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache)) ?: null;
+                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
+                    if (!is_null($entPhysicalIndex)) {
+                        $expressionLanguage = new ExpressionLanguage();
+                        $entPhysicalIndex = $expressionLanguage->evaluate($entPhysicalIndex);
+                    }
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
                     $sensor_name = $device['os'];
