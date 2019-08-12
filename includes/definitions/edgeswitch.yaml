@@ -17,3 +17,5 @@ discovery:
         - '/^EdgeSwitch/'
         - '/^EdgePoint/'
         - '/^USW-/'
+        - '/^Linux UBNT/'
+        - '/^UBNT US/'
