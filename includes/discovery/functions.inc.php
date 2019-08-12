@@ -19,6 +19,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Device\YamlDiscovery;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 function discover_new_device($hostname, $device = '', $method = '', $interface = '')
 {
@@ -1070,7 +1071,8 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     }
 
                     echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit".PHP_EOL;
-                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
+                    $expressionLanguage = new ExpressionLanguage();
+                    $entPhysicalIndex = $expressionLanguage->evaluate(YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache)) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
                     $sensor_name = $device['os'];
