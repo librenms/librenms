@@ -33,14 +33,14 @@
         <label for="loglevel-{{ $id }}" class="control-label">@lang('Log Level')</label>
         <select name="loglevel" id="loglevel-{{ $id }}" class="form-control">
             <option value="" disabled @if($loglevel == null) selected @endif>@lang('Log Level')</option>
-            <option value="0" @if($loglevel === 0) selected @endif>@lang('(0) Emergency')</option>
-            <option value="1" @if($loglevel == 1) selected @endif>@lang('(1) Alert')</option>
-            <option value="2" @if($loglevel == 2) selected @endif>@lang('(2) Critical')</option>
-            <option value="3" @if($loglevel == 3) selected @endif>@lang('(3) Error')</option>
-            <option value="4" @if($loglevel == 4) selected @endif>@lang('(4) Warning')</option>
-            <option value="5" @if($loglevel == 5) selected @endif>@lang('(5) Notice')</option>
-            <option value="6" @if($loglevel == 6) selected @endif>@lang('(6) Informational')</option>
-            <option value="7" @if($loglevel == 7) selected @endif>@lang('(7) Debug')</option>
+            <option value="0" @if($loglevel === 0) selected @endif>(0) @lang('syslog.severity.0')</option>
+            <option value="1" @if($loglevel == 1) selected @endif>(1) @lang('syslog.severity.1')</option>
+            <option value="2" @if($loglevel == 2) selected @endif>(2) @lang('syslog.severity.2')</option>
+            <option value="3" @if($loglevel == 3) selected @endif>(3) @lang('syslog.severity.3')</option>
+            <option value="4" @if($loglevel == 4) selected @endif>(4) @lang('syslog.severity.4')</option>
+            <option value="5" @if($loglevel == 5) selected @endif>(5) @lang('syslog.severity.5')</option>
+            <option value="6" @if($loglevel == 6) selected @endif>(6) @lang('syslog.severity.6')</option>
+            <option value="7" @if($loglevel == 7) selected @endif>(7) @lang('syslog.severity.7')</option>
         </select>
     </div>
 
