@@ -74,6 +74,12 @@ function api_get_graph(array $vars)
     $auth = '1';
     $base64_output = '';
 
+    // prevent ugly error for undefined graphs from being passed to the user
+    list($type, $subtype) = extract_graph_type($vars['type']);
+    if (!is_file(base_path("includes/html/graphs/$type/auth.inc.php"))) {
+        return api_error(400, 'Invalid graph type');
+    }
+
     ob_start();
 
     rrdtool_initialize(false);
@@ -117,14 +123,14 @@ function check_port_permission($port_id, $device_id, $callback)
     return $callback($port_id);
 }
 
-function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
+function get_graph_by_port_hostname(\Illuminate\Http\Request $request, $ifname = null, $type = 'port_bits')
 {
     // This will return a graph for a given port by the ifName
     $hostname     = $request->route('hostname');
     $device_id    = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $vars = [
-        'port'   => $request->route('ifname'),
-        'type'   => $request->route('type', 'port_bits'),
+        'port'   => $ifname ?: $request->route('ifname'),
+        'type'   => $request->route('type', $type),
         'output' => $request->get('output', 'display'),
         'width'  => $request->get('width', 1075),
         'height' => $request->get('height', 300),
@@ -149,10 +155,23 @@ function get_graph_by_port_hostname(\Illuminate\Http\Request $request)
 
 function get_port_stats_by_port_hostname(\Illuminate\Http\Request $request)
 {
+    $ifName = $request->route('ifname');
+
+    // handle %2f in paths and pass to get_graph_by_port_hostname if needed
+    if (str_contains($ifName, '/')) {
+        $parts = explode('/', $request->path());
+
+        if (isset($parts[5])) {
+            $ifName = urldecode($parts[5]);
+            if (isset($parts[6])) {
+                return get_graph_by_port_hostname($request, $ifName, $parts[6]);
+            }
+        }
+    }
+
     // This will return port stats based on a devices hostname and ifName
     $hostname  = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $ifName    = $request->route('ifname');
     $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=? AND `deleted` = 0', [$device_id, $ifName]);
 
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
