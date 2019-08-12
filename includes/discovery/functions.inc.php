@@ -1062,7 +1062,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         if (is_numeric($data[$limit])) {
                             $$limit = $data[$limit];
                         } else {
-                            $$limit = dynamic_discovery_get_value($limit, $index, $data, $pre_cache, 'null');
+                            $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
                             }
@@ -1105,45 +1105,6 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             }
         }
     }
-}
-
-/**
- * Helper function for dynamic discovery to search for data from pre_cached snmp data
- *
- * @param string $name The name of the field from the discovery data or just an oid
- * @param int $index The index of the current sensor
- * @param array $discovery_data The discovery data for the current sensor
- * @param array $pre_cache all pre-cached snmp data
- * @param mixed $default The default value to return if data is not found
- * @return mixed
- */
-function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache, $default = null)
-{
-    if (isset($discovery_data[$name])) {
-        $name = $discovery_data[$name];
-    }
-
-    if (isset($pre_cache[$discovery_data['oid']][$index][$name])) {
-        return $pre_cache[$discovery_data['oid']][$index][$name];
-    }
-
-    if (isset($pre_cache[$name])) {
-        if (is_array($pre_cache[$name])) {
-            if (isset($pre_cache[$name][$index][$name])) {
-                return $pre_cache[$name][$index][$name];
-            } elseif (isset($pre_cache[$index][$name])) {
-                return $pre_cache[$index][$name];
-            } elseif (isset($pre_cache[$name][$index])) {
-                return $pre_cache[$name][$index];
-            } elseif (count($pre_cache[$name]) === 1) {
-                return current($pre_cache[$name]);
-            }
-        } else {
-            return $pre_cache[$name];
-        }
-    }
-
-    return $default;
 }
 
 /**
