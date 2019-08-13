@@ -107,13 +107,18 @@ The only sensor we have defined here is airflow. The available options are as fo
   the default group.
 - `index` (optional): This is the index value we use to uniquely
   identify this sensor. `{{ $index }}` will be replaced by the `index`
-  from the snmp walk.
+  from the snmp walk. Variables specified as `{{ $OID }}` will be replaced
+  by the value retrieved from the corresponding OID.
 - `skip_values` (optional): This is an array of values we should skip
   over (see note below).
 - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
 - `skip_value_gt` (optional): If sensor value is greater than this, skip the discovery.
 - `entPhysicalIndex` (optional): If the sensor belongs to a physical
-  entity then you can specify the index here.
+  entity then you can specify the index here. Variables specified as `{{ $OID }}`
+  will be replaced with the value retrieved from the corresponding OID. Afterwards,
+  the resulting string will be evaluated for basic arithmetic expressions by the
+  Symfony ExpressionLanguage component, which allows the construction of an artificial
+  entPhysicalIndex when the vendor didn't adhere to the Entity MIB specification.
 - `entPhysicalIndex_measured` (optional): If the sensor belongs to a
   physical entity then you can specify the entity type here.
 - `user_func` (optional): You can provide a function name for the
