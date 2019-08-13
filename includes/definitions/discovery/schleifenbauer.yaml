@@ -32,7 +32,7 @@ modules:
                     value: sdbDevInActualCurrent
                     num_oid: '.1.3.6.1.4.1.31034.12.1.1.2.6.1.1.5.{{ $index }}'
                     warn_limit: sdbDevInMaxAmps
-                    high_limit: sdbDevCfMaximumLoad
+                    high_limit: '{{ $sdbDevCfMaximumLoad }} * 100'
                     entPhysicalIndex: '{{ $sdbDevIdIndex }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 2'
                     descr: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }} RMS Current'
                     index: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }}'
