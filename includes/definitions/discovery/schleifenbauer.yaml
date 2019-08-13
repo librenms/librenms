@@ -5,7 +5,6 @@ modules:
             data:
                 -
                     oid:
-                        - sdbDevIdIndex
                         - sdbDevIdSerialNumber
                         - sdbDevCfMaximumLoad
         count:
@@ -33,7 +32,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.31034.12.1.1.2.6.1.1.5.{{ $index }}'
                     warn_limit: sdbDevInMaxAmps
                     high_limit: '{{ $sdbDevCfMaximumLoad }} * 100'
-                    entPhysicalIndex: '{{ $sdbDevIdIndex }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 2'
+                    entPhysicalIndex: '{{ $subindex0 }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 2'
                     descr: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }} RMS Current'
                     index: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }}'
                     divisor: 100
@@ -43,7 +42,7 @@ modules:
                     oid: sdbDevSnsTable
                     value: sdbDevSnsValue
                     num_oid: '.1.3.6.1.4.1.31034.12.1.1.2.8.2.1.3.{{ $index }}'
-                    entPhysicalIndex: '{{ $sdbDevIdIndex }} * 10000 + 3000 + {{ $sdbDevSnsIndex }} * 10'
+                    entPhysicalIndex: '{{ $subindex0 }} * 10000 + 3000 + {{ $sdbDevSnsIndex }} * 10'
                     descr: '{{ $sdbDevIdSerialNumber }} External Humidity'
                     index: '{{ $sdbDevIdSerialNumber }}-H{{ $sdbDevSnsIndex }}'
                     divisor: 100
@@ -59,7 +58,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.31034.12.1.1.2.6.1.1.2.{{ $index }}'
                     low_limit: 0
                     high_limit: 16777215
-                    entPhysicalIndex: '{{ $sdbDevIdIndex }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 4'
+                    entPhysicalIndex: '{{ $subindex0 }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 4'
                     descr: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }} Lifetime kWh Total'
                     index: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }}'
         power_factor:
@@ -70,7 +69,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.31034.12.1.1.2.6.1.1.4.{{ $index }}'
                     low_limit: 0
                     high_limit: 1
-                    entPhysicalIndex: '{{ $sdbDevIdIndex }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 5'
+                    entPhysicalIndex: '{{ $subindex0 }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 5'
                     descr: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }} Power Factor'
                     index: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }}'
                     divisor: 10000
@@ -80,7 +79,7 @@ modules:
                     oid: sdbDevInTable
                     value: sdbDevInPowerVoltAmpere
                     num_oid: '.1.3.6.1.4.1.31034.12.1.1.2.6.1.1.9.{{ $index }}'
-                    entPhysicalIndex: '{{ $sdbDevIdIndex }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 3'
+                    entPhysicalIndex: '{{ $subindex0 }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 3'
                     descr: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }} Apparent Power'
                     index: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }}'
         state:
@@ -101,7 +100,7 @@ modules:
                     oid: sdbDevSnsTable
                     value: sdbDevSnsValue
                     num_oid: '.1.3.6.1.4.1.31034.12.1.1.2.8.2.1.3.{{ $index }}'
-                    entPhysicalIndex: '{{ $sdbDevIdIndex }} * 10000 + 3000 + {{ $sdbDevSnsIndex }} * 10'
+                    entPhysicalIndex: '{{ $subindex0 }} * 10000 + 3000 + {{ $sdbDevSnsIndex }} * 10'
                     descr: '{{ $sdbDevIdSerialNumber }} External Temperature'
                     index: '{{ $sdbDevIdSerialNumber }}-T{{ $sdbDevSnsIndex }}'
                     divisor: 100
@@ -115,7 +114,7 @@ modules:
                     oid: sdbDevInTable
                     value: sdbDevInActualVoltage
                     num_oid: '.1.3.6.1.4.1.31034.12.1.1.2.6.1.1.7.{{ $index }}'
-                    entPhysicalIndex: '{{ $sdbDevIdIndex }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 1'
+                    entPhysicalIndex: '{{ $subindex0 }} * 10000 + 1000 + {{ $sdbDevInIndex }} * 10 + 1'
                     descr: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }} Voltage'
                     index: '{{ $sdbDevIdSerialNumber }}-L{{ $sdbDevInIndex }}'
                     divisor: 100
