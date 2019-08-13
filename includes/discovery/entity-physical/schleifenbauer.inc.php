@@ -2,7 +2,7 @@
 /*
  * LibreNMS entity-physical module for discovery of components in a Schleifenbauer SPDM databus ring
  *
- * Copyright (c) 2018 Martijn Schmidt <martijn.schmidt@gmail.com>
+ * Copyright (c) 2019 Martijn Schmidt <martijn.schmidt@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -61,23 +61,23 @@ foreach ($sdbMgmtCtrlDevUnitAddressArray as $sdbMgmtCtrlDevUnitAddress => $sdbDe
         $entPhysicalAlias = $sdbDevIdLocationArray[$sdbDevIdIndex] != '' ? $sdbDevIdNameArray[$sdbDevIdIndex] ." @ ". $sdbDevIdLocationArray[$sdbDevIdIndex] : $sdbDevIdNameArray[$sdbDevIdIndex];
     } // end of $entPhysicalAlias if-sequence
 
-    discover_entity_physical($valid, $device, $sdbMgmtCtrlDevUnitAddress * 10, $entPhysicalDescr, 'chassis', $entPhysicalName, $sdbDevIdProductIdArray[$sdbDevIdIndex], $sdbDevIdSerialNumberArray[$sdbDevIdIndex], $entPhysicalContainedIn, 'Schleifenbauer Products B.V.', $sdbMgmtCtrlDevUnitAddress, null, $entPhysicalHardwareRev, null, $sdbDevIdFirmwareVersionArray[$sdbDevIdIndex], 'true', $entPhysicalAlias, $sdbDevIdVanityTagArray[$sdbDevIdIndex], null);
+    discover_entity_physical($valid, $device, $sdbDevIdIndex * 10000, $entPhysicalDescr, 'chassis', $entPhysicalName, $sdbDevIdProductIdArray[$sdbDevIdIndex], $sdbDevIdSerialNumberArray[$sdbDevIdIndex], $entPhysicalContainedIn, 'Schleifenbauer Products B.V.', $sdbMgmtCtrlDevUnitAddress, null, $entPhysicalHardwareRev, null, $sdbDevIdFirmwareVersionArray[$sdbDevIdIndex], 'true', $entPhysicalAlias, $sdbDevIdVanityTagArray[$sdbDevIdIndex], null);
 
     // Since a fully numerical entPhysicalIndex is only available for the actual PDU, we are calculating a fake entPhysicalIndex to avoid namespace collision. We have an Integer32 of space per IETF RFC6933 anyway.
-    // The maximum sdbMgmtCtrlDevUnitAddress is 255, but multiplying by 1 million for namespace size. Add +100k for every top-level index below a PDU.
+    // The maximum $sdbDevIdIndex is 65535, but multiplying by 10000 for namespace size. Add +1k for every top-level index below a PDU.
     foreach ($sdbDevInNameArray[$sdbDevIdIndex] as $sdbDevInIndex => $sdbDevInName) {
-        $inputIndex          = $sdbMgmtCtrlDevUnitAddress * 1000000 + 100000 + $sdbDevInIndex * 1000; // +100k for the first top-level namespace. Add 1000 * sdbDevInIndex which goes up to 48. Leave 3 variable digits at the end.
+        $inputIndex          = $sdbDevIdIndex * 10000 + 1000 + $sdbDevInIndex * 10; // +1k for the first top-level namespace. Add 10 * sdbDevInIndex which goes up to 48. Leave 1 variable digit at the end.
         $entPhysicalDescr    = $sdbDevCfMaximumLoadArray[$sdbDevIdIndex] ."A input phase";
         $entPhysicalName     = "Input L". $sdbDevInIndex;
 
-        discover_entity_physical($valid, $device, $inputIndex, $entPhysicalDescr, 'powerSupply', $entPhysicalName, null, null, $sdbMgmtCtrlDevUnitAddress * 10, 'Schleifenbauer Products B.V.', $sdbDevInIndex, null, null, null, null, 'false', $sdbDevInName, null, null);
+        discover_entity_physical($valid, $device, $inputIndex, $entPhysicalDescr, 'powerSupply', $entPhysicalName, null, null, $sdbDevIdIndex * 10000, 'Schleifenbauer Products B.V.', $sdbDevInIndex, null, null, null, null, 'false', $sdbDevInName, null, null);
 
         // Enumerate sensors under the Input
-        discover_entity_physical($valid, $device, $inputIndex + 110, $entPhysicalName .' voltage sensor (V)', 'sensor', 'Voltage Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 1, null, null, null, null, 'false', null, null, null);
-        discover_entity_physical($valid, $device, $inputIndex + 120, $entPhysicalName .' RMS current sensor (A)', 'sensor', 'Current Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 2, null, null, null, null, 'false', null, null, null);
-        discover_entity_physical($valid, $device, $inputIndex + 130, $entPhysicalName .' apparent power sensor (W)', 'sensor', 'Power Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 3, null, null, null, null, 'false', null, null, null);
-        discover_entity_physical($valid, $device, $inputIndex + 140, $entPhysicalName .' lifetime power consumed sensor (kWh)', 'sensor', 'Power Consumed Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 4, null, null, null, null, 'false', null, null, null);
-        discover_entity_physical($valid, $device, $inputIndex + 150, $entPhysicalName .' power factor sensor (ratio)', 'sensor', 'Power Factor Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 5, null, null, null, null, 'false', null, null, null);
+        discover_entity_physical($valid, $device, $inputIndex + 1, $entPhysicalName .' voltage sensor (V)', 'sensor', 'Voltage Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 1, null, null, null, null, 'false', null, null, null);
+        discover_entity_physical($valid, $device, $inputIndex + 2, $entPhysicalName .' RMS current sensor (A)', 'sensor', 'Current Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 2, null, null, null, null, 'false', null, null, null);
+        discover_entity_physical($valid, $device, $inputIndex + 3, $entPhysicalName .' apparent power sensor (W)', 'sensor', 'Power Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 3, null, null, null, null, 'false', null, null, null);
+        discover_entity_physical($valid, $device, $inputIndex + 4, $entPhysicalName .' lifetime power consumed sensor (kWh)', 'sensor', 'Power Consumed Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 4, null, null, null, null, 'false', null, null, null);
+        discover_entity_physical($valid, $device, $inputIndex + 5, $entPhysicalName .' power factor sensor (ratio)', 'sensor', 'Power Factor Sensor', null, null, $inputIndex, 'Schleifenbauer Products B.V.', 5, null, null, null, null, 'false', null, null, null);
     } // end Input discovery foreach sdbDevInNameArray
 
     // Only enumerate outlets if this is a stand-alone, non-databus unit.
@@ -85,13 +85,13 @@ foreach ($sdbMgmtCtrlDevUnitAddressArray as $sdbMgmtCtrlDevUnitAddress => $sdbDe
         // Check if we can find any outlets on this PDU..
         if ($sdbDevOutNameArray[$sdbDevIdIndex] != '') {
             // We found outlets, so let's spawn an Outlet Backplane.
-            $outletBackplaneIndex     = $sdbMgmtCtrlDevUnitAddress * 1000000 + 200000; // +200k for the second top-level index namespace.
+            $outletBackplaneIndex     = $sdbDevIdIndex * 10000 + 2000; // +2k for the second top-level index namespace.
             $entPhysicalDescr         = $sdbDevCfOutletsTotalArray[$sdbDevIdIndex] ." outlets";
 
-            discover_entity_physical($valid, $device, $outletBackplaneIndex, $entPhysicalDescr, 'backplane', 'Outlets', null, null, $sdbMgmtCtrlDevUnitAddress * 10, 'Schleifenbauer Products B.V.', '-1', null, null, null, null, 'false', null, null, null);
+            discover_entity_physical($valid, $device, $outletBackplaneIndex, $entPhysicalDescr, 'backplane', 'Outlets', null, null, $sdbDevIdIndex * 10000, 'Schleifenbauer Products B.V.', '-1', null, null, null, null, 'false', null, null, null);
 
             foreach ($sdbDevOutNameArray[$sdbDevIdIndex] as $sdbDevOutIndex => $sdbDevOutName) {
-                $outletIndex      = $sdbMgmtCtrlDevUnitAddress * 1000000 + 200000 + $sdbDevOutIndex * 1000; // +200k for the second top-level index namespace. Add 1000 * sdbDevOutIndex which goes up to 48. Leave 3 variable digits at the end.
+                $outletIndex      = $sdbDevIdIndex * 10000 + 2000 + $sdbDevOutIndex * 10; // +2k for the second top-level index namespace. Add 10 * sdbDevOutIndex which goes up to 48. Leave 1 variable digit at the end.
                 $entPhysicalName  = "Outlet #". $sdbDevOutIndex;
 
                 discover_entity_physical($valid, $device, $outletIndex, 'PDU outlet', 'powerSupply', $entPhysicalName, null, null, $outletBackplaneIndex, 'Schleifenbauer Products B.V.', $sdbDevOutIndex, null, null, null, null, 'false', $sdbDevOutName, null, null);
@@ -102,13 +102,13 @@ foreach ($sdbMgmtCtrlDevUnitAddressArray as $sdbMgmtCtrlDevUnitAddress => $sdbDe
     // Check if we can find any external sensor connections on this PDU..
     if ($sdbDevSnsTypeArray[$sdbDevIdIndex] != '') {
         // We found at least one sensor connection, so let's spawn a Sensor Container.
-        $sensorContainerIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 300000; // +300k for the third top-level index namespace.
+        $sensorContainerIndex = $sdbDevIdIndex * 10000 + 3000; // +3k for the third top-level index namespace.
         $entPhysicalDescr     = $sdbDevCfSensorsArray[$sdbDevIdIndex] == 1 ? "1 external sensor" : $sdbDevCfSensorsArray[$sdbDevIdIndex] ." external sensors";
 
-        discover_entity_physical($valid, $device, $sensorContainerIndex, $entPhysicalDescr, 'container', 'Sensor Container', null, null, $sdbMgmtCtrlDevUnitAddress * 10, 'Schleifenbauer Products B.V.', '-1', null, null, null, null, 'false', null, null, null);
+        discover_entity_physical($valid, $device, $sensorContainerIndex, $entPhysicalDescr, 'container', 'Sensor Container', null, null, $sdbDevIdIndex * 10000, 'Schleifenbauer Products B.V.', '-1', null, null, null, null, 'false', null, null, null);
 
         foreach ($sdbDevSnsNameArray[$sdbDevIdIndex] as $sdbDevSnsIndex => $sdbDevSnsName) {
-            $sensorIndex      = $sdbMgmtCtrlDevUnitAddress * 1000000 + 300000 + $sdbDevSnsIndex * 1000; // +300k for the third top-level index namespace. Add 1000 * sdbDevSnsIndex which goes up to 16. Leave 3 variable digits at the end.
+            $sensorIndex      = $sdbDevIdIndex * 10000 + 3000 + $sdbDevSnsIndex * 10; // +3k for the third top-level index namespace. Add 10 * sdbDevSnsIndex which goes up to 16. Leave 3 variable digits at the end.
             switch ($sdbDevSnsTypeArray[$sdbDevIdIndex][$sdbDevSnsIndex]) {
                 case ('T'):
                     $class = 'temperature';
