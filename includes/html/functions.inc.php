@@ -1527,6 +1527,34 @@ function generate_stacked_graphs($transparency = '88')
 }
 
 /**
+ * Parse AT time spec, does not handle the entire spec.
+ * @param string $time
+ * @return int
+ */
+function parse_at_time($time)
+{
+    if (is_numeric($time)) {
+        return $time < 0 ? time() + $time : intval($time);
+    }
+
+    if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
+        $units = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+            'y' => 31557600,
+        ];
+        $value = substr($time, 1, -1);
+        $unit = substr($time, -1);
+
+        $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
+        return time() + $offset;
+    }
+
+    return (int)strtotime($time);
+}
+
+/**
  * Get the ZFS pools for a device... just requires the device ID
  * an empty return means ZFS is not in use or there are currently no pools
  * @param $device_id
