@@ -170,7 +170,11 @@ class Schema
                 $base => $paths
             ];
 
-            file_put_contents($cache_file, serialize($cache));
+            if (is_writable($cache_file)) {
+                @file_put_contents($cache_file, serialize($cache));
+            } else {
+                \Log::error("Could not write cache file ($cache_file)!");
+            }
         }
 
         return $cache[$base];
