@@ -1060,10 +1060,13 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
-                        $$limit = YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache) ?: null;
-                        if (!is_null($$limit)) {
-                            $expressionLanguage = new ExpressionLanguage();
-                            $$limit = $expressionLanguage->evaluate($$limit);
+                        $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, null);
+                        if (!is_numeric($$limit)) {
+                            $$limit = YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache) ?: null;
+                            if (!is_null($$limit)) {
+                                $expressionLanguage = new ExpressionLanguage();
+                                $$limit = $expressionLanguage->evaluate($$limit);
+                            }
                         }
                         $$limit = is_numeric($$limit) ? ($$limit / $divisor) * $multiplier : null;
                         if (is_numeric($data[$limit])) {
