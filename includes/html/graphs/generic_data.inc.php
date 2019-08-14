@@ -142,12 +142,12 @@ if ($to > time()) {
     $rrd_options .= ' VDEF:islope=inbits_max,LSLSLOPE';
     $rrd_options .= ' VDEF:icons=inbits_max,LSLINT';
     $rrd_options .= ' CDEF:ilsl=inbits_max,POP,islope,COUNT,*,icons,+ ';
-    $rrd_options .= " LINE3:ilsl#44aa55:'In Linear Prediction\\n':dashes=8";
+    $rrd_options .= " LINE2:ilsl#44aa55:'In Linear Prediction\\n':dashes=8";
 
     $rrd_options .= ' VDEF:oslope=doutbits_max,LSLSLOPE';
     $rrd_options .= ' VDEF:ocons=doutbits_max,LSLINT';
     $rrd_options .= ' CDEF:olsl=doutbits_max,POP,oslope,COUNT,*,ocons,+ ';
-    $rrd_options .= " LINE3:olsl#4400dd:'Out Linear Prediction\\n':dashes=8";
+    $rrd_options .= " LINE2:olsl#4400dd:'Out Linear Prediction\\n':dashes=8";
 }
 
 if ($_GET['previous'] == 'yes') {
