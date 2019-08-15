@@ -129,7 +129,7 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
         $this->assertEquals(212334234, parse_at_time(212334234));
         $this->assertEquals(time()-43, parse_at_time('-43'), '-43 did not match');
         $this->assertEquals(0, parse_at_time('invalid'));
-        $this->assertEquals(606636000, parse_at_time('March 23 1989'));
+        $this->assertEquals(606614400, parse_at_time('March 23 1989 UTC'));
         $this->assertEquals(time()+86400, parse_at_time('+1 day'));
     }
 }
