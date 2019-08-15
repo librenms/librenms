@@ -38,31 +38,32 @@ foreach (dbFetchRows($full_query, $param) as $alert_entry) {
     $hostname    = gethostbyid(mres($alert_entry['device_id']));
     $alert_state = $alert_entry['state'];
 
-    if ($alert_state != '') {
-        if ($alert_state == '0') {
-            $glyph_color = 'green';
-            $text        = 'Ok';
-        } elseif ($alert_state == '1') {
-            $glyph_color = 'red';
-            $text        = 'Alert';
-        } elseif ($alert_state == '2') {
-            $glyph_color = 'lightgrey';
-            $text        = 'Ack';
-        } elseif ($alert_state == '3') {
-            $glyph_color = 'orange';
-            $text        = 'Worse';
-        } elseif ($alert_state == '4') {
-            $glyph_color = 'khaki';
-            $text        = 'Better';
-        }
+    if ($alert_state == '0') {
+        $glyph_color = 'green';
+        $text        = 'Ok';
+    } elseif ($alert_state == '1') {
+        $glyph_color = 'red';
+        $text        = 'Alert';
+    } elseif ($alert_state == '2') {
+        $glyph_color = 'lightgrey';
+        $text        = 'Ack';
+    } elseif ($alert_state == '3') {
+        $glyph_color = 'orange';
+        $text        = 'Worse';
+    } elseif ($alert_state == '4') {
+        $glyph_color = 'khaki';
+        $text        = 'Better';
+    } else {
+        $glyph_color = 'red';
+        $text        = 'Unknown state';
+    }
 
-        $data[] = array(
-            $alert_entry['time_logged'],
-            $hostname,
-            htmlspecialchars($alert_entry['name']),
-            $text,
-        );
-    }//end if
+    $data[] = array(
+        $alert_entry['time_logged'],
+        $hostname,
+        htmlspecialchars($alert_entry['name']),
+        $text,
+    );
 }//end foreach
 
 $header = array(
