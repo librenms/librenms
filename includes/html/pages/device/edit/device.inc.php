@@ -149,7 +149,7 @@ if ($_POST['editing']) {
                 if (!$device_model->override_sysLocation) {
                     echo(' disabled="1"');
                 }
-                ?> value="<?php echo display($device_model->location->location); ?>" />
+                ?> value="<?php echo display($device_model->location); ?>" />
         </div>
     </div>
     <div class="form-group">
