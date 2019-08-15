@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -25,9 +26,30 @@ class DeviceGroupController extends Controller
     {
         $this->authorize('manage', DeviceGroup::class);
 
+        $device_groups = DeviceGroup::orderBy('name')->withCount('devices')->get();
+        $ungrouped_device_ids = $this->groupedDevicesDeviceId($device_groups);
+        $ungrouped_devices = Device::orderby('hostname')->whereNotIn('device_id', $ungrouped_device_ids);
+
         return view('device-group.index', [
-            'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
+            'device_groups' => $device_groups,
+            'ungrouped_devices' => $ungrouped_devices,
         ]);
+    }
+
+    /**
+     * get all grouped devices
+     *
+     * @return Array with device_ids of all grouped devices
+     */
+    private function groupedDevicesDeviceId($device_groups)
+    {
+        $device_ids = array();
+        foreach ($device_groups as $device_group) {
+            foreach ($device_group->devices as $device) {
+                $device_ids[] = $device->device_id;
+            }
+        }
+        return array_unique($device_ids);
     }
 
     /**

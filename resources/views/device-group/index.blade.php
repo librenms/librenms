@@ -55,6 +55,37 @@
                     </table>
                 </div>
             </div>
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                @lang('ungrouped Devices') (<?php echo(count($ungrouped_devices))?>)
+                </h4>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table id="ungrouped-devices-table" class="table table-condensed table-hover">
+                        <thead>
+                        <tr>
+                            <th>@lang('Vendor')</th>
+                            <th>@lang('Device')</th>
+                            <th>@lang('Platform')</th>
+                            <th>@lang('Operating System')</th>
+                            <th>@lang('Location')</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($ungrouped_devices as $device)
+                            <tr id="row_{{ $device->device_id }}">
+                                <td><img alt="{{ $device->os }} "src="{{ asset($device->icon) }}" width="32px" height="32px" title="{{ $device->os }}"></td>
+                                <td><a class="list-device" href="device/device={{$device->device_id}}"><b>{{ $device->hostname }}</b></a><br>{{$device->sysName}}</td>
+                                <td>{{ $device->hardware }}</td>
+                                <td>{{ $device->os }} {{ $device->version }} ({{ $device->features }})</td>
+                                <td>{{ $device->location->location }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
