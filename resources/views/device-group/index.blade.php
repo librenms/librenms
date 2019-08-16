@@ -57,7 +57,7 @@
             </div>
             <div class="panel-heading">
                 <h4 class="panel-title">
-                @lang('ungrouped Devices') (<?php echo(count($ungrouped_devices))?>)
+                @lang('ungrouped Devices') ({{ $ungrouped_devices->count() }})
                 </h4>
             </div>
             <div class="panel-body">
@@ -69,7 +69,6 @@
                             <th>@lang('Device')</th>
                             <th>@lang('Platform')</th>
                             <th>@lang('Operating System')</th>
-                            <th>@lang('Location')</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -79,7 +78,6 @@
                                 <td><a class="list-device" href="device/device={{$device->device_id}}"><b>{{ $device->hostname }}</b></a><br>{{$device->sysName}}</td>
                                 <td>{{ $device->hardware }}</td>
                                 <td>{{ $device->os }} {{ $device->version }} ({{ $device->features }})</td>
-                                <td>{{ $device->location->location }}</td>
                             </tr>
                         @endforeach
                         </tbody>

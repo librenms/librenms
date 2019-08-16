@@ -28,7 +28,7 @@ class DeviceGroupController extends Controller
 
         $device_groups = DeviceGroup::orderBy('name')->withCount('devices')->get();
         $ungrouped_device_ids = $this->groupedDevicesDeviceId($device_groups);
-        $ungrouped_devices = Device::orderby('hostname')->whereNotIn('device_id', $ungrouped_device_ids);
+        $ungrouped_devices = Device::orderby('hostname')->whereNotIn('device_id', $ungrouped_device_ids)->get();
 
         return view('device-group.index', [
             'device_groups' => $device_groups,
