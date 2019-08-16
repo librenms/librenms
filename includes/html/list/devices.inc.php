@@ -58,7 +58,7 @@ if (!empty($_REQUEST['limit'])) {
     $offset = 0;
 }
 
-$sql = "SELECT `device_id`, `hostname`, `sysName` FROM `devices` $query";
+$sql = "SELECT `device_id`, `hostname`, `sysName` FROM `devices` $query order by `hostname`";
 $devices = array_map(function ($device) {
     return [
         'id' => $device['device_id'],
