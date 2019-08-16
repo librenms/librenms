@@ -48,7 +48,6 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
     public function discoverProcessors()
     {
         $device = $this->getDevice();
-
         if (starts_with(
             $device['sysObjectID'],
             ['.1.3.6.1.4.1.674.10895.3020', '.1.3.6.1.4.1.674.10895.3021', '.1.3.6.1.4.1.674.10895.3030',
@@ -73,7 +72,6 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
         ) {
             return $this->discoverVxworksProcessors('.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.1.1.4.9.0');
         }
-
         return $this->discoverVxworksProcessors('.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.1.1.4.4.0');
     }
 
