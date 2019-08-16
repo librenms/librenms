@@ -1063,7 +1063,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, null);
                         if (!is_numeric($$limit)) {
                             $$limit = YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache) ?: null;
-                            if (!is_null($$limit)) {
+                            if (is_string($$limit)) {
                                 $expressionLanguage = new ExpressionLanguage();
                                 $$limit = $expressionLanguage->evaluate($$limit);
                             }
