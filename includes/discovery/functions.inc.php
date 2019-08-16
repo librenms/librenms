@@ -1063,7 +1063,9 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, null);
                         if (!is_numeric($$limit)) {
                             $$limit = YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache) ?: null;
-                            if (is_string($$limit)) {
+                            // We only want to evaluate formulas which begin and end with rational numbers, and
+                            // where each rational number is separated by one simple arithmetic operator.
+                            if (preg_match('/^-?\d+(\.\d+)?( ?[-+*\/] ?-?\d+(\.\d+)?)+$/', $$limit)) {
                                 $expressionLanguage = new ExpressionLanguage();
                                 $$limit = $expressionLanguage->evaluate($$limit);
                             }
@@ -1076,7 +1078,9 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                     echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit".PHP_EOL;
                     $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
-                    if (!is_null($entPhysicalIndex)) {
+                    // We only want to evaluate formulas which begin and end with rational numbers, and
+                    // where each rational number is separated by one simple arithmetic operator.
+                    if (preg_match('/^-?\d+(\.\d+)?( ?[-+*\/] ?-?\d+(\.\d+)?)+$/', $entPhysicalIndex)) {
                         $expressionLanguage = new ExpressionLanguage();
                         $entPhysicalIndex = $expressionLanguage->evaluate($entPhysicalIndex);
                     }
