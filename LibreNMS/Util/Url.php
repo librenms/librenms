@@ -85,7 +85,7 @@ class Url
         }
 
         if ($device->location_id) {
-            $contents .= ' - ' . htmlentities($device->location);
+            $contents .= ' - ' . htmlentities($device->location->location);
         }
 
         $contents .= '</div>';
