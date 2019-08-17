@@ -48,7 +48,11 @@ class Edgecos extends OS implements ProcessorDiscovery
         if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.22.')) { //ECS3528
             $oid = '.1.3.6.1.4.1.259.10.1.22.1.39.2.1.0';
         };
-
+        
+        if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.39.')) { //ECS4110
+            $oid = '.1.3.6.1.4.1.259.10.1.39.1.39.2.1.0';
+        };
+        
         if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.45.')) { //ECS4120
             $oid = '.1.3.6.1.4.1.259.10.1.45.1.39.2.1.0';
         };
