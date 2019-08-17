@@ -1144,6 +1144,26 @@ function scan_new_plugins()
     return( $installed );
 }
 
+function scan_removed_plugins()
+{
+    $removed = 0; # Track how many plugins will be removed from database
+
+    if (file_exists(Config::get('plugin_dir'))) {
+        $plugin_files = scandir(Config::get('plugin_dir'));
+        $installed_plugins = dbFetchColumn("SELECT `plugin_name` FROM `plugins`");
+        foreach ($installed_plugins as $name) {
+            if (in_array($name, $plugin_files)) {
+                continue;
+            }
+            if (dbDelete('plugins', "`plugin_name` = ?", $name)) {
+                $removed++;
+            }
+        }
+    }
+
+    return( $removed );
+}
+
 function validate_device_id($id)
 {
     if (empty($id) || !is_numeric($id)) {

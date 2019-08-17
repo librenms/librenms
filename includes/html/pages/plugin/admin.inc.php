@@ -3,6 +3,7 @@
 if (Auth::user()->hasGlobalAdmin()) {
     // Scan for new plugins and add to the database
     $new_plugins = scan_new_plugins();
+    $removed_plugins = scan_removed_plugins();
 
 
     // Check if we have to toggle enabled / disable a particular module
@@ -43,6 +44,13 @@ if ($new_plugins > 0) {
     echo '<div class="panel-body">
     <div class="alert alert-warning">
       We have found '.$new_plugins.' new plugins that need to be configured and enabled
+    </div>
+  </div>';
+}
+if ($removed_plugins > 0) {
+    echo '<div class="panel-body">
+    <div class="alert alert-warning">
+      We have found '.$removed_plugins.' removed plugins
     </div>
   </div>';
 }
