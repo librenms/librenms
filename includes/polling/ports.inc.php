@@ -320,6 +320,10 @@ if ($device['os'] == 'junos') {
     require_once 'ports/junos-vcp.inc.php';
 }
 
+if ($device['os'] == 'edgecos') {
+    require_once 'ports/edgecos.inc.php';
+}
+
 if (Config::get('enable_ports_adsl')) {
     $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl')", [$device['device_id']]);
 }
