@@ -19,6 +19,12 @@ if ($device['os_group'] == "cisco") {
     include "cisco-voice/cisco-iospri.inc.php";
 
     /*
+     * Cisco IP
+     * This module graphs the used IP channels on a Cisco Voice Gateway
+     */
+    include "cisco-voice/cisco-ip.inc.php";
+
+    /*
      * Cisco DSP
      * This module graphs the used and total DSP resources on a Cisco Voice Gateway
      */
