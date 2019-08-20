@@ -458,7 +458,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
 
         foreach (Config::get('html.device.links') as $links) {
             $html_link = view(['template' => $links['url']], ['device' => $device])->__toString();
- 	    echo '<li><a href="'.$html_link.'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" aria-hidden="true"></i> '.$links['title'].'</a></li>';
+            echo '<li><a href="'.$html_link.'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" aria-hidden="true"></i> '.$links['title'].'</a></li>';
         }
 
         if (Config::has('gateone.server')) {
