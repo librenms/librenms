@@ -454,6 +454,12 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                   <span class="caret"></span></button>
                   <ul class="dropdown-menu">
                     <li><a href="https://'.$device['hostname'].'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
+
+        foreach (Config::get('html.device.links') as $links) {
+            $html_link = view(['template' => $links['url']], ['device' => $device])->__toString();
+            echo '<li><a href="'.$html_link.'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" aria-hidden="true"></i> '.$links['title'].'</a></li>';
+        }
+
         if (Config::has('gateone.server')) {
             if (Config::get('gateone.use_librenms_user') == true) {
                 echo '<li><a href="' . Config::get('gateone.server') . '?ssh=ssh://' . Auth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
