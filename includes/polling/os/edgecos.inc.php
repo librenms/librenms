@@ -7,7 +7,7 @@ if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.6.')) {              /
 } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.24.')) {  //ECS4510
     $tmp_mib = 'ECS4510-MIB';
 } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.39.')) {  //ECS4110
-    $temp_mibs = 'ECS4110-MIB';
+    $tmp_mib  = 'ECS4110-MIB';
 }  elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.42.')) { //ECS4210
     $tmp_mib = 'ECS4210-MIB';
 } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.27.')) {  //ECS3510
