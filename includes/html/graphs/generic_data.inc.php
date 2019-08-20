@@ -137,8 +137,21 @@ $rrd_options .= " GPRINT:totout:'Out %6.2lf%sB)\\l'";
 $rrd_options .= ' LINE1:percentile_in#aa0000';
 $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
+// Linear prediction of trend
+if ($to > time()) {
+    $rrd_options .= ' VDEF:islope=inbits_max,LSLSLOPE';
+    $rrd_options .= ' VDEF:icons=inbits_max,LSLINT';
+    $rrd_options .= ' CDEF:ilsl=inbits_max,POP,islope,COUNT,*,icons,+ ';
+    $rrd_options .= " LINE2:ilsl#44aa55:'In Linear Prediction\\n':dashes=8";
+
+    $rrd_options .= ' VDEF:oslope=doutbits_max,LSLSLOPE';
+    $rrd_options .= ' VDEF:ocons=doutbits_max,LSLINT';
+    $rrd_options .= ' CDEF:olsl=doutbits_max,POP,oslope,COUNT,*,ocons,+ ';
+    $rrd_options .= " LINE2:olsl#4400dd:'Out Linear Prediction\\n':dashes=8";
+}
+
 if ($_GET['previous'] == 'yes') {
-    $rrd_options .= ' LINE1.25:in' . $format . "X#009900:'Prev In \\\\n'";
+    $rrd_options .= ' LINE1.25:in' . $format . "X#009900:'Prev In \\n'";
     $rrd_options .= ' LINE1.25:dout' . $format . "X#000099:'Prev Out'";
 }
 

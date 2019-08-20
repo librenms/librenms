@@ -22,13 +22,9 @@ $title    = $vars['title'];
 $vertical = $vars['vertical'];
 $legend   = $vars['legend'];
 $output   = (!empty($vars['output']) ? $vars['output'] : 'default');
-$from = (isset($vars['from']) ? $vars['from'] : time() - 60 * 60 * 24);
-$to   = (isset($vars['to']) ? $vars['to'] : time());
+$from = parse_at_time($_GET['from']) ?: Config::get('time.day');
+$to   = parse_at_time($_GET['to']) ?: Config::get('time.now');
 $graph_type = (isset($vars['graph_type']) ? $vars['graph_type'] : Config::get('webui.graph_type'));
-
-if ($from < 0) {
-    $from = ($to + $from);
-}
 
 $period = ($to - $from);
 $base64_output = '';

@@ -14,12 +14,8 @@ if (session('widescreen')) {
     $thumb_width=113;
 }
 
-if (!is_numeric($vars['from'])) {
-    $vars['from'] = strtotime($vars['from']) ?: Config::get('time.day');
-}
-if (!is_numeric($vars['to'])) {
-    $vars['to'] = strtotime($vars['to']) ?: Config::get('time.now');
-}
+$vars['from'] = parse_at_time($vars['from']) ?: Config::get('time.day');
+$vars['to'] = parse_at_time($vars['to']) ?: Config::get('time.now');
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
 
