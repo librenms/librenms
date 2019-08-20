@@ -14,7 +14,6 @@
 include "includes/html/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_filename = rrd_name($device['hostname'], 'cisco-voice-ip');
-
 if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                             Cur  Min  Max\\n'";
     $rrd_options .= " DEF:sip="    . $rrd_filename . ":sip:AVERAGE ";
@@ -56,5 +55,4 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_options .= " GPRINT:multicast:LAST:%3.0lf ";
     $rrd_options .= " GPRINT:multicast:MIN:%3.0lf ";
     $rrd_options .= " GPRINT:multicast_max:MAX:%3.0lf\\\l ";
-
 }
