@@ -32,14 +32,14 @@ Example contents:
   
 ## Custom device menu entry
 
-You can add custom external system link in the menu on the device page, and you can take the device information as a parameter to the url, such as hostname, sysName.
-  
+You can add custom external links in the menu on the device page.
+
 This feature allows you to easily link applications to related systems, as shown in the example of Open-audIT.
-  
-Open the file `config.php`:
+
+The Links value is parsed by Laravel Blade's templating engine so you can use Device variables such as `hostname`, `sysName` and more.
+
+`config.php:`
 
 ```php
-$config['html']['device']['links'] = [['url' => 'http://atssrv/open-audit/index/devices/{{ $device[\'sysName\'] }}', 'title' => 'Open-AudIT']];
+$config['html']['device']['links'][] = ['url' => 'http://atssrv/open-audit/index/devices/{{ $device[\'sysName\'] }}', 'title' => 'Open-AudIT'];
 ```
-  
-If you want to add more external system links, add them to the array of values.
