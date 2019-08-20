@@ -26,12 +26,13 @@ class DeviceGroupController extends Controller
     {
         $this->authorize('manage', DeviceGroup::class);
 
-        $device_groups = DeviceGroup::orderBy('name')->withCount('devices')->get();
-        $ungrouped_device_ids = $this->groupedDevicesDeviceId($device_groups);
-        $ungrouped_devices = Device::orderby('hostname')->whereNotIn('device_id', $ungrouped_device_ids)->get();
+        $devices = DeviceGroup::orderBy('name')->withCount('devices')->get();
+        $grouped_device_ids = $this->grouped_devices_device_id($devices);
+
+        $ungrouped_devices = Device::orderby('hostname')->whereNotIn('device_id', $grouped_device_ids)->get();
 
         return view('device-group.index', [
-            'device_groups' => $device_groups,
+            'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
             'ungrouped_devices' => $ungrouped_devices,
         ]);
     }
@@ -39,16 +40,17 @@ class DeviceGroupController extends Controller
     /**
      * get all grouped devices
      *
-     * @return Array with device_ids of all grouped devices
+     * @return Array with grouped device_ids
      */
-    private function groupedDevicesDeviceId($device_groups)
+    private function grouped_devices_device_id($grouped_devices)
     {
         $device_ids = array();
-        foreach ($device_groups as $device_group) {
+        foreach ($grouped_devices as $device_group) {
             foreach ($device_group->devices as $device) {
                 $device_ids[] = $device->device_id;
             }
         }
+
         return array_unique($device_ids);
     }
 
