@@ -58,7 +58,8 @@ foreach ($tables as $tablevalue) {
         }
 
         // Create State Index
-        create_state_index($value_oid, $states);
+        $states_name = "drac." . $value_oid;
+        create_state_index($states_name, $states);
 
         foreach ($temp as $index => $entry) {
             if ($value_oid == 'memoryDeviceStatus') {
@@ -88,7 +89,7 @@ foreach ($tables as $tablevalue) {
             );
 
             //Create Sensor To State Index
-            create_sensor_to_state_index($device, $value_oid, $index);
+            create_sensor_to_state_index($device, $states_name, $index);
         }
     }
 }

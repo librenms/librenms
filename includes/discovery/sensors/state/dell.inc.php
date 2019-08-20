@@ -28,8 +28,9 @@ foreach ($tables as $tablevalue) {
 
     if (is_array($temp)) {
         //Create State Index
-        $state_name = $tablevalue[2];
-        if ($state_name == 'processorDeviceStatusStatus' || $state_name == 'memoryDeviceStatus' || $state_name == 'powerSupplyStatus' || $state_name == 'intrusionStatus') {
+        $state_oid = $tablevalue[2];
+        $state_name = "dell." . $state_oid;
+        if ($state_name == 'dell.processorDeviceStatusStatus' || $state_name == 'dell.memoryDeviceStatus' || $state_name == 'dell.powerSupplyStatus' || $state_name == 'dell.intrusionStatus') {
             $states = [
                 ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
                 ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
@@ -38,7 +39,7 @@ foreach ($tables as $tablevalue) {
                 ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'],
                 ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'nonRecoverable'],
             ];
-        } elseif ($state_name == 'controllerState') {
+        } elseif ($state_name == 'dell.controllerState') {
             $states = [
                 ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'],
                 ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
@@ -46,7 +47,7 @@ foreach ($tables as $tablevalue) {
                 ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'offline'],
                 ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'degraded'],
             ];
-        } elseif ($state_name == 'arrayDiskState') {
+        } elseif ($state_name == 'dell.arrayDiskState') {
             $states = [
                 ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'],
                 ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
@@ -72,7 +73,7 @@ foreach ($tables as $tablevalue) {
                 ['value' => 22, 'generic' => 2, 'graph' => 0, 'descr' => 'incompatible'],
                 ['value' => 23, 'generic' => 2, 'graph' => 0, 'descr' => 'readOnly'],
             ];
-        } elseif ($state_name == 'virtualDiskState') {
+        } elseif ($state_name == 'dell.virtualDiskState') {
             $states = [
                 ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
                 ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'ready'],
@@ -91,7 +92,7 @@ foreach ($tables as $tablevalue) {
                 ['value' => 36, 'generic' => 1, 'graph' => 1, 'descr' => 'backgroundInit'],
                 ['value' => 52, 'generic' => 2, 'graph' => 1, 'descr' => 'permanentlyDegraded'],
             ];
-        } elseif ($state_name == 'batteryState') {
+        } elseif ($state_name == 'dell.batteryState') {
             $states = [
                 ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'],
                 ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'failed'],
@@ -108,17 +109,17 @@ foreach ($tables as $tablevalue) {
 
         foreach ($temp as $index => $entry) {
             if (strpos($index, '54.') === false) { //Because Dell is buggy
-                if ($state_name == 'intrusionStatus') {
+                if ($state_name == 'dell.intrusionStatus') {
                     $descr = $tablevalue[3];
-                } elseif ($state_name == 'batteryState') {
+                } elseif ($state_name == 'dell.batteryState') {
                     $descr = str_replace('"', "", snmp_get($device, "batteryConnectionControllerName." .$index. "", "-Ovqn", $tablevalue[4])) . ' - ' .$temp[$index][$tablevalue[3]];
-                } elseif ($state_name == 'arrayDiskState') {
+                } elseif ($state_name == 'dell.arrayDiskState') {
                     $descr = str_replace('"', "", snmp_get($device, "arrayDiskEnclosureConnectionEnclosureName." .$index. "", "-Ovqn", $tablevalue[4])) . ' - ' .$temp[$index][$tablevalue[3]];
                 } else {
                     $descr = clean($temp[$index][$tablevalue[3]]); // Use clean as virtualDiskDeviceName is user defined
                 }
                 //Discover Sensors
-                discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
+                discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_oid, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
 
                 //Create Sensor To State Index
                 create_sensor_to_state_index($device, $state_name, $index);
