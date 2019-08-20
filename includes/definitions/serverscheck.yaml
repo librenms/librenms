@@ -3,7 +3,7 @@ text: ServersCheck
 type: network
 discovery:
     -
-    sysObjectID: .1.3.6.1.4.1.17095
-    sysDescr_regex: '/(Temperature|Sensor)+ Gateway/'
+        sysObjectID: .1.3.6.1.4.1.17095
+        sysDescr_regex: '/(Temperature|Sensor)+ Gateway/'
 mib_dir:
     - serverscheck
