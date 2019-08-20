@@ -38,7 +38,7 @@ foreach ($datas as $type) {
     }
     echo '>';
 
-    echo generate_link($types[$type]['short'], $wireless_link_array, array('metric' => $type));
+    echo generate_link(__("wireless.$type.short"), $wireless_link_array, ['metric' => $type]);
 
     echo '</span>';
 }
@@ -47,18 +47,19 @@ print_optionbar_end();
 
 if ($vars['metric'] == 'overview') {
     foreach ($datas as $type) {
-        $text = $types[$type]['long'];
-        if (!empty($types[$type]['unit'])) {
-            $text .=  ' (' . $types[$type]['unit'] . ')';
+        $text = __("wireless.$type.long");
+        $unit = __("wireless.$type.unit");
+        if (!empty($unit)) {
+            $text .= " ($unit)";
         }
 
         $graph_title = generate_link($text, $wireless_link_array, array('metric' => $type));
         $graph_array['type'] = 'device_wireless_'.$type;
 
-        include $config['install_dir'] . '/includes/html/print-device-graph.php';
+        include \LibreNMS\Config::get('install_dir') . '/includes/html/print-device-graph.php';
     }
 } elseif (isset($types[$vars['metric']])) {
-    $unit = $types[$vars['metric']]['unit'];
+    $unit = __('wireless.' . $vars['metric'] . '.unit');
     $factor = 1;
     if ($unit == 'MHz') {
         $unit = 'Hz';
@@ -72,9 +73,9 @@ if ($vars['metric'] == 'overview') {
     );
     foreach ($sensors as $sensor) {
         if (!is_integer($row++ / 2)) {
-            $row_colour = $config['list_colour']['even'];
+            $row_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
-            $row_colour = $config['list_colour']['odd'];
+            $row_colour = \LibreNMS\Config::get('list_colour.odd');
         }
 
         $sensor_descr = $sensor['sensor_descr'];
@@ -101,7 +102,7 @@ if ($vars['metric'] == 'overview') {
         $graph_array['id']   = $sensor['sensor_id'];
         $graph_array['type'] = 'wireless_' . $vars['metric'];
 
-        include $config['install_dir'] . '/includes/html/print-graphrow.inc.php';
+        include \LibreNMS\Config::get('install_dir') . '/includes/html/print-graphrow.inc.php';
 
         echo '</div></div>';
     }

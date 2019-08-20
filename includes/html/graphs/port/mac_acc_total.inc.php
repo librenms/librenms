@@ -90,11 +90,11 @@ foreach ($accs as $acc) {
         }//end if
 
         $this_id = str_replace('.', '', $acc['mac']);
-        if (!$config['graph_colours'][$colours][$iter]) {
+        if (!\LibreNMS\Config::get("graph_colours.$colours.$iter")) {
             $iter = 0;
         }
 
-        $colour       = $config['graph_colours'][$colours][$iter];
+        $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
         $descr        = rrdtool_escape($name, 36);
         $rrd_options .= ' DEF:in'.$this_id."=$this_rrd:".$prefix.'IN:AVERAGE ';
         $rrd_options .= ' DEF:out'.$this_id."temp=$this_rrd:".$prefix.'OUT:AVERAGE ';

@@ -12,10 +12,10 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
@@ -23,9 +23,8 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 $transport = $vars['transport'] ?: null;
 $transport_id = $vars['transport_id'] ?: null;
 
-require_once $config['install_dir'].'/includes/alerts.inc.php';
 $tmp = array(dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location_id from devices order by device_id asc limit 1'));
-$tmp['contacts'] = GetContacts($tmp);
+$tmp['contacts'] = AlertUtil::getContacts($tmp);
 $obj = array(
     "hostname"  => $tmp[0]['hostname'],
     "device_id" => $tmp[0]['device_id'],
@@ -33,7 +32,7 @@ $obj = array(
     "version" => $tmp[0]['version'],
     "hardware" => $tmp[0]['hardware'],
     "location" => $tmp[0]['location'],
-    "title"     => "Testing transport from ".$config['project_name'],
+    "title" => "Testing transport from " . Config::get('project_name'),
     "elapsed"   => "11s",
     "id"        => "000",
     "faults"    => false,

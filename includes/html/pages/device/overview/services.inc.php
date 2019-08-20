@@ -2,7 +2,7 @@
 
 use LibreNMS\Util\ObjectCache;
 
-if (ObjectCache::serviceCounts()['total'] > 0) {
+if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
     // Build the string.
     $break = '';
     $output = '';
@@ -20,17 +20,17 @@ if (ObjectCache::serviceCounts()['total'] > 0) {
             // Unknown
             $status = 'grey';
         }
-        $output .= $break . '<a class=' . $status . '>' . strtolower($data['service_type']) . '</a>';
+        $output .= $break . '<div title=' . str_replace(' ', '&nbsp;&nbsp;', $data['service_message']) . '><a class=' . $status . '>' . strtolower($data['service_type']) . '</a></div>';
         $break = ', ';
     }
 
-    $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical']);
+    $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']);
     ?>
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default panel-condensed">
                     <div class="panel-heading">
-                    <i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong>
+                    <?php echo '<a href="device/device='.$device['device_id'].'/tab=services">'?><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong><?php echo '</a>'?>
                     </div>
                     <table class="table table-hover table-condensed table-striped">
                         <tr>

@@ -15,8 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $pagetitle[] = 'Services';
 
 require_once 'includes/services.inc.php';
@@ -59,7 +57,7 @@ foreach ($menu_options as $option => $text) {
 }
 unset($sep);
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo '<div class="pull-right"><a data-toggle="modal" href="#create-service"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> Add Service</a></div>';
 }
 
@@ -90,7 +88,7 @@ if (count($services) > '0') {
         echo '<div class="col-sm-5">' . nl2br(trim($service['service_message'])) . '</div>';
         echo '<div class="col-sm-2">';
         echo '<div class="pull-right">';
-        if (LegacyAuth::user()->hasGlobalAdmin()) {
+        if (Auth::user()->hasGlobalAdmin()) {
             echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
         <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
         }
@@ -100,7 +98,7 @@ if (count($services) > '0') {
         if ($vars['view'] == 'details') {
             // if we have a script for this check, use it.
             $check_ds = null;
-            $check_script = $config['install_dir'] . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
+            $check_script = \LibreNMS\Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
             if (is_file($check_script)) {
                 include $check_script;
 

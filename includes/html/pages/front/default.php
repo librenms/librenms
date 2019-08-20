@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 require_once 'includes/html/object-cache.inc.php';
 
@@ -16,7 +16,7 @@ function generate_front_box($frontbox_class, $content)
 echo '
   <div class="row">
 ';
-if ($config['vertical_summary']) {
+if (Config::get('vertical_summary')) {
     echo '    <div class="col-md-9">';
 } else {
     echo '    <div class="col-md-8">';
@@ -34,10 +34,10 @@ echo '<div class="status-boxes">';
 $count_boxes = 0;
 
 // Device down boxes
-if (LegacyAuth::user()->hasGlobalRead()) {
-    $sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0' LIMIT " . $config['front_page_down_box_limit'];
+if (Auth::user()->hasGlobalRead()) {
+    $sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0' LIMIT " . Config::get('front_page_down_box_limit');
 } else {
-    $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . LegacyAuth::id() . "' AND D.status = '0' AND D.ignore = '0' LIMIT" . $config['front_page_down_box_limit'];
+    $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . Auth::id() . "' AND D.status = '0' AND D.ignore = '0' LIMIT" . Config::get('front_page_down_box_limit');
 }
 
 foreach (dbFetchRows($sql) as $device) {
@@ -50,15 +50,15 @@ foreach (dbFetchRows($sql) as $device) {
     ++$count_boxes;
 }
 
-if (LegacyAuth::user()->hasGlobalRead()) {
-    $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0' AND `D`.`status` = '1' LIMIT " . $config['front_page_down_box_limit'];
+if (Auth::user()->hasGlobalRead()) {
+    $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0' AND `D`.`status` = '1' LIMIT " . Config::get('front_page_down_box_limit');
 } else {
-    $sql = "SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . LegacyAuth::id() . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0' AND `D`.`status` = '1'  LIMIT " . $config['front_page_down_box_limit'];
+    $sql = "SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . Auth::id() . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0' AND `D`.`status` = '1'  LIMIT " . Config::get('front_page_down_box_limit');
 }
 
 // These things need to become more generic, and more manageable across different frontpages... rewrite inc :>
 // Port down boxes
-if ($config['warn']['ifdown']) {
+if (Config::get('warn.ifdown')) {
     foreach (dbFetchRows($sql) as $interface) {
         if (!$interface['deleted']) {
             $interface = cleanPort($interface);
@@ -66,7 +66,7 @@ if ($config['warn']['ifdown']) {
                 'alert alert-danger',
                 generate_device_link($interface, shorthost($interface['hostname'])) . "<br />
         <span class=\"interface-updown\">Port Down</span><br />
-<!--      <img src='graph.php?type=bits&amp;if=" . $interface['port_id'] . '&amp;from=' . $config['time']['day'] . '&amp;to=' . $config['time']['now'] . "&amp;width=100&amp;height=32' /> -->
+<!--      <img src='graph.php?type=bits&amp;if=" . $interface['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . "&amp;width=100&amp;height=32' /> -->
         " . generate_port_link($interface, substr(makeshortif($interface['label']), 0, 13)) . ' <br />
         ' . ($interface['ifAlias'] ? '<span class="body-date-1">' . substr($interface['ifAlias'], 0, 20) . '</span>' : '')
             );
@@ -78,12 +78,12 @@ if ($config['warn']['ifdown']) {
 /*
     FIXME service permissions? seem nonexisting now.. */
 // Service down boxes
-if (LegacyAuth::user()->hasGlobalRead()) {
-    $sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = '2' AND D.ignore = '0' AND S.service_ignore = '0' LIMIT " . $config['front_page_down_box_limit'];
+if (Auth::user()->hasGlobalRead()) {
+    $sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = '2' AND D.ignore = '0' AND S.service_ignore = '0' LIMIT " . Config::get('front_page_down_box_limit');
     $param[] = '';
 } else {
-    $sql = "SELECT * FROM services AS S, devices AS D, devices_perms AS P WHERE P.`user_id` = ? AND P.`device_id` = D.`device_id` AND S.`device_id` = D.`device_id` AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '2' LIMIT " . $config['front_page_down_box_limit'];
-    $param[] = LegacyAuth::id();
+    $sql = "SELECT * FROM services AS S, devices AS D, devices_perms AS P WHERE P.`user_id` = ? AND P.`device_id` = D.`device_id` AND S.`device_id` = D.`device_id` AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '2' LIMIT " . Config::get('front_page_down_box_limit');
+    $param[] = Auth::id();
 }
 
 foreach (dbFetchRows($sql, $param) as $service) {
@@ -98,11 +98,11 @@ foreach (dbFetchRows($sql, $param) as $service) {
 }
 
 // BGP neighbour down boxes
-if (isset($config['enable_bgp']) && $config['enable_bgp']) {
-    if (LegacyAuth::user()->hasGlobalRead()) {
-        $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0 AND `D`.`status` = '1' LIMIT " . $config['front_page_down_box_limit'];
+if (Config::get('enable_bgp')) {
+    if (Auth::user()->hasGlobalRead()) {
+        $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0 AND `D`.`status` = '1' LIMIT " . Config::get('front_page_down_box_limit');
     } else {
-        $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . LegacyAuth::id() . "' AND  bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0 AND `D`.`status` = '1' LIMIT " . $config['front_page_down_box_limit'];
+        $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . Auth::id() . "' AND  bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0 AND `D`.`status` = '1' LIMIT " . Config::get('front_page_down_box_limit');
     }
 
     foreach (dbFetchRows($sql) as $peer) {
@@ -118,11 +118,11 @@ if (isset($config['enable_bgp']) && $config['enable_bgp']) {
 }
 
 // Device rebooted boxes
-if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $config['uptime_warning'] > 0 && $config['os'][$device['os']]['bad_uptime'] !== true) {
-    if (LegacyAuth::user()->hasGlobalRead()) {
-        $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0 LIMIT " . $config['front_page_down_box_limit'];
+if (filter_var(Config::get('uptime_warning'), FILTER_VALIDATE_FLOAT) !== false && Config::get('uptime_warning') > 0 && !Config::get("os.{$device['os']}.bad_uptime")) {
+    if (Auth::user()->hasGlobalRead()) {
+        $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '" . Config::get('uptime_warning') . "' AND D.ignore = 0 LIMIT " . Config::get('front_page_down_box_limit');
     } else {
-        $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . LegacyAuth::id() . "' AND D.status = '1' AND D.uptime > 0 AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0 LIMIT " . $config['front_page_down_box_limit'];
+        $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . Auth::id() . "' AND D.status = '1' AND D.uptime > 0 AND D.uptime < '" . Config::get('uptime_warning') . "' AND D.ignore = 0 LIMIT " . Config::get('front_page_down_box_limit');
     }
 
     foreach (dbFetchRows($sql) as $device) {
@@ -138,7 +138,7 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $c
 
 if ($count_boxes == 0) {
     echo "<h5>Nothing here yet</h5><p class=welcome>This is where status notifications about devices and services would normally go. You might have none
-  because you run such a great network, or perhaps you've just started using " . $config['project_name'] . ". If you're new to " . $config['project_name'] . ', you might
+  because you run such a great network, or perhaps you've just started using " . Config::get('project_name') . ". If you're new to " . Config::get('project_name') . ', you might
   want to start by adding one or more devices in the Devices menu.</p>';
 }
 
@@ -150,7 +150,7 @@ echo '
   </div>
 ';
 
-if ($config['vertical_summary']) {
+if (Config::get('vertical_summary')) {
     echo '   <div class="col-md-3">';
     include_once 'includes/html/device-summary-vert.inc.php';
     echo implode('', $common_output);
@@ -167,8 +167,8 @@ echo '
   <div class="col-md-12">
 ';
 
-if ($config['enable_syslog']) {
-    $sql = "SELECT *, DATE_FORMAT(timestamp, '" . $config['dateformat']['mysql']['compact'] . "') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
+if (Config::get('enable_syslog')) {
+    $sql = "SELECT *, DATE_FORMAT(timestamp, '" . Config::get('dateformat.mysql.compact') . "') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
 
     echo '<div class="container-fluid">
           <div class="row">
@@ -198,12 +198,12 @@ if ($config['enable_syslog']) {
     echo '</div>';
     echo '</div>';
 } else {
-    if (LegacyAuth::user()->hasGlobalRead()) {
-        $query = "SELECT *,DATE_FORMAT(datetime, '" . $config['dateformat']['mysql']['compact'] . "') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
+    if (Auth::user()->hasGlobalRead()) {
+        $query = "SELECT *,DATE_FORMAT(datetime, '" . Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
         $alertquery = 'SELECT devices.device_id,name,state,time_logged FROM alert_log LEFT JOIN devices ON alert_log.device_id=devices.device_id LEFT JOIN alert_rules ON alert_log.rule_id=alert_rules.id ORDER BY `time_logged` DESC LIMIT 0,15';
     } else {
-        $query = "SELECT *,DATE_FORMAT(datetime, '" . $config['dateformat']['mysql']['compact'] . "') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host = P.device_id AND P.user_id = " . LegacyAuth::id() . ' ORDER BY `datetime` DESC LIMIT 0,15';
-        $alertquery = 'SELECT devices.device_id,name,state,time_logged FROM alert_log LEFT JOIN devices ON alert_log.device_id=devices.device_id LEFT JOIN alert_rules ON alert_log.rule_id=alert_rules.id RIGHT JOIN devices_perms ON alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = ' . LegacyAuth::id() . ' ORDER BY `time_logged` DESC LIMIT 0,15';
+        $query = "SELECT *,DATE_FORMAT(datetime, '" . Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host = P.device_id AND P.user_id = " . Auth::id() . ' ORDER BY `datetime` DESC LIMIT 0,15';
+        $alertquery = 'SELECT devices.device_id,name,state,time_logged FROM alert_log LEFT JOIN devices ON alert_log.device_id=devices.device_id LEFT JOIN alert_rules ON alert_log.rule_id=alert_rules.id RIGHT JOIN devices_perms ON alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = ' . Auth::id() . ' ORDER BY `time_logged` DESC LIMIT 0,15';
     }
 
     echo '<div class="container-fluid">

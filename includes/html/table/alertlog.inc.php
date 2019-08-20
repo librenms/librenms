@@ -13,8 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $where = 1;
 
 if (is_numeric($vars['device_id'])) {
@@ -27,11 +25,11 @@ if ($vars['state'] >= 0) {
     $param[] = mres($vars['state']);
 }
 
-if (LegacyAuth::user()->hasGlobalRead()) {
+if (Auth::user()->hasGlobalRead()) {
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
 } else {
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id RIGHT JOIN devices_perms AS P ON E.device_id = P.device_id WHERE $where AND P.user_id = ?";
-    $param[] = array(LegacyAuth::id());
+    $param[] = array(Auth::id());
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
@@ -59,7 +57,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '" . $config['dateformat']['mysql']['compact'] . "') as humandate,details $sql";
+$sql = "SELECT D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {

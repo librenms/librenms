@@ -32,7 +32,7 @@ if (isset($options['g'])) {
     $groups = [];
 }
 
-if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
+if (Config::get('base_url') !== true && \LibreNMS\Config::get('influxdb.enable') === true) {
     $influxdb = influxdb_connect();
 } else {
     $influxdb = false;

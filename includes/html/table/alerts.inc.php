@@ -13,8 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $where = ' `devices`.`disabled` = 0';
 
 $alert_states = array(
@@ -84,10 +82,10 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where .= ' AND `DP`.`user_id`=?';
-    $param[] = LegacyAuth::id();
+    $param[] = Auth::id();
 }
 
 $sql .= " LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id`";
@@ -155,7 +153,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         $severity .= ' <strong>-</strong>';
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
+    $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
 
     switch ($severity) {
         case 'critical':
@@ -198,6 +196,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(array('page' => 'alert-rules')) . '">' . htmlentities($alert['name']) . '</a></i>',
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
         'hostname' => $hostname,
+        'location' => generate_link($alert['location'], array('page' => 'devices', 'location' => $alert['location'])),
         'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],

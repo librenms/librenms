@@ -49,20 +49,21 @@
             user_grid.bootgrid({
                 formatters: {
                     actions: function (column, row) {
-                        var edit_button = '<form action="users/' + row['user_id'] + '/edit" method="GET">' +
+                        var edit_button = '<form action="{{ route('users.edit', ':user_id') }}'.replace(':user_id', row['user_id']) + '" method="GET">' +
+                            '@csrf' +
                             '<button type="submit" title="@lang('Edit')" class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i></button>' +
                             '</form> ';
 
                         var delete_button = '<button type="button" title="@lang('Delete')" class="btn btn-sm btn-danger" onclick="return delete_user(' + row['user_id'] + ', \'' + row['username'] + '\');">' +
                             '<i class="fa fa-trash"></i></button> ';
 
-                        var manage_button = '<form action="edituser/" method="GET"';
+                        var manage_button = '<form action="{{ url('edituser') }}/" method="GET"';
 
                         if (row['level'] >= 5) {
                             manage_button += ' style="visibility:hidden;"'
                         }
 
-                        manage_button += '><input type="hidden" name="user_id" value="' + row['user_id'] +
+                        manage_button += '>@csrf<input type="hidden" name="user_id" value="' + row['user_id'] +
                             '"><button type="submit" title="@lang('Manage Access')" class="btn btn-sm btn-primary"><i class="fa fa-tasks"></i></button>' +
                             '</form> ';
 
@@ -88,18 +89,18 @@
                 }
             });
 
-            @if(\LibreNMS\Authentication\LegacyAuth::get()->canManageUsers())
-                $('.actionBar').append('<div class="pull-left"><a href="users/create" type="button" class="btn btn-primary">@lang('Add User')</a></div>');
+            @if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
+                $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">@lang('Add User')</a></div>');
             @endif
 
             user_grid.css('display', 'table'); // done loading, show
         });
 
-        function delete_user(user_id, username)
+        function delete_user(user_id, username, url)
         {
             if (confirm('@lang('Are you sure you want to delete ')' + username + '?')) {
                 $.ajax({
-                    url: 'users/' + user_id,
+                    url: '{{ route('users.destroy', ':user_id') }}'.replace(':user_id', user_id),
                     type: 'DELETE',
                     success: function (msg) {
                         $("#users").bootgrid("remove", [user_id]);

@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Config;
+
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
@@ -81,32 +83,32 @@ $rrd_options .= ' CDEF:doutbits_max=doutoctets_max,8,*';
 $rrd_options .= ' CDEF:inbits=inoctets,8,*';
 $rrd_options .= ' CDEF:inbits_max=inoctets_max,8,*';
 
-if ($config['rrdgraph_real_percentile']) {
+if (Config::get('rrdgraph_real_percentile')) {
     $rrd_options .= ' CDEF:highbits=inoctets,outoctets,MAX,8,*';
-    $rrd_options .= ' VDEF:percentilehigh=highbits,' . $config['percentile_value'] . ',PERCENT';
+    $rrd_options .= ' VDEF:percentilehigh=highbits,' . Config::get('percentile_value') . ',PERCENT';
 }
 
 $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
 $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
 $rrd_options .= ' VDEF:tot=octets,TOTAL';
 $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
-$rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . $config['percentile_value'] . ',PERCENT';
+$rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . Config::get('percentile_value') . ',PERCENT';
 $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
 $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 
 if ($format == 'octets' || $format == 'bytes') {
-    $rrd_options .= ' VDEF:percentile_in=inoctets,' . $config['percentile_value'] . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outoctets,' . $config['percentile_value'] . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inoctets,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outoctets,' . Config::get('percentile_value') . ',PERCENT';
     $units = 'Bps';
     $format = 'octets';
 } else {
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . $config['percentile_value'] . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . $config['percentile_value'] . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
     $units = 'bps';
     $format = 'bits';
 }
 
-$rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . $config['percentile_value'] . "th %\\n'";
+$rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . Config::get('percentile_value') . "th %\\n'";
 
 $rrd_options .= ' AREA:in' . $format . '_max#D7FFC7' . $stacked['transparency'] . ':';
 $rrd_options .= ' AREA:in' . $format . '#90B040' . $stacked['transparency'] . ':';
@@ -124,7 +126,7 @@ $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.2lf%s';
 $rrd_options .= ' GPRINT:out' . $format . '_max:MAX:%6.2lf%s';
 $rrd_options .= " GPRINT:percentile_out:%6.2lf%s\\n";
 
-if ($config['rrdgraph_real_percentile']) {
+if (Config::get('rrdgraph_real_percentile')) {
     $rrd_options .= ' HRULE:percentilehigh#FF0000:"Highest"';
     $rrd_options .= " GPRINT:percentilehigh:\"%30.2lf%s\\n\"";
 }
@@ -135,8 +137,21 @@ $rrd_options .= " GPRINT:totout:'Out %6.2lf%sB)\\l'";
 $rrd_options .= ' LINE1:percentile_in#aa0000';
 $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
+// Linear prediction of trend
+if ($to > time()) {
+    $rrd_options .= ' VDEF:islope=inbits_max,LSLSLOPE';
+    $rrd_options .= ' VDEF:icons=inbits_max,LSLINT';
+    $rrd_options .= ' CDEF:ilsl=inbits_max,POP,islope,COUNT,*,icons,+ ';
+    $rrd_options .= " LINE2:ilsl#44aa55:'In Linear Prediction\\n':dashes=8";
+
+    $rrd_options .= ' VDEF:oslope=doutbits_max,LSLSLOPE';
+    $rrd_options .= ' VDEF:ocons=doutbits_max,LSLINT';
+    $rrd_options .= ' CDEF:olsl=doutbits_max,POP,oslope,COUNT,*,ocons,+ ';
+    $rrd_options .= " LINE2:olsl#4400dd:'Out Linear Prediction\\n':dashes=8";
+}
+
 if ($_GET['previous'] == 'yes') {
-    $rrd_options .= ' LINE1.25:in' . $format . "X#009900:'Prev In \\\\n'";
+    $rrd_options .= ' LINE1.25:in' . $format . "X#009900:'Prev In \\n'";
     $rrd_options .= ' LINE1.25:dout' . $format . "X#000099:'Prev Out'";
 }
 

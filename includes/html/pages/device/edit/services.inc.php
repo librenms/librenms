@@ -1,10 +1,8 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (LegacyAuth::user()->hasGlobalRead()) {
+if (Auth::user()->hasGlobalRead()) {
     if ($vars['addsrv']) {
-        if (LegacyAuth::user()->hasGlobalAdmin()) {
+        if (Auth::user()->hasGlobalAdmin()) {
             $updated = '1';
 
             $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);
@@ -16,7 +14,7 @@ if (LegacyAuth::user()->hasGlobalRead()) {
     }
 
     // Build the types list.
-    foreach (scandir($config['nagios_plugins']) as $file) {
+    foreach (scandir(\LibreNMS\Config::get('nagios_plugins')) as $file) {
         if (substr($file, 0, 6) === 'check_') {
             $check_name = substr($file, 6);
             $servicesform .= "<option value='$check_name'>$check_name</option>";

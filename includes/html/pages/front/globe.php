@@ -29,8 +29,6 @@
 
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 include_once 'includes/html/object-cache.inc.php';
 echo '<div class="container-fluid">
     <div class="row">
@@ -68,8 +66,8 @@ echo '      </div>
 </div>';
 
 //From default.php - This code is not part of above license.
-if ($config['enable_syslog']) {
-    $sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog ORDER BY seq DESC LIMIT 20";
+if (\LibreNMS\Config::get('enable_syslog')) {
+    $sql = "SELECT *, DATE_FORMAT(timestamp, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') AS date from syslog ORDER BY seq DESC LIMIT 20";
     echo('<div class="container-fluid">
           <div class="row">
             <div class="col-md-12">
@@ -97,11 +95,11 @@ if ($config['enable_syslog']) {
     echo("</div>");
     echo("</div>");
 } else {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
-        $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
+    if (Auth::user()->hasGlobalAdmin()) {
+        $query = "SELECT *,DATE_FORMAT(datetime, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
     } else {
-        $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
-            P.device_id AND P.user_id = " . LegacyAuth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
+        $query = "SELECT *,DATE_FORMAT(datetime, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
+            P.device_id AND P.user_id = " . Auth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
     }
 
     echo('<div class="container-fluid">

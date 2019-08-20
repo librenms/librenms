@@ -2,27 +2,12 @@
 
 $simple_rrd = true;
 
-if (!is_array($config['nfsen_rrds'])) {
-    $config['nfsen_rrds'] = array($config['nfsen_rrds']);
-}
-
-foreach ($config['nfsen_rrds'] as $nfsenrrds) {
+foreach ((array)\LibreNMS\Config::get('nfsen_rrds', []) as $nfsenrrds) {
     if ($nfsenrrds[(strlen($nfsenrrds) - 1)] != '/') {
         $nfsenrrds .= '/';
     }
 
-    // convert dots in filename to underscores
-    $nfsensuffix = '';
-    if ($config['nfsen_suffix']) {
-        $nfsensuffix = $config['nfsen_suffix'];
-    }
-
-    if (isset($config['nfsen_split_char']) && !empty($config['nfsen_split_char'])) {
-        $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
-    } else {
-        $basefilename_underscored = $device['hostname'];
-    }
-    $nfsen_filename           = preg_replace('/'.$nfsensuffix.'/', '', $basefilename_underscored);
+    $nfsen_filename=nfsen_hostname($device['hostname']);
 
     if (is_file($nfsenrrds.$nfsen_filename.'.rrd')) {
         $rrd_filename = $nfsenrrds.$nfsen_filename.'.rrd';

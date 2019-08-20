@@ -11,10 +11,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
 ?>
 <!--Modal for adding or updating an alert transport -->
     <div class="modal fade" id="edit-alert-transport" tabindex="-1" role="dialog"
@@ -27,6 +26,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                 </div>
                 <div class="modal-body">
                     <form method="post" role="form" id="transports" class="form-horizontal transports-form">
+                        <?php echo csrf_field() ?>
                         <input type="hidden" name="transport_id" id="transport_id" value="">
                         <input type="hidden" name="type" id="type" value="alert-transports">
                         <div class='form-group' title="The description of this alert transport.">
@@ -77,6 +77,7 @@ foreach ($transports_list as $transport) {
     }
     
     echo '<form method="post" role="form" id="'.strtolower($transport).'-form" class="form-horizontal transport">';
+    echo csrf_field();
     echo '<input type="hidden" name="transport-type" id="transport-type" value="'.strtolower($transport).'">';
    
     $tmp = call_user_func($class.'::configTemplate');
@@ -85,7 +86,7 @@ foreach ($transports_list as $transport) {
         if ($item['type'] !== 'hidden') {
             echo '<div class="form-group" title="' . $item['descr'] . '">';
             echo '<label for="' . $item['name'] . '" class="col-sm-3 col-md-2 control-label">' . $item['title'] . ': </label>';
-            if ($item['type'] == 'text') {
+            if ($item['type'] == 'text' || $item['type'] == 'password') {
                 echo '<div class="col-sm-9 col-md-10">';
                 echo '<input type="' . $item['type'] . '" id="' . $item['name'] . '" name="' . $item['name'] . '" class="form-control" ';
                 if ($item['required']) {
@@ -158,6 +159,7 @@ foreach ($transports_list as $transport) {
                 </div>
                 <div class="modal-footer">
                     <form role="form" class="remove_transport_form">
+                        <?php echo csrf_field() ?>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger danger" id="remove-alert-transport" data-target="remove-alert-transport">Delete</button>
                         <input type="hidden" name="transport_id" id="delete_transport_id" value="">

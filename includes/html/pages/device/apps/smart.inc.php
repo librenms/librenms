@@ -1,7 +1,5 @@
 <?php
 
-global $config;
-
 $disks=get_disks_with_smart($device, $app['app_id']);
 
 print_optionbar_start();
@@ -37,10 +35,12 @@ if (isset($vars['disk'])) {
         'smart_other'       => 'Other',
         'smart_tests_status'=> 'S.M.A.R.T self-tests results',
         'smart_tests_ran'   => 'S.M.A.R.T self-tests run count',
+        'smart_runtime'     => 'Power On Hours',
     );
 } else {
     $graphs = array(
         'smart_id5'=>'ID# 5, Reallocated Sectors Count',
+        'smart_id9'=>'ID# 9, Power On Hours',
         'smart_id10'=>'ID# 10, Spin Retry Count',
         'smart_id173'=>'ID# 173, SSD Wear Leveller Worst Case Erase Count',
         'smart_id177'=>'ID# 177, SSD Wear Leveling Count',
@@ -63,7 +63,7 @@ foreach ($graphs as $key => $text) {
     $graph_type            = $key;
     $graph_array['height'] = '100';
     $graph_array['width']  = '215';
-    $graph_array['to']     = $config['time']['now'];
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['id']     = $app['app_id'];
     $graph_array['type']   = 'application_'.$key;
 

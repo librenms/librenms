@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
-//Don't know where this should come from, but it is used later, so I just define it here.
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
+//Don't know where this should come from, but it is used later, so I just define it here.
 $row_colour="#ffffff";
 
 $sql_array= array();
@@ -27,10 +27,10 @@ if (!empty($device['hostname'])) {
     $sql = ' ';
 }
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $join_sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D1`.`device_id` = `DP`.`device_id`';
     $sql  .= ' AND `DP`.`user_id`=?';
-    $sql_array[] = LegacyAuth::id();
+    $sql_array[] = Auth::id();
 }
 
 $devices_by_id = array();
@@ -48,7 +48,7 @@ if (is_numeric($vars['group'])) {
     $sql_array[] = $vars['group'];
 }
 
-if (in_array('mac', $config['network_map_items'])) {
+if (in_array('mac', Config::get('network_map_items'))) {
     $ports = dbFetchRows("SELECT
                              `D1`.`status` AS `local_status`,
                              `D1`.`device_id` AS `local_device_id`,
@@ -97,7 +97,7 @@ if (in_array('mac', $config['network_map_items'])) {
                      ", $sql_array);
 }
 
-if (in_array('xdp', $config['network_map_items'])) {
+if (in_array('xdp', Config::get('network_map_items'))) {
     $devices = dbFetchRows("SELECT
                              `D1`.`status` AS `local_status`,
                              `D1`.`device_id` AS `local_device_id`,
@@ -151,35 +151,35 @@ $list = array_merge($ports, $devices);
 $node_disabled_style = array(
     'color' => array(
         'highlight' => array(
-            'background' => $config['network_map_legend']['di.node'],
+            'background' => Config::get('network_map_legend.di.node'),
         ),
-        'border' => $config['network_map_legend']['di.border'],
-        'background' => $config['network_map_legend']['di.node'],
+        'border' => Config::get('network_map_legend.di.border'),
+        'background' => Config::get('network_map_legend.di.node'),
     ),
 );
 $node_down_style = array(
     'color' => array(
         'highlight' => array(
-            'background' => $config['network_map_legend']['dn.node'],
-            'border' => $config['network_map_legend']['dn.border'],
+            'background' => Config::get('network_map_legend.dn.node'),
+            'border' => Config::get('network_map_legend.dn.border'),
         ),
-        'border' => $config['network_map_legend']['dn.border'],
-        'background' => $config['network_map_legend']['dn.node'],
+        'border' => Config::get('network_map_legend.dn.border'),
+        'background' => Config::get('network_map_legend.dn.node'),
     ),
 );
 $edge_disabled_style = array(
     'dashes' => array(8,12),
     'color' => array(
-        'color' => $config['network_map_legend']['di.edge'],
-        'highlight' => $config['network_map_legend']['di.edge'],
+        'color' => Config::get('network_map_legend.di.edge'),
+        'highlight' => Config::get('network_map_legend.di.edge'),
     ),
 );
 $edge_down_style = array(
     'dashes' => array(8,12),
     'color' => array(
-        'border' => $config['network_map_legend']['dn.border'],
-        'highlight' => $config['network_map_legend']['dn.edge'],
-        'color' => $config['network_map_legend']['dn.edge'],
+        'border' => Config::get('network_map_legend.dn.border'),
+        'highlight' => Config::get('network_map_legend.dn.edge'),
+        'color' => Config::get('network_map_legend.dn.edge'),
     ),
 );
 
@@ -258,8 +258,16 @@ foreach ($list as $items) {
     if ($link_used > 100) {
         $link_used = 100;
     }
-
-    $link_style = array('color' => array('border' => $config['network_map_legend'][$link_used], 'highlight' => $config['network_map_legend'][$link_used], 'color' => $config['network_map_legend'][$link_used]));
+    if (is_nan($link_used)) {
+        $link_used = 0;
+    }
+    $link_style = [
+        'color' => [
+            'border' => Config::get("network_map_legend.$link_used"),
+            'highlight' => Config::get("network_map_legend.$link_used"),
+            'color' => Config::get("network_map_legend.$link_used")
+        ]
+    ];
 
 
     if (($items['remote_ifoperstatus'] == 'down') || ($items['local_ifoperstatus'] == 'down')) {
@@ -290,7 +298,7 @@ foreach ($list as $items) {
                 'from'=>$items['local_device_id'],
                 'to'=>$items['remote_device_id'],
                 'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),
-                'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#", "", $row_colour)."'>\n", '', 0, 1),
+                'title' => generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=" . $items['local_port_id'] . "&amp;from=" . Config::get('time.day') . "&amp;to=" . Config::get('time.now') . "&amp;width=100&amp;height=20&amp;legend=no&amp;bg=" . str_replace("#", "", $row_colour) . "'>\n", '', 0, 1),
                 'width'=>$width,
             ),
             $link_style
@@ -334,8 +342,8 @@ echo $edges;
         edges: edges,
         stabilize: true
     };
-    var options =  <?php echo $config['network_map_vis_options']; ?>;
-    var network = new vis.Network(container, data, options);
+    var options =  <?php echo Config::get('network_map_vis_options'); ?>;
+var network = new vis.Network(container, data, options);
     network.on('click', function (properties) {
         if (properties.nodes > 0) {
             window.location.href = "device/device="+properties.nodes+"/tab=neighbours/selection=map/"

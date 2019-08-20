@@ -5,30 +5,33 @@ All the `list_*logs` calls are aliased to `list_logs`.
 
 Retrieve all logs or logs for a specific device.
 
-  - id or hostname is the specific device
+- id or hostname is the specific device
 
 Input:
 
-  - start: The page number to request.
-  - limit: The limit of results to be returned.
-  - from: The date and time to search from.
-  - to: The data and time to search to.
+- start: The page number to request.
+- limit: The limit of results to be returned.
+- from: The date and time to search from.
+- to: The data and time to search to.
 
 ### `list_eventlog`
+
 Route: `/api/v0/logs/eventlog/:hostname`
 
 ### `list_syslog`
+
 Route: `/api/v0/logs/syslog/:hostname`
 
 ### `list_alertlog`
+
 Route: `/api/v0/logs/alertlog/:hostname`
 
 ### `list_authlog`
+
 Route: `/api/v0/logs/authlog/:hostname`
 
-
-
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/syslog/:hostname?limit=20
@@ -36,6 +39,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventl
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",

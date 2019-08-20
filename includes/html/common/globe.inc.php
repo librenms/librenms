@@ -47,7 +47,7 @@ foreach (getlocations() as $location_row) {
     $count = 0;
     $down  = 0;
     foreach (dbFetchRows("SELECT `device_id`, `hostname`, `status` FROM `devices` WHERE `location_id` = ? && `disabled` = 0 && `ignore` = 0 GROUP BY `hostname`", [$location_id]) as $device) {
-        if ($config['frontpage_globe']['markers'] == 'devices' || empty($config['frontpage_globe']['markers'])) {
+        if (\LibreNMS\Config::get('frontpage_globe.markers') == 'devices' || empty(\LibreNMS\Config::get('frontpage_globe.markers'))) {
             $devices[] = $device['hostname'];
             $count++;
             if ($device['status'] == "0") {
@@ -56,7 +56,7 @@ foreach (getlocations() as $location_row) {
             } else {
                 $devices_up[] = $device;
             }
-        } elseif ($config['frontpage_globe']['markers'] == 'ports') {
+        } elseif (\LibreNMS\Config::get('frontpage_globe.markers') == 'ports') {
             foreach (dbFetchRows("SELECT ifName,ifOperStatus,ifAdminStatus FROM ports WHERE ports.device_id = ? && ports.ignore = 0 && ports.disabled = 0 && ports.deleted = 0", array($device['device_id'])) as $port) {
                 $count++;
                 if ($port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] == 'up') {
@@ -69,17 +69,17 @@ foreach (getlocations() as $location_row) {
         }
     }
     $pdown = $count ? ($down / $count)*100 : 0;
-    if ($config['frontpage_globe']['markers'] == 'devices' || empty($config['frontpage_globe']['markers'])) {
+    if (\LibreNMS\Config::get('frontpage_globe.markers') == 'devices' || empty(\LibreNMS\Config::get('frontpage_globe.markers'))) {
         $devices_down = array_merge(array(count($devices_up). " Devices OK"), $devices_down);
-    } elseif ($config['frontpage_globe']['markers'] == 'ports') {
+    } elseif (\LibreNMS\Config::get('frontpage_globe.markers') == 'ports') {
         $devices_down = array_merge(array(count($devices_up). " Ports OK"), $devices_down);
     }
     $locations[] = "            ['".$location."', ".$pdown.", ".$count.", '".implode(",<br/> ", $devices_down)."']";
 }
 $temp_output .= implode(",\n", $locations);
 
-$map_world = $config['frontpage_globe']['region'] ? $config['frontpage_globe']['region'] : 'world';
-$map_countries = $config['frontpage_globe']['resolution'] ? $config['frontpage_globe']['resolution'] : 'countries';
+$map_world = \LibreNMS\Config::get('frontpage_globe.region', 'world');
+$map_countries = \LibreNMS\Config::get('frontpage_globe.resolution', 'countries');
 
 $temp_output .= "
         ]);

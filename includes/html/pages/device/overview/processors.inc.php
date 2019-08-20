@@ -15,9 +15,9 @@ if (count($processors)) {
         <table class="table table-hover table-condensed table-striped">';
 
     $graph_array           = array();
-    $graph_array['to']     = $config['time']['now'];
+    $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['type']   = 'processor_usage';
-    $graph_array['from']   = $config['time']['day'];
+    $graph_array['from'] = \LibreNMS\Config::get('time.day');
     $graph_array['legend'] = 'no';
 
     $totalPercent=0;
@@ -27,7 +27,7 @@ if (count($processors)) {
         $text_descr = rewrite_entity_descr($proc['processor_descr']);
 
         $percent      = $proc['processor_usage'];
-        if ($config['cpu_details_overview'] === true) {
+        if (\LibreNMS\Config::get('cpu_details_overview') === true) {
             $background   = get_percentage_colours($percent, $proc['processor_perc_warn']);
 
             $graph_array['id']     = $proc['processor_id'];
@@ -59,14 +59,14 @@ if (count($processors)) {
         }
     }//end foreach
 
-    if ($config['cpu_details_overview'] === false) {
-        if ($_SESSION['screen_width']) {
-            if ($_SESSION['screen_width'] > 970) {
-                $graph_array['width'] = round(($_SESSION['screen_width'] - 390 )/2, 0);
+    if (\LibreNMS\Config::get('cpu_details_overview') === false) {
+        if ($screen_width = Session::get('screen_width')) {
+            if ($screen_width > 970) {
+                $graph_array['width'] = round(($screen_width - 390 )/2, 0);
                 $graph_array['height'] = round($graph_array['width'] /3);
                 $graph_array['lazy_w'] = $graph_array['width'] + 80;
             } else {
-                $graph_array['width'] = $_SESSION['screen_width'] - 190;
+                $graph_array['width'] = $screen_width - 190;
                 $graph_array['height'] = round($graph_array['width'] /3);
                 $graph_array['lazy_w'] = $graph_array['width'] + 80;
             }

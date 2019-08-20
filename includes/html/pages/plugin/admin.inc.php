@@ -1,8 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     // Scan for new plugins and add to the database
     $new_plugins = scan_new_plugins();
 
@@ -73,6 +71,7 @@ foreach (dbFetchRows('SELECT * FROM plugins') as $plugins) {
             </td>
             <td>
               <form class="form-inline" role="form" action="" method="post" id="'.$plugins['plugin_id'].'" name=="'.$plugins['plugin_id'].'">
+                ' . csrf_field() . '
                 <input type="hidden" name="plugin_id" value="'.$plugins['plugin_id'].'">
                 <input type="hidden" name="plugin_active" value="'.$plugins['plugin_active'].'">
                 <button type="submit" class="btn btn-sm btn-'.$plugin_button.'">'.$plugin_label.'</button>

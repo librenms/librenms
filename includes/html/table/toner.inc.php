@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Util\StringHelpers;
 
 $graph_type = 'toner_usage';
@@ -27,7 +26,7 @@ if (!empty($searchPhrase)) {
 }
 
 $count_sql = "SELECT COUNT(*) FROM `toner`";
-$param[] = LegacyAuth::id();
+$param[] = Auth::id();
 
 $count     = dbFetchCell($count_sql, $param);
 if (empty($count)) {
@@ -59,8 +58,8 @@ foreach (dbFetchRows($sql, $param) as $toner) {
 
         $graph_array['type']        = $graph_type;
         $graph_array['id']          = $toner['toner_id'];
-        $graph_array['from']        = $config['time']['day'];
-        $graph_array['to']          = $config['time']['now'];
+        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['height']      = '20';
         $graph_array['width']       = '80';
         $graph_array_zoom           = $graph_array;
@@ -83,7 +82,7 @@ foreach (dbFetchRows($sql, $param) as $toner) {
         if ($vars['view'] == 'graphs') {
             $graph_array['height'] = '100';
             $graph_array['width']  = '216';
-            $graph_array['to']     = $config['time']['now'];
+            $graph_array['to'] = \LibreNMS\Config::get('time.now');
             $graph_array['id']     = $toner['toner_id'];
             $graph_array['type']   = $graph_type;
             $return_data           = true;

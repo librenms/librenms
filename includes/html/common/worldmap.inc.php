@@ -23,10 +23,10 @@
  */
 
 use Auth;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 
 $install_dir = Config::get('install_dir');
-require_once $install_dir . '/includes/alerts.inc.php';
 
 if (Config::get('map.engine', 'leaflet') == 'leaflet') {
     $temp_output = '
@@ -110,7 +110,7 @@ var greenMarker = L.AwesomeMarkers.icon({
             $map_devices['lng'] = $tmp_loc['lng'];
         }
         if ($map_devices['status'] == 0) {
-            if (IsMaintenance($map_devices['device_id'])) {
+            if (AlertUtil::isMaintenance($map_devices['device_id'])) {
                 if ($show_status == 0) { // Don't show icon if only down devices should be shown
                     continue;
                 } else {

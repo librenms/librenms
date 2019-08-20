@@ -1,7 +1,5 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $pagetitle[] = 'About';
 $git_log = `git log -10`;
 ?>
@@ -25,7 +23,7 @@ $git_log = `git log -10`;
   <div style="float: right; padding: 0px; width: 49%">
     <h3>License</h3>
     <pre>
-Copyright (C) 2013-<?php echo date('Y').' '.$config['project_name']; ?> Contributors
+Copyright (C) 2013-<?php echo date('Y') . ' ' . \LibreNMS\Config::get('project_name'); ?> Contributors
 Copyright (C) 2006-2012 Adam Armstrong
 
 This program is free software: you can redistribute it and/or modify
@@ -90,7 +88,7 @@ echo "
     <table class='table table-condensed'>
       <tr>";
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo "        <td colspan='4'><span class='bg-danger'>$callback</span><br />
           Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
         <tr>
@@ -156,7 +154,7 @@ echo "
     <h3>LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system.</h3>
 <?php
 $versions = version_info();
-$project_name    = $config['project_name'];
+$project_name = \LibreNMS\Config::get('project_name');
 $webserv_version = $_SERVER['SERVER_SOFTWARE'];
 $php_version     = $versions['php_ver'];
 $mysql_version   = $versions['mysql_ver'];

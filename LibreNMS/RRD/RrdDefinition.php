@@ -25,6 +25,7 @@
 
 namespace LibreNMS\RRD;
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidRrdTypeException;
 
 class RrdDefinition
@@ -53,8 +54,6 @@ class RrdDefinition
      */
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
     {
-        global $config;
-
         if (empty($name)) {
             d_echo("DS must be set to a non-empty string.");
         }
@@ -62,7 +61,7 @@ class RrdDefinition
         $ds = array();
         $ds[] = $this->escapeName($name);
         $ds[] = $this->checkType($type);
-        $ds[] = is_null($heartbeat) ? $config['rrd']['heartbeat'] : $heartbeat;
+        $ds[] = is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat;
         $ds[] = is_null($min) ? 'U' : $min;
         $ds[] = is_null($max) ? 'U' : $max;
 

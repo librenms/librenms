@@ -13,12 +13,10 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $minutes = 15;
 $seconds = ($minutes * 60);
-$top     = $config['front_page_settings']['top']['devices'];
-if (LegacyAuth::user()->hasGlobalRead()) {
+$top = \LibreNMS\Config::get('front_page_settings.top.devices');
+if (Auth::user()->hasGlobalRead()) {
     $query = "
         SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
         FROM ports as p, devices as d
@@ -43,20 +41,13 @@ if (LegacyAuth::user()->hasGlobalRead()) {
         ORDER BY total desc
         LIMIT $top
         ";
-    $param[] = array(LegacyAuth::id());
+    $param[] = array(Auth::id());
 }//end if
 
 echo "<strong>Top $top devices (last $minutes minutes)</strong>\n";
 echo "<table class='simple'>\n";
 foreach (dbFetchRows($query, $param) as $result) {
-    echo '<tr class=top10>'.'<td class=top10>'.generate_device_link($result, shorthost($result['hostname'])).'</td>'.'<td class=top10>'.generate_device_link(
-        $result,
-        generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], 'device_bits', 'no', 150, 21, '&', 'top10'),
-        array(),
-        0,
-        0,
-        0
-    ).'</td>'."</tr>\n";
+    echo '<tr class=top10>'.'<td class=top10>'.generate_device_link($result, shorthost($result['hostname'])).'</td>'.'<td class=top10>'.generate_device_link($result, generate_minigraph_image($result, \LibreNMS\Config::get('time.day'), \LibreNMS\Config::get('time.now'), 'device_bits', 'no', 150, 21, '&', 'top10'), array(), 0, 0, 0).'</td>'."</tr>\n";
 }
 
 echo "</table>\n";

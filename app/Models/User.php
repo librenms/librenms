@@ -160,6 +160,11 @@ class User extends Authenticatable
 
     // ---- Define Relationships ----
 
+    public function apiToken()
+    {
+        return $this->hasOne('App\Models\ApiToken', 'user_id', 'user_id');
+    }
+
     public function devices()
     {
         if ($this->hasGlobalRead()) {

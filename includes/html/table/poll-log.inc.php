@@ -1,18 +1,17 @@
 <?php
 
 use LibreNMS\Config;
-use LibreNMS\Authentication\LegacyAuth;
 
 $sql = ' FROM `devices` AS D ';
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     $sql .= ", devices_perms AS P ";
 }
 
 $sql .= " LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`";
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
-    $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '".LegacyAuth::id()."' AND D.ignore = '0'";
+if (!Auth::user()->hasGlobalAdmin()) {
+    $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '".Auth::id()."' AND D.ignore = '0'";
 } else {
     $sql .= ' WHERE 1';
 }

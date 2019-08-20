@@ -72,7 +72,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
         $percent    = $history['bill_percent'];
         $dir_95th   = $history['dir_95th'];
         $rate_95th  = formatRates($history['rate_95th']);
-        $total_data = format_number($history['traf_total'], $config['billing']['base']);
+        $total_data = format_number($history['traf_total'], \LibreNMS\Config::get('billing.base'));
 
         $background = get_percentage_colours($percent);
 
@@ -83,11 +83,11 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
             $out     = formatRates($history['rate_95th_out']);
             $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #'.$background['left'].'; font-weight: bold;">'.formatRates($history['bill_overuse']).'</span>');
         } elseif ($type == 'Quota') {
-            $allowed = format_number($history['bill_allowed'], $config['billing']['base']);
-            $used    = format_number($history['total_data'], $config['billing']['base']);
-            $in      = format_number($history['traf_in'], $config['billing']['base']);
-            $out     = format_number($history['traf_out'], $config['billing']['base']);
-            $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #'.$background['left'].'; font-weight: bold;">'.format_number($history['bill_overuse'], $config['billing']['base']).'B</span>');
+            $allowed = format_number($history['bill_allowed'], \LibreNMS\Config::get('billing.base'));
+            $used = format_number($history['total_data'], \LibreNMS\Config::get('billing.base'));
+            $in = format_number($history['traf_in'], \LibreNMS\Config::get('billing.base'));
+            $out = format_number($history['traf_out'], \LibreNMS\Config::get('billing.base'));
+            $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . format_number($history['bill_overuse'], \LibreNMS\Config::get('billing.base')) . 'B</span>');
         }
 
         $total_data = (($type == 'Quota') ? '<b>'.$total_data.'</b>' : $total_data);

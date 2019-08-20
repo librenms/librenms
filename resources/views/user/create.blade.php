@@ -5,8 +5,10 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <form action="users" method="POST" role="form" class="form-horizontal col-md-8 col-md-offset-2">
+        <form action="{{ route('users.store') }}" method="POST" role="form"
+              class="form-horizontal col-md-8 col-md-offset-2">
             <legend>@lang('Create User')</legend>
+            @csrf
 
             <div class="form-group @if($errors->has('username')) has-error @endif">
                 <label for="realname" class="control-label col-sm-3">@lang('Username')</label>

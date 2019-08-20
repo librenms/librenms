@@ -29,8 +29,6 @@ foreach ($components as $k => $v) {
 }
 $components = $keep;
 
-global $config;
-
 $subtype = basename($vars['subtype']);
 if (is_file("includes/html/pages/device/loadbalancer/$subtype.inc.php")) {
     include "includes/html/pages/device/loadbalancer/$subtype.inc.php";

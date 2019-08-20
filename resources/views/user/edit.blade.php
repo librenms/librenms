@@ -5,9 +5,11 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <form action="users/{{ $user->user_id }}" method="POST" role="form" class="form-horizontal col-md-8 col-md-offset-2">
+        <form action="{{ route('users.update', $user->user_id)}}" method="POST" role="form"
+              class="form-horizontal col-md-8 col-md-offset-2">
             <legend>@lang('Edit User'): {{ $user->username }}</legend>
             {{ method_field('PUT') }}
+            @csrf
 
             @include('user.form')
 

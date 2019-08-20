@@ -1,11 +1,9 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!LegacyAuth::check()) {
+if (!Auth::check()) {
     die('Unauthorized');
 }
 
@@ -43,7 +41,7 @@ if (isset($_REQUEST['search'])) {
             die(json_encode($results));
         } elseif ($_REQUEST['type'] == 'device') {
             // Device search
-            if (LegacyAuth::user()->hasGlobalRead()) {
+            if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
                     "SELECT * FROM `devices` LEFT JOIN `locations` ON `locations`.`id` = `devices`.`location_id` WHERE `devices`.`hostname` LIKE ? OR `locations`.`location` LIKE ? OR `devices`.`sysName` LIKE ? OR `devices`.`purpose` LIKE ? OR `devices`.`notes` LIKE ? ORDER BY `devices`.hostname LIMIT " . $limit,
                     ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%"]
@@ -51,7 +49,7 @@ if (isset($_REQUEST['search'])) {
             } else {
                 $results = dbFetchRows(
                     "SELECT * FROM `devices` AS `D` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` LEFT JOIN `locations` ON `locations`.`id` = `D`.`location_id` WHERE `P`.`user_id` = ? AND (D.`hostname` LIKE ? OR D.`sysName` LIKE ? OR `locations`.`location` LIKE ?) ORDER BY hostname LIMIT " . $limit,
-                    [LegacyAuth::id(), "%$search%", "%$search%", "%$search%"]
+                    [Auth::id(), "%$search%", "%$search%", "%$search%"]
                 );
             }
 
@@ -74,10 +72,10 @@ if (isset($_REQUEST['search'])) {
                         $highlight_colour = '#008000';
                     }
 
-                    if (LegacyAuth::user()->hasGlobalRead()) {
+                    if (Auth::user()->hasGlobalRead()) {
                         $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ?', [$result['device_id']]);
                     } else {
-                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `I`.`device_id` = `D`.`device_id` AND D.device_id = ?', [LegacyAuth::id(), $result['device_id']]);
+                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `I`.`device_id` = `D`.`device_id` AND D.device_id = ?', [Auth::id(), $result['device_id']]);
                     }
 
                     $device[] = array(
@@ -88,7 +86,7 @@ if (isset($_REQUEST['search'])) {
                         'device_ports'    => $num_ports,
                         'device_image'    => getIcon($result),
                         'device_hardware' => $result['hardware'],
-                        'device_os'       => $config['os'][$result['os']]['text'],
+                        'device_os' => \LibreNMS\Config::getOsSetting($result['os'], 'text'),
                         'version'         => $result['version'],
                         'location'        => $result['location'],
                     );
@@ -99,7 +97,7 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'ports') {
             // Search ports
-            if (LegacyAuth::user()->hasGlobalRead()) {
+            if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
                     "SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ? ORDER BY ifDescr LIMIT ".$limit,
                     ["%$search%", "%$search%", "%$search%"]
@@ -107,7 +105,7 @@ if (isset($_REQUEST['search'])) {
             } else {
                 $results = dbFetchRows(
                     "SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ?) ORDER BY ifDescr LIMIT ".$limit,
-                    [LegacyAuth::id(), LegacyAuth::id(), "%$search%", "%$search%", "%$search%"]
+                    [Auth::id(), Auth::id(), "%$search%", "%$search%", "%$search%"]
                 );
             }
 
@@ -151,7 +149,7 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'bgp') {
             // Search bgp peers
-            if (LegacyAuth::user()->hasGlobalRead()) {
+            if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
                     "SELECT `bgpPeers`.*,`devices`.* FROM `bgpPeers` LEFT JOIN `devices` ON  `bgpPeers`.`device_id` =  `devices`.`device_id` WHERE `astext` LIKE ? OR `bgpPeerIdentifier` LIKE ? OR `bgpPeerRemoteAs` LIKE ? ORDER BY `astext` LIMIT " . $limit,
                     ["%$search%", "%$search%", "%$search%"]
@@ -159,7 +157,7 @@ if (isset($_REQUEST['search'])) {
             } else {
                 $results = dbFetchRows(
                     "SELECT `bgpPeers`.*,`D`.* FROM `bgpPeers`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND  `bgpPeers`.`device_id`=`D`.`device_id` AND  (`astext` LIKE ? OR `bgpPeerIdentifier` LIKE ? OR `bgpPeerRemoteAs` LIKE ?) ORDER BY `astext` LIMIT ".$limit,
-                    [LegacyAuth::id(), "%$search%", "%$search%", "%$search%"]
+                    [Auth::id(), "%$search%", "%$search%", "%$search%"]
                 );
             }
 
@@ -207,7 +205,7 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'applications') {
             // Device search
-            if (LegacyAuth::user()->hasGlobalRead()) {
+            if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
                     "SELECT * FROM `applications` INNER JOIN `devices` ON devices.device_id = applications.device_id WHERE `app_type` LIKE ? OR `hostname` LIKE ? ORDER BY hostname LIMIT ".$limit,
                     ["%$search%", "%$search%"]
@@ -215,7 +213,7 @@ if (isset($_REQUEST['search'])) {
             } else {
                 $results = dbFetchRows(
                     "SELECT * FROM `applications` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `applications`.`device_id` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` WHERE `P`.`user_id` = ? AND (`app_type` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ".$limit,
-                    [LegacyAuth::id(), "%$search%", "%$search%"]
+                    [Auth::id(), "%$search%", "%$search%"]
                 );
             }
 
@@ -243,7 +241,7 @@ if (isset($_REQUEST['search'])) {
                         'colours'         => $highlight_colour,
                         'device_image'    => getIcon($result),
                         'device_hardware' => $result['hardware'],
-                        'device_os'       => $config['os'][$result['os']]['text'],
+                        'device_os' => \LibreNMS\Config::getOsSetting($result['os'], 'text'),
                         'version'         => $result['version'],
                         'location'        => $result['location'],
                     );
@@ -254,7 +252,7 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'munin') {
             // Device search
-            if (LegacyAuth::user()->hasGlobalRead()) {
+            if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
                     "SELECT * FROM `munin_plugins` INNER JOIN `devices` ON devices.device_id = munin_plugins.device_id WHERE `mplug_type` LIKE ? OR `mplug_title` LIKE ? OR `hostname` LIKE ? ORDER BY hostname LIMIT ".$limit,
                     ["%$search%", "%$search%", "%$search%"]
@@ -262,7 +260,7 @@ if (isset($_REQUEST['search'])) {
             } else {
                 $results = dbFetchRows(
                     "SELECT * FROM `munin_plugins` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `munin_plugins`.`device_id` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` WHERE `P`.`user_id` = ? AND (`mplug_type` LIKE ? OR `mplug_title` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ".$limit,
-                    [LegacyAuth::id(), "%$search%", "%$search%", "%$search%"]
+                    [Auth::id(), "%$search%", "%$search%", "%$search%"]
                 );
             }
 
@@ -289,7 +287,7 @@ if (isset($_REQUEST['search'])) {
                         'colours'         => $highlight_colour,
                         'device_image'    => getIcon($result),
                         'device_hardware' => $result['hardware'],
-                        'device_os'       => $config['os'][$result['os']]['text'],
+                        'device_os' => \LibreNMS\Config::getOsSetting($result['os'], 'text'),
                         'version'         => $result['version'],
                         'location'        => $result['location'],
                         'plugin'          => $result['mplug_type'],
@@ -301,7 +299,7 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'iftype') {
             // Device search
-            if (LegacyAuth::user()->hasGlobalRead()) {
+            if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
                     "SELECT `ports`.ifType FROM `ports` WHERE `ifType` LIKE ? GROUP BY ifType ORDER BY ifType LIMIT ".$limit,
                     ["%$search%"]
@@ -309,7 +307,7 @@ if (isset($_REQUEST['search'])) {
             } else {
                 $results = dbFetchRows(
                     "SELECT `I`.ifType FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifType` LIKE ?) GROUP BY ifType ORDER BY ifType LIMIT ".$limit,
-                    [LegacyAuth::id(), LegacyAuth::id(), "%$search%"]
+                    [Auth::id(), Auth::id(), "%$search%"]
                 );
             }
             if (count($results)) {
@@ -327,7 +325,7 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'bill') {
             // Device search
-            if (LegacyAuth::user()->hasGlobalRead()) {
+            if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
                     "SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` WHERE `bill_name` LIKE ? OR `bill_notes` LIKE ? LIMIT ".$limit,
                     ["%$search%", "%$search%"]
@@ -335,7 +333,7 @@ if (isset($_REQUEST['search'])) {
             } else {
                 $results = dbFetchRows(
                     "SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` INNER JOIN `bill_perms` ON `bills`.bill_id = `bill_perms`.bill_id WHERE `bill_perms`.user_id = ? AND (`bill_name` LIKE ? OR `bill_notes` LIKE ?) LIMIT ".$limit,
-                    [LegacyAuth::id(), "%$search%", "%$search%"]
+                    [Auth::id(), "%$search%", "%$search%"]
                 );
             }
             $json = json_encode($results);

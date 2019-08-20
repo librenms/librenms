@@ -478,7 +478,7 @@
                     "sensor_index": "0",
                     "sensor_type": "Severity",
                     "sensor_descr": "Status of all equipment objects",
-                    "group": "",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,

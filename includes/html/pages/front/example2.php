@@ -8,8 +8,6 @@
 ?>
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $nodes = array();
 
 $sql = "SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'";
@@ -70,8 +68,8 @@ foreach (dbFetchRows($sql) as $peer) {
         </center></div>';
 }
 
-if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $config['uptime_warning'] > 0) {
-    $sql = "SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '".$config['uptime_warning']."'";
+if (filter_var(\LibreNMS\Config::get('uptime_warning'), FILTER_VALIDATE_FLOAT) !== false && \LibreNMS\Config::get('uptime_warning') > 0) {
+    $sql = "SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '" . \LibreNMS\Config::get('uptime_warning') . "'";
     foreach (dbFetchRows($sql) as $device) {
         echo "<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ddffdd; margin: 4px;'>
             <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
@@ -89,7 +87,7 @@ echo "
 
     ";
 
-$sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
+$sql = "SELECT *, DATE_FORMAT(timestamp, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
 echo '<table cellspacing=0 cellpadding=2 width=100%>';
 foreach (dbFetchRows($sql) as $entry) {
     unset($syslog_output);
@@ -105,9 +103,9 @@ echo '</div>
     <td bgcolor=#e5e5e5 width=275 valign=top>';
 
 // this stuff can be customised to show whatever you want....
-if (LegacyAuth::user()->hasGlobalRead()) {
+if (Auth::user()->hasGlobalRead()) {
     $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'L2TP: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
-    $sql .= $config['mydomain']."' ORDER BY I.ifAlias";
+    $sql .= \LibreNMS\Config::get('mydomain') . "' ORDER BY I.ifAlias";
     unset($seperator);
     foreach (dbFetchRows($sql) as $interface) {
         $ports['l2tp'] .= $seperator.$interface['port_id'];
@@ -115,7 +113,7 @@ if (LegacyAuth::user()->hasGlobalRead()) {
     }
 
     $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
-    $sql .= $config['mydomain']."' ORDER BY I.ifAlias";
+    $sql .= \LibreNMS\Config::get('mydomain') . "' ORDER BY I.ifAlias";
     unset($seperator);
     foreach (dbFetchRows($sql) as $interface) {
         $ports['transit'] .= $seperator.$interface['port_id'];
@@ -123,7 +121,7 @@ if (LegacyAuth::user()->hasGlobalRead()) {
     }
 
     $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'Server: thlon-pbx%' AND I.device_id = D.device_id AND D.hostname LIKE '%";
-    $sql .= $config['mydomain']."' ORDER BY I.ifAlias";
+    $sql .= \LibreNMS\Config::get('mydomain') . "' ORDER BY I.ifAlias";
     unset($seperator);
     foreach (dbFetchRows($sql) as $interface) {
         $ports['voip'] .= $seperator.$interface['port_id'];
@@ -131,15 +129,15 @@ if (LegacyAuth::user()->hasGlobalRead()) {
     }
 
     if ($ports['transit']) {
-        echo "<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&amp;ports=".$ports['transit'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now']."&amp;width=400&amp;height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >"."<div style='font-size: 18px; font-weight: bold;'>Internet Transit</div>"."<img src='graph.php?type=multi_bits&amp;ports=".$ports['transit'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now']."&amp;width=200&amp;height=100'></a>";
+        echo "<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&amp;ports=" . $ports['transit'] . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=400&amp;height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >" . "<div style='font-size: 18px; font-weight: bold;'>Internet Transit</div>" . "<img src='graph.php?type=multi_bits&amp;ports=" . $ports['transit'] . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=200&amp;height=100'></a>";
     }
 
     if ($ports['l2tp']) {
-        echo "<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&amp;ports=".$ports['l2tp'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now']."&amp;width=400&amp;height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >"."<div style='font-size: 18px; font-weight: bold;'>L2TP ADSL</div>"."<img src='graph.php?type=multi_bits&amp;ports=".$ports['l2tp'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now']."&amp;width=200&amp;height=100'></a>";
+        echo "<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&amp;ports=" . $ports['l2tp'] . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=400&amp;height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >" . "<div style='font-size: 18px; font-weight: bold;'>L2TP ADSL</div>" . "<img src='graph.php?type=multi_bits&amp;ports=" . $ports['l2tp'] . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=200&amp;height=100'></a>";
     }
 
     if ($ports['voip']) {
-        echo "<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&amp;ports=".$ports['voip'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now']."&amp;width=400&amp;height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >"."<div style='font-size: 18px; font-weight: bold;'>VoIP to PSTN</div>"."<img src='graph.php?type=multi_bits&amp;ports=".$ports['voip'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now']."&amp;width=200&amp;height=100'></a>";
+        echo "<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&amp;ports=" . $ports['voip'] . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=400&amp;height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >" . "<div style='font-size: 18px; font-weight: bold;'>VoIP to PSTN</div>" . "<img src='graph.php?type=multi_bits&amp;ports=" . $ports['voip'] . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=200&amp;height=100'></a>";
     }
 }//end if
 

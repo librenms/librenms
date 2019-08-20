@@ -20,8 +20,8 @@ $total_data = $bill_data['total_data'];
 $in_data    = $bill_data['total_data_in'];
 $out_data   = $bill_data['total_data_out'];
 
-$fromtext       = dbFetchCell("SELECT DATE_FORMAT($datefrom, '".$config['dateformat']['mysql']['date']."')");
-$totext         = dbFetchCell("SELECT DATE_FORMAT($dateto, '".$config['dateformat']['mysql']['date']."')");
+$fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . \LibreNMS\Config::get('dateformat.mysql.date') . "')");
+$totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . \LibreNMS\Config::get('dateformat.mysql.date') . "')");
 $unixfrom       = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
 $unixto         = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
 $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
@@ -42,7 +42,11 @@ if ($bill_data['bill_type'] == 'quota') {
 
 $total['ave'] = format_bytes_billing(($bill_data['total_data'] / $cur_days));
 $total['est'] = format_bytes_billing(($bill_data['total_data'] / $cur_days * $total_days));
-$total['per'] = round(($bill_data['total_data'] / $bill_data['bill_quota'] * 100), 2);
+if ($bill_data['bill_type'] == 'quota') {
+    $total['per'] = round(($bill_data['total_data'] / $bill_data['bill_quota'] * 100), 2);
+} else {
+    $total['per'] = round(($bill_data['total_data'] / ($bill_data['total_data'] / $cur_days * $total_days) * 100), 2);
+}
 $total['bg']  = get_percentage_colours($total['per']);
 
 $in['data']  = format_bytes_billing($bill_data['total_data_in']);
@@ -61,7 +65,7 @@ $out['bg']    = get_percentage_colours($out['per']);
 
 $ousage['over']  = ($bill_data['total_data'] - ($bill_data['bill_quota']));
 $ousage['over']  = (($ousage['over'] < 0) ? '0' : $ousage['over']);
-$ousage['data']  = format_number($ousage['over'], $config['billing']['base']);
+$ousage['data'] = format_number($ousage['over'], \LibreNMS\Config::get('billing.base'));
 $ousage['allow'] = $total['allow'];
 $ousage['ave']   = format_bytes_billing(($ousage['over'] / $cur_days));
 $ousage['est']   = format_bytes_billing(($ousage['over'] / $cur_days * $total_days));
@@ -159,7 +163,7 @@ $bi .= '&amp;width=1190&amp;height=250';
 $bi .= "'>";
 
 $di  = "<img src='graph.php?type=bill_historictransfer&id=".$bill_id;
-$di .= '&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'];
+$di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
 $di .= '&amp;imgtype=hour';
 $di .= '&amp;width=1190&amp;height=250';
 $di .= "'>";

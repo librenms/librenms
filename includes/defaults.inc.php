@@ -62,6 +62,7 @@ $config['ipmitool']       = '/usr/bin/ipmitool';
 $config['virsh']          = '/usr/bin/virsh';
 $config['dot']            = '/usr/bin/dot';
 $config['sfdp']           = '/usr/bin/sfdp';
+$config['nfdump']         = '/usr/bin/nfdump';
 
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
@@ -369,12 +370,16 @@ $config['network_map_legend'] = array(
     '90'           => '#d12300',
     '95'           => '#cc0000',
     '100'          => '#cc0000',
-    'di.edge'      => '#dddddd88',
-    'di.border'    => '#cccccc',
-    'di.node'      => '#eeeeee',
-    'dn.edge'      => '#ff777788',
-    'dn.border'    => '#ff5555',
-    'dn.node'      => '#ffdddd',
+    'di' => [
+        'edge' => '#dddddd88',
+        'border' => '#cccccc',
+        'node' => '#eeeeee',
+    ],
+    'dn' => [
+        'edge' => '#ff777788',
+        'border' => '#ff5555',
+        'node' => '#ffdddd',
+    ]
 );
 
 // Default mini graph time options:
@@ -537,6 +542,26 @@ $config['nfsen_enable'] = 0;
 // $config['nfsen_split_char']   = "_";
 // $config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
 // $config['nfsen_suffix']   = "_yourdomain_com";
+$config['nfsen_subdirlayout'] = 1;
+$config['nfsen_last_max'] = 153600; // 48 hours ago in seconds
+$config['nfsen_top_max'] = 500; // max topN value for stats
+$config['nfsen_top_N']=array( 10, 20, 50, 100, 200, 500 );
+$config['nfsen_top_default']=20;
+$config['nfsen_stat_default']='srcip';
+$config['nfsen_order_default']='packets';
+$config['nfsen_last_default']=900;
+$config['nfsen_lasts']=array(
+                            '300'=>'5 minutes',
+                            '600'=>'10 minutes',
+                            '900'=>'15 minutes',
+                            '1800'=>'30 minutes',
+                            '3600'=>'1 hour',
+                            '9600'=>'3 hours',
+                            '38400'=>'12 hours',
+                            '76800'=>'24 hours',
+                            '115200'=>'36 hours',
+                            '153600'=>'48 hours',
+                            );
 // Location Mapping
 // Use this feature to map ugly locations to pretty locations
 // config['location_map']['Under the Sink'] = "Under The Sink, The Office, London, UK";
@@ -802,6 +827,7 @@ $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
 $config['poller_modules']['loadbalancers']               = false;
 $config['poller_modules']['mef']                         = false;
+$config['poller_modules']['mpls']                        = true;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -844,6 +870,7 @@ $config['discovery_modules']['loadbalancers']        = false;
 $config['discovery_modules']['mef']                  = false;
 $config['discovery_modules']['wireless']             = true;
 $config['discovery_modules']['fdb-table']            = true;
+$config['discovery_modules']['mpls']                 = true;
 // Enable daily updates
 $config['update'] = 1;
 
@@ -956,9 +983,6 @@ $config['leaflet']['tile_url']                          = "{s}.tile.openstreetma
 
 // General GUI options
 $config['gui']['network-map']['style']                  = 'new';//old is also valid
-
-// Navbar variables
-$config['navbar']['manage_groups']['hide']              = 0;
 
 // Show errored ports in the summary table on the dashboard
 $config['summary_errors']                               = 0;

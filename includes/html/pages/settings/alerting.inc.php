@@ -12,15 +12,14 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 $no_refresh = true;
 
 $config_groups = get_config_by_group('alerting');
 
-if (isset($config['base_url']) && filter_var($config['base_url'].'/'.$_SERVER['REQUEST_URI'], FILTER_VALIDATE_URL)) {
-    $callback = $config['base_url'].'/'.$_SERVER['REQUEST_URI'].'/';
+if (Config::has('base_url') && filter_var(Config::get('base_url') . '/' . $_SERVER['REQUEST_URI'], FILTER_VALIDATE_URL)) {
+    $callback = Config::get('base_url') . '/' . $_SERVER['REQUEST_URI'] . '/';
 } else {
     $callback = get_url().'/';
 }
@@ -170,6 +169,7 @@ echo '
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
 ';
+echo csrf_field();
 
 echo generate_dynamic_config_panel('General alert settings', $config_groups, $general_conf);
 

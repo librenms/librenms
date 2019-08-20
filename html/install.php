@@ -1,10 +1,13 @@
 <?php
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 session_start();
+$librenms_dir = realpath(__DIR__ . '/..');
+
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
-} elseif (!file_exists("config.php")) {
+} elseif (!file_exists("{$librenms_dir}/config.php")) {
     $allowed_vars = array('stage','build-ok','dbhost','dbuser','dbpass','dbname','dbport','dbsocket','add_user','add_pass','add_email');
     foreach ($allowed_vars as $allowed) {
         if (isset($_POST[$allowed])) {
@@ -16,7 +19,7 @@ if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
 $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
-if (file_exists('config.php') && $stage != 6) {
+if (file_exists("{$librenms_dir}/config.php") && $stage != 6) {
     unset($_SESSION['stage']);
     header("Location: /");
     exit;
@@ -78,7 +81,7 @@ if ($stage == 4) {
     }
 } elseif ($stage == 6) {
     // If we get here then let's do some final checks.
-    if (!file_exists("config.php")) {
+    if (!file_exists("{$librenms_dir}/config.php")) {
         // config.php file doesn't exist. go back to that stage
         $msg = "config.php still doesn't exist";
         $stage = 5;
@@ -103,12 +106,12 @@ $complete = 1;
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-  <title><?php echo($config['page_title_prefix']); ?></title>
+    <title><?php echo(Config::get('page_title_prefix')); ?></title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-  <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo(Config::get('stylesheet')); ?>" rel="stylesheet" type="text/css"/>
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -118,7 +121,7 @@ $complete = 1;
   <div class="container">
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
-        <h2 class="text-center">Welcome to the <?php echo($config['project_name']); ?> install</h2>
+          <h2 class="text-center">Welcome to the <?php echo(Config::get('project_name')); ?> install</h2>
       </div>
     </div>
     <div class="row">
@@ -214,6 +217,7 @@ echo "</td></tr>";
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
         <form class="form-inline" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="1">
           <button type="submit" class="btn btn-success pull-right"
             <?php
@@ -234,6 +238,7 @@ echo "</td></tr>";
       </div>
       <div class="col-md-6">
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="2">
           <div class="form-group">
             <label for="dbhost" class="col-sm-4" control-label">DB Host: </label>
@@ -297,6 +302,7 @@ echo "</td></tr>";
       <div class="col-md-6">
         If you don't see any errors or messages above then the database setup has been successful.<br />
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="3">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -392,7 +398,7 @@ $config_file = <<<"EOD"
 #\$config\['update'\] = 0;  # uncomment to completely disable updates
 EOD;
 
-if (!file_exists("config.php")) {
+if (!file_exists("{$librenms_dir}/config.php")) {
     $conf = fopen("config.php", 'w');
     if ($conf != false) {
         if (fwrite($conf, "<?php\n") === false) {
@@ -410,6 +416,7 @@ if (!file_exists("config.php")) {
 }
 ?>
       <form class="form-horizontal" role="form" method="post">
+        <?php echo csrf_field() ?>
         <input type="hidden" name="stage" value="6">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -433,6 +440,7 @@ if (!file_exists("config.php")) {
       </div>
       <div class="col-md-6">
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="4">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -489,6 +497,7 @@ if (LegacyAuth::get()->canManageUsers()) {
 
 ?>
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="5">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">

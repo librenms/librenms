@@ -16,7 +16,7 @@ use App\Models\ApiToken;
 use App\Models\User;
 use LibreNMS\Authentication\LegacyAuth;
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     if (empty($_POST['token'])) {
         $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
     }
@@ -34,6 +34,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
         </div>
         <div class="modal-footer">
           <form role="form" class="remove_token_form">
+            <?php echo csrf_field() ?>
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             <button type="submit" class="btn btn-danger danger" id="token-removal" data-target="token-removal">Delete</button>
             <input type="hidden" name="token_id" id="token_id" value="">
@@ -53,6 +54,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
         </div>
         <div class="modal-body">
           <form role="form" class="form-horizontal create_token_form">
+            <?php echo csrf_field() ?>
             <div class="form-group">
               <label for="user_id" class="col-sm-2 control-label">User: </label>
               <div class="col-sm-4">

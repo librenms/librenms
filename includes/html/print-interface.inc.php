@@ -5,7 +5,7 @@ $(function () {
 </script>
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
 // This file prints a table row for each interface
@@ -20,9 +20,9 @@ if ($int_colour) {
     $row_colour = $int_colour;
 } else {
     if (!is_integer($i / 2)) {
-        $row_colour = $config['list_colour']['even'];
+        $row_colour = Config::get('list_colour.even');
     } else {
-        $row_colour = $config['list_colour']['odd'];
+        $row_colour = Config::get('list_colour.odd');
     }
 }
 
@@ -40,10 +40,10 @@ if (dbFetchCell('SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?', arr
     $mac = '';
 }
 
-echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='{$config['list_colour']['highlight']}';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
+echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='" . Config::get('list_colour.highlight') . "';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
     <td valign=top width=350>";
 
-if (LegacyAuth::user()->hasGlobalRead()) {
+if (Auth::user()->hasGlobalRead()) {
     $port_data = array_to_htmljson($port);
     echo '<i class="fa fa-tag" data-toggle="popover" data-content="'.$port_data.'" data-html="true"></i>';
 }
@@ -76,11 +76,11 @@ echo "</td><td width=100 onclick=\"location.href='".generate_port_url($port)."'\
 
 if ($port_details) {
     $port['graph_type'] = 'port_bits';
-    echo generate_port_link($port, "<img src='graph.php?type=port_bits&amp;id=".$port['port_id'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=100&amp;height=20&amp;legend=no&amp;bg='.str_replace('#', '', $row_colour)."'>");
+    echo generate_port_link($port, "<img src='graph.php?type=port_bits&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
     $port['graph_type'] = 'port_upkts';
-    echo generate_port_link($port, "<img src='graph.php?type=port_upkts&amp;id=".$port['port_id'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=100&amp;height=20&amp;legend=no&amp;bg='.str_replace('#', '', $row_colour)."'>");
+    echo generate_port_link($port, "<img src='graph.php?type=port_upkts&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
     $port['graph_type'] = 'port_errors';
-    echo generate_port_link($port, "<img src='graph.php?type=port_errors&amp;id=".$port['port_id'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=100&amp;height=20&amp;legend=no&amp;bg='.str_replace('#', '', $row_colour)."'>");
+    echo generate_port_link($port, "<img src='graph.php?type=port_errors&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
 }
 
 echo "</td><td width=120 onclick=\"location.href='".generate_port_url($port)."'\" >";
@@ -188,7 +188,7 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
 
     unset($br);
 
-    if ($port_details && $config['enable_port_relationship'] === true) {
+    if ($port_details && Config::get('enable_port_relationship') === true) {
         // Show which other devices are on the same subnet as this interface
         foreach (dbFetchRows("SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `port_id` = ? AND `ipv4_address` NOT LIKE '127.%'", array($port['port_id'])) as $net) {
             $ipv4_network_id = $net['ipv4_network_id'];
@@ -240,7 +240,7 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     }
 
 
-    if ($port_details && $config['enable_port_relationship'] === true && port_permitted($int_link, $device['device_id'])) {
+    if ($port_details && Config::get('enable_port_relationship') === true && port_permitted($int_link, $device['device_id'])) {
         foreach ($int_links as $int_link) {
             $neighborsCount++;
             if ($neighborsCount == 4) {
@@ -275,7 +275,7 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     // unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 }//end if
 
-if ($port_details && $config['enable_port_relationship'] === true && port_permitted($port['port_id'], $device['device_id'])) {
+if ($port_details && Config::get('enable_port_relationship') === true && port_permitted($port['port_id'], $device['device_id'])) {
     foreach (dbFetchRows('SELECT * FROM `pseudowires` WHERE `port_id` = ?', array($port['port_id'])) as $pseudowire) {
         // `port_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
         $pw_peer_dev = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($pseudowire['peer_device_id']));

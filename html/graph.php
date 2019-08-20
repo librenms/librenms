@@ -9,14 +9,12 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $start = microtime(true);
 
 $init_modules = array('web', 'graphs', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-$auth = LegacyAuth::check() || is_client_authorized($_SERVER['REMOTE_ADDR']);
+$auth = Auth::check() || is_client_authorized($_SERVER['REMOTE_ADDR']);
 
 if (!$auth) {
     die('Unauthorized');
@@ -26,7 +24,7 @@ set_debug(isset($_GET['debug']));
 
 rrdtool_initialize(false);
 
-require $config['install_dir'] . '/includes/html/graphs/graph.inc.php';
+require \LibreNMS\Config::get('install_dir') . '/includes/html/graphs/graph.inc.php';
 
 rrdtool_close();
 

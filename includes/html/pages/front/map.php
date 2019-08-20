@@ -22,14 +22,14 @@
  * @subpackage Frontpage
  */
 
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
-if ($config['map']['engine'] == 'leaflet') {
+if (Config::get('map.engine') == 'leaflet') {
     require_once 'includes/html/common/worldmap.inc.php';
     echo implode('', $common_output);
 } else {
-    if (isset($config['mapael']['default_map']) && is_file($config['html_dir'].'/js/'.$config['mapael']['default_map'])) {
-        $default_map = $config['mapael']['default_map'];
+    if (Config::has('mapael.default_map') && is_file(Config::get('html_dir') . '/js/' . Config::get('mapael.default_map'))) {
+        $default_map = Config::get('mapael.default_map');
     } else {
         $default_map = 'maps/world_countries.js';
     }
@@ -37,22 +37,14 @@ if ($config['map']['engine'] == 'leaflet') {
     $map_name = $map_tmp[count($map_tmp)-1];
     $map_name = str_replace('.js', '', $map_name);
 
-    if (isset($config['mapael']['map_width']) && is_numeric($config['mapael']['map_width'])) {
-        $map_width = $config['mapael']['map_width'];
-    } else {
-        $map_width = '800';
-    }
+    $map_width = (int)Config::get('mapael.map_width', 800);
+    $default_zoom = Config::get('mapael.default_zoom', 0);
 
-    if (isset($config['mapael']['default_zoom'])) {
-        $default_zoom = $config['mapael']['default_zoom'];
-    } else {
-        $default_zoom = 0;
-    }
 
-    if (isset($config['mapael']['default_lat']) && isset($config['mapael']['default_lng'])) {
+    if (Config::has('mapael.default_lat') && Config::has('mapael.default_lng')) {
         $init_zoom = "init: {
-                            latitude: " . $config['mapael']['default_lat'] . ",
-                            longitude: " . $config['mapael']['default_lng'] . ",
+                            latitude: " . Config::has('mapael.default_lat') . ",
+                            longitude: " . Config::has('mapael.default_lng') . ",
                             level: $default_zoom
                         }\n";
     }
@@ -156,8 +148,8 @@ echo '		</div>
 </div>';
 
 //From default.php - This code is not part of above license.
-if ($config['enable_syslog']) {
-    $sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog ORDER BY seq DESC LIMIT 20";
+if (Config::get('enable_syslog')) {
+    $sql = "SELECT *, DATE_FORMAT(timestamp, '" . Config::get('dateformat.mysql.compact') . "') AS date from syslog ORDER BY seq DESC LIMIT 20";
 
     echo('<div class="container-fluid">
           <div class="row">
@@ -186,11 +178,11 @@ if ($config['enable_syslog']) {
     echo("</div>");
     echo("</div>");
 } else {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
-        $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
+    if (Auth::user()->hasGlobalAdmin()) {
+        $query = "SELECT *,DATE_FORMAT(datetime, '" . Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
     } else {
-        $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
-    P.device_id AND P.user_id = " . LegacyAuth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
+        $query = "SELECT *,DATE_FORMAT(datetime, '" . Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
+    P.device_id AND P.user_id = " . Auth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
     }
 
     echo('<div class="container-fluid">

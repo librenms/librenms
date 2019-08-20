@@ -33,6 +33,7 @@ use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
 use App\Models\User;
+use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Auth;
 use Illuminate\View\View;
@@ -68,6 +69,7 @@ class MenuComposer
         $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
             collect();
+        $vars['show_vmwinfo'] = Vminfo::hasAccess($user)->exists();
 
         // Service menu
         if (Config::get('show_services')) {
@@ -79,7 +81,7 @@ class MenuComposer
         $vars['port_counts']['pseudowire'] = Config::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
 
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
-        $vars['custom_port_descr'] = collect(\LibreNMS\Config::get('custom_descr', []))
+        $vars['custom_port_descr'] = collect(Config::get('custom_descr', []))
             ->filter()
             ->map(function ($descr) {
                 return strtolower($descr);
@@ -119,6 +121,16 @@ class MenuComposer
                         'url' => 'vrf',
                         'icon' => 'arrows',
                         'text' => 'VRFs',
+                    ]
+                ];
+            }
+
+            if ($routing_count['mpls']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'mpls',
+                        'icon' => 'tag',
+                        'text' => 'MPLS',
                     ]
                 ];
             }
@@ -205,7 +217,7 @@ class MenuComposer
             })->count();
 
         // Search bar
-        $vars['typeahead_limit'] = \LibreNMS\Config::get('webui.global_search_result_limit');
+        $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
 
         $view->with($vars);
     }

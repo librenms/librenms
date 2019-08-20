@@ -37,6 +37,7 @@ class TopInterfacesController extends WidgetController
         'interface_count' => 5,
         'time_interval' => 15,
         'interface_filter' => null,
+        'device_group' => null,
     ];
 
     /**
@@ -53,7 +54,11 @@ class TopInterfacesController extends WidgetController
             ->select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->where('poll_time', '>', Carbon::now()->subMinutes($data['time_interval'])->timestamp)
-            ->has('device')
+            ->when($data['device_group'], function ($query) use ($data) {
+                $query->inDeviceGroup($data['device_group']);
+            }, function ($query) {
+                $query->has('device');
+            })
             ->orderByRaw('SUM(LEAST(ifInOctets_rate, 9223372036854775807) + LEAST(ifOutOctets_rate, 9223372036854775807)) DESC')
             ->limit($data['interface_count']);
 
@@ -69,6 +74,6 @@ class TopInterfacesController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        return view('widgets.settings.top-interfaces', $this->getSettings());
+        return view('widgets.settings.top-interfaces', $this->getSettings(true));
     }
 }

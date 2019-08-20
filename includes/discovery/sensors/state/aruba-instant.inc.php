@@ -40,7 +40,7 @@ if (!empty($oids)) {
     //Create State Translation
     $radio_states = [
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
+        ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'down'],
     ];
 
     create_state_index($ap_state_name, $ap_states);

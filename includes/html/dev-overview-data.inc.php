@@ -12,7 +12,7 @@ echo "<div class='row'>
           <div class='panel panel-default panel-condensed device-overview'>
             <div class='panel-heading'>";
 
-if ($config['overview_show_sysDescr']) {
+if (Config::get('overview_show_sysDescr')) {
     echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
     echo Config::get('overview_show_sysDescr', true) ? $device['sysDescr'] : 'System';
     echo '</strong>';
@@ -34,7 +34,7 @@ if ($device['features']) {
     $device['features'] = '('.$device['features'].')';
 }
 
-$device['os_text'] = $config['os'][$device['os']]['text'];
+$device['os_text'] = Config::get("os.{$device['os']}.text");
 
 echo '<div class="row">
         <div class="col-sm-4">System Name</div>
@@ -43,7 +43,7 @@ echo '<div class="row">
 
 if (!empty($device['ip'])) {
      echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>{$device['ip']}</div></div>";
-} elseif ($config['force_ip_to_sysname'] === true) {
+} elseif (Config::get('force_ip_to_sysname') === true) {
     try {
         $ip = IP::parse($device['hostname']);
         echo "<div class='row'><div class='col-sm-4'>IP Address</div><div class='col-sm-8'>$ip</div></div>";
@@ -127,7 +127,7 @@ if ($device['location_id']) {
 
     echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
     if ($location_valid) {
-        echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
+        echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . ',' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     }
     echo '</div>
         </div>
@@ -151,7 +151,7 @@ if ($device['location_id']) {
                         update_location(' . $location->id . ', new_location, function(success) {
                             if (success) {
                                 $("#coordinates-text").text(new_location.lat.toFixed(5) + ", " + new_location.lng.toFixed(5));
-                                $("#map-it-button").attr("href", "https://maps.google.com/?q=" + new_location.lat + "+" + new_location.lng );
+                                $("#map-it-button").attr("href", "https://maps.google.com/?q=" + new_location.lat + "," + new_location.lng );
                             }
                         });
                     }

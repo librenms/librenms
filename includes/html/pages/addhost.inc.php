@@ -1,12 +1,12 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
 
 $no_refresh = true;
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 
     exit;
@@ -26,12 +26,12 @@ if (!empty($_POST['hostname'])) {
         print_error("Invalid hostname or IP: $hostname");
     }
 
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         // Settings common to SNMPv2 & v3
         if ($_POST['port']) {
             $port = clean($_POST['port']);
         } else {
-            $port = $config['snmp']['port'];
+            $port = Config::get('snmp.port');
         }
 
         if ($_POST['transport']) {
@@ -51,11 +51,11 @@ if (!empty($_POST['hostname'])) {
             );
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
-                $config['snmp']['community'] = array(clean($_POST['community'], false));
+                Config::set('snmp.community', [clean($_POST['community'], false)]);
             }
 
             $snmpver = clean($_POST['snmpver']);
-            print_message("Adding host $hostname communit".(count($config['snmp']['community']) == 1 ? 'y' : 'ies').' '.implode(', ', $config['snmp']['community'])." port $port using $transport");
+            print_message("Adding host $hostname communit" . (count(Config::get('snmp.community')) == 1 ? 'y' : 'ies') . ' ' . implode(', ', Config::get('snmp.community')) . " port $port using $transport");
         } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = array(
                    'authlevel'  => clean($_POST['authlevel']),
@@ -66,7 +66,9 @@ if (!empty($_POST['hostname'])) {
                    'cryptoalgo' => clean($_POST['cryptoalgo'], false),
                   );
 
-            array_push($config['snmp']['v3'], $v3);
+            $v3_config = Config::get('snmp.v3');
+            array_push($v3_config, $v3);
+            Config::set('snmp.v3', $v3_config);
 
             $snmpver = 'v3';
             print_message("Adding SNMPv3 host $hostname port $port");
@@ -107,6 +109,7 @@ $pagetitle[] = 'Add host';
   </div>
   <div class="col-sm-6">
 <form name="form1" method="post" action="" class="form-horizontal" role="form">
+    <?php echo csrf_field() ?>
   <div><h2>Add Device</h2></div>
   <div class="alert alert-info">Devices will be checked for Ping/SNMP reachability before being probed.</div>
   <div class="well well-lg">
@@ -159,7 +162,7 @@ $pagetitle[] = 'Add host';
           <div class="col-sm-3">
             <select name="transport" id="transport" class="form-control input-sm">
 <?php
-foreach ($config['snmp']['transports'] as $transport) {
+foreach (Config::get('snmp.transports') as $transport) {
     echo "<option value='".$transport."'";
     if ($transport == $device['transport']) {
         echo " selected='selected'";
@@ -180,7 +183,7 @@ foreach ($config['snmp']['transports'] as $transport) {
 
 foreach (get_port_assoc_modes() as $mode) {
     $selected = "";
-    if ($mode == $config['default_port_association_mode']) {
+    if ($mode == Config::get('default_port_association_mode')) {
         $selected = "selected";
     }
 
@@ -258,7 +261,7 @@ foreach (get_port_assoc_modes() as $mode) {
         </div>
       </div>
 <?php
-if ($config['distributed_poller'] === true) {
+if (Config::get('distributed_poller') === true) {
     echo '
           <div class="form-group">
               <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>

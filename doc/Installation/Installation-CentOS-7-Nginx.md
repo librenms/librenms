@@ -1,35 +1,70 @@
 source: Installation/Installation-CentOS-7-Nginx.md
 path: blob/master/doc/
-> NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
+
+> NOTE: These instructions assume you are the **root** user.  If you
+> are not, prepend `sudo` to the shell commands (the ones that aren't
+> at `mysql>` prompts) or temporarily become a user with root
+> privileges with `sudo -s` or `sudo -i`.
 
 **Please note the minimum supported PHP version is 7.1.3**
 
-## Install Required Packages ##
+# Install Required Packages
 
-    yum install epel-release
+```
+yum install epel-release
+```
 
-    rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+```
+rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+```
 
-    yum install composer cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php72w php72w-cli php72w-common php72w-curl php72w-fpm php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
+```
+yum install composer cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php72w php72w-cli php72w-common php72w-curl php72w-fpm php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
+```
 
-#### Add librenms user
+# Add librenms user
 
-    useradd librenms -d /opt/librenms -M -r
-    usermod -a -G librenms nginx
+```
+useradd librenms -d /opt/librenms -M -r
+usermod -a -G librenms nginx
+```
 
-#### Download LibreNMS
+# Download LibreNMS
 
-    cd /opt
-    composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
+```
+cd /opt
+git clone https://github.com/librenms/librenms.git
+```
 
-## DB Server ##
+# Set permissions
 
-#### Configure MySQL
+```
+chown -R librenms:librenms /opt/librenms
+chmod 770 /opt/librenms
+setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+chgrp apache /var/lib/php/session/
+```
 
-    systemctl start mariadb
-    mysql -u root
+# Install PHP dependencies
+
+```
+su - librenms
+./scripts/composer_wrapper.php install --no-dev
+exit
+```
+
+# DB Server
+
+## Configure MySQL
+
+```
+systemctl start mariadb
+mysql -u root
+```
 
 > NOTE: Please change the 'password' below to something secure.
+
 ```sql
 CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
@@ -38,7 +73,9 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-    vi /etc/my.cnf
+```
+vi /etc/my.cnf
+```
 
 Within the `[mysqld]` section please add:
 
@@ -46,20 +83,30 @@ Within the `[mysqld]` section please add:
 innodb_file_per_table=1
 lower_case_table_names=0
 ```
-    systemctl enable mariadb
-    systemctl restart mariadb
 
-## Web Server ##
+```
+systemctl enable mariadb
+systemctl restart mariadb
+```
 
-### Configure and Start PHP-FPM
+# Web Server
 
-Ensure date.timezone is set in php.ini to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
+## Configure and Start PHP-FPM
 
-    vi /etc/php.ini
+Ensure date.timezone is set in php.ini to your preferred time zone.
+See <http://php.net/manual/en/timezones.php> for a list of supported
+timezones.  Valid examples are: "America/New_York",
+"Australia/Brisbane", "Etc/UTC".
+
+```
+vi /etc/php.ini
+```
 
 In `/etc/php-fpm.d/www.conf` make these changes:
 
-    vi /etc/php-fpm.d/www.conf
+```
+vi /etc/php-fpm.d/www.conf
+```
 
 ```nginx
 ;user = apache
@@ -75,12 +122,16 @@ listen.group = nginx
 listen.mode = 0660
 ```
 
-    systemctl enable php-fpm
-    systemctl restart php-fpm
+```
+systemctl enable php-fpm
+systemctl restart php-fpm
+```
 
-### Configure NGINX
+## Configure NGINX
 
-    vi /etc/nginx/conf.d/librenms.conf
+```
+vi /etc/nginx/conf.d/librenms.conf
+```
 
 Add the following config, edit `server_name` as required:
 
@@ -111,37 +162,50 @@ server {
 }
 ```
 
-> NOTE: If this is the only site you are hosting on this server (it should be :)) then you will need to disable the default site.
+> NOTE: If this is the only site you are hosting on this server (it
+> should be :)) then you will need to disable the default site.
+
 Delete the `server` section from `/etc/nginx/nginx.conf`
 
-    systemctl enable nginx
-    systemctl restart nginx
+```
+systemctl enable nginx
+systemctl restart nginx
+```
 
-#### SELinux
+# SELinux
 
 Install the policy tool for SELinux:
 
-    yum install policycoreutils-python
+```
+yum install policycoreutils-python
+```
 
-##### Configure the contexts needed by LibreNMS:
+## Configure the contexts needed by LibreNMS:
 
-    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
-    restorecon -RFvv /opt/librenms/logs/
-    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
-    restorecon -RFvv /opt/librenms/rrd/
-    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/storage(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/storage(/.*)?'
-    restorecon -RFvv /opt/librenms/storage/
-    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/bootstrap/cache(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/bootstrap/cache(/.*)?'
-    restorecon -RFvv /opt/librenms/bootstrap/cache/
-    setsebool -P httpd_can_sendmail=1
-    setsebool -P httpd_execmem 1
+```
+semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
+semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
+restorecon -RFvv /opt/librenms/logs/
+semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
+semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
+restorecon -RFvv /opt/librenms/rrd/
+semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/storage(/.*)?'
+semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/storage(/.*)?'
+restorecon -RFvv /opt/librenms/storage/
+semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/bootstrap/cache(/.*)?'
+restorecon -RFvv /opt/librenms/bootstrap/cache/
+setsebool -P httpd_can_sendmail=1
+setsebool -P httpd_execmem 1
+```
 
-##### Allow fping
-Create the file http_fping.tt with the following contents. You can create this file anywhere, as it is a throw-away file. The last step in this install procedure will install the module in the proper location.
+# Allow fping
+
+Create the file http_fping.tt with the following contents. You can
+create this file anywhere, as it is a throw-away file. The last step
+in this install procedure will install the module in the proper
+location.
+
 ```
 module http_fping 1.0;
 
@@ -158,87 +222,124 @@ allow httpd_t self:rawip_socket { getopt create setopt write read };
 
 Then run these commands
 
-    checkmodule -M -m -o http_fping.mod http_fping.tt
-    semodule_package -o http_fping.pp -m http_fping.mod
-    semodule -i http_fping.pp
+```
+checkmodule -M -m -o http_fping.mod http_fping.tt
+semodule_package -o http_fping.pp -m http_fping.mod
+semodule -i http_fping.pp
+```
 
-#### Allow access through firewall
+# Allow access through firewall
 
-    firewall-cmd --zone public --add-service http
-    firewall-cmd --permanent --zone public --add-service http
-    firewall-cmd --zone public --add-service https
-    firewall-cmd --permanent --zone public --add-service https
+```
+firewall-cmd --zone public --add-service http
+firewall-cmd --permanent --zone public --add-service http
+firewall-cmd --zone public --add-service https
+firewall-cmd --permanent --zone public --add-service https
+```
 
-### Configure snmpd
+# Configure snmpd
 
-    cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
+```
+cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
+```
 
-    vi /etc/snmp/snmpd.conf
+```
+vi /etc/snmp/snmpd.conf
+```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
-    curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
-    chmod +x /usr/bin/distro
-    systemctl enable snmpd
-    systemctl restart snmpd
+```
+curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+chmod +x /usr/bin/distro
+systemctl enable snmpd
+systemctl restart snmpd
+```
 
-### Cron job
+# Cron job
 
-    cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
+```
+cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
+```
 
-> NOTE: Keep in mind  that cron, by default, only uses a very limited set of environment variables. You may need to configure proxy variables for the cron invocation. Alternatively adding the proxy settings in config.php is possible too. The config.php file will be created in the upcoming steps. Review the following URL after you finished librenms install steps: https://docs.librenms.org/Support/Configuration/#proxy-support
+> NOTE: Keep in mind  that cron, by default, only uses a very limited
+> set of environment variables. You may need to configure proxy
+> variables for the cron invocation. Alternatively adding the proxy
+> settings in config.php is possible too. The config.php file will be
+> created in the upcoming steps. Review the following URL after you
+> finished librenms install steps:
+> <https://docs.librenms.org/Support/Configuration/#proxy-support>
 
-#### Copy logrotate config
+# Copy logrotate config
 
-LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large and be rotated out.  To rotate out the old logs you can use the provided logrotate config file:
+LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can
+become large and be rotated out.  To rotate out the old logs you can
+use the provided logrotate config file:
 
-    cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
+```
+cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
+```
 
-### Set permissions
-
-    chown -R librenms:librenms /opt/librenms
-    setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
-    setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
-    chgrp apache /var/lib/php/session/
-
-## Web installer ##
+# Web installer
 
 Now head to the web installer and follow the on-screen instructions.
 
-    http://librenms.example.com/install.php
-    
-The web installer might prompt you to create a `config.php` file in your librenms install location manually, copying the content displayed on-screen to the file. If you have to do this, please remember to set the permissions on config.php after you copied the on-screen contents to the file. Run:
+<http://librenms.example.com/install.php>
 
-    chown librenms:librenms /opt/librenms/config.php
+The web installer might prompt you to create a `config.php` file in
+your librenms install location manually, copying the content displayed
+on-screen to the file. If you have to do this, please remember to set
+the permissions on config.php after you copied the on-screen contents
+to the file. Run:
 
-### Final steps
+```
+chown librenms:librenms /opt/librenms/config.php
+```
 
-That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
+# Final steps
 
-#### Add the first device
+That's it!  You now should be able to log in to
+<http://librenms.example.com/>.  Please note that we have not covered
+ HTTPS setup in this example, so your LibreNMS install is not secure
+ by default.  Please do not expose it to the public Internet unless
+ you have configured HTTPS and taken appropriate web server hardening
+ steps.
+
+# Add the first device
 
 We now suggest that you add localhost as your first device from within the WebUI.
 
-#### Troubleshooting
+# Troubleshooting
 
-If you ever have issues with your install, run validate.php as root in the librenms directory:
+If you ever have issues with your install, run validate.php as root in
+the librenms directory:
 
-    cd /opt/librenms
-    ./validate.php
+```
+cd /opt/librenms
+./validate.php
+```
 
-There are various options for getting help listed on the LibreNMS web site: https://www.librenms.org/#support
+There are various options for getting help listed on the LibreNMS web
+site: https://www.librenms.org/#support
 
-### What next?
+# What next?
 
-Now that you've installed LibreNMS, we'd suggest that you have a read of a few other docs to get you going:
+Now that you've installed LibreNMS, we'd suggest that you have a read
+of a few other docs to get you going:
 
- - [Performance tuning](http://docs.librenms.org/Support/Performance)
- - [Alerting](http://docs.librenms.org/Extensions/Alerting/)
- - [Device Groups](http://docs.librenms.org/Extensions/Device-Groups/)
- - [Auto discovery](http://docs.librenms.org/Extensions/Auto-Discovery/)
+- [Performance tuning](http://docs.librenms.org/Support/Performance)
+- [Alerting](http://docs.librenms.org/Extensions/Alerting/)
+- [Device Groups](http://docs.librenms.org/Extensions/Device-Groups/)
+- [Auto discovery](http://docs.librenms.org/Extensions/Auto-Discovery/)
 
-### Closing
+# Closing
 
-We hope you enjoy using LibreNMS. If you do, it would be great if you would consider opting into the stats system we have, please see [this page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on what it is and how to enable it.
+We hope you enjoy using LibreNMS. If you do, it would be great if you
+would consider opting into the stats system we have, please see [this
+page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on
+what it is and how to enable it.
 
-If you would like to help make LibreNMS better there are [many ways to help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).
+If you would like to help make LibreNMS better there are [many ways to
+help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You
+can also [back LibreNMS on Open
+Collective](https://t.libren.ms/donations).

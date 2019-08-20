@@ -1,14 +1,12 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $no_refresh = true;
 
 $link_array = array('page'    => 'device',
     'device'  => $device['device_id'],
     'tab' => 'edit');
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     print_error("Insufficient Privileges");
 } else {
     $panes['device']   = 'Device Settings';
@@ -21,7 +19,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
         $panes['routing'] = 'Routing';
     }
 
-    if (count($config['os'][$device['os']]['icons'])) {
+    if (count(\LibreNMS\Config::get("os.{$device['os']}.icons"))) {
         $panes['icon']  = 'Icon';
     }
 
@@ -34,7 +32,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
         $panes['modules']  = 'Modules';
     }
 
-    if ($config['show_services']) {
+    if (\LibreNMS\Config::get('show_services')) {
         $panes['services'] = 'Services';
     }
 

@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 if (isset($settings['mode_select']) && $settings['mode_select'] !== '') {
     $mode = $settings['mode_select'];
@@ -28,7 +28,7 @@ $select_modes = array(
     '2' => 'devices and services',
 );
 
-if ($config['webui']['availability_map_compact'] == 1) {
+if (Config::get('webui.availability_map_compact') == 1) {
     $compact_tile = $settings['tile_size'];
 }
 
@@ -37,6 +37,7 @@ $show_disabled_ignored = $settings['show_disabled_and_ignored'];
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
     <form class="form" onsubmit="widget_settings(this); return false;">
+        ' . csrf_field() . '
         <div class="form-group">
             <div class="col-sm-4">
                 <label for="title" class="control-label availability-map-widget-header">Widget title</label>
@@ -46,7 +47,7 @@ if (defined('SHOW_SETTINGS')) {
             </div>
         </div>';
 
-    if ($config['webui']['availability_map_compact'] === false) {
+    if (Config::get('webui.availability_map_compact') === false) {
         $common_output[] = '
     <div class="form-group">
         <div class="col-sm-4">
@@ -62,7 +63,7 @@ if (defined('SHOW_SETTINGS')) {
 ';
     }
 
-    if ($config['webui']['availability_map_compact'] == 1) {
+    if (Config::get('webui.availability_map_compact') == 1) {
         $common_output[] = '
         <div class="form-group">
             <div class="col-sm-4">
@@ -103,7 +104,7 @@ if (defined('SHOW_SETTINGS')) {
         <div class="col-sm-6">
             <select name="mode_select" class="form-control">';
 
-    if ($config['show_services'] == 0) {
+    if (Config::get('show_services') == 0) {
         $common_output[] = '<option value="0" selected>only devices</option>';
     } else {
         foreach ($select_modes as $mode_select => $option) {
@@ -120,7 +121,7 @@ if (defined('SHOW_SETTINGS')) {
         </div>
     </div>';
 
-    if ($config['webui']['availability_map_compact'] == 1) {
+    if (Config::get('webui.availability_map_compact') == 1) {
         $common_outputp[] = '
         <div class="form-group">
             <div class="col-sm-4">
@@ -156,7 +157,7 @@ if (defined('SHOW_SETTINGS')) {
     $service_ignored_count = 0;
     $service_disabled_count = 0;
 
-    if ($config['webui']['availability_map_sort_status'] == 1) {
+    if (Config::get('webui.availability_map_sort_status') == 1) {
         $deviceOrderBy = 'status';
         $serviceOrderBy = '`S`.`service_status` DESC';
     } else {
@@ -166,16 +167,16 @@ if (defined('SHOW_SETTINGS')) {
 
     if ($mode == 0 || $mode == 2) {
         // Only show devices if mode is 0 or 2 (Only Devices or both)
-        if ($config['webui']['availability_map_use_device_groups'] != 0) {
+        if (Config::get('webui.availability_map_use_device_groups') != 0) {
             $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
             $in_devices = dbFetchColumn($device_group, [$_SESSION['group_view']]);
         }
 
         $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`ignore`, `D`.`disabled` FROM `devices` AS `D`';
 
-        if (!LegacyAuth::user()->hasGlobalRead()) {
+        if (!Auth::user()->hasGlobalRead()) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
-            $param = [LegacyAuth::id()];
+            $param = [Auth::id()];
         } else {
             $sql .= ' WHERE ';
             $param = [];
@@ -187,7 +188,7 @@ if (defined('SHOW_SETTINGS')) {
             $sql .= '(`D`.`status` IN (0,1,2) OR `D`.`ignore` = 1 OR `D`.`disabled` = 1)';
         }
 
-        if ($config['webui']['availability_map_use_device_groups'] != 0 && !empty($in_devices)) {
+        if (Config::get('webui.availability_map_use_device_groups') != 0 && !empty($in_devices)) {
             $sql .= " AND `D`.`device_id` IN " . dbGenPlaceholders(count($in_devices));
             $param = array_merge($param, $in_devices);
         }
@@ -206,7 +207,7 @@ if (defined('SHOW_SETTINGS')) {
                 $deviceLabel = "label-default";
                 $host_ignored_count++;
             } elseif ($device['status'] == '1') {
-                if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != 0)) {
+                if (($device['uptime'] < Config::get('uptime_warning')) && ($device['uptime'] != 0)) {
                     $deviceState = 'warn';
                     $deviceLabel = 'label-warning';
                     $deviceLabelOld = 'availability-map-oldview-box-warn';
@@ -225,12 +226,12 @@ if (defined('SHOW_SETTINGS')) {
             }
             $device_system_name = format_hostname($device);
 
-            if ($config['webui']['availability_map_compact'] == 0) {
+            if (Config::get('webui.availability_map_compact') == 0) {
                 if ($directpage == "yes") {
                     $deviceIcon = getIconTag($device);
                     $temp_output[] = '
                     <a href="' .generate_device_url($device). '" title="' . $device_system_name . " - " . formatUptime($device['uptime']) . '">
-                    <div class="device-availability ' . $deviceState . '" style="width:' . $config['webui']['availability_map_box_size'] . 'px;">
+                    <div class="device-availability ' . $deviceState . '" style="width:' . Config::get('webui.availability_map_box_size') . 'px;">
                         <span class="availability-label label ' . $deviceLabel . ' label-font-border">' . $deviceState . '</span>
                         <span class="device-icon">' . $deviceIcon . '</span><br>
                         <span class="small">' . shorthost($device_system_name) . '</span>
@@ -252,13 +253,13 @@ if (defined('SHOW_SETTINGS')) {
         }
     }
 
-    if (($mode == 1 || $mode == 2) && ($config['show_services'] != 0)) {
-        if (LegacyAuth::user()->hasGlobalRead()) {
+    if (($mode == 1 || $mode == 2) && (Config::get('show_services') != 0)) {
+        if (Auth::user()->hasGlobalRead()) {
             $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id` ORDER BY '.$serviceOrderBy.';';
             $service_par = array();
         } else {
             $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D, devices_perms P where `S`.`device_id` = `D`.`device_id` AND D.device_id = P.device_id AND P.user_id = ? ORDER BY '.$serviceOrderBy.';';
-            $service_par = array(LegacyAuth::id());
+            $service_par = array(Auth::id());
         }
         $services = dbFetchRows($service_query, $service_par);
         if (count($services) > 0) {
@@ -281,12 +282,12 @@ if (defined('SHOW_SETTINGS')) {
                 }
                 $service_system_name = format_hostname($service);
 
-                if ($config['webui']['availability_map_compact'] == 0) {
+                if (Config::get('webui.availability_map_compact') == 0) {
                     if ($directpage == "yes") {
                         $deviceIcon = getIconTag($service);
                         $temp_output[] = '
                         <a href="' . generate_url(array('page' => 'device', 'tab' => 'services', 'device' => $service['device_id'])) . '" title="' . $service_system_name . " - " . $service['service_type'] . " - " . $service['service_desc'] . '">
-                            <div class="service-availability ' . $serviceState . '" style="width:' . $config['webui']['availability_map_box_size'] . 'px;">
+                            <div class="service-availability ' . $serviceState . '" style="width:' . Config::get('webui.availability_map_box_size') . 'px;">
                                 <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service["service_type"] . '</span>
                                 <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
                                 <span class="device-icon">' . $deviceIcon . '</span><br>
@@ -319,7 +320,7 @@ if (defined('SHOW_SETTINGS')) {
             <span class="page-availability-title">Availability map for</span>
             <select id="mode" class="page-availability-report-select" name="mode">';
 
-        if ($config['show_services'] == 0) {
+        if (Config::get('show_services') == 0) {
             $temp_header[] = '<option value="0" selected>only devices</option>';
         } else {
             foreach ($select_modes as $mode_select => $option) {
@@ -337,7 +338,7 @@ if (defined('SHOW_SETTINGS')) {
         </div>
         <div class="page-availability-title-right">';
 
-        if (($config['webui']['availability_map_use_device_groups'] != 0) && ($mode == 0 || $mode == 2)) {
+        if ((Config::get('webui.availability_map_use_device_groups') != 0) && ($mode == 0 || $mode == 2)) {
             $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
             $dev_groups = dbFetchRows($sql);
 
@@ -389,7 +390,7 @@ if (defined('SHOW_SETTINGS')) {
             </div>';
     }
 
-    if (($mode == 1 || $mode == 2) && ($config['show_services'] != 0)) {
+    if (($mode == 1 || $mode == 2) && (Config::get('show_services') != 0)) {
         $temp_header[] = '
             <div class="' . $serviceClass . '">
                 <span>Total services</span>

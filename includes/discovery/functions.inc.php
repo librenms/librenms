@@ -228,6 +228,9 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     if (!is_numeric($divisor)) {
         $divisor  = 1;
     }
+    if (can_skip_sensor($device, $type, $descr)) {
+        return false;
+    }
 
     d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current, (limits: LL: $low_limit, LW: $low_warn_limit, W: $warn_limit, H: $high_limit)\n");
 
@@ -382,29 +385,20 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
 function sensor_low_limit($class, $current)
 {
-    $limit = null;
-
+    // matching an empty case executes code until a break is reached
     switch ($class) {
         case 'temperature':
             $limit = $current - 10;
             break;
         case 'voltage':
-                $limit = $current * 0.85;
+            $limit = $current * 0.85;
             break;
         case 'humidity':
             $limit = 30;
             break;
-        case 'count':
-        case 'current':
-            $limit = null;
-            break;
         case 'fanspeed':
             $limit = $current * 0.80;
             break;
-        case 'power':
-            $limit = null;
-            break;
-        case 'power_consumed':
         case 'power_factor':
             $limit = -1;
             break;
@@ -412,34 +406,24 @@ function sensor_low_limit($class, $current)
             $limit = -80;
             break;
         case 'airflow':
-        case 'dbm':
         case 'snr':
         case 'frequency':
         case 'pressure':
         case 'cooling':
             $limit = $current * 0.95;
             break;
-        case 'delay':
-        case 'quality_factor':
-        case 'chromatic_dispersion':
-        case 'ber':
-        case 'eer':
-        case 'waterflow':
+        default:
+            return null;
     }//end switch
 
-    if (is_numeric($limit)) {
-        return round($limit, 11);
-    }
-
-    return $limit;
+    return round($limit, 11);
 }
 
 //end sensor_low_limit()
 
 function sensor_limit($class, $current)
 {
-    $limit = null;
-
+    // matching an empty case executes code until a break is reached
     switch ($class) {
         case 'temperature':
             $limit = $current + 20;
@@ -450,17 +434,11 @@ function sensor_limit($class, $current)
         case 'humidity':
             $limit = 70;
             break;
-        case 'count':
-        case 'current':
-        case 'power':
-            $limit = $current * 1.50;
-            break;
-        case 'power_consumed':
-        case 'power_factor':
-            $limit = 1;
-            break;
         case 'fanspeed':
             $limit = $current * 1.80;
+            break;
+        case 'power_factor':
+            $limit = 1;
             break;
         case 'signal':
             $limit = -30;
@@ -469,20 +447,17 @@ function sensor_limit($class, $current)
             $limit = 80;
             break;
         case 'airflow':
-        case 'dbm':
         case 'snr':
         case 'frequency':
         case 'pressure':
         case 'cooling':
             $limit = $current * 1.05;
             break;
+        default:
+            return null;
     }//end switch
 
-    if (is_numeric($limit)) {
-        return round($limit, 11);
-    }
-
-    return $limit;
+    return round($limit, 11);
 }
 
 //end sensor_limit()
@@ -811,6 +786,7 @@ function discover_entity_physical(&$valid, $device, $entPhysicalIndex, $entPhysi
                 'entPhysicalIsFRU'        => $entPhysicalIsFRU,
                 'entPhysicalAlias'        => $entPhysicalAlias,
                 'entPhysicalAssetID'      => $entPhysicalAssetID,
+                'ifIndex'                 => $ifIndex,
             );
             dbUpdate($update_data, 'entPhysical', '`device_id`=? AND `entPhysicalIndex`=?', array($device['device_id'], $entPhysicalIndex));
         }//end if
@@ -1018,7 +994,7 @@ function ignore_storage($os, $descr)
  */
 function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 {
-    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]) {
+    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type] && ! can_skip_sensor($device, $sensor_type, '')) {
         $sensor_options = array();
         if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'])) {
             $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
@@ -1068,14 +1044,15 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 d_echo("Final sensor value: $value\n");
 
-                if (YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache) === false && is_numeric($value)) {
+                $skippedFromYaml = YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache);
+                if ($skippedFromYaml === false && is_numeric($value)) {
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
 
                     // process the description
                     $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);
 
                     // process the group
-                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache);
+                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache) ?: null;
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
@@ -1093,7 +1070,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     }
 
                     echo "Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit".PHP_EOL;
-                    $entPhysicalIndex = str_replace('{{ $index }}', $index, $data['entPhysicalIndex']) ?: null;
+                    $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
                     $sensor_name = $device['os'];
@@ -1341,6 +1318,27 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
         dbInsert($cbgp, 'bgpPeers_cbgp');
     }
 }
+
+/**
+ * check if we should skip this sensor from discovery
+ * @param $device
+ * @param string $sensor_type
+ * @param string $sensor_descr
+ * @return bool
+ */
+function can_skip_sensor($device, $sensor_type = '', $sensor_descr = '')
+{
+    if (! empty($sensor_type) && Config::getCombined($device['os'], "disabled_sensors.$sensor_type", false)) {
+        return true;
+    }
+    foreach (Config::getCombined($device['os'], "disabled_sensors_regex", []) as $skipRegex) {
+        if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 /**
  * check if we should skip this device from discovery

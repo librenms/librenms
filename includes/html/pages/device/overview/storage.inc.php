@@ -19,7 +19,7 @@ if (count($drives)) {
         $skipdrive = 0;
 
         if ($device['os'] == 'junos') {
-            foreach ($config['ignore_junos_os_drives'] as $jdrive) {
+            foreach (\LibreNMS\Config::get('ignore_junos_os_drives') as $jdrive) {
                 if (preg_match($jdrive, $drive['storage_descr'])) {
                     $skipdrive = 1;
                 }
@@ -29,7 +29,7 @@ if (count($drives)) {
         }
 
         if ($device['os'] == 'freebsd') {
-            foreach ($config['ignore_bsd_os_drives'] as $jdrive) {
+            foreach (\LibreNMS\Config::get('ignore_bsd_os_drives') as $jdrive) {
                 if (preg_match($jdrive, $drive['storage_descr'])) {
                     $skipdrive = 1;
                 }
@@ -49,10 +49,10 @@ if (count($drives)) {
         $graph_array           = array();
         $graph_array['height'] = '100';
         $graph_array['width']  = '210';
-        $graph_array['to']     = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['id']     = $drive['storage_id'];
         $graph_array['type']   = $graph_type;
-        $graph_array['from']   = $config['time']['day'];
+        $graph_array['from'] = \LibreNMS\Config::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array         = $graph_array;

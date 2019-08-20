@@ -12,15 +12,15 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Alert\AlertDB;
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
 $rule     = implode(' ', $_POST['rules']);
 $rule     = rtrim($rule, '&|');
-$query    = GenSQL($rule);
+$query    = AlertDB::genSQL($rule);
 $alert_id = $_POST['alert_id'];
 $count    = mres($_POST['count']);
 $delay    = mres($_POST['delay']);

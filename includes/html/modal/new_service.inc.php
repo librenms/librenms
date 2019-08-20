@@ -11,11 +11,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     // Build the types list.
-    $dir = $config['nagios_plugins'];
+    $dir = \LibreNMS\Config::get('nagios_plugins');
     if (file_exists($dir) && is_dir($dir)) {
         $files = scandir($dir);
         $dir .= DIRECTORY_SEPARATOR;
@@ -26,7 +24,6 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
             }
         }
     }
-
 ?>
 
 <div class="modal fade bs-example-modal-sm" id="create-service" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -38,6 +35,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
             </div>
             <div class="modal-body">
                 <form method="post" role="form" id="service" class="form-horizontal service-form">
+                    <?php echo csrf_field() ?>
                     <input type="hidden" name="service_id" id="service_id" value="">
                     <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
                     <input type="hidden" name="type" id="type" value="create-service">
@@ -46,7 +44,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                             <span id="ajax_response">&nbsp;</span>
                         </div>
                     </div>
-                    <div class="form-service">
+                    <div class="form-service row">
                         <label for='stype' class='col-sm-3 control-label'>Type: </label>
                         <div class="col-sm-9">
                             <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
@@ -54,25 +52,37 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                             </select>
                         </div>
                     </div>
-                    <div class='form-service'>
+                    <div class='form-service row'>
                         <label for='desc' class='col-sm-3 control-label'>Description: </label>
                         <div class='col-sm-9'>
                             <textarea id='desc' name='desc' class='form-control'></textarea>
                         </div>
                     </div>
-                    <div class="form-service">
+                    <div class="form-service row">
                         <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
                         <div class="col-sm-9">
                             <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device['hostname']?>'/>
                         </div>
                     </div>
-                    <div class="form-service">
+                    <div class="form-service row">
                         <label for='param' class='col-sm-3 control-label'>Parameters: </label>
                         <div class="col-sm-9">
-                            <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                           <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
                         </div>
                     </div>
-                    <div class="form-service">
+                    <div class="form-service row">
+                        <label for='ignore' class='col-sm-3 control-label'>Ignore: </label>
+                        <div class="col-sm-9">
+                            <input type='checkbox' id='ignore' name='ignore'>
+                        </div>
+                    </div>
+                    <div class="form-service row">
+                        <label for='disabled' class='col-sm-3 control-label'>Disabled: </label>
+                        <div class="col-sm-9">
+                            <input type='checkbox' id='disabled' name='disabled'>
+                        </div>
+                    </div>
+                    <div class="form-service row">
                         <div class="col-sm-offset-3 col-sm-9">
                             <button class="btn btn-success btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button>
                         </div>
@@ -93,6 +103,8 @@ $('#create-service').on('hide.bs.modal', function (event) {
     $('#ip').val('');
     $('#desc').val('');
     $('#param').val('');
+    $('#ignore').val('');
+    $('#disabled').val('');
 });
 
 // on-load
@@ -112,8 +124,17 @@ $('#create-service').on('show.bs.modal', function (e) {
             $('#ip').val(output['ip']);
             $('#desc').val(output['desc']);
             $('#param').val(output['param']);
+            $('#ignore').val(output['ignore']);
+            $('#disabled').val(output['disabled']);
+            if ($('#ignore').attr('value') == 1) {
+                $('#ignore').prop("checked", true);
+            }
+            if ($('#disabled').attr('value') == 1) {
+                $('#disabled').prop("checked", true);
+            }
         }
     });
+
 });
 
 // on-submit

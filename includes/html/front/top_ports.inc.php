@@ -13,12 +13,10 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $minutes = 15;
 $seconds = ($minutes * 60);
-$top     = $config['front_page_settings']['top']['ports'];
-if (LegacyAuth::user()->hasGlobalRead()) {
+$top = \LibreNMS\Config::get('front_page_settings.top.ports');
+if (Auth::user()->hasGlobalRead()) {
     $query = "
         SELECT *, p.ifInOctets_rate + p.ifOutOctets_rate as total
         FROM ports as p, devices as d
@@ -43,8 +41,8 @@ if (LegacyAuth::user()->hasGlobalRead()) {
         LIMIT $top
         ";
     $param[] = array(
-        LegacyAuth::id(),
-        LegacyAuth::id(),
+        Auth::id(),
+        Auth::id(),
     );
 }//end if
 

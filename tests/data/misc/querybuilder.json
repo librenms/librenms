@@ -3,114 +3,181 @@
         "",
         {"condition":"OR","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"begins_with","value":"begin"}],"valid":true},
         "devices.hostname LIKE 'begin%'",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE 'begin%'"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE 'begin%'",
+        ["select * from `devices` where (`devices`.`hostname` LIKE ?)", ["begin%"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_begins_with","value":"notbegin"}],"valid":true},
         "devices.hostname NOT LIKE 'notbegin%'",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE 'notbegin%'"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE 'notbegin%'",
+        ["select * from `devices` where (`devices`.`hostname` NOT LIKE ?)", ["notbegin%"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"contains","value":"contains"}],"valid":true},
         "devices.hostname LIKE '%contains%'",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%contains%'"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%contains%'",
+        ["select * from `devices` where (`devices`.`hostname` LIKE ?)", ["%contains%"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_contains","value":"notcontains"}],"valid":true},
         "devices.hostname NOT LIKE '%notcontains%'",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notcontains%'"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notcontains%'",
+        ["select * from `devices` where (`devices`.`hostname` NOT LIKE ?)", ["%notcontains%"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"ends_with","value":"ends"}],"valid":true},
         "devices.hostname LIKE '%ends'",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%ends'"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%ends'",
+        ["select * from `devices` where (`devices`.`hostname` LIKE ?)", ["%ends"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_ends_with","value":"notends"}],"valid":true},
         "devices.hostname NOT LIKE '%notends'",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notends'"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname NOT LIKE '%notends'",
+        ["select * from `devices` where (`devices`.`hostname` NOT LIKE ?)", ["%notends"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"ports.ifDescr","field":"ports.ifDescr","type":"string","input":"text","operator":"is_null","value":""}],"valid":true},
         "ports.ifDescr IS NULL",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NULL"
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NULL",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where (`ports`.`ifDescr` is null)", []]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"ports.ifDescr","field":"ports.ifDescr","type":"string","input":"text","operator":"is_not_null","value":""}],"valid":true},
         "ports.ifDescr IS NOT NULL",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NOT NULL"
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NOT NULL",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where (`ports`.`ifDescr` is not null)", []]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hardware","field":"devices.hardware","type":"string","input":"text","operator":"is_empty","value":null}],"valid":true},
         "devices.hardware = ''",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware = ''"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware = ''",
+        ["select * from `devices` where (`devices`.`hardware` = ?)", [""]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.hardware","field":"devices.hardware","type":"string","input":"text","operator":"is_not_empty","value":null}],"valid":true},
         "devices.hardware != ''",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware != ''"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hardware != ''",
+        ["select * from `devices` where (`devices`.`hardware` != ?)", [""]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.device_id","field":"devices.device_id","type":"integer","input":"number","operator":"between","value":["3","99"]}],"valid":true},
         "devices.device_id BETWEEN 3 AND 99",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id BETWEEN 3 AND 99"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id BETWEEN 3 AND 99",
+        ["select * from `devices` where (`devices`.`device_id` between ? and ?)", ["3","99"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"devices.device_id","field":"devices.device_id","type":"integer","input":"number","operator":"not_between","value":["2","4"]}],"valid":true},
         "devices.device_id NOT BETWEEN 2 AND 4",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id NOT BETWEEN 2 AND 4"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.device_id NOT BETWEEN 2 AND 4",
+        ["select * from `devices` where (`devices`.`device_id` not between ? and ?)", ["2","4"]]
     ],
     [
         "%macros.device_up = 1",
         {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
         "macros.device_up = 1",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1"
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1",
+        ["select * from `devices` where ((devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = ?)", ["1"]]
     ],
     [
         "%sensors.sensor_current > %sensors.sensor_limit",
         {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"greater","value":"`sensors.sensor_limit`"}],"valid":true},
         "sensors.sensor_current > sensors.sensor_limit",
-        "SELECT * FROM devices,sensors WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id) AND sensors.sensor_current > sensors.sensor_limit"
+        "SELECT * FROM devices,sensors WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id) AND sensors.sensor_current > sensors.sensor_limit",
+        ["select * from `devices` left join `sensors` on `devices`.`device_id` = `sensors`.`device_id` where (`sensors`.`sensor_current` > sensors.sensor_limit)", []]
     ],
     [
         "%devices.hostname ~ \"@ocal@\" ",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"regex","value":".*ocal.*"}],"valid":true},
         "devices.hostname REGEXP \".*ocal.*\"",
-        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname REGEXP \".*ocal.*\""
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname REGEXP \".*ocal.*\"",
+        ["select * from `devices` where (`devices`.`hostname` REGEXP ?)", [".*ocal.*"]]
     ],
     [
         "%macros.state_sensor_critical",
         {"condition":"AND","rules":[{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
         "macros.state_sensor_critical = 1",
-        "SELECT * FROM devices,sensors,sensors_to_state_indexes,state_indexes,state_translations WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id AND sensors.sensor_id = sensors_to_state_indexes.sensor_id AND sensors_to_state_indexes.state_index_id = state_indexes.state_index_id AND state_indexes.state_index_id = state_translations.state_index_id) AND (sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = 1"
+        "SELECT * FROM devices,sensors,sensors_to_state_indexes,state_indexes,state_translations WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id AND sensors.sensor_id = sensors_to_state_indexes.sensor_id AND sensors_to_state_indexes.state_index_id = state_indexes.state_index_id AND state_indexes.state_index_id = state_translations.state_index_id) AND (sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = 1",
+        ["select * from `devices` left join `sensors` on `devices`.`device_id` = `sensors`.`device_id` left join `sensors_to_state_indexes` on `sensors`.`sensor_id` = `sensors_to_state_indexes`.`sensor_id` left join `state_indexes` on `sensors_to_state_indexes`.`state_index_id` = `state_indexes`.`state_index_id` left join `state_translations` on `state_indexes`.`state_index_id` = `state_translations`.`state_index_id` where ((sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = ?)", ["1"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"},{"condition":"OR","rules":[{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge12"},{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge13"}]},{"id":"ports.ifInOctets_delta","field":"ports.ifInOctets_delta","type":"integer","input":"number","operator":"greater","value":"42"}],"valid":true},
         "macros.device = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (devices.disabled = 0 && devices.ignore = 0) = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42"
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (devices.disabled = 0 && devices.ignore = 0) = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where ((devices.disabled = 0 && devices.ignore = 0) = ? AND (`ports`.`ifName` = ? OR `ports`.`ifName` = ?) AND `ports`.`ifInOctets_delta` > ?)", ["1","Ge12","Ge13","42"]]
     ],
     [
         "%bills.bill_name = \"Neil's Bill\"",
         {"condition":"AND","rules":[{"id":"bills.bill_name","field":"bills.bill_name","type":"string","input":"text","operator":"equal","value":"Neil's Bill"}],"valid":true},
         "bills.bill_name = \"Neil's Bill\"",
-        "SELECT * FROM devices,ports,bill_ports,bills WHERE (devices.device_id = ? AND devices.device_id = ports.device_id AND ports.port_id = bill_ports.port_id AND bill_ports.bill_id = bills.bill_id) AND bills.bill_name = \"Neil's Bill\""
+        "SELECT * FROM devices,ports,bill_ports,bills WHERE (devices.device_id = ? AND devices.device_id = ports.device_id AND ports.port_id = bill_ports.port_id AND bill_ports.bill_id = bills.bill_id) AND bills.bill_name = \"Neil's Bill\"",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `bill_ports` on `ports`.`port_id` = `bill_ports`.`port_id` left join `bills` on `bill_ports`.`bill_id` = `bills`.`bill_id` where (`bills`.`bill_name` = ?)", ["Neil's Bill"]]
     ],
     [
         "%ports.ifOutErrors_rate >= \"100\" || %ports.ifInErrors_rate >= \"100\"",
         {"condition":"OR","rules":[{"id":"ports.ifOutErrors_rate","field":"ports.ifOutErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"},{"id":"ports.ifInErrors_rate","field":"ports.ifInErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"}],"valid":true},
         "ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100)"
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100)",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where (`ports`.`ifOutErrors_rate` >= ? OR `ports`.`ifInErrors_rate` >= ?)", ["100","100"]]
+    ],
+    [
+        "%devices.hostname = %devices.sysName &&",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"`devices.sysName`"}],"valid":true},
+        "devices.hostname = devices.sysName",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname = devices.sysName",
+        ["select * from `devices` where (`devices`.`hostname` = devices.sysName)", []]
+    ],
+    [
+        "%devices.hostname ~ \"%router\" &&",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"regex","value":"router"}],"valid":true},
+        "devices.hostname REGEXP \"router\"",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname REGEXP \"router\"",
+        ["select * from `devices` where (`devices`.`hostname` REGEXP ?)", ["router"]]
+    ],
+    [
+        "syslog.timestamp > %macros.past_5m && syslog.msg ~ \"@Port Down@\"",
+        {"condition":"AND","rules":[{"id":"syslog.timestamp","field":"syslog.timestamp","type":"datetime","input":"text","operator":"greater","value":"`macros.past_5m`"},{"id":"syslog.msg","field":"syslog.msg","type":"string","input":"text","operator":"regex","value":".*Port Down.*"}],"valid":true},
+        "syslog.timestamp > macros.past_5m AND syslog.msg REGEXP \".*Port Down.*\"",
+        "SELECT * FROM devices,syslog WHERE (devices.device_id = ? AND devices.device_id = syslog.device_id) AND syslog.timestamp > (DATE_SUB(NOW(),INTERVAL 5 MINUTE)) AND syslog.msg REGEXP \".*Port Down.*\"",
+        ["select * from `devices` left join `syslog` on `devices`.`device_id` = `syslog`.`device_id` where (`syslog`.`timestamp` > (DATE_SUB(NOW(),INTERVAL 5 MINUTE)) AND `syslog`.`msg` REGEXP ?)", [".*Port Down.*"]]
+    ],
+    [
+        "%macros.port_usage_perc > 80",
+        {"condition":"AND","rules":[{"id":"macros.port_usage_perc","field":"macros.port_usage_perc","type":"integer","input":"text","operator":"greater","value":"80"}],"valid":true},
+        "macros.port_usage_perc > 80",
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (((ports.ifInOctets_rate*8) / ports.ifSpeed)*100) > 80",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where ((((ports.ifInOctets_rate*8) / ports.ifSpeed)*100) > ?)", ["80"]]],
+    [
+        "%devices.sysName ~ \"..domain.com\" || %devices.sysName ~ \"switch.\" &&",
+        {"condition":"OR","rules":[{"id":"devices.sysName","field":"devices.sysName","type":"string","input":"text","operator":"regex","value":"..domain.com"},{"id":"devices.sysName","field":"devices.sysName","type":"string","input":"text","operator":"regex","value":"switch."}],"valid":true},
+        "devices.sysName REGEXP \"..domain.com\" OR devices.sysName REGEXP \"switch.\"",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (devices.sysName REGEXP \"..domain.com\" OR devices.sysName REGEXP \"switch.\")",
+        ["select * from `devices` where (`devices`.`sysName` REGEXP ? OR `devices`.`sysName` REGEXP ?)", ["..domain.com","switch."]]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"contains","value":"one"},{"condition":"OR","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"contains","value":"two"},{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"contains","value":"three"},{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"begins_with","value":"six"},{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"seven"}]}]},{"condition":"OR","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_contains","value":"four"},{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"not_contains","value":"five"}]}],"valid":true},
+        "devices.hostname LIKE '%one%' AND (devices.hostname LIKE '%two%' OR devices.hostname LIKE '%three%' OR (devices.hostname LIKE 'six%' AND devices.hostname = \"seven\")) AND (devices.hostname NOT LIKE '%four%' OR devices.hostname NOT LIKE '%five%')",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname LIKE '%one%' AND (devices.hostname LIKE '%two%' OR devices.hostname LIKE '%three%' OR (devices.hostname LIKE 'six%' AND devices.hostname = \"seven\")) AND (devices.hostname NOT LIKE '%four%' OR devices.hostname NOT LIKE '%five%')",
+        ["select * from `devices` where (`devices`.`hostname` LIKE ? AND (`devices`.`hostname` LIKE ? OR `devices`.`hostname` LIKE ? OR (`devices`.`hostname` LIKE ? AND `devices`.`hostname` = ?)) AND (`devices`.`hostname` NOT LIKE ? OR `devices`.`hostname` NOT LIKE ?))", ["%one%","%two%","%three%","six%","seven","%four%","%five%"]]
+    ],
+    [
+        "%locations.location ~ somewhere",
+        {"condition":"AND","rules":[{"id":"locations.location","field":"locations.location","type":"string","input":"text","operator":"regex","value":"somewhere"}],"valid":true},
+        "locations.location REGEXP \"somewhere\"",
+        "SELECT * FROM locations,devices WHERE (devices.device_id = ? AND locations.id = devices.location_id) AND locations.location REGEXP \"somewhere\"",
+        ["select * from `devices` left join `locations` on `locations`.`id` = `devices`.`location_id` where (`locations`.`location` REGEXP ?)", ["somewhere"]]
     ]
 ]

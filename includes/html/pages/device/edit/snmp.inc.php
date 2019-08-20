@@ -1,9 +1,9 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 if ($_POST['editing']) {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
         if ($snmp_enabled) {
@@ -11,7 +11,7 @@ if ($_POST['editing']) {
             $community    = clean($_POST['community']);
             $snmpver      = clean($_POST['snmpver']);
             $transport    = $_POST['transport'] ? clean($_POST['transport']) : $transport = 'udp';
-            $port         = $_POST['port'] ? clean($_POST['port']) : $config['snmp']['port'];
+            $port = $_POST['port'] ? clean($_POST['port']) : Config::get('snmp.port');
             $timeout      = clean($_POST['timeout']);
             $retries      = clean($_POST['retries']);
             $port_assoc_mode = clean($_POST['port_assoc_mode']);
@@ -116,6 +116,7 @@ $max_oid = get_dev_attrib($device, 'snmp_max_oid');
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
+    " . csrf_field() . "
     <div class='form-group'>
     <label for='hardware' class='col-sm-2 control-label'>SNMP</label>
     <div class='col-sm-4'>
@@ -138,7 +139,7 @@ echo "
     <div class='form-group'>
     <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
-    <input id='os' class='form-control' name='os' value='".$config['os'][$device['os']]['text']."'/>
+    <input id='os' class='form-control' name='os' value='" . Config::get("os.{$device['os']}.text") . "'/>
     <input type='hidden' id='os_id' class='form-control' name='os_id' value='".$device['os']."'/>
     </div>
     </div>
@@ -155,11 +156,11 @@ echo "
     </select>
     </div>
     <div class='col-sm-2'>
-    <input type='text' name='port' placeholder='port' class='form-control input-sm' value='".($device['port'] == $config['snmp']['port'] ? "" : $device['port'])."'>
+    <input type='text' name='port' placeholder='port' class='form-control input-sm' value='" . ($device['port'] == Config::get('snmp.port') ? "" : $device['port']) . "'>
     </div>
     <div class='col-sm-1'>
     <select name='transport' id='transport' class='form-control input-sm'>";
-foreach ($config['snmp']['transports'] as $transport) {
+foreach (Config::get('snmp.transports') as $transport) {
     echo "<option value='".$transport."'";
     if ($transport == $device['transport']) {
         echo " selected='selected'";
@@ -288,7 +289,7 @@ echo "        </select>
 </div>
 <?php
 
-if ($config['distributed_poller'] === true) {
+if (Config::get('distributed_poller') === true) {
     echo '
         <div class="form-group">
         <label for="poller_group" class="col-sm-2 control-label">Poller Group</label>

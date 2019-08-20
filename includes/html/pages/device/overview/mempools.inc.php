@@ -29,10 +29,10 @@ if (count($mempools)) {
         $graph_array           = array();
         $graph_array['height'] = '100';
         $graph_array['width']  = '210';
-        $graph_array['to']     = $config['time']['now'];
+        $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['id']     = $mempool['mempool_id'];
         $graph_array['type']   = $graph_type;
-        $graph_array['from']   = $config['time']['day'];
+        $graph_array['from'] = \LibreNMS\Config::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array         = $graph_array;

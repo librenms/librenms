@@ -33,7 +33,7 @@ if ($vars['section'] == 'eventlog') {
     echo '</span>';
 }
 
-if (isset($config['enable_syslog']) && $config['enable_syslog'] == 1) {
+if (\LibreNMS\Config::get('enable_syslog') == 1) {
     echo ' | ';
 
     if ($vars['section'] == 'syslog') {
@@ -46,7 +46,7 @@ if (isset($config['enable_syslog']) && $config['enable_syslog'] == 1) {
     }
 }
 
-if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
+if (\LibreNMS\Config::get('graylog.port')) {
     echo ' | ';
     if ($vars['section'] == 'graylog') {
         echo '<span class="pagemenu-selected">';

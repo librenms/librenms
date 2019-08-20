@@ -45,6 +45,7 @@ class WorldMapController extends WidgetController
             'init_zoom' => Config::get('leaflet.default_zoom', 2),
             'group_radius' => Config::get('leaflet.group_radius', 80),
             'status' => '0,1',
+            'device_group' => null,
         ];
     }
 
@@ -60,6 +61,9 @@ class WorldMapController extends WidgetController
             ->with('location')
             ->isActive()
             ->whereIn('status', $status)
+            ->when($settings['device_group'], function ($query) use ($settings) {
+                $query->inDeviceGroup($settings['device_group']);
+            })
             ->get()
             ->filter(function ($device) use ($status) {
                 /** @var Device $device */
@@ -94,6 +98,6 @@ class WorldMapController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        return view('widgets.settings.worldmap', $this->getSettings());
+        return view('widgets.settings.worldmap', $this->getSettings(true));
     }
 }

@@ -1,9 +1,8 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Config;
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = array(
@@ -93,9 +92,9 @@ if (!LegacyAuth::user()->hasGlobalRead()) {
         $i = '1';
         foreach (dbFetchRows('SELECT `vrf_name`, `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription` FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription`,`vrf_name`') as $vrf) {
             if (($i % 2)) {
-                $bg_colour = $config['list_colour']['even'];
+                $bg_colour = Config::get('list_colour.even');
             } else {
-                $bg_colour = $config['list_colour']['odd'];
+                $bg_colour = Config::get('list_colour.odd');
             }
 
             echo "<tr valign=top bgcolor='$bg_colour'>";
@@ -109,15 +108,15 @@ if (!LegacyAuth::user()->hasGlobalRead()) {
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
                 if (($i % 2)) {
                     if (($x % 2)) {
-                        $dev_colour = $config['list_colour']['even_alt'];
+                        $dev_colour = Config::get('list_colour.even_alt');
                     } else {
-                        $dev_colour = $config['list_colour']['even_alt2'];
+                        $dev_colour = Config::get('list_colour.even_alt2');
                     }
                 } else {
                     if (($x % 2)) {
-                        $dev_colour = $config['list_colour']['odd_alt2'];
+                        $dev_colour = Config::get('list_colour.odd_alt2');
                     } else {
-                        $dev_colour = $config['list_colour']['odd_alt'];
+                        $dev_colour = Config::get('list_colour.odd_alt');
                     }
                 }
 
@@ -146,12 +145,12 @@ if (!LegacyAuth::user()->hasGlobalRead()) {
                         case 'errors':
                             $port['width']      = '130';
                             $port['height']     = '30';
-                            $port['from']       = $config['time']['day'];
-                            $port['to']         = $config['time']['now'];
+                            $port['from'] = Config::get('time.day');
+                            $port['to'] = Config::get('time.now');
                             $port['bg']         = '#'.$bg;
                             $port['graph_type'] = 'port_'.$vars['graph'];
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
-                            text-align: center; float: left; background-color: ".$config['list_colour']['odd_alt2'].";'>
+                            text-align: center; float: left; background-color: " . Config::get('list_colour.odd_alt2') . ";'>
                                 <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>';
                             print_port_thumbnail($port);
                             echo "<div style='font-size: 9px;'>".substr(short_port_descr($port['ifAlias']), 0, 22).'</div>

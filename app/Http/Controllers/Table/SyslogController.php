@@ -34,6 +34,7 @@ class SyslogController extends TableController
     {
         return [
             'device' => 'nullable|int',
+            'device_group' => 'nullable|int',
             'program' => 'nullable|string',
             'priority' => 'nullable|string',
             'to' => 'nullable|date',
@@ -64,17 +65,17 @@ class SyslogController extends TableController
     public function baseQuery($request)
     {
         /** @var Builder $query */
-        $query = Syslog::hasAccess($request->user())->with('device');
-
-        if ($from = $request->get('from')) {
-            $query->where('timestamp', '>=', $from);
-        }
-
-        if ($to = $request->get('to')) {
-            $query->where('timestamp', '<=', $to);
-        }
-
-        return $query;
+        return Syslog::hasAccess($request->user())
+            ->with('device')
+            ->when($request->device_group, function ($query) use ($request) {
+                $query->inDeviceGroup($request->device_group);
+            })
+            ->when($request->from, function ($query) use ($request) {
+                $query->where('timestamp', '>=', $request->from);
+            })
+            ->when($request->to, function ($query) use ($request) {
+                $query->where('timestamp', '<=', $request->to);
+            });
     }
 
     public function formatItem($syslog)

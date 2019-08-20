@@ -10,20 +10,19 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $data = dbFetchRow("SELECT `notes` FROM `devices` WHERE device_id = ?", array(
     $device['device_id']
 ));
 
 $disabled = '';
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     $disabled = 'disabled';
 }
 
 ?>
 
 <form class="form-horizontal" action="" method="post">
+    <?php echo csrf_field() ?>
     <h3>Device Notes</h3>
     <hr>
     <div class="form-group">

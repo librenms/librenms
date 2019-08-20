@@ -40,7 +40,6 @@ function load_graph_definitions_local($logarithmic = false, $tinylegend = false)
 
 function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instances, $opts = array())
 {
-    global $config;
     $sources = array();
 
     $title = "$host/$plugin".(!is_null($plugin_instance) ? "-$plugin_instance" : '')."/$type";
@@ -64,7 +63,7 @@ function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instanc
 	$type_instances = array('ham', 'spam', 'malware',  'sent', 'deferred', 'reject', 'bounced'); */
     foreach ($type_instances as $inst) {
         $file  = '';
-        foreach ($config['datadirs'] as $datadir) {
+        foreach (\LibreNMS\Config::get('datadirs') as $datadir) {
             if (is_file($datadir.'/'.$title.'-'.$inst.'.rrd')) {
                 $file = $datadir.'/'.$title.'-'.$inst.'.rrd';
                 break;

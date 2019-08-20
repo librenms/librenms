@@ -30,7 +30,7 @@ use LibreNMS\DB\Schema;
 
 class QueryBuilderParser implements \JsonSerializable
 {
-    private static $legacy_operators = [
+    protected static $legacy_operators = [
         '=' => 'equal',
         '!=' => 'not_equal',
         '~' => 'regex',
@@ -40,7 +40,7 @@ class QueryBuilderParser implements \JsonSerializable
         '<=' => 'less_or_equal',
         '>=' => 'greater_or_equal',
     ];
-    private static $operators = [
+    protected static $operators = [
         'equal' => "=",
         'not_equal' => "!=",
         'less' => "<",
@@ -63,7 +63,7 @@ class QueryBuilderParser implements \JsonSerializable
         'not_regex' => 'NOT REGEXP',
     ];
 
-    private static $values = [
+    protected static $values = [
         'between' => "? AND ?",
         'not_between' => "? AND ?",
         'begins_with' => "'?%'",
@@ -78,8 +78,8 @@ class QueryBuilderParser implements \JsonSerializable
         'is_not_empty' => "''",
     ];
 
-    private $builder;
-    private $schema;
+    protected $builder;
+    protected $schema;
 
     private function __construct(array $builder)
     {
@@ -107,7 +107,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param array $rules
      * @return array List of tables found in rules
      */
-    private function findTablesRecursive($rules)
+    protected function findTablesRecursive($rules)
     {
         $tables = [];
 
@@ -167,13 +167,17 @@ class QueryBuilderParser implements \JsonSerializable
         $split = array_chunk(preg_split('/(&&|\|\|)/', $query, -1, PREG_SPLIT_DELIM_CAPTURE), 2);
 
         foreach ($split as $chunk) {
-            list($rule_text, $rule_operator) = $chunk;
+            if (count($chunk) < 2 && empty($chunk[0])) {
+                continue; // likely the ending && or ||
+            }
+
+            @list($rule_text, $rule_operator) = $chunk;
             if (!isset($condition)) {
                 // only allow one condition.  Since old rules had no grouping, this should hold logically
                 $condition = ($rule_operator == '||' ? 'OR' : 'AND');
             }
 
-            list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
+            @list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
             $field = ltrim($field, '%');
 
             // for rules missing values just use '= 1'
@@ -181,11 +185,12 @@ class QueryBuilderParser implements \JsonSerializable
             if (is_null($value)) {
                 $value = '1';
             } else {
-                $value = trim($value, '"');
-
                 // value is a field, mark it with backticks
                 if (starts_with($value, '%')) {
                     $value = '`' . ltrim($value, '%') . '`';
+                } else {
+                    // but if it has quotes just remove the %
+                    $value = ltrim(trim($value, '"'), '%');
                 }
 
                 // replace regex placeholder, don't think we can safely convert to like operators
@@ -236,7 +241,7 @@ class QueryBuilderParser implements \JsonSerializable
 
         if ($expand) {
             $sql = 'SELECT * FROM ' .implode(',', $this->getTables());
-            $sql .= ' WHERE ' . $this->generateGlue() . ' AND ';
+            $sql .= ' WHERE (' . implode(' AND ', $this->generateGlue()) . ') AND ';
 
             // only wrap in ( ) if the condition is OR and there is more than one rule
             $wrap = $this->builder['condition'] == 'OR' && count($this->builder['rules']) > 1;
@@ -281,7 +286,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param bool $expand Expand macros?
      * @return string
      */
-    private function parseRule($rule, $expand = false)
+    protected function parseRule($rule, $expand = false)
     {
         $field = $rule['field'];
         $builder_op = $rule['operator'];
@@ -320,7 +325,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param int $depth_limit
      * @return string|array
      */
-    private function expandMacro($subject, $tables_only = false, $depth_limit = 20)
+    protected function expandMacro($subject, $tables_only = false, $depth_limit = 20)
     {
         if (!str_contains($subject, 'macros.')) {
             return $subject;
@@ -361,9 +366,9 @@ class QueryBuilderParser implements \JsonSerializable
      * Generate glue and first part of sql query for this rule
      *
      * @param string $target the name of the table to target, for alerting, this should be devices
-     * @return string
+     * @return array
      */
-    private function generateGlue($target = 'devices')
+    protected function generateGlue($target = 'devices')
     {
         $tables = $this->getTables();  // get all tables in query
 
@@ -382,9 +387,7 @@ class QueryBuilderParser implements \JsonSerializable
         }
 
         // remove duplicates
-        $glue = array_unique($glue);
-
-        return '(' . implode(' AND ', $glue) . ')';
+        return array_unique($glue);
     }
 
     /**

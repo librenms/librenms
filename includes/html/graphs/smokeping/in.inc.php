@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 $src = device_by_id_cache($_GET['src']);
 
 // This is my translation of Smokeping's graphing.
@@ -8,10 +10,10 @@ $scale_min   = 0;
 $scale_rigid = true;
 
 require 'includes/html/graphs/common.inc.php';
-require 'smokeping_common.inc.php';
+require 'includes/html/graphs/device/smokeping_common.inc.php';
 
 $i         = 0;
-$pings     = $config['smokeping']['pings'];
+$pings = Config::get('smokeping.pings');
 $iter      = 0;
 $colourset = 'mixed';
 
@@ -28,9 +30,9 @@ if ($width > '500') {
 }
 
 $filename_dir = generate_smokeping_file($device);
-if ($src['hostname'] == $config['own_hostname']) {
+if ($src['hostname'] == Config::get('own_hostname')) {
     $filename = $filename_dir . $device['hostname'].'.rrd';
-    if (!rrdtool_check_rrd_exists($filename_dir.$device['hostname'].'.rrd')) {
+    if (!rrdtool_check_rrd_exists($filename)) {
         // Try with dots in hostname replaced by underscores
         $filename = $filename_dir . str_replace('.', '_', $device['hostname']).'.rrd';
     }
@@ -42,11 +44,11 @@ if ($src['hostname'] == $config['own_hostname']) {
     }
 }
 
-if (!isset($config['graph_colours'][$colourset][$iter])) {
+if (!Config::has("graph_colours.$colourset.$iter")) {
     $iter = 0;
 }
 
-  $colour = $config['graph_colours'][$colourset][$iter];
+$colour = Config::get("graph_colours.$colourset.$iter");
   $iter++;
 
   $descr = rrdtool_escape($source, $descr_len);
