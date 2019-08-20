@@ -28,7 +28,7 @@
                         <li><a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Dashboard')</a></li>
                         <li class="dropdown-submenu">
-                            <a href="{{ url('overview') }}"><i class="fa fa-map fa-fw fa-lg"
+                            <a><i class="fa fa-map fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Maps')</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
@@ -37,7 +37,7 @@
                                 <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
                                                                   aria-hidden="true"></i> @lang('Network')</a></li>
                                 @if($device_groups->isNotEmpty())
-                                    <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"
+                                    <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> @lang('Device Groups Maps')
                                         </a>
                                         <ul class="dropdown-menu scrollable-menu">
@@ -71,7 +71,7 @@
                         </li>
                         @endif
                         <li class="dropdown-submenu">
-                            <a href="{{ url('overview') }}"><i class="fa fa-wrench fa-fw fa-lg"
+                            <a><i class="fa fa-wrench fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Tools')</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
@@ -147,7 +147,7 @@
                     @endif
 
                     @if($device_groups->isNotEmpty())
-                            <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"
+                            <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> @lang('Device Groups')
                                 </a>
                             <ul class="dropdown-menu scrollable-menu">
@@ -161,7 +161,7 @@
                     @if($locations->isNotEmpty())
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('Geo Locations')</a>
+                            <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('Geo Locations')</a>
                             <ul class="dropdown-menu scrollable-menu">
                                 <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('All Locations')</a></li>
                             @foreach($locations as $location)
