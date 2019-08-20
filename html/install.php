@@ -4,7 +4,6 @@ use LibreNMS\Config;
 
 session_start();
 $librenms_dir = realpath(__DIR__ . '/..');
-$php_temp_dir = sys_get_temp_dir() ? sys_get_temp_dir() : '/tmp';
 
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
@@ -212,7 +211,7 @@ if ($status == 'no') {
 }
 echo "</td></tr>";
     
-if (is_writable($php_temp_dir)) {
+if (is_writable(Config::get('temp_dir'))) {
     $status = 'yes';
     $row_class = 'success';
 } else {
@@ -223,7 +222,7 @@ if (is_writable($php_temp_dir)) {
 
 echo "<tr class='$row_class'><td>Temporary directory writable</td><td>$status</td><td>";
 if ($status == 'no') {
-    echo "$php_temp_dir is not writable";
+    echo Config::get('temp_dir') . ' is not writable';
     if (function_exists('posix_getgrgid')) {
         $group_info = posix_getgrgid(filegroup(session_save_path()));
         if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
