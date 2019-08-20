@@ -1,4 +1,4 @@
-ECS4110-52P-MIB DEFINITIONS ::= BEGIN
+ECS4110-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 
@@ -28,7 +28,7 @@ accton              OBJECT IDENTIFIER ::= { enterprises 259 }
 edgecoreNetworks    OBJECT IDENTIFIER ::= { accton 10 }
 edgecoreNetworksMgt OBJECT IDENTIFIER ::= { edgecoreNetworks 1 }
 
-ecs4110-52pMIB MODULE-IDENTITY
+ecs4110-MIB MODULE-IDENTITY
         LAST-UPDATED "201404090000Z"
         ORGANIZATION "Edgecore Networks, Inc."
         CONTACT-INFO
@@ -53,59 +53,58 @@ ecs4110-52pMIB MODULE-IDENTITY
                 "Initial version of this MIB."
         ::= { edgecoreNetworksMgt 39 }
 
-ecs4110-52pMIBObjects       OBJECT IDENTIFIER ::= { ecs4110-52pMIB 1 }
-ecs4110-52pNotifications    OBJECT IDENTIFIER ::= { ecs4110-52pMIB 2 }
+ecs4110-MIBObjects       OBJECT IDENTIFIER ::= { ecs4110-MIB 1 }
+ecs4110-Notifications    OBJECT IDENTIFIER ::= { ecs4110-MIB 2 }
 
 -- supported groups
 
-switchMgt           OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 1 }
-portMgt             OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 2 }
-trunkMgt            OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 3 }
-lacpMgt             OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 4 }
-staMgt              OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 5 }
-restartMgt          OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 7 }
-mirrorMgt           OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 8 }
-igmpSnoopMgt        OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 9 }
-ipMgt               OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 10 }
-vlanMgt             OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 12 }
-priorityMgt         OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 13 }
-trapDestMgt         OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 14 }
-qosMgt              OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 16 }
-securityMgt         OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 17 }
-sysLogMgt           OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 19 }
-lineMgt             OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 20 }
-sysTimeMgt          OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 23 }
-fileMgt             OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 24 }
-dnsMgt              OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 26 }
-poeMgt              OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 28 }
-stormMgt            OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 33 }
-sysResourceMgt      OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 39 }
-mvrMgt              OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 44 }
-dhcpSnoopMgt        OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 46 }
-clusterMgt          OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 47 }
-ipSrcGuardMgt       OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 48 }
-oamMgt              OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 52 }
-mldSnoopMgt         OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 54 }
-dynamicArpInspectionMgt    OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 56 }
-pppoeiaMgt          OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 60 }
-timeRangeMgt        OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 61 }
-erpsMgt             OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 62 }
-lbdMgt              OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 63 }
-mvr6Mgt             OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 66 }
-ipv6RaGuardMgt      OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 67 }
-udldMgt             OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 69 }
-dhcpv6SnoopMgt      OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 71 }
-ip6SrcGuardMgt      OBJECT IDENTIFIER ::= { ecs4110-52pMIBObjects 74 }
+switchMgt           OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 1 }
+portMgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 2 }
+trunkMgt            OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 3 }
+lacpMgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 4 }
+staMgt              OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 5 }
+restartMgt          OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 7 }
+mirrorMgt           OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 8 }
+igmpSnoopMgt        OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 9 }
+ipMgt               OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 10 }
+vlanMgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 12 }
+priorityMgt         OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 13 }
+trapDestMgt         OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 14 }
+qosMgt              OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 16 }
+securityMgt         OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 17 }
+sysLogMgt           OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 19 }
+lineMgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 20 }
+sysTimeMgt          OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 23 }
+fileMgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 24 }
+dnsMgt              OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 26 }
+poeMgt              OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 28 }
+stormMgt            OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 33 }
+sysResourceMgt      OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 39 }
+mvrMgt              OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 44 }
+dhcpSnoopMgt        OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 46 }
+clusterMgt          OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 47 }
+ipSrcGuardMgt       OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 48 }
+oamMgt              OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 52 }
+mldSnoopMgt         OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 54 }
+dynamicArpInspectionMgt    OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 56 }
+pppoeiaMgt          OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 60 }
+erpsMgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 62 }
+lbdMgt              OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 63 }
+mvr6Mgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 66 }
+ipv6RaGuardMgt      OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 67 }
+udldMgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 69 }
+dhcpv6SnoopMgt      OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 71 }
+ip6SrcGuardMgt      OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 74 }
 
 
 --
 -- Product sysObjectID values
 --
 
-ecs4110-52t    OBJECT IDENTIFIER ::= { ecs4110-52pMIB 101 }
-ecs4110-52p    OBJECT IDENTIFIER ::= { ecs4110-52pMIB 102 }
-ecs4110-28t    OBJECT IDENTIFIER ::= { ecs4110-52pMIB 103 }
-ecs4110-28p    OBJECT IDENTIFIER ::= { ecs4110-52pMIB 104 }
+ecs4110-52t    OBJECT IDENTIFIER ::= { ecs4110-MIB 101 }
+ecs4110-52p    OBJECT IDENTIFIER ::= { ecs4110-MIB 102 }
+ecs4110-28t    OBJECT IDENTIFIER ::= { ecs4110-MIB 103 }
+ecs4110-28p    OBJECT IDENTIFIER ::= { ecs4110-MIB 104 }
 
 -- -------------------------------------------------------------
 -- Textual Conventions
@@ -5769,7 +5768,7 @@ vlanPortMode OBJECT-TYPE
                     Setting it to access(3) sets an access link."
         ::= { vlanPortEntry 2 }
 
---¡@SYS_CPNT_COMMUNITY_PRIVATE_VLAN¡@(use PVLAN_MGR API) start
+--ï¿½@SYS_CPNT_COMMUNITY_PRIVATE_VLANï¿½@(use PVLAN_MGR API) start
 vlanPortPrivateVlanType OBJECT-TYPE
         SYNTAX     INTEGER
                    {
@@ -18128,327 +18127,6 @@ pppoeiaPortStatsClearAction OBJECT-TYPE
                      The value noClear(2) will always be displayed when reading."
         ::= { pppoeiaPortStatsEntry 11 }
 
---
--- time range
---
-
-timeRangeTable OBJECT-TYPE
-        SYNTAX      SEQUENCE OF TimeRangeEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Table for time range."
-        ::= { timeRangeMgt 1 }
-
-timeRangeEntry OBJECT-TYPE
-        SYNTAX      TimeRangeEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Entry for time range."
-        INDEX       { timeRangeIndex }
-        ::= { timeRangeTable 1 }
-
-TimeRangeEntry ::= SEQUENCE
-{
-        timeRangeIndex         Integer32,
-        timeRangeName          DisplayString,
-        timeRangeStatus        ValidStatus
-}
-
-timeRangeIndex OBJECT-TYPE
-        SYNTAX       Integer32
-        MAX-ACCESS   read-only
-        STATUS       current
-        DESCRIPTION "The index of time range entry."
-        ::= { timeRangeEntry 1 }
-
-timeRangeName OBJECT-TYPE
-        SYNTAX       DisplayString (SIZE (1..32))
-        MAX-ACCESS   read-write
-        STATUS       current
-        DESCRIPTION "The name of time range entry."
-        ::= { timeRangeEntry 2 }
-
-timeRangeStatus OBJECT-TYPE
-        SYNTAX       ValidStatus
-        MAX-ACCESS   read-create
-        STATUS       current
-        DESCRIPTION "Setting this to valid(1) creates an entry.
-                     Setting this to invalid(2) destroys an entry."
-        ::= { timeRangeEntry 3 }
-
-timeRangePeriodicTable OBJECT-TYPE
-        SYNTAX      SEQUENCE OF TimeRangePeriodicEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Table for periodic time-range entries."
-        ::= { timeRangeMgt 2 }
-
-timeRangePeriodicEntry OBJECT-TYPE
-        SYNTAX      TimeRangePeriodicEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Entry for periodic time-range."
-        INDEX       {
-                      timeRangePeriodicTimeRangeIndex,
-                      timeRangePeriodicStartDaysOfTheWeek,
-                      timeRangePeriodicStartHours,
-                      timeRangePeriodicStartMinutes,
-                      timeRangePeriodicEndDaysOfTheWeek,
-                      timeRangePeriodicEndHours,
-                      timeRangePeriodicEndMinutes
-                    }
-        ::= { timeRangePeriodicTable 1 }
-
-TimeRangePeriodicEntry ::= SEQUENCE
-{
-        timeRangePeriodicTimeRangeIndex       Integer32,
-        timeRangePeriodicStartDaysOfTheWeek   INTEGER,
-        timeRangePeriodicStartHours           Integer32,
-        timeRangePeriodicStartMinutes         Integer32,
-        timeRangePeriodicEndDaysOfTheWeek     INTEGER,
-        timeRangePeriodicEndHours             Integer32,
-        timeRangePeriodicEndMinutes           Integer32,
-        timeRangePeriodicStatus               ValidStatus
-}
-
-timeRangePeriodicTimeRangeIndex OBJECT-TYPE
-        SYNTAX       Integer32
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "The index of time range. The object
-                     should exist in timeRangeIndex of timeRangeTable."
-        ::= { timeRangePeriodicEntry 1 }
-
-timeRangePeriodicStartDaysOfTheWeek OBJECT-TYPE
-        SYNTAX       INTEGER
-                     {
-                        sunday(0),
-                        monday(1),
-                        tuesday(2),
-                        wednesday(3),
-                        thursday(4),
-                        friday(5),
-                        saturday(6),
-                        daily(7),
-                        weekdays(8),
-                        weekend(9)
-                     }
-        MAX-ACCESS   read-create
-        STATUS       current
-        DESCRIPTION "Specifies the start days-of-the-week of the periodic time-range entry.
-                     1. If the start days-of-the-week is set to Sunday, Monday¡K or Saturday
-                        then the end days-of-the-week shall be set to Sunday, Monday¡K, or Saturday.
-                        1-1. If the start time is equal to the end time (for example: 09:00 - 09:00),
-                             it means that the rule is active in the whole day.
-                        1-2. If the end time is prior to the start time (for example: 05:00 - 01:00),
-                             it means that the rule is inactive from 01:01 to 04:59.
-                     2. If the start days-of-the-week is set to Daily, Weekdays, or Weekend,
-                        then the end days-of-the-week shall be set the same as start,
-                        and the start time shall be before the end time."
-        ::= { timeRangePeriodicEntry 2 }
-
-timeRangePeriodicStartHours OBJECT-TYPE
-        SYNTAX       Integer32(0..23)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the start hours of the periodic time-range entry."
-        ::= { timeRangePeriodicEntry 3 }
-
-timeRangePeriodicStartMinutes OBJECT-TYPE
-        SYNTAX       Integer32(0..59)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the start minutess of the periodic time-range entry."
-        ::= { timeRangePeriodicEntry 4 }
-
-timeRangePeriodicEndDaysOfTheWeek OBJECT-TYPE
-        SYNTAX       INTEGER
-                     {
-                        sunday(0),
-                        monday(1),
-                        tuesday(2),
-                        wednesday(3),
-                        thursday(4),
-                        friday(5),
-                        saturday(6),
-                        daily(7),
-                        weekdays(8),
-                        weekend(9)
-                     }
-        MAX-ACCESS   read-create
-        STATUS       current
-        DESCRIPTION "Specifies the end days-of-the-week of the periodic time-range entry.
-                     1. If the start days-of-the-week is set to Sunday, Monday¡K or Saturday
-                        then the end days-of-the-week shall be set to Sunday, Monday¡K, or Saturday.
-                        1-1. If the start time is equal to the end time (for example: 09:00 - 09:00),
-                             it means that the rule is active in the whole day.
-                        1-2. If the end time is prior to the start time (for example: 05:00 - 01:00),
-                             it means that the rule is inactive from 01:01 to 04:59.
-                     2. If the start days-of-the-week is set to Daily, Weekdays, or Weekend,
-                        then the end days-of-the-week shall be set the same as start,
-                        and the start time shall be before the end time."
-        ::= { timeRangePeriodicEntry 5 }
-
-timeRangePeriodicEndHours OBJECT-TYPE
-        SYNTAX       Integer32(0..23)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the end hours of the periodic time-range entry."
-        ::= { timeRangePeriodicEntry 6 }
-
-timeRangePeriodicEndMinutes OBJECT-TYPE
-        SYNTAX       Integer32(0..59)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the end minutess of the periodic time-range entry."
-        ::= { timeRangePeriodicEntry 7 }
-
-timeRangePeriodicStatus OBJECT-TYPE
-        SYNTAX       ValidStatus
-        MAX-ACCESS   read-create
-        STATUS       current
-        DESCRIPTION "Setting this to valid(1) creates an periodic entry.
-                     Setting this to invalid(2) destroys an periodic entry."
-        ::= { timeRangePeriodicEntry 8 }
-
-timeRangeAbsoluteTable OBJECT-TYPE
-        SYNTAX      SEQUENCE OF TimeRangeAbsoluteEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Table for absolute time-range entries."
-        ::= { timeRangeMgt 3 }
-
-timeRangeAbsoluteEntry OBJECT-TYPE
-        SYNTAX      TimeRangeAbsoluteEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Entry for absolute time-range."
-        INDEX       {
-                      timeRangeAbsoluteTimeRangeIndex,
-                      timeRangeAbsoluteStartYears,
-                      timeRangeAbsoluteStartMonths,
-                      timeRangeAbsoluteStartDays,
-                      timeRangeAbsoluteStartHours,
-                      timeRangeAbsoluteStartMinutes,
-                      timeRangeAbsoluteEndYears,
-                      timeRangeAbsoluteEndMonths,
-                      timeRangeAbsoluteEndDays,
-                      timeRangeAbsoluteEndHours,
-                      timeRangeAbsoluteEndMinutes
-                    }
-        ::= { timeRangeAbsoluteTable 1 }
-
-TimeRangeAbsoluteEntry ::= SEQUENCE
-{
-        timeRangeAbsoluteTimeRangeIndex       Integer32,
-        timeRangeAbsoluteStartYears           Integer32,
-        timeRangeAbsoluteStartMonths          Integer32,
-        timeRangeAbsoluteStartDays            Integer32,
-        timeRangeAbsoluteStartHours           Integer32,
-        timeRangeAbsoluteStartMinutes         Integer32,
-        timeRangeAbsoluteEndYears             Integer32,
-        timeRangeAbsoluteEndMonths            Integer32,
-        timeRangeAbsoluteEndDays              Integer32,
-        timeRangeAbsoluteEndHours             Integer32,
-        timeRangeAbsoluteEndMinutes           Integer32,
-        timeRangeAbsoluteStatus               ValidStatus
-}
-
-timeRangeAbsoluteTimeRangeIndex OBJECT-TYPE
-        SYNTAX       Integer32
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "The index of time range. The object
-                     should exist in timeRangeIndex of timeRangeTable."
-        ::= { timeRangeAbsoluteEntry 1 }
-
-timeRangeAbsoluteStartYears OBJECT-TYPE
-        SYNTAX       Integer32(2013..2037,65535)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the start years of the absolute time-range entry.
-                     65535 means don't care."
-        ::= { timeRangeAbsoluteEntry 2 }
-
-timeRangeAbsoluteStartMonths OBJECT-TYPE
-        SYNTAX       Integer32(1..12,255)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the start months of the absolute time-range entry.
-                     255 means don't care."
-        ::= { timeRangeAbsoluteEntry 3 }
-
-timeRangeAbsoluteStartDays OBJECT-TYPE
-        SYNTAX       Integer32(1..31,255)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the start days of the absolute time-range entry.
-                     255 means don't care."
-        ::= { timeRangeAbsoluteEntry 4 }
-
-timeRangeAbsoluteStartHours OBJECT-TYPE
-        SYNTAX       Integer32(0..23,255)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the start hours of the absolute time-range entry.\
-                     255 means don't care."
-        ::= { timeRangeAbsoluteEntry 5 }
-
-timeRangeAbsoluteStartMinutes OBJECT-TYPE
-        SYNTAX       Integer32(0..59,255)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the start minutes of the absolute time-range entry.\
-                     255 means don't care."
-        ::= { timeRangeAbsoluteEntry 6 }
-
-timeRangeAbsoluteEndYears OBJECT-TYPE
-        SYNTAX       Integer32(2013..2037,65535)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the end years of the absolute time-range entry.
-                     65535 means don't care."
-        ::= { timeRangeAbsoluteEntry 7 }
-
-timeRangeAbsoluteEndMonths OBJECT-TYPE
-        SYNTAX       Integer32(1..12,255)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the end months of the absolute time-range entry.
-                     255 means don't care."
-        ::= { timeRangeAbsoluteEntry 8 }
-
-timeRangeAbsoluteEndDays OBJECT-TYPE
-        SYNTAX       Integer32(1..31,255)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the end days of the absolute time-range entry.
-                     255 means don't care."
-        ::= { timeRangeAbsoluteEntry 9 }
-
-timeRangeAbsoluteEndHours OBJECT-TYPE
-        SYNTAX       Integer32(0..23,255)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the end hours of the absolute time-range entry.\
-                     255 means don't care."
-        ::= { timeRangeAbsoluteEntry 10 }
-
-timeRangeAbsoluteEndMinutes OBJECT-TYPE
-        SYNTAX       Integer32(0..59,255)
-        MAX-ACCESS   not-accessible
-        STATUS       current
-        DESCRIPTION "Specifies the end minutes of the absolute time-range entry.\
-                     255 means don't care."
-        ::= { timeRangeAbsoluteEntry 11 }
-
-timeRangeAbsoluteStatus OBJECT-TYPE
-        SYNTAX       ValidStatus
-        MAX-ACCESS   read-create
-        STATUS       current
-        DESCRIPTION "Setting this to valid(1) creates an absolute entry.
-                     Setting this to invalid(2) destroys an absolute entry."
-        ::= { timeRangeAbsoluteEntry 12 }
 
 --
 -- erpsMgt
@@ -21110,28 +20788,28 @@ ip6SrcGuardBindingStatus                OBJECT-TYPE
 -- trap definitions
 --
 
-ecs4110-52pTraps  OBJECT IDENTIFIER ::= { ecs4110-52pNotifications  1 }
-ecs4110-52pTrapsPrefix OBJECT IDENTIFIER ::= { ecs4110-52pTraps 0 }
+ecs4110-Traps  OBJECT IDENTIFIER ::= { ecs4110-Notifications  1 }
+ecs4110-TrapsPrefix OBJECT IDENTIFIER ::= { ecs4110-Traps 0 }
 
 swPowerStatusChangeTrap NOTIFICATION-TYPE
         OBJECTS     { swIndivPowerUnitIndex, swIndivPowerIndex, swIndivPowerStatus }
         STATUS      current
         DESCRIPTION "This trap is sent when the power state changes."
-        ::= { ecs4110-52pTrapsPrefix 1 }
+        ::= { ecs4110-TrapsPrefix 1 }
 
 swPortSecurityTrap NOTIFICATION-TYPE
         OBJECTS       { ifIndex }
         STATUS        current
         DESCRIPTION "This trap is sent when the port is being intruded. This trap
                      will only be sent when the portSecActionTrap is enabled."
-        ::= { ecs4110-52pTrapsPrefix 36 }
+        ::= { ecs4110-TrapsPrefix 36 }
 
 swIpFilterRejectTrap NOTIFICATION-TYPE
         OBJECTS     { trapIpFilterRejectMode, trapIpFilterRejectIp }
         STATUS      current
         DESCRIPTION "This trap is sent when an incorrect IP address is rejected by
                        the ipfilter."
-        ::= { ecs4110-52pTrapsPrefix 40 }
+        ::= { ecs4110-TrapsPrefix 40 }
 
 --poe traps start
 pethPsePortOnOffNotification NOTIFICATION-TYPE
@@ -21140,7 +20818,7 @@ pethPsePortOnOffNotification NOTIFICATION-TYPE
         DESCRIPTION
                 " This Notification indicates if a Pse Port is delivering power to the PD. This notification SHOULD be sent on
                    every status change except in searching mode."
-        ::= { ecs4110-52pTrapsPrefix 43 }
+        ::= { ecs4110-TrapsPrefix 43 }
 
 pethPsePortPowerMaintenanceStatusNotification NOTIFICATION-TYPE
         OBJECTS     { pethPsePortPowerMaintenanceStatus  }
@@ -21148,7 +20826,7 @@ pethPsePortPowerMaintenanceStatusNotification NOTIFICATION-TYPE
         DESCRIPTION
               " This Notification indicates a Port Change Status and
                     SHOULD be sent on every status change."
-        ::= { ecs4110-52pTrapsPrefix 44 }
+        ::= { ecs4110-TrapsPrefix 44 }
 
 
 pethMainPowerUsageOnNotification NOTIFICATION-TYPE
@@ -21157,7 +20835,7 @@ pethMainPowerUsageOnNotification NOTIFICATION-TYPE
         DESCRIPTION
               " This Notification indicates PSE Threshold usage indication is
                    on; the power usage is above the threshold."
-        ::= { ecs4110-52pTrapsPrefix 45 }
+        ::= { ecs4110-TrapsPrefix 45 }
 
 pethMainPowerUsageOffNotification NOTIFICATION-TYPE
         OBJECTS     { pethMainPseConsumptionPower }
@@ -21165,7 +20843,7 @@ pethMainPowerUsageOffNotification NOTIFICATION-TYPE
         DESCRIPTION
               " This Notification indicates that the PSE Threshold usage indication
                  is off; the usage power is below the threshold."
-        ::= { ecs4110-52pTrapsPrefix 46 }
+        ::= { ecs4110-TrapsPrefix 46 }
 --poe traps end
 
 
@@ -21183,7 +20861,7 @@ swAtcBcastStormAlarmFireTrap NOTIFICATION-TYPE
         DESCRIPTION
             "When the broadcast traffic is detected as the storm, this trap
              will be fired."
-        ::= { ecs4110-52pTrapsPrefix 70 }
+        ::= { ecs4110-TrapsPrefix 70 }
 
 swAtcBcastStormAlarmClearTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21196,7 +20874,7 @@ swAtcBcastStormAlarmClearTrap NOTIFICATION-TYPE
         DESCRIPTION
             "When the broadcast storm is detected as the normal traffic, this
              trap will be fired."
-        ::= { ecs4110-52pTrapsPrefix 71 }
+        ::= { ecs4110-TrapsPrefix 71 }
 
 swAtcBcastStormTcApplyTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21209,7 +20887,7 @@ swAtcBcastStormTcApplyTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is activated, this trap will be fired."
-        ::= { ecs4110-52pTrapsPrefix 72 }
+        ::= { ecs4110-TrapsPrefix 72 }
 
 swAtcBcastStormTcReleaseTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21222,7 +20900,7 @@ swAtcBcastStormTcReleaseTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is released, this trap will be fired."
-        ::= { ecs4110-52pTrapsPrefix 73 }
+        ::= { ecs4110-TrapsPrefix 73 }
 
 swAtcMcastStormAlarmFireTrap      NOTIFICATION-TYPE
         OBJECTS     {
@@ -21235,7 +20913,7 @@ swAtcMcastStormAlarmFireTrap      NOTIFICATION-TYPE
         DESCRIPTION
             "When the multicast traffic is detected as the storm, this trap
              will be fired."
-        ::= { ecs4110-52pTrapsPrefix 74 }
+        ::= { ecs4110-TrapsPrefix 74 }
 
 swAtcMcastStormAlarmClearTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21248,7 +20926,7 @@ swAtcMcastStormAlarmClearTrap NOTIFICATION-TYPE
         DESCRIPTION
             "When the multicast storm is detected as the normal traffic, this
              trap will be fired."
-        ::= { ecs4110-52pTrapsPrefix 75 }
+        ::= { ecs4110-TrapsPrefix 75 }
 
 swAtcMcastStormTcApplyTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21261,7 +20939,7 @@ swAtcMcastStormTcApplyTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is activated, this trap will be fired."
-        ::= { ecs4110-52pTrapsPrefix 76 }
+        ::= { ecs4110-TrapsPrefix 76 }
 
 swAtcMcastStormTcReleaseTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21274,20 +20952,20 @@ swAtcMcastStormTcReleaseTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is released, this trap will be fired."
-        ::= { ecs4110-52pTrapsPrefix 77 }
+        ::= { ecs4110-TrapsPrefix 77 }
 
 stpBpduGuardPortShutdownTrap NOTIFICATION-TYPE
         OBJECTS     { ifIndex }
         STATUS   current
         DESCRIPTION "This trap will be sent when an interface is shut down
                      because of BPDU guard."
-        ::= { ecs4110-52pTrapsPrefix 91 }
+        ::= { ecs4110-TrapsPrefix 91 }
 
 swLoopbackDetectionTrap NOTIFICATION-TYPE
         OBJECTS     { staLoopbackDetectionPortIfIndex }
         STATUS   current
         DESCRIPTION "This trap will be sent when loopback BPDUs have been detected."
-        ::= { ecs4110-52pTrapsPrefix 95 }
+        ::= { ecs4110-TrapsPrefix 95 }
 
 networkAccessPortLinkDetectionTrap    NOTIFICATION-TYPE
         OBJECTS     {
@@ -21299,7 +20977,7 @@ networkAccessPortLinkDetectionTrap    NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when a networkAccessPortLinkDetection
                      event is triggered."
-        ::= { ecs4110-52pTrapsPrefix 96 }
+        ::= { ecs4110-TrapsPrefix 96 }
 
 dot1agCfmMepUpTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21307,7 +20985,7 @@ dot1agCfmMepUpTrap NOTIFICATION-TYPE
                     }
         STATUS      current
         DESCRIPTION "This trap is sent when a new remote MEP is discovered."
-        ::= { ecs4110-52pTrapsPrefix 97 }
+        ::= { ecs4110-TrapsPrefix 97 }
 
 dot1agCfmMepDownTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21316,7 +20994,7 @@ dot1agCfmMepDownTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when port status or interface status TLV
                      received from remote MEP indicates it is not up."
-        ::= { ecs4110-52pTrapsPrefix 98 }
+        ::= { ecs4110-TrapsPrefix 98 }
 
 dot1agCfmConfigFailTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21325,7 +21003,7 @@ dot1agCfmConfigFailTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when a MEP receives a CCM with MPID
                      which already exists on the same MA in this switch."
-        ::= { ecs4110-52pTrapsPrefix 99 }
+        ::= { ecs4110-TrapsPrefix 99 }
 
 dot1agCfmLoopFindTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21333,7 +21011,7 @@ dot1agCfmLoopFindTrap NOTIFICATION-TYPE
                     }
         STATUS      current
         DESCRIPTION "This trap is sent when a MEP receives its own CCMs."
-        ::= { ecs4110-52pTrapsPrefix 100 }
+        ::= { ecs4110-TrapsPrefix 100 }
 
 dot1agCfmMepUnknownTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21342,7 +21020,7 @@ dot1agCfmMepUnknownTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when a CCM is received from
                      an unexpected MEP."
-        ::= { ecs4110-52pTrapsPrefix 101 }
+        ::= { ecs4110-TrapsPrefix 101 }
 
 dot1agCfmMepMissingTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21351,7 +21029,7 @@ dot1agCfmMepMissingTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when the cross-check enable timer expires
                      and no CCMs were received from an expected (configured) MEP."
-        ::= { ecs4110-52pTrapsPrefix 102 }
+        ::= { ecs4110-TrapsPrefix 102 }
 
 dot1agCfmMaUpTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21359,7 +21037,7 @@ dot1agCfmMaUpTrap NOTIFICATION-TYPE
                     }
         STATUS      current
         DESCRIPTION "This trap is sent when all expected remote MEPs are up."
-        ::= { ecs4110-52pTrapsPrefix 103 }
+        ::= { ecs4110-TrapsPrefix 103 }
 
 autoUpgradeTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21369,35 +21047,35 @@ autoUpgradeTrap NOTIFICATION-TYPE
                     }
         STATUS      current
         DESCRIPTION "This trap is sent when auto upgrade is executed."
-        ::= { ecs4110-52pTrapsPrefix 104 }
+        ::= { ecs4110-TrapsPrefix 104 }
 
 swCpuUtiRisingNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the CPU utilization has risen
                from cpuUtiFallingThreshold to cpuUtiRisingThreshold."
-        ::= { ecs4110-52pTrapsPrefix 107 }
+        ::= { ecs4110-TrapsPrefix 107 }
 
 swCpuUtiFallingNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the CPU utilization has fallen
                from cpuUtiRisingThreshold to cpuUtiFallingThreshold."
-        ::= { ecs4110-52pTrapsPrefix 108 }
+        ::= { ecs4110-TrapsPrefix 108 }
 
 swMemoryUtiRisingThresholdNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the memory utilization has risen
                from memoryUtiFallingThreshold to memoryUtiRisingThreshold."
-        ::= { ecs4110-52pTrapsPrefix 109 }
+        ::= { ecs4110-TrapsPrefix 109 }
 
 swMemoryUtiFallingThresholdNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the memory utilization has fallen
                from memoryUtiRisingThreshold to memoryUtiFallingThreshold."
-        ::= { ecs4110-52pTrapsPrefix 110 }
+        ::= { ecs4110-TrapsPrefix 110 }
 
 dhcpRogueServerAttackTrap NOTIFICATION-TYPE
         OBJECTS
@@ -21409,7 +21087,7 @@ dhcpRogueServerAttackTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when receiving a DHCP packet from a
                     rogue server."
-        ::= { ecs4110-52pTrapsPrefix 114 }
+        ::= { ecs4110-TrapsPrefix 114 }
 
 macNotificationTrap NOTIFICATION-TYPE
         OBJECTS
@@ -21422,7 +21100,7 @@ macNotificationTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when there are changes of the
                      dynamic MAC addresses on the switch."
-        ::= { ecs4110-52pTrapsPrefix 138 }
+        ::= { ecs4110-TrapsPrefix 138 }
 
 lbdDetectionTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21432,7 +21110,7 @@ lbdDetectionTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when a loopback condition is detected
                      by LBD."
-        ::= { ecs4110-52pTrapsPrefix 141 }
+        ::= { ecs4110-TrapsPrefix 141 }
 
 lbdRecoveryTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -21440,7 +21118,7 @@ lbdRecoveryTrap NOTIFICATION-TYPE
                     }
         STATUS      current
         DESCRIPTION "This trap is sent when a recovery is done by LBD."
-        ::= { ecs4110-52pTrapsPrefix 142 }
+        ::= { ecs4110-TrapsPrefix 142 }
 
 sfpThresholdAlarmWarnTrap NOTIFICATION-TYPE
         OBJECTS
@@ -21451,7 +21129,7 @@ sfpThresholdAlarmWarnTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
           "This trap is sent when the sfp's A/D quantity is not within alarm/warning thresholds."
-        ::= { ecs4110-52pTrapsPrefix 189 }
+        ::= { ecs4110-TrapsPrefix 189 }
 
 udldPortShutdownTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -21460,7 +21138,7 @@ udldPortShutdownTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when the port is shut down by UDLD."
-    ::= { ecs4110-52pTrapsPrefix 192 }
+    ::= { ecs4110-TrapsPrefix 192 }
 
 userAuthenticationFailureTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -21471,7 +21149,7 @@ userAuthenticationFailureTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap will be triggered if authentication is fail."
-    ::= { ecs4110-52pTrapsPrefix 199 }
+    ::= { ecs4110-TrapsPrefix 199 }
 
 userAuthenticationSuccessTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -21482,7 +21160,7 @@ userAuthenticationSuccessTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap will be triggered if authentication is successful."
-    ::= { ecs4110-52pTrapsPrefix 200 }
+    ::= { ecs4110-TrapsPrefix 200 }
 
 loginTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -21493,7 +21171,7 @@ loginTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when user login."
-    ::= { ecs4110-52pTrapsPrefix 201 }
+    ::= { ecs4110-TrapsPrefix 201 }
 
 logoutTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -21504,7 +21182,7 @@ logoutTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when user logout."
-    ::= { ecs4110-52pTrapsPrefix 202 }
+    ::= { ecs4110-TrapsPrefix 202 }
 
 fileCopyTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -21528,7 +21206,7 @@ fileCopyTrap NOTIFICATION-TYPE
                  the login user information(trapVarLoginUserName/
                  trapVarSessionType/trapVarLoginInetAddressTypes/
                  trapVarLoginInetAddres) will be null value."
-    ::= { ecs4110-52pTrapsPrefix 208 }
+    ::= { ecs4110-TrapsPrefix 208 }
 
 userauthCreateUserTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -21536,7 +21214,7 @@ userauthCreateUserTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when create user account."
-    ::= { ecs4110-52pTrapsPrefix 209 }
+    ::= { ecs4110-TrapsPrefix 209 }
 
 userauthDeleteUserTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -21544,7 +21222,7 @@ userauthDeleteUserTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when delete user account."
-    ::= { ecs4110-52pTrapsPrefix 210 }
+    ::= { ecs4110-TrapsPrefix 210 }
 
 userauthModifyUserPrivilegeTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -21553,19 +21231,19 @@ userauthModifyUserPrivilegeTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when modify user privilege."
-    ::= { ecs4110-52pTrapsPrefix 211 }
+    ::= { ecs4110-TrapsPrefix 211 }
 
 cpuGuardControlTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when CPU utilization
                  rises above the high-watermark first time or when CPU utilization
                  rises from below the low-watermark to above the high-watermark."
-    ::= { ecs4110-52pTrapsPrefix 213 }
+    ::= { ecs4110-TrapsPrefix 213 }
 
 cpuGuardReleaseTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when CPU utilization falls from
                  above the high-watermark to below the low-watermark."
-    ::= { ecs4110-52pTrapsPrefix 214 }
+    ::= { ecs4110-TrapsPrefix 214 }
 
 END
