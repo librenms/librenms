@@ -25,6 +25,7 @@
 $config['project_name'] = 'LibreNMS';
 $config['project_id']   = strtolower($config['project_name']);
 
+$config['temp_dir']    = '/tmp';
 $config['log_dir']     = $config['install_dir'].'/logs';
 
 // MySQL Debug level
