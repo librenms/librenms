@@ -1001,7 +1001,7 @@ function add_edit_rule(\Illuminate\Http\Request $request)
         if ($device == "-1") {
             continue;
         }
-        $devices[] = ctype_digit($device) ? $device : getidbyname($device);
+        $devices[] = (ctype_digit($device) || is_int($device)) ? $device : getidbyname($device);
     }
 
     if (isset($data['builder'])) {
