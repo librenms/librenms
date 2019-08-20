@@ -434,6 +434,10 @@ $config['graph_types']['device']['cisco-iospri']['section']  = 'voice';
 $config['graph_types']['device']['cisco-iospri']['order']    = '0';
 $config['graph_types']['device']['cisco-iospri']['descr']    = 'PRI Utilisation';
 
+$config['graph_types']['device']['cisco-voice-ip']['section']  = 'voice';
+$config['graph_types']['device']['cisco-voice-ip']['order']    = '0';
+$config['graph_types']['device']['cisco-voice-ip']['descr']    = 'IP Real Time Calls';
+
 $config['graph_types']['device']['cisco-iosdsp']['section']  = 'voice';
 $config['graph_types']['device']['cisco-iosdsp']['order']    = '0';
 $config['graph_types']['device']['cisco-iosdsp']['descr']    = 'DSP Utilisation';
