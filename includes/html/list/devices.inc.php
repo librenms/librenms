@@ -58,7 +58,7 @@ if (!empty($_REQUEST['limit'])) {
     $offset = 0;
 }
 
-$sql = "SELECT `device_id`, `hostname`, `sysName` FROM `devices` $query order by `hostname`";
+$sql = "SELECT `device_id`, `hostname`, `sysName` FROM `devices` $query";
 $devices = array_map(function ($device) {
     return [
         'id' => $device['device_id'],
@@ -67,5 +67,7 @@ $devices = array_map(function ($device) {
 }, dbFetchRows($sql, $params));
 
 $more = ($offset + count($devices)) < $total;
+
+array_multisort(array_column($devices, 'text'), SORT_ASC, $devices);
 
 return [$devices, $more];
