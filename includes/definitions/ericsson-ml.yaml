@@ -1,5 +1,5 @@
-os: ericsson
-text: 'Ericsson'
+os: ericsson-ml
+text: 'Ericsson MINI-LINK'
 type: wireless
 empty_ifdescr: true
 icon: ericsson

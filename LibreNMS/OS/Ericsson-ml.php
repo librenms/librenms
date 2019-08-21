@@ -1,8 +1,8 @@
 <?php
 /**
- * Ray.php
+ * Ericsson-ml.php
  *
- * Racom.eu
+ * 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
-class Ericsson extends OS implements
+class Ericsson-ml extends OS implements
     ProcessorDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
