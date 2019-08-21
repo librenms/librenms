@@ -1,0 +1,135 @@
+PT-MONITOR-MIB DEFINITIONS::=BEGIN
+	IMPORTS	
+		MODULE-IDENTITY,OBJECT-TYPE,Integer32
+			FROM SNMPv2-SMI
+		  pt FROM PT-MIB
+		  MODULE-COMPLIANCE,
+      OBJECT-GROUP FROM SNMPv2-CONF
+     TEXTUAL-CONVENTION FROM SNMPv2-TC;
+	
+	    ptMonitor MODULE-IDENTITY
+        LAST-UPDATED "201603091230Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB of PT specifics"
+                
+        REVISION      "201603091230Z"
+        DESCRIPTION
+            "Validated."    
+            
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "The initial version of this MIB module."
+
+        ::= { pt 4 }
+        
+        ptMonitorConformance OBJECT IDENTIFIER ::= { ptMonitor 2 }
+ 
+--
+-- The textual conventions we define and use in this MIB.
+-- 
+    HealthStatusTC ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"hw status."
+	SYNTAX     INTEGER {
+		eOK       (1),
+		eNOTOK    (2),
+		eUNKNOWN  (3)
+	}
+	
+---
+---The HW Diagnostic Group definition
+---	    
+
+---
+---hw diagnostic table definition
+---
+	hwDiagnosticsTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwDiagnosticsEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "A list of interface entries.  The number of entries is
+            given by the value of ExampleNumber."
+    		::= { ptMonitor 1 }
+
+	hwDiagnosticsEntry OBJECT-TYPE
+    		SYNTAX      HwDiagnosticsEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."
+    		INDEX   { hwIndex }
+    		::= { hwDiagnosticsTable 1 }
+ 
+	HwDiagnosticsEntry ::=
+		    SEQUENCE {
+        			hwIndex                     Integer32,
+        			temperatureStatus           OCTET STRING,
+        			healthStatus        	    HealthStatusTC		
+		    }      
+ 
+	hwIndex OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible 
+	       STATUS      current
+    		DESCRIPTION
+            "a unique index for hw that we diagnose, here it is the slotId"
+    	     ::= { hwDiagnosticsEntry 1 }
+    	     
+	temperatureStatus OBJECT-TYPE
+    	   SYNTAX      OCTET STRING (SIZE (0..80))
+    	   MAX-ACCESS  read-only
+    	   STATUS      current
+    	   DESCRIPTION
+            "The temperature in degree Celsius."
+    	     ::= { hwDiagnosticsEntry 2 } 
+  		
+	healthStatus OBJECT-TYPE
+    	   SYNTAX      HealthStatusTC
+    	   MAX-ACCESS  read-only
+    	   STATUS      current
+    	   DESCRIPTION
+            "This is the hw running status, it has the following value:
+	     eOK       (1),
+	     eNOT_OK   (2),
+	     eUNKNOWN  (3)            
+            "
+    	     ::= { hwDiagnosticsEntry 3 } 
+    	     
+    	     
+--
+-- Conformance
+--
+
+    ptMonitorCompliances OBJECT IDENTIFIER ::= { ptMonitorConformance 1 }
+    ptMonitorGroups      OBJECT IDENTIFIER ::= { ptMonitorConformance 2 }
+
+    ptMonitorFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptMonitorCompleteGroup}
+        ::= { ptMonitorCompliances 1 }
+
+    ptMonitorCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+              temperatureStatus,
+              healthStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptMonitorGroups 1 }
+            	      
+END
+
