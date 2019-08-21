@@ -1,0 +1,4919 @@
+MINI-LINK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        enterprises              FROM SNMPv2-SMI;
+     
+     
+    miniLink MODULE-IDENTITY
+        LAST-UPDATED "201603091230Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the top MIB for Ericsson MINI-LINK"
+        REVISION      "201603091230Z"
+
+        DESCRIPTION
+            "Validated."
+
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "The initial version of this MIB module
+                            with OID for mini link types."
+
+        ::= { ericsson 223 }
+
+
+    -- *************
+    -- * MINI LINK *
+    -- *************
+    ericsson OBJECT IDENTIFIER ::= { enterprises 193 }    
+ 
+
+END
+PT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP    FROM SNMPv2-CONF
+        miniLink       FROM MINI-LINK-MIB;
+        
+    pt MODULE-IDENTITY
+        LAST-UPDATED "201701211200Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB of PT specifics.
+            The entPhysical and ifIndex used are based on the MOC below:
+            IP_INTERFACE_MOC  10000
+            LANX_PORT_MOC     20000
+            WANX_PORT_MOC     30000
+            PT_MOC            40000
+            OM_MOC            50000
+            RMM_MOC           60000
+            SFP_MOC           70000
+            WIFI_MOC          80000
+            RJ45_MOC          90000
+            XPIC_MOC         100000
+            CT_MOC           110000
+            RLT_MOC          120000
+        
+            As MOI, slot and port are added according to:
+            Slot no * 100
+            Port no * 1
+            
+            For example an SFP in slot 1 port 3: 70103"
+
+        REVISION      "201701211200Z"
+        DESCRIPTION
+            "MOC and MOI explained."
+
+        REVISION      "201603091200Z"
+        DESCRIPTION
+            "Validated."
+            
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "The initial version of this MIB module."
+
+        ::= { miniLink 2 }
+
+
+    -- ************
+    -- * PT       *     
+    -- ************
+    
+       ptDeviceType OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents type of the PT. Always set to the
+             same value as 'sysObjectID'."
+        ::= { pt 1 }   
+
+--ptTrap    ::= { pt 2 }
+--ptFM      ::= { pt 3 }
+--ptMonitor ::= { pt 4 }
+--ptPM      ::= { pt 5 }
+--ptSFP     ::= { pt 6 }
+--ptRadioLink ::= { pt 7 }
+
+    ptConformance OBJECT IDENTIFIER ::= { pt 8 }  
+    
+--
+-- Conformance
+--
+
+    ptCompliances OBJECT IDENTIFIER ::= { ptConformance 1 }
+    ptGroups      OBJECT IDENTIFIER ::= { ptConformance 2 }
+
+    ptCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptCompleteGroup }
+        ::= { ptCompliances 1 }
+
+    ptCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            ptDeviceType
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptGroups 1 }
+        
+END
+
+
+
+PT-TRAP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        OBJECT-TYPE,
+        Integer32,
+        Counter32                   FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        DisplayString, DateAndTime  FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        NOTIFICATION-GROUP,
+        OBJECT-GROUP                FROM SNMPv2-CONF
+        pt                          FROM PT-MIB;
+
+--
+-- Module identity part.
+--
+
+    ptTrap MODULE-IDENTITY
+        LAST-UPDATED "201711221500Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            " "
+
+        DESCRIPTION
+            "The MIB module describes the enterprise specific traps
+             for PT products."
+
+        REVISION      "201711221500Z"
+        DESCRIPTION
+            "Added alarms under NotificationId and ProbableCause:
+	  	licMissingCriticalFAL* and licMissingMajor*"
+
+
+        REVISION      "201609231200Z"
+        DESCRIPTION
+            "Added alarms:
+            carrierTerminationConfigMismatch (397)
+            wifiIncompatibleHardware (398)
+            icccDown (399)
+            radioLinkTerminalReducedCapacity (400)"
+
+        REVISION      "201603091200Z"
+        DESCRIPTION
+            "Validated"
+
+        REVISION      "201506240800Z"
+        DESCRIPTION
+            "Support for PT trap OIDs."
+
+         ::= { pt 2 }
+
+--
+--PT-TRAP groups.
+--
+
+    ptTraps          OBJECT IDENTIFIER ::= { ptTrap 1 }
+    ptTrapContents   OBJECT IDENTIFIER ::= { ptTrap 2 }
+ --   ptTrapsPrefix    OBJECT IDENTIFIER ::= { ptTrap 0 }
+    ptTrapsConformance OBJECT IDENTIFIER ::= { ptTrap 3 }
+
+
+--
+-- Local data types.
+--
+EventCause ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for event causes."
+    SYNTAX     INTEGER
+    {
+        swdlOk                             (50),
+        loopOpended                        (53),
+        loopClosed                         (54),
+        mcu                                (56),
+        mcd                                (57),
+        rstpNewRoot                        (58),
+        rstpTopologyChange                 (59),
+        rmonRisingThreshold                (60),
+        rmonFallingThreshold               (61),
+        pingCompleted                      (62),
+        modIns                             (63),
+        cdbBackupOk                        (64),
+        cdbRestoreOk                       (65),
+        information                        (66),
+        fileTransferStart                  (67),
+        fileTransferEnd                    (68),
+        modOos                             (70),
+        modOosMaint                        (71),
+        moduleRestart                      (72),
+        moduleShutdown                     (73),
+        slotUnequipped                     (74),
+        emergencyPassword                  (75),
+        cdbEraseLimitedOk                  (77),
+        lkfInstallOk                       (78),
+        lkfRemoveOk                        (79),
+        ccmLoopbackCompletion              (80),
+        ccmLinktraceCompletion             (81),
+        erpProtectionStateChange           (82),
+        portLoopDisabled                   (83),
+        portLoopEnabled                    (84),
+        t0SourceSwitched                   (86),
+        ptpModeSwitch                      (87),
+        cdbEraseOk                         (88),
+        ptpMasterSwitched                  (89),
+        bfdSessionUp                       (90),
+        bfdSessionStateChanged             (91),
+        licInServiceUnlockPeriod           (347),
+        licInUnlockedMode                  (348),
+        deleteUserEvent                    (386),
+        wifiModuleInserted                 (389),
+        wifiModuleRemoved                  (390),
+        spectrumDiagnosticScanStarted      (391),
+        spectrumDiagnosticScanFinished     (392),
+        aaaLocal                           (506),
+        aaaTacacs                          (507),
+        aaaRadius                          (508),
+        deleteNotificationSubscriber       (509),
+        disableNotificationSubscriber      (510),
+        disableNotificationReporting       (511)
+    }
+
+EventType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for event types."
+    SYNTAX     INTEGER
+    {
+        information            (1),
+        warning                (2)
+    }
+
+NotificationId ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for notification ids."
+    SYNTAX     INTEGER
+    {
+        objectCreate                        (  1),
+        objectDelete                        (  2),
+        avc                                 (  3),
+        protectionSwitch                    ( 10),
+        swdlOk                              ( 50),
+        loopOpended                         ( 53),
+        loopClosed                          ( 54),
+        mcu                                 ( 56),
+        mcd                                 ( 57),
+        rstpNewRoot                         ( 58),
+        rstpTopologyChange                  ( 59),
+        rmonRisingThreshold                 ( 60),
+        rmonFallingThreshold                ( 61),
+        pingCompleted                       ( 62),
+        modIns                              ( 63),
+        cdbBackupOk                         ( 64),
+        cdbRestoreOk                        ( 65),
+        information                         ( 66),
+        fileTransferStart                   ( 67),
+        fileTransferEnd                     ( 68),
+        modOos                              ( 70),
+        modOosMaint                         ( 71),
+        moduleRestart                       ( 72),
+        moduleShutdown                      ( 73),
+        slotUnequipped                      ( 74),
+        emergencyPassword                   ( 75),
+        cdbEraseLimitedOk                   ( 77),
+        lkfInstallOk                        ( 78),
+        lkfRemoveOk                         ( 79),
+        ccmLoopbackCompletion               ( 80),
+        ccmLinktraceCompletion              ( 81),
+        erpProtectionStateChange            ( 82),
+        portLoopDisabled                    ( 83),
+        portLoopEnabled                     ( 84),
+        t0SourceSwitched                    ( 86),
+        ptpModeSwitch                       ( 87),
+        cdbEraseOk                          ( 88),
+        ptpMasterSwitched                   ( 89),
+        bfdSessionUp                        ( 90),
+        bfdSessionStateChanged              ( 91),
+        mid                                 (100),
+        linkDown                            (141),
+        alarmInp                            (142),
+        temp                                (154),
+        tempCri                             (155),
+        arc                                 (157),
+        t0HoldOver                          (158),
+        pwrLow                              (162),
+        pwrHigh                             (163),
+        pwrOff                              (164),
+        ifmodMismatch                       (166),
+        ifmodNotProv                        (168),
+        nrMismatch                          (170),
+        ntpUnreachable                      (171),
+        cdbDiskNearFull                     (172),
+        tmpDiskNearFull                     (176),
+        invFailure                          (189),
+        syncAutoLockout                     (191),
+        nrNotCommitted                      (192),
+        acMstTimeout                        (202),
+        rsAckTimeout                        (203),
+        swdlAborted                         (204),
+        cdbRestoreFail                      (207),
+        cdbBackupFail                       (208),
+        fileTransferFail                    (209),
+        swdlFail                            (210),
+        swdlRollbackFail                    (211),
+        standbySWDLFail                     (212),
+        haLogReset                          (213),
+        cdbErased                           (214),
+        nrAutoRollback                      (215),
+        lkgCdbRollback                      (218),
+        hwDiagError                         (219),
+        swError                             (220),
+        oamErrorSymPeriod                   (221),
+        oamErrorFramePeriod                 (222),
+        oamErrorFrame                       (223),
+        oamErrorFrameSecsSummary            (224),
+        oamCritical                         (225),
+        oamDyingGasp                        (226),
+        lkfInstallFail                      (227),
+        lkfRemoveFail                       (228),
+        dhcpError                           (242),
+        hardwareFail                        (252),
+        ifmodFail                           (253),
+        defXconnCCM                         (257),
+        defErrorCCM                         (258),
+        defRemoteCCM                        (259),
+        defMacStatus                        (260),
+        defRDICCM                           (261),
+        y1731DMRttDeg                       (273),
+        y1731DMOneWayDegReverse             (274),
+        y1731DMOneWayDegForward             (275),
+        y1731DMVRttDeg                      (276),
+        y1731DMVOneWayDegReverse            (277),
+        y1731DMVOneWayDegForward            (278),
+        y1731LMFrameLossNearEnd             (279),
+        y1731LMFrameLossFarEnd              (280),
+        syncSourceLossRedundancy            (281),
+        xpicCableDisconnected               (282),
+        ipIfHardwareFail                    (300),
+        arpHardwareFail                     (301),
+        rtTableHardwareFail                 (302),
+        remoteMepHardwareFail               (303),
+        rfInputLow                          (328),
+        rfOutputATPCMaxTooLong              (329),
+        radioLinkConnectionDefect           (330),
+        radioLinkIDMismatch                 (331),
+        radioLinkHardwareDefect             (332),
+        rlts115MinThresholdCrossing         (333),
+        rlts124HourThresholdCrossing        (334),
+        rlts215MinThresholdCrossing         (335),
+        rlts224HourThresholdCrossing        (336),
+        rltm15MinThresholdCrossing          (337),
+        rltm24HourThresholdCrossing         (338),
+        tlts115MinThresholdCrossing         (339),
+        tlts124HourThresholdCrossing        (340),
+        tltm15MinThresholdCrossing          (341),
+        tltm24HourThresholdCrossing         (342),
+        psac15MinThresholdCrossing          (343),
+        psac24HourThresholdCrossing         (344),
+        ams15MinThresholdCrossing           (345),
+        ams24HourThresholdCrossing          (346),
+        licInServiceUnlockPeriod            (347),
+        licInUnlockedMode                   (348),
+        licUnlockPeriodExpired              (349),
+        licMissingCritical                  (350),
+        licMissingMajor                     (351),
+        licMaintenanceUnlockTokenWarning    (352),
+        licMaintenanceUnlockTokenMajor      (353),
+        licEmergencyUnlockTokenWarning      (354),
+        licEmergencyUnlockTokenMajor        (355),
+        licIntegrationUnlockPeriodExpired   (365),
+        licMaintenanceUnlockPeriodExpired   (366),
+        licEmergencyUnlockPeriodExpired     (367),
+        licSystemUnlockPeriodExpired        (368),
+        rmmMissing                          (369),
+        rmmFaulty                           (370),
+        cdbCompressedFileTooLarge           (371),
+        ifModTemperatureTooHigh             (375),
+        ifModTemperatureTooLow              (376),
+        ifModVoltageTooHigh                 (377),
+        ifModVoltageTooLow                  (378),
+        ifModTxBiasTooHigh                  (379),
+        ifModTxBiasTooLow                   (380),
+        ifModTxPowerTooHigh                 (381),
+        ifModTxPowerTooLow                  (382),
+        ifModRxPowerTooLow                  (383),
+        tempLow                             (384),
+        deleteUserAlarm                     (385),
+        deleteUserEvent                     (386),
+        alignmentModeEnabled                (387),
+        wifiModuleNotResponding             (388),
+        wifiModuleInserted                  (389),
+        wifiModuleRemoved                   (390),
+        spectrumDiagnosticScanStarted       (391),
+        spectrumDiagnosticScanFinished      (392),
+        ber                                 (393),
+        wifiDefaultPasswordNotChanged       (394),
+        wifiSoftwareMismatch                (395),
+        managementPortOpened                (396),
+        carrierTerminationConfigMismatch    (397),
+        wifiIncompatibleHardware            (398),
+        icccDown                            (399),
+        radioLinkTerminalReducedCapacity    (400),
+        licMissingCriticalFAL1241762        (402),
+        licMissingMajorFAL1241762           (403),
+        licMissingCriticalFAL1241669        (404),
+        licMissingMajorFAL1241669           (405),
+        licMissingCriticalFAL1242293        (406),
+        licMissingMajorFAL1242293           (407),
+        licMissingCriticalFAL1242339        (408),
+        licMissingMajorFAL1242339           (409),
+        licMissingCriticalFAL1242322        (412),
+        licMissingMajorFAL1242322           (413),
+        licMissingCriticalFAL1242378        (414),
+        licMissingMajorFAL1242378           (415),
+        licMissingCriticalFAL1241778        (416),
+        licMissingMajorFAL1241778           (417),
+        licMissingCriticalFAL1241764        (418),
+        licMissingMajorFAL1241764           (419),
+        licMissingCriticalFAL1241885        (420),
+        licMissingMajorFAL1241885           (421),
+        licMissingCriticalFAL1241801        (422),
+        licMissingMajorFAL1241801           (423),
+        licMissingCriticalFAL1242043        (424),
+        licMissingMajorFAL1242043           (425),
+        licMissingCriticalFAL1242088        (426),
+        licMissingMajorFAL1242088           (427),
+        licMissingCriticalFAL1241726        (428),
+        licMissingMajorFAL1241726           (429),
+        licMissingCriticalFAL1241884        (430),
+        licMissingMajorFAL1241884           (431),
+        licMissingCriticalFAL1242186        (432),
+        licMissingMajorFAL1242186           (433),
+        licMissingCriticalFAL1242044        (434),
+        licMissingMajorFAL1242044           (435),
+        licMissingCriticalFAL1242089        (436),
+        licMissingMajorFAL1242089           (437),
+        licMissingCriticalFAL1242295        (438),
+        licMissingMajorFAL1242295           (439),
+        licMissingCriticalFAL1242297        (440),
+        licMissingMajorFAL1242297           (441),
+        licMissingCriticalFAL1242298        (442),
+        licMissingMajorFAL1242298           (443),
+        licMissingCriticalFAL1242299        (444),
+        licMissingMajorFAL1242299           (445),
+        licMissingCriticalFAL1242342        (446),
+        licMissingMajorFAL1242342           (447),
+        licMissingCriticalFAL1242343        (448),
+        licMissingMajorFAL1242343           (449),
+        licMissingCriticalFAL1242345        (450),
+        licMissingMajorFAL1242345           (451),
+        licMissingCriticalFAL1242346        (452),
+        licMissingMajorFAL1242346           (453),
+        licMissingCriticalFAL1242347        (454),
+        licMissingMajorFAL1242347           (455),
+        licMissingCriticalFAL1242348        (456),
+        licMissingMajorFAL1242348           (457),
+        licMissingCriticalFAL1242402        (458),
+        licMissingMajorFAL1242402           (459),
+        licMissingCriticalFAL1242364        (460),
+        licMissingMajorFAL1242364           (461),
+        licMissingCriticalFAL1242365        (462),
+        licMissingMajorFAL1242365           (463),
+        licMissingCriticalFAL1242880        (464),
+        licMissingMajorFAL1242880           (465),
+        licMissingCriticalFAL1242323        (486),
+        licMissingMajorFAL1242323           (487),
+        licMissingCriticalFAL1242324        (488),
+        licMissingMajorFAL1242324           (489),
+        licMissingCriticalFAL1242325        (490),
+        licMissingMajorFAL1242325           (491),
+        licMissingCriticalFAL1242326        (492),
+        licMissingMajorFAL1242326           (493),
+        licMissingCriticalFAL1242401        (494),
+        licMissingMajorFAL1242401           (495),
+        licMissingCriticalFAL1242400        (496),
+        licMissingMajorFAL1242400           (497),
+        licMissingCriticalFAL1242885        (498),
+        licMissingMajorFAL1242885           (499),
+        licMissingCriticalFAL1242615        (500),
+        licMissingMajorFAL1242615           (501),
+        licMissingCriticalFAL1241765        (502),
+        licMissingMajorFAL1241765           (503),
+        aaaLocal                            (506),
+        aaaTacacs                           (507),
+        aaaRadius                           (508),
+        deleteNotificationSubscriber        (509),
+        disableNotificationSubscriber       (510),
+        disableNotificationReporting        (511),
+        licMissingCriticalFAL1241767        (516),
+        licMissingMajorFAL1241767           (517),
+        licMissingCriticalFAL1241768        (518),
+        licMissingMajorFAL1241768           (519),
+        licMissingCriticalFAL1241769        (520),
+        licMissingMajorFAL1241769           (521),
+        licMissingCriticalFAL1241770        (522),
+        licMissingMajorFAL1241770           (523),
+        licMissingCriticalFAL1241771        (524),
+        licMissingMajorFAL1241771           (525),
+        licMissingCriticalFAL1241772        (526),
+        licMissingMajorFAL1241772           (527),
+        licMissingCriticalFAL1241773        (528),
+        licMissingMajorFAL1241773           (529),
+        licMissingCriticalFAL1241774        (530),
+        licMissingMajorFAL1241774           (531),
+        licMissingCriticalFAL1241670        (532),
+        licMissingMajorFAL1241670           (533),
+        licMissingCriticalFAL1241707        (534),
+        licMissingMajorFAL1241707           (535),
+        licMissingCriticalFAL1241708        (536),
+        licMissingMajorFAL1241708           (537),
+        licMissingCriticalFAL1241709        (538),
+        licMissingMajorFAL1241709           (539),
+        licMissingCriticalFAL1241710        (540),
+        licMissingMajorFAL1241710           (541),
+        licMissingCriticalFAL1241711        (542),
+        licMissingMajorFAL1241711           (543),
+        licMissingCriticalFAL1241712        (544),
+        licMissingMajorFAL1241712           (545),
+        licMissingCriticalFAL1241713        (546),
+        licMissingMajorFAL1241713           (547),
+        licMissingCriticalFAL1242300        (548),
+        licMissingMajorFAL1242300           (549),
+        licMissingCriticalFAL1242301        (550),
+        licMissingMajorFAL1242301           (551),
+        licMissingCriticalFAL1242302        (552),
+        licMissingMajorFAL1242302           (553),
+        licMissingCriticalFAL1242303        (554),
+        licMissingMajorFAL1242303           (555),
+        licMissingCriticalFAL1242304        (556),
+        licMissingMajorFAL1242304           (557),
+        licMissingCriticalFAL1242305        (558),
+        licMissingMajorFAL1242305           (559),
+        licMissingCriticalFAL1242306        (560),
+        licMissingMajorFAL1242306           (561),
+        licMissingCriticalFAL1242307        (562),
+        licMissingMajorFAL1242307           (563),
+        licMissingCriticalFAL1242308        (564),
+        licMissingMajorFAL1242308           (565),
+        licMissingCriticalFAL1242309        (566),
+        licMissingMajorFAL1242309           (567),
+        licMissingCriticalFAL1242310        (568),
+        licMissingMajorFAL1242310           (569),
+        licMissingCriticalFAL1242311        (570),
+        licMissingMajorFAL1242311           (571),
+        licMissingCriticalFAL1242312        (572),
+        licMissingMajorFAL1242312           (573),
+        licMissingCriticalFAL1242313        (574),
+        licMissingMajorFAL1242313           (575),
+        licMissingCriticalFAL1242314        (576),
+        licMissingMajorFAL1242314           (577),
+        licMissingCriticalFAL1242350        (578),
+        licMissingMajorFAL1242350           (579),
+        licMissingCriticalFAL1242351        (580),
+        licMissingMajorFAL1242351           (581),
+        licMissingCriticalFAL1242352        (582),
+        licMissingMajorFAL1242352           (583),
+        licMissingCriticalFAL1242353        (584),
+        licMissingMajorFAL1242353           (585),
+        licMissingCriticalFAL1242354        (586),
+        licMissingMajorFAL1242354           (587),
+        licMissingCriticalFAL1242355        (588),
+        licMissingMajorFAL1242355           (589),
+        licMissingCriticalFAL1242356        (590),
+        licMissingMajorFAL1242356           (591),
+        licMissingCriticalFAL1242357        (592),
+        licMissingMajorFAL1242357           (593),
+        licMissingCriticalFAL1242358        (594),
+        licMissingMajorFAL1242358           (595),
+        licMissingCriticalFAL1242359        (596),
+        licMissingMajorFAL1242359           (597),
+        licMissingCriticalFAL1242360        (598),
+        licMissingMajorFAL1242360           (599),
+        licMissingCriticalFAL1242361        (600),
+        licMissingMajorFAL1242361           (601),
+        licMissingCriticalFAL1242362        (602),
+        licMissingMajorFAL1242362           (603),
+        licMissingCriticalFAL1242363        (604),
+        licMissingMajorFAL1242363           (605),
+        licMissingCriticalFAL1242874        (606),
+        licMissingMajorFAL1242874           (607),
+        licMissingCriticalFAL1242875        (608),
+        licMissingMajorFAL1242875           (609),
+        licMissingCriticalFAL1242876        (610),
+        licMissingMajorFAL1242876           (611),
+        licMissingCriticalFAL1242877        (612),
+        licMissingMajorFAL1242877           (613),
+        licMissingCriticalFAL1242878        (614),
+        licMissingMajorFAL1242878           (615),
+        licMissingCriticalFAL1241127        (648),
+        licMissingMajorFAL1241127           (649),
+        licMissingCriticalFAL1241766        (650),
+        licMissingMajorFAL1241766           (651)
+    }
+
+ProbableCause ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for probable causes."
+    SYNTAX     INTEGER
+    {
+        swdlOk                              ( 50),
+        loopOpended                         ( 53),
+        loopClosed                          ( 54),
+        mcu                                 ( 56),
+        mcd                                 ( 57),
+        rstpNewRoot                         ( 58),
+        rstpTopologyChange                  ( 59),
+        rmonRisingThreshold                 ( 60),
+        rmonFallingThreshold                ( 61),
+        pingCompleted                       ( 62),
+        modIns                              ( 63),
+        cdbBackupOk                         ( 64),
+        cdbRestoreOk                        ( 65),
+        information                         ( 66),
+        fileTransferStart                   ( 67),
+        fileTransferEnd                     ( 68),
+        modOos                              ( 70),
+        modOosMaint                         ( 71),
+        moduleRestart                       ( 72),
+        moduleShutdown                      ( 73),
+        slotUnequipped                      ( 74),
+        emergencyPassword                   ( 75),
+        cdbEraseLimitedOk                   ( 77),
+        lkfInstallOk                        ( 78),
+        lkfRemoveOk                         ( 79),
+        ccmLoopbackCompletion               ( 80),
+        ccmLinktraceCompletion              ( 81),
+        erpProtectionStateChange            ( 82),
+        portLoopDisabled                    ( 83),
+        portLoopEnabled                     ( 84),
+        t0SourceSwitched                    ( 86),
+        ptpModeSwitch                       ( 87),
+        cdbEraseOk                          ( 88),
+        ptpMasterSwitched                   ( 89),
+        bfdSessionUp                        ( 90),
+        bfdSessionStateChanged              ( 91),
+        mid                                 (100),
+        linkDown                            (141),
+        alarmInp                            (142),
+        temp                                (154),
+        tempCri                             (155),
+        arc                                 (157),
+        t0HoldOver                          (158),
+        pwrLow                              (162),
+        pwrHigh                             (163),
+        pwrOff                              (164),
+        ifmodMismatch                       (166),
+        ifmodNotProv                        (168),
+        nrMismatch                          (170),
+        ntpUnreachable                      (171),
+        cdbDiskNearFull                     (172),
+        tmpDiskNearFull                     (176),
+        invFailure                          (189),
+        syncAutoLockout                     (191),
+        nrNotCommitted                      (192),
+        acMstTimeout                        (202),
+        rsAckTimeout                        (203),
+        swdlAborted                         (204),
+        cdbRestoreFail                      (207),
+        cdbBackupFail                       (208),
+        fileTransferFail                    (209),
+        swdlFail                            (210),
+        swdlRollbackFail                    (211),
+        standbySWDLFail                     (212),
+        haLogReset                          (213),
+        cdbErased                           (214),
+        nrAutoRollback                      (215),
+        lkgCdbRollback                      (218),
+        hwDiagError                         (219),
+        swError                             (220),
+        oamErrorSymPeriod                   (221),
+        oamErrorFramePeriod                 (222),
+        oamErrorFrame                       (223),
+        oamErrorFrameSecsSummary            (224),
+        oamCritical                         (225),
+        oamDyingGasp                        (226),
+        lkfInstallFail                      (227),
+        lkfRemoveFail                       (228),
+        dhcpError                           (242),
+        hardwareFail                        (252),
+        ifmodFail                           (253),
+        defXconnCCM                         (257),
+        defErrorCCM                         (258),
+        defRemoteCCM                        (259),
+        defMacStatus                        (260),
+        defRDICCM                           (261),
+        y1731DMRttDeg                       (273),
+        y1731DMOneWayDegReverse             (274),
+        y1731DMOneWayDegForward             (275),
+        y1731DMVRttDeg                      (276),
+        y1731DMVOneWayDegReverse            (277),
+        y1731DMVOneWayDegForward            (278),
+        y1731LMFrameLossNearEnd             (279),
+        y1731LMFrameLossFarEnd              (280),
+        syncSourceLossRedundancy            (281),
+        xpicCableDisconnected               (282),
+        ipIfHardwareFail                    (300),
+        arpHardwareFail                     (301),
+        rtTableHardwareFail                 (302),
+        remoteMepHardwareFail               (303),
+        rfInputLow                          (328),
+        rfOutputATPCMaxTooLong              (329),
+        radioLinkConnectionDefect           (330),
+        radioLinkIDMismatch                 (331),
+        radioLinkHardwareDefect             (332),
+        rlts115MinThresholdCrossing         (333),
+        rlts124HourThresholdCrossing        (334),
+        rlts215MinThresholdCrossing         (335),
+        rlts224HourThresholdCrossing        (336),
+        rltm15MinThresholdCrossing          (337),
+        rltm24HourThresholdCrossing         (338),
+        tlts115MinThresholdCrossing         (339),
+        tlts124HourThresholdCrossing        (340),
+        tltm15MinThresholdCrossing          (341),
+        tltm24HourThresholdCrossing         (342),
+        psac15MinThresholdCrossing          (343),
+        psac24HourThresholdCrossing         (344),
+        ams15MinThresholdCrossing           (345),
+        ams24HourThresholdCrossing          (346),
+        licInServiceUnlockPeriod            (347),
+        licInUnlockedMode                   (348),
+        licUnlockPeriodExpired              (349),
+        licMissingCritical                  (350),
+        licMissingMajor                     (351),
+        licMaintenanceUnlockTokenWarning    (352),
+        licMaintenanceUnlockTokenMajor      (353),
+        licEmergencyUnlockTokenWarning      (354),
+        licEmergencyUnlockTokenMajor        (355),
+        licIntegrationUnlockPeriodExpired   (365),
+        licMaintenanceUnlockPeriodExpired   (366),
+        licEmergencyUnlockPeriodExpired     (367),
+        licSystemUnlockPeriodExpired        (368),
+        rmmMissing                          (369),
+        rmmFaulty                           (370),
+        cdbCompressedFileTooLarge           (371),
+        ifModTemperatureTooHigh             (375),
+        ifModTemperatureTooLow              (376),
+        ifModVoltageTooHigh                 (377),
+        ifModVoltageTooLow                  (378),
+        ifModTxBiasTooHigh                  (379),
+        ifModTxBiasTooLow                   (380),
+        ifModTxPowerTooHigh                 (381),
+        ifModTxPowerTooLow                  (382),
+        ifModRxPowerTooLow                  (383),
+        tempLow                             (384),
+        deleteUserAlarm                     (385),
+        deleteUserEvent                     (386),
+        alignmentModeEnabled                (387),
+        wifiModuleNotResponding             (388),
+        wifiModuleInserted                  (389),
+        wifiModuleRemoved                   (390),
+        spectrumDiagnosticScanStarted       (391),
+        spectrumDiagnosticScanFinished      (392),
+        ber                                 (393),
+        wifiDefaultPasswordNotChanged       (394),
+        wifiSoftwareMismatch                (395),
+        managementPortOpened                (396),
+        carrierTerminationConfigMismatch    (397),
+        wifiIncompatibleHardware            (398),
+        icccDown                            (399),
+        radioLinkTerminalReducedCapacity    (400),
+        licMissingCriticalFAL1241762        (402),
+        licMissingMajorFAL1241762           (403),
+        licMissingCriticalFAL1241669        (404),
+        licMissingMajorFAL1241669           (405),
+        licMissingCriticalFAL1242293        (406),
+        licMissingMajorFAL1242293           (407),
+        licMissingCriticalFAL1242339        (408),
+        licMissingMajorFAL1242339           (409),
+        licMissingCriticalFAL1242322        (412),
+        licMissingMajorFAL1242322           (413),
+        licMissingCriticalFAL1242378        (414),
+        licMissingMajorFAL1242378           (415),
+        licMissingCriticalFAL1241778        (416),
+        licMissingMajorFAL1241778           (417),
+        licMissingCriticalFAL1241764        (418),
+        licMissingMajorFAL1241764           (419),
+        licMissingCriticalFAL1241885        (420),
+        licMissingMajorFAL1241885           (421),
+        licMissingCriticalFAL1241801        (422),
+        licMissingMajorFAL1241801           (423),
+        licMissingCriticalFAL1242043        (424),
+        licMissingMajorFAL1242043           (425),
+        licMissingCriticalFAL1242088        (426),
+        licMissingMajorFAL1242088           (427),
+        licMissingCriticalFAL1241726        (428),
+        licMissingMajorFAL1241726           (429),
+        licMissingCriticalFAL1241884        (430),
+        licMissingMajorFAL1241884           (431),
+        licMissingCriticalFAL1242186        (432),
+        licMissingMajorFAL1242186           (433),
+        licMissingCriticalFAL1242044        (434),
+        licMissingMajorFAL1242044           (435),
+        licMissingCriticalFAL1242089        (436),
+        licMissingMajorFAL1242089           (437),
+        licMissingCriticalFAL1242295        (438),
+        licMissingMajorFAL1242295           (439),
+        licMissingCriticalFAL1242297        (440),
+        licMissingMajorFAL1242297           (441),
+        licMissingCriticalFAL1242298        (442),
+        licMissingMajorFAL1242298           (443),
+        licMissingCriticalFAL1242299        (444),
+        licMissingMajorFAL1242299           (445),
+        licMissingCriticalFAL1242342        (446),
+        licMissingMajorFAL1242342           (447),
+        licMissingCriticalFAL1242343        (448),
+        licMissingMajorFAL1242343           (449),
+        licMissingCriticalFAL1242345        (450),
+        licMissingMajorFAL1242345           (451),
+        licMissingCriticalFAL1242346        (452),
+        licMissingMajorFAL1242346           (453),
+        licMissingCriticalFAL1242347        (454),
+        licMissingMajorFAL1242347           (455),
+        licMissingCriticalFAL1242348        (456),
+        licMissingMajorFAL1242348           (457),
+        licMissingCriticalFAL1242402        (458),
+        licMissingMajorFAL1242402           (459),
+        licMissingCriticalFAL1242364        (460),
+        licMissingMajorFAL1242364           (461),
+        licMissingCriticalFAL1242365        (462),
+        licMissingMajorFAL1242365           (463),
+        licMissingCriticalFAL1242880        (464),
+        licMissingMajorFAL1242880           (465),
+        licMissingCriticalFAL1242323        (486),
+        licMissingMajorFAL1242323           (487),
+        licMissingCriticalFAL1242324        (488),
+        licMissingMajorFAL1242324           (489),
+        licMissingCriticalFAL1242325        (490),
+        licMissingMajorFAL1242325           (491),
+        licMissingCriticalFAL1242326        (492),
+        licMissingMajorFAL1242326           (493),
+        licMissingCriticalFAL1242401        (494),
+        licMissingMajorFAL1242401           (495),
+        licMissingCriticalFAL1242400        (496),
+        licMissingMajorFAL1242400           (497),
+        licMissingCriticalFAL1242885        (498),
+        licMissingMajorFAL1242885           (499),
+        licMissingCriticalFAL1242615        (500),
+        licMissingMajorFAL1242615           (501),
+        licMissingCriticalFAL1241765        (502),
+        licMissingMajorFAL1241765           (503),
+        aaaLocal                            (506),
+        aaaTacacs                           (507),
+        aaaRadius                           (508),
+        deleteNotificationSubscriber        (509),
+        disableNotificationSubscriber       (510),
+        disableNotificationReporting        (511),
+        licMissingCriticalFAL1241767        (516),
+        licMissingMajorFAL1241767           (517),
+        licMissingCriticalFAL1241768        (518),
+        licMissingMajorFAL1241768           (519),
+        licMissingCriticalFAL1241769        (520),
+        licMissingMajorFAL1241769           (521),
+        licMissingCriticalFAL1241770        (522),
+        licMissingMajorFAL1241770           (523),
+        licMissingCriticalFAL1241771        (524),
+        licMissingMajorFAL1241771           (525),
+        licMissingCriticalFAL1241772        (526),
+        licMissingMajorFAL1241772           (527),
+        licMissingCriticalFAL1241773        (528),
+        licMissingMajorFAL1241773           (529),
+        licMissingCriticalFAL1241774        (530),
+        licMissingMajorFAL1241774           (531),
+        licMissingCriticalFAL1241670        (532),
+        licMissingMajorFAL1241670           (533),
+        licMissingCriticalFAL1241707        (534),
+        licMissingMajorFAL1241707           (535),
+        licMissingCriticalFAL1241708        (536),
+        licMissingMajorFAL1241708           (537),
+        licMissingCriticalFAL1241709        (538),
+        licMissingMajorFAL1241709           (539),
+        licMissingCriticalFAL1241710        (540),
+        licMissingMajorFAL1241710           (541),
+        licMissingCriticalFAL1241711        (542),
+        licMissingMajorFAL1241711           (543),
+        licMissingCriticalFAL1241712        (544),
+        licMissingMajorFAL1241712           (545),
+        licMissingCriticalFAL1241713        (546),
+        licMissingMajorFAL1241713           (547),
+        licMissingCriticalFAL1242300        (548),
+        licMissingMajorFAL1242300           (549),
+        licMissingCriticalFAL1242301        (550),
+        licMissingMajorFAL1242301           (551),
+        licMissingCriticalFAL1242302        (552),
+        licMissingMajorFAL1242302           (553),
+        licMissingCriticalFAL1242303        (554),
+        licMissingMajorFAL1242303           (555),
+        licMissingCriticalFAL1242304        (556),
+        licMissingMajorFAL1242304           (557),
+        licMissingCriticalFAL1242305        (558),
+        licMissingMajorFAL1242305           (559),
+        licMissingCriticalFAL1242306        (560),
+        licMissingMajorFAL1242306           (561),
+        licMissingCriticalFAL1242307        (562),
+        licMissingMajorFAL1242307           (563),
+        licMissingCriticalFAL1242308        (564),
+        licMissingMajorFAL1242308           (565),
+        licMissingCriticalFAL1242309        (566),
+        licMissingMajorFAL1242309           (567),
+        licMissingCriticalFAL1242310        (568),
+        licMissingMajorFAL1242310           (569),
+        licMissingCriticalFAL1242311        (570),
+        licMissingMajorFAL1242311           (571),
+        licMissingCriticalFAL1242312        (572),
+        licMissingMajorFAL1242312           (573),
+        licMissingCriticalFAL1242313        (574),
+        licMissingMajorFAL1242313           (575),
+        licMissingCriticalFAL1242314        (576),
+        licMissingMajorFAL1242314           (577),
+        licMissingCriticalFAL1242350        (578),
+        licMissingMajorFAL1242350           (579),
+        licMissingCriticalFAL1242351        (580),
+        licMissingMajorFAL1242351           (581),
+        licMissingCriticalFAL1242352        (582),
+        licMissingMajorFAL1242352           (583),
+        licMissingCriticalFAL1242353        (584),
+        licMissingMajorFAL1242353           (585),
+        licMissingCriticalFAL1242354        (586),
+        licMissingMajorFAL1242354           (587),
+        licMissingCriticalFAL1242355        (588),
+        licMissingMajorFAL1242355           (589),
+        licMissingCriticalFAL1242356        (590),
+        licMissingMajorFAL1242356           (591),
+        licMissingCriticalFAL1242357        (592),
+        licMissingMajorFAL1242357           (593),
+        licMissingCriticalFAL1242358        (594),
+        licMissingMajorFAL1242358           (595),
+        licMissingCriticalFAL1242359        (596),
+        licMissingMajorFAL1242359           (597),
+        licMissingCriticalFAL1242360        (598),
+        licMissingMajorFAL1242360           (599),
+        licMissingCriticalFAL1242361        (600),
+        licMissingMajorFAL1242361           (601),
+        licMissingCriticalFAL1242362        (602),
+        licMissingMajorFAL1242362           (603),
+        licMissingCriticalFAL1242363        (604),
+        licMissingMajorFAL1242363           (605),
+        licMissingCriticalFAL1242874        (606),
+        licMissingMajorFAL1242874           (607),
+        licMissingCriticalFAL1242875        (608),
+        licMissingMajorFAL1242875           (609),
+        licMissingCriticalFAL1242876        (610),
+        licMissingMajorFAL1242876           (611),
+        licMissingCriticalFAL1242877        (612),
+        licMissingMajorFAL1242877           (613),
+        licMissingCriticalFAL1242878        (614),
+        licMissingMajorFAL1242878           (615),
+        licMissingCriticalFAL1241127        (648),
+        licMissingMajorFAL1241127           (649),
+        licMissingCriticalFAL1241766        (650),
+        licMissingMajorFAL1241766           (651)
+    }
+
+Severity ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for Severity."
+    SYNTAX     INTEGER
+    {
+        indeterminate (1),
+        critical      (2),
+        major         (3),
+        minor         (4),
+        warning       (5),
+        cleared       (6)
+    }
+
+SwitchReason ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for switch reason."
+    SYNTAX     INTEGER
+    {
+        na                      ( 1),
+        restored                ( 2),
+        signalFail              ( 3),
+        signalMismatch          ( 4),
+        signalDegrade           ( 5),
+        automaticSwitch         ( 6),
+        manual                  ( 7),
+        remoteRequest           ( 8),
+        protectionDisabled      ( 9),
+        moduleFail              (10)
+    }
+
+SwitchType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for switch types."
+    SYNTAX     INTEGER
+    {
+        sdhMsp                 (1),
+        sdhSncp                (2),
+        equipememtProtection   (3),
+        synchronisation        (4),
+        scSwitchover           (5)
+    }
+
+--   MARGE - extended ALARM-INFO - LayerRate
+--
+--
+--   Id (TMF513)    Layer identifier (TMF513)             Managed objects (AXXTMN)    Presented value (AXXTMN)
+--   ===========   =========================              ========================    ========================
+--
+--   1              LR_Not_Applicable                     all not specified below     not applicable
+--
+--   5              LR_E1_2M                              PDHPort                     E1
+--                                                        E1
+--
+--   7              LR_E3_34M                             PDHPort                     E3
+--                                                        E3
+--
+--   11             LR_VT2_and_TU12_VC12                  TU12                        VC12  TU12/VC12
+--
+--   13             LR_Low_Order_TU3_VC3                  TU3                         VC3 TU3/VC3
+--
+--   15             LR_STS3c_and_AU4_VC4                  AU4                         VC4 AU4/VC4
+--
+--   16             LR_STS12c_VC4_4c                      AU4_4c                      AU4_4C
+--
+--   20             LR_Section_OC3_STS3_and_RS_STM1       RS                          RS_STM1
+--
+--   21             LR_Section_OC12_STS12_and_RS_STM4     RS                          RS_STM4
+--
+--   22             LR_Section_OC48_STS48_and_RS_STM16    RS                          RS_STM16
+--
+--   25             LR_Line_OC3_STS3_and_MS_STM1          MS                          MS_STM1
+--
+--   26             LR_Line_OC12_STS12_and_MS_STM4        MS                          MS_STM4
+--
+--   27             LR_Line_OC48_STS48_and_MS_STM16       MS                          MS_STM16
+--
+--   46             LR_PHYSICAL_ELECTRICAL                LANx                        ELECTRICAL
+--                                                        SDHPort
+--
+--   47             LR_PHYSICAL_OPTICAL                   SDHPort                     OPTICAL
+--                                                        PDHPort
+--                                                        LANx
+--
+--   73             LR_DSR_OC3_STM1                       SDHPort                     STM1
+--
+--   74             LR_DSR_OC12_STM4                      SDHPort                     STM4
+--
+--   76             LR_DSR_OC48_STM16                     SDHPort                     STM16
+--
+--   87             LR_DSR_Gigabit_Ethernet               LANx                        GE
+--
+--   96             LR_Ethernet                           LANx                        Ethernet
+--                                                        WANx
+--
+--   97             LR_DSR_Fast_Ethernet                  LANx                        FE
+--                                                        WANx
+--
+--   98             LR_Encapsulation                      VCGroup (?) or              ENCAP
+--                                                        LANx/WANx
+--
+--   99             LR_Fragment                           LANx (if in L1)             Fragment
+--                                                        WANx
+--
+
+LayerRate ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for LayerRate."
+    SYNTAX     INTEGER
+    {
+      lrNotApplicable                        (1),
+      lrT3AndDs345m                          (4),
+      lrE1or2M                               (5),
+      lrE3or34M                              (7),
+      lrVt2andTu12Vc12                       (11),
+      lrLowOrderTu3Vc3                       (13),
+      lrSts3candAu4Vc4                       (15),
+      lrSts12cVc44c                          (16),
+      lrSectionOc3Sts3andRsStm1              (20),
+      lrSectionOc12Sts12andRsStm4            (21),
+      lrSectionOc48Sts48andRsStm16           (22),
+      lrLineOc3Sts3andMsStm1                 (25),
+      lrLineOc12Sts12andMsStm4               (26),
+      lrLineOc48Sts48andMsStm16              (27),
+      lrDsrOc3Stm1                           (73),
+      lrDsrOc12Stm4                          (74),
+      lrDsrOc48Stm16                         (76),
+      lrDsrGigabitEthernet                   (87),
+      lrEncapsulation                        (98),
+      lrFragment                             (99)
+    }
+
+--
+-- PT-TRAP trap group.
+--
+
+    ptTrapAlarmNotificationClear NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsSeverity,
+            ptTrapContentsProbableCause,
+            ptTrapContentsProbableCauseQualifier,
+            ptTrapContentsLayerRate,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An alarm notification clear trap indicates that a clearable alarm condition has occurred."
+        ::= { ptTraps 1 }
+
+    ptTrapAlarmNotificationNonClear NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsSeverity,
+            ptTrapContentsProbableCause,
+            ptTrapContentsProbableCauseQualifier,
+            ptTrapContentsLayerRate,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An alarm notification non-clear trap indicates that a non-clearable alarm condition has occurred."
+        ::= { ptTraps 2 }
+
+    ptTrapEventNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsEventType,
+            ptTrapContentsEventCause,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An event notification trap indicates that an event has occurred."
+        ::= { ptTraps 3 }
+
+    ptTrapProtectionSwitchNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsSwitchType,
+            ptTrapContentsSwitchReason,
+            ptTrapContentsSwitchAwayFromMo,
+            ptTrapContentsSwitchToMo,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "A protection switch notification trap indicates that a protection
+             switch has occurred."
+        ::= { ptTraps 4 }
+
+    ptTrapObjectCreateNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An object create notification trap indicates that an object has
+             been created."
+        ::= { ptTraps 5 }
+
+    ptTrapObjectDeleteNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An object delete notification trap indicates that an object has
+             been deleted."
+        ::= { ptTraps 6 }
+
+    ptTrapAvcNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsAvc,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An attribute value change notification trap indicates that
+             attributes has been changed."
+        ::= { ptTraps 7 }
+
+
+--
+-- ptTRAP trap objects group.
+--
+--  ptTrapContentsTables   OBJECT IDENTIFIER ::= { ptTrapContents 1 }
+    ptTrapContentsObjects  OBJECT IDENTIFIER ::= { ptTrapContents 2 }
+
+-------------------------------------------------------------------------------
+-- ptTRAP contents group tables.
+-------------------------------------------------------------------------------
+
+-- Currently none
+
+
+-------------------------------------------------------------------------------
+-- ptTRAP contents group objects.
+-------------------------------------------------------------------------------
+
+    ptTrapContentsTimeStamp OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the time stamp of notification traps (seconds since Epoch).
+            , that is the number of seconds that have elapsed since 1970-01-01 UTC."
+        ::= { ptTrapContentsObjects 1 }
+
+    ptTrapContentsNotificationId OBJECT-TYPE
+        SYNTAX      NotificationId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the notification id of notification traps."
+        ::= { ptTrapContentsObjects 2 }
+
+    ptTrapContentsSequenceNumber OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the sequence number of notification traps."
+        ::= { ptTrapContentsObjects 3 }
+
+    ptTrapContentsAdditionalText  OBJECT-TYPE
+        SYNTAX      DisplayString ( SIZE (0..80) )
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the additional text of notification traps."
+        ::= { ptTrapContentsObjects 4 }
+
+    ptTrapContentsManagedObjectId  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the managed object id of notification traps.
+             The managed object id uniquely identifies the source of the
+             notification and consists of class and instance information
+             for the source. It is represented by a formated text string
+             which first contains the class and depending on the class a list
+             of attribute name and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 5 }
+
+    ptTrapContentsReferenceObjectId  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the referenced object id for the
+             managed object id in cases where the managed object id is
+             not physical object.
+             It has the same format as 'ptTrapContentsManagedObjectId' and
+             is represented by a formated text string which first contains
+             the class and depending on the class a list of attribute name
+             and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 6 }
+
+    ptTrapContentsSeverity  OBJECT-TYPE
+        SYNTAX      Severity
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the severity number of alarm notification
+             traps."
+        ::= { ptTrapContentsObjects 7 }
+
+    ptTrapContentsProbableCause  OBJECT-TYPE
+        SYNTAX      ProbableCause
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the probable cause of alarm notification
+             traps."
+        ::= { ptTrapContentsObjects 8 }
+
+    ptTrapContentsProbableCauseQualifier  OBJECT-TYPE
+        SYNTAX      DisplayString ( SIZE (0..80) )
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the probable cause qualifier of alarm
+             notification traps."
+        ::= { ptTrapContentsObjects 9 }
+
+    ptTrapContentsEventType  OBJECT-TYPE
+        SYNTAX      EventType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the event type of event notification
+             traps."
+        ::= { ptTrapContentsObjects 10 }
+
+    ptTrapContentsEventCause  OBJECT-TYPE
+        SYNTAX      EventCause
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the event cause of event notification
+             traps."
+        ::= { ptTrapContentsObjects 11 }
+
+    ptTrapContentsSwitchType  OBJECT-TYPE
+        SYNTAX      SwitchType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the switch type of protection switch
+             notification traps."
+        ::= { ptTrapContentsObjects 12 }
+
+    ptTrapContentsSwitchReason  OBJECT-TYPE
+        SYNTAX      SwitchReason
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the switch reason of protection switch
+             notification traps."
+        ::= { ptTrapContentsObjects 13 }
+
+    ptTrapContentsSwitchAwayFromMo  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the managed object id of the switch
+             away from object of a protection switch.
+             It has the same format as 'ptTrapContentsManagedObjectId' and
+             is represented by a formated text string which first contains
+             the class and depending on the class a list of attribute name
+             and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 14 }
+
+    ptTrapContentsSwitchToMo  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the managed object id of the switch
+             to object of a protection switch.
+             It has the same format as 'ptTrapContentsManagedObjectId' and
+             is represented by a formated text string which first contains
+             the class and depending on the class a list of attribute name
+             and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 15 }
+
+    ptTrapContentsAvc OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the AVC of attribute value change
+             notification traps.
+             The AVC is a list of attribute names and values. It is
+             represented by a formated text string with attribute name and
+             value pairs:
+
+             '<name>=<value>;<name>=<value>;...'
+
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 16 }
+
+    ptTrapContentsLayerRate  OBJECT-TYPE
+        SYNTAX      LayerRate
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the LayerRate translation of the alarm
+             point of the alarm.
+             0 means not applicable for the alarm."
+        ::= { ptTrapContentsObjects 17 }
+
+    ptTrapContentsDateAndTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the Local date and time with UTC Time zone information of notification traps."
+        ::= { ptTrapContentsObjects 18 }
+
+
+--
+-- Conformance
+--
+
+    ptTrapsCompliances OBJECT IDENTIFIER ::= { ptTrapsConformance 1 }
+    ptTrapsGroups      OBJECT IDENTIFIER ::= { ptTrapsConformance 2 }
+
+    ptTRAPSFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptTrapsCompleteGroup, ptTrapsNotificationGroup }
+        ::= { ptTrapsCompliances 1 }
+
+    ptTrapsCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsSeverity,
+            ptTrapContentsProbableCause,
+            ptTrapContentsProbableCauseQualifier,
+            ptTrapContentsEventType,
+            ptTrapContentsEventCause,
+            ptTrapContentsSwitchType,
+            ptTrapContentsSwitchReason,
+            ptTrapContentsSwitchAwayFromMo,
+            ptTrapContentsSwitchToMo,
+            ptTrapContentsAvc,
+            ptTrapContentsLayerRate,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptTrapsGroups 1 }
+
+ptTrapsNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+            ptTrapAlarmNotificationClear,
+            ptTrapAlarmNotificationNonClear,
+            ptTrapEventNotification,
+            ptTrapProtectionSwitchNotification,
+            ptTrapObjectCreateNotification,
+            ptTrapObjectDeleteNotification,
+            ptTrapAvcNotification
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current notifications in this MIB module."
+        ::= { ptTrapsGroups 2 }
+
+END
+
+PT-FM-MIB DEFINITIONS::=BEGIN
+	IMPORTS	
+		MODULE-IDENTITY,OBJECT-TYPE,Integer32
+			FROM SNMPv2-SMI
+			MODULE-COMPLIANCE,
+      OBJECT-GROUP FROM SNMPv2-CONF
+		pt FROM PT-MIB
+  TEXTUAL-CONVENTION, DateAndTime FROM SNMPv2-TC;
+  		
+		    ptFM MODULE-IDENTITY
+        LAST-UPDATED "201603211200Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB of PT specifics"
+            
+        REVISION      "201603211200Z"
+        DESCRIPTION
+            "Added Managed and Reference OID to the current alarms"
+
+        REVISION      "201603091200Z"
+        DESCRIPTION
+            "Validated."
+            
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "The initial version of this MIB module."
+
+        ::= { pt 3 }
+			 
+	config             OBJECT IDENTIFIER ::= { ptFM 1 } 
+	alarm              OBJECT IDENTIFIER ::= { ptFM 2 } 	
+	log                OBJECT IDENTIFIER ::= { ptFM 3 }
+	ptFMConformance    OBJECT IDENTIFIER ::= { ptFM 4 }
+--
+-- The textual conventions we define and use in this MIB.
+--   	 
+ NotificationIdTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Notification ID which is NONE now."
+    SYNTAX     INTEGER {  
+    	eNONE (0)
+	}  
+	
+ MoClassTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Textual Convention for MoClass"
+    SYNTAX     INTEGER {  
+    	eNONE (0)
+	}  
+	
+ SeverityTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the severity level, take the value of INDETERMINATE,
+	   CRITICAL, MAJOR, MINOR, WARNING and CLEARED. "
+    SYNTAX     INTEGER {  
+          eINDETERMINATE (1),
+          eCRITICAL      (2),
+          eMAJOR         (3),
+          eMINOR         (4),
+          eWARNING       (5),
+          eCLEARED       (6)
+	} 
+	
+ProbableCauseTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Probable Cause"
+    SYNTAX     INTEGER { 
+    	eNONE (0)
+	}   
+	
+ CategoryTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the category. "
+    SYNTAX     INTEGER {  
+             eHIGHORDERLEVEL        (1),
+             eUNFILTERED            (2),
+             eLOWORDERLEVEL         (3),
+             eNONE                  (4)
+            }   
+ ClearableTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates whether a notification is clearable or not."
+    SYNTAX     INTEGER {  
+             eTRUE      (1),
+             eFALSE     (2)
+            }   
+ EnableStatusTypeTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the enable status type: ENABLED or DISABLED. "
+    SYNTAX     INTEGER {  
+             eENABLED      (1),
+             eDISABLED     (2)
+            }   
+
+ LayerRateTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An emulation for layer rate."
+    SYNTAX     INTEGER {  
+                  eLRNOTAPPLICABLE  (1),
+                  eLRT3ANDDS345M (4),
+                  eLRE12M   (5),
+                  eLRE334M  (7),
+                  eLRVT2ANDTU12VC12  (11),
+                  eLRLOWORDERTU3VC3 (13),
+                  eLRSTS3CANDAU4VC4  (15),
+                  eLRSTS12CVC44C       (16),
+                  eLRSECTIONOC3STS3ANDRSSTM1  (20),
+                  eLRSECTIONOC12STS12ANDRSSTM4 (21),
+                  eLRSECTIONOC48STS48ANDRSSTM16 (22),
+                  eLRLINEOC3STS3ANDMSSTM1 (25),
+                  eLRLINEOC12STS12ANDMSSTM4 (26),
+                  eLRLINEOC48STS48ANDMSSTM16 (27),
+                  eLRDSROC3STM1  (73),
+                  eLRDSROC12STM4  (74),
+                  eLRDSROC48STM16  (76),
+                  eLRDSRGIGABITETHERNET (87),
+                  eLRENCAPSULATION   (98),
+                  eLRFRAGMENT  (99)
+             }  
+ EventTypeTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the event type: INFORMATION or WARNING. "
+    SYNTAX     INTEGER {  
+             eINFORMATION      (1),
+             eWARNING          (2)
+            }   
+
+ EventCauseTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the event cause (only NONE is supported)."
+    SYNTAX     INTEGER {  
+             eNONE      (0)
+            }   
+	    
+ SwitchTypeTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the switch type. "
+    SYNTAX     INTEGER {  
+            eSDHMSP (1),
+            eSDHSNCP (2),
+            eEQUIPEMEMTPROTECTION (3),
+            eSYNCHRONISATION (4),
+            eSCSWITCHOVER (5)
+            }  
+	    
+ SwitchReasonTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the switch reason. "
+    SYNTAX     INTEGER {  
+            eNA (1),
+            eRESTORED (2),
+            eSIGNALFAIL (3),
+            eSIGNALMISMATCH (4),
+            eSIGNALDEGRADE (5),
+            eAUTOMATICSWITCH (6),
+            eMANUAL (7),
+            eREMOTEREQUEST (8),
+            ePROTECTIONDISABLED (9),
+            eMODULEFAIL (10)
+            }   
+
+---
+---The Fault Managment Group definition
+---
+
+---
+--- Alarm Config Table definition
+---
+	alarmConfigTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlarmConfigEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "This configuration defines the default severity of an alarm notification.
+            "
+    		::= { config 1 }
+
+	alarmConfigEntry OBJECT-TYPE
+    		SYNTAX      AlarmConfigEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface indexed by NotificationId and moClass. "
+    		INDEX   { notificationId ,moClass }
+    		::= { alarmConfigTable 1 }
+ 
+	AlarmConfigEntry ::=
+		    SEQUENCE {
+                    notificationId              NotificationIdTC,
+                    moClass                     MoClassTC,
+                    severity                    SeverityTC,
+                    probableCauseQualifier      OCTET STRING,
+                    probableCause               ProbableCauseTC,
+                    category                    CategoryTC,
+                    clearable                   ClearableTC
+		    }      
+ 
+	notificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "Notification Id"
+    	     ::= { alarmConfigEntry 1 }
+ 
+	moClass OBJECT-TYPE
+    		SYNTAX      MoClassTC
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "MO Class"
+    	::= { alarmConfigEntry 2 }  
+     		
+	severity OBJECT-TYPE
+    	   SYNTAX      SeverityTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "SeverityTC"
+    	     ::= { alarmConfigEntry 3 }
+ 
+	probableCauseQualifier OBJECT-TYPE
+    		SYNTAX      OCTET STRING (SIZE (0..80))
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Probable Cause Qualifier"
+    	::= { alarmConfigEntry 4 }  
+	probableCause OBJECT-TYPE
+    	   SYNTAX      ProbableCauseTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Probable Cause"
+    	     ::= { alarmConfigEntry 5 }
+ 
+	category OBJECT-TYPE
+    		SYNTAX      CategoryTC
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "For non-clearable alarms, filtering category is NONE."
+    	::= { alarmConfigEntry 6 }  
+	
+	clearable OBJECT-TYPE
+    		SYNTAX      ClearableTC
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "This attribute indicates whether this is a clearable or 
+	     non-clearable alarm notification."
+    	::= { alarmConfigEntry 7 }     
+
+---
+--- AlarmPersistencyConfigTable definition 
+---   
+     
+  	alarmPersistencyConfigTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlarmPersistencyConfigEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+                "Alarm Persistency Configuration Table"
+    		::= { config 2 }   
+    		
+	alarmPersistencyConfigEntry OBJECT-TYPE
+    		SYNTAX      AlarmPersistencyConfigEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+                "An entry containing management information applicable to a
+                 particular interface."
+    		INDEX   { category }
+    		::= { alarmPersistencyConfigTable 1 }
+ 
+	AlarmPersistencyConfigEntry ::=
+		    SEQUENCE {
+                    persistencyConfigcategory       CategoryTC,
+                    onFilter               Integer32,
+                    offFilter              Integer32
+		    }      
+ 
+	persistencyConfigcategory OBJECT-TYPE
+    	       SYNTAX      CategoryTC
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    	       DESCRIPTION
+               "Persistency Configuration category"
+    	       ::= { alarmPersistencyConfigEntry 1 }
+ 
+	onFilter OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+                "An integer with max value of 30. 
+	        Default is 0 sec for highOrderLevel and Unfiltered, 
+	        and 3 sec for lowOrderLevel"
+    	        ::= { alarmPersistencyConfigEntry 2 }  
+     		
+	offFilter OBJECT-TYPE
+    	       SYNTAX      Integer32
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    	       DESCRIPTION
+               "Off Filter"
+    	       ::= { alarmPersistencyConfigEntry 3 }   
+	        	       
+---NotificationConfigTable definition   
+notificationConfig   OBJECT IDENTIFIER ::= { config 3 }
+	notificationReporting OBJECT-TYPE
+    	   SYNTAX      EnableStatusTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "This attribute is used to enable or disable reporting of notifications 
+	    from the AXXMETRO device. When disabled, no notifications will be sent."
+    	     ::= { notificationConfig 1 }
+ 
+	lCASExtendedAlarms OBJECT-TYPE
+    		SYNTAX      EnableStatusTypeTC
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "This attribute is used to enable or disable reporting of 
+	     extended LCAS notifications."
+    	::= { notificationConfig 2 }  
+     		
+	nIMAlarms OBJECT-TYPE
+    	   SYNTAX      EnableStatusTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "This attribute is used to enable or disable reporting of 
+	    notifications from the NIM objects."
+    	::= { notificationConfig 3 }   
+	pJEAlarms OBJECT-TYPE
+    	   SYNTAX      EnableStatusTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "When the operator changes the value from enabled to disabled, 
+	    all active PJE alarms shall be cleared.
+	    When the operator changes the value from disabled to enabled, 
+	    event counting shall be restarted (counters reset to 0).
+	    This attribute has node scope, ie. it impacts all PJE alarms 
+	    on all SDH ports on the node."
+    	::= { notificationConfig 4 }  
+
+---CurrentAlarmsTable definition
+  	currentAlarmsTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF CurrentAlarmsEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "Current Alarms Table"
+    		::= { alarm 1 }   
+    		
+	currentAlarmsEntry OBJECT-TYPE
+    		SYNTAX      CurrentAlarmsEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {sequenceNumber}
+    		::= { currentAlarmsTable 1 }              
+            
+	CurrentAlarmsEntry ::=
+		    SEQUENCE {   
+                    sequenceNumber                        Integer32,
+                    currentAlarmTimeStamp                 DateAndTime,
+                    currentAlarmNotificationId            NotificationIdTC,
+                    currentAlarmManagedObjectId           OCTET STRING,
+                    currentAlarmReferenceObjectId         OCTET STRING,
+                    currentAlarmSeverity                  SeverityTC,
+                    currentAlarmProbableCause             ProbableCauseTC,
+                    currentAlarmProbableCauseQualifier    OCTET STRING,
+                    currentAlarmAdditionalText            OCTET STRING,
+                    currentAlarmLayerRate                 LayerRateTC		    
+            }      
+ 
+	sequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "Sequence Number"
+    	     ::= { currentAlarmsEntry 1 }
+ 
+	currentAlarmTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Time Stamp"
+    	::= { currentAlarmsEntry 2 }  
+     		
+	currentAlarmNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Current Alarm Notification Id"
+    	::= { currentAlarmsEntry 3 } 
+    	
+  currentAlarmManagedObjectId  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the managed object id of an active alarm.
+             The managed object id uniquely identifies the source of the
+             notification and consists of class and instance information
+             for the source. It is represented by a formated text string
+             which first contains the class and depending on the class a list
+             of attribute name and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { currentAlarmsEntry 4 }
+
+  currentAlarmReferenceObjectId  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the referenced object id for the
+             managed object id in cases where the managed object id is
+             a virtual object id.
+             It has the same format as 'currentAlarmManagedObjectId' and
+             is represented by a formated text string which first contains
+             the class and depending on the class a list of attribute name
+             and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { currentAlarmsEntry 5 }
+    	
+    	  
+	currentAlarmSeverity OBJECT-TYPE
+    	   SYNTAX      SeverityTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Current Alarm Severity"
+    	::= { currentAlarmsEntry 6 }  
+	currentAlarmProbableCause OBJECT-TYPE
+    	   SYNTAX      ProbableCauseTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Current Alarm Probable Cause"
+    	  ::= { currentAlarmsEntry 7 }
+ 
+	currentAlarmProbableCauseQualifier OBJECT-TYPE
+    		SYNTAX      OCTET STRING (SIZE (0..80))
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Current Alarm Probable Cause Qualifier"
+    	::= { currentAlarmsEntry 8 }  
+     		
+	currentAlarmAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Additional Text"
+    	::= { currentAlarmsEntry 9 }   
+	currentAlarmLayerRate OBJECT-TYPE
+    	   SYNTAX      LayerRateTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Layer Rate"
+    	::= { currentAlarmsEntry 10 } 
+   
+---Log definition  
+alarmLog  OBJECT IDENTIFIER ::= { log 1 }
+---Alarm Log definition
+    maxNumOfEntriesForAlarm  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Max Number Of Entries For Alarm"
+        ::= { alarmLog 1 }  
+    lastSeqNumForAlarm  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Last Sequence Number For Alarm"
+        ::= { alarmLog 2 } 	
+---AlarmLog table definition          
+  	alarmLogTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlarmLogEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "Alarm Log Table"
+    		::= { alarmLog 3 }   
+    		
+	alarmLogEntry OBJECT-TYPE
+    		SYNTAX      AlarmLogEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {alarmLogSequenceNumber}
+    		::= { alarmLogTable 1 }              
+            
+	AlarmLogEntry ::=
+		    SEQUENCE {   
+                    alarmLogSequenceNumber           Integer32,
+                    alarmLogTimeStamp                DateAndTime,
+                    alarmLogNotificationId           NotificationIdTC,
+                    alarmLogSeverity                 SeverityTC,
+                    alarmLogProbableCause            ProbableCauseTC,
+                    alarmLogProbableCauseQualifier   OCTET STRING,
+                    alarmLogAdditionalText           OCTET STRING,
+                    alarmLogLayerRate                LayerRateTC		    
+            }      
+ 
+	alarmLogSequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "AlarmLog Sequence Number"
+    	     ::= { alarmLogEntry 1 }
+ 
+	alarmLogTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Alarm Log TimeStamp"
+    	::= { alarmLogEntry 2 }  
+     		
+	alarmLogNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Notification Id"
+    	::= { alarmLogEntry 3 }   
+	alarmLogSeverity OBJECT-TYPE
+    	   SYNTAX      SeverityTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Severity"
+    	::= { alarmLogEntry 4 }  
+	alarmLogProbableCause OBJECT-TYPE
+    	   SYNTAX      ProbableCauseTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Probable Cause"
+    	  ::= { alarmLogEntry 5 }
+ 
+	alarmLogProbableCauseQualifier OBJECT-TYPE
+    		SYNTAX      OCTET STRING (SIZE (0..80))
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Alarm Log Probable Cause Qualifier"
+    	::= { alarmLogEntry 6 }  
+     		
+	alarmLogAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Additional Text"
+    	::= { alarmLogEntry 7 }   
+	alarmLogLayerRate OBJECT-TYPE
+    	   SYNTAX      LayerRateTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Layer Rate"
+    	::= { alarmLogEntry 8 }    
+--- TMNNotificationLog definition      
+tmnNotificationLog  OBJECT IDENTIFIER ::= { log 2 }
+    maxNumOfEntriesForTMN  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Maximum Number Of Entries For TMN"
+        ::= { tmnNotificationLog 1 }  
+    lastSeqNumForTMN  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Last Sequence Number For TMN"
+        ::= { tmnNotificationLog 2 } 
+        
+---TMNNotificationLog table definition
+ 	tmnNotificationLogTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF TmnNotificationLogEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "TMN Notification Log Table"
+    		::= { tmnNotificationLog 3 }   
+    		
+	tmnNotificationLogEntry OBJECT-TYPE
+    		SYNTAX      TmnNotificationLogEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {tmnSequenceNumber}
+    		::= { tmnNotificationLogTable 1 }              
+            
+	TmnNotificationLogEntry ::=
+		    SEQUENCE {   
+                    tmnSequenceNumber           Integer32,
+                    tmnTimeStamp                DateAndTime,
+                    tmnNotificationId           NotificationIdTC,
+                    tmnAdditionalText           OCTET STRING		    
+            }      
+ 
+	tmnSequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "TMN Sequence Number"
+    	     ::= { tmnNotificationLogEntry 1 }
+ 
+	tmnTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "TMN TimeStamp"
+    	::= { tmnNotificationLogEntry 2 }  
+     		
+	tmnNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "TMN Notification Id"
+    	::= { tmnNotificationLogEntry 3 }    		
+	tmnAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "TMN Additional Text"
+    	::= { tmnNotificationLogEntry 4 }   
+
+---EventLog definition    
+eventLog  OBJECT IDENTIFIER ::= { log 3 }
+    maxNumOfEntriesForEvent  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Maximum Number Of Entries For Event"
+        ::= { eventLog 1 }  
+    lastSeqNumForEvent  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Last Sequence Number For Event"
+        ::= { eventLog 2 } 	
+---EventLog table definition          
+  	eventLogTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF EventLogEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "Event Log Table"
+    		::= { eventLog 3 }   
+    		
+	eventLogEntry OBJECT-TYPE
+    		SYNTAX      EventLogEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {eventLogSequenceNumber}
+    		::= { eventLogTable 1 }              
+            
+	EventLogEntry ::=
+		    SEQUENCE {   
+                            eventLogSequenceNumber           Integer32,
+                            eventLogTimeStamp                DateAndTime,
+                            eventLogNotificationId           NotificationIdTC,
+                            eventType                        EventTypeTC,
+                            eventLogAdditionalText           OCTET STRING,
+                            eventCause                       EventCauseTC		    
+            }      
+ 
+	eventLogSequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "Event Log Sequence Number"
+    	     ::= { eventLogEntry 1 }
+ 
+	eventLogTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Event Log TimeStamp"
+    	::= { eventLogEntry 2 }  
+     		
+	eventLogNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Event Log Notification Id"
+    	::= { eventLogEntry 3 }   
+	eventType OBJECT-TYPE
+    	   SYNTAX      EventTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Event Type"
+    	::= { eventLogEntry 4 }     		
+	eventLogAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Event Log Additional Text"
+    	::= { eventLogEntry 5 }   
+	eventCause OBJECT-TYPE
+    	   SYNTAX      EventCauseTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Event Cause"
+    	::= { eventLogEntry 6 }  
+    	
+---ProtectionSwitchLog definition 
+protectionSwitchLog  OBJECT IDENTIFIER ::= { log 4 }
+    maxNumOfEntriesForSwitch  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Maximum Number Of Entries For Switch"
+        ::= { protectionSwitchLog 1 }  
+    lastSeqNumForSwitch  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Last Sequence Number For Switch"
+        ::= { protectionSwitchLog 2 } 	
+---ProtectionSwitchLog table definition          
+  	protectionSwitchLogTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF ProtectionSwitchLogEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "Protection Switch Log Table"
+    		::= { protectionSwitchLog 3 }   
+    		
+	protectionSwitchLogEntry OBJECT-TYPE
+    		SYNTAX      ProtectionSwitchLogEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {switchLogSequenceNumber}
+    		::= { protectionSwitchLogTable 1 }              
+            
+	ProtectionSwitchLogEntry ::=
+		    SEQUENCE {   
+		                switchLogSequenceNumber           Integer32,
+                    switchLogTimeStamp                DateAndTime,
+                    switchLogNotificationId           NotificationIdTC,
+                    switchType                        SwitchTypeTC,
+                    switchLogAdditionalText           OCTET STRING,
+                    switchReason                      SwitchReasonTC		    
+            }      
+ 
+	switchLogSequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "Switch Log Sequence Number"
+    	     ::= { protectionSwitchLogEntry 1 }
+ 
+	switchLogTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Switch Log TimeStamp"
+    	::= { protectionSwitchLogEntry 2 }  
+     		
+	switchLogNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Switch Log Notification Id"
+    	::= { protectionSwitchLogEntry 3 }   
+	switchType OBJECT-TYPE
+    	   SYNTAX      SwitchTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Represents the type of the protection for which the switch has occurred."
+    	::= { protectionSwitchLogEntry 4 }     		
+	switchLogAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Switch Log Additional Text"
+    	::= { protectionSwitchLogEntry 5 }   
+	switchReason OBJECT-TYPE
+    	   SYNTAX      SwitchReasonTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "This attribute represents the reason for the switch."
+    	::= { protectionSwitchLogEntry 6 }  
+    	
+--
+-- Conformance
+--
+
+    ptFMCompliances OBJECT IDENTIFIER ::= { ptFMConformance 1 }
+    ptFMGroups      OBJECT IDENTIFIER ::= { ptFMConformance 2 }
+
+    ptFMFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptFMCompleteGroup}
+        ::= { ptFMCompliances 1 }
+
+    ptFMCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+          alarmLogTimeStamp,
+          alarmLogNotificationId,
+          alarmLogSeverity,
+          alarmLogProbableCause,
+          alarmLogProbableCauseQualifier,
+          alarmLogAdditionalText,
+          alarmLogLayerRate,
+          category,
+          clearable,
+          currentAlarmTimeStamp,
+          currentAlarmNotificationId,
+          currentAlarmManagedObjectId,
+          currentAlarmReferenceObjectId,
+          currentAlarmSeverity,
+          currentAlarmProbableCause,
+          currentAlarmProbableCauseQualifier,
+          currentAlarmAdditionalText,
+          currentAlarmLayerRate,
+          eventLogTimeStamp,
+          eventLogNotificationId,
+          eventType,
+          eventLogAdditionalText,
+          eventCause,
+          lastSeqNumForAlarm,
+          lastSeqNumForTMN,
+          lastSeqNumForEvent,
+          lastSeqNumForSwitch,
+          lCASExtendedAlarms,
+          maxNumOfEntriesForAlarm, 
+          maxNumOfEntriesForTMN,
+          maxNumOfEntriesForEvent,
+          maxNumOfEntriesForSwitch,
+          notificationReporting,
+          nIMAlarms,
+          onFilter,
+          offFilter,
+          pJEAlarms,
+          probableCauseQualifier,
+          probableCause,
+          severity,
+          switchLogTimeStamp,
+          switchLogNotificationId,
+          switchType,
+          switchLogAdditionalText,
+          switchReason,
+          tmnTimeStamp,
+          tmnNotificationId,
+          tmnAdditionalText
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptFMGroups 1 }        
+
+
+END 
+
+PT-PM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,Integer32, Counter64 FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP FROM SNMPv2-CONF
+        pt       FROM PT-MIB;
+
+    ptPM MODULE-IDENTITY
+        LAST-UPDATED "201808291230Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            " "
+
+        DESCRIPTION
+            "This is the MIB of PT PM specifics"
+
+        REVISION      "201808291230Z"
+        DESCRIPTION
+            "Support for PT PM OIDs"
+
+        REVISION      "201603091230Z"
+        DESCRIPTION
+            "Version 1.0:   Validated."
+
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "Version 0.1:   The initial version of this MIB module."
+
+      ::= { pt 5 }
+
+         ptPMConformance OBJECT IDENTIFIER ::= { ptPM 2 }
+
+
+---
+---The definition of ptPMTable
+---
+   ptPMTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PtPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+            "A table of ptPM Table entries."
+        ::= { ptPM 1 }
+
+   ptPMEntry OBJECT-TYPE
+        SYNTAX      PtPMEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "An entry of ptPM application."
+        INDEX   { queueIndex }
+        ::= { ptPMTable 1 }
+
+
+   PtPMEntry ::=
+        SEQUENCE {
+              queueIndex                      Integer32,
+              forwardingPacket                Counter64,
+              forwardingOctets                Counter64,
+              discardPackets                  Counter64,
+              discardOctets                   Counter64,
+              inputPackets                    Counter64,
+              inputOctets                     Counter64
+                            }
+
+   queueIndex OBJECT-TYPE
+        SYNTAX       Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "A unique index for the queue."
+
+        ::= { ptPMEntry 1 }
+
+   forwardingPacket OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of packets that have been sent from the queue."
+
+        ::= { ptPMEntry 2 }
+
+   forwardingOctets  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of octets that have been sent from the queue."
+
+        ::= { ptPMEntry 3 }
+
+   discardPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of packets that have been discarded by the queue management mechanism."
+
+        ::= { ptPMEntry 4 }
+
+   discardOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of octets that have been discarded by the queue management mechanism."
+
+        ::= { ptPMEntry 5 }
+
+   inputPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of packets that have reached the queue."
+
+        ::= { ptPMEntry 6 }
+
+    inputOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of octets that have reached the queue."
+
+        ::= { ptPMEntry 7 }
+
+--
+-- Conformance
+--
+
+    ptPMCompliances OBJECT IDENTIFIER ::= { ptPMConformance 1 }
+    ptPMGroups      OBJECT IDENTIFIER ::= { ptPMConformance 2 }
+
+    ptPMFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptPMCompleteGroup}
+        ::= { ptPMCompliances 1 }
+
+    ptPMCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            forwardingPacket,
+            forwardingOctets,
+            discardPackets,
+            discardOctets,
+            inputPackets,
+            inputOctets
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptPMGroups 1 }
+
+
+
+
+    -- ************
+    -- * PT       *
+    -- ************
+
+    -- Place holder for ETHERNET-PM-COUNTER-MIB
+
+END
+
+PT-RADIOLINK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,Counter32, Integer32, IpAddress  FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+        InetAddressIPv6 FROM INET-ADDRESS-MIB
+        ifEntry FROM IF-MIB
+        pt FROM PT-MIB;
+
+
+    ptRadioLink MODULE-IDENTITY
+        LAST-UPDATED "201712011600Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB for Radio Link specifics in PT"
+
+        REVISION      "201712011600Z"
+        DESCRIPTION
+        "Added plcAdminStatus and plcOperStatus."
+
+        REVISION      "201704051000Z"
+        DESCRIPTION
+        "Added channelSpacing enums."
+
+        REVISION      "201701181000Z"
+        DESCRIPTION
+        "Added mlhcAdminStatus, mlhcOperStatus and mlhcMplsConfig."
+
+        REVISION      "201612061400Z"
+        DESCRIPTION
+            "Added more MOs in ctTable and rltTable. Added G.826 tables."
+
+        REVISION      "201605221030Z"
+        DESCRIPTION
+            "The initial version of this MIB module
+                            with OID for MINI-LINK."
+
+
+        ::= { pt 7 }
+        
+     ptRadioLinkConformance OBJECT IDENTIFIER ::= { ptRadioLink 2 } 
+     ctPerformance OBJECT IDENTIFIER ::= { ptRadioLink 4 }
+    
+---
+--- Textual conventions
+---
+     AcmTC ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+            "An integer which indicates the ACM."
+     SYNTAX INTEGER
+     {
+    	 acmHalfBpsk(1),
+    	 acmHalfBpskLight(2),
+    	 acmHalfBpskStrong(3),
+    	 acmBpsk(4),
+       acmBpskLight(5),
+       acmBpskStrong(6),
+       acm4Qam(7),
+       acm4QamLight(8),
+       acm4QamStrong(9),
+       acm16Qam(10),
+       acm16QamLight(11),
+       acm16QamStrong(12),
+       acm32Qam(13),
+       acm32QamLight(14),
+       acm32QamStrong(15),
+       acm64Qam(16),
+       acm64QamLight(17),
+       acm64QamStrong(18),
+       acm128Qam(19),
+       acm128QamLight(20),
+       acm128QamStrong(21),
+       acm256Qam(22),
+       acm256QamLight(23),
+       acm256QamStrong(24),
+       acm512Qam(25),
+       acm512QamLight(26),
+       acm512QamStrong(27),
+       acm1024Qam(28),
+       acm1024QamLight(29),
+       acm1024QamStrong(30),
+       acm2048Qam(31),
+       acm2048QamLight(32),
+       acm2048QamStrong(33),
+       acm4096Qam(34),
+       acm4096QamLight(35),
+       acm4096QamStrong(36)
+     }
+     
+     
+     EnableStatusTC ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+            "An integer which indicates the enabled status."     
+     SYNTAX INTEGER
+     {
+       enabled(1),
+       disabled(2),
+       unknown(3)
+     }
+     
+     XpicMimoTC ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+            "An integer which indicates the XPIC or MIMO status."     
+     SYNTAX INTEGER
+     {
+       notAvailable(1),
+       locked(2),
+       unlocked(3),
+       unknown(4)
+     }
+
+---
+---The definition of ctTable
+---   
+  ctTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+            "A table of CT Table entries."
+        ::= { ptRadioLink 1 }
+        
+  ctEntry OBJECT-TYPE
+        SYNTAX      CtEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "An entry of CT application."
+        AUGMENTS   { ifEntry }
+        ::= { ctTable 1 }
+ 
+  CtEntry ::=
+        SEQUENCE {
+              actualInputPower                OCTET STRING,
+              actualOutputPower               OCTET STRING,
+              actualRxAcm                     OCTET STRING,
+              actualTxAcm                     OCTET STRING,
+              ctDistinguishedName             OCTET STRING,
+              description                     OCTET STRING,
+              carrierId                       INTEGER,
+              ctStatus                        INTEGER,
+              frameId                         Integer32,
+              txFrequency                     Integer32,
+              minTxFrequency                  Integer32,
+              maxTxFrequency                  Integer32,
+              rxFrequency                     Integer32,
+              minRxFrequency                  Integer32,
+              maxRxFrequency                  Integer32,
+              frequencyStepSize               Integer32,
+              duplexDistance                  Integer32,
+              duplexType                      INTEGER,
+              duplexConfig                    EnableStatusTC,
+              autoFreqSelection               INTEGER,
+              autoFreqSelectedChannel         Integer32,
+              autoFreqSelectionStatus         INTEGER,
+              channelSpacing                  INTEGER,
+              polarization                    INTEGER,
+              txOperStatus                    INTEGER,
+              txAdminStatus                   INTEGER,
+              selectedOutputPowerType         INTEGER,
+              availableOutputPowerType        INTEGER,
+              selectedMinOutputPower          Integer32,
+              selectedMaxOutputPower          Integer32,
+              availableMinOutputPower         Integer32,
+              availableMaxOutputPower         Integer32,
+              referenceSec                    INTEGER,
+              targetInputPowerFarEnd          Integer32,
+              berAlarmThreshold               INTEGER,
+              inputPowerAlarmThreshold        Integer32,
+              plannedAlignmentInputPower      Integer32,
+              atpcFallback                    EnableStatusTC,
+              atpcFallbackTimer               Integer32,
+              atpcFallbackOutputPower         Integer32,
+              xpicStatus                      XpicMimoTC,
+              mimoStatus                      XpicMimoTC,
+              actualSnir                      OCTET STRING,
+              actualXpi                       OCTET STRING,
+              actualSi                        OCTET STRING,
+              actualTxCapacity                Integer32,
+              licensedCapacity                Integer32,
+              availableMinCapacity            Integer32,
+              availableMaxCapacity            Integer32,
+              selectedMinCapacity             Integer32,
+              selectedMaxCapacity             Integer32,
+              wantedLicensedCapacity          Integer32,
+              availableMinAcm                 AcmTC,
+              availableMaxAcm                 AcmTC,
+              selectedMinAcm                  AcmTC,
+              selectedMaxAcm                  AcmTC,
+              actualRxAcmTC                   AcmTC,
+              actualTxAcmTC                   AcmTC,
+              alignmentMode                   EnableStatusTC,
+              rfLoop                          EnableStatusTC
+              }
+ 
+  actualInputPower OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Actual input power of the CT in dBm"
+        ::= { ctEntry 1 }
+
+  actualOutputPower OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Actual output power of the CT in dBm"
+        ::= { ctEntry 2 }
+
+  actualRxAcm       OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Actual rx modulation and coding"
+        ::= { ctEntry 3 } 
+
+  actualTxAcm       OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Actual tx modulation and coding"
+        ::= { ctEntry 4 } 
+  
+  ctDistinguishedName OBJECT-TYPE
+  			SYNTAX      OCTET STRING
+  			MAX-ACCESS  read-only
+  			STATUS      current
+  			DESCRIPTION
+  			"Unique id/name of the carrier termination, according to FDN (rack/slot/port/class)"
+  			::= { ctEntry 5 }
+  
+  description OBJECT-TYPE
+  			SYNTAX      OCTET STRING
+  			MAX-ACCESS  read-write
+  			STATUS      current
+  			DESCRIPTION
+  				"User description of the carrior termination."
+  			::= { ctEntry 6 }
+  
+  carrierId       OBJECT-TYPE
+  			SYNTAX INTEGER
+  			{
+  				a(1),
+  				b(2),
+  				c(3),
+  				d(4),
+  				unknown(5)
+  			}     
+  			MAX-ACCESS  read-write
+  			STATUS      current
+  			DESCRIPTION
+  				"Id of the carrier. (A, B, C, D)
+  				Used in XPIC & MIMO configurations to check that the carrier termination is connected to the correct far end carrier termination. 
+  				Should be the same id on both sides of the hop. Defaulted when not MIMO or XPIC.
+  				Sometimes also referred to as preamble"
+  			::= { ctEntry 7 }
+  			
+  ctStatus  OBJECT-TYPE
+       	SYNTAX INTEGER
+        {
+        	down(1),
+          up(2),
+          na(3),
+          unknown(4),
+          degraded(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of the carrier termination, hop"
+        ::= { ctEntry 8}
+
+  frameId  OBJECT-TYPE
+        SYNTAX Integer32 (0..10000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A unique identifier for the radio frame to be used. 
+            Wanted frameId, txFrequency, rxFrequency, referenceSec, selectedMinAcm and selectedMaxAcm must be a valid combination."
+        ::= { ctEntry 9}
+        
+  txFrequency  OBJECT-TYPE
+  			SYNTAX Integer32
+  			MAX-ACCESS read-write
+  			STATUS current
+  			DESCRIPTION
+  				"Selected frequency on the transmitter (kHz). 
+  				Wanted frameId, txFrequency, rxFrequency, referenceSec, selectedMinAcm and selectedMaxAcm must be a valid combination."
+  			::= { ctEntry 10}
+        
+  minTxFrequency  OBJECT-TYPE
+  			SYNTAX Integer32
+  			MAX-ACCESS read-only
+  			STATUS current
+  			DESCRIPTION
+  				"Minimum Tx frequency possible to use, given by the selected frame-id"
+  			::= { ctEntry 11}
+  
+  maxTxFrequency  OBJECT-TYPE
+  			SYNTAX Integer32
+  			MAX-ACCESS read-only
+  			STATUS current
+  			DESCRIPTION
+  				"Maximum Tx frequency possible to use, given by the selected frame-id"
+  ::= { ctEntry 12}
+  
+  rxFrequency  OBJECT-TYPE
+  			SYNTAX Integer32
+  			MAX-ACCESS read-write
+  			STATUS current
+  			DESCRIPTION
+  				"Selected frequency on the receiver (kHz). 
+  				Wanted frameId, txFrequency, rxFrequency, referenceSec, selectedMinAcm and selectedMaxAcm must be a valid combination."
+  ::= { ctEntry 13}
+  
+  minRxFrequency  OBJECT-TYPE
+  			SYNTAX Integer32
+  			MAX-ACCESS read-only
+  			STATUS current
+  			DESCRIPTION
+  				"Minimum Rx frequency possible to use, given by the selected frame-id"
+  ::= { ctEntry 14}
+
+  maxRxFrequency  OBJECT-TYPE
+  			SYNTAX Integer32
+  			MAX-ACCESS read-only
+  			STATUS current
+  			DESCRIPTION
+  				"Maximum Rx frequency possible to use, given by the selected frame-id"
+  			::= { ctEntry 15}
+  
+  frequencyStepSize  OBJECT-TYPE
+  			SYNTAX Integer32
+  			MAX-ACCESS read-only
+  			STATUS current
+  			DESCRIPTION
+  				"Frequency step size in kHz"
+  			::= { ctEntry 16}
+  
+  duplexDistance  OBJECT-TYPE
+  			SYNTAX Integer32
+  			MAX-ACCESS read-only
+  			STATUS current
+  			DESCRIPTION
+  				"Distance between Tx and Rx frequencies (kHz)"
+  			::= { ctEntry 17}
+  
+  duplexType  OBJECT-TYPE
+  			SYNTAX INTEGER
+  			{
+  				variable(1),
+  				fixed(2),
+  				unknown(3)
+  			}
+  			MAX-ACCESS read-only
+  			STATUS current
+  			DESCRIPTION
+  				"The duplex type is given by the equipment (Fixed,Variable)"
+  			::= { ctEntry 18}
+  
+  
+  duplexConfig  OBJECT-TYPE
+  		SYNTAX EnableStatusTC
+  		MAX-ACCESS read-write
+  		STATUS current
+  		DESCRIPTION
+  			"Enabling or disabling configuration of Rx freq using duplex distance"
+  		::= { ctEntry 19}
+  		
+  autoFreqSelection  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        disabled(1),
+        master(2),
+        slave(3),
+        unknown(4)
+      }
+    	MAX-ACCESS read-write
+    	STATUS current
+    	DESCRIPTION
+    	"Automatic frequency selection mode"
+    	::= { ctEntry 20}
+    	
+ 	autoFreqSelectedChannel  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Automatic frequency selected channel"
+      ::= { ctEntry 21}
+ 	
+ 	autoFreqSelectionStatus  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+    	  idle(1),
+        searchingForSlave(2),
+        requestingInfoFromSlave(3),
+        waitingForMaster(4),
+        waitingForChannelInfoRequest(5),
+        inProgress(6),
+        initializing(7),
+        finished(8),
+        failed(9),
+        unknown(10)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Automatic frequency status"
+      ::= { ctEntry 22}
+      
+  channelSpacing  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+    	cs7MHz(1),
+        cs10MHz(2),
+        cs14MHz(3),
+        cs20MHz(4),
+        cs28MHz(5),
+        cs30MHz(6),
+        cs40MHz(7),
+        cs50MHz(8),
+        cs56MHz(9),
+        cs250MHz(10),
+        cs60MHz(11),
+        cs500MHz(12),
+        cs750MHz(13),
+        cs100MHz(14),
+        cs150MHz(15),
+        cs200MHz(16),
+        cs125MHz(17),
+        cs80MHz(18),
+        cs112MHz(19),
+        cs1000MHz(20),
+        cs1250MHz(21),
+        cs1500MHz(22),
+        cs62p5MHz(23),
+        cs2000MHz(24),
+        unknown(25)    	  
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      	"Channel spacing"
+      ::= { ctEntry 23}
+      
+  polarization  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        notSpecified(1),
+        horizontal(2),
+        vertical(3),
+        unknown(4)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Antenna polarization"
+      ::= { ctEntry 24}
+  
+  txOperStatus  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        unknown(1),
+        off(2),
+        on(3),
+        standby(4)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Operative status of the transmitter"
+      ::= { ctEntry 25}
+      
+  txAdminStatus  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        off(1),
+        on(2),
+        unknown(3)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Administrative status of the transmitter"
+      ::= { ctEntry 26}
+      
+  selectedOutputPowerType  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        standard(1),
+        high(2),
+        unknown(3)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Selected output power type"
+      ::= { ctEntry 27}
+      
+  availableOutputPowerType  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        standard(1),
+        high(2),
+        unknown(3)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Available output power type"
+      ::= { ctEntry 28}
+      
+  selectedMinOutputPower  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Selected min output power.
+       Selected min & max output power should be set to the same value for RTPC mode, otherwise the hop operates in ATPC mode."
+      ::= { ctEntry 29}
+      
+  selectedMaxOutputPower  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Selected max output power.
+       Selected min & max output power should be set to the same value for RTPC mode, otherwise the hop operates in ATPC mode."
+      ::= { ctEntry 30}
+   
+   
+  availableMinOutputPower  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The minimum output power supported (dBm).
+        The system shows a value if the equipment is available and a frame id has been selected."
+      ::= { ctEntry 31}
+  
+  availableMaxOutputPower  OBJECT-TYPE
+  		SYNTAX Integer32
+  		MAX-ACCESS read-only
+  		STATUS current
+  		DESCRIPTION
+  			"The maximum output power supported (dBm).
+  			The system shows a value if the equipment is available and a frame id has been selected."
+  ::= { ctEntry 32}
+      
+  referenceSec  OBJECT-TYPE
+  		SYNTAX INTEGER
+  		{
+  			noAvailable(1),
+  			sec2(2),
+  	    sec4L(4),
+  	    sec4H(5),
+  	    sec5B(7),
+  	    sec6B(9),
+  	    sec5LB(10),
+  	    sec5HB(11),
+  	    sec6LB(12),
+        sec6HB(13),
+        sec7B(14),
+        unknown(15)
+  		}
+  		MAX-ACCESS read-write
+  		STATUS current
+  		DESCRIPTION
+  			"Each modulation is compliant to a Reference Spectrum Efficiency Class (RSEC). 
+  			When running Adaptive Coding/Modulation, one SEC has to be selected for all the coding/modulations between selectedMinACM and selectedMaxACM.
+  			This parameter is called Reference SEC. This setting will affect availableMaxOutputPower, in order to fulfill spectrum requirements.
+  			Wanted frameId, txFrequency, rxFrequency, referenceSec, selectedMinAcm and selectedMaxAcm must be a valid combination."
+  		::= { ctEntry 33}
+  		
+ targetInputPowerFarEnd  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "The wanted input power at far end (dBm), when running ATPC"
+      ::= { ctEntry 34}
+
+ berAlarmThreshold  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        tenExpMinus6(1),
+        tenExpMinus3(2)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Threshold for the BER alarm"
+      ::= { ctEntry 35}
+  		
+ inputPowerAlarmThreshold  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      	"Threshold for the input power alarm"
+      ::= { ctEntry 36}
+ 
+ 	plannedAlignmentInputPower  OBJECT-TYPE
+ 			SYNTAX Integer32
+ 			MAX-ACCESS read-write
+ 			STATUS current
+ 			DESCRIPTION
+ 				"The planned received input power (dBm) dependent upon selected minimum ACM and corresponding output power.
+ 					Used when doing alignment"
+ 			::= { ctEntry 37}
+ 	
+ 	atpcFallback  OBJECT-TYPE
+     SYNTAX EnableStatusTC
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+     	"Enable or disable the output power fall back function"
+     ::= { ctEntry 38}
+     
+ atpcFallbackTimer  OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+     	"Specifies the timer for output power fall back (# of seconds)"
+     ::= { ctEntry 39}
+      
+ atpcFallbackOutputPower  OBJECT-TYPE
+ 			SYNTAX Integer32
+ 			MAX-ACCESS read-write
+ 			STATUS current
+ 			DESCRIPTION
+ 				"The ATPC fallback output power"
+ 			::= { ctEntry 40}
+ 
+ 	xpicStatus  OBJECT-TYPE
+ 			SYNTAX XpicMimoTC
+ 			MAX-ACCESS read-only
+ 			STATUS current
+ 			DESCRIPTION
+ 				"Status of the XPIC function."
+ 			::= { ctEntry 41}
+ 			
+ 	mimoStatus  OBJECT-TYPE
+ 		   SYNTAX XpicMimoTC
+ 		   MAX-ACCESS read-only
+ 		   STATUS current
+ 		   DESCRIPTION
+ 		    "Status of the MIMO function."
+ 		   ::= { ctEntry 42}
+ 		   
+ 	actualSnir  OBJECT-TYPE
+ 	        SYNTAX OCTET STRING
+ 	        MAX-ACCESS read-only
+ 	        STATUS current
+ 	        DESCRIPTION
+ 	          "Actual signal to noise plus interference ratio (dB)."
+ 	        ::= { ctEntry 43}
+ 		  
+ 	actualXpi  OBJECT-TYPE
+           SYNTAX OCTET STRING
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+             "The carrier to cross-polar interference level (dBc)."
+           ::= { ctEntry 44}
+ 	       
+ 	actualSi  OBJECT-TYPE
+           SYNTAX OCTET STRING
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+             "Spatial interference between the CTs when MIMO is configured."
+           ::= { ctEntry 45}
+ 		
+	actualTxCapacity  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+         "Actual capacity supported by the carrier termination."
+        ::= { ctEntry 46}
+	
+	licensedCapacity  OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Wanted or installed license for the capacity allowed for the carrier termination."
+     ::= { ctEntry 47}
+	 
+	availableMinCapacity  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "Minimum capacity possible to use. Given by the selected frame-id (kbit/s)"
+      ::= { ctEntry 48}
+	  
+	availableMaxCapacity  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "Maximum capacity possible to use. Given by the selected frame-id (kbit/s)"
+      ::= { ctEntry 49}
+        
+	selectedMinCapacity  OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Selected minimum capacity, derived from selected minimum ACM (kbit/s)"
+     ::= { ctEntry 50}
+
+	selectedMaxCapacity  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "Selected maximum capacity, derived from selected maximum ACM (kbit/s)"
+      ::= { ctEntry 51}
+
+	wantedLicensedCapacity  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Wanted licensed capacity and creation of LRF for the carrier termination (kbit/s)"
+      ::= { ctEntry 52}
+	
+	availableMinAcm  OBJECT-TYPE
+     SYNTAX AcmTC
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Minimum ACM possible to use, given by the selected frame id."
+     ::= { ctEntry 53}
+	 
+	availableMaxAcm  OBJECT-TYPE
+      SYNTAX AcmTC
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "Maximum ACM possible to use, given by the selected frame id"
+      ::= { ctEntry 54}
+	  
+	selectedMinAcm  OBJECT-TYPE
+      SYNTAX AcmTC
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Selected minimum coding/modulation. If selectedMinACM = selectedMaxACM, then the modulation is fixed"
+      ::= { ctEntry 55}
+	  
+	selectedMaxAcm  OBJECT-TYPE
+      SYNTAX AcmTC
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Selected maximum coding/modulation. If selectedMinACM = selectedMaxACM, then the modulation is fixed"
+      ::= { ctEntry 56}
+	
+	 actualRxAcmTC  OBJECT-TYPE
+     SYNTAX AcmTC
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Actual rx modulation and coding"
+     ::= { ctEntry 57}
+   
+ actualTxAcmTC  OBJECT-TYPE
+     SYNTAX AcmTC
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Actual tx modulation and coding"
+     ::= { ctEntry 58}
+	  
+	alignmentMode  OBJECT-TYPE
+      SYNTAX EnableStatusTC
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Enable or disable the alignment mode"
+      ::= { ctEntry 59}
+	
+	rfLoop  OBJECT-TYPE
+     SYNTAX EnableStatusTC
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+      "Enable or disable the rf loop"
+     ::= { ctEntry 60}
+ 
+
+  ---
+  ---The definition of rltTable
+  ---   
+  rltTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF RltEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+              "A table of RLT Table entries."
+          ::= { ptRadioLink 3 }
+          
+  rltEntry OBJECT-TYPE
+          SYNTAX      RltEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                    "An entry of RLT application."
+          AUGMENTS   { ifEntry }
+          ::= { rltTable 1 }
+   
+  RltEntry ::=
+          SEQUENCE {
+        	  		rltDistinguishedName   OCTET STRING,
+        	  		neIpAddress            IpAddress,
+        	  		neIpv6Address          InetAddressIPv6,
+        	  		neName                 OCTET STRING,
+        	  		neType                 INTEGER,
+        	  		id                     OCTET STRING, 
+        	  		rltStatus              INTEGER,
+        	  		mode                   INTEGER,
+        	  		actualTxTotalCapacity  Integer32,
+        	  		limitedTotalCapacity   Integer32,
+        	  		protectionStatus       INTEGER,
+        	  		revertiveWaitToRestore Integer32,
+        	  		revertivePreferredTx   INTEGER,
+        	  		protectionSwitchMode   INTEGER,
+        	  		fadeNotificationTimer  Integer32,
+        	  		expectedFarEndId       OCTET STRING,
+        	  		farEndIdCheck          INTEGER,
+        	  		cpriMode               INTEGER,
+        	  		cpriStatus             INTEGER,
+        	  		manualSwitch           INTEGER,
+        	  		mlhcOperStatus         INTEGER,
+        	  		mlhcAdminStatus        INTEGER,
+        	  		mlhcMplsConfig         INTEGER,
+                                plcOperStatus          INTEGER,
+                                plcAdminStatus         INTEGER
+                      }
+   
+  rltDistinguishedName OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Unique id/name of the radio link termination, according to FDN (rack/slot/port/class)"
+          ::= { rltEntry 1 }
+  
+  neIpAddress OBJECT-TYPE
+          SYNTAX      IpAddress
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "NE IP address"
+          ::= { rltEntry 2 }
+
+  neIpv6Address OBJECT-TYPE
+          SYNTAX      InetAddressIPv6
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+            "NE IP V6 address"
+          ::= { rltEntry 3 }
+
+  neName       OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "NE Name"
+          ::= { rltEntry 4 } 
+
+  neType       OBJECT-TYPE
+  				SYNTAX INTEGER
+  				{
+  					unknown(1),
+  					mle(2),
+  					xfMle(3),
+  					tn(4),
+  					cn(5),
+  					pt(6)
+  				}     
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "NE Type"
+          ::= { rltEntry 5 }
+          
+  id      OBJECT-TYPE
+  				SYNTAX OCTET STRING
+  				MAX-ACCESS read-write
+  				STATUS current
+  				DESCRIPTION
+  					"User defined id of the radio link terminal"
+  				::= { rltEntry 6}
+    
+  rltStatus  OBJECT-TYPE
+  				SYNTAX INTEGER
+  				{
+  					down(1),
+  					up(2),
+  					na(3),
+  					unknown(4),
+  					degraded(5)
+  				}
+  				MAX-ACCESS read-only
+  				STATUS current
+  				DESCRIPTION
+  					"The status of the radio link terminal"
+          ::= { rltEntry 7}
+  				
+ 	mode    OBJECT-TYPE
+  	      SYNTAX INTEGER
+  	      {
+  	    	  mode1plus0(1),
+  	        mode1plus1CSB(2),
+  	        mode1plus1RLP(3),
+  	        mode2plus0RLB(4),
+  	        mode2plus1CSB(5),
+  	        mode2plus1RLP(6),
+  	        mode2plus2CSB(7),
+  	        mode2plus2RLP(8),
+  	        mode3plus0RLB(9),
+            mode4plus0RLB(10),
+            notAvailable11(11),
+            notAvailable12(12),
+            notAvailable13(13),
+            notAvailable14(14),
+            mode3plus1RLP(15),
+            mode3plus2RLP(16),
+            mode3plus3RLP(17),
+            mode4plus1RLP(18),
+            mode4plus2RLP(19),
+            mode4plus3RLP(20),
+            mode4plus4RLP(21),
+            notAvailable22(22),
+            notAvailable23(23),
+            notAvailable24(24),
+            notAvailable25(25),
+            notAvailable26(26),
+            notAvailable27(27),
+            mode3plus1CSB(28),
+            mode3plus2CSB(29),
+            mode3plus3CSB(30),
+            mode4plus1CSB(31),
+            mode4plus2CSB(32),
+            mode4plus3CSB(33),
+            mode4plus4CSB(34),
+            unknown(35)
+  	      }
+  	      MAX-ACCESS read-write
+  	      STATUS current
+  	      DESCRIPTION
+  	      	"The status of the radio link terminal"
+  	      ::= { rltEntry 8}
+  				
+  actualTxTotalCapacity OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+  	              "Actual aggregated total (packet + TDM) transmitter capacity for the radio link termination.
+  	              Limited by licenses & configuration (=nearEndLimitedCapacity) and depending on actual modulation/coding used at the moment."
+          ::= { rltEntry 9 }
+  
+  limitedTotalCapacity OBJECT-TYPE
+  				SYNTAX      Integer32
+  				MAX-ACCESS  read-only
+  				STATUS      current
+  				DESCRIPTION
+  					"Maximum total capacity allowed by the current configuration and installed licenses.
+  					Aggregated from the constituent carrier termination values."
+  				::= { rltEntry 10 }
+  
+         
+  protectionStatus OBJECT-TYPE
+  				SYNTAX INTEGER
+  				{
+  					unprotected(1),
+  					protected(2),
+  					unableToProtect(3),
+  					unknown(4)
+  				}
+  				MAX-ACCESS read-only
+  				STATUS current
+  				DESCRIPTION
+  					"Status of a protected node."
+  				::= { rltEntry 11}
+  
+  revertiveWaitToRestore OBJECT-TYPE
+  				SYNTAX Integer32
+  				MAX-ACCESS read-write
+  				STATUS current
+  				DESCRIPTION
+  				"The time, in number of seconds, to wait before switching back to the preferred Tx."
+  				::= { rltEntry 12}
+     
+  revertivePreferredTx OBJECT-TYPE
+     			SYNTAX INTEGER
+     			{
+     				ct11(1),
+     				ct12(2),
+     				ct21(3),
+     				ct22(4),
+     				notApplicable(5),
+     				unknown(6)
+     			}
+     			MAX-ACCESS read-write
+     			STATUS current
+     			DESCRIPTION
+     				"The preferred carrier termination transmitter."
+     			::= { rltEntry 13}
+  
+  
+
+  protectionSwitchMode OBJECT-TYPE
+  				SYNTAX INTEGER
+  				{
+  					auto(1),
+  					manual(2),
+  					autoAndRevertive(3),
+  					unknown(4),
+  					notApplicable(5)
+  				}
+  				MAX-ACCESS read-write
+  				STATUS current
+  				DESCRIPTION
+  					".The mode in which the switching mechanism is configured"
+  				::= { rltEntry 14}
+ 
+  
+  fadeNotificationTimer OBJECT-TYPE
+  				SYNTAX Integer32
+  				MAX-ACCESS read-write
+  				STATUS current
+  				DESCRIPTION
+  					"Notification is sent if fading is longer than this timer, applicable for protection."
+  				::= { rltEntry 15}
+  
+  expectedFarEndId OBJECT-TYPE
+  				SYNTAX      OCTET STRING
+  				MAX-ACCESS  read-write
+  				STATUS      current
+  				DESCRIPTION
+  					"Expected id of far-end terminal"
+  				::= { rltEntry 16 }
+  
+  farEndIdCheck OBJECT-TYPE
+  				SYNTAX INTEGER
+  				{
+  					enabled(1),
+  					disabled(2),
+  					unknown(3)
+  				}
+  				MAX-ACCESS read-write
+  				STATUS current
+  				DESCRIPTION
+  					"Enabling of far end id check."
+  				::= { rltEntry 17}
+  				
+  cpriMode OBJECT-TYPE
+  				SYNTAX INTEGER
+  				{
+  					master(1),
+  					slave(2),
+  					notApplicable(3),
+  					unknown(4)
+  				}
+  				MAX-ACCESS read-write
+  				STATUS current
+  				DESCRIPTION
+  					"Set the mode of the CPRI front-haul product."
+  				::= { rltEntry 18}
+
+  cpriStatus OBJECT-TYPE
+  				SYNTAX INTEGER
+  				{
+  					idle(1),
+  					waitingOnRtcSync(2),
+  					waitingOnCpri(3),
+  					waitingOnRxRequest(4),
+  					waitingOnTxRequest(5),
+  					inSync(6),
+  					unknown(7)
+  				}
+  				MAX-ACCESS read-only
+  				STATUS current
+  				DESCRIPTION
+  					"The status of the CPRI front-haul product."
+  				::= { rltEntry 19}
+
+  manualSwitch OBJECT-TYPE
+  				SYNTAX INTEGER
+  				{
+  		      ct11(1),
+  		      ct12(2),
+  		      ct21(3),
+  		      ct22(4),
+  		      notApplicable(5),
+  		      unknown(6)
+  				}
+  				MAX-ACCESS read-write
+  				STATUS current
+  				DESCRIPTION
+  					"Manual switch of protected carrier termination transmitter."
+  				::= { rltEntry 20}  
+
+  mlhcOperStatus  OBJECT-TYPE
+  		      SYNTAX INTEGER
+  		      {
+  		        up(1),
+  		        down(2),
+  		        unknown(3)
+  		      }
+  		      MAX-ACCESS read-only
+  		      STATUS current
+  		      DESCRIPTION
+  		      "Operative status of multi layer header compression."
+  		      ::= { rltEntry 21}
+
+  mlhcAdminStatus  OBJECT-TYPE
+  		      SYNTAX INTEGER
+  		      {
+  		        off(1),
+  		        on(2),
+  		        unknown(3)
+  		      }
+  		      MAX-ACCESS read-write
+  		      STATUS current
+  		      DESCRIPTION
+  		      "Administrative status of multi layer header compression."
+  		      ::= { rltEntry 22}
+
+  mlhcMplsConfig  OBJECT-TYPE
+                      SYNTAX INTEGER
+                      {
+                        controlWord(1),
+                        l2(2),
+                        l3(3),
+                        mplsOnly(4),
+                        unknown(5)
+                      }
+                      MAX-ACCESS read-write
+                      STATUS current
+                      DESCRIPTION
+                      "MLHC/MPLS configuration."
+                      ::= { rltEntry 23}
+
+  plcOperStatus  OBJECT-TYPE
+                      SYNTAX INTEGER
+                      {
+                        up(1),
+                        down(2),
+                        unknown(3)
+                      }
+                      MAX-ACCESS read-only
+                      STATUS current
+                      DESCRIPTION
+                      "Operative status of payload compression."
+                      ::= { rltEntry 24}
+
+  plcAdminStatus  OBJECT-TYPE
+                      SYNTAX INTEGER
+                      {
+                        off(1),
+                        on(2),
+                        unknown(3)
+                      }
+                      MAX-ACCESS read-write
+                      STATUS current
+                      DESCRIPTION
+                      "Administrative status of payload compression."
+                      ::= { rltEntry 25}
+  ---
+  ---The definition of ct826ContinuousTable
+  ---
+ctG826ContinuousTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF CtG826ContinuousEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+              "A table of CT G826 Performance Continuous counters entries.
+              The counters are reset by ctG826Reset"
+          ::= { ctPerformance 1 }
+          
+  ctG826ContinuousEntry OBJECT-TYPE
+          SYNTAX      CtG826ContinuousEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                    "An entry of CT G826 Performance Continuous counters."
+          AUGMENTS   { ifEntry }
+          ::= { ctG826ContinuousTable 1 }
+   
+  CtG826ContinuousEntry ::=
+          SEQUENCE {
+        	  ctG826TimeElapsed        Counter32,
+        	  ctBBE                    Counter32,
+        	  ctBBER                   OCTET STRING,
+        	  ctES                     Counter32,
+        	  ctESR                    OCTET STRING,
+        	  ctSES                    Counter32,
+        	  ctSESR                   OCTET STRING,
+        	  ctBB                     OCTET STRING,
+        	  ctUAS                    Counter32,
+        	  ctG826Reset              INTEGER
+          }
+   
+  ctG826TimeElapsed OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Time elapsed in seconds since last PMReset"
+          ::= { ctG826ContinuousEntry 1 }
+
+  ctBBE   OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Background Block Errors"
+          ::= { ctG826ContinuousEntry 2 }
+
+  ctBBER  OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Background Block Errors Ratio"
+          ::= { ctG826ContinuousEntry 3 } 
+
+  ctES    OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Error seconds"
+          ::= { ctG826ContinuousEntry 4 } 
+  
+  ctESR   OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Error seconds Ratio"
+          ::= { ctG826ContinuousEntry 5 }
+
+  ctSES   OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Severely error seconds"
+          ::= { ctG826ContinuousEntry 6 }
+
+  ctSESR  OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Severely error seconds Ratio"
+          ::= { ctG826ContinuousEntry 7 } 
+
+  ctBB    OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Background blocks"
+          ::= { ctG826ContinuousEntry 8 } 
+
+  ctUAS   OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Unavailable seconds "
+          ::= { ctG826ContinuousEntry 9 }
+
+  ctG826Reset OBJECT-TYPE
+          SYNTAX INTEGER
+          {
+              other(1),
+              noReset(2),
+              reset(3)
+          }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+              "Reset the continuous PM counters"
+          ::= { ctG826ContinuousEntry 10 }
+ 
+  
+---
+---The definition of ctG826Current15mTable
+---   
+ctG826Current15mTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF CtG826Current15mEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                "A table of CT Performance G826 15 m current counters Table entries."
+            ::= { ctPerformance 2 }
+            
+  ctG826Current15mEntry OBJECT-TYPE
+            SYNTAX      CtG826Current15mEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                      "An entry of CT Performance G826 15 m current Table counters."
+            AUGMENTS   { ifEntry }
+            ::= { ctG826Current15mTable 1 }
+     
+  CtG826Current15mEntry ::=
+            SEQUENCE {
+            	ctG826Current15mTimeElapsed   Counter32,
+            	ctCurrent15mBBE           Counter32,
+              ctCurrent15mBBER          OCTET STRING,
+              ctCurrent15mES            Counter32,
+              ctCurrent15mESR           OCTET STRING,
+              ctCurrent15mSES           Counter32,
+              ctCurrent15mSESR          OCTET STRING,
+              ctCurrent15mBB            Counter32,
+              ctCurrent15mUAS           Counter32
+                        }
+     
+  ctG826Current15mTimeElapsed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time elapsed in seconds since last PMReset"
+    ::= { ctG826Current15mEntry 1 }
+    
+  ctCurrent15mBBE OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background Block Errors"
+    ::= { ctG826Current15mEntry 2 }
+
+  ctCurrent15mBBER       OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background Block Errors Ratio"
+    ::= { ctG826Current15mEntry 3 } 
+
+  ctCurrent15mES  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error seconds"
+    ::= { ctG826Current15mEntry 4 } 
+
+  ctCurrent15mESR OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error seconds Ratio"
+    ::= { ctG826Current15mEntry 5 }
+
+  ctCurrent15mSES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Severely error seconds"
+    ::= { ctG826Current15mEntry 6 }
+
+  ctCurrent15mSESR       OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Severely error seconds Ratio"
+    ::= { ctG826Current15mEntry 7 } 
+
+  ctCurrent15mBB       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background blocks"
+    ::= { ctG826Current15mEntry 8 } 
+
+  ctCurrent15mUAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unavailable seconds "
+    ::= { ctG826Current15mEntry 9 }
+      
+---
+---The definition of ctG826Current24hTable
+---   
+ctG826Current24hTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF CtG826Current24hEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+              "A table of CT Performance G826 Current 24h counters entries."
+          ::= { ctPerformance 3 }
+              
+  ctG826Current24hEntry OBJECT-TYPE
+      SYNTAX      CtG826Current24hEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+               "An entry of CT Performance G826 Current 24 h counters."
+      AUGMENTS   { ifEntry }
+        ::= { ctG826Current24hTable 1 }
+       
+      CtG826Current24hEntry ::=
+              SEQUENCE {
+            	  	ctG826Current24hTimeElapsed Counter32,
+                  ctCurrent24hBBE             Counter32,
+                  ctCurrent24hBBER            OCTET STRING,
+                  ctCurrent24hES              Counter32,
+                  ctCurrent24hESR             OCTET STRING,
+                  ctCurrent24hSES             Counter32,
+                  ctCurrent24hSESR            OCTET STRING,
+                  ctCurrent24hBB              Counter32,
+                  ctCurrent24hUAS             Counter32
+              }
+      
+  ctG826Current24hTimeElapsed OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Time elapsed in seconds since last PMReset"
+      ::= { ctG826Current24hEntry 1 }
+       
+  ctCurrent24hBBE OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Background Block Errors"
+      ::= { ctG826Current24hEntry 2 }
+
+  ctCurrent24hBBER       OBJECT-TYPE
+      SYNTAX      OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Background Block Errors Ratio"
+      ::= { ctG826Current24hEntry 3 } 
+
+  ctCurrent24hES  OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Error seconds"
+      ::= { ctG826Current24hEntry 4 } 
+
+  ctCurrent24hESR OBJECT-TYPE
+      SYNTAX      OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Error seconds Ratio"
+      ::= { ctG826Current24hEntry 5 }
+
+  ctCurrent24hSES OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Severely error seconds"
+      ::= { ctG826Current24hEntry 6 }
+
+  ctCurrent24hSESR       OBJECT-TYPE
+      SYNTAX      OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Severely error seconds Ratio"
+      ::= { ctG826Current24hEntry 7 } 
+
+  ctCurrent24hBB       OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Background blocks"
+      ::= { ctG826Current24hEntry 8 } 
+
+  ctCurrent24hUAS OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Unavailable seconds "
+      ::= { ctG826Current24hEntry 9 }
+      
+--
+-- Conformance
+--
+
+    ptRadioLinkCompliances OBJECT IDENTIFIER ::= { ptRadioLinkConformance 1 }
+    ptRadioLinkGroups      OBJECT IDENTIFIER ::= { ptRadioLinkConformance 2 }
+
+    ptRadioLinkFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptRadioLinkCompleteGroup}
+        ::= { ptRadioLinkCompliances 1 }
+
+    ptRadioLinkCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            actualInputPower,
+            actualOutputPower,
+            actualRxAcm,
+            actualRxAcmTC,
+            actualSi,
+            actualSnir,
+            actualTxAcm,
+            actualTxAcmTC,
+            actualTxCapacity,
+            actualTxTotalCapacity,
+            actualXpi,
+            alignmentMode,
+            atpcFallback,
+            atpcFallbackTimer,
+            atpcFallbackOutputPower,
+            autoFreqSelectedChannel,
+            autoFreqSelection,
+            autoFreqSelectionStatus,
+            availableMaxAcm,
+            availableMaxCapacity,
+            availableMaxOutputPower,
+            availableMinAcm,
+            availableMinCapacity,
+            availableMinOutputPower,
+            availableOutputPowerType,
+            berAlarmThreshold,
+            carrierId,
+            channelSpacing,
+            cpriMode,
+            cpriStatus,
+            ctDistinguishedName,
+            ctCurrent15mBB,
+            ctCurrent15mBBE,
+            ctCurrent15mBBER,
+            ctCurrent15mES,
+            ctCurrent15mESR,
+            ctCurrent15mSES,
+            ctCurrent15mSESR,
+            ctCurrent15mUAS,
+            ctG826Current15mTimeElapsed,
+            ctCurrent24hBB,
+            ctCurrent24hBBE,
+            ctCurrent24hBBER,
+            ctCurrent24hES,
+            ctCurrent24hESR,
+            ctCurrent24hSES,
+            ctCurrent24hSESR,
+            ctCurrent24hUAS,
+            ctG826Current24hTimeElapsed,
+            ctBB,
+            ctBBE,
+            ctBBER,
+            ctES,
+            ctESR,
+            ctG826Reset,
+            ctSES,
+            ctSESR,
+            ctG826TimeElapsed,
+            ctUAS,
+            ctStatus,
+            description,
+            duplexConfig,
+            duplexDistance,
+            duplexType,
+            expectedFarEndId,
+            fadeNotificationTimer,
+            farEndIdCheck,
+            frameId,
+            frequencyStepSize,
+            id,
+            inputPowerAlarmThreshold,
+            licensedCapacity,
+            limitedTotalCapacity,
+            manualSwitch,
+            maxRxFrequency,
+            maxTxFrequency,
+            mimoStatus,
+            minRxFrequency,
+            minTxFrequency,
+            mlhcAdminStatus,
+            mlhcMplsConfig,
+            mlhcOperStatus,
+            plcAdminStatus,
+            plcOperStatus,
+            mode,
+            neIpAddress,
+            neIpv6Address,
+            neName,
+            neType,
+            plannedAlignmentInputPower,
+            polarization,
+            protectionStatus,
+            protectionSwitchMode,
+            referenceSec,
+            revertivePreferredTx,
+            revertiveWaitToRestore,
+            rfLoop,
+            rltDistinguishedName,
+            rltStatus,
+            rxFrequency,
+            selectedMaxAcm,
+            selectedMaxCapacity,
+            selectedMaxOutputPower,
+            selectedMinAcm,
+            selectedMinCapacity,
+            selectedMinOutputPower,
+            selectedOutputPowerType,
+            targetInputPowerFarEnd,
+            txAdminStatus,
+            txFrequency,
+            txOperStatus,
+            wantedLicensedCapacity,
+            xpicStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptRadioLinkGroups 1 }
+
+
+END
+PT-MONITOR-MIB DEFINITIONS::=BEGIN
+	IMPORTS	
+		MODULE-IDENTITY,OBJECT-TYPE,Integer32
+			FROM SNMPv2-SMI
+		  pt FROM PT-MIB
+		  MODULE-COMPLIANCE,
+      OBJECT-GROUP FROM SNMPv2-CONF
+     TEXTUAL-CONVENTION FROM SNMPv2-TC;
+	
+	    ptMonitor MODULE-IDENTITY
+        LAST-UPDATED "201603091230Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB of PT specifics"
+                
+        REVISION      "201603091230Z"
+        DESCRIPTION
+            "Validated."    
+            
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "The initial version of this MIB module."
+
+        ::= { pt 4 }
+        
+        ptMonitorConformance OBJECT IDENTIFIER ::= { ptMonitor 2 }
+ 
+--
+-- The textual conventions we define and use in this MIB.
+-- 
+    HealthStatusTC ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"hw status."
+	SYNTAX     INTEGER {
+		eOK       (1),
+		eNOTOK    (2),
+		eUNKNOWN  (3)
+	}
+	
+---
+---The HW Diagnostic Group definition
+---	    
+
+---
+---hw diagnostic table definition
+---
+	hwDiagnosticsTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwDiagnosticsEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "A list of interface entries.  The number of entries is
+            given by the value of ExampleNumber."
+    		::= { ptMonitor 1 }
+
+	hwDiagnosticsEntry OBJECT-TYPE
+    		SYNTAX      HwDiagnosticsEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."
+    		INDEX   { hwIndex }
+    		::= { hwDiagnosticsTable 1 }
+ 
+	HwDiagnosticsEntry ::=
+		    SEQUENCE {
+        			hwIndex                     Integer32,
+        			temperatureStatus           OCTET STRING,
+        			healthStatus        	    HealthStatusTC		
+		    }      
+ 
+	hwIndex OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible 
+	       STATUS      current
+    		DESCRIPTION
+            "a unique index for hw that we diagnose, here it is the slotId"
+    	     ::= { hwDiagnosticsEntry 1 }
+    	     
+	temperatureStatus OBJECT-TYPE
+    	   SYNTAX      OCTET STRING (SIZE (0..80))
+    	   MAX-ACCESS  read-only
+    	   STATUS      current
+    	   DESCRIPTION
+            "The temperature in degree Celsius."
+    	     ::= { hwDiagnosticsEntry 2 } 
+  		
+	healthStatus OBJECT-TYPE
+    	   SYNTAX      HealthStatusTC
+    	   MAX-ACCESS  read-only
+    	   STATUS      current
+    	   DESCRIPTION
+            "This is the hw running status, it has the following value:
+	     eOK       (1),
+	     eNOT_OK   (2),
+	     eUNKNOWN  (3)            
+            "
+    	     ::= { hwDiagnosticsEntry 3 } 
+    	     
+    	     
+--
+-- Conformance
+--
+
+    ptMonitorCompliances OBJECT IDENTIFIER ::= { ptMonitorConformance 1 }
+    ptMonitorGroups      OBJECT IDENTIFIER ::= { ptMonitorConformance 2 }
+
+    ptMonitorFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptMonitorCompleteGroup}
+        ::= { ptMonitorCompliances 1 }
+
+    ptMonitorCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+              temperatureStatus,
+              healthStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptMonitorGroups 1 }
+            	      
+END
+
+PT-SFP-MIB DEFINITIONS::=BEGIN
+  IMPORTS 
+    MODULE-IDENTITY,OBJECT-TYPE,Integer32
+      FROM SNMPv2-SMI
+      pt FROM PT-MIB
+      MODULE-COMPLIANCE,
+      OBJECT-GROUP FROM SNMPv2-CONF
+    entPhysicalEntry FROM ENTITY-MIB
+  TEXTUAL-CONVENTION FROM SNMPv2-TC;
+  
+      ptSFP MODULE-IDENTITY
+        LAST-UPDATED "201605221030Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB of PT SFP specifics. Most entries are read from the SFP itself according to SFF-8472"
+            
+        REVISION      "201605221030Z"
+        DESCRIPTION
+            "The initial version of this MIB module."
+
+        ::= { pt 6 }
+        
+        ptSFPConformance OBJECT IDENTIFIER ::= { ptSFP 2 }
+  
+--
+-- The textual conventions we define and use in this MIB.
+--
+ 
+PortInterfaceTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer which indicates the type of PORT_INTERFACE. "
+    SYNTAX     INTEGER {
+		eNONE                 (1),
+		eUNKNOWN              (2),
+		e100BASELX10          (5),
+		e100BASEFX            (7),
+		e1000BASET            (8),
+		e1000BASEZX           (10),
+		e1000BASELX10         (11),
+		eS11                  (12),
+		eS11E                 (13),
+		eL11                  (14),
+		eL12                  (15),
+		eS41                  (16),
+		eL41                  (17),
+		eL42                  (18),
+		eL42CWDM32DB          (19),
+		eS161                 (20),
+		eL161                 (21),
+		eL162                 (22),
+		eL162CWDM32DB         (23),
+		eL12CWDM28DB          (24),
+		e1000BASESX           (25),
+		e1000BASECWDM32DB     (26),
+		e1000BASECWDM28DB     (27),
+		eL12CWDM32DB          (29),
+		e10GBASELRLW          (30),
+		e10GBASEEREW          (31),
+		e10GBASEZpRZpW        (32),
+		eL42CWDM28DB          (33),
+		eL162CWDM28DB         (34),
+		eMULTIRATECWDM28DB    (35),
+		eMULTIRATECWDM32DB    (36),
+		eMULTIRATES11S41      (37),
+		e100BASEBX10U         (38),
+		e100BASEBX10D         (39),
+		e1000BASEBX10U        (40),
+		e1000BASEBX10D        (41),
+		e10GBASESX            (42),
+		e10GBASELH            (43),
+		eSTM1SFWD             (44),
+		eSTM1SFWU             (45),
+		eSTM4SFWD             (46),
+		eSTM4SFWU             (47),
+    e1000BASELX           (48),
+    e10GBASESRSW          (49),
+    e1000BASETFIXED       (50),
+    e1000BASEBX20U        (51),
+    e1000BASEBX20D        (52),
+    e10GBASEDWDM          (53),
+    eDWDMSFPHP            (54),
+    eUNRECOGNIZEDSFP      (55)
+    }
+ 
+   InstallStateTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer which indicates the type of INSTALL_STATE."
+    SYNTAX     INTEGER {
+    
+		eEMPTY(1),
+		eNOTINSTALLED(2),
+		eINSTALLEDANDNOTPROVISIONED(3),
+		eINSTALLEDANDPROVISIONED(4),
+		eUNAVAILABLE(5),
+		eUNKNOWN (6)
+	}
+	
+  WaveLengthTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer which indicates the type of WAVELENGTH. d is for the decimal."
+    SYNTAX     INTEGER {
+		eNA             (1),
+		eUNKNOWN        (2),
+		e1471           (3),
+		e1491           (4),
+		e1511           (5),
+		e1531           (6),
+		e1551           (7),
+		e1571           (8),
+		e1591           (9),
+		e1611           (10),
+		eNOTPROVISIONED (11),
+		e1311           (12),
+    e1560d6         (13),
+    e1559d8         (14),
+    e1559d0         (15),
+    e1558d2         (16),
+    e1557d4         (17),
+    e1556d6         (18),
+    e1555d8         (19),
+    e1554d9         (20),
+    e1554d1         (21),
+    e1553d3         (22),
+    e1552d5         (23),
+    e1551d7         (24),
+    e1550d9         (25),
+    e1550d1         (26),
+    e1549d3         (27),
+    e1548d5         (28),
+    e1547d7         (29),
+    e1546d9         (30),
+    e1546d1         (31),
+    e1545d3         (32),
+    e1544d5         (33),
+    e1543d7         (34),
+    e1542d9         (35),
+    e1542d1         (36),
+    e1541d4         (37),
+    e1540d6         (38),
+    e1539d8         (39),
+    e1539d0         (40),
+    e1538d2         (41),
+    e1537d4         (42),
+    e1536d6         (43),
+    e1535d8         (44),
+    e1535d0         (45),
+    e1534d3         (46),
+    e1533d5         (47),
+    e1532d7         (48),
+    e1531d9         (49),
+    e1531d1         (50),
+    e1530d3         (51),
+    e1529d6         (52),
+    e850            (53)
+}
+
+  ConnectorTypeTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer which indicates the type of CONNECTOR_TYPE according SFF-8024."
+    SYNTAX     INTEGER {
+		eUNKNOWNORUNSPECIFIED         (1),
+		eSC                           (2),
+		eFIBERCHANNELSTYLE1COPPER     (3),
+		eFIBERCHANNELSTYLE2COPPER     (4),
+		eBNCTNC                       (5),
+		eFIBERCHANNELCOAXIALHEADERS   (6),
+		eFIBERJACK                    (7),
+		eLC                           (8),
+		eMTRT                         (9),
+		eMU                           (10),
+		eSG                           (11),
+		eOPTICALPIGTAIL               (12),
+		eRESERVED                     (13),
+		eHSSDCII                      (14),
+		eCOPPERPIGTAIL                (15),
+		eVENDORSPECIFIC               (16)
+	}
+	
+---
+---The SFP Group definition
+---
+---
+---The definition of sfpTable
+---   
+  ptSFPTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF PtSFPEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+            "An table of SFP Table entries."
+        ::= { ptSFP 1 }
+        
+  ptSFPEntry OBJECT-TYPE
+        SYNTAX      PtSFPEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "An entry of PT SFP application."
+        AUGMENTS   { entPhysicalEntry }
+        ::= { ptSFPTable 1 }
+ 
+  PtSFPEntry ::=
+        SEQUENCE {
+              installedSFP                    PortInterfaceTC,
+              installState                    InstallStateTC, 
+              vendorName                      OCTET STRING,
+              vendorOui                       Integer32,
+              vendorPn                        OCTET STRING,
+              vendorRev                       OCTET STRING,
+              vendorSn                        OCTET STRING,
+              saleableEntityCode              OCTET STRING,
+              connectorType                   ConnectorTypeTC,
+              installedWavelength             WaveLengthTC,
+              levelRx                         Integer32,
+              rxPower                         OCTET STRING,
+              txPower                         OCTET STRING,
+              brNominal                       Integer32,
+              length9m1km                     Integer32,
+              length9m100m                    Integer32,
+              length50m10m                    Integer32,
+              length62m10m                    Integer32,
+              lengthCopper1m                  Integer32,
+              temperature                     OCTET STRING,
+              vcc                             OCTET STRING,
+              biasCurrent                     OCTET STRING
+                    }
+ 
+  installedSFP OBJECT-TYPE
+        SYNTAX      PortInterfaceTC
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Type of the inserted module, see textual convention"
+        ::= { ptSFPEntry 1 }
+
+  installState OBJECT-TYPE
+        SYNTAX      InstallStateTC
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status of the inserted module, see textual convention"
+        ::= { ptSFPEntry 2 } 
+
+  vendorName OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..40))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "SFP vendor name as reported by the SFP"
+           ::= { ptSFPEntry 3 }
+             
+  vendorOui OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "SFP vendor IEEE company ID as reported by the SFP"
+           ::= { ptSFPEntry 4 }
+               
+  vendorPn OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..40))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Part number provided by SFP vendor (ASCII) as reported by the SFP"
+           ::= { ptSFPEntry 5 }
+             
+  vendorRev OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..40))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Revision level for part number provided by vendor (ASCII) as reported by the SFP"
+           ::= { ptSFPEntry 6 }
+           
+  vendorSn OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..8))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Serial number provided by vendor (ASCII) as reported by the SFP"
+           ::= { ptSFPEntry 7 }
+           
+  saleableEntityCode OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..8))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Propriety product name as reported by the SFP's Vendor Specific EEPROM"
+           ::= { ptSFPEntry 8 }  
+           
+  connectorType OBJECT-TYPE
+         SYNTAX      ConnectorTypeTC
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "An integer which indicates the type of CONNECTOR_TYPE according SFF-8024. See also textual convention"
+           ::= { ptSFPEntry 9 }  
+                   
+  installedWavelength OBJECT-TYPE
+         SYNTAX      WaveLengthTC
+         MAX-ACCESS  read-only
+         STATUS      current
+        DESCRIPTION
+            "An integer that in case of an optical SFP, is the laser wavelength in nm. See also textual convention."
+           ::= { ptSFPEntry 10 }  
+           
+  levelRx OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+        DESCRIPTION
+            "The input level in dBm (optical interfaces only). The value is an offset. The value 100 represents 0 dBm. The value 50 represents no signal."
+           ::= { ptSFPEntry 11 }
+           
+  rxPower OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The received light power, in dBm."
+            ::= { ptSFPEntry 12 }       
+
+  txPower OBJECT-TYPE
+             SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The transmit light power, in dBm."
+            ::= { ptSFPEntry 13 }   
+           
+  brNominal OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "The nominal bit rate, in units of 100 Mbps."
+           ::= { ptSFPEntry 14 }
+             
+  length9m1km OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for 9/125 um single fiber, units of 1 km"
+           ::= { ptSFPEntry 15 }   
+  length9m100m OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for 9/125 um single fiber, units of 100 m"
+           ::= { ptSFPEntry 16 }
+             
+  length50m10m OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for 50/125 um OM2 fiber, units of 10 m"
+           ::= { ptSFPEntry 17 }  
+           
+  length62m10m OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for 62.5/125 um OM1 fiber, units of 10 m "
+           ::= { ptSFPEntry 18 }
+             
+  lengthCopper1m OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for copper or direct attach cable, units of m "
+           ::= { ptSFPEntry 19 }     
+   
+  temperature OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The SFP module temperature, in degree Celsius"
+            ::= { ptSFPEntry 20 }
+
+  vcc OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The supply voltage of the interface module, in V."
+            ::= { ptSFPEntry 21 }
+
+  biasCurrent OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The bias current of the interface module, in mA."
+            ::= { ptSFPEntry 22 }
+
+--
+-- Conformance
+--
+
+    ptSFPCompliances OBJECT IDENTIFIER ::= { ptSFPConformance 1 }
+    ptSFPGroups      OBJECT IDENTIFIER ::= { ptSFPConformance 2 }
+
+    ptSFPFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptSFPCompleteGroup}
+        ::= { ptSFPCompliances 1 }
+
+    ptSFPCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+              installedSFP,
+              installState,
+              installedWavelength,
+              levelRx,
+              vendorName,
+              vendorOui,
+              vendorPn,
+              vendorRev,
+              connectorType,
+              brNominal,
+              length9m1km,
+              length9m100m,
+              length50m10m,
+              length62m10m,
+              lengthCopper1m,
+              saleableEntityCode,
+              vendorSn, 
+              rxPower,
+              txPower,
+              temperature,
+              vcc,
+              biasCurrent
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptSFPGroups 1 }
+
+END
