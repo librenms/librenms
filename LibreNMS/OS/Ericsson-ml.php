@@ -2,7 +2,7 @@
 /**
  * Ericsson-ml.php
  *
- * 
+ *
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
-class Ericsson-ml extends OS implements
+class Ericssonml extends OS implements
     ProcessorDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
