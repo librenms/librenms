@@ -68,4 +68,6 @@ $devices = array_map(function ($device) {
 
 $more = ($offset + count($devices)) < $total;
 
+array_multisort(array_column($devices, 'text'), SORT_ASC, $devices);
+
 return [$devices, $more];
