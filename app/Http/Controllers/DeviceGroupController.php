@@ -26,13 +26,13 @@ class DeviceGroupController extends Controller
     {
         $this->authorize('manage', DeviceGroup::class);
 
-        $devices = DeviceGroup::orderBy('name')->withCount('devices')->get();
-        $grouped_device_ids = $this->grouped_devices_device_id($devices);
+        $device_groups = DeviceGroup::orderBy('name')->with('devices:devices.device_id')->withCount('devices')->get();
+        $grouped_device_ids = $this->groupedDevicesDeviceId($device_groups);
 
         $ungrouped_devices = Device::orderby('hostname')->whereNotIn('device_id', $grouped_device_ids)->get();
 
         return view('device-group.index', [
-            'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
+            'device_groups' => $device_groups,
             'ungrouped_devices' => $ungrouped_devices,
         ]);
     }
@@ -42,7 +42,7 @@ class DeviceGroupController extends Controller
      *
      * @return Array with grouped device_ids
      */
-    private function grouped_devices_device_id($grouped_devices)
+    private function groupedDevicesDeviceId($grouped_devices)
     {
         $device_ids = array();
         foreach ($grouped_devices as $device_group) {
