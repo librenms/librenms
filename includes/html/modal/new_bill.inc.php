@@ -46,15 +46,15 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                             <?php
                               $sort_field = 'hostname';
 
-                              if (\LibreNMS\Config::get('force_ip_to_sysname') === true) {
-                                  $sort_field = 'sysName';
-                              }
+                            if (\LibreNMS\Config::get('force_ip_to_sysname') === true) {
+                                $sort_field = 'sysName';
+                            }
 
                               $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY ?', array($sort_field));
-                              foreach ($devices as $device) {
-                                  $selected = $device['device_id'] == $port_device_id ? " selected" : "";
-                                  echo "<option value='${device['device_id']}' $selected>".format_hostname($device)."</option>\n";
-                              }
+                            foreach ($devices as $device) {
+                                $selected = $device['device_id'] == $port_device_id ? " selected" : "";
+                                echo "<option value='${device['device_id']}' $selected>".format_hostname($device)."</option>\n";
+                            }
                             ?>
                         </select>
                     </div>
