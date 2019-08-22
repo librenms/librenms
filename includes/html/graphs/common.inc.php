@@ -2,8 +2,13 @@
 
 use LibreNMS\Util\Clean;
 
-$from = parse_at_time($_GET['from']);
-$to = parse_at_time($_GET['to']);
+if ($_GET['from']) {
+    $from = parse_at_time($_GET['from']);
+}
+
+if ($_GET['to']) {
+    $to = parse_at_time($_GET['to']);
+}
 
 if ($_GET['width']) {
     $width = (int)$_GET['width'];
