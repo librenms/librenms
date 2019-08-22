@@ -86,12 +86,12 @@
 
         <table class='table table-condensed'>
 
-            @if (Auth::user()->hasGlobalAdmin())
+            @admin
             <tr>
                 <td colspan='4'>
                     <span class='bg-danger'>
                         <label for="callback">@lang('Opt in to send anonymous usage statistics to LibreNMS?')</label><br />
-                        <input type="checkbox" id="callback" data-size="normal" name="statistics">
+                        <input type="checkbox" id="callback" data-size="normal" name="statistics" @if($callback_status) checked @endif>
                     </span><br />
                     @lang('Online stats:') <a href='https://stats.librenms.org/'>stats.librenms.org</a>
                 </td>
@@ -104,7 +104,7 @@
                 </td>
             </tr>
             @endisset
-            @endif
+            @endadmin
 
             <tr>
                 <td><i class='fa fa-fw fa-server fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('Devices')</b></td>
@@ -191,39 +191,37 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
 </div>
 @endsection
 
-@section('javascript')
+@section('scripts')
 <script>
-    $(document).ready(function () {
-        $("[name='statistics']").bootstrapSwitch('offColor','danger','size','mini');
-        $('input[name="statistics"]').on('switchChange.bootstrapSwitch',  function(event, state) {
-            event.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: '{{ url('/ajax/form') }}',
-                data: { type: "callback-statistics", state: state},
-                dataType: "json",
-                success: function(data){},
-                error:function(){
-                    return $("#switch-state").bootstrapSwitch("toggle");
-                }
-            });
+    $("[name='statistics']").bootstrapSwitch('offColor','danger','size','mini');
+    $('input[name="statistics"]').on('switchChange.bootstrapSwitch',  function(event, state) {
+        event.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { type: "callback-statistics", state: state},
+            dataType: "json",
+            success: function(data){},
+            error:function(){
+                return $("#switch-state").bootstrapSwitch("toggle");
+            }
         });
-        $('#clear-stats').click(function(event) {
-            event.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: '{{ url('/ajax/form') }}',
-                data: { type: "callback-clear"},
-                dataType: "json",
-                success: function(data){
-                    location.reload(true);
-                },
-                error:function(){}
-            });
-        });
-
-        var ver_date = $('#version_date');
-        ver_date.text(moment.unix(ver_date.text()));
     });
+    $('#clear-stats').click(function(event) {
+        event.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { type: "callback-clear"},
+            dataType: "json",
+            success: function(data){
+                location.reload(true);
+            },
+            error:function(){}
+        });
+    });
+
+    var ver_date = $('#version_date');
+    ver_date.text(moment.unix(ver_date.text()));
 </script>
 @endsection

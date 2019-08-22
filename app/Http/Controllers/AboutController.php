@@ -55,21 +55,14 @@ use LibreNMS\Util\Version;
 
 class AboutController extends Controller
 {
-
     public function index(Request $request)
     {
-        $callback_uuid = null;
-
-        $callback_status = Callback::where('name', 'enabled')->first()->value;
-        if ($callback_status && $callback_status != 2) {
-            $callback_uuid = Callback::where('name', 'uuid')->first();
-        }
-
+        $callback_status = Callback::get('enabled') === '1';
         $version = Version::get();
 
         return view('about.index', [
             'callback_status' => $callback_status,
-            'callback_uuid'   => $callback_uuid,
+            'callback_uuid'   => $callback_status ? Callback::get('uuid') : null,
 
             'db_schema' => vsprintf('%s (%s)', $version->database()),
             'git_log'   => $version->gitChangelog(),

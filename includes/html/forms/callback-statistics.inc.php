@@ -18,14 +18,4 @@ if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-if ($_POST['state'] == 'true') {
-    $state = 1;
-} elseif ($_POST['state'] == 'false') {
-    $state = 0;
-} else {
-    $state = 0;
-}
-
-if (dbUpdate(array('value' => $state), 'callback', '`name` = "enabled"', array()) == 0) {
-    dbInsert(array('value' => $state,'name' => 'enabled'), 'callback');
-}
+\App\Models\Callback::set('enabled', (int)($_POST['state'] == 'true'));
