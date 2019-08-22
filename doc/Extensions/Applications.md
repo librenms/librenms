@@ -868,20 +868,25 @@ $mysql_host = 'localhost';
 $mysql_port = 3306;
 ```
 
+Note that depending on your MySQL installation (chrooted install for example),
+you may have to specify 127.0.0.1 instead of localhost. Localhost make
+a MySQL connexion via the mysql socket, while 127.0.0.1 make a standard
+IP connexion to mysql.
+
 5: Edit your snmpd.conf file and add:
 
 ```
 extend mysql /etc/snmp/mysql
 ```
 
-6: Restart snmpd.
-
-7: Install the PHP CLI language and your MySQL module of choice for
+6: Install the PHP CLI language and your MySQL module of choice for
 PHP.
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+7: Restart snmpd.
 
 # NGINX
 
