@@ -1,0 +1,179 @@
+mib: ZMTEL-ODU-MIB
+modules:
+    sensors:
+        count:
+            data:
+                -
+                    oid: pCID
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.19.{{ $index }}'
+                    descr: Physical Cell ID
+                    index: 'pCID.{{ $index }}'
+        snr:
+            data:
+                -
+                    oid: sinr
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.15.{{ $index }}'
+                    descr: Signal to Interference
+                    index: 'sinr.{{ $index }}'
+                -
+                    oid: cinr0
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.16.{{ $index }}'
+                    descr: Carrier to Interference 0
+                    index: 'cinr0.{{ $index }}'
+                -
+                    oid: cinr1
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.17.{{ $index }}'
+                    descr: Carrier to Interference 1
+                    index: 'cinr1.{{ $index }}'
+        frequency:
+            data:
+                -
+                    oid: dlFrequency
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.8.{{ $index }}'
+                    descr: Download
+                    index: 'dlFrequency.{{ $index }}'
+                -
+                    oid: ulFrequency
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.9.{{ $index }}'
+                    descr: Upload
+                    index: 'ulFrequency.{{ $index }}'
+                -
+                    oid: bandwidth
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.10.{{ $index }}'
+                    descr: Bandwidth
+                    index: 'bandwidth.{{ $index }}'
+        dbm:
+            data:
+                -
+                    oid: rsrp0
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.11.{{ $index }}'
+                    descr: RSRP0
+                    index: 'rsrp0.{{ $index }}'
+                    group: Reference Signal Received Power
+                -
+                    oid: rsrp1
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.12.{{ $index }}'
+                    descr: RSRP1
+                    index: 'rsrp1.{{ $index }}'
+                    group: Reference Signal Received Power
+                -
+                    oid: rsrq
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.13.{{ $index }}'
+                    descr: Reference Signal Received Quality
+                    index: 'rsrq.{{ $index }}'
+                -
+                    oid: rssi
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.14.{{ $index }}'
+                    descr: Received Signal Strength Indicator
+                    index: 'rssi.{{ $index }}'
+                -
+                    oid: txPower
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.18.{{ $index }}'
+                    descr: Tx Power
+                    index: 'txPower.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: wanMode
+                    num_oid: '.1.3.6.1.4.1.38595.10.4.1.{{ $index }}'
+                    index: 'wanMode.{{ $index }}'
+                    descr: WAN Mode
+                    state_name: wanMode
+                    states:
+                        - { value: 0, descr: NAT, graph: 0, generic: 0 }
+                        - { value: 1, descr: Router, graph: 0, generic: 0 }
+                        - { value: 2, descr: Router, graph: 0, generic: 0 }
+                -
+                    oid: wanType
+                    num_oid: '.1.3.6.1.4.1.38595.10.4.2.{{ $index }}'
+                    index: 'wanType.{{ $index }}'
+                    descr: WAN type
+                    state_name: wanType
+                    states:
+                        - { value: 0, descr: DHCP, graph: 0, generic: 0 }
+                        - { value: 1, descr: Static, graph: 0, generic: 0 }
+                -
+                    oid: firewall
+                    num_oid: '.1.3.6.1.4.1.38595.10.2.9.{{ $index }}'
+                    index: 'firewall.{{ $index }}'
+                    descr: Firewall Status
+                    state_name: firewall
+                    states:
+                        - { value: 0, descr: disabled, graph: 0, generic: 2 }
+                        - { value: 1, descr: enabled, graph: 0, generic: 0 }
+                -
+                    oid: dlMCS
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.6.{{ $index }}'
+                    index: 'dlMCS.{{ $index }}'
+                    descr: Download
+                    state_name: dlMCS
+                    group: Modulation Scheme
+                    states:
+                        - { value: 0, descr: mcs0-qpsk-tbs0, graph: 1, generic: 0 }
+                        - { value: 1, descr: mcs1-qpsk-tbs1, graph: 1, generic: 0 }
+                        - { value: 2, descr: mcs2-qpsk-tbs2, graph: 1, generic: 0 }
+                        - { value: 3, descr: mcs3-qpsk-tbs3, graph: 1, generic: 0 }
+                        - { value: 4, descr: mcs4-qpsk-tbs4, graph: 1, generic: 0 }
+                        - { value: 5, descr: mcs5-qpsk-tbs5, graph: 1, generic: 0 }
+                        - { value: 6, descr: mcs6-qpsk-tbs6, graph: 1, generic: 0 }
+                        - { value: 7, descr: mcs7-qpsk-tbs7, graph: 1, generic: 0 }
+                        - { value: 8, descr: mcs8-qpsk-tbs8, graph: 1, generic: 0 }
+                        - { value: 9, descr: mcs9-qpsk-tbs9, graph: 1, generic: 0 }
+                        - { value: 10, descr: mcs10-16qam-tbs9, graph: 1, generic: 0 }
+                        - { value: 11, descr: mcs11-16qam-tbs10, graph: 1, generic: 0 }
+                        - { value: 12, descr: mcs12-16qam-tbs11, graph: 1, generic: 0 }
+                        - { value: 13, descr: mcs13-16qam-tbs12, graph: 1, generic: 0 }
+                        - { value: 14, descr: mcs14-16qam-tbs13, graph: 1, generic: 0 }
+                        - { value: 15, descr: mcs15-16qam-tbs14, graph: 1, generic: 0 }
+                        - { value: 16, descr: mcs16-16qam-tbs15, graph: 1, generic: 0 }
+                        - { value: 17, descr: mcs17-64qam-tbs15, graph: 1, generic: 0 }
+                        - { value: 19, descr: mcs19-64qam-tbs17, graph: 1, generic: 0 }
+                        - { value: 21, descr: mcs21-64qam-tbs19, graph: 1, generic: 0 }
+                        - { value: 22, descr: mcs22-64qam-tbs20, graph: 1, generic: 0 }
+                        - { value: 23, descr: mcs23-64qam-tbs21, graph: 1, generic: 0 }
+                        - { value: 24, descr: mcs24-64qam-tbs22, graph: 1, generic: 0 }
+                        - { value: 25, descr: mcs25-64qam-tbs23, graph: 1, generic: 0 }
+                        - { value: 26, descr: mcs26-64qam-tbs24, graph: 1, generic: 0 }
+                        - { value: 27, descr: mcs27-64qam-tbs25, graph: 1, generic: 0 }
+                        - { value: 28, descr: mcs28-64qam-tbs26, graph: 1, generic: 0 }
+                        - { value: 29, descr: mcs29-qpsk-reserved, graph: 1, generic: 0 }
+                        - { value: 30, descr: mcs30-16qam-reserved, graph: 1, generic: 0 }
+                        - { value: 31, descr: mcs31-64qam-reserved, graph: 1, generic: 0 }
+                -
+                    oid: ulMCS
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.7.{{ $index }}'
+                    index: 'ulMCS.{{ $index }}'
+                    descr: Upload
+                    state_name: ulMCS
+                    group: Modulation Scheme
+                    states:
+                        - { value: 0, descr: mcs0-qpsk-tbs0, graph: 1, generic: 0 }
+                        - { value: 1, descr: mcs1-qpsk-tbs1, graph: 1, generic: 0 }
+                        - { value: 2, descr: mcs2-qpsk-tbs2, graph: 1, generic: 0 }
+                        - { value: 3, descr: mcs3-qpsk-tbs3, graph: 1, generic: 0 }
+                        - { value: 4, descr: mcs4-qpsk-tbs4, graph: 1, generic: 0 }
+                        - { value: 5, descr: mcs5-qpsk-tbs5, graph: 1, generic: 0 }
+                        - { value: 6, descr: mcs6-qpsk-tbs6, graph: 1, generic: 0 }
+                        - { value: 7, descr: mcs7-qpsk-tbs7, graph: 1, generic: 0 }
+                        - { value: 8, descr: mcs8-qpsk-tbs8, graph: 1, generic: 0 }
+                        - { value: 9, descr: mcs9-qpsk-tbs9, graph: 1, generic: 0 }
+                        - { value: 10, descr: mcs10-16qam-tbs9, graph: 1, generic: 0 }
+                        - { value: 11, descr: mcs11-16qam-tbs10, graph: 1, generic: 0 }
+                        - { value: 12, descr: mcs12-16qam-tbs11, graph: 1, generic: 0 }
+                        - { value: 13, descr: mcs13-16qam-tbs12, graph: 1, generic: 0 }
+                        - { value: 14, descr: mcs14-16qam-tbs13, graph: 1, generic: 0 }
+                        - { value: 15, descr: mcs15-16qam-tbs14, graph: 1, generic: 0 }
+                        - { value: 16, descr: mcs16-16qam-tbs15, graph: 1, generic: 0 }
+                        - { value: 17, descr: mcs17-64qam-tbs15, graph: 1, generic: 0 }
+                        - { value: 19, descr: mcs19-64qam-tbs17, graph: 1, generic: 0 }
+                        - { value: 21, descr: mcs21-64qam-tbs19, graph: 1, generic: 0 }
+                        - { value: 22, descr: mcs22-64qam-tbs20, graph: 1, generic: 0 }
+                        - { value: 23, descr: mcs23-64qam-tbs21, graph: 1, generic: 0 }
+                        - { value: 24, descr: mcs24-64qam-tbs22, graph: 1, generic: 0 }
+                        - { value: 25, descr: mcs25-64qam-tbs23, graph: 1, generic: 0 }
+                        - { value: 26, descr: mcs26-64qam-tbs24, graph: 1, generic: 0 }
+                        - { value: 27, descr: mcs27-64qam-tbs25, graph: 1, generic: 0 }
+                        - { value: 28, descr: mcs28-64qam-tbs26, graph: 1, generic: 0 }
+                        - { value: 29, descr: mcs29-qpsk-reserved, graph: 1, generic: 0 }
+                        - { value: 30, descr: mcs30-16qam-reserved, graph: 1, generic: 0 }
+                        - { value: 31, descr: mcs31-64qam-reserved, graph: 1, generic: 0 }

@@ -6,10 +6,40 @@ if ($device['os'] == 'junos') {
     $entity_array = array();
     echo ' jnxBoxAnatomy';
     $entity_array = snmpwalk_cache_oid($device, 'jnxBoxAnatomy', $entity_array, 'JUNIPER-MIB');
+} elseif ($device['os'] == 'aruba-instant') {
+    $entity_array = array();
+    echo 'aruba-instant';
+
+    $ai_mib = 'AI-AP-MIB';
+    $ai_ig_data = snmpwalk_group($device, 'aiInfoGroup', $ai_mib);
+     discover_entity_physical(
+         $valid,
+         $device,
+         1,                                              // entPhysicalIndex
+         $ai_ig_data['aiVirtualControllerIPAddress.0'],  // entPhysicalDescr
+         'chassis',                                      // entPhysicalClass
+         $ai_ig_data['aiVirtualControllerName.0'],       // entPhysicalName
+         'Instant Virutal Controller Cluster',           // entPhysicalModelName
+         $ai_ig_data['aiVirtualControllerKey.0'],        // entPhysicalSerialNum
+         '0',                                            // entPhysicalContainedIn
+         'Aruba',                                        // entPhysicalMfgName
+         '-1',                                           // entPhysicalParentRelPos
+         'Aruba',                                        // entPhysicalVendorType
+         null,                                           // entPhysicalHardwareRev
+         null,                                           // entPhysicalFirmwareRev
+         null,                                           // entPhysicalSoftwareRev
+         null,                                           // entPhysicalIsFRU
+         null,                                           // entPhysicalAlias
+         null,                                           // entPhysicalAssetID
+         null                                            // ifIndex
+     );
+
+    $entity_array = snmpwalk_group($device, 'aiAccessPointEntry', $ai_mib);
+    $instant_index = 2;
 } elseif ($device['os'] == 'timos') {
     $entity_array = array();
     echo 'tmnxHwObjs';
-    $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', '+'.$config['mib_dir'].'/aos:'.$config['mib_dir']);
+    $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', 'nokia');
 } else {
     $entity_array = array();
     echo ' entPhysicalEntry';
@@ -87,6 +117,7 @@ if ($device['os'] == 'saf-cfm') {
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
+    unset($ifIndex);
     if ($device['os'] == 'junos') {
         // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values
         // are made up here.
@@ -108,6 +139,24 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         // fix for issue 1865, $entPhysicalIndex, as it contains a quad dotted number on newer Junipers
         // using str_replace to remove all dots should fix this even if it changes in future
         $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
+    } elseif ($device['os'] == 'aruba-instant') {
+        $entPhysicalDescr        = $entry['aiAPMACAddress'];
+        $entPhysicalContainedIn  = 1;
+        $entPhysicalSerialNum    = $entry['aiAPSerialNum'];
+        $entPhysicalModelName    = $entry['aiAPModel'];
+        $entPhysicalMfgName      = 'Aruba';
+        $entPhysicalVendorType   = 'Aruba';
+        $entPhysicalParentRelPos = -1;
+        $entPhysicalSoftwareRev  = $device['version'];
+        $entPhysicalIndex        = $instant_index;
+
+        if ($entry['aiAPIPAddress'] == $ai_ig_data['aiMasterIPAddress.0']) {
+            $entPhysicalName = sprintf('%s %s Cluster Master', $entry['aiAPName'], $entry['aiAPIPAddress']);
+        } else {
+            $entPhysicalName = sprintf('%s %s Cluster Member', $entry['aiAPName'], $entry['aiAPIPAddress']);
+        }
+
+        $instant_index += 1;
     } elseif ($device['os'] == 'timos') {
         $entPhysicalDescr        = $entry['tmnxCardTypeDescription'];
         $entPhysicalContainedIn  = $entry['tmnxHwContainedIn'];
@@ -142,6 +191,12 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalIsFRU        = $entry['entPhysicalIsFRU'];
         $entPhysicalAlias        = $entry['entPhysicalAlias'];
         $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
+
+        //VRP devices seems to use LogicalEntity '1' instead of '0' like the default code checks.
+        //Standard code is still run after anyway.
+        if (isset($entry['1']['entAliasMappingIdentifier'])) {
+            $ifIndex = preg_replace('/ifIndex\.(\d+).*/', '$1', $entry['1']['entAliasMappingIdentifier']);
+        }
     } else {
         $entPhysicalDescr        = array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '';
         $entPhysicalContainedIn  = array_key_exists('entPhysicalContainedIn', $entry)  ? $entry['entPhysicalContainedIn']  : '';
@@ -162,14 +217,13 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
 
     if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {
         $ifIndex = $entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'];
-    }
-
-    if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
-        unset($ifIndex);
-    } else {
-        $ifIndex_array = explode('.', $ifIndex);
-        $ifIndex       = $ifIndex_array[1];
-        unset($ifIndex_array);
+        if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
+            unset($ifIndex);
+        } else {
+            $ifIndex_array = explode('.', $ifIndex);
+            $ifIndex       = $ifIndex_array[1];
+            unset($ifIndex_array);
+        }
     }
 
     // List of real names for cisco entities

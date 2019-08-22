@@ -3,11 +3,11 @@ import LibreNMS
 import json
 import logging
 import os
+import pymysql
 import subprocess
 import threading
 import sys
 import time
-import timeit
 
 from datetime import timedelta
 from logging import debug, info, warning, error, critical, exception
@@ -16,83 +16,6 @@ from time import sleep
 from socket import gethostname
 from signal import signal, SIGTERM
 from uuid import uuid1
-
-
-class PerformanceCounter(object):
-    """
-    This is a simple counter to record execution time and number of jobs. It's unique to each
-    poller instance, so does not need to be globally syncronised, just locally.
-    """
-
-    def __init__(self):
-        self._count = 0
-        self._jobs = 0
-        self._lock = threading.Lock()
-
-    def add(self, n):
-        """
-        Add n to the counter and increment the number of jobs by 1
-        :param n: Number to increment by
-        """
-        with self._lock:
-            self._count += n
-            self._jobs += 1
-
-    def split(self, precise=False):
-        """
-        Return the current counter value and keep going
-        :param precise: Whether floating point precision is desired
-        :return: ((INT or FLOAT), INT)
-        """
-        return (self._count if precise else int(self._count)), self._jobs
-
-    def reset(self, precise=False):
-        """
-        Return the current counter value and then zero it.
-        :param precise: Whether floating point precision is desired
-        :return: ((INT or FLOAT), INT)
-        """
-        with self._lock:
-            c = self._count
-            j = self._jobs
-            self._count = 0
-            self._jobs = 0
-
-            return (c if precise else int(c)), j
-
-
-class TimeitContext(object):
-    """
-    Wrapper around timeit to allow the timing of larger blocks of code by wrapping them in "with"
-    """
-
-    def __init__(self):
-        self._t = timeit.default_timer()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        del self._t
-
-    def delta(self):
-        """
-        Calculate the elapsed time since the context was initialised
-        :return: FLOAT
-        """
-        if not self._t:
-            raise ArithmeticError("Timer has not been started, cannot return delta")
-
-        return timeit.default_timer() - self._t
-
-    @classmethod
-    def start(cls):
-        """
-        Factory method for TimeitContext
-        :param cls:
-        :return: TimeitContext
-        """
-        return cls()
 
 
 class ServiceConfig:
@@ -111,6 +34,7 @@ class ServiceConfig:
 
     class PollerConfig:
         def __init__(self, workers, frequency, calculate=None):
+            self.enabled = True
             self.workers = workers
             self.frequency = frequency
             self.calculate = calculate
@@ -127,13 +51,16 @@ class ServiceConfig:
 
     debug = False
     log_level = 20
+    max_db_failures = 5
 
     alerting = PollerConfig(1, 60)
     poller = PollerConfig(24, 300)
     services = PollerConfig(8, 300)
     discovery = PollerConfig(16, 21600)
     billing = PollerConfig(2, 300, 60)
+    ping = PollerConfig(1, 120)
     down_retry = 60
+    update_enabled = True
     update_frequency = 86400
 
     master_resolution = 1
@@ -169,16 +96,25 @@ class ServiceConfig:
         self.log_level = config.get('poller_service_loglevel', ServiceConfig.log_level)
 
         # new options
+        self.poller.enabled = config.get('service_poller_enabled', True)  # unused
         self.poller.workers = config.get('service_poller_workers', ServiceConfig.poller.workers)
         self.poller.frequency = config.get('service_poller_frequency', ServiceConfig.poller.frequency)
-        self.services.workers = config.get('service_services_workers', ServiceConfig.services.workers)
-        self.services.frequency = config.get('service_services_frequency', ServiceConfig.services.frequency)
+        self.discovery.enabled = config.get('service_discovery_enabled', True)   # unused
         self.discovery.workers = config.get('service_discovery_workers', ServiceConfig.discovery.workers)
         self.discovery.frequency = config.get('service_discovery_frequency', ServiceConfig.discovery.frequency)
+        self.services.enabled = config.get('service_services_enabled', True)
+        self.services.workers = config.get('service_services_workers', ServiceConfig.services.workers)
+        self.services.frequency = config.get('service_services_frequency', ServiceConfig.services.frequency)
+        self.billing.enabled = config.get('service_billing_enabled', True)
         self.billing.frequency = config.get('service_billing_frequency', ServiceConfig.billing.frequency)
         self.billing.calculate = config.get('service_billing_calculate_frequency', ServiceConfig.billing.calculate)
+        self.alerting.enabled = config.get('service_alerting_enabled', True)
+        self.alerting.frequency = config.get('service_alerting_frequency', ServiceConfig.alerting.frequency)
+        self.ping.enabled = config.get('service_ping_enabled', False)
+        self.ping.frequency = config.get('ping_rrd_step', ServiceConfig.billing.calculate)
         self.down_retry = config.get('service_poller_down_retry', ServiceConfig.down_retry)
         self.log_level = config.get('service_loglevel', ServiceConfig.log_level)
+        self.update_enabled = config.get('service_update_enabled', ServiceConfig.update_enabled)
         self.update_frequency = config.get('service_update_frequency', ServiceConfig.update_frequency)
 
         self.redis_host = os.getenv('REDIS_HOST', config.get('redis_host', ServiceConfig.redis_host))
@@ -245,13 +181,12 @@ class Service:
     config = ServiceConfig()
     _fp = False
     _started = False
-    alerting_manager = None
+    queue_managers = {}
     poller_manager = None
     discovery_manager = None
-    services_manager = None
-    billing_manager = None
     last_poll = {}
     terminate_flag = False
+    db_failures = 0
 
     def __init__(self):
         self.config.populate()
@@ -259,17 +194,12 @@ class Service:
 
         self.attach_signals()
 
-        # init database connections different ones for different threads
-        self._db = LibreNMS.DB(self.config)  # main
-        self._services_db = LibreNMS.DB(self.config)  # services dispatch
-        self._discovery_db = LibreNMS.DB(self.config)  # discovery dispatch
+        self._db = LibreNMS.DB(self.config)
 
         self._lm = self.create_lock_manager()
         self.daily_timer = LibreNMS.RecurringTimer(self.config.update_frequency, self.run_maintenance, 'maintenance')
         self.stats_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.log_performance_stats, 'performance')
         self.is_master = False
-
-        self.performance_stats = {'poller': PerformanceCounter(), 'discovery': PerformanceCounter(), 'services': PerformanceCounter()}
 
     def attach_signals(self):
         info("Attaching signal handlers on thread %s", threading.current_thread().name)
@@ -288,29 +218,35 @@ class Service:
         debug("Starting up queue managers...")
 
         # initialize and start the worker pools
-        self.poller_manager = LibreNMS.QueueManager(self.config, 'poller', self.poll_device)
-        self.alerting_manager = LibreNMS.TimedQueueManager(self.config, 'alerting', self.poll_alerting,
-                                                           self.dispatch_alerting)
-        self.services_manager = LibreNMS.TimedQueueManager(self.config, 'services', self.poll_services,
-                                                           self.dispatch_services)
-        self.discovery_manager = LibreNMS.TimedQueueManager(self.config, 'discovery', self.discover_device,
-                                                            self.dispatch_discovery)
-        self.billing_manager = LibreNMS.BillingQueueManager(self.config, self.poll_billing,
-                                                            self.dispatch_poll_billing, self.dispatch_calculate_billing)
-
-        self.daily_timer.start()
+        self.poller_manager = LibreNMS.PollerQueueManager(self.config, self._lm)
+        self.queue_managers['poller'] = self.poller_manager
+        self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
+        self.queue_managers['discovery'] = self.discovery_manager
+        if self.config.alerting.enabled:
+            self.queue_managers['alerting'] = LibreNMS.AlertQueueManager(self.config, self._lm)
+        if self.config.services.enabled:
+            self.queue_managers['services'] = LibreNMS.ServicesQueueManager(self.config, self._lm)
+        if self.config.billing.enabled:
+            self.queue_managers['billing'] = LibreNMS.BillingQueueManager(self.config, self._lm)
+        if self.config.ping.enabled:
+            self.queue_managers['ping'] = LibreNMS.PingQueueManager(self.config, self._lm)
+        if self.config.update_enabled:
+            self.daily_timer.start()
         self.stats_timer.start()
 
         info("LibreNMS Service: {} started!".format(self.config.unique_name))
         info("Poller group {}. Using Python {} and {} locks and queues"
              .format('0 (default)' if self.config.group == [0] else self.config.group, python_version(),
                      'redis' if isinstance(self._lm, LibreNMS.RedisLock) else 'internal'))
-        info("Maintenance tasks will be run every {}".format(timedelta(seconds=self.config.update_frequency)))
+        if self.config.update_enabled:
+            info("Maintenance tasks will be run every {}".format(timedelta(seconds=self.config.update_frequency)))
+        else:
+            warning("Maintenance tasks are disabled.")
 
         # Main dispatcher loop
         try:
             while not self.terminate_flag:
-                master_lock = self._lm.lock('dispatch.master', self.config.unique_name, self.config.master_timeout, True)
+                master_lock = self._acquire_master()
                 if master_lock:
                     if not self.is_master:
                         info("{} is now the master dispatcher".format(self.config.name))
@@ -339,148 +275,57 @@ class Service:
         info("Dispatch loop terminated")
         self.shutdown()
 
+    def _acquire_master(self):
+        return self._lm.lock('dispatch.master', self.config.unique_name, self.config.master_timeout, True)
+
+    def _release_master(self):
+        self._lm.unlock('dispatch.master', self.config.unique_name)
+
     # ------------ Discovery ------------
     def dispatch_immediate_discovery(self, device_id, group):
-        if self.discovery_manager.get_queue(group).empty() and not self.discovery_is_locked(device_id):
+        if not self.discovery_manager.is_locked(device_id):
             self.discovery_manager.post_work(device_id, group)
-
-    def dispatch_discovery(self):
-        devices = self.fetch_device_list()
-        for device in devices:
-            self.discovery_manager.post_work(device[0], device[1])
-
-    def discover_device(self, device_id):
-        if self.lock_discovery(device_id):
-            try:
-                with TimeitContext.start() as t:
-                    info("Discovering device {}".format(device_id))
-                    self.call_script('discovery.php', ('-h', device_id))
-                    info('Discovery complete {}'.format(device_id))
-                    self.report_execution_time(t.delta(), 'discovery')
-            except subprocess.CalledProcessError as e:
-                if e.returncode == 5:
-                    info("Device {} is down, cannot discover, waiting {}s for retry"
-                         .format(device_id, self.config.down_retry))
-                    self.lock_discovery(device_id, True)
-                else:
-                    self.unlock_discovery(device_id)
-            else:
-                self.unlock_discovery(device_id)
-
-    # ------------ Alerting ------------
-    def dispatch_alerting(self):
-        self.alerting_manager.post_work('alerts', 0)
-
-    def poll_alerting(self, _=None):
-        try:
-            info("Checking alerts")
-            self.call_script('alerts.php')
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 1:
-                warning("There was an error issuing alerts: {}".format(e.output))
-            else:
-                raise
-
-    # ------------ Services ------------
-    def dispatch_services(self):
-        devices = self.fetch_services_device_list()
-        for device in devices:
-            self.services_manager.post_work(device[0], device[1])
-
-    def poll_services(self, device_id):
-        if self.lock_services(device_id):
-            try:
-                with TimeitContext.start() as t:
-                    info("Checking services on device {}".format(device_id))
-                    self.call_script('check-services.php', ('-h', device_id))
-                    info('Services complete {}'.format(device_id))
-                    self.report_execution_time(t.delta(), 'services')
-            except subprocess.CalledProcessError as e:
-                if e.returncode == 5:
-                    info("Device {} is down, cannot poll service, waiting {}s for retry"
-                         .format(device_id, self.config.down_retry))
-                    self.lock_services(device_id, True)
-                else:
-                    self.unlock_services(device_id)
-            else:
-                self.unlock_services(device_id)
-
-    # ------------ Billing ------------
-    def dispatch_calculate_billing(self):
-        self.billing_manager.post_work('calculate', 0)
-
-    def dispatch_poll_billing(self):
-        self.billing_manager.post_work('poll', 0)
-
-    def poll_billing(self, run_type):
-        if run_type == 'poll':
-            info("Polling billing")
-            self.call_script('poll-billing.php')
-            info("Polling billing complete")
-        else:  # run_type == 'calculate'
-            info("Calculating billing")
-            self.call_script('billing-calculate.php')
-            info("Calculating billing complete")
 
     # ------------ Polling ------------
     def dispatch_immediate_polling(self, device_id, group):
-        if self.poller_manager.get_queue(group).empty() and not self.polling_is_locked(device_id):
+        if not self.poller_manager.is_locked(device_id):
             self.poller_manager.post_work(device_id, group)
 
             if self.config.debug:
                 cur_time = time.time()
                 elapsed = cur_time - self.last_poll.get(device_id, cur_time)
-                self.last_poll[device_id] = time.time()
+                self.last_poll[device_id] = cur_time
                 # arbitrary limit to reduce spam
                 if elapsed > (self.config.poller.frequency - self.config.master_resolution):
                     debug("Dispatching polling for device {}, time since last poll {:.2f}s"
                           .format(device_id, elapsed))
 
-    def poll_device(self, device_id):
-        if self.lock_polling(device_id):
-            info('Polling device {}'.format(device_id))
-
-            try:
-                with TimeitContext.start() as t:
-                    self.call_script('poller.php', ('-h', device_id))
-                    self.report_execution_time(t.delta(), 'poller')
-            except subprocess.CalledProcessError as e:
-                if e.returncode == 6:
-                    warning('Polling device {} unreachable, waiting {}s for retry'.format(device_id, self.config.down_retry))
-                    # re-lock to set retry timer
-                    self.lock_polling(device_id, True)
-                else:
-                    error('Polling device {} failed! {}'.format(device_id, e))
-                    self.unlock_polling(device_id)
-            else:
-                info('Polling complete {}'.format(device_id))
-                # self.polling_unlock(device_id)
-        else:
-            debug('Tried to poll {}, but it is locked'.format(device_id))
-
-    def fetch_services_device_list(self):
-        return self._services_db.query("SELECT DISTINCT(`device_id`), `poller_group` FROM `services`"
-                                       " LEFT JOIN `devices` USING (`device_id`) WHERE `disabled`=0")
-
-    def fetch_device_list(self):
-        return self._discovery_db.query("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
-
     def fetch_immediate_device_list(self):
-        poller_find_time = self.config.poller.frequency - 1
-        discovery_find_time = self.config.discovery.frequency - 1
+        try:
+            poller_find_time = self.config.poller.frequency - 1
+            discovery_find_time = self.config.discovery.frequency - 1
 
-        return self._db.query('''SELECT `device_id`,
-              `poller_group`,
-              COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1) AS `poll`,
-              COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1) AS `discover`
-            FROM `devices`
-            WHERE `disabled` = 0 AND (
-                `last_polled` IS NULL OR
-                `last_discovered` IS NULL OR
-                `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND) OR
-                `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND)
-            )
-            ORDER BY `last_polled_timetaken` DESC''', (poller_find_time, discovery_find_time, poller_find_time, discovery_find_time))
+            result = self._db.query('''SELECT `device_id`,
+                  `poller_group`,
+                  COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1) AS `poll`,
+                  IF(snmp_disable=1 OR status=0, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1)) AS `discover`
+                FROM `devices`
+                WHERE `disabled` = 0 AND (
+                    `last_polled` IS NULL OR
+                    `last_discovered` IS NULL OR
+                    `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND) OR
+                    `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND)
+                )
+                ORDER BY `last_polled_timetaken` DESC''', (poller_find_time, discovery_find_time, poller_find_time, discovery_find_time))
+            self.db_failures = 0
+            return result
+        except pymysql.err.Error:
+            self.db_failures += 1
+            if self.db_failures > self.config.max_db_failures:
+                warning("Too many DB failures ({}), attempting to release master".format(self.db_failures))
+                self._release_master()
+                sleep(self.config.master_resolution)  # sleep to give another node a chance to acquire
+            return []
 
     def run_maintenance(self):
         """
@@ -500,75 +345,10 @@ class Service:
             sleep(wait)
 
         info("Running maintenance tasks")
-        output = self.call_script('daily.sh')
+        output = LibreNMS.call_script('daily.sh')
         info("Maintenance tasks complete\n{}".format(output))
 
         self.restart()
-
-    # Lock Helpers #
-    def lock_discovery(self, device_id, retry=False):
-        lock_name = self.gen_lock_name('discovery', device_id)
-        timeout = self.config.down_retry if retry else LibreNMS.normalize_wait(self.config.discovery.frequency)
-        return self._lm.lock(lock_name, self.gen_lock_owner(), timeout, retry)
-
-    def unlock_discovery(self, device_id):
-        lock_name = self.gen_lock_name('discovery', device_id)
-        return self._lm.unlock(lock_name, self.gen_lock_owner())
-
-    def discovery_is_locked(self, device_id):
-        lock_name = self.gen_lock_name('discovery', device_id)
-        return self._lm.check_lock(lock_name)
-
-    def lock_polling(self, device_id, retry=False):
-        lock_name = self.gen_lock_name('polling', device_id)
-        timeout = self.config.down_retry if retry else self.config.poller.frequency
-        return self._lm.lock(lock_name, self.gen_lock_owner(), timeout, retry)
-
-    def unlock_polling(self, device_id):
-        lock_name = self.gen_lock_name('polling', device_id)
-        return self._lm.unlock(lock_name, self.gen_lock_owner())
-
-    def polling_is_locked(self, device_id):
-        lock_name = self.gen_lock_name('polling', device_id)
-        return self._lm.check_lock(lock_name)
-
-    def lock_services(self, device_id, retry=False):
-        lock_name = self.gen_lock_name('services', device_id)
-        timeout = self.config.down_retry if retry else self.config.services.frequency
-        return self._lm.lock(lock_name, self.gen_lock_owner(), timeout, retry)
-
-    def unlock_services(self, device_id):
-        lock_name = self.gen_lock_name('services', device_id)
-        return self._lm.unlock(lock_name, self.gen_lock_owner())
-
-    def services_is_locked(self, device_id):
-        lock_name = self.gen_lock_name('services', device_id)
-        return self._lm.check_lock(lock_name)
-
-    @staticmethod
-    def gen_lock_name(lock_class, device_id):
-        return '{}.device.{}'.format(lock_class, device_id)
-
-    def gen_lock_owner(self):
-        return "{}-{}".format(self.config.unique_name, threading.current_thread().name)
-
-    def call_script(self, script, args=()):
-        """
-        Run a LibreNMS script.  Captures all output and throws an exception if a non-zero
-        status is returned.  Blocks parent signals (like SIGINT and SIGTERM).
-        :param script: the name of the executable relative to the base directory
-        :param args: a tuple of arguments to send to the command
-        :returns the output of the command
-        """
-        if script.endswith('.php'):
-            # save calling the sh process
-            base = ('/usr/bin/env', 'php')
-        else:
-            base = ()
-
-        cmd = base + ("{}/{}".format(self.config.BASE_DIR, script),) + tuple(map(str, args))
-        # preexec_fn=os.setsid here keeps process signals from propagating
-        return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid, close_fds=True).decode()
 
     def create_lock_manager(self):
         """
@@ -609,7 +389,7 @@ class Service:
 
         info('Restarting service... ')
         self._stop_managers_and_wait()
-        self._lm.unlock('dispatch.master', self.config.unique_name)
+        self._release_master()
 
         python = sys.executable
         os.execl(python, python, *sys.argv)
@@ -632,7 +412,7 @@ class Service:
         info('Shutting down, waiting for running jobs to complete...')
 
         self.stop_dispatch_timers()
-        self._lm.unlock('dispatch.master', self.config.unique_name)
+        self._release_master()
 
         self.daily_timer.stop()
         self.stats_timer.stop()
@@ -648,34 +428,32 @@ class Service:
         Start all dispatch timers and begin pushing events into queues.
         This should only be started when we are the master dispatcher.
         """
-        self.alerting_manager.start_dispatch()
-        self.billing_manager.start_dispatch()
-        self.services_manager.start_dispatch()
-        self.discovery_manager.start_dispatch()
+        for manager in self.queue_managers.values():
+            try:
+                manager.start_dispatch()
+            except AttributeError:
+                pass
 
     def stop_dispatch_timers(self):
         """
         Stop all dispatch timers, this should be called when we are no longer the master dispatcher.
         """
-        self.alerting_manager.stop_dispatch()
-        self.billing_manager.stop_dispatch()
-        self.services_manager.stop_dispatch()
-        self.discovery_manager.stop_dispatch()
+        for manager in self.queue_managers.values():
+            try:
+                manager.stop_dispatch()
+            except AttributeError:
+                pass
 
     def _stop_managers_and_wait(self):
         """
         Stop all QueueManagers, and wait for their processing threads to complete.
         We send the stop signal to all QueueManagers first, then wait for them to finish.
         """
-        self.discovery_manager.stop()
-        self.poller_manager.stop()
-        self.services_manager.stop()
-        self.billing_manager.stop()
+        for manager in self.queue_managers.values():
+            manager.stop()
 
-        self.discovery_manager.stop_and_wait()
-        self.poller_manager.stop_and_wait()
-        self.services_manager.stop_and_wait()
-        self.billing_manager.stop_and_wait()
+        for manager in self.queue_managers.values():
+            manager.stop_and_wait()
 
     def check_single_instance(self):
         """
@@ -694,9 +472,6 @@ class Service:
             warning("Another instance is already running, quitting.")
             exit(2)
 
-    def report_execution_time(self, time, activity):
-        self.performance_stats[activity].add(time)
-
     def log_performance_stats(self):
         info("Counting up time spent polling")
 
@@ -710,19 +485,19 @@ class Service:
             # Find our ID
             self._db.query('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE node_id="{0}"; '.format(self.config.node_id))
 
-            for worker_type, counter in self.performance_stats.items():
-                worker_seconds, devices = counter.reset()
+            for worker_type, manager in self.queue_managers.items():
+                worker_seconds, devices = manager.performance.reset()
 
                 # Record the queue state
                 self._db.query('INSERT INTO poller_cluster_stats(parent_poller, poller_type, depth, devices, worker_seconds, workers, frequency) '
                                'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
                                'ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; '
                                .format(worker_type,
-                                       sum([getattr(self, ''.join([worker_type, '_manager'])).get_queue(group).qsize() for group in self.config.group]),
+                                       sum([manager.get_queue(group).qsize() for group in self.config.group]),
                                        devices,
                                        worker_seconds,
                                        getattr(self.config, worker_type).workers,
                                        getattr(self.config, worker_type).frequency)
                                )
-        except Exception:
+        except pymysql.err.Error:
             exception("Unable to log performance statistics - is the database still online?")

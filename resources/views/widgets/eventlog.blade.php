@@ -19,9 +19,10 @@
         {
             return {
                 device: "{{ $device }}",
+                device_group: "{{ $device_group }}",
                 eventtype: "{{ $eventtype }}"
             };
         },
-        url: "ajax/table/eventlog"
+        url: "{{ url('/ajax/table/eventlog') }}"
     });
 </script>

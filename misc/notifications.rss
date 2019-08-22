@@ -53,10 +53,15 @@
     <description>As described previously, Legacy Alert Templates and Transports have been removed.  You can find more info here: https://community.librenms.org/t/deprecation-notice-alerting-legacy-transports-and-templates/5915</description>
     <pubDate>Fri, 15 Feb 2017 23:00:00 +0000</pubDate>
   </item>
-    <item>
-      <title>Cisco Temperature Sensor Threshold Values Stored as High Limits</title>
-      <description>During discovery, some temperature sensors discovered on Cisco devices had their highest temperature value stored as warning high limit. For new discovered devices, this value is now stored as high limit.</description>
-      <pubDate>Sun, 17 Mar 2019 21:00:00 +0100</pubDate>
-    </item>
+  <item>
+    <title>Cisco Temperature Sensor Threshold Values Stored as High Limits</title>
+    <description>During discovery, some temperature sensors discovered on Cisco devices had their highest temperature value stored as warning high limit. For new discovered devices, this value is now stored as high limit.</description>
+    <pubDate>Sun, 17 Mar 2019 21:00:00 +0100</pubDate>
+  </item>
+   <item>
+    <title>LibreNMS Python Dispatcher Service V2 (breaking change)</title>
+    <description>Version two of the LibreNMS python dispatcher service is merged. This code now requires Redis 5.x and redis-py 3.x to operate (if using distributed polling). If you are using the dispatcher service with Redis and have not updated, polling will stop functioning.</description>
+    <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>

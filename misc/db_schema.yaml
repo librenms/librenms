@@ -516,9 +516,10 @@ device_groups:
   Columns:
     - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
-    - { Field: desc, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: desc, Type: varchar(255), 'Null': true, Extra: '', Default: '' }
+    - { Field: type, Type: varchar(16), 'Null': false, Extra: '', Default: dynamic }
+    - { Field: rules, Type: text, 'Null': true, Extra: '' }
     - { Field: pattern, Type: text, 'Null': true, Extra: '' }
-    - { Field: params, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     name: { Name: name, Columns: [name], Unique: true, Type: BTREE }
@@ -867,6 +868,143 @@ migrations:
     - { Field: batch, Type: int(11), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+mpls_lsps:
+  Columns:
+    - { Field: lsp_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: vrf_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: lsp_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspLastChange, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspName, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: mplsLspAdminState, Type: 'enum(''noop'',''inService'',''outOfService'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspOperState, Type: 'enum(''unknown'',''inService'',''outOfService'',''transition'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspFromAddr, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: mplsLspToAddr, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: mplsLspType, Type: 'enum(''unknown'',''dynamic'',''static'',''bypassOnly'',''p2mpLsp'',''p2mpAuto'',''mplsTp'',''meshP2p'',''oneHopP2p'',''srTe'',''meshP2pSrTe'',''oneHopP2pSrTe'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspFastReroute, Type: 'enum(''true'',''false'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspAge, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspTimeDown, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspPrimaryTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspTransitions, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsLspLastTransition, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspConfiguredPaths, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsLspStandbyPaths, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsLspOperationalPaths, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [lsp_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+mpls_lsp_paths:
+  Columns:
+    - { Field: lsp_path_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: lsp_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: path_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathLastChange, Type: bigint(20), 'Null': false, Extra: '' }
+    - { Field: mplsLspPathType, Type: 'enum(''other'',''primary'',''standby'',''secondary'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathBandwidth, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathOperBandwidth, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathAdminState, Type: 'enum(''noop'',''inService'',''outOfService'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathOperState, Type: 'enum(''unknown'',''inService'',''outOfService'',''transition'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathState, Type: 'enum(''unknown'',''active'',''inactive'')', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathFailCode, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: mplsLspPathFailNodeAddr, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: mplsLspPathMetric, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathOperMetric, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspPathTimeDown, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: mplsLspPathTransitionCount, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [lsp_path_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+mpls_saps:
+  Columns:
+    - { Field: sap_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: svc_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: svc_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: sapPortId, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: ifName, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: sapEncapValue, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: sapRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': true, Extra: '' }
+    - { Field: sapType, Type: 'enum(''unknown'',''epipe'',''tls'',''vprn'',''ies'',''mirror'',''apipe'',''fpipe'',''ipipe'',''cpipe'',''intTls'',''evpnIsaTls'')', 'Null': true, Extra: '' }
+    - { Field: sapDescription, Type: varchar(80), 'Null': true, Extra: '' }
+    - { Field: sapAdminStatus, Type: 'enum(''up'',''down'')', 'Null': true, Extra: '' }
+    - { Field: sapOperStatus, Type: 'enum(''up'',''down'')', 'Null': true, Extra: '' }
+    - { Field: sapLastMgmtChange, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: sapLastStatusChange, Type: bigint(20), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [sap_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+mpls_sdps:
+  Columns:
+    - { Field: sdp_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: sdp_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: sdpRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': true, Extra: '' }
+    - { Field: sdpDelivery, Type: 'enum(''gre'',''mpls'',''l2tpv3'',''greethbridged'')', 'Null': true, Extra: '' }
+    - { Field: sdpDescription, Type: varchar(80), 'Null': true, Extra: '' }
+    - { Field: sdpAdminStatus, Type: 'enum(''up'',''down'')', 'Null': true, Extra: '' }
+    - { Field: sdpOperStatus, Type: 'enum(''up'',''notAlive'',''notReady'',''invalidEgressInterface'',''transportTunnelDown'',''down'')', 'Null': true, Extra: '' }
+    - { Field: sdpAdminPathMtu, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: sdpOperPathMtu, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: sdpLastMgmtChange, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: sdpLastStatusChange, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: sdpActiveLspType, Type: 'enum(''not-applicable'',''rsvp'',''ldp'',''bgp'',''none'',''mplsTp'',''srIsis'',''srOspf'',''srTeLsp'',''fpe'')', 'Null': true, Extra: '' }
+    - { Field: sdpFarEndInetAddressType, Type: 'enum(''ipv4'',''ipv6'')', 'Null': true, Extra: '' }
+    - { Field: sdpFarEndInetAddress, Type: varchar(46), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [sdp_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+mpls_sdp_binds:
+  Columns:
+    - { Field: bind_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: sdp_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: svc_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: sdp_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: svc_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: sdpBindRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': true, Extra: '' }
+    - { Field: sdpBindAdminStatus, Type: 'enum(''up'',''down'')', 'Null': true, Extra: '' }
+    - { Field: sdpBindOperStatus, Type: 'enum(''up'',''down'')', 'Null': true, Extra: '' }
+    - { Field: sdpBindLastMgmtChange, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: sdpBindLastStatusChange, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: sdpBindType, Type: 'enum(''spoke'',''mesh'')', 'Null': true, Extra: '' }
+    - { Field: sdpBindVcType, Type: 'enum(''undef'',''ether'',''vlan'',''mirrior'',''atmSduatmCell'',''atmVcc'',''atmVpc'',''frDlci'',''ipipe'',''satopE1'',''satopT1'',''satopE3'',''satopT3'',''cesopsn'',''cesopsnCas'')', 'Null': true, Extra: '' }
+    - { Field: sdpBindBaseStatsIngFwdPackets, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: sdpBindBaseStatsIngFwdOctets, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: sdpBindBaseStatsEgrFwdPackets, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: sdpBindBaseStatsEgrFwdOctets, Type: bigint(20), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [bind_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+mpls_services:
+  Columns:
+    - { Field: svc_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: svc_oid, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: svcRowStatus, Type: 'enum(''active'',''notInService'',''notReady'',''createAndGo'',''createAndWait'',''destroy'')', 'Null': true, Extra: '' }
+    - { Field: svcType, Type: 'enum(''unknown'',''epipe'',''tls'',''vprn'',''ies'',''mirror'',''apipe'',''fpipe'',''ipipe'',''cpipe'',''intTls'',''evpnIsaTls'')', 'Null': true, Extra: '' }
+    - { Field: svcCustId, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: svcAdminStatus, Type: 'enum(''up'',''down'')', 'Null': true, Extra: '' }
+    - { Field: svcOperStatus, Type: 'enum(''up'',''down'')', 'Null': true, Extra: '' }
+    - { Field: svcDescription, Type: varchar(80), 'Null': true, Extra: '' }
+    - { Field: svcMtu, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: svcNumSaps, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: svcNumSdps, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: svcLastMgmtChange, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: svcLastStatusChange, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: svcVRouterId, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: svcTlsMacLearning, Type: 'enum(''enabled'',''disabled'')', 'Null': true, Extra: '' }
+    - { Field: svcTlsStpAdminStatus, Type: 'enum(''enabled'',''disabled'')', 'Null': true, Extra: '' }
+    - { Field: svcTlsStpOperStatus, Type: 'enum(''up'',''down'')', 'Null': true, Extra: '' }
+    - { Field: svcTlsFdbTableSize, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: svcTlsFdbNumEntries, Type: int(11), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [svc_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 munin_plugins:
   Columns:
     - { Field: mplug_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }

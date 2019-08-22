@@ -34,13 +34,13 @@ if (!empty($agent_data['uptime'])) {
 
     $uptime = max(
         round($poll_device['sysUptime'] / 100),
-        $config['os'][$device['os']]['bad_snmpEngineTime'] ? 0 : $uptime_data[0]['snmpEngineTime'],
-        $config['os'][$device['os']]['bad_hrSystemUptime'] ? 0 : round($uptime_data[0]['hrSystemUptime'] / 100)
+        Config::get("os.{$device['os']}.bad_snmpEngineTime") ? 0 : $uptime_data[0]['snmpEngineTime'],
+        Config::get("os.{$device['os']}.bad_hrSystemUptime") ? 0 : round($uptime_data[0]['hrSystemUptime'] / 100)
     );
     d_echo("Uptime seconds: $uptime\n");
 }
 
-if ($uptime != 0 && $config['os'][$device['os']]['bad_uptime'] !== true) {
+if ($uptime != 0 && Config::get("os.{$device['os']}.bad_uptime") !== true) {
     if ($uptime < $device['uptime']) {
         log_event('Device rebooted after ' . Time::formatInterval($device['uptime']) . " -> {$uptime}s", $device, 'reboot', 4, $device['uptime']);
     }
@@ -61,7 +61,7 @@ if ($uptime != 0 && $config['os'][$device['os']]['bad_uptime'] !== true) {
 $poll_device['sysLocation'] = str_replace('"', '', $poll_device['sysLocation']);
 
 // Rewrite sysLocation if there is a mapping array (database too?)
-if (!empty($poll_device['sysLocation']) && (is_array($config['location_map']) || is_array($config['location_map_regex']) || is_array($config['location_map_regex_sub']))) {
+if (!empty($poll_device['sysLocation']) && (is_array(Config::get('location_map')) || is_array(Config::get('location_map_regex')) || is_array(Config::get('location_map_regex_sub')))) {
     $poll_device['sysLocation'] = rewrite_location($poll_device['sysLocation']);
 }
 

@@ -6,7 +6,7 @@ use DB;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Rewrite;
 
-class Port extends BaseModel
+class Port extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'port_id';
@@ -129,6 +129,7 @@ class Port extends BaseModel
         return $query->where([
             ['deleted', '=', 0],
             ['ignore', '=', 0],
+            ['disabled', '=', 0],
             ['ifOperStatus', '=', 'up'],
         ]);
     }
@@ -142,6 +143,7 @@ class Port extends BaseModel
         return $query->where([
             ['deleted', '=', 0],
             ['ignore', '=', 0],
+            ['disabled', '=', 0],
             ['ifOperStatus', '=', 'down'],
             ['ifAdminStatus', '=', 'up'],
         ]);
@@ -153,7 +155,12 @@ class Port extends BaseModel
      */
     public function scopeIsShutdown($query)
     {
-        return $query->where('ifAdminStatus', 'down');
+        return $query->where([
+            ['deleted', '=', 0],
+            ['ignore', '=', 0],
+            ['disabled', '=', 0],
+            ['ifAdminStatus', '=', 'down'],
+        ]);
     }
 
     /**
@@ -176,8 +183,7 @@ class Port extends BaseModel
     {
         return $query->where([
             ['deleted', '=', 0],
-            ['ignore', '=', 0],
-            ['ifAdminStatus', '=', 'down'],
+            ['disabled', '=', 1],
         ]);
     }
 
@@ -187,7 +193,11 @@ class Port extends BaseModel
      */
     public function scopeHasErrors($query)
     {
-        return $query->where(function ($query) {
+        return $query->where([
+            ['deleted', '=', 0],
+            ['ignore', '=', 0],
+            ['disabled', '=', 0],
+        ])->where(function ($query) {
             /** @var Builder $query */
             $query->where('ifInErrors_delta', '>', 0)
                 ->orWhere('ifOutErrors_delta', '>', 0);
@@ -200,11 +210,6 @@ class Port extends BaseModel
     }
 
     // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
-    }
 
     public function events()
     {

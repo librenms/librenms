@@ -12,10 +12,30 @@ if ($device['os_group'] == 'cisco') {
         );
         $cip_array = array();
 
-        foreach ($cip_oids as $oid) {
+        foreach (array_merge($cip_oids, array('cipMacSwitchedBytes', 'cipMacSwitchedPkts')) as $oid) {
             echo "$oid ";
             $cip_array = snmpwalk_cache_cip($device, $oid, $cip_array, 'CISCO-IP-STAT-MIB');
         }
+
+        // Normalize cip_array
+        $cip_array = array_map(function ($entries) {
+            return array_map(function ($entry) {
+                $new_entry = array();
+                
+                foreach (array('Bytes', 'Pkts') as $unit) {
+                    $returned_oid = (array_key_exists('cipMacHCSwitched'.$unit, $entry)) ? 'cipMacHCSwitched' : 'cipMacSwitched';
+                    $new_value = array();
+    
+                    foreach ($entry[$returned_oid.$unit] as $key => $value) {
+                        $new_value[$key] = intval($value);
+                    }
+    
+                    $new_entry['cipMacHCSwitched'.$unit] = $new_value;
+                }
+                
+                return $new_entry;
+            }, $entries);
+        }, $cip_array);
 
         $polled = time();
 
@@ -62,7 +82,7 @@ if ($device['os_group'] == 'cisco') {
                 d_echo("\n" . $acc['hostname'] . ' ' . $acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out ");
 
                 $rrd_name = array('cip', $ifIndex, $mac);
-                $rrd_dev = RrdDefinition::make()
+                $rrd_def = RrdDefinition::make()
                     ->addDataset('IN', 'COUNTER', 0, 12500000000)
                     ->addDataset('OUT', 'COUNTER', 0, 12500000000)
                     ->addDataset('PIN', 'COUNTER', 0, 12500000000)

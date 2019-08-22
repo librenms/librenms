@@ -11,8 +11,6 @@
  *
  */
 
-use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -24,9 +22,9 @@ use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
-use Symfony\Component\Process\Process;
-use PHPMailer\PHPMailer\PHPMailer;
 use LibreNMS\Util\Time;
+use PHPMailer\PHPMailer\PHPMailer;
+use Symfony\Component\Process\Process;
 
 if (!function_exists('set_debug')) {
     /**
@@ -153,9 +151,7 @@ function parse_modules($type, $options)
 
 function logfile($string)
 {
-    global $config;
-
-    $fd = fopen($config['log_file'], 'a');
+    $fd = fopen(Config::get('log_file'), 'a');
     fputs($fd, $string . "\n");
     fclose($fd);
 }
@@ -316,12 +312,24 @@ function compare_var($a, $b, $comparison = '=')
             return $a < $b;
         case "contains":
             return str_contains($a, $b);
+        case "not_contains":
+            return !str_contains($a, $b);
         case "starts":
             return starts_with($a, $b);
+        case "not_starts":
+            return !starts_with($a, $b);
         case "ends":
             return ends_with($a, $b);
+        case "not_ends":
+            return !ends_with($a, $b);
         case "regex":
             return (bool)preg_match($b, $a);
+        case "not regex":
+            return !((bool)preg_match($b, $a));
+        case "in_array":
+            return in_array($a, $b);
+        case "not_in_array":
+            return !in_array($a, $b);
         default:
             return false;
     }
@@ -338,10 +346,9 @@ function percent_colour($perc)
 // Returns the last in/out errors value in RRD
 function interface_errors($rrd_file, $period = '-1d')
 {
-    global $config;
     $errors = array();
 
-    $cmd = $config['rrdtool']." fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
+    $cmd = Config::get('rrdtool') . " fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
     $data = trim(shell_exec($cmd));
     $in_errors = 0;
     $out_errors = 0;
@@ -377,7 +384,7 @@ function getLogo($device)
  */
 function getLogoTag($device, $class = null)
 {
-    $tag = '<img src="' . getLogo($device) . '" title="' . getImageTitle($device) . '"';
+    $tag = '<img src="' . url(getLogo($device)) . '" title="' . getImageTitle($device) . '"';
     if (isset($class)) {
         $tag .= " class=\"$class\" ";
     }
@@ -429,7 +436,7 @@ function renamehost($id, $new, $source = 'console')
 
 function delete_device($id)
 {
-    global $config, $debug;
+    global $debug;
 
     if (isCli() === false) {
         ignore_user_abort(true);
@@ -507,8 +514,6 @@ function delete_device($id)
  */
 function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = array())
 {
-    global $config;
-
     // Test Database Exists
     if (host_exists($host)) {
         throw new HostExistsException("Already have host $host");
@@ -520,7 +525,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     }
 
     // check if we have the host by IP
-    if ($config['addhost_alwayscheckip'] === true) {
+    if (Config::get('addhost_alwayscheckip') === true) {
         $ip = gethostbyname($host);
     } else {
         $ip = $host;
@@ -558,7 +563,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     foreach ($snmpvers as $snmpver) {
         if ($snmpver === "v3") {
             // Try each set of parameters from config
-            foreach ($config['snmp']['v3'] as $v3) {
+            foreach (Config::get('snmp.v3') as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
                 if ($force_add === true || isSNMPable($device)) {
                     return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add);
@@ -568,7 +573,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             }
         } elseif ($snmpver === "v2c" || $snmpver === "v1") {
             // try each community from config
-            foreach ($config['snmp']['community'] as $community) {
+            foreach (Config::get('snmp.community') as $community) {
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
 
                 if ($force_add === true || isSNMPable($device)) {
@@ -626,8 +631,6 @@ function formatUptime($diff, $format = "long")
 
 function isSNMPable($device)
 {
-    global $config;
-
     $pos = snmp_check($device);
     if ($pos === true) {
         return true;
@@ -687,9 +690,9 @@ function getpollergroup($poller_group = '0')
             $poller_group_array=explode(',', $poller_group);
             return getpollergroup($poller_group_array[0]);
         } else {
-            if ($config['distributed_poller_group']) {
+            if (Config::get('distributed_poller_group')) {
                 //If not use the poller's group from the config
-                return getpollergroup($config['distributed_poller_group']);
+                return getpollergroup(Config::get('distributed_poller_group'));
             } else {
                 //If all else fails use default
                 return '0';
@@ -881,7 +884,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => \Carbon\Carbon::now(),
         'severity' => $severity,
         'message' => $text,
-        'username'  => isset(LegacyAuth::user()->username) ? LegacyAuth::user()->username : '',
+        'username'  => Auth::user()->username ?? '',
     ], 'eventlog');
 }
 
@@ -911,42 +914,41 @@ function parse_email($emails)
 
 function send_mail($emails, $subject, $message, $html = false)
 {
-    global $config;
     if (is_array($emails) || ($emails = parse_email($emails))) {
         d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
         $mail = new PHPMailer(true);
         try {
             $mail->Hostname = php_uname('n');
 
-            foreach (parse_email($config['email_from']) as $from => $from_name) {
+            foreach (parse_email(Config::get('email_from')) as $from => $from_name) {
                 $mail->setFrom($from, $from_name);
             }
             foreach ($emails as $email => $email_name) {
                 $mail->addAddress($email, $email_name);
             }
             $mail->Subject = $subject;
-            $mail->XMailer = $config['project_name_version'];
+            $mail->XMailer = Config::get('project_name_version');
             $mail->CharSet = 'utf-8';
             $mail->WordWrap = 76;
             $mail->Body = $message;
             if ($html) {
                 $mail->isHTML(true);
             }
-            switch (strtolower(trim($config['email_backend']))) {
+            switch (strtolower(trim(Config::get('email_backend')))) {
                 case 'sendmail':
                     $mail->Mailer = 'sendmail';
-                    $mail->Sendmail = $config['email_sendmail_path'];
+                    $mail->Sendmail = Config::get('email_sendmail_path');
                     break;
                 case 'smtp':
                     $mail->isSMTP();
-                    $mail->Host       = $config['email_smtp_host'];
-                    $mail->Timeout    = $config['email_smtp_timeout'];
-                    $mail->SMTPAuth   = $config['email_smtp_auth'];
-                    $mail->SMTPSecure = $config['email_smtp_secure'];
-                    $mail->Port       = $config['email_smtp_port'];
-                    $mail->Username   = $config['email_smtp_username'];
-                    $mail->Password   = $config['email_smtp_password'];
-                    $mail->SMTPAutoTLS= $config['email_auto_tls'];
+                    $mail->Host = Config::get('email_smtp_host');
+                    $mail->Timeout = Config::get('email_smtp_timeout');
+                    $mail->SMTPAuth = Config::get('email_smtp_auth');
+                    $mail->SMTPSecure = Config::get('email_smtp_secure');
+                    $mail->Port = Config::get('email_smtp_port');
+                    $mail->Username = Config::get('email_smtp_username');
+                    $mail->Password = Config::get('email_smtp_password');
+                    $mail->SMTPAutoTLS = Config::get('email_auto_tls');
                     $mail->SMTPDebug  = false;
                     break;
                 default:
@@ -996,18 +998,18 @@ function isHexString($str)
 # Include all .inc.php files in $dir
 function include_dir($dir, $regex = "")
 {
-    global $device, $config, $valid;
+    global $device, $valid;
 
     if ($regex == "") {
         $regex = "/\.inc\.php$/";
     }
 
-    if ($handle = opendir($config['install_dir'] . '/' . $dir)) {
+    if ($handle = opendir(Config::get('install_dir') . '/' . $dir)) {
         while (false !== ($file = readdir($handle))) {
-            if (filetype($config['install_dir'] . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file)) {
-                d_echo("Including: " . $config['install_dir'] . '/' . $dir . '/' . $file . "\n");
+            if (filetype(Config::get('install_dir') . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file)) {
+                d_echo("Including: " . Config::get('install_dir') . '/' . $dir . '/' . $file . "\n");
 
-                include($config['install_dir'] . '/' . $dir . '/' . $file);
+                include(Config::get('install_dir') . '/' . $dir . '/' . $file);
             }
         }
 
@@ -1119,17 +1121,14 @@ function port_fill_missing(&$port, $device)
 
 function scan_new_plugins()
 {
-
-    global $config;
-
     $installed = 0; // Track how many plugins we install.
 
-    if (file_exists($config['plugin_dir'])) {
-        $plugin_files = scandir($config['plugin_dir']);
+    if (file_exists(Config::get('plugin_dir'))) {
+        $plugin_files = scandir(Config::get('plugin_dir'));
         foreach ($plugin_files as $name) {
-            if (is_dir($config['plugin_dir'].'/'.$name)) {
+            if (is_dir(Config::get('plugin_dir') . '/' . $name)) {
                 if ($name != '.' && $name != '..') {
-                    if (is_file($config['plugin_dir'].'/'.$name.'/'.$name.'.php') && is_file($config['plugin_dir'].'/'.$name.'/'.$name.'.inc.php')) {
+                    if (is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php') && is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.inc.php')) {
                         $plugin_id = dbFetchRow("SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = '$name'");
                         if (empty($plugin_id)) {
                             if (dbInsert(array('plugin_name' => $name, 'plugin_active' => '0'), 'plugins')) {
@@ -1147,8 +1146,6 @@ function scan_new_plugins()
 
 function validate_device_id($id)
 {
-
-    global $config;
     if (empty($id) || !is_numeric($id)) {
         $return = false;
     } else {
@@ -1334,16 +1331,14 @@ function set_curl_proxy($curl)
  */
 function get_proxy()
 {
-    global $config;
-
     if (getenv('http_proxy')) {
         return getenv('http_proxy');
     } elseif (getenv('https_proxy')) {
         return getenv('https_proxy');
-    } elseif (isset($config['callback_proxy'])) {
-        return $config['callback_proxy'];
-    } elseif (isset($config['http_proxy'])) {
-        return $config['http_proxy'];
+    } elseif ($callback_proxy = Config::get('callback_proxy')) {
+        return $callback_proxy;
+    } elseif ($http_proxy = Config::get('http_proxy')) {
+        return $http_proxy;
     }
     return false;
 }
@@ -1533,17 +1528,15 @@ function snmpTransportToAddressFamily($transport)
  */
 function host_exists($hostname, $sysName = null)
 {
-    global $config;
-
     $query = "SELECT COUNT(*) FROM `devices` WHERE `hostname`=?";
     $params = array($hostname);
 
-    if (!empty($sysName) && !$config['allow_duplicate_sysName']) {
+    if (!empty($sysName) && !Config::get('allow_duplicate_sysName')) {
         $query .= " OR `sysName`=?";
         $params[] = $sysName;
 
-        if (!empty($config['mydomain'])) {
-            $full_sysname = rtrim($sysName, '.') . '.' . $config['mydomain'];
+        if (!empty(Config::get('mydomain'))) {
+            $full_sysname = rtrim($sysName, '.') . '.' . Config::get('mydomain');
             $query .= " OR `sysName`=?";
             $params[] = $full_sysname;
         }
@@ -1553,11 +1546,8 @@ function host_exists($hostname, $sysName = null)
 
 function oxidized_reload_nodes()
 {
-
-    global $config;
-
-    if ($config['oxidized']['enabled'] === true && $config['oxidized']['reload_nodes'] === true && isset($config['oxidized']['url'])) {
-        $oxidized_reload_url = $config['oxidized']['url'] . '/reload.json';
+    if (Config::get('oxidized.enabled') === true && Config::get('oxidized.reload_nodes') === true && Config::has('oxidized.url')) {
+        $oxidized_reload_url = Config::get('oxidized.url') . '/reload.json';
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -1617,9 +1607,8 @@ function dnslookup($device, $type = false, $return = false)
 
 function rrdtest($path, &$stdOutput, &$stdError)
 {
-    global $config;
     //rrdtool info <escaped rrd path>
-    $command = $config['rrdtool'].' info '.escapeshellarg($path);
+    $command = Config::get('rrdtool') . ' info ' . escapeshellarg($path);
     $process = proc_open(
         $command,
         array (
@@ -1762,8 +1751,7 @@ function delta_to_bits($delta, $period)
 
 function report_this($message)
 {
-    global $config;
-    return '<h2>'.$message.' Please <a href="'.$config['project_issues'].'">report this</a> to the '.$config['project_name'].' developers.</h2>';
+    return '<h2>' . $message . ' Please <a href="' . Config::get('project_issues') . '">report this</a> to the ' . Config::get('project_name') . ' developers.</h2>';
 }//end report_this()
 
 function hytera_h2f($number, $nd)
@@ -1812,7 +1800,7 @@ function hytera_h2f($number, $nd)
     $binpoint=substr($scibin, $exp);
     $intnumber=bindec("1".$binint);
 
-    $tmppoint = "";
+    $tmppoint = [];
     for ($i=0; $i<strlen($binpoint); $i++) {
         $tmppoint[]=substr($binpoint, $i, 1);
     }
@@ -2248,8 +2236,7 @@ function update_device_logo(&$device)
  */
 function cache_peeringdb()
 {
-    global $config;
-    if ($config['peeringdb']['enabled'] === true) {
+    if (Config::get('peeringdb.enabled') === true) {
         $peeringdb_url = 'https://peeringdb.com/api';
         // We cache for 71 hours
         $cached = dbFetchCell("SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600");
@@ -2413,10 +2400,8 @@ function dump_db_schema()
  */
 function get_schema_list()
 {
-    global $config;
-
     // glob returns an array sorted by filename
-    $files = glob($config['install_dir'].'/sql-schema/*.sql');
+    $files = glob(Config::get('install_dir') . '/sql-schema/*.sql');
 
     // set the keys to the db schema version
     $files = array_reduce($files, function ($array, $file) {

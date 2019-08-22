@@ -19,7 +19,8 @@ foreach ($sql_result as $entry) {
 $insert = []; // populate $insert with database entries
 if (file_exists(Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php")) {
     require Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php";
-} elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
+} elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe'|| $device['os'] == 'nxos') {
+    //ios,iosxe,nxos are all Cisco
     include Config::get('install_dir') . '/includes/discovery/fdb-table/ios.inc.php';
 }
 

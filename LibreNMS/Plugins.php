@@ -101,6 +101,7 @@ class Plugins
      */
     public static function load($file, $pluginName)
     {
+        chdir(Config::get('install_dir') . '/html');
         $plugin = self::getInstance($file, $pluginName);
 
         $class = get_class($plugin);
@@ -111,6 +112,8 @@ class Plugins
                 self::$plugins[$hookName][] = $class;
             }
         }
+
+        chdir(Config::get('install_dir'));
 
         return $plugin;
     }
@@ -168,28 +171,34 @@ class Plugins
     /**
      * Call hook for plugin.
      *
-     * @param string $hook   Name of hook to call
-     * @param array  $params Optional array of parameters for hook
+     * @param string $hook Name of hook to call
+     * @param array|false $params Optional array of parameters for hook
+     * @return string
      */
     public static function call($hook, $params = false)
     {
+        chdir(Config::get('install_dir') . '/html');
         self::start();
 
-        if (empty(self::$plugins[$hook])) {
-            return;
-        }
-
-        foreach (self::$plugins[$hook] as $name) {
-            try {
-                if (!is_array($params)) {
-                    @call_user_func([$name, $hook]);
-                } else {
-                    @call_user_func_array([$name, $hook], $params);
+        ob_start();
+        if (!empty(self::$plugins[$hook])) {
+            foreach (self::$plugins[$hook] as $name) {
+                try {
+                    if (!is_array($params)) {
+                        @call_user_func([$name, $hook]);
+                    } else {
+                        @call_user_func_array([$name, $hook], $params);
+                    }
+                } catch (\Exception $e) {
+                    Log::error($e);
                 }
-            } catch (\Exception $e) {
-                Log::error($e);
             }
         }
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        chdir(Config::get('install_dir'));
+        return $output;
     }
 
     /**

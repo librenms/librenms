@@ -28,6 +28,7 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Models\User;
 use Illuminate\Validation\Rule;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -87,12 +88,16 @@ class AddUserCommand extends LnmsCommand
         $user = new User([
             'username' => $this->argument('username'),
             'level' => $roles[$this->option('role')],
-            'descr' => (string)$this->option('descr'),
-            'email' => (string)$this->option('email'),
-            'realname' => (string)$this->option('full-name'),
+            'descr' => $this->option('descr'),
+            'email' => $this->option('email'),
+            'realname' => $this->option('full-name'),
             'auth_type' => 'mysql',
         ]);
+
         $user->setPassword($password);
+        $user->save();
+
+        $user->auth_id = LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $user->save();
 
         $this->info(__('commands.user:add.success', ['username' => $user->username]));

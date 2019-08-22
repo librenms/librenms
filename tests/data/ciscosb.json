@@ -43,7 +43,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.9.6.1.80",
                     "sysDescr": "Linux, Cisco Systems, Inc WAP371 (WAP371-A-K9), Version 1.3.0.4",
                     "sysContact": "<private>",
-                    "version": null,
+                    "version": "Software 1.3.0.4",
                     "hardware": null,
                     "features": null,
                     "os": "ciscosb",

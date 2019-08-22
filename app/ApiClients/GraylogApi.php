@@ -122,13 +122,7 @@ class GraylogApi
         }
 
         if ($device) {
-            $ip = gethostbyname($device->hostname);
-            $device_query = 'source:"' . $device->hostname . '" || source:"' . $ip . '"';
-            if ($device->ip && $ip != $device->ip) {
-                $device_query .= ' || source:"' . $device->ip . '"';
-            }
-
-            $query[] = '(' . $device_query . ')';
+            $query[] = 'source: ("' . $this->getAddresses($device)->implode('" OR "') . '")';
         }
 
         if (empty($query)) {
@@ -136,6 +130,31 @@ class GraylogApi
         }
 
         return implode('&&', $query);
+    }
+
+    public function getAddresses(Device $device)
+    {
+        $addresses = collect([
+            gethostbyname($device->hostname),
+            $device->hostname,
+            $device->ip,
+        ]);
+
+        if (Config::get('graylog.match-any-address')) {
+            $addresses = $addresses->merge($device->ipv4->pluck('ipv4_address')
+                ->filter(
+                    function ($address) {
+                        return $address != "127.0.0.1";
+                    }
+                ))->merge($device->ipv6->pluck('ipv6_address')
+                ->filter(
+                    function ($address) {
+                        return $address != "0000:0000:0000:0000:0000:0000:0000:0001";
+                    }
+                ));
+        }
+
+        return $addresses->filter()->unique();
     }
 
     public function isConfigured()

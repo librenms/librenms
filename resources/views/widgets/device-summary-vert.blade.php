@@ -16,7 +16,7 @@
             <td><a href="{{ url('devices/format=list_detail/state=up') }}"><span class="green"> {{ $devices['up'] }}</span></a></td>
             <td><a href="{{ url('ports/format=list_detail/state=up') }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
             @if($show_services)
-                <td><a href="{{ url('services/view=details/state=ok') }}"><span class="green"> {{ $services['up'] }}</span></a></td>
+                <td><a href="{{ url('services/view=details/state=ok') }}"><span class="green"> {{ $services['ok'] }}</span></a></td>
             @endif
         </tr>
         <tr>
@@ -24,7 +24,7 @@
             <td><a href="{{ url('devices/format=list_detail/state=down') }}"><span class="red"> {{ $devices['down'] }}</span></a></td>
             <td><a href="{{ url('ports/format=list_detail/state=down') }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
             @if($show_services)
-                <td><a href="{{ url('services/view=details/state=critical') }}"><span class="red"> {{ $services['down'] }}</span></a></td>
+                <td><a href="{{ url('services/view=details/state=critical') }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
             @endif
         </tr>
         <tr>
@@ -36,7 +36,7 @@
             @endif
         </tr>
         <tr>
-            <th><span class="black">Disabled/Shutdown</span></th>
+            <th><span class="black">@lang('Disabled')/@lang('Shutdown')</span></th>
             <td><a href="{{ url('devices/format=list_detail/disabled=1') }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
             <td><a href="{{ url('ports/format=list_detail/state=admindown') }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
             @if($show_services)
@@ -55,10 +55,10 @@
         @endif
         <tr>
             <th><span class="grey">@lang('Total')</span></th>
-            <td><a href="{{ url('devices') }}"><span> {{ $devices['count'] }}</span></a></td>
-            <td><a href="{{ url('ports') }}"><span> {{ $ports['count'] }}</span></a></td>
+            <td><a href="{{ url('devices') }}"><span> {{ $devices['total'] }}</span></a></td>
+            <td><a href="{{ url('ports') }}"><span> {{ $ports['total'] }}</span></a></td>
             @if($show_services)
-                <td><a href="{{ url('services') }}"><span> {{ $services['count'] }}</span></a></td>
+                <td><a href="{{ url('services') }}"><span> {{ $services['total'] }}</span></a></td>
             @endif
         </tr>
         </tbody>

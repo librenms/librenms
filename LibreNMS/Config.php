@@ -84,9 +84,6 @@ class Config
         $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
         self::set('alert.macros.rule', $macros);
 
-        // variable definitions (remove me)
-        require $install_dir . '/includes/vmware_guestid.inc.php';
-
         // Load user config
         @include $install_dir . '/config.php';
 
@@ -340,6 +337,16 @@ class Config
     }
 
     /**
+     * Get the full configuration array
+     * @return array
+     */
+    public static function getAll()
+    {
+        global $config;
+        return $config;
+    }
+
+    /**
      * merge the database config with the global config
      * Global config overrides db
      */
@@ -454,6 +461,7 @@ class Config
         self::setDefault('log_dir', '%s/logs', ['install_dir']);
         self::setDefault('log_file', '%s/%s.log', ['log_dir', 'project_id']);
         self::setDefault('plugin_dir', '%s/plugins', ['html_dir']);
+        self::setDefault('temp_dir', sys_get_temp_dir() ?: '/tmp');
 //        self::setDefault('email_from', '"%s" <%s@' . php_uname('n') . '>', ['project_name', 'email_user']);  // FIXME email_from set because alerting config
 
         // deprecated variables

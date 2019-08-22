@@ -44,39 +44,7 @@ class Pagerduty extends Transport
         } else {
             $obj['event_type'] = 'trigger';
         }
-
-        if (empty($this->config)) {
-            return $this->deliverAlertEvent($obj, $opts);
-        }
         return $this->contactPagerduty($obj, $this->config);
-    }
-
-    public function deliverAlertEvent($obj, $opts)
-    {
-        // This code uses events for PD
-        $protocol = array(
-            'service_key' => $opts,
-            'incident_key' => $obj['alert_id'],
-            'description' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
-            'client' => 'LibreNMS',
-        );
-
-        foreach ($obj['faults'] as $fault => $data) {
-            $protocol['details'][] = $data['string'];
-        }
-        $curl = curl_init();
-        set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_URL, 'https://events.pagerduty.com/generic/2010-04-15/create_event.json');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-type' => 'application/json'));
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($protocol));
-        $ret  = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            var_dump("PagerDuty returned Error, retry later"); //FIXME: propper debuging
-            return 'HTTP Status code ' . $code;
-        }
-        return true;
     }
 
     /**
@@ -89,7 +57,7 @@ class Pagerduty extends Transport
         $data = [
             'routing_key'  => $config['service_key'],
             'event_action' => $obj['event_type'],
-            'dedup_key'    => $obj['alert_id'],
+            'dedup_key'    => (string)$obj['alert_id'],
             'payload'    => [
                 'custom_details'  => substr(implode(PHP_EOL, array_column($obj['faults'], 'string')), 0, 1020) . '....' ?: 'Test',
                 'source'   => $obj['hostname'],

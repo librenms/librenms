@@ -131,4 +131,26 @@ while (isset($lines[$int])) {
 
     $int++;
 }
+
+
+# smart enhancement id9
+$rrd_name = array('app', $name, $app_id);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('id9', 'GAUGE', 0);
+
+$int=0;
+while (isset($lines[$int])) {
+    list($disk, , , , , , , , , , , , , , , , , , , , , , , , , $id9)=explode(",", $lines[$int]);
+
+    $rrd_name = array('app', $name.'_id9', $app_id, $disk);
+
+    $fields = ['id9' => $id9];
+    $metrics[$disk]['id9'] = $id9;
+    
+    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    data_update($device, 'app', $tags, $fields);
+
+    $int++;
+}
+
 update_application($app, $output, $metrics);

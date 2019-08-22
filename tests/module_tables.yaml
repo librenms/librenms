@@ -29,6 +29,32 @@ fdb-table:
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]
+mpls:
+    mpls_lsps:
+        excluded_fields: [lsp_id, device_id]
+        order_by: vrf_oid, lsp_oid
+    mpls_lsp_paths:
+        excluded_fields: [lsp_path_id, device_id, lsp_id]
+        joins:
+            - { left: mpls_lsp_paths.lsp_id, right: mpls_lsps.lsp_id, select: [vrf_oid, lsp_oid] }
+        order_by: vrf_oid, lsp_oid, path_oid
+    mpls_sdps:
+        excluded_fields: [sdp_id, device_id]
+        order_by: sdp_oid
+    mpls_sdp_binds:
+        excluded_fields: [bind_id, sdp_id, svc_id, device_id]
+        joins:
+            - { left: mpls_sdp_binds.sdp_id, right: mpls_sdps.sdp_id, select: [mpls_sdps.sdp_oid] }
+            - { left: mpls_sdp_binds.svc_id, right: mpls_services.svc_id, select: [mpls_services.svc_oid] }
+        order_by: mpls_sdps.sdp_oid, mpls_services.svc_oid
+    mpls_services:
+        excluded_fields: [svc_id, device_id]
+        order_by: svc_oid
+    mpls_saps:
+        excluded_fields: [sap_id, svc_id, device_id]
+        joins:
+            - { left: mpls_saps.svc_id, right: mpls_services.svc_id, select: [mpls_services.svc_oid] }
+        order_by: mpls_services.svc_oid, mpls_saps.sapPortId, mpls_saps.sapEncapValue
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
@@ -85,3 +111,10 @@ vrf:
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]
+cisco-mac-accounting:
+    mac_accounting:
+        excluded_fields: [ma_id, port_id, poll_time, poll_prev, poll_period, cipMacHCSwitchedBytes_input_rate, cipMacHCSwitchedBytes_output_rate, cipMacHCSwitchedPkts_input_rate, cipMacHCSwitchedPkts_output_rate]
+        joins:
+            - { left: mac_accounting.port_id, right: ports.port_id, select: [ifIndex] }
+        custom_where: WHERE ports.device_id=?
+        order_by: ports.ifIndex, mac

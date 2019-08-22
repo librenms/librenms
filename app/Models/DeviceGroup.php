@@ -25,262 +25,106 @@
 
 namespace App\Models;
 
-use DB;
+use LibreNMS\Alerting\QueryBuilderFluentParser;
+use Log;
+use Permissions;
 
 class DeviceGroup extends BaseModel
 {
     public $timestamps = false;
-    protected $appends = ['patternSql'];
-    protected $fillable = ['name', 'desc', 'pattern', 'params'];
-    protected $casts = ['params' => 'array'];
+    protected $fillable = ['name', 'desc', 'type'];
+    protected $casts = ['rules' => 'array'];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (DeviceGroup $deviceGroup) {
+            $deviceGroup->devices()->detach();
+        });
+
+        static::saving(function (DeviceGroup $deviceGroup) {
+            if ($deviceGroup->isDirty('rules')) {
+                $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
+            }
+        });
+
+        static::saved(function (DeviceGroup $deviceGroup) {
+            if ($deviceGroup->isDirty('rules')) {
+                $deviceGroup->updateDevices();
+            }
+        });
+    }
 
     // ---- Helper Functions ----
 
-    public function updateRelations()
+    /**
+     * Update devices included in this group (dynamic only)
+     */
+    public function updateDevices()
     {
-        // we need an id to add relationships
-        if (is_null($this->id)) {
-            $this->save();
+        if ($this->type == 'dynamic') {
+            $this->devices()->sync(QueryBuilderFluentParser::fromJSON($this->rules)->toQuery()
+                ->distinct()->pluck('devices.device_id'));
         }
-
-        $device_ids = $this->getDeviceIdsRaw();
-
-        // update the relationships (deletes and adds as needed)
-        $this->devices()->sync($device_ids);
     }
 
     /**
-     * Get an array of the device ids from this group by re-querying the database with
-     * either the specified pattern or the saved pattern of this group
+     * Update the device groups for the given device or device_id
      *
-     * @param string $statement Optional, will use the pattern from this group if not specified
-     * @param array $params array of paremeters
+     * @param Device|int $device
      * @return array
      */
-    public function getDeviceIdsRaw($statement = null, $params = null)
+    public static function updateGroupsFor($device)
     {
-        if (is_null($statement)) {
-            $statement = $this->pattern;
+        $device = ($device instanceof Device ? $device : Device::find($device));
+        if (!$device instanceof Device) {
+            // could not load device
+            return [
+                "attached" => [],
+                "detached" => [],
+                "updated" => [],
+            ];
         }
 
-        if (is_null($params)) {
-            if (empty($this->params)) {
-                if (!starts_with($statement, '%')) {
-                    // can't build sql
-                    return [];
-                }
-            } else {
-                $params = $this->params;
-            }
-        }
-
-        $statement = $this->applyGroupMacros($statement);
-        $tables = $this->getTablesFromPattern($statement);
-
-        $query = null;
-        if (count($tables) == 1) {
-            $query = DB::table($tables[0])->select('device_id')->distinct();
-        } else {
-            $query = DB::table('devices')->select('devices.device_id')->distinct();
-
-            foreach ($tables as $table) {
-                // skip devices table, we used that as the base.
-                if ($table == 'devices') {
-                    continue;
-                }
-
-                $query = $query->join($table, 'devices.device_id', '=', $table.'.device_id');
-            }
-        }
-
-        // match the device ids
-        if (is_null($params)) {
-            return $query->whereRaw($statement)->pluck('device_id')->toArray();
-        } else {
-            return $query->whereRaw($statement, $params)->pluck('device_id')->toArray();
-        }
-    }
-
-    /**
-     * Process Macros
-     *
-     * @param string $pattern Rule to process
-     * @param int $x Recursion-Anchor, do not pass
-     * @return string|boolean
-     */
-    public static function applyGroupMacros($pattern, $x = 1)
-    {
-        if (!str_contains($pattern, 'macros.')) {
-            return $pattern;
-        }
-
-        foreach (\LibreNMS\Config::get('alert.macros.group', []) as $macro => $value) {
-            $value = str_replace(['%', '&&', '||'], ['', 'AND', 'OR'], $value);  // this might need something more complex
-            if (!str_contains($macro, ' ')) {
-                $pattern = str_replace('macros.'.$macro, '('.$value.')', $pattern);
-            }
-        }
-
-        if (str_contains($pattern, 'macros.')) {
-            if (++$x < 30) {
-                $pattern = self::applyGroupMacros($pattern, $x);
-            } else {
-                return false;
-            }
-        }
-        return $pattern;
-    }
-
-    /**
-     * Extract an array of tables in a pattern
-     *
-     * @param string $pattern
-     * @return array
-     */
-    private function getTablesFromPattern($pattern)
-    {
-        preg_match_all('/[A-Za-z_]+(?=\.[A-Za-z_]+ )/', $pattern, $tables);
-        if (is_null($tables)) {
-            return [];
-        }
-        return array_keys(array_flip($tables[0])); // unique tables only
-    }
-
-    /**
-     * Convert a v1 device group pattern to sql that can be ingested by jQuery-QueryBuilder
-     *
-     * @param $pattern
-     * @return array
-     */
-    private function convertV1Pattern($pattern)
-    {
-        $pattern = rtrim($pattern, ' &&');
-        $pattern = rtrim($pattern, ' ||');
-
-        $ops = ['=', '!=', '<', '<=', '>', '>='];
-        $parts = str_getcsv($pattern, ' '); // tokenize the pattern, respecting quoted parts
-        $out = "";
-
-        $count = count($parts);
-        for ($i = 0; $i < $count; $i++) {
-            $cur = $parts[$i];
-
-            if (starts_with($cur, '%')) {
-                // table and column or macro
-                $out .= substr($cur, 1).' ';
-            } elseif (substr($cur, -1) == '~') {
-                // like operator
-                $content = $parts[++$i]; // grab the content so we can format it
-
-                if (starts_with($cur, '!')) {
-                    // prepend NOT
-                    $out .= 'NOT ';
+        $device_group_ids = static::query()
+            ->with(['devices' => function ($query) {
+                $query->select('devices.device_id');
+            }])
+            ->get()
+            ->filter(function ($device_group) use ($device) {
+                /** @var DeviceGroup $device_group */
+                if ($device_group->type == 'dynamic') {
+                    try {
+                        return $device_group->getParser()
+                            ->toQuery()
+                            ->where('devices.device_id', $device->device_id)
+                            ->exists();
+                    } catch (\Illuminate\Database\QueryException $e) {
+                        Log::error("Device Group '$device_group->name' generates invalid query: " . $e->getMessage());
+                        return false;
+                    }
                 }
 
-                $out .= "LIKE('".$this->convertRegexToLike($content)."') ";
-            } elseif ($cur == '&&') {
-                $out .= 'AND ';
-            } elseif ($cur == '||') {
-                $out .= 'OR ';
-            } elseif (in_array($cur, $ops)) {
-                // pass-through operators
-                $out .= $cur.' ';
-            } else {
-                // user supplied input
-                $out .= "'".trim($cur, '"\'')."' "; // TODO: remove trim, only needed with invalid input
-            }
-        }
-        return rtrim($out);
+                // for static, if this device is include, keep it.
+                return $device_group->devices
+                    ->where('device_id', $device->device_id)
+                    ->isNotEmpty();
+            })->pluck('id');
+
+        return $device->groups()->sync($device_group_ids);
     }
 
     /**
-     * Convert sql regex to like, many common uses can be converted
-     * Should only be used to convert v1 patterns
+     * Get a query builder parser instance from this device group
      *
-     * @param $pattern
-     * @return string
+     * @return QueryBuilderFluentParser
      */
-    private function convertRegexToLike($pattern)
+    public function getParser()
     {
-        $startAnchor = starts_with($pattern, '^');
-        $endAnchor = ends_with($pattern, '$');
-
-        $pattern = trim($pattern, '^$');
-
-        $wildcards = ['@', '.*'];
-        if (str_contains($pattern, $wildcards)) {
-            // contains wildcard
-            $pattern = str_replace($wildcards, '%', $pattern);
-        }
-
-        // add ends appropriately
-        if ($startAnchor && !$endAnchor) {
-            $pattern .= '%';
-        } elseif (!$startAnchor && $endAnchor) {
-            $pattern = '%'.$pattern;
-        }
-
-        // if there are no wildcards, assume substring
-        if (!str_contains($pattern, '%')) {
-            $pattern = '%'.$pattern.'%';
-        }
-
-        return $pattern;
-    }
-
-    // ---- Accessors/Mutators ----
-
-    /**
-     * Returns an sql formatted string
-     * Mostly, this is for ingestion by JQuery-QueryBuilder
-     *
-     * @return string
-     */
-    public function getPatternSqlAttribute()
-    {
-        $sql = $this->pattern;
-
-        // fill in parameters
-        foreach ((array)$this->params as $value) {
-            if (!is_numeric($value) && !starts_with($value, "'")) {
-                $value = "'".$value."'";
-            }
-            $sql = preg_replace('/\?/', $value, $sql, 1);
-        }
-        return $sql;
-    }
-
-    /**
-     * Custom mutator for params attribute
-     * Allows already encoded json to pass through
-     *
-     * @param array|string $params
-     */
-//    public function setParamsAttribute($params)
-//    {
-//        if (!Util::isJson($params)) {
-//            $params = json_encode($params);
-//        }
-//
-//        $this->attributes['params'] = $params;
-//    }
-
-    /**
-     * Check if the stored pattern is v1
-     * Convert it to v2 for display
-     * Currently, it will only be updated in the database if the user saves the rule in the ui
-     *
-     * @param $pattern
-     * @return string
-     */
-    public function getPatternAttribute($pattern)
-    {
-        // If this is a v1 pattern, convert it to sql
-        if (starts_with($pattern, '%')) {
-            return $this->convertV1Pattern($pattern);
-        }
-
-        return $pattern;
+        return !empty($this->rules) ?
+            QueryBuilderFluentParser::fromJson($this->rules) :
+            QueryBuilderFluentParser::fromOld($this->pattern);
     }
 
     // ---- Query Scopes ----
@@ -291,25 +135,10 @@ class DeviceGroup extends BaseModel
             return $query;
         }
 
-        if (!$this->isJoined($query, 'device_group_device')) {
-            $query->join('device_group_device', 'device_group_device.device_group_id', 'device_groups.id');
-        }
-
-        return $this->hasDeviceAccess($query, $user, 'device_group_device');
+        return $query->whereIn('id', Permissions::deviceGroupsForUser($user));
     }
 
     // ---- Define Relationships ----
-
-
-    public function alertSchedules()
-    {
-        return $this->morphToMany('App\Models\AlertSchedule', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
-    }
-
-    public function rules()
-    {
-        return $this->belongsToMany('App\Models\AlertRule', 'alert_group_map', 'group_id', 'rule_id');
-    }
 
     public function devices()
     {

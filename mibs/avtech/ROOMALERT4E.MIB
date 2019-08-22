@@ -2,12 +2,12 @@
 --defines ROOMALERT4E-MIB for SNMP agent extension of Room Alert 4E
 --Contents:	Global Registration Module
 --		Room Alert OIDs - Enterprise 20916
---Version:	1.0.1
---Date:		WEB_RELEASE_DATE_PLACEHOLDER
+--Version:	4.2.4
+--Date:		15 February 2019
 --Developed By: AVTECH Software, Inc.
 
 --
---Copyright (c) COPYRIGHT_YEAR_PLACEHOLDER AVTECH Software, Inc.
+--Copyright (c) 2019 AVTECH Software, Inc.
 --
 
 ROOMALERT4E-MIB DEFINITIONS ::= BEGIN
@@ -24,10 +24,10 @@ IMPORTS
 
 avtech      OBJECT IDENTIFIER ::= { enterprises 20916 }
 products      OBJECT IDENTIFIER ::= { avtech 1 }
-ROOMALERT4E      OBJECT IDENTIFIER ::= { products 6 }
-sensors       OBJECT IDENTIFIER ::= { ROOMALERT4E 1 }
-signaltower		OBJECT IDENTIFIER ::= { ROOMALERT4E 2 }
-traps	      OBJECT IDENTIFIER ::= { ROOMALERT4E 3 }
+roomalert4E      OBJECT IDENTIFIER ::= { products 6 }
+sensors       OBJECT IDENTIFIER ::= { roomalert4E 1 }
+signaltower		OBJECT IDENTIFIER ::= { roomalert4E 2 }
+traps	      OBJECT IDENTIFIER ::= { roomalert4E 3 }
 internal   OBJECT IDENTIFIER ::= { sensors 1 }
 temperature   OBJECT IDENTIFIER ::= { internal 1 }
 label	OBJECT IDENTIFIER ::= { internal 2 }
@@ -45,14 +45,14 @@ internal-tempf OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"The internal temperature reading in Fahrenheit. Because the SNMP Protocol does not support floating point numbers, values are scaled by 100 and should be divided by 100 to get the actual value."
+	DESCRIPTION	"The internal temperature reading in Fahrenheit."
 ::= { temperature 1 }
 
 internal-tempc OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"The internal temperature reading in Celsius. Because the SNMP Protocol does not support floating point numbers, values are scaled by 100 and should be divided by 100 to get the actual value."
+	DESCRIPTION	"The internal temperature reading in Celsius."
 ::= { temperature 2 }
 
 internal-label OBJECT-TYPE
@@ -66,28 +66,28 @@ digital-sen1-1 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Celsius."
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
 ::= { digital-sen1 1 }
 
 digital-sen1-2 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Fahrenheit."
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
 ::= { digital-sen1 2 }
 
 digital-sen1-3 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity."
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
 ::= { digital-sen1 3 }
 
 digital-sen1-4 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit."
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
 ::= { digital-sen1 4 }
 
 digital-sen1-5 OBJECT-TYPE
@@ -97,39 +97,53 @@ digital-sen1-5 OBJECT-TYPE
 	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
 ::= { digital-sen1 5 }
 
+digital-sen1-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current dew point in Celsius."
+::= { digital-sen1 6 }
+
+digital-sen1-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current dew point in Fahrenheit."
+::= { digital-sen1 7 }
+
 digital-sen1-label OBJECT-TYPE
 	SYNTAX		OCTET STRING
 	ACCESS		read-only
 	STATUS		mandatory
 	DESCRIPTION "The label of this sensor"
-::= {digital-sen1 6}
+::= {digital-sen1 8}
 
 digital-sen2-1 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Celsius."
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
 ::= { digital-sen2 1 }
 
 digital-sen2-2 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Fahrenheit."
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
 ::= { digital-sen2 2 }
 
 digital-sen2-3 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity."
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
 ::= { digital-sen2 3 }
 
 digital-sen2-4 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..65535)
 	ACCESS		read-only
 	STATUS		mandatory
-	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit."
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
 ::= { digital-sen2 4 }
 
 digital-sen2-5 OBJECT-TYPE
@@ -139,12 +153,26 @@ digital-sen2-5 OBJECT-TYPE
 	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
 ::= { digital-sen2 5 }
 
+digital-sen2-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current dew point in Celsius."
+::= { digital-sen2 6 }
+
+digital-sen2-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current dew point in Fahrenheit."
+::= { digital-sen2 7 }
+
 digital-sen2-label OBJECT-TYPE
 	SYNTAX		OCTET STRING
 	ACCESS		read-only
 	STATUS		mandatory
 	DESCRIPTION "The label of this sensor"
-::= {digital-sen2 6}
+::= {digital-sen2 8}
 
 switch-sen1 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..1)
@@ -163,49 +191,49 @@ switch-label OBJECT-TYPE
 red-led OBJECT-TYPE
 	SYNTAX  	INTEGER(0..1)
 	ACCESS		read-write
-	STATUS		current
+	STATUS		mandatory
 	DESCRIPTION	"The status of this Light Tower element (0 = OFF, 1 = ON)."
 ::= { signaltower 1 }
 
 amber-led OBJECT-TYPE
 	SYNTAX  	INTEGER(0..1)
 	ACCESS		read-write
-	STATUS		current
+	STATUS		mandatory
 	DESCRIPTION	"The status of this Light Tower element (0 = OFF, 1 = ON)."
 ::= { signaltower 2 }
 
 green-led OBJECT-TYPE
 	SYNTAX  	INTEGER(0..1)
 	ACCESS		read-write
-	STATUS		current
+	STATUS		mandatory
 	DESCRIPTION	"The status of this Light Tower element (0 = OFF, 1 = ON)."
 ::= { signaltower 3 }
 
 blue-led OBJECT-TYPE
 	SYNTAX  	INTEGER(0..1)
 	ACCESS		read-write
-	STATUS		current
+	STATUS		mandatory
 	DESCRIPTION	"The status of this Light Tower element (0 = OFF, 1 = ON)."
 ::= { signaltower 4 }
 
 white-led OBJECT-TYPE
 	SYNTAX  	INTEGER(0..1)
 	ACCESS		read-write
-	STATUS		current
+	STATUS		mandatory
 	DESCRIPTION	"The status of this Light Tower element (0 = OFF, 1 = ON)."
 ::= { signaltower 5 }
 
 alarm1 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..1)
 	ACCESS		read-write
-	STATUS		current
+	STATUS		mandatory
 	DESCRIPTION	"The status of this Light Tower element (0 = OFF, 1 = ON)."
 ::= { signaltower 6 }
 
 alarm2 OBJECT-TYPE
 	SYNTAX  	INTEGER(0..1)
 	ACCESS		read-write
-	STATUS		current
+	STATUS		mandatory
 	DESCRIPTION	"The status of this Light Tower element (0 = OFF, 1 = ON)."
 ::= { signaltower 7 }
 
@@ -217,10 +245,10 @@ alarmmessage OBJECT-TYPE
 ::= { traps 1 }
 
 
--- ROOMALERT4E TRAPS
+-- roomalert4E TRAPS
 
 room-alert-4e-snmp-trap TRAP-TYPE
-	ENTERPRISE	ROOMALERT4E
+	ENTERPRISE	roomalert4E
 	VARIABLES	{ alarmmessage }
 	DESCRIPTION	"A room-alert-4e-snmp-trap indicates that an alarm
 			condition has occurred on the sensor indicated

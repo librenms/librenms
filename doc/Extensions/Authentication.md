@@ -35,7 +35,7 @@ $config['auth_mechanism'] = "mysql";
 
 - 5: **Global Read**: Read only Administrator. 
 
-- 10: **Administartor**: This is a global read/write admin account.
+- 10: **Administrator**: This is a global read/write admin account.
 
 - 11: **Demo Account**: Provides full read/write with certain restrictions (i.e can't delete devices).
 
@@ -162,6 +162,7 @@ $config['auth_ldap_groupmemberattr'] = 'memberUid'; // attribute to use to see i
 $config['auth_ldap_uid_attribute'] = 'uidnumber';   // attribute for unique id
 $config['auth_ldap_debug'] = false;                 // enable for verbose debug messages
 $config['auth_ldap_userdn'] = true;                 // Uses a users full DN as the value of the member attribute in a group instead of member: username. (it’s member: uid=username,ou=groups,dc=domain,dc=com)
+$config['auth_ldap_userlist_filter'] = 'service=informatique'; // Replace 'service=informatique' by your ldap filter to limit the number of responses if you have an ldap directory with thousand of users
 ```
 
 ### LDAP bind user (optional)

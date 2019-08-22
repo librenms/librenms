@@ -62,6 +62,7 @@ $config['ipmitool']       = '/usr/bin/ipmitool';
 $config['virsh']          = '/usr/bin/virsh';
 $config['dot']            = '/usr/bin/dot';
 $config['sfdp']           = '/usr/bin/sfdp';
+$config['nfdump']         = '/usr/bin/nfdump';
 
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
@@ -224,8 +225,12 @@ $config['alerts']['port_util_perc'] = 85;
 $config['uptime_warning'] = '84600';
 // Time in seconds to display a "Device Rebooted" Alert. 0 to disable warnings.
 // Cosmetics
-$config['rrdgraph_def_text']  = '-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5';
+$config['rrdgraph_def_text']  = '-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5';
 $config['rrdgraph_def_text'] .= ' -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal';
+// This is largely for people who are using a dark CSS override system.
+// For multi-user installs, likely best to leave it at the default or pick one that works nicely for both.
+// If you want a color that works nice for both a dark or light BG, 0000FF seems to.
+$config['rrdgraph_def_text_color'] = '000000';
 $config['rrdgraph_real_percentile'] = false;
 $config['percentile_value'] = 95;
 // Set to TRUE if you want to display the 95% based on the highest value. (aka real 95%)
@@ -365,12 +370,16 @@ $config['network_map_legend'] = array(
     '90'           => '#d12300',
     '95'           => '#cc0000',
     '100'          => '#cc0000',
-    'di.edge'      => '#dddddd88',
-    'di.border'    => '#cccccc',
-    'di.node'      => '#eeeeee',
-    'dn.edge'      => '#ff777788',
-    'dn.border'    => '#ff5555',
-    'dn.node'      => '#ffdddd',
+    'di' => [
+        'edge' => '#dddddd88',
+        'border' => '#cccccc',
+        'node' => '#eeeeee',
+    ],
+    'dn' => [
+        'edge' => '#ff777788',
+        'border' => '#ff5555',
+        'node' => '#ffdddd',
+    ]
 );
 
 // Default mini graph time options:
@@ -533,6 +542,26 @@ $config['nfsen_enable'] = 0;
 // $config['nfsen_split_char']   = "_";
 // $config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
 // $config['nfsen_suffix']   = "_yourdomain_com";
+$config['nfsen_subdirlayout'] = 1;
+$config['nfsen_last_max'] = 153600; // 48 hours ago in seconds
+$config['nfsen_top_max'] = 500; // max topN value for stats
+$config['nfsen_top_N']=array( 10, 20, 50, 100, 200, 500 );
+$config['nfsen_top_default']=20;
+$config['nfsen_stat_default']='srcip';
+$config['nfsen_order_default']='packets';
+$config['nfsen_last_default']=900;
+$config['nfsen_lasts']=array(
+                            '300'=>'5 minutes',
+                            '600'=>'10 minutes',
+                            '900'=>'15 minutes',
+                            '1800'=>'30 minutes',
+                            '3600'=>'1 hour',
+                            '9600'=>'3 hours',
+                            '38400'=>'12 hours',
+                            '76800'=>'24 hours',
+                            '115200'=>'36 hours',
+                            '153600'=>'48 hours',
+                            );
 // Location Mapping
 // Use this feature to map ugly locations to pretty locations
 // config['location_map']['Under the Sink'] = "Under The Sink, The Office, London, UK";
@@ -798,6 +827,7 @@ $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
 $config['poller_modules']['loadbalancers']               = false;
 $config['poller_modules']['mef']                         = false;
+$config['poller_modules']['mpls']                        = true;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -840,6 +870,7 @@ $config['discovery_modules']['loadbalancers']        = false;
 $config['discovery_modules']['mef']                  = false;
 $config['discovery_modules']['wireless']             = true;
 $config['discovery_modules']['fdb-table']            = true;
+$config['discovery_modules']['mpls']                 = true;
 // Enable daily updates
 $config['update'] = 1;
 
@@ -884,8 +915,8 @@ $config['allow_duplicate_sysName'] = false;// Set to true if you want to allow d
 
 $config['enable_port_relationship'] = true;
 // Set this to false to not display neighbour relationships for ports
-$config['enable_footer'] = 1;
-// Set this to 0 if you want to disable the footer copyright in the web interface
+$config['enable_footer'] = false;
+// Set this to true if you want to enable the footer in the web interface
 $config['api_demo'] = 0;
 // Set this to 1 if you want to disable some untrusting features for the API
 // Distributed Poller-Settings
@@ -952,9 +983,6 @@ $config['leaflet']['tile_url']                          = "{s}.tile.openstreetma
 
 // General GUI options
 $config['gui']['network-map']['style']                  = 'new';//old is also valid
-
-// Navbar variables
-$config['navbar']['manage_groups']['hide']              = 0;
 
 // Show errored ports in the summary table on the dashboard
 $config['summary_errors']                               = 0;

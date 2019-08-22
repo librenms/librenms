@@ -2,6 +2,10 @@
 
 @section('form')
     <div class="form-group row">
+        <label for="title-{{ $id }}" class="control-label">@lang('Widget title')</label>
+        <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Custom title')" value="{{ $title }}">
+    </div>
+    <div class="form-group row">
         <label for="acknowledged-{{ $id }}" class="control-label">@lang('Show acknowledged'):</label>
         <select class="form-control" name="acknowledged" id="acknowledged-{{ $id }}">
             <option value="">@lang('not filtered')</option>
@@ -36,9 +40,9 @@
     </div>
     <div class="form-group">
         <label for="device_group-{{ $id }}" class="control-label">@lang('Device group')</label>
-        <select class="form-control" name="group" id="device_group-{{ $id }}" data-placeholder="@lang('All alerts')">
+        <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="@lang('All Devices')">
             @if($device_group)
-                <option value="{{ $device_group->id }}" selected> {{ $device_group->name }} </option>
+                <option value="{{ $device_group->id }}" selected>{{ $device_group->name }}</option>
             @endif
         </select>
     </div>
@@ -47,6 +51,13 @@
         <select class="form-control" name="proc" id="proc-{{ $id }}">
             <option value="1" @if($proc == 1) selected @endif>@lang('show')</option>
             <option value="0" @if($proc == 0) selected @endif>@lang('hide')</option>
+        </select>
+    </div>
+    <div class="form-group row">
+        <label for="location-{{ $id }}" class="control-label">@lang('Show Location field'):</label>
+        <select class="form-control" name="location" id="location-{{ $id }}">
+            <option value="1" @if($location == 1) selected @endif>@lang('show')</option>
+            <option value="0" @if($location == 0) selected @endif>@lang('hide')</option>
         </select>
     </div>
     <div class="form-group row">
@@ -60,6 +71,6 @@
 
 @section('javascript')
     <script type="text/javascript">
-        init_select2('#device_group-{{ $id }}', 'device-group', {}, '{{ $group ?: '' }}');
+        init_select2('#device_group-{{ $id }}', 'device-group', {});
     </script>
 @endsection

@@ -29,19 +29,11 @@ class Smsfeedback extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $smsfeedback_opts['user']  = $this->config['smsfeedback-user'];
         $smsfeedback_opts['token'] = $this->config['smsfeedback-pass'];
         $smsfeedback_opts['sender'] = $this->config['smsfeedback-sender'];
         $smsfeedback_opts['to']    = $this->config['smsfeedback-mobiles'];
         return $this->contactsmsfeedback($obj, $smsfeedback_opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
-        return $this->contactsmsfeedback($obj, $opts);
     }
 
     public static function contactsmsfeedback($obj, $opts)

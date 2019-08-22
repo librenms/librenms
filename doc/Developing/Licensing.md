@@ -1,4 +1,5 @@
 ## Contributor Agreement
+
 path: blob/master/doc/
 
 By contributing code to LibreNMS (whether by a GitHub pull request, or by
@@ -14,14 +15,16 @@ any other means), you assert that:
   source code comment) any and all sources and influences used in the
   production of that contribution.
 
-- You have not viewed code written under the [Observium License](http://www.observium.org/wiki/License) in the
+- You have not viewed code written under the [Observium
+  License](http://www.observium.org/wiki/License) in the
   production of contributed code.  This includes all Observium code after
   Subversion revision 3250 and any patches or other code covered by that
   license after Tue May 29 13:08:01 2012 +0000 (the date of Observium r3250).
 
-To agree with these assertions, when you submit your first pull request you 
-will be asked after submitting to sign the CLA, you do this by following the 
-link provided in the PR and agreeing to the CLA using your GitHub account. 
+To agree with these assertions, when you submit your first pull
+request you  will be asked after submitting to sign the CLA, you do
+this by following the  link provided in the PR and agreeing to the CLA
+using your GitHub account.
 
 ## Local patches
 
@@ -32,14 +35,14 @@ feature you use to which this applies, please document its functionality in
 an issue, and we'll do our best to include equivalent functionality in
 LibreNMS.
 
-
 ## Copyright
 
 We recommend that if you add a new file containing original code to the code
 base that you include a copyright notice in it as per the Free Software
 Foundation's guidelines.  You might find something like the following header
-appropriate (although this is not legal advice ;-). Please also ensure you add 
-the package information to the header.
+appropriate (although this is not legal advice ;-). Please also ensure
+you add the package information to the header.
+
 ```
 <?php
 /*
@@ -57,6 +60,7 @@ the package information to the header.
  * @author     Me <me@infowidgitz.com>
 
 ```
+
 The GPLv3 itself also contains recommendations about applying the GPL to
 your code.  Please see LICENSE.txt at the top of this source code
 distribution for details.
@@ -70,22 +74,23 @@ message.  Accurate attribution is crucial to our success as a Free Software
 project.
 
 - For any dependency
-    - Include its name, source URL, copyright notice, and license in `doc/General/Credits.md`
+  - Include its name, source URL, copyright notice, and license in `doc/General/Credits.md`
 
 - To add a php dependency, please use composer
-    - Add the dependency `composer require slim/slim`
+  - Add the dependency `composer require slim/slim`
 
-    - Updating php dependencies
-        - Update dependencies `FORCE=1 php56 ./scripts/composer_wrapper.php update`
-        - Commit the updated composer.lock file
+  - Updating php dependencies
+    - Update dependencies `FORCE=1 php56 ./scripts/composer_wrapper.php update`
+    - Commit the updated composer.lock file
 
 - To add a javascript dependency
-    - Where possible please include minimized libraries in the html/js/ folder.
+  - Where possible please include minimized libraries in the html/js/ folder.
 
 - Don't submit code whose license conflicts with the GPLv3.  If you're not
-  sure, consult the [Free Software Foundation's license list](http://www.gnu.org/licenses/license-list.html) and see if
-  your code's license is on the compatible or incompatible list.  If you
-  prefer a non-copyleft license, Apache 2.0 is the recommended choice as per
+  sure, consult the [Free Software Foundation's license
+  list](http://www.gnu.org/licenses/license-list.html) and see if
+  your code's license is on the compatible or incompatible list.  If
+  you   prefer a non-copyleft license, Apache 2.0 is the recommended choice as per
   the FSF guidelines.
 
 - The current Observium license is incompatible with GPLv3.  Don't submit

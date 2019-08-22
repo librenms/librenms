@@ -77,14 +77,14 @@ if (Config::get('enable_sla') && $device['os_group'] == 'cisco') {
             // Remove from the list
             $existing_slas = array_diff($existing_slas, array($sla_id));
 
-            dbUpdate($data, 'slas', '`sla_id` = :sla_id', array('sla_id' => $sla_id));
+            dbUpdate($data, 'slas', 'sla_id = ?', [$sla_id]);
             echo '.';
         }
     }//end foreach
 
     // Mark all remaining SLAs as deleted
     foreach ($existing_slas as $existing_sla) {
-        dbUpdate(array('deleted' => 1), 'slas', '`sla_id` = :sla_id', array('sla_id' => $existing_sla));
+        dbUpdate(['deleted' => 1], 'slas', 'sla_id = ?', [$existing_sla]);
         echo '-';
     }
 

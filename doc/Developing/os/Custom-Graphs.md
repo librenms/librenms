@@ -1,7 +1,9 @@
 source: Developing/os/Custom-Graphs.md
 path: blob/master/doc/
 
-First we define our graphs in `includes/definitions.inc.php` to share our work and contribute in the development of LibreNMS. :-) (or place in `config.php` if you don't plan to contribute)
+First we define our graphs in `includes/definitions.inc.php` to share
+our work and contribute in the development of LibreNMS. :-) (or place
+in `config.php` if you don't plan to contribute)
 
 ```php
 // Pulse Secure Graphs
@@ -11,14 +13,19 @@ $config['graph_types']['device']['pulse_users'] = ['section' => 'firewall', 'ord
 
 #### Polling OS
 
-OS polling is not necessarily where custom polling should be done, please speak to one of the core devs in [Discord](https://t.libren.ms/discord) for guidance.
+OS polling is not necessarily where custom polling should be done,
+please speak to one of the core devs in
+[Discord](https://t.libren.ms/discord) for guidance.
 
 Let's update our example file to add additional polling:
 
 ```bash
 includes/polling/os/pulse.inc.php
 ```
-We declare two specific graphs for users and sessions numbers. Theses two graphs will be displayed on the firewall section of the graphs tab as it was written in the definition include file.
+
+We declare two specific graphs for users and sessions numbers. Theses
+two graphs will be displayed on the firewall section of the graphs tab
+as it was written in the definition include file.
 
 ```php
 <?php
@@ -56,12 +63,13 @@ if (is_numeric($sessions)) {
 
 #### Displaying
 
-The specific graphs are not displayed automatically so we need to write the following PHP code:
+The specific graphs are not displayed automatically so we need to
+write the following PHP code:
 
 **Pulse Sessions**
 
 ```bash
-html/includes/graphs/device/pulse_sessions.inc.php
+includes/html/graphs/device/pulse_sessions.inc.php
 ```
 
 ```php
@@ -89,7 +97,7 @@ require 'includes/graphs/generic_simplex.inc.php';
 **Pulse Users**
 
 ```bash
-html/includes/graphs/device/pulse_users.inc.php
+includes/html/graphs/device/pulse_users.inc.php
 ```
 
 ```php
@@ -97,7 +105,7 @@ html/includes/graphs/device/pulse_users.inc.php
 
 $rrd_filename = rrd_name($device['hostname'], 'pulse_users');
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ds = 'users';
 
@@ -110,7 +118,8 @@ $graph_max = 1;
 
 $unit_text = 'Users';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';
 ```
 
-That should be it, after data has started to be collected graphs should appear in the WebUI.
+That should be it, after data has started to be collected graphs
+should appear in the WebUI.
