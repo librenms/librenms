@@ -1129,9 +1129,9 @@ function scan_new_plugins()
             if (is_dir(Config::get('plugin_dir') . '/' . $name)) {
                 if ($name != '.' && $name != '..') {
                     if (is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php') && is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.inc.php')) {
-                        $plugin_id = dbFetchRow("SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = '$name'");
+                        $plugin_id = dbFetchRow("SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = ?", [$name]);
                         if (empty($plugin_id)) {
-                            if (dbInsert(array('plugin_name' => $name, 'plugin_active' => '0'), 'plugins')) {
+                            if (dbInsert(['plugin_name' => $name, 'plugin_active' => '0'), 'plugins']) {
                                 $installed++;
                             }
                         }
@@ -1141,7 +1141,7 @@ function scan_new_plugins()
         }
     }
 
-    return( $installed );
+    return $installed;
 }
 
 function scan_removed_plugins()
