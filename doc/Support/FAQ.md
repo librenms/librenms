@@ -368,7 +368,10 @@ adding to /etc/snmp/snmpd.conf :
 
 ## <a name="faq8"> How do I add support for a new OS?</a>
 
-Please see [Supporting a new OS](../Developing/Support-New-OS.md)
+Please see [Supporting a new OS](../Developing/Support-New-OS.md) if you are adding all
+the support yourself, i.e. writing all of the supporting code. If you are only able
+to supply supporting info, and would like the help of others to write up the code, please
+follow the below steps.
 
 ## <a name="faq20"> What information do you need to add a new OS?</a>
 
