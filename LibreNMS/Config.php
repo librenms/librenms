@@ -461,6 +461,7 @@ class Config
         self::setDefault('log_dir', '%s/logs', ['install_dir']);
         self::setDefault('log_file', '%s/%s.log', ['log_dir', 'project_id']);
         self::setDefault('plugin_dir', '%s/plugins', ['html_dir']);
+        self::setDefault('temp_dir', sys_get_temp_dir() ?: '/tmp');
 //        self::setDefault('email_from', '"%s" <%s@' . php_uname('n') . '>', ['project_name', 'email_user']);  // FIXME email_from set because alerting config
 
         // deprecated variables
