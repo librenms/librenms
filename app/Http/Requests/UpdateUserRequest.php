@@ -37,9 +37,9 @@ class UpdateUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'realname' => 'max:64',
+            'realname' => 'nullable|max:64|alpha_space',
             'email' => 'nullable|email|max:64',
-            'descr' => 'max:30',
+            'descr' => 'nullable|max:30|alpha_space',
             'level' => 'int',
             'old_password' => 'nullable|string',
             'new_password' => 'nullable|confirmed|min:' . Config::get('password.min_length', 8),
