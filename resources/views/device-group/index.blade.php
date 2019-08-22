@@ -75,7 +75,7 @@
                         @foreach($ungrouped_devices as $device)
                             <tr id="row_{{ $device->device_id }}">
                                 <td><img alt="{{ $device->os }} "src="{{ asset($device->icon) }}" width="32px" height="32px" title="{{ $device->os }}"></td>
-                                <td><a class="list-device" href="device/device={{$device->device_id}}"><b>{{ $device->hostname }}</b></a><br>{{$device->sysName}}</td>
+                                <td><a class="list-device" href="{{ url("device/device=$device->device_id") }}"><b>{{ $device->hostname }}</b></a><br>{{$device->sysName}}</td>
                                 <td>{{ $device->hardware }}</td>
                                 <td>{{ $device->os }} {{ $device->version }} ({{ $device->features }})</td>
                             </tr>
