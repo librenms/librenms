@@ -19,8 +19,8 @@ class Linenotify extends Transport
     private function contactLinenotify($obj, $opts)
     {
         $lineUrl = 'https://notify-api.line.me/api/notify';
-        $lineHead = array('Authorization: Bearer ' . $opts['line-notify-access-token']);
-        $lineFields = array('message' => $obj['msg']);
+        $lineHead = ['Authorization: Bearer ' . $opts['line-notify-access-token']];
+        $lineFields = ['message' => $obj['msg']];
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $lineUrl);
