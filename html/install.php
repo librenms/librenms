@@ -210,6 +210,29 @@ if ($status == 'no') {
     }
 }
 echo "</td></tr>";
+    
+if (is_writable(Config::get('temp_dir'))) {
+    $status = 'yes';
+    $row_class = 'success';
+} else {
+    $status = 'no';
+    $row_class = 'danger';
+    $complete = false;
+}
+
+echo "<tr class='$row_class'><td>Temporary directory writable</td><td>$status</td><td>";
+if ($status == 'no') {
+    echo Config::get('temp_dir') . ' is not writable';
+    if (function_exists('posix_getgrgid')) {
+        $group_info = posix_getgrgid(filegroup(session_save_path()));
+        if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+            $group = $group_info['name'];
+            $user = get_current_user();
+            echo ", suggested fix <strong>chown $user:$group $php_temp_dir</strong>";
+        }
+    }
+}
+echo "</td></tr>";
 ?>
         </table>
       </div>
