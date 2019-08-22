@@ -4,9 +4,12 @@
     <div class="container-fluid">
         <div class="container">
             <div id="app">
-                <accordion  >
+                <accordion>
                     <accordion-item name="Test">
                         Test Content
+                    </accordion-item>
+                    <accordion-item name="Test 2">
+                        Test 2 Content
                     </accordion-item>
                 </accordion>
             </div>
