@@ -102,6 +102,7 @@ class RunAlerts
         $obj['alert_notes']   = $alert['note'];
         $obj['device_id']     = $alert['device_id'];
         $obj['rule_id']       = $alert['rule_id'];
+        $obj['id']            = $alert['id'];
         $obj['status']        = $device['status'];
         $obj['status_reason'] = $device['status_reason'];
         if (can_ping_device($attribs)) {
