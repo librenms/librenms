@@ -149,15 +149,15 @@ if (!$emptyCheck) { ?>
                     <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
                         <option value=''>Select a device</option>
                         <?php
-                          $sort_field = 'hostname';
-                          if (\LibreNMS\Config::get('force_ip_to_sysname') === true) {
-                              $sort_field = 'sysName';
-                          }
+                        $sort_field = 'hostname';
+                        if (\LibreNMS\Config::get('force_ip_to_sysname') === true) {
+                            $sort_field = 'sysName';
+                        }
 
-                          $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY ?', array($sort_field));
-                          foreach ($devices as $device) {
-                              echo "<option value='${device['device_id']}'>".format_hostname($device)."</option>\n";
-                          }
+                        $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY ?', array($sort_field));
+                        foreach ($devices as $device) {
+                            echo "<option value='${device['device_id']}'>".format_hostname($device)."</option>\n";
+                        }
                         ?>
                     </select>
                 </div>
