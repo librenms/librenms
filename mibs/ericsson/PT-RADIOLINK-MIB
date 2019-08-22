@@ -1,0 +1,1663 @@
+PT-RADIOLINK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,Counter32, Integer32, IpAddress  FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+        InetAddressIPv6 FROM INET-ADDRESS-MIB
+        ifEntry FROM IF-MIB
+        pt FROM PT-MIB;
+
+
+    ptRadioLink MODULE-IDENTITY
+        LAST-UPDATED "201712011600Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB for Radio Link specifics in PT"
+
+        REVISION      "201712011600Z"
+        DESCRIPTION
+        "Added plcAdminStatus and plcOperStatus."
+
+        REVISION      "201704051000Z"
+        DESCRIPTION
+        "Added channelSpacing enums."
+
+        REVISION      "201701181000Z"
+        DESCRIPTION
+        "Added mlhcAdminStatus, mlhcOperStatus and mlhcMplsConfig."
+
+        REVISION      "201612061400Z"
+        DESCRIPTION
+            "Added more MOs in ctTable and rltTable. Added G.826 tables."
+
+        REVISION      "201605221030Z"
+        DESCRIPTION
+            "The initial version of this MIB module
+                            with OID for MINI-LINK."
+
+
+        ::= { pt 7 }
+
+     ptRadioLinkConformance OBJECT IDENTIFIER ::= { ptRadioLink 2 } 
+     ctPerformance OBJECT IDENTIFIER ::= { ptRadioLink 4 }
+
+---
+--- Textual conventions
+---
+     AcmTC ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+            "An integer which indicates the ACM."
+     SYNTAX INTEGER
+     {
+         acmHalfBpsk(1),
+         acmHalfBpskLight(2),
+         acmHalfBpskStrong(3),
+         acmBpsk(4),
+       acmBpskLight(5),
+       acmBpskStrong(6),
+       acm4Qam(7),
+       acm4QamLight(8),
+       acm4QamStrong(9),
+       acm16Qam(10),
+       acm16QamLight(11),
+       acm16QamStrong(12),
+       acm32Qam(13),
+       acm32QamLight(14),
+       acm32QamStrong(15),
+       acm64Qam(16),
+       acm64QamLight(17),
+       acm64QamStrong(18),
+       acm128Qam(19),
+       acm128QamLight(20),
+       acm128QamStrong(21),
+       acm256Qam(22),
+       acm256QamLight(23),
+       acm256QamStrong(24),
+       acm512Qam(25),
+       acm512QamLight(26),
+       acm512QamStrong(27),
+       acm1024Qam(28),
+       acm1024QamLight(29),
+       acm1024QamStrong(30),
+       acm2048Qam(31),
+       acm2048QamLight(32),
+       acm2048QamStrong(33),
+       acm4096Qam(34),
+       acm4096QamLight(35),
+       acm4096QamStrong(36)
+     }
+
+
+     EnableStatusTC ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+            "An integer which indicates the enabled status."     
+     SYNTAX INTEGER
+     {
+       enabled(1),
+       disabled(2),
+       unknown(3)
+     }
+
+     XpicMimoTC ::= TEXTUAL-CONVENTION
+     STATUS     current
+     DESCRIPTION
+            "An integer which indicates the XPIC or MIMO status."     
+     SYNTAX INTEGER
+     {
+       notAvailable(1),
+       locked(2),
+       unlocked(3),
+       unknown(4)
+     }
+
+---
+---The definition of ctTable
+---   
+  ctTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+            "A table of CT Table entries."
+        ::= { ptRadioLink 1 }
+
+  ctEntry OBJECT-TYPE
+        SYNTAX      CtEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "An entry of CT application."
+        AUGMENTS   { ifEntry }
+        ::= { ctTable 1 }
+
+  CtEntry ::=
+        SEQUENCE {
+              actualInputPower                OCTET STRING,
+              actualOutputPower               OCTET STRING,
+              actualRxAcm                     OCTET STRING,
+              actualTxAcm                     OCTET STRING,
+              ctDistinguishedName             OCTET STRING,
+              description                     OCTET STRING,
+              carrierId                       INTEGER,
+              ctStatus                        INTEGER,
+              frameId                         Integer32,
+              txFrequency                     Integer32,
+              minTxFrequency                  Integer32,
+              maxTxFrequency                  Integer32,
+              rxFrequency                     Integer32,
+              minRxFrequency                  Integer32,
+              maxRxFrequency                  Integer32,
+              frequencyStepSize               Integer32,
+              duplexDistance                  Integer32,
+              duplexType                      INTEGER,
+              duplexConfig                    EnableStatusTC,
+              autoFreqSelection               INTEGER,
+              autoFreqSelectedChannel         Integer32,
+              autoFreqSelectionStatus         INTEGER,
+              channelSpacing                  INTEGER,
+              polarization                    INTEGER,
+              txOperStatus                    INTEGER,
+              txAdminStatus                   INTEGER,
+              selectedOutputPowerType         INTEGER,
+              availableOutputPowerType        INTEGER,
+              selectedMinOutputPower          Integer32,
+              selectedMaxOutputPower          Integer32,
+              availableMinOutputPower         Integer32,
+              availableMaxOutputPower         Integer32,
+              referenceSec                    INTEGER,
+              targetInputPowerFarEnd          Integer32,
+              berAlarmThreshold               INTEGER,
+              inputPowerAlarmThreshold        Integer32,
+              plannedAlignmentInputPower      Integer32,
+              atpcFallback                    EnableStatusTC,
+              atpcFallbackTimer               Integer32,
+              atpcFallbackOutputPower         Integer32,
+              xpicStatus                      XpicMimoTC,
+              mimoStatus                      XpicMimoTC,
+              actualSnir                      OCTET STRING,
+              actualXpi                       OCTET STRING,
+              actualSi                        OCTET STRING,
+              actualTxCapacity                Integer32,
+              licensedCapacity                Integer32,
+              availableMinCapacity            Integer32,
+              availableMaxCapacity            Integer32,
+              selectedMinCapacity             Integer32,
+              selectedMaxCapacity             Integer32,
+              wantedLicensedCapacity          Integer32,
+              availableMinAcm                 AcmTC,
+              availableMaxAcm                 AcmTC,
+              selectedMinAcm                  AcmTC,
+              selectedMaxAcm                  AcmTC,
+              actualRxAcmTC                   AcmTC,
+              actualTxAcmTC                   AcmTC,
+              alignmentMode                   EnableStatusTC,
+              rfLoop                          EnableStatusTC
+              }
+
+  actualInputPower OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Actual input power of the CT in dBm"
+        ::= { ctEntry 1 }
+
+  actualOutputPower OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Actual output power of the CT in dBm"
+        ::= { ctEntry 2 }
+
+  actualRxAcm       OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Actual rx modulation and coding"
+        ::= { ctEntry 3 } 
+
+  actualTxAcm       OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Actual tx modulation and coding"
+        ::= { ctEntry 4 } 
+
+  ctDistinguishedName OBJECT-TYPE
+            SYNTAX      OCTET STRING
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+            "Unique id/name of the carrier termination, according to FDN (rack/slot/port/class)"
+            ::= { ctEntry 5 }
+
+  description OBJECT-TYPE
+            SYNTAX      OCTET STRING
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "User description of the carrior termination."
+            ::= { ctEntry 6 }
+
+  carrierId       OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                a(1),
+                b(2),
+                c(3),
+                d(4),
+                unknown(5)
+            }     
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "Id of the carrier. (A, B, C, D)
+                Used in XPIC & MIMO configurations to check that the carrier termination is connected to the correct far end carrier termination. 
+                Should be the same id on both sides of the hop. Defaulted when not MIMO or XPIC.
+                Sometimes also referred to as preamble"
+            ::= { ctEntry 7 }
+
+  ctStatus  OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            down(1),
+          up(2),
+          na(3),
+          unknown(4),
+          degraded(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of the carrier termination, hop"
+        ::= { ctEntry 8}
+
+  frameId  OBJECT-TYPE
+        SYNTAX Integer32 (0..10000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A unique identifier for the radio frame to be used. 
+            Wanted frameId, txFrequency, rxFrequency, referenceSec, selectedMinAcm and selectedMaxAcm must be a valid combination."
+        ::= { ctEntry 9}
+
+  txFrequency  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Selected frequency on the transmitter (kHz). 
+                Wanted frameId, txFrequency, rxFrequency, referenceSec, selectedMinAcm and selectedMaxAcm must be a valid combination."
+            ::= { ctEntry 10}
+
+  minTxFrequency  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Minimum Tx frequency possible to use, given by the selected frame-id"
+            ::= { ctEntry 11}
+
+  maxTxFrequency  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Maximum Tx frequency possible to use, given by the selected frame-id"
+  ::= { ctEntry 12}
+
+  rxFrequency  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Selected frequency on the receiver (kHz). 
+                Wanted frameId, txFrequency, rxFrequency, referenceSec, selectedMinAcm and selectedMaxAcm must be a valid combination."
+  ::= { ctEntry 13}
+
+  minRxFrequency  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Minimum Rx frequency possible to use, given by the selected frame-id"
+  ::= { ctEntry 14}
+
+  maxRxFrequency  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Maximum Rx frequency possible to use, given by the selected frame-id"
+            ::= { ctEntry 15}
+
+  frequencyStepSize  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Frequency step size in kHz"
+            ::= { ctEntry 16}
+
+  duplexDistance  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Distance between Tx and Rx frequencies (kHz)"
+            ::= { ctEntry 17}
+
+  duplexType  OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                variable(1),
+                fixed(2),
+                unknown(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The duplex type is given by the equipment (Fixed,Variable)"
+            ::= { ctEntry 18}
+
+
+  duplexConfig  OBJECT-TYPE
+        SYNTAX EnableStatusTC
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enabling or disabling configuration of Rx freq using duplex distance"
+        ::= { ctEntry 19}
+
+  autoFreqSelection  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        disabled(1),
+        master(2),
+        slave(3),
+        unknown(4)
+      }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Automatic frequency selection mode"
+        ::= { ctEntry 20}
+
+    autoFreqSelectedChannel  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Automatic frequency selected channel"
+      ::= { ctEntry 21}
+
+    autoFreqSelectionStatus  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+          idle(1),
+        searchingForSlave(2),
+        requestingInfoFromSlave(3),
+        waitingForMaster(4),
+        waitingForChannelInfoRequest(5),
+        inProgress(6),
+        initializing(7),
+        finished(8),
+        failed(9),
+        unknown(10)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Automatic frequency status"
+      ::= { ctEntry 22}
+
+  channelSpacing  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        cs7MHz(1),
+        cs10MHz(2),
+        cs14MHz(3),
+        cs20MHz(4),
+        cs28MHz(5),
+        cs30MHz(6),
+        cs40MHz(7),
+        cs50MHz(8),
+        cs56MHz(9),
+        cs250MHz(10),
+        cs60MHz(11),
+        cs500MHz(12),
+        cs750MHz(13),
+        cs100MHz(14),
+        cs150MHz(15),
+        cs200MHz(16),
+        cs125MHz(17),
+        cs80MHz(18),
+        cs112MHz(19),
+        cs1000MHz(20),
+        cs1250MHz(21),
+        cs1500MHz(22),
+        cs62p5MHz(23),
+        cs2000MHz(24),
+        unknown(25)       
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "Channel spacing"
+      ::= { ctEntry 23}
+
+  polarization  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        notSpecified(1),
+        horizontal(2),
+        vertical(3),
+        unknown(4)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Antenna polarization"
+      ::= { ctEntry 24}
+
+  txOperStatus  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        unknown(1),
+        off(2),
+        on(3),
+        standby(4)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Operative status of the transmitter"
+      ::= { ctEntry 25}
+
+  txAdminStatus  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        off(1),
+        on(2),
+        unknown(3)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Administrative status of the transmitter"
+      ::= { ctEntry 26}
+
+  selectedOutputPowerType  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        standard(1),
+        high(2),
+        unknown(3)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Selected output power type"
+      ::= { ctEntry 27}
+
+  availableOutputPowerType  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        standard(1),
+        high(2),
+        unknown(3)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Available output power type"
+      ::= { ctEntry 28}
+
+  selectedMinOutputPower  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Selected min output power.
+       Selected min & max output power should be set to the same value for RTPC mode, otherwise the hop operates in ATPC mode."
+      ::= { ctEntry 29}
+
+  selectedMaxOutputPower  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Selected max output power.
+       Selected min & max output power should be set to the same value for RTPC mode, otherwise the hop operates in ATPC mode."
+      ::= { ctEntry 30}
+
+
+  availableMinOutputPower  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The minimum output power supported (dBm).
+        The system shows a value if the equipment is available and a frame id has been selected."
+      ::= { ctEntry 31}
+
+  availableMaxOutputPower  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum output power supported (dBm).
+            The system shows a value if the equipment is available and a frame id has been selected."
+  ::= { ctEntry 32}
+
+  referenceSec  OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            noAvailable(1),
+            sec2(2),
+        sec4L(4),
+        sec4H(5),
+        sec5B(7),
+        sec6B(9),
+        sec5LB(10),
+        sec5HB(11),
+        sec6LB(12),
+        sec6HB(13),
+        sec7B(14),
+        unknown(15)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each modulation is compliant to a Reference Spectrum Efficiency Class (RSEC). 
+            When running Adaptive Coding/Modulation, one SEC has to be selected for all the coding/modulations between selectedMinACM and selectedMaxACM.
+            This parameter is called Reference SEC. This setting will affect availableMaxOutputPower, in order to fulfill spectrum requirements.
+            Wanted frameId, txFrequency, rxFrequency, referenceSec, selectedMinAcm and selectedMaxAcm must be a valid combination."
+        ::= { ctEntry 33}
+
+ targetInputPowerFarEnd  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "The wanted input power at far end (dBm), when running ATPC"
+      ::= { ctEntry 34}
+
+ berAlarmThreshold  OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        tenExpMinus6(1),
+        tenExpMinus3(2)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+      "Threshold for the BER alarm"
+      ::= { ctEntry 35}
+
+ inputPowerAlarmThreshold  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "Threshold for the input power alarm"
+      ::= { ctEntry 36}
+
+    plannedAlignmentInputPower  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The planned received input power (dBm) dependent upon selected minimum ACM and corresponding output power.
+                    Used when doing alignment"
+            ::= { ctEntry 37}
+
+    atpcFallback  OBJECT-TYPE
+     SYNTAX EnableStatusTC
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+        "Enable or disable the output power fall back function"
+     ::= { ctEntry 38}
+
+ atpcFallbackTimer  OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+        "Specifies the timer for output power fall back (# of seconds)"
+     ::= { ctEntry 39}
+
+ atpcFallbackOutputPower  OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The ATPC fallback output power"
+            ::= { ctEntry 40}
+
+    xpicStatus  OBJECT-TYPE
+            SYNTAX XpicMimoTC
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Status of the XPIC function."
+            ::= { ctEntry 41}
+
+    mimoStatus  OBJECT-TYPE
+           SYNTAX XpicMimoTC
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "Status of the MIMO function."
+           ::= { ctEntry 42}
+
+    actualSnir  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+              "Actual signal to noise plus interference ratio (dB)."
+            ::= { ctEntry 43}
+
+    actualXpi  OBJECT-TYPE
+           SYNTAX OCTET STRING
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+             "The carrier to cross-polar interference level (dBc)."
+           ::= { ctEntry 44}
+
+    actualSi  OBJECT-TYPE
+           SYNTAX OCTET STRING
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+             "Spatial interference between the CTs when MIMO is configured."
+           ::= { ctEntry 45}
+
+    actualTxCapacity  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+         "Actual capacity supported by the carrier termination."
+        ::= { ctEntry 46}
+
+    licensedCapacity  OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Wanted or installed license for the capacity allowed for the carrier termination."
+     ::= { ctEntry 47}
+
+    availableMinCapacity  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "Minimum capacity possible to use. Given by the selected frame-id (kbit/s)"
+      ::= { ctEntry 48}
+
+    availableMaxCapacity  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "Maximum capacity possible to use. Given by the selected frame-id (kbit/s)"
+      ::= { ctEntry 49}
+
+    selectedMinCapacity  OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Selected minimum capacity, derived from selected minimum ACM (kbit/s)"
+     ::= { ctEntry 50}
+
+    selectedMaxCapacity  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "Selected maximum capacity, derived from selected maximum ACM (kbit/s)"
+      ::= { ctEntry 51}
+
+    wantedLicensedCapacity  OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Wanted licensed capacity and creation of LRF for the carrier termination (kbit/s)"
+      ::= { ctEntry 52}
+
+    availableMinAcm  OBJECT-TYPE
+     SYNTAX AcmTC
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Minimum ACM possible to use, given by the selected frame id."
+     ::= { ctEntry 53}
+
+    availableMaxAcm  OBJECT-TYPE
+      SYNTAX AcmTC
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+       "Maximum ACM possible to use, given by the selected frame id"
+      ::= { ctEntry 54}
+
+    selectedMinAcm  OBJECT-TYPE
+      SYNTAX AcmTC
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Selected minimum coding/modulation. If selectedMinACM = selectedMaxACM, then the modulation is fixed"
+      ::= { ctEntry 55}
+
+    selectedMaxAcm  OBJECT-TYPE
+      SYNTAX AcmTC
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Selected maximum coding/modulation. If selectedMinACM = selectedMaxACM, then the modulation is fixed"
+      ::= { ctEntry 56}
+
+     actualRxAcmTC  OBJECT-TYPE
+     SYNTAX AcmTC
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Actual rx modulation and coding"
+     ::= { ctEntry 57}
+
+ actualTxAcmTC  OBJECT-TYPE
+     SYNTAX AcmTC
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      "Actual tx modulation and coding"
+     ::= { ctEntry 58}
+
+    alignmentMode  OBJECT-TYPE
+      SYNTAX EnableStatusTC
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+       "Enable or disable the alignment mode"
+      ::= { ctEntry 59}
+
+    rfLoop  OBJECT-TYPE
+     SYNTAX EnableStatusTC
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+      "Enable or disable the rf loop"
+     ::= { ctEntry 60}
+
+
+  ---
+  ---The definition of rltTable
+  ---   
+  rltTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF RltEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+              "A table of RLT Table entries."
+          ::= { ptRadioLink 3 }
+
+  rltEntry OBJECT-TYPE
+          SYNTAX      RltEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                    "An entry of RLT application."
+          AUGMENTS   { ifEntry }
+          ::= { rltTable 1 }
+
+  RltEntry ::=
+          SEQUENCE {
+                    rltDistinguishedName   OCTET STRING,
+                    neIpAddress            IpAddress,
+                    neIpv6Address          InetAddressIPv6,
+                    neName                 OCTET STRING,
+                    neType                 INTEGER,
+                    id                     OCTET STRING, 
+                    rltStatus              INTEGER,
+                    mode                   INTEGER,
+                    actualTxTotalCapacity  Integer32,
+                    limitedTotalCapacity   Integer32,
+                    protectionStatus       INTEGER,
+                    revertiveWaitToRestore Integer32,
+                    revertivePreferredTx   INTEGER,
+                    protectionSwitchMode   INTEGER,
+                    fadeNotificationTimer  Integer32,
+                    expectedFarEndId       OCTET STRING,
+                    farEndIdCheck          INTEGER,
+                    cpriMode               INTEGER,
+                    cpriStatus             INTEGER,
+                    manualSwitch           INTEGER,
+                    mlhcOperStatus         INTEGER,
+                    mlhcAdminStatus        INTEGER,
+                    mlhcMplsConfig         INTEGER,
+                                plcOperStatus          INTEGER,
+                                plcAdminStatus         INTEGER
+                      }
+
+  rltDistinguishedName OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Unique id/name of the radio link termination, according to FDN (rack/slot/port/class)"
+          ::= { rltEntry 1 }
+
+  neIpAddress OBJECT-TYPE
+          SYNTAX      IpAddress
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "NE IP address"
+          ::= { rltEntry 2 }
+
+  neIpv6Address OBJECT-TYPE
+          SYNTAX      InetAddressIPv6
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+            "NE IP V6 address"
+          ::= { rltEntry 3 }
+
+  neName       OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "NE Name"
+          ::= { rltEntry 4 } 
+
+  neType       OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    unknown(1),
+                    mle(2),
+                    xfMle(3),
+                    tn(4),
+                    cn(5),
+                    pt(6)
+                }     
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "NE Type"
+          ::= { rltEntry 5 }
+
+  id      OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "User defined id of the radio link terminal"
+                ::= { rltEntry 6}
+
+  rltStatus  OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    down(1),
+                    up(2),
+                    na(3),
+                    unknown(4),
+                    degraded(5)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "The status of the radio link terminal"
+          ::= { rltEntry 7}
+
+    mode    OBJECT-TYPE
+          SYNTAX INTEGER
+          {
+              mode1plus0(1),
+            mode1plus1CSB(2),
+            mode1plus1RLP(3),
+            mode2plus0RLB(4),
+            mode2plus1CSB(5),
+            mode2plus1RLP(6),
+            mode2plus2CSB(7),
+            mode2plus2RLP(8),
+            mode3plus0RLB(9),
+            mode4plus0RLB(10),
+            notAvailable11(11),
+            notAvailable12(12),
+            notAvailable13(13),
+            notAvailable14(14),
+            mode3plus1RLP(15),
+            mode3plus2RLP(16),
+            mode3plus3RLP(17),
+            mode4plus1RLP(18),
+            mode4plus2RLP(19),
+            mode4plus3RLP(20),
+            mode4plus4RLP(21),
+            notAvailable22(22),
+            notAvailable23(23),
+            notAvailable24(24),
+            notAvailable25(25),
+            notAvailable26(26),
+            notAvailable27(27),
+            mode3plus1CSB(28),
+            mode3plus2CSB(29),
+            mode3plus3CSB(30),
+            mode4plus1CSB(31),
+            mode4plus2CSB(32),
+            mode4plus3CSB(33),
+            mode4plus4CSB(34),
+            unknown(35)
+          }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+            "The status of the radio link terminal"
+          ::= { rltEntry 8}
+
+  actualTxTotalCapacity OBJECT-TYPE
+          SYNTAX      Integer32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                  "Actual aggregated total (packet + TDM) transmitter capacity for the radio link termination.
+                  Limited by licenses & configuration (=nearEndLimitedCapacity) and depending on actual modulation/coding used at the moment."
+          ::= { rltEntry 9 }
+
+  limitedTotalCapacity OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Maximum total capacity allowed by the current configuration and installed licenses.
+                    Aggregated from the constituent carrier termination values."
+                ::= { rltEntry 10 }
+
+
+  protectionStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    unprotected(1),
+                    protected(2),
+                    unableToProtect(3),
+                    unknown(4)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Status of a protected node."
+                ::= { rltEntry 11}
+
+  revertiveWaitToRestore OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                "The time, in number of seconds, to wait before switching back to the preferred Tx."
+                ::= { rltEntry 12}
+
+  revertivePreferredTx OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    ct11(1),
+                    ct12(2),
+                    ct21(3),
+                    ct22(4),
+                    notApplicable(5),
+                    unknown(6)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "The preferred carrier termination transmitter."
+                ::= { rltEntry 13}
+
+
+
+  protectionSwitchMode OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    auto(1),
+                    manual(2),
+                    autoAndRevertive(3),
+                    unknown(4),
+                    notApplicable(5)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    ".The mode in which the switching mechanism is configured"
+                ::= { rltEntry 14}
+
+
+  fadeNotificationTimer OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Notification is sent if fading is longer than this timer, applicable for protection."
+                ::= { rltEntry 15}
+
+  expectedFarEndId OBJECT-TYPE
+                SYNTAX      OCTET STRING
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Expected id of far-end terminal"
+                ::= { rltEntry 16 }
+
+  farEndIdCheck OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    enabled(1),
+                    disabled(2),
+                    unknown(3)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Enabling of far end id check."
+                ::= { rltEntry 17}
+
+  cpriMode OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    master(1),
+                    slave(2),
+                    notApplicable(3),
+                    unknown(4)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Set the mode of the CPRI front-haul product."
+                ::= { rltEntry 18}
+
+  cpriStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    idle(1),
+                    waitingOnRtcSync(2),
+                    waitingOnCpri(3),
+                    waitingOnRxRequest(4),
+                    waitingOnTxRequest(5),
+                    inSync(6),
+                    unknown(7)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "The status of the CPRI front-haul product."
+                ::= { rltEntry 19}
+
+  manualSwitch OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+              ct11(1),
+              ct12(2),
+              ct21(3),
+              ct22(4),
+              notApplicable(5),
+              unknown(6)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "Manual switch of protected carrier termination transmitter."
+                ::= { rltEntry 20}  
+
+  mlhcOperStatus  OBJECT-TYPE
+              SYNTAX INTEGER
+              {
+                up(1),
+                down(2),
+                unknown(3)
+              }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+              "Operative status of multi layer header compression."
+              ::= { rltEntry 21}
+
+  mlhcAdminStatus  OBJECT-TYPE
+              SYNTAX INTEGER
+              {
+                off(1),
+                on(2),
+                unknown(3)
+              }
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+              "Administrative status of multi layer header compression."
+              ::= { rltEntry 22}
+
+  mlhcMplsConfig  OBJECT-TYPE
+                      SYNTAX INTEGER
+                      {
+                        controlWord(1),
+                        l2(2),
+                        l3(3),
+                        mplsOnly(4),
+                        unknown(5)
+                      }
+                      MAX-ACCESS read-write
+                      STATUS current
+                      DESCRIPTION
+                      "MLHC/MPLS configuration."
+                      ::= { rltEntry 23}
+
+  plcOperStatus  OBJECT-TYPE
+                      SYNTAX INTEGER
+                      {
+                        up(1),
+                        down(2),
+                        unknown(3)
+                      }
+                      MAX-ACCESS read-only
+                      STATUS current
+                      DESCRIPTION
+                      "Operative status of payload compression."
+                      ::= { rltEntry 24}
+
+  plcAdminStatus  OBJECT-TYPE
+                      SYNTAX INTEGER
+                      {
+                        off(1),
+                        on(2),
+                        unknown(3)
+                      }
+                      MAX-ACCESS read-write
+                      STATUS current
+                      DESCRIPTION
+                      "Administrative status of payload compression."
+                      ::= { rltEntry 25}
+  ---
+  ---The definition of ct826ContinuousTable
+  ---
+ctG826ContinuousTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF CtG826ContinuousEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+              "A table of CT G826 Performance Continuous counters entries.
+              The counters are reset by ctG826Reset"
+          ::= { ctPerformance 1 }
+
+  ctG826ContinuousEntry OBJECT-TYPE
+          SYNTAX      CtG826ContinuousEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                    "An entry of CT G826 Performance Continuous counters."
+          AUGMENTS   { ifEntry }
+          ::= { ctG826ContinuousTable 1 }
+
+  CtG826ContinuousEntry ::=
+          SEQUENCE {
+              ctG826TimeElapsed        Counter32,
+              ctBBE                    Counter32,
+              ctBBER                   OCTET STRING,
+              ctES                     Counter32,
+              ctESR                    OCTET STRING,
+              ctSES                    Counter32,
+              ctSESR                   OCTET STRING,
+              ctBB                     OCTET STRING,
+              ctUAS                    Counter32,
+              ctG826Reset              INTEGER
+          }
+
+  ctG826TimeElapsed OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Time elapsed in seconds since last PMReset"
+          ::= { ctG826ContinuousEntry 1 }
+
+  ctBBE   OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Background Block Errors"
+          ::= { ctG826ContinuousEntry 2 }
+
+  ctBBER  OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Background Block Errors Ratio"
+          ::= { ctG826ContinuousEntry 3 } 
+
+  ctES    OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Error seconds"
+          ::= { ctG826ContinuousEntry 4 } 
+
+  ctESR   OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Error seconds Ratio"
+          ::= { ctG826ContinuousEntry 5 }
+
+  ctSES   OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Severely error seconds"
+          ::= { ctG826ContinuousEntry 6 }
+
+  ctSESR  OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Severely error seconds Ratio"
+          ::= { ctG826ContinuousEntry 7 } 
+
+  ctBB    OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Background blocks"
+          ::= { ctG826ContinuousEntry 8 } 
+
+  ctUAS   OBJECT-TYPE
+          SYNTAX      Counter32
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Unavailable seconds "
+          ::= { ctG826ContinuousEntry 9 }
+
+  ctG826Reset OBJECT-TYPE
+          SYNTAX INTEGER
+          {
+              other(1),
+              noReset(2),
+              reset(3)
+          }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+              "Reset the continuous PM counters"
+          ::= { ctG826ContinuousEntry 10 }
+
+
+---
+---The definition of ctG826Current15mTable
+---   
+ctG826Current15mTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF CtG826Current15mEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                "A table of CT Performance G826 15 m current counters Table entries."
+            ::= { ctPerformance 2 }
+
+  ctG826Current15mEntry OBJECT-TYPE
+            SYNTAX      CtG826Current15mEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                      "An entry of CT Performance G826 15 m current Table counters."
+            AUGMENTS   { ifEntry }
+            ::= { ctG826Current15mTable 1 }
+
+  CtG826Current15mEntry ::=
+            SEQUENCE {
+                ctG826Current15mTimeElapsed   Counter32,
+                ctCurrent15mBBE           Counter32,
+              ctCurrent15mBBER          OCTET STRING,
+              ctCurrent15mES            Counter32,
+              ctCurrent15mESR           OCTET STRING,
+              ctCurrent15mSES           Counter32,
+              ctCurrent15mSESR          OCTET STRING,
+              ctCurrent15mBB            Counter32,
+              ctCurrent15mUAS           Counter32
+                        }
+
+  ctG826Current15mTimeElapsed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time elapsed in seconds since last PMReset"
+    ::= { ctG826Current15mEntry 1 }
+
+  ctCurrent15mBBE OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background Block Errors"
+    ::= { ctG826Current15mEntry 2 }
+
+  ctCurrent15mBBER       OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background Block Errors Ratio"
+    ::= { ctG826Current15mEntry 3 } 
+
+  ctCurrent15mES  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error seconds"
+    ::= { ctG826Current15mEntry 4 } 
+
+  ctCurrent15mESR OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error seconds Ratio"
+    ::= { ctG826Current15mEntry 5 }
+
+  ctCurrent15mSES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Severely error seconds"
+    ::= { ctG826Current15mEntry 6 }
+
+  ctCurrent15mSESR       OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Severely error seconds Ratio"
+    ::= { ctG826Current15mEntry 7 } 
+
+  ctCurrent15mBB       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background blocks"
+    ::= { ctG826Current15mEntry 8 } 
+
+  ctCurrent15mUAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unavailable seconds "
+    ::= { ctG826Current15mEntry 9 }
+
+---
+---The definition of ctG826Current24hTable
+---   
+ctG826Current24hTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF CtG826Current24hEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+              "A table of CT Performance G826 Current 24h counters entries."
+          ::= { ctPerformance 3 }
+
+  ctG826Current24hEntry OBJECT-TYPE
+      SYNTAX      CtG826Current24hEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+               "An entry of CT Performance G826 Current 24 h counters."
+      AUGMENTS   { ifEntry }
+        ::= { ctG826Current24hTable 1 }
+
+      CtG826Current24hEntry ::=
+              SEQUENCE {
+                    ctG826Current24hTimeElapsed Counter32,
+                  ctCurrent24hBBE             Counter32,
+                  ctCurrent24hBBER            OCTET STRING,
+                  ctCurrent24hES              Counter32,
+                  ctCurrent24hESR             OCTET STRING,
+                  ctCurrent24hSES             Counter32,
+                  ctCurrent24hSESR            OCTET STRING,
+                  ctCurrent24hBB              Counter32,
+                  ctCurrent24hUAS             Counter32
+              }
+
+  ctG826Current24hTimeElapsed OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Time elapsed in seconds since last PMReset"
+      ::= { ctG826Current24hEntry 1 }
+
+  ctCurrent24hBBE OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Background Block Errors"
+      ::= { ctG826Current24hEntry 2 }
+
+  ctCurrent24hBBER       OBJECT-TYPE
+      SYNTAX      OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Background Block Errors Ratio"
+      ::= { ctG826Current24hEntry 3 } 
+
+  ctCurrent24hES  OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Error seconds"
+      ::= { ctG826Current24hEntry 4 } 
+
+  ctCurrent24hESR OBJECT-TYPE
+      SYNTAX      OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Error seconds Ratio"
+      ::= { ctG826Current24hEntry 5 }
+
+  ctCurrent24hSES OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Severely error seconds"
+      ::= { ctG826Current24hEntry 6 }
+
+  ctCurrent24hSESR       OBJECT-TYPE
+      SYNTAX      OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Severely error seconds Ratio"
+      ::= { ctG826Current24hEntry 7 } 
+
+  ctCurrent24hBB       OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Background blocks"
+      ::= { ctG826Current24hEntry 8 } 
+
+  ctCurrent24hUAS OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Unavailable seconds "
+      ::= { ctG826Current24hEntry 9 }
+
+--
+-- Conformance
+--
+
+    ptRadioLinkCompliances OBJECT IDENTIFIER ::= { ptRadioLinkConformance 1 }
+    ptRadioLinkGroups      OBJECT IDENTIFIER ::= { ptRadioLinkConformance 2 }
+
+    ptRadioLinkFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptRadioLinkCompleteGroup}
+        ::= { ptRadioLinkCompliances 1 }
+
+    ptRadioLinkCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            actualInputPower,
+            actualOutputPower,
+            actualRxAcm,
+            actualRxAcmTC,
+            actualSi,
+            actualSnir,
+            actualTxAcm,
+            actualTxAcmTC,
+            actualTxCapacity,
+            actualTxTotalCapacity,
+            actualXpi,
+            alignmentMode,
+            atpcFallback,
+            atpcFallbackTimer,
+            atpcFallbackOutputPower,
+            autoFreqSelectedChannel,
+            autoFreqSelection,
+            autoFreqSelectionStatus,
+            availableMaxAcm,
+            availableMaxCapacity,
+            availableMaxOutputPower,
+            availableMinAcm,
+            availableMinCapacity,
+            availableMinOutputPower,
+            availableOutputPowerType,
+            berAlarmThreshold,
+            carrierId,
+            channelSpacing,
+            cpriMode,
+            cpriStatus,
+            ctDistinguishedName,
+            ctCurrent15mBB,
+            ctCurrent15mBBE,
+            ctCurrent15mBBER,
+            ctCurrent15mES,
+            ctCurrent15mESR,
+            ctCurrent15mSES,
+            ctCurrent15mSESR,
+            ctCurrent15mUAS,
+            ctG826Current15mTimeElapsed,
+            ctCurrent24hBB,
+            ctCurrent24hBBE,
+            ctCurrent24hBBER,
+            ctCurrent24hES,
+            ctCurrent24hESR,
+            ctCurrent24hSES,
+            ctCurrent24hSESR,
+            ctCurrent24hUAS,
+            ctG826Current24hTimeElapsed,
+            ctBB,
+            ctBBE,
+            ctBBER,
+            ctES,
+            ctESR,
+            ctG826Reset,
+            ctSES,
+            ctSESR,
+            ctG826TimeElapsed,
+            ctUAS,
+            ctStatus,
+            description,
+            duplexConfig,
+            duplexDistance,
+            duplexType,
+            expectedFarEndId,
+            fadeNotificationTimer,
+            farEndIdCheck,
+            frameId,
+            frequencyStepSize,
+            id,
+            inputPowerAlarmThreshold,
+            licensedCapacity,
+            limitedTotalCapacity,
+            manualSwitch,
+            maxRxFrequency,
+            maxTxFrequency,
+            mimoStatus,
+            minRxFrequency,
+            minTxFrequency,
+            mlhcAdminStatus,
+            mlhcMplsConfig,
+            mlhcOperStatus,
+            plcAdminStatus,
+            plcOperStatus,
+            mode,
+            neIpAddress,
+            neIpv6Address,
+            neName,
+            neType,
+            plannedAlignmentInputPower,
+            polarization,
+            protectionStatus,
+            protectionSwitchMode,
+            referenceSec,
+            revertivePreferredTx,
+            revertiveWaitToRestore,
+            rfLoop,
+            rltDistinguishedName,
+            rltStatus,
+            rxFrequency,
+            selectedMaxAcm,
+            selectedMaxCapacity,
+            selectedMaxOutputPower,
+            selectedMinAcm,
+            selectedMinCapacity,
+            selectedMinOutputPower,
+            selectedOutputPowerType,
+            targetInputPowerFarEnd,
+            txAdminStatus,
+            txFrequency,
+            txOperStatus,
+            wantedLicensedCapacity,
+            xpicStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptRadioLinkGroups 1 }
+
+
+END
+
