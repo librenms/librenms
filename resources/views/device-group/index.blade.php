@@ -61,7 +61,7 @@
         <div id="manage-device-groups-panel" class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                @lang('ungrouped Devices') ({{ $ungrouped_devices->count() }})
+                @lang('Ungrouped Devices') ({{ $ungrouped_devices->count() }})
                 </h4>
             </div>
             <div class="panel-body">
