@@ -24,7 +24,7 @@ foreach ($_GET as $name => $value) {
 }
 
 // FIXME - other place?
-function doerror ($msg, $type) {
+function doerror($msg, $type) {
     // Create a xxx*xxx image
     $im = imagecreate(200, 50);
 
