@@ -44,7 +44,7 @@ function doerror ($msg, $type) {
 
     if (!empty(Config::get('allow_unauth_redirect_to')) && Config::get('allow_unauth_redirect') == '1') {
         die(Header("Location: ".Config::get('allow_unauth_redirect_to')."?type=".$type.""));
-    }else{
+    } else {
         die(''); // The image for in link after expire
     }
 }
@@ -57,9 +57,9 @@ if (!$auth) {
 $referrer = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
 $own = parse_url(Config::get('base_url'), PHP_URL_HOST);
 
-if(isset($vars['rule']) && isset($vars['alert']) && Config::get('allow_unauth_time_limit') == 1){
+if (isset($vars['rule']) && isset($vars['alert']) && Config::get('allow_unauth_time_limit') == 1) {
     $query = "SELECT `time_logged` FROM `alert_log` WHERE device_id = ". $vars['device']  ." AND rule_id = ". $vars[rule]  ." AND id = ". $vars['alert']  ." AND state =! 0 AND details IS NOT NULL ORDER BY id DESC";
-    if (empty(dbFetch($query))){
+    if (empty(dbFetch($query))) {
         doerror("No Valid Request", 10);
     } else {
         $vars['from'] = floor(date_timestamp_get(date_create(dbFetchCell($query, [time_logged])))/300) * 300 - (Config::get('allow_unauth_time_befor') * 60);
@@ -69,8 +69,8 @@ if(isset($vars['rule']) && isset($vars['alert']) && Config::get('allow_unauth_ti
         $date = date_create($res[0]['time_logged']);
         if (empty($res)) {
             //this is ok :)
-        }elseif (count($res) == 1 && time() - date_timestamp_get($date) > (Config::get('allow_unauth_time_after') * 60)) {
-            doerror("Alert is closed", 1);
+        } elseif (count($res) == 1 && time() - date_timestamp_get($date) > (Config::get('allow_unauth_time_after') * 60)) {
+             doerror("Alert is closed", 1);
         }elseif (count($res) >= 2) {
             doerror("Alert is closed", 5);
         }
