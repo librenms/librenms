@@ -56,19 +56,19 @@
             <h3>@lang('LibreNMS is a community-based project')</h3>
             @lang('Please feel free to join us and contribute code, documentation, and bug reports:')
             <br>
-              <a href="http://www.librenms.org/">Web site</a> |
-              <a href="https://docs.librenms.org/">Docs</a> |
-              <a href="https://github.com/librenms/">GitHub</a> |
-              <a href="https://community.librenms.org/c/help">Bug tracker</a> |
-              <a href="https://community.librenms.org">Community Forum</a> |
-              <a href="http://twitter.com/librenms">Twitter</a> |
-              <a href="http://www.librenms.org/changelog.html">Changelog</a> |
-              <a href="#" data-toggle="modal" data-target="#git_log">Git log</a>
+              <a href="http://www.librenms.org/">@lang('Web site')</a> |
+              <a href="https://docs.librenms.org/">@lang('Docs')</a> |
+              <a href="https://github.com/librenms/">@lang('GitHub')</a> |
+              <a href="https://community.librenms.org/c/help">@lang('Bug tracker')</a> |
+              <a href="https://community.librenms.org">@lang('Community Forum')</a> |
+              <a href="http://twitter.com/librenms">@lang('Twitter')</a> |
+              <a href="http://www.librenms.org/changelog.html">@lang('Changelog')</a> |
+              <a href="#" data-toggle="modal" data-target="#git_log">@lang('Local git log')</a>
           </p>
 
           <h3>@lang('Contributors')</h3>
 
-          <p>See the <a href="https://github.com/librenms/librenms/blob/master/AUTHORS.md">list of contributors</a> on GitHub.</p>
+          <p>@lang('See the <a href=":url">list of contributors</a> on GitHub.', ['url' => 'https://github.com/librenms/librenms/blob/master/AUTHORS.md'])</p>
 
           <h3>@lang('Acknowledgements')</h3>
 
