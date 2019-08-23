@@ -58,13 +58,13 @@ $referrer = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
 $own = parse_url(Config::get('base_url'), PHP_URL_HOST);
 
 if(isset($vars[rule]) && isset($vars[alert]) && Config::get('allow_unauth_time_limit') == 1){
-    $query = "SELECT `time_logged` FROM `alert_log` WHERE device_id = ". $vars[device]  ." AND rule_id = ". $vars[rule]  ." AND id = ". $v$
+    $query = "SELECT `time_logged` FROM `alert_log` WHERE device_id = ". $vars[device]  ." AND rule_id = ". $vars[rule]  ." AND id = ". $vars[alert]  ." AND state =! 0 AND details IS NOT NULL ORDER BY id DESC";
     if (empty(dbFetch($query))){
         doerror("No Valid Request",10);
     }else{
-        $vars['from'] = floor(date_timestamp_get(date_create(dbFetchCell($query, [time_logged])))/300) * 300 - (Config::get('allow_unauth_$
+        $vars['from'] = floor(date_timestamp_get(date_create(dbFetchCell($query, [time_logged])))/300) * 300 - (Config::get('allow_unauth_time_befor') * 60);
         $vars['to'] = time();
-        $query = "SELECT * FROM `alert_log` WHERE rule_id = ". $vars[rule] ." AND device_id = ". $vars[device] ." AND id >= ". $vars[alert$
+        $query = "SELECT * FROM `alert_log` WHERE rule_id = ". $vars[rule] ." AND device_id = ". $vars[device] ." AND id >= ". $vars[alert] ." AND state = 0 AND details IS NOT NULL ORDER BY id DESC";
         $res = dbFetch($query);
         $date = date_create($res[0][time_logged]);
         if (empty($res)){
