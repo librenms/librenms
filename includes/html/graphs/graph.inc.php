@@ -2,11 +2,6 @@
 
 use LibreNMS\Config;
 
-// Push $_GET into $vars to be compatible with web interface naming
-foreach ($_GET as $name => $value) {
-    $vars[$name] = $value;
-}
-
 list($type, $subtype) = extract_graph_type($vars['type']);
 
 if (is_numeric($vars['device'])) {
@@ -22,8 +17,8 @@ $title    = $vars['title'];
 $vertical = $vars['vertical'];
 $legend   = $vars['legend'];
 $output   = (!empty($vars['output']) ? $vars['output'] : 'default');
-$from = parse_at_time($_GET['from']) ?: Config::get('time.day');
-$to   = parse_at_time($_GET['to']) ?: Config::get('time.now');
+$from = parse_at_time($vars['from']) ?: Config::get('time.day');
+$to   = parse_at_time($vars['to']) ?: Config::get('time.now');
 $graph_type = (isset($vars['graph_type']) ? $vars['graph_type'] : Config::get('webui.graph_type'));
 
 $period = ($to - $from);
