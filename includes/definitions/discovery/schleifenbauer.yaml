@@ -47,8 +47,9 @@ modules:
                     index: '{{ $sdbDevIdSerialNumber }}-H{{ $sdbDevSnsIndex }}'
                     divisor: 100
                     skip_values:
-                        - op: '!='
+                        -
                           oid: sdbDevSnsType
+                          op: '!='
                           value: H
         power_consumed:
             data:
@@ -105,8 +106,9 @@ modules:
                     index: '{{ $sdbDevIdSerialNumber }}-T{{ $sdbDevSnsIndex }}'
                     divisor: 100
                     skip_values:
-                        - op: '!='
+                        -
                           oid: sdbDevSnsType
+                          op: '!='
                           value: T
         voltage:
             data:
