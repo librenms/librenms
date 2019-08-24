@@ -26,6 +26,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
+    Route::get('about', 'AboutController@index');
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'pollers/tab=log/');
