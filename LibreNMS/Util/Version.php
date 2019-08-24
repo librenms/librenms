@@ -74,4 +74,18 @@ class Version
     {
         return rtrim(shell_exec('git describe --tags 2>/dev/null'));
     }
+
+    public function gitChangelog()
+    {
+        if ($this->is_git_install) {
+            return shell_exec('git log -10');
+        }
+    }
+
+    public function gitDate()
+    {
+        if ($this->is_git_install) {
+            return shell_exec("git show --pretty='%ct' --no-patch HEAD");
+        }
+    }
 }
