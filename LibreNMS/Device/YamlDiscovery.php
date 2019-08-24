@@ -132,7 +132,7 @@ class YamlDiscovery
             $value = preg_replace_callback('/{{ \$([a-zA-Z0-9.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
                 if (is_null($replace) && str_contains($index, '.')) {
-                    list($index) = explode('.', $index);
+                    $index = implode('.', explode('.', $index, -1));
                     $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
                 }
                 if (is_null($replace)) {
