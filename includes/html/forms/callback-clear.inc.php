@@ -18,4 +18,4 @@ if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-dbUpdate(array('value' => '2'), 'callback', '`name` = "enabled"', array());
+\App\Models\Callback::set('enabled', '2');
