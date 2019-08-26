@@ -72,8 +72,10 @@ if (isset($vars['rule']) && isset($vars['alert']) && Config::get('allow_unauth_t
             //this is ok :)
         } elseif (count($res) == 1 && time() - date_timestamp_get($date) > (Config::get('allow_unauth_time_after') * 60)) {
              doerror("Alert is closed", 1);
-        } elseif (count($res) >= 2) {
+        } elseif (count($res) >= 2 && count($res) < 5 ) {
             doerror("Alert is closed", 5);
+        } elseif (count($res) >= 5) {
+            doerror("No Valid Request", 10);
         }
     }
 } elseif (!in_array($referrer, Config::get('allow_unauth_domains')) || $own != $referrer) {
