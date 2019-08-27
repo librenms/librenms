@@ -117,7 +117,7 @@ class GraylogController extends SimpleTableController
             'source'    => $device ? Url::deviceLink($device) : $message['message']['source'],
             'message'   => $message['message']['message'] ?? '',
             'facility'  => is_numeric($facility) ? "($facility) " . __("syslog.facility.$facility"): $facility,
-            'level'     => is_numeric($level) ? "($level) " . __("syslog.severity.$level") : $level,
+            'level'     => (is_numeric($level) && $level >= 0) ? "($level) " . __("syslog.severity.$level") : $level,
         ];
     }
 
