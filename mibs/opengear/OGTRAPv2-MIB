@@ -62,6 +62,9 @@ ogDialPoolMib OBJECT IDENTIFIER ::= {
 ogCustomMib OBJECT IDENTIFIER ::= {
 	ogLegacyMgmt 115
 }
+ogCliMib OBJECT IDENTIFIER ::= {
+	ogLegacyMgmt 116
+}
 
 --
 -- v1 Trap contents
@@ -218,6 +221,7 @@ ogAlarmType OBJECT-TYPE
 		wirelessApDisassociation(87),
 		wirelessApAuthenticationFailure(88),
 		dialPoolHealth(89),
+		cliUserSession(90),
 		customCheckFailure(255),
 		unknown(65535)
 	}
@@ -1173,5 +1177,39 @@ ogCustomNotification TRAP-TYPE
 	DESCRIPTION
  		"A notification sent when a custom check alarm occurs."
 	::= 33
+
+-- CLI Session Alarms
+ogCliMibObjects OBJECT IDENTIFIER  ::= {
+	ogCliMib 1
+}
+ogCliEvent OBJECT IDENTIFIER ::= {
+	ogCliMibObjects 1
+}
+ogCliEventTable OBJECT IDENTIFIER ::= {
+	ogCliEvent 1
+}
+ogCliEventEntry OBJECT IDENTIFIER ::= {
+	ogCliEventTable 1
+}
+
+ogCliUserNotification TRAP-TYPE
+	ENTERPRISE  opengear
+	VARIABLES {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+	}
+	DESCRIPTION
+		"An alarm sent when a user connection to CLI session occurs"
+	::= 34
 
 END
