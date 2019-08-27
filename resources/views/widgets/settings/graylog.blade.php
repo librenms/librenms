@@ -32,7 +32,7 @@
     <div class="form-group">
         <label for="loglevel-{{ $id }}" class="control-label">@lang('Log Level')</label>
         <select name="loglevel" id="loglevel-{{ $id }}" class="form-control">
-            <option value="" disabled @if($loglevel == null) selected @endif>@lang('Log Level')</option>
+            <option value="" disabled @if($loglevel == null) selected @endif>@lang('Minimum log Level')</option>
             <option value="0" @if($loglevel === 0) selected @endif>(0) @lang('syslog.severity.0')</option>
             <option value="1" @if($loglevel == 1) selected @endif>(1) @lang('syslog.severity.1')</option>
             <option value="2" @if($loglevel == 2) selected @endif>(2) @lang('syslog.severity.2')</option>
