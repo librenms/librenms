@@ -1,6 +1,8 @@
 <?php
 
-if (\LibreNMS\Config::get('graylog.server')) {
+use LibreNMS\Config;
+
+if (Config::get('graylog.server')) {
     echo '
         <div class="row" id="graylog-card">
             <div class="col-md-12">
@@ -32,8 +34,8 @@ if (\LibreNMS\Config::get('graylog.server')) {
     </div>
     <script>
     ';
-    $rowCount = \LibreNMS\Config::get('graylog.device-page.rowCount') ?? 10;
-    $loglevel = \LibreNMS\Config::get('graylog.device-page.loglevel') ?? 7;
+    $rowCount = Config::get('graylog.device-page.rowCount', 10);
+    $loglevel = Config::get('graylog.device-page.loglevel');
     $tmp_output .= '
         $.ajax({
             type: "post",
