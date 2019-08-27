@@ -28,7 +28,7 @@
             <table class='table table-condensed table-hover'>
                 <tr>
                     <td><b>@lang('Version')</b></td>
-                    <td><a href='http://www.librenms.org/changelog.html'>{{ $version_local }} - <span id='version_date'>{{ $git_date }}</span></a></td>
+                    <td><a href='http://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
                 </tr>
                 <tr>
                     <td><b>@lang('Database Schema')</b></td>
@@ -91,8 +91,9 @@
                 <td colspan='4'>
                     <span class='bg-danger'>
                         <label for="callback">@lang('Opt in to send anonymous usage statistics to LibreNMS?')</label><br />
-                        <input type="checkbox" id="callback" data-size="normal" name="statistics" @if($callback_status) checked @endif>
-                    </span><br />
+                    </span>
+                    <input type="checkbox" id="callback" data-size="normal" name="statistics" @if($callback_status) checked @endif>
+                    <br />
                     @lang('Online stats:') <a href='https://stats.librenms.org/'>stats.librenms.org</a>
                 </td>
             </tr>
@@ -222,6 +223,8 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
     });
 
     var ver_date = $('#version_date');
-    ver_date.text(moment.unix(ver_date.text()));
+    if (ver_date.text()) {
+        ver_date.text(' - '.concat(moment.unix(ver_date.text()))).show();
+    }
 </script>
 @endsection
