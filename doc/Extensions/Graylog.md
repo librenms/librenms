@@ -47,6 +47,13 @@ If you want to match the source address of the log entries against any IP addres
 the primary address and the host name to assign the log entries to a device, you can activate this function using
 $config['graylog']['match-any-address'] = 'true';
 
+There are 2 configuration parameters to influence the behaviour of the "Recent Graylog" table on the overview page of the devices.
+$config['graylog']['device-page']['rowCount'] sets the maximum number of rows to be displayed (default: 10)
+With $config['graylog']['device-page']['loglevel'] you can set which loglevels should be displayed on the overview page. (default: 7, min: 0, max: 7)
+$config['graylog']['device-page']['loglevel'] = 4 shows only entries with a log level less than or equal to 4 (Emergency, Alert, Critical, Error, Warning).
+
+You can set a default Log Level Filter with $config['graylog']['loglevel'] (applies to  /graylog and /device/device=/tab=logs/section=graylog/ (min: 0, max: 7)
+
 ## Suppressing/enabling the domain part of a hostname for specific platforms
 You should see if what you get in syslog/Graylog matches up with your configured hosts first. If you need to modify the syslog messages from specific platforms, this may be of assistance:
 

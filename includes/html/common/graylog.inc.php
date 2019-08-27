@@ -80,6 +80,18 @@ if (\LibreNMS\Config::has('graylog.timezone')) {
 }
 
 $tmp_output .= '
+                "<div class=\"form-group\">"+
+                "<select name=\"loglevel\" id=\"loglevel\" class=\"form-control\">"+
+                "<option value=\"\" disabled selected>Log Level</option>"+
+                "<option value=\"0\">'.("(0) " . __("syslog.severity.0")).'</option>"+
+                "<option value=\"1\">'.("(1) " . __("syslog.severity.1")).'</option>"+
+                "<option value=\"2\">'.("(2) " . __("syslog.severity.2")).'</option>"+
+                "<option value=\"3\">'.("(3) " . __("syslog.severity.3")).'</option>"+
+                "<option value=\"4\">'.("(4) " . __("syslog.severity.4")).'</option>"+
+                "<option value=\"5\">'.("(5) " . __("syslog.severity.5")).'</option>"+
+                "<option value=\"6\">'.("(6) " . __("syslog.severity.6")).'</option>"+
+                "<option value=\"7\">'.("(7) " . __("syslog.severity.7")).'</option>"+
+                "</select>&nbsp;</div>"+
                 "<div class=\"form-group\"><select name=\"range\" class=\"form-control\">"+
                 "<option value=\"0\">Search all time</option>"+
                 "<option value=\"300\">Search last 5 minutes</option>"+
@@ -97,7 +109,7 @@ $tmp_output .= '
                 "</select>&nbsp;</div>"+
                 "<button type=\"submit\" class=\"btn btn-success\">Filter</button>&nbsp;"+
                 "</form></div>"+
-                "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
+                "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>";
 
     var graylog_grid = $("#graylog").bootgrid({
         ajax: true,
@@ -123,7 +135,8 @@ $tmp_output .= '
             return {
                 stream: "' . (isset($_POST['stream']) ? mres($_POST['stream']) : '') . '",
                 device: "' . (isset($filter_device) ? $filter_device : '') . '",
-                range: "' . (isset($_POST['range']) ? mres($_POST['range']) : '')  . '"
+                range: "' . (isset($_POST['range']) ? mres($_POST['range']) : '')  . '",
+                loglevel: "' . (isset($_POST['loglevel']) ? mres($_POST['loglevel']) : '')  . '",
             };
         },
         url: "' . url('/ajax/table/graylog') . '",
