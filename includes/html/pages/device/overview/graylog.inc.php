@@ -35,7 +35,7 @@ if (Config::get('graylog.server')) {
     <script>
     ';
     $rowCount = Config::get('graylog.device-page.rowCount', 10);
-    $loglevel = Config::get('graylog.device-page.loglevel');
+    $loglevel = Config::get('graylog.device-page.loglevel', 7);
     $tmp_output .= '
         $.ajax({
             type: "post",
