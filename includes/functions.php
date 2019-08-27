@@ -1129,9 +1129,9 @@ function scan_new_plugins()
             if (is_dir(Config::get('plugin_dir') . '/' . $name)) {
                 if ($name != '.' && $name != '..') {
                     if (is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php') && is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.inc.php')) {
-                        $plugin_id = dbFetchRow("SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = '$name'");
+                        $plugin_id = dbFetchRow("SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = ?", [$name]);
                         if (empty($plugin_id)) {
-                            if (dbInsert(array('plugin_name' => $name, 'plugin_active' => '0'), 'plugins')) {
+                            if (dbInsert(['plugin_name' => $name, 'plugin_active' => '0'], 'plugins')) {
                                 $installed++;
                             }
                         }
@@ -1141,7 +1141,27 @@ function scan_new_plugins()
         }
     }
 
-    return( $installed );
+    return $installed;
+}
+
+function scan_removed_plugins()
+{
+    $removed = 0; # Track how many plugins will be removed from database
+
+    if (file_exists(Config::get('plugin_dir'))) {
+        $plugin_files = scandir(Config::get('plugin_dir'));
+        $installed_plugins = dbFetchColumn("SELECT `plugin_name` FROM `plugins`");
+        foreach ($installed_plugins as $name) {
+            if (in_array($name, $plugin_files)) {
+                continue;
+            }
+            if (dbDelete('plugins', "`plugin_name` = ?", $name)) {
+                $removed++;
+            }
+        }
+    }
+
+    return( $removed );
 }
 
 function validate_device_id($id)
