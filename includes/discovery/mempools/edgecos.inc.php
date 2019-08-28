@@ -31,7 +31,7 @@ if ($device['os'] == 'edgecos') {
     $temp_data = snmp_get_multi_oid($device, ['memoryTotal.0', 'memoryFreed.0','memoryAllocated.0'], '-OUQs', $temp_mibs);
     $total = $temp_data['memoryTotal.0'];
     $avail = $temp_data['memoryFreed.0'];
-    $used = $temp_data['memoryAllocated.0'];
+    $used = $temp_data['memoryAllocated.0'] ?? ($total - $avail);
 
     if ((is_numeric($total)) && (is_numeric($avail)) && (is_numeric($used) )) {
         discover_mempool($valid_mempool, $device, 0, 'edgecos', 'Memory', '1', null, null);
