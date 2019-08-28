@@ -29,6 +29,6 @@ if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.24.')) { //ECS451
 $temp_data = snmp_get_multi_oid($device, ['memoryTotal.0', 'memoryFreed.0','memoryAllocated.0'], '-OUQs', $temp_mibs);
 $mempool['total'] = $temp_data['memoryTotal.0'];
 $mempool['free'] = $temp_data['memoryFreed.0'];
-$mempool['used'] = $temp_data['memoryAllocated.0'];
+$mempool['used'] = $temp_data['memoryAllocated.0'] ?? ($mempool['total'] - $mempool['free']);
 
 unset($temp_mibs, $temp_data);
