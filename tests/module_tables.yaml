@@ -92,6 +92,7 @@ sensors:
 storage:
     storage:
         excluded_fields: [device_id, storage_id]
+        order_by: storage_index
 toner:
     toner:
         excluded_fields: [device_id, toner_id]
