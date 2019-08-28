@@ -24,6 +24,5 @@ class FixTemplateLinefeeds extends Migration
      */
     public function down()
     {
-        DB::table('alert_templates')->update(['template' => DB::raw('REPLACE(`template`, char(10), \'\\\\r\\\\n\')')]);
     }
 }
