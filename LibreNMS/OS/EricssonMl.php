@@ -97,7 +97,7 @@ class EricssonMl extends OS implements
     {
         $oid = '.1.3.6.1.4.1.193.223.2.7.1.1.43.110101'; //PT-RADIOLINK-MIB::actualSnir.0
         return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'eric', 1, 'CINR', null, 1, 10),
+            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'eric', 1, 'CINR', null, 1, 1),
         );
     }
     /**
