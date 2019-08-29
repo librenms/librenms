@@ -35,7 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
-class Ericssonml extends OS implements
+class EricssonMl extends OS implements
     ProcessorDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
