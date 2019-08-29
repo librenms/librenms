@@ -1,0 +1,823 @@
+IBM-LES-BUS-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmlesrv.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Counter32
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    TruthValue, MacAddress, TimeStamp
+            FROM SNMPv2-TC-v1
+    AtmLaneAddress
+            FROM LAN-EMULATION-CLIENT-MIB
+    lesConfEntry, lesConfIndex
+            FROM LAN-EMULATION-LES-MIB
+    mssServerLanE, AtmPrivateAddrEsi, AtmSelector, 
+    AtmVccTrafficType, Bandwidth
+            FROM NWAYSMSS-MIB;
+
+ibmLesBusMIB OBJECT IDENTIFIER ::= { mssServerLanE 1 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9701171200Z
+--  OrgName
+--    IBM Corporation
+--  ContactInfo
+--     Florian K Kandefer
+--       Postal:  IBM Corporation
+--                800 Park Offices Drive
+--                Research Triangle Park, NC 27709
+--                US
+--       Tel:     +1 919 254 0685
+--       Fax:     +1 919 254 0391
+--       E-mail:  kandefer@vnet.ibm.com     
+--  Descr
+--    
+--    These are proprietary extensions for managing ATM
+--    LAN Emulation Servers.
+--  RevDate
+--    9701161200Z
+--  RevDescr
+--    
+--    2)  Updated MIB import names to match ATM Forum MIB names.
+--    
+--        Updated some of the description fields.
+--    
+--        Added busMode to ibmLesBusConfTable for fast bus configuration.
+--    
+--        Added neverSet(0) enumeration to redundancyRole object.
+--  RevDate
+--    9608281200Z
+--  RevDescr
+--    
+--         1)  This is the first version of this MIB
+
+ibmLesBusConfGroup OBJECT IDENTIFIER ::= { ibmLesBusMIB 1 }
+ibmLesBusStatGroup OBJECT IDENTIFIER ::= { ibmLesBusMIB 2 }
+ibmBusMonStatGroup OBJECT IDENTIFIER ::= { ibmLesBusMIB 3 }
+ibmLesBusMIBConformance OBJECT IDENTIFIER ::= { ibmLesBusMIB 4 }
+ibmLesBusMIBGroups OBJECT IDENTIFIER ::= { ibmLesBusMIBConformance 1 }
+ibmLesBusMIBCompliances OBJECT IDENTIFIER ::= { ibmLesBusMIBConformance 2 }
+
+ibmLesBusConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmLesBusConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains configuration information
+         for the LESs within the scope of the agent."
+    ::= { ibmLesBusConfGroup 1 }
+
+ibmLesBusConfEntry OBJECT-TYPE
+    SYNTAX IbmLesBusConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table represents a
+        LES.  The parameters in each entry apply
+        to one emulated LAN served by one LES.
+        Objects lesLanType and lesMaxFrameSize
+          are also required besides lesRowStatus
+          during row creation."
+    INDEX { lesConfIndex }
+-- Augments lesConfEntry FROM LAN-EMULATION-LES-MIB
+    ::= { ibmLesBusConfTable 1 }
+
+IbmLesBusConfEntry ::= SEQUENCE {
+    atmDevNum INTEGER,
+    useBurnedInEsi TruthValue,
+    configuredEsi AtmPrivateAddrEsi,
+    configuredSelector AtmSelector,
+    leArpResponseDest INTEGER,
+    use2ControlDistributeVccs TruthValue,
+    use2MulticastForwardVccs TruthValue,
+    validateBestEffortPcr TruthValue,
+    controlDirectMaxReservedBw Bandwidth,
+    multicastSendMaxReservedBw Bandwidth,
+    controlDistributeVccType AtmVccTrafficType,
+    controlDistributePcr Bandwidth,
+    controlDistributeScr Bandwidth,
+    multicastForwardVccType AtmVccTrafficType,
+    multicastForwardPcr Bandwidth,
+    multicastForwardScr Bandwidth,
+    validateJoinsWithLecs TruthValue,
+    redundancyEnabled TruthValue,
+    redundancyRole INTEGER,
+    redundancyAtmAddr AtmLaneAddress,
+    bmonEnabled TruthValue,
+    numTopMacs INTEGER,
+    sampleDuration INTEGER,
+    interSampleTime INTEGER,
+    sampleRate INTEGER,
+    busMode INTEGER
+    }
+
+atmDevNum OBJECT-TYPE
+    SYNTAX INTEGER(0..255)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Identifies ATM device to be used by LES/BUS. "
+    ::= { ibmLesBusConfEntry 1 }
+
+useBurnedInEsi OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies whether a MAC Address burned into the ATM
+         device should be used as the End System Identifier
+         component of the LES/BUS ATM Address."
+    ::= { ibmLesBusConfEntry 2 }
+
+configuredEsi OBJECT-TYPE
+    SYNTAX AtmPrivateAddrEsi
+--    Rsyntax OCTET STRING(SIZE(6))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Locally Administered End System Identifier that is to be
+         used as the ESI component of the LES/BUS ATM Address.
+         If this object is used do not use the ATM Forum elanLecAtmMask.
+         If both are used the last object set will take affect."
+    ::= { ibmLesBusConfEntry 3 }
+
+configuredSelector OBJECT-TYPE
+    SYNTAX AtmSelector
+--    Rsyntax OCTET STRING(SIZE(1))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies value to be used as Selector field component
+         of LES/BUS ATM Address.
+         If this object is used do not use the ATM Forum elanLecAtmMask.
+         If both are used the last object set will take affect."
+    ::= { ibmLesBusConfEntry 4 }
+
+leArpResponseDest OBJECT-TYPE
+    SYNTAX INTEGER {
+        oneClient(0),
+        allClients(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When the value is ALL_CLIENTS, LE_ARP_RESPONSE
+         frames initiated or forwarded by the LES are
+         sent to all clients on the Point-to-Multipoint
+         Control Distribute VCC(s).  When the value is
+         ONE_CLIENT, LE_ARP_RESPONSE frames are sent
+         solely to the client that originated the
+         associated LE_ARP_REQUEST over the Control
+         Direct VCC to that client.  The primary advantage
+         of sending LE_ARP_RESPONSE frames to all clients
+         is that the clients are provided an opportunity
+         to learn new {LAN Destination, ATM Address}
+         mappings by 'eavesdropping' (secondary effects
+         include lower LES processing requirements and
+         less latency introduced by the LES).  The
+         potential disadvantage is that the benefits of
+         eavesdropping, if it is even performed, may not
+         compensate for the additional client overhead. "
+    ::= { ibmLesBusConfEntry 5 }
+
+use2ControlDistributeVccs OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When TRUE, proxy clients are placed on one
+         Point-to-Multipoint Control Distribute VCC
+         and all other clients are placed on another
+         Point-to-Multipoint Control Distribute VCC.
+         When FALSE, all clients are placed on a single
+         Point-to-Multipoint Control Distribute VCC.
+         The advantage of using two Control Distribute VCCs
+         is that non-proxy clients are not perturbed by
+         LE_ARP_REQUESTs for unregistered LAN Destinations
+         (the LES answers LE_ARP_REQUESTs for registered
+         LAN Destinations).  The disadvantage is that
+         Control Frames destined for all clients
+         (LE_TOPOLOGY_REQUEST, LE_NARP_REQUEST, and
+         possibly LE_ARP_RESPONSE depending upon LES-BUS-12)
+         must be transmitted on 2 VCCs (as a related aside,
+         note that LE_FLUSH_RESPONSEs are sent solely to
+         the originator of the corresponding LE_FLUSH_REQUEST
+         over the Control Direct VCC to that client)."
+    ::= { ibmLesBusConfEntry 6 }
+
+use2MulticastForwardVccs OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When TRUE:
+           - proxy clients are placed on one Point-to-Multipoint
+             Multicast Forward VCC and all other clients are
+             placed on another Point-to-Multipoint Multicast
+             Forward VCC,
+           - all 'unknown' unicast frames and all unicast frames
+             for LAN Destinations registered by proxy clients
+             are forwarded on the Proxy Multicast Forward VCC
+             ('unknown' unicast frames are not forwarded to
+             non-proxy clients),
+           - all unicast frames for LAN Destinations registered
+             by non-proxy clients are forwarded on the Multicast
+             Send VCC to that client, and
+           - multicast and broadcast frames are transmitted on
+             both Multicast Forward VCCs.
+         When FALSE:
+           -  all clients are placed on a single
+              Point-to-Multipoint Multicast Forward VCC, and
+           -  the BUS functions as a simple forwarding device
+              (efficient, but 'dumb') with respect to unicast
+              frames.
+         One advantage of enabling this option is a reduction in
+         client pertubation due to 'nuisance' unicast frames (i.e.,
+         unicast frames not destined for the client); proxy clients
+         do not receive unicast frames destined for non-proxy
+         clients, and non-proxy clients never receive nuisance
+         unicast frames.  Another advantage is the reduction in
+         network bandwidth devoted to nuisance frames.  The
+         potential disadvantage is that the increased processing
+         requirements result in a degradation of overall system
+         performance."
+    ::= { ibmLesBusConfEntry 7 }
+
+validateBestEffortPcr OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When false, Best Effort Control Direct or Multicast Send
+         VCCs will be accepted without regard to the signalled
+         forward Peak Cell Rate (PCR).  When true, Best Effort
+         VCCs will be rejected if the signalled forward PCR
+         exceeds the line rate of the LES/BUS ATM device.
+         Calls will not be rejected due to the backward PCR.
+         The signalled backward PCR will be honored if it does
+         not exceed the line rate; otherwise, transmissions to
+         the caller will be at line rate."
+    ::= { ibmLesBusConfEntry 8 }
+
+controlDirectMaxReservedBw OBJECT-TYPE
+    SYNTAX Bandwidth
+--    Rsyntax Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Defines the maximum acceptable Sustained Cell Rate (SCR)
+         for a Control Direct VCC; if SCR is not specified on the
+         incoming call, then this parameter defines the maximum
+         acceptable Peak Cell Rate (PCR) for a Control Direct VCC
+         with reserved bandwidth.  This parameter is applied to
+         both forward and backward directions.  Calls received
+         with Traffic Parameters specifying higher rates will be
+         released.  If SCR is specified on the incoming call,
+         the call will not be rejected due to the PCR or Maximum
+         Burst Size.  The constraint imposed by this parameter is
+         not applicable to BEST EFFORT connections. "
+    ::= { ibmLesBusConfEntry 9 }
+
+multicastSendMaxReservedBw OBJECT-TYPE
+    SYNTAX Bandwidth
+--    Rsyntax Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Defines the maximum acceptable Sustained Cell Rate (SCR)
+         for a Multicast Send VCC; if SCR is not specified on the
+         incoming call, then this parameter defines the maximum
+         acceptable Peak Cell Rate (PCR) for a Multicast Send VCC
+         with reserved bandwidth.  This parameter is applied to
+         both forward and backward directions.  Calls received
+         with Traffic Parameters specifying higher rates will be
+         released.  If SCR is specified on the incoming call,
+         the call will not be rejected due to the PCR or Maximum
+         Burst Size.  The constraint imposed by this parameter is
+         not applicable to BEST EFFORT connections. "
+    ::= { ibmLesBusConfEntry 10 }
+
+controlDistributeVccType OBJECT-TYPE
+    SYNTAX AtmVccTrafficType
+--    Rsyntax INTEGER {
+--        bestEffort(1),
+--        reservedBandwidth(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies type of traffic characteristics
+         to be associated with Control Distribute VCC(s).
+         Bandwidth is not reserved for best effort traffic."
+    ::= { ibmLesBusConfEntry 11 }
+
+controlDistributePcr OBJECT-TYPE
+    SYNTAX Bandwidth
+--    Rsyntax Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the Peak Cell Rate (PCR) Traffic Parameter
+         for the Control Distribute VCC(s).  Since the Control
+         Distribute is a point-to-multipoint VCC, the
+         specified rate applies to the forward direction only."
+    ::= { ibmLesBusConfEntry 12 }
+
+controlDistributeScr OBJECT-TYPE
+    SYNTAX Bandwidth
+--    Rsyntax Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the Sustained Cell Rate (SCR) Traffic
+         Parameter for the Control Distribute VCC(s).
+         Since the Control Distribute is a point-to-multipoint
+         VCC, the specified rate applies to the forward
+         direction only.  If the SCR equals the PCR specified
+         in LES-BUS-19, the call is signalled with PCR only.
+         If SCR is signalled, the Maximum Burst Size traffic
+         parameter is set to accomodate the maximum control
+         frame size of 1516 bytes. "
+    ::= { ibmLesBusConfEntry 13 }
+
+multicastForwardVccType OBJECT-TYPE
+    SYNTAX AtmVccTrafficType
+--    Rsyntax INTEGER {
+--        bestEffort(1),
+--        reservedBandwidth(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies type of traffic characteristics
+         to be associated with Multicast Forward VCC(s).
+         Bandwidth is not reserved for best effort traffic."
+    ::= { ibmLesBusConfEntry 14 }
+
+multicastForwardPcr OBJECT-TYPE
+    SYNTAX Bandwidth
+--    Rsyntax Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the Peak Cell Rate (PCR) Traffic Parameter
+         for the Multicast Forward VCC(s).  Since the Multicast
+         Multicast Forward is a point-to-multipoint
+         VCC, the specified rate applies to the forward
+         direction only."
+    ::= { ibmLesBusConfEntry 15 }
+
+multicastForwardScr OBJECT-TYPE
+    SYNTAX Bandwidth
+--    Rsyntax Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the Sustained Cell Rate (SCR) Traffic
+         Parameter for the Multicast Forward VCC(s).  Since
+         the Multicast Forward is a point-to-multipoint
+         VCC, the specified rate applies to the forward
+         direction only.  If the SCR equals the PCR
+         specified in LES-BUS-22, the call is signalled
+         with PCR only.  If SCR is signalled, the Maximum
+         Burst Size traffic parameter is set to accomodate
+         the maximum data frame size specified in
+         maxDataFrameSize."
+    ::= { ibmLesBusConfEntry 16 }
+
+validateJoinsWithLecs OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies whether clients that attempt to join
+         the ELAN must be validated by the LECS. The default
+         value is taken from the corresponding object in the ELAN MIB,
+         and it overrides the ELAN value."
+    ::= { ibmLesBusConfEntry 17 }
+
+redundancyEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Redundancy support allows clients to be assigned to
+         a backup LES/BUS in the event that the primary LES/BUS
+         for the ELAN fails."
+    ::= { ibmLesBusConfEntry 18 }
+
+redundancyRole OBJECT-TYPE
+    SYNTAX INTEGER {
+        neverSet(0),
+        primaryLesBus(1),
+        backupLesBus(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Redundancy Protocol Role.  Specifies whether this LES/BUS instance
+         is to serve as the primary or backup LES/BUS for the ELAN. This
+         object is only valid when redundancyEnabled is true. If this object
+         is never set and redundancyEnabled has never been set to true
+         redundancyRole will have a value of 0."
+    ::= { ibmLesBusConfEntry 19 }
+
+redundancyAtmAddr OBJECT-TYPE
+    SYNTAX AtmLaneAddress
+--    Rsyntax OCTET STRING(SIZE(0 | 20))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "ATM Address of Backup LES/BUS. Specifies the ATM address of the
+         backup LES/BUS for the ELAN.  Currently, only the private
+         address formats defined by the ATM Forum are supported, there
+         are three private ATM address formats (Data Country Code (DCC)
+         Format, International Code Designator (ICD) Format, and E.164 Format)
+         and all are modeled after the format of an OSI Network Service Access
+         Point (NSAP), all three private address formats are 20 octets
+         (ATM_PRIVATE_ADDR_OCTETS) in length, and the most significant octet
+         contains an Authority and Format Identifier (AFI) field that identifies
+         the address format (see constants ATM_ADDR_DCC_AFI, ATM_ADDR_ICD_AFI,
+         and ATM_ADDR_E164_AFI), the remaining octets of the address are divided
+         into an Initial Domain Identifier (IDI) and a Domain Specific Part
+         (DSP), the IDI has specific encoding rules that may be enforced by the
+         configurator (see Section 5.1.3 of the ATM Forum UNI Specification)."
+    ::= { ibmLesBusConfEntry 20 }
+
+bmonEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Enable BUS Monitor for ELAN.  When TRUE, host usage of the
+         Broadcast and Unknown Server is monitored.  Periodic sampling
+         is performed to provide information on the top N heaviest
+         users of the BUS.  Here, a user is defined as any MAC
+         address originating data frames to the BUS.  Information is
+         available on the last sample interval.  When FALSE, BUS
+         Monitoring is not performed."
+    ::= { ibmLesBusConfEntry 21 }
+
+numTopMacs OBJECT-TYPE
+    SYNTAX INTEGER(1..100)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Number of Top MAC Addresses to Record.  Specifies the number
+         of MACs to be recorded with the highest quantity of sampled
+         frames sent to the BUS in a sample interval."
+    ::= { ibmLesBusConfEntry 22 }
+
+sampleDuration OBJECT-TYPE
+    SYNTAX INTEGER(1..600)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Number of seconds in each Sample Interval. Specifies the number
+         of seconds in each BUS Monitor sample interval."
+    ::= { ibmLesBusConfEntry 23 }
+
+interSampleTime OBJECT-TYPE
+    SYNTAX INTEGER(1..120)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minutes between start of one sample and the next sample.
+         Specifies the number of minutes between the start of
+         one BUS Monitor sample interval and the start of the
+         next sample interval."
+    ::= { ibmLesBusConfEntry 24 }
+
+sampleRate OBJECT-TYPE
+    SYNTAX INTEGER(1..1000)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the rate at which the BUS Monitor samples
+         frames sent to the BUS during a sample interval.
+         A value of 1 indicates that every frame sent to the
+         BUS is sampled.  A value of 100 indicates that 1
+         out of every 100 frames sent to the BUS is sampled."
+    ::= { ibmLesBusConfEntry 25 }
+
+busMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        systemBusMode(1),
+        adapterBusMode(2),
+        vccSpliceBusMode(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        With the Fast Bus Feature the BUS can run now run in one of
+        three modes:
+        
+        systemBusMode(1) - Frames from BUS are buffered into system memory.
+                           All intelligent BUS mode are available in this mode.
+        
+        adapterBusMode(2) - Frames received for the BUS are kept in adapter memory.
+                            BCM is not available in this mode. On Token-Ring
+                            all data frames are counted as multicast frames.
+        
+        vccSpliceBusMode(3) - The BUS ties all Multicast Send VCCs into the
+                              Multicast Forward VCC. Frames received for the
+                              BUS are immediately forwarded onto the Multicast
+                              Foward VCC without notifying the BUS. Statistics
+                              related to frame rec/transmit are not maintained
+                              when the Bus mode is VCC Splice."
+    ::= { ibmLesBusConfEntry 26 }
+
+ibmLesBusStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmLesBusStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains all counters ???."
+    ::= { ibmLesBusStatGroup 1 }
+
+ibmLesBusStatEntry OBJECT-TYPE
+    SYNTAX IbmLesBusStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains a LES and its counters."
+    INDEX { lesConfIndex }
+-- Augments lesConfEntry FROM LAN-EMULATION-LES-MIB
+    ::= { ibmLesBusStatTable 1 }
+
+IbmLesBusStatEntry ::= SEQUENCE {
+    redundancyVccRefused Counter32,
+    redundancyVccReleased Counter32,
+    redundancyVccFailure Counter32
+    }
+
+redundancyVccRefused OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of Redundancy VCC call setup requests
+         rejected by the LES for any reason."
+    ::= { ibmLesBusStatEntry 1 }
+
+redundancyVccReleased OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of times a Redundancy VCC has been
+         released by LEC/network for any reason."
+    ::= { ibmLesBusStatEntry 2 }
+
+redundancyVccFailure OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of Redundancy VCC requests made by LES that failed."
+    ::= { ibmLesBusStatEntry 3 }
+
+bmonSampleInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BmonSampleInfoEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains the BUS Monitor (BMON) information for the
+         last complete sample processed.  The following information is
+         maintained for each BUS instance using BMON:
+            - Time that the last complete sample interval started.
+            - Duration of the sample interval.
+            - Number of top hosts actually recorded in the sample.
+            - Number of frames received during the sample interval.
+            - Number of frames sampled in the sample interval.
+            - Frame sampling rate (i.e., 1 out of N frames sampled).
+         Each BUS instance may have a BMON.  This table is indexed by
+         lesConfIndex."
+    ::= { ibmBusMonStatGroup 1 }
+
+bmonSampleInfoEntry OBJECT-TYPE
+    SYNTAX BmonSampleInfoEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains BMON information for the
+         last complete sample processed for a specific BUS instance."
+    INDEX { lesConfIndex }
+    ::= { bmonSampleInfoTable 1 }
+
+BmonSampleInfoEntry ::= SEQUENCE {
+    bmonSampleStartTime TimeStamp,
+    bmonSampleDuration Counter32,
+    bmonNumTopMacs Counter32,
+    bmonReceivedFrames Counter32,
+    bmonSampledFrames Counter32,
+    bmonSamplingRate Counter32
+    }
+
+bmonSampleStartTime OBJECT-TYPE
+    SYNTAX TimeStamp
+--    Rsyntax TimeTicks
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Timestamp for the start of the last complete BUS Monitor
+         sample interval."
+    ::= { bmonSampleInfoEntry 1 }
+
+bmonSampleDuration OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Duration of the last complete sample interval."
+    ::= { bmonSampleInfoEntry 2 }
+
+bmonNumTopMacs OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of top hosts actually recorded during the
+         last complete sample interval."
+    ::= { bmonSampleInfoEntry 3 }
+
+bmonReceivedFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of frames received during the last
+         complete sample interval."
+    ::= { bmonSampleInfoEntry 4 }
+
+bmonSampledFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of frames actually sampled during the last
+         complete sample interval."
+    ::= { bmonSampleInfoEntry 5 }
+
+bmonSamplingRate OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The frame sampling rate given as N where the rate
+         is 1 out of every N frames will be sampled."
+    ::= { bmonSampleInfoEntry 6 }
+
+bmonStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BmonStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains the BUS Monitor (BMON) counters for the top N
+         heaviest users of a BUS (i.e., the N MAC addresses that originate
+         the most data frames.  Each BUS instance may have a BMON.  This
+         table augments the bmonConfTable."
+    ::= { ibmBusMonStatGroup 2 }
+
+bmonStatEntry OBJECT-TYPE
+    SYNTAX BmonStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains BMON statistics for the top
+         users of the indicated BUS instance."
+    INDEX { lesConfIndex, bmonTopNRank }
+    ::= { bmonStatTable 1 }
+
+BmonStatEntry ::= SEQUENCE {
+    bmonTopNRank Counter32,
+    bmonTopNSrcMacAddr MacAddress,
+    bmonTopNLecAtmAddr AtmLaneAddress,
+    bmonTopNFramesSampled Counter32
+    }
+
+bmonTopNRank OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Rank for the indicated host (i.e., MAC address) given
+         as N where 1 is the host originating the most frames."
+    ::= { bmonStatEntry 1 }
+
+bmonTopNSrcMacAddr OBJECT-TYPE
+    SYNTAX MacAddress
+--    Rsyntax OCTET STRING(SIZE(6))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Source MAC Address for this host."
+    ::= { bmonStatEntry 2 }
+
+bmonTopNLecAtmAddr OBJECT-TYPE
+    SYNTAX AtmLaneAddress
+--    Rsyntax OCTET STRING(SIZE(0 | 20))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Associated LEC ATM Address for this host."
+    ::= { bmonStatEntry 3 }
+
+bmonTopNFramesSampled OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of frames sampled from this host during last
+         complete sample interval."
+    ::= { bmonStatEntry 4 }
+
+ibmLesBusCConfGroup OBJECT IDENTIFIER ::= { ibmLesBusMIBGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing configuration information
+--    about an LES/BUS.
+--  objects
+--    atmDevNum, useBurnedInEsi, configuredEsi, configuredSelector, 
+--    leArpResponseDest, use2ControlDistributeVccs, 
+--    use2MulticastForwardVccs, validateBestEffortPcr, 
+--    controlDirectMaxReservedBw, multicastSendMaxReservedBw, 
+--    controlDistributeVccType, controlDistributePcr, 
+--    controlDistributeScr, multicastForwardVccType, 
+--    multicastForwardPcr, multicastForwardScr, 
+--    validateJoinsWithLecs, redundancyEnabled, redundancyAtmAddr, 
+--    redundancyRole, bmonEnabled, numTopMacs, sampleDuration, 
+--    interSampleTime, sampleRate, busMode
+
+ibmLesBusCStatGroup OBJECT IDENTIFIER ::= { ibmLesBusMIBGroups 2 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing statistics information
+--     about an LES/BUS.
+--  objects
+--    redundancyVccRefused, redundancyVccReleased, 
+--    redundancyVccFailure
+
+ibmBusMonCStatGroup OBJECT IDENTIFIER ::= { ibmLesBusMIBGroups 3 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing top N user information
+--    for a LES/BUS.
+--  objects
+--    bmonSampleStartTime, bmonSampleDuration, bmonNumTopMacs, 
+--    bmonReceivedFrames, bmonSampledFrames, bmonSamplingRate, 
+--    bmonTopNRank, bmonTopNSrcMacAddr, bmonTopNLecAtmAddr, 
+--    bmonTopNFramesSampled
+
+ibmLesBusMIBCompliance OBJECT IDENTIFIER ::= { ibmLesBusMIBCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The compliance statement for SNMP IBM extensions
+--    to for ATM emulated LANS.
+--  Module
+--    >>current<<
+--   OptGroup
+--    ibmLesBusCConfGroup
+
+
+END
