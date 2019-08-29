@@ -48,8 +48,12 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
     public function discoverProcessors()
     {
         $device = $this->getDevice();
-
-        if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.674.10895.3031')) {
+        if (starts_with($device['sysObjectID'], [
+            '.1.3.6.1.4.1.674.10895.3020',
+            '.1.3.6.1.4.1.674.10895.3021',
+            '.1.3.6.1.4.1.674.10895.3030',
+            '.1.3.6.1.4.1.674.10895.3031',
+        ])) {
             d_echo("Dell Powerconnect 55xx");
             return array(
                 Processor::discover(
@@ -59,10 +63,18 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
                     0
                 )
             );
-        } elseif (starts_with($device['sysObjectID'], ['.1.3.6.1.4.1.674.10895.3024', '.1.3.6.1.4.1.674.10895.3065'])) {
+        } elseif (starts_with($device['sysObjectID'], [
+            '.1.3.6.1.4.1.674.10895.3024',
+            '.1.3.6.1.4.1.674.10895.3042',
+            '.1.3.6.1.4.1.674.10895.3053',
+            '.1.3.6.1.4.1.674.10895.3054',
+            '.1.3.6.1.4.1.674.10895.3056',
+            '.1.3.6.1.4.1.674.10895.3058',
+            '.1.3.6.1.4.1.674.10895.3065',
+            '.1.3.6.1.4.1.674.10895.3046',
+        ])) {
             return $this->discoverVxworksProcessors('.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.1.1.4.9.0');
         }
-
         return $this->discoverVxworksProcessors('.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.1.1.4.4.0');
     }
 
