@@ -30,21 +30,20 @@ user that can be an unprivileged user. In these situations you need to use sudo.
 To test if you need sudo, first check the user snmpd is running as. 
 Then test if you can run the extend script as that user without issue. 
 For example if snmpd is running as 'Debian-snmp' and we want
-to run the extend for proxmox, we run: 
+to run the extend for proxmox, we check that the following run without error: 
 
-`sudo -u Debian-snmpn/usr/local/bin/proxmox` 
+```
+sudo -u Debian-snmpn/usr/local/bin/proxmox 
+```
 
-and make sure it runs as expected.
-
-If it does not work, then you will need to use sudo with extend. 
-And for the example above, that would mean adding the line
+If it doesn't work, then you will need to use sudo with the extend command. For the example above, that would mean adding the line
 below to the sudoers file.
 
 ```
 Debian-snmp ALL = NOPASSWD: /usr/local/bin/proxmox
 ```
 
-And we would need to add sudo to add sudo to the extend command, which would look 
+Finally we would need to add sudo to the extend command, which would look 
 like that for proxmox:
 
 ```
