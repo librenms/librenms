@@ -28,10 +28,13 @@ One major thing to keep in mind when using SNMP extend is these run as the snmpd
 user that can be an unprivileged user. In these situations you need to use sudo.
 
 To test if you need sudo, first check the user snmpd is running as. 
-Then test if you can run the extend script as that user with out issue. 
+Then test if you can run the extend script as that user without issue. 
 For example if snmpd is running as 'Debian-snmp' and we want
-to run the extend for proxmox, we would do `sudo -u Debian-snmp
-/usr/local/bin/proxmox` and make sure it runs as expected.
+to run the extend for proxmox, we run: 
+
+`sudo -u Debian-snmpn/usr/local/bin/proxmox` 
+
+and make sure it runs as expected.
 
 If it does not work, then you will need to use sudo with extend. 
 And for the example above, that would mean adding the line
