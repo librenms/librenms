@@ -33,6 +33,9 @@ to run ping checks as quickly as possible without increasing snmp load on your d
 *    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
 ```
 
+> **NOTE**: If you are using distributed pollers append the **`-g #`** with the group number of the poller on **ALL**
+> devices that you are running these cheks from, otherwise you will __may__ false up/down status depending on network setup
+
 #### Sub minute ping check
 
 Cron only has a resolution of one minute, so we have to use a trick to allow sub minute checks.
