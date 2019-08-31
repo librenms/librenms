@@ -28,8 +28,7 @@ foreach ($tables as $tablevalue) {
 
     if (is_array($temp)) {
         //Create State Index
-        $state_oid = $tablevalue[2];
-        $state_name = "dell." . $state_oid;
+        $state_name = "dell." . $tablevalue[2];
         if ($state_name == 'dell.processorDeviceStatusStatus' || $state_name == 'dell.memoryDeviceStatus' || $state_name == 'dell.powerSupplyStatus' || $state_name == 'dell.intrusionStatus') {
             $states = [
                 ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
@@ -119,7 +118,7 @@ foreach ($tables as $tablevalue) {
                     $descr = clean($temp[$index][$tablevalue[3]]); // Use clean as virtualDiskDeviceName is user defined
                 }
                 //Discover Sensors
-                discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_oid, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
+                discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
 
                 //Create Sensor To State Index
                 create_sensor_to_state_index($device, $state_name, $index);
