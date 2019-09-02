@@ -1,8 +1,8 @@
 <?php
 
-if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "proxmox" || $device['os'] == "recoveryos") {
+if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) {
     list(,,$version) = explode(" ", $device['sysDescr']);
-    if (strstr($device['sysDescr'], "386")|| strstr($device['sysDescr'], "486")||strstr($device['sysDescr'], "586")||strstr($device['sysDescr'], "686")) {
+    if (preg_match('[3-6]86', $device['sysDescr'])) {
         $hardware = "Generic x86";
     } elseif (strstr($device['sysDescr'], "x86_64")) {
         $hardware = "Generic x86 64-bit";
