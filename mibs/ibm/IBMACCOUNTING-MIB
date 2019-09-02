@@ -1,0 +1,1523 @@
+IBMACCOUNTING-MIB DEFINITIONS ::= BEGIN
+
+--IMPORTS
+--      MODULE-IDENTITY, enterprises, Integer32, Counter32,
+--      Gauge32, TimeTicks, OBJECT-TYPE
+--            FROM SNMPv2-SMI
+--     OBJECT-GROUP, MODULE-COMPLIANCE
+--            FROM SNMPv2-CONF
+--      DisplayString
+--            FROM SNMPv2-TC;
+
+IMPORTS
+      enterprises, Gauge, Counter, TimeTicks
+            FROM RFC1155-SMI
+      OBJECT-TYPE
+            FROM RFC-1212
+      DisplayString
+            FROM RFC1213-MIB;
+
+--ibmappnIsAccounting MODULE-IDENTITY
+--      LAST-UPDATED "9610071800Z"
+--      ORGANIZATION "IBM"
+--      CONTACT-INFO "Bob Moore (remoore @ ralvm6)
+--                    IBM Corporation
+--                    800 Park Offices Drive
+--                    CNMA/664
+--                    P.O. Box 12195
+--                    Research Triangle Park, NC 27709, USA
+--                    Tel:    1 919 254 4436
+--                    E-mail: remoore@ralvm6.vnet.ibm.com"
+--
+--      DESCRIPTION
+--          "This MIB module represents the intermediate session accounting
+--          group from the original IBM-6611-APPN-MIB, updated to SNMPv2
+--          SMI.  It is set up to use as its anchor point the same OID that
+--          identified the group in the IBM-6611-APPN MIB, so that existing
+--          manager applications will not need to change."
+--
+--      ::= { ibmappnSessIntermediate 2 }
+
+-- The following OID assignments result in the same OIDs for the
+-- objects in the intermediate session accounting group as those
+-- in the IBM-6611-APPN-MIB.
+ibm                     OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd                 OBJECT IDENTIFIER ::= { ibm 6 }
+ibm6611                 OBJECT IDENTIFIER ::= { ibmProd 2 }
+ibmappn                 OBJECT IDENTIFIER ::= { ibm6611 13 }
+ibmappnSession          OBJECT IDENTIFIER ::= { ibmappn 7 }
+ibmappnSessIntermediate OBJECT IDENTIFIER ::= { ibmappnSession 3 }
+ibmappnIsAccounting     OBJECT IDENTIFIER ::= { ibmappnSessIntermediate 2 }
+
+
+-- *********************************************************************
+-- Intermediate Session Accounting Global Objects
+-- ---------------------------------------------------------------------
+-- The following simple objects allow:
+--    * monitoring of the global accounting status
+--    * setting of a byte threshold for recording statistics on
+--      active sessions
+--    * requesting checkpoint records of active sessions to be
+--       recorded
+--    * setting the manager time and name
+-- *********************************************************************
+ibmappnIsAcGlobal OBJECT IDENTIFIER ::= { ibmappnIsAccounting 1 }
+
+ibmappnIsAcGlobeStatus OBJECT-TYPE
+      SYNTAX INTEGER  {
+                      notActive(1),
+                      activeNotFull(2),
+                      activeButFull(3)
+                      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object indicates the current status for accounting type.
+
+           1. indicates collection is not active for any media type.
+           2. indicates collection is active for at least one media
+              type; and that media is not full.
+           3. indicates collection is active for at least one media
+              type; but all active medias are full."
+
+      ::=  { ibmappnIsAcGlobal 1 }
+
+ibmappnIsAcGlobeByteThresh OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The byte threshold for recording accounting information for an
+          active session.
+
+          If the total of the byte counters (FmdBytes and NonFmdBtyes) is
+          an even multiple of this non-zero value, statistics for this
+          session will be recorded to all active buffers.
+
+          A value of zero indicates that no byte threshold has been set."
+
+      ::=  { ibmappnIsAcGlobal 2 }
+
+ibmappnIsAcGlobeCheckPt OBJECT-TYPE
+      SYNTAX INTEGER {
+                     ready(1),
+                     yes(2)
+                     }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "By setting this value to yes, the agent will collect
+           accounting information for all active sessions.  This
+           information will be recorded to all active buffers."
+
+      ::=  { ibmappnIsAcGlobal 3 }
+
+ibmappnIsAcGlobeMgrUtcSecs OBJECT-TYPE
+      SYNTAX INTEGER (0..59)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) seconds.  It
+          contains an integer from 0 to 59.  By setting this value, the
+          agent will create time record with its corresponding time and
+          name.  When setting this object, the manager should also set
+          all other ibmappnIsAcGlobeMgr objects with the same SET
+          operation."
+
+      ::=  { ibmappnIsAcGlobal 4 }
+
+ibmappnIsAcGlobeMgrUtcMins OBJECT-TYPE
+      SYNTAX INTEGER (0..59)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) minutes.  It
+          contains an integer from 0 to 59.  By setting this value, the
+          agent will create time record with its corresponding time and
+          name.  When setting this object, the manager should also set
+          all other ibmappnIsAcGlobeMgr objects with the same SET
+          operation."
+
+      ::=  { ibmappnIsAcGlobal 5 }
+
+ibmappnIsAcGlobeMgrUtcHours OBJECT-TYPE
+      SYNTAX INTEGER (0..23)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) hours.  It
+          contains an integer from 0 to 23.  By setting this value, the
+          agent will create time record with its corresponding time and
+          name.  When setting this object, the manager should also set
+          all other ibmappnIsAcGlobeMgr objects with the same SET
+          operation."
+
+      ::=  { ibmappnIsAcGlobal 6 }
+
+ibmappnIsAcGlobeMgrUtcMdays OBJECT-TYPE
+      SYNTAX INTEGER (0..31)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) day of the
+          month.  It contains an integer from 1 to 31; or 0 if the
+          manager has not set this object.  By setting this value, the
+          agent will create time record with its corresponding time and
+          name.  When setting this object, the manager should also set
+          all other ibmappnIsAcGlobeMgr objects with the same SET
+          operation."
+
+      ::=  { ibmappnIsAcGlobal 7 }
+
+ibmappnIsAcGlobeMgrUtcMonths OBJECT-TYPE
+      SYNTAX INTEGER {
+                     january(0),
+                     february(1),
+                     march(2),
+                     april(3),
+                     may(4),
+                     june(5),
+                     july(6),
+                     august(7),
+                     september(8),
+                     october(9),
+                     november(10),
+                     december(11)
+                     }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) months since
+          January.  It contains an integer from 0 to 11.  By setting this
+          value, the agent will create time record with its corresponding
+          time and name.  When setting this object, the manager should
+          also set all other ibmappnIsAcGlobeMgr objects with the same
+          SET operation."
+
+      ::=  { ibmappnIsAcGlobal 8 }
+
+ibmappnIsAcGlobeMgrUtcYears OBJECT-TYPE
+      SYNTAX INTEGER (0..1000)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's number of years since 1900.  For years up
+          through 1999, this value is identical to the manager's
+          Coordinated Universal Time (UTC) years.  Beginning in the year
+          2000, however, this value will be greater than the UTC years
+          value by 100 (or more).  By setting this value, the agent will
+          create time record with its corresponding time and name.  When
+          setting this object, the manager should also set all other
+          ibmappnIsAcGlobeMgr objects with the same SET operation."
+
+      ::=  { ibmappnIsAcGlobal 9 }
+
+ibmappnIsAcGlobeMgrUtcWdays OBJECT-TYPE
+      SYNTAX INTEGER {
+                     sunday(0),
+                     monday(1),
+                     tuesday(2),
+                     wednesday(3),
+                     thursday(4),
+                     friday(5),
+                     saturday(6)
+                     }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) days since
+          Sunday.  It contains an integer from 0 to 6.  By setting this
+          value, the agent will create time record with its corresponding
+          time and name.  When setting this object, the manager should
+          also set all other ibmappnIsAcGlobeMgr objects with the same
+          SET operation."
+
+      ::=  { ibmappnIsAcGlobal 10 }
+
+ibmappnIsAcGlobeMgrUtcYdays OBJECT-TYPE
+      SYNTAX INTEGER (0..365)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) days since
+          January 1.  It contains an integer from 0 to 365.  By setting
+          this value, the agent will create time record with its
+          corresponding time and name.  When setting this object, the
+          manager should also set all other ibmappnIsAcGlobeMgr objects
+          with the same SET operation."
+
+      ::=  { ibmappnIsAcGlobal 11 }
+
+ibmappnIsAcGlobeMgrUtcIsdst OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) daylight saving
+          time flag.  It is positive if daylight saving time is in
+          effect.  It is zero if daylight saving time is not in effect.
+          It is negative if the manager does not support the function.
+          By setting this value, the agent will create time record with
+          its corresponding time and name.  When setting this object, the
+          manager should also set all other ibmappnIsAcGlobeMgr objects
+          with the same SET operation."
+
+      ::=  { ibmappnIsAcGlobal 12 }
+
+ibmappnIsAcGlobeMgrName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (3..17))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The name of the manager who set the manager UTC times or NULL
+          if the manager name has not been set.  It contains:
+
+           a. the network id of the manager,
+           b. a period (.)
+           c. the cp name of the manager.
+
+           By setting this value, the agent will create time record with
+           its corresponding time and name.  When setting this object,
+           the manager should also set all other ibmappnIsAcGlobeMgr
+           objects with the same SET operation."
+
+      ::=  { ibmappnIsAcGlobal 13 }
+
+-- *********************************************************************
+-- Intermediate Session Accounting Buffer Type Table
+-- ---------------------------------------------------------------------
+-- This table contains information on the accounting buffer types
+-- (recording medias).  It provides:
+-- * monitoring of buffer type (media) statistics
+-- * starting and stopping recording
+-- * setting of buffer type (media) recording characteristics:
+--   - maximum number of buffers
+--   - maximum number of records/buffer
+--   - recording format
+--   - full action
+-- * resetting of statistics
+-- *********************************************************************
+
+ibmappnIsAcBtypeTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmappnIsAcBtypeEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+           "Intermediate Session Accounting Buffer Type Table"
+
+      ::= { ibmappnIsAccounting 2 }
+
+ibmappnIsAcBtypeEntry OBJECT-TYPE
+      SYNTAX IbmappnIsAcBtypeEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+           "Entry of Intermediate Session Accounting Buffer Type Table."
+
+      INDEX
+             { ibmappnIsAcBtypeMedia }
+
+      ::= { ibmappnIsAcBtypeTable 1 }
+
+IbmappnIsAcBtypeEntry ::= SEQUENCE {
+      ibmappnIsAcBtypeMedia          INTEGER,
+      ibmappnIsAcBtypeActive         INTEGER,
+      ibmappnIsAcBtypeDirName        DisplayString,
+      ibmappnIsAcBtypePrdMaxBufs     INTEGER,
+      ibmappnIsAcBtypeMaxBufs        INTEGER,
+      ibmappnIsAcBtypeCurBufs        Gauge,
+      ibmappnIsAcBtypePrdRecPerBuf   INTEGER,
+      ibmappnIsAcBtypeRecPerBuf      INTEGER,
+      ibmappnIsAcBtypeRecFormat      INTEGER,
+      ibmappnIsAcBtypeFullAction     INTEGER,
+      ibmappnIsAcBtypeFullTime       TimeTicks,
+      ibmappnIsAcBtypeFullReason     INTEGER,
+      ibmappnIsAcBtypeFullWraps      INTEGER,
+      ibmappnIsAcBtypeFullLosts      INTEGER,
+      ibmappnIsAcBtypeErrorWraps     INTEGER,
+      ibmappnIsAcBtypeErrorLosts     INTEGER,
+      ibmappnIsAcBtypeCheckPts       INTEGER,
+      ibmappnIsAcBtypePurges         INTEGER,
+      ibmappnIsAcBtypeDeletes        INTEGER,
+      ibmappnIsAcBtypeResets         INTEGER,
+      ibmappnIsAcBtypeClearStats     INTEGER
+                       }
+
+ibmappnIsAcBtypeMedia OBJECT-TYPE
+      SYNTAX INTEGER {
+                     memory(1),
+                     dasd(2)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The media for storing the intermediate session accounting
+          records."
+
+      ::= { ibmappnIsAcBtypeEntry 1 }
+
+ibmappnIsAcBtypeActive OBJECT-TYPE
+      SYNTAX INTEGER {
+                     no(1),
+                     yes(2)
+                     }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "Indicates whether or not the buffer media is active.
+           1. no:  indicates the buffer media is not currently
+                   used for recording.
+           2. yes: indicates the buffer media is currently being
+                   used for recording."
+
+      ::= { ibmappnIsAcBtypeEntry 2 }
+
+ibmappnIsAcBtypeDirName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The name of the directory which will be used to allocate and
+          write buffers of this type.  For memory buffer types, this
+          field will be NULL."
+
+      ::= { ibmappnIsAcBtypeEntry 3 }
+
+ibmappnIsAcBtypePrdMaxBufs OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The maximum number of buffer media supported by the product."
+
+      ::= { ibmappnIsAcBtypeEntry 4 }
+
+ibmappnIsAcBtypeMaxBufs OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The maximum number of buffer media that will be used for
+          recording accounting information.  This value must be in the
+          range of zero to the Product Maximum."
+
+      ::= { ibmappnIsAcBtypeEntry 5 }
+
+ibmappnIsAcBtypeCurBufs OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "The current number of buffer media.  This is the sum of all
+           full and in use buffers of this type."
+
+      ::= { ibmappnIsAcBtypeEntry 6 }
+
+ibmappnIsAcBtypePrdRecPerBuf OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "The maximum number of records supported by the product."
+
+      ::= { ibmappnIsAcBtypeEntry 7 }
+
+ibmappnIsAcBtypeRecPerBuf OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The maximum number of records which will be recorded in an
+          individual buffer.  This value must be in the range of zero to
+          the Product Maximum."
+
+      ::= { ibmappnIsAcBtypeEntry 8 }
+
+ibmappnIsAcBtypeRecFormat OBJECT-TYPE
+      SYNTAX INTEGER {
+                     ascii(1),
+                     binary(2)
+                     }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+           "This defines the recording format of records.
+            (1) ascii:   records are recorded in ascii
+                         (English text format)
+            (2) binary:  records are recorded in binary
+                         (machine readable format)"
+
+      ::= { ibmappnIsAcBtypeEntry 9 }
+
+ibmappnIsAcBtypeFullAction OBJECT-TYPE
+      SYNTAX INTEGER {
+                     halt(1),
+                     wrap(2)
+                     }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+           "This defines the behaviour used when all media buffers
+            are full.
+            (1) halt: stop creating new records
+            (2) wrap: overwrite the existing records."
+
+      ::= { ibmappnIsAcBtypeEntry 10 }
+
+ibmappnIsAcBtypeFullTime OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The time when the full condition was encountered.  This time
+          is represented in hundredths of a second since the node was
+          started, up to a value of 2**32-1 (4,294,967,295), after which
+          it wraps."
+
+      ::= { ibmappnIsAcBtypeEntry 11 }
+
+ibmappnIsAcBtypeFullReason OBJECT-TYPE
+      SYNTAX INTEGER {
+                     notFull(1),
+                     physicallyFull(2),
+                     logicallyFull(3),
+                     ioErrors(4)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "The reason the buffer media is full.
+            (1) The media is not full.
+            (2) The maximum number of buffers have been reached,
+                all buffers are full, and the full action is halt.
+            (3) The maximum number of buffers is zero or
+                the maximum number of records is less than 5 or
+                a unique record number cannot be generated.
+            (4) Unable to write to the media due to I/O errors."
+
+      ::= { ibmappnIsAcBtypeEntry 12 }
+
+ibmappnIsAcBtypeFullWraps OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "The number of accounting records being overwritten due to
+           buffer full situation."
+
+      ::= { ibmappnIsAcBtypeEntry 13 }
+
+ibmappnIsAcBtypeFullLosts OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "The number of new accounting records lost due to the buffer
+           full situation."
+
+      ::= { ibmappnIsAcBtypeEntry 14 }
+
+ibmappnIsAcBtypeErrorWraps OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "The number of accounting records lost to due to other
+           reasons, (e.g. I/O error, software error) while in a wrap
+           condition."
+
+      ::= { ibmappnIsAcBtypeEntry 15 }
+
+ibmappnIsAcBtypeErrorLosts OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "The number of accounting records lost to due to other
+           reasons, (e.g. I/O error, software error) while not in a full
+           condition."
+
+      ::= { ibmappnIsAcBtypeEntry 16 }
+
+ibmappnIsAcBtypeCheckPts OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of times a buffer of this type has been recorded to
+          for checkpointing active intermediate sessions."
+
+      ::= { ibmappnIsAcBtypeEntry 17 }
+
+ibmappnIsAcBtypePurges OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of times a buffer of this type has been purged."
+
+      ::= { ibmappnIsAcBtypeEntry 18 }
+
+ibmappnIsAcBtypeDeletes OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of times entries have been deleted from a buffer of
+          this type."
+
+      ::= { ibmappnIsAcBtypeEntry 19 }
+
+ibmappnIsAcBtypeResets OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of times the Btype counters have been reset as a
+          result of a SET."
+
+      ::= { ibmappnIsAcBtypeEntry 20 }
+
+ibmappnIsAcBtypeClearStats OBJECT-TYPE
+      SYNTAX INTEGER {
+                     ready(1),
+                     yes(2)
+                     }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "By setting this object to yes, all statistics for this media
+          type will be cleared (set to zero); and the Btype reset counter
+          will be incremented.  Objects affected by this include:
+
+           - ibmappnIsAcBtypeFullTime
+           - ibmappnIsAcBtypeFullReason
+           - ibmappnIsAcBtypeFullWraps
+           - ibmappnIsAcBtypeFullLosts
+           - ibmappnIsAcBtypeErrorWraps
+           - ibmappnIsAcBtypeErrorLosts
+           - ibmappnIsAcBtypeCheckPts
+           - ibmappnIsAcBtypePurges
+           - ibmappnIsAcBtypeDeletes"
+
+      ::= { ibmappnIsAcBtypeEntry 21 }
+
+-- *********************************************************************
+-- Intermediate Session Accounting Buffer Table
+-- ---------------------------------------------------------------------
+-- This table contains information on accounting buffers of a
+-- a specific buffer type.  It provides for:
+-- * deleting of records
+-- * purging of buffers
+-- * switching active buffers
+-- *********************************************************************
+
+ibmappnIsAcBufTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmappnIsAcBufEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+           "Intermediate Session Accounting Buffer Table"
+
+      ::= { ibmappnIsAccounting 3 }
+
+ibmappnIsAcBufEntry OBJECT-TYPE
+      SYNTAX IbmappnIsAcBufEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+           "Entry of Intermediate Session Accounting Buffer Table."
+
+      INDEX
+             { ibmappnIsAcBufMedia,
+               ibmappnIsAcBufNumber }
+
+      ::= { ibmappnIsAcBufTable 1 }
+
+IbmappnIsAcBufEntry ::= SEQUENCE {
+      ibmappnIsAcBufMedia            INTEGER,
+      ibmappnIsAcBufNumber           INTEGER,
+      ibmappnIsAcBufState            INTEGER,
+      ibmappnIsAcBufRecFormat        INTEGER,
+      ibmappnIsAcBufMaxRecords       INTEGER,
+      ibmappnIsAcBufOldestIndex      INTEGER,
+      ibmappnIsAcBufNewestIndex      INTEGER,
+      ibmappnIsAcBufName             DisplayString
+                       }
+
+ibmappnIsAcBufMedia OBJECT-TYPE
+      SYNTAX INTEGER {
+                     memory(1),
+                     dasd(2)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "The media for storing the intermediate session accounting
+           records."
+
+      ::= { ibmappnIsAcBufEntry 1 }
+
+ibmappnIsAcBufNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Number of the buffer.  Each time a new buffer is used for
+          recording, an incremented number will be assigned.  Thus, the
+          order of in which the buffers were filled can be determined."
+
+      ::=  { ibmappnIsAcBufEntry 2 }
+
+ibmappnIsAcBufState OBJECT-TYPE
+      SYNTAX INTEGER {
+                     complete(1),
+                     active(2),
+                     purge(3)
+                     }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The current buffer state.
+           1. complete: indicates the buffer is full or recording is not
+                        active for this buffer.  In either case, the
+                        buffer is ready to be retrieved.  This value may
+                        be specified in a SET operation to change a
+                        buffer's state from active to complete.
+
+           2. active:   indicates the buffer is current being used for
+                        recording.  This value is not valid for use in a
+                        SET operation.
+
+           3. purge:    indicates the buffer should be purged.
+                        This value may be specified in a SET operation to
+                        remove a buffer.  Specification of this value is
+                        only valid for complete buffers.  It is not valid
+                        for active buffers."
+
+      ::=  { ibmappnIsAcBufEntry 3 }
+
+ibmappnIsAcBufRecFormat OBJECT-TYPE
+      SYNTAX INTEGER {
+                     ascii(1),
+                     binary(2)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "This defines the recording format of records.
+            (1) ascii:   records are recorded in ascii
+                         (English text format)
+            (2) binary:  records are recorded in binary
+                         (machine readable format)"
+
+      ::= { ibmappnIsAcBufEntry 4 }
+
+ibmappnIsAcBufMaxRecords OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The maximum number of records this buffer may contain.  It is
+          derived from the number of records per buffer set in the buffer
+          type table."
+
+      ::=  { ibmappnIsAcBufEntry 5 }
+
+ibmappnIsAcBufOldestIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The oldest accounting index contained in this buffer.  By
+          setting this object, all records with indexes less than this
+          value will be deleted.  Setting of this object will not be
+          honored for all types of buffers."
+
+      ::=  { ibmappnIsAcBufEntry 6 }
+
+ibmappnIsAcBufNewestIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The newest accounting index contained in this buffer."
+
+      ::=  { ibmappnIsAcBufEntry 7 }
+
+ibmappnIsAcBufName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (1..64))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The name of the buffer."
+
+      ::=  { ibmappnIsAcBufEntry 8 }
+
+-- *********************************************************************
+-- Intermediate Session Accounting Time Table
+-- ---------------------------------------------------------------------
+-- This table contains information on accounting events
+-- *********************************************************************
+
+ibmappnIsAcTimeTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmappnIsAcTimeEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+           "Intermediate Session Accounting Time Table"
+
+      ::= { ibmappnIsAccounting 4 }
+
+ibmappnIsAcTimeEntry OBJECT-TYPE
+      SYNTAX IbmappnIsAcTimeEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+           "Entry of Intermediate Session Accounting Time Table."
+
+      INDEX
+             { ibmappnIsAcTimeIndex }
+
+      ::= { ibmappnIsAcTimeTable 1 }
+
+IbmappnIsAcTimeEntry ::= SEQUENCE {
+      ibmappnIsAcTimeIndex                INTEGER,
+      ibmappnIsAcTimeEntryType            INTEGER,
+      ibmappnIsAcTimeForMedia             INTEGER,
+      ibmappnIsAcTimeRecTime              TimeTicks,
+
+      ibmappnIsAcTimeAgtUtcSecs           INTEGER,
+      ibmappnIsAcTimeAgtUtcMins           INTEGER,
+      ibmappnIsAcTimeAgtUtcHours          INTEGER,
+      ibmappnIsAcTimeAgtUtcMdays          INTEGER,
+      ibmappnIsAcTimeAgtUtcMonths         INTEGER,
+      ibmappnIsAcTimeAgtUtcYears          INTEGER,
+      ibmappnIsAcTimeAgtUtcWdays          INTEGER,
+      ibmappnIsAcTimeAgtUtcYdays          INTEGER,
+      ibmappnIsAcTimeAgtUtcIsdst          INTEGER,
+      ibmappnIsAcTimeAgtName              DisplayString,
+
+      ibmappnIsAcTimeMgrUtcSecs           INTEGER,
+      ibmappnIsAcTimeMgrUtcMins           INTEGER,
+      ibmappnIsAcTimeMgrUtcHours          INTEGER,
+      ibmappnIsAcTimeMgrUtcMdays          INTEGER,
+      ibmappnIsAcTimeMgrUtcMonths         INTEGER,
+      ibmappnIsAcTimeMgrUtcYears          INTEGER,
+      ibmappnIsAcTimeMgrUtcWdays          INTEGER,
+      ibmappnIsAcTimeMgrUtcYdays          INTEGER,
+      ibmappnIsAcTimeMgrUtcIsdst          INTEGER,
+      ibmappnIsAcTimeMgrName              DisplayString,
+      ibmappnIsAcTimeMgrTimeValid         INTEGER
+                               }
+
+ibmappnIsAcTimeIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Intermediate Session Time record index.  This object starts
+          with 0, and increase up to maximum value of 2**31-1
+          (2,147,483,647), after which it wraps."
+
+      ::=  { ibmappnIsAcTimeEntry 1 }
+
+ibmappnIsAcTimeEntryType OBJECT-TYPE
+      SYNTAX INTEGER {
+                     startCollection(1),
+                     endCollection(2),
+                     createdMedia(3),
+                     wrappedMedia(4),
+                     timeChange(5),
+                     managerSetTime(6),
+                     recordFormatChanged(7),
+                     timeReference(8)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Indicates whether the entry was made as the result of:
+           1. a SET to start collecting accounting data, or
+           2. a SET to stop  collecting accounting data, or
+           3. the creation of a new media to store accounting data, or
+           4. a media was full and wrapped (over writing records), or
+           5. the system time changed, or
+           6. a manager set the manager times and/or manager name, or
+           7. the record format for this media changed, or
+           8. time reference for the media"
+
+      ::=  { ibmappnIsAcTimeEntry 2 }
+
+ibmappnIsAcTimeForMedia OBJECT-TYPE
+      SYNTAX INTEGER {
+                     memoryMedia(1),
+                     dasdMedia(2),
+                     allMedias(99)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object qualifies the time entry type.  It indicates
+           the media type(s) to which the entry applies."
+
+      ::=  { ibmappnIsAcTimeEntry 3 }
+
+ibmappnIsAcTimeRecTime OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The time when the intermediate session record was created.
+          This time is represented in hundredths of a second since the
+          node was started, up to a value of 2**32-1 (4,294,967,295),
+          after which it wraps."
+
+      ::=  { ibmappnIsAcTimeEntry 4 }
+
+ibmappnIsAcTimeAgtUtcSecs OBJECT-TYPE
+      SYNTAX INTEGER (0..59)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The agent's Coordinated Universal Time (UTC) seconds.
+           It contains an integer from 0 to 59."
+
+      ::=  { ibmappnIsAcTimeEntry 5 }
+
+ibmappnIsAcTimeAgtUtcMins OBJECT-TYPE
+      SYNTAX INTEGER (0..59)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The agent's Coordinated Universal Time (UTC) minutes.
+           It contains an integer from 0 to 59."
+
+      ::=  { ibmappnIsAcTimeEntry 6 }
+
+ibmappnIsAcTimeAgtUtcHours OBJECT-TYPE
+      SYNTAX INTEGER (0..23)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The agent's Coordinated Universal Time (UTC) hours.  It
+          contains an integer from 0 to 23."
+
+      ::=  { ibmappnIsAcTimeEntry 7 }
+
+ibmappnIsAcTimeAgtUtcMdays OBJECT-TYPE
+      SYNTAX INTEGER (1..31)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The agent's Coordinated Universal Time (UTC) day of the month.
+          It contains an integer from 1 to 31."
+
+      ::=  { ibmappnIsAcTimeEntry 8 }
+
+
+ibmappnIsAcTimeAgtUtcMonths OBJECT-TYPE
+      SYNTAX INTEGER {
+                     january(0),
+                     february(1),
+                     march(2),
+                     april(3),
+                     may(4),
+                     june(5),
+                     july(6),
+                     august(7),
+                     september(8),
+                     october(9),
+                     november(10),
+                     december(11)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The agent's Coordinated Universal Time (UTC) months since
+          January.  It contains an integer from 0 to 11."
+
+      ::=  { ibmappnIsAcTimeEntry 9 }
+
+ibmappnIsAcTimeAgtUtcYears OBJECT-TYPE
+      SYNTAX INTEGER (0..1000)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The agent's number of years since 1900.  For years up
+          through 1999, this value is identical to the manager's
+          Coordinated Universal Time (UTC) years.  Beginning in the year
+          2000, however, this value will be greater than the UTC years
+          value by 100 (or more)."
+
+      ::=  { ibmappnIsAcTimeEntry 10 }
+
+ibmappnIsAcTimeAgtUtcWdays OBJECT-TYPE
+      SYNTAX INTEGER {
+                     sunday(0),
+                     monday(1),
+                     tuesday(2),
+                     wednesday(3),
+                     thursday(4),
+                     friday(5),
+                     saturday(6)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The agent's Coordinated Universal Time (UTC) days since
+          Sunday.  It contains an integer from 0 to 6."
+
+      ::=  { ibmappnIsAcTimeEntry 11 }
+
+ibmappnIsAcTimeAgtUtcYdays OBJECT-TYPE
+      SYNTAX INTEGER (0..365)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The agent's Coordinated Universal Time (UTC) days since
+          January 1.  It contains an integer from 0 to 365."
+
+      ::=  { ibmappnIsAcTimeEntry 12 }
+
+ibmappnIsAcTimeAgtUtcIsdst OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The agent's Coordinated Universal Time (UTC) daylight saving
+          time flag.  It is positive if daylight saving time is in
+          effect.  It is zero if daylight saving time is not in effect.
+          It is negative if the manager causing this entry to be created
+          did not support the function."
+
+      ::=  { ibmappnIsAcTimeEntry 13 }
+
+ibmappnIsAcTimeAgtName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (3..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The name of the agent who set the agent UTC times.  It
+          contains:
+
+           a. the network id of the agent,
+           b. a period (.)
+           c. the cp name of the agent."
+
+      ::=  { ibmappnIsAcTimeEntry 14 }
+
+ibmappnIsAcTimeMgrUtcSecs OBJECT-TYPE
+      SYNTAX INTEGER (0..59)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) seconds.
+           It contains an integer from 0 to 59."
+
+      ::=  { ibmappnIsAcTimeEntry 15 }
+
+ibmappnIsAcTimeMgrUtcMins OBJECT-TYPE
+      SYNTAX INTEGER (0..59)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) minutes.
+           It contains an integer from 0 to 59."
+
+      ::=  { ibmappnIsAcTimeEntry 16 }
+
+ibmappnIsAcTimeMgrUtcHours OBJECT-TYPE
+      SYNTAX INTEGER (0..23)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) hours.
+           It contains an integer from 0 to 23."
+
+      ::=  { ibmappnIsAcTimeEntry 17 }
+
+ibmappnIsAcTimeMgrUtcMdays OBJECT-TYPE
+      SYNTAX INTEGER (0..31)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) day of the
+          month.  It contains an integer from 1 to 31; or 0 if the
+          manager did not set the ibmappnIsAcGlobeMgrUtcMdays object."
+
+      ::=  { ibmappnIsAcTimeEntry 18 }
+
+ibmappnIsAcTimeMgrUtcMonths OBJECT-TYPE
+      SYNTAX INTEGER {
+                     january(0),
+                     february(1),
+                     march(2),
+                     april(3),
+                     may(4),
+                     june(5),
+                     july(6),
+                     august(7),
+                     september(8),
+                     october(9),
+                     november(10),
+                     december(11)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) months since
+          January.  It contains an integer from 0 to 11."
+
+      ::=  { ibmappnIsAcTimeEntry 19 }
+
+ibmappnIsAcTimeMgrUtcYears OBJECT-TYPE
+      SYNTAX INTEGER (0..1000)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's number of years since 1900.  For years up
+          through 1999, this value is identical to the manager's
+          Coordinated Universal Time (UTC) years.  Beginning in the year
+          2000, however, this value will be greater than the UTC years
+          value by 100 (or more)."
+
+      ::=  { ibmappnIsAcTimeEntry 20 }
+
+ibmappnIsAcTimeMgrUtcWdays OBJECT-TYPE
+      SYNTAX INTEGER {
+                     sunday(0),
+                     monday(1),
+                     tuesday(2),
+                     wednesday(3),
+                     thursday(4),
+                     friday(5),
+                     saturday(6)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) days since
+          Sunday.  It contains an integer from 0 to 6."
+
+      ::=  { ibmappnIsAcTimeEntry 21 }
+
+ibmappnIsAcTimeMgrUtcYdays OBJECT-TYPE
+      SYNTAX INTEGER (0..365)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) days since
+          January 1.  It contains an integer from 0 to 365."
+
+      ::=  { ibmappnIsAcTimeEntry 22 }
+
+ibmappnIsAcTimeMgrUtcIsdst OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The manager's Coordinated Universal Time (UTC) daylight saving
+          time flag.  It is positive if daylight saving time is in
+          effect.  It is zero if daylight saving time is not in effect.
+          It is negative if the manager does not support the function."
+
+      ::=  { ibmappnIsAcTimeEntry 23 }
+
+ibmappnIsAcTimeMgrName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The name of the manager who set the manager UTC times or NULL
+          if the manager name has not been set.  It contains:
+
+           a. the network id of the manager,
+           b. a period (.)
+           c. the cp name of the manager."
+
+      ::=  { ibmappnIsAcTimeEntry 24 }
+
+ibmappnIsAcTimeMgrTimeValid OBJECT-TYPE
+      SYNTAX INTEGER  {
+                      notvalid(1),
+                      valid(2)
+                      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "This indicates rather or not the  manager UTC times are
+          valid.  It is set by the manager if the manager determines the
+          manager UTC times are valid."
+
+      ::=  { ibmappnIsAcTimeEntry 25 }
+
+-- *********************************************************************
+-- Intermediate Session Accounting Data Table
+-- ---------------------------------------------------------------------
+-- This table contains accounting data for intermediate sessions
+-- *********************************************************************
+
+ibmappnIsAcDataTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmappnIsAcDataEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+           "Intermediate Session Accounting Data Table"
+
+      ::= { ibmappnIsAccounting 5 }
+
+ibmappnIsAcDataEntry OBJECT-TYPE
+      SYNTAX IbmappnIsAcDataEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+           "Entry of Intermediate Session Accounting Data Table."
+
+      INDEX
+             { ibmappnIsAcIndex }
+
+      ::= { ibmappnIsAcDataTable 1 }
+
+IbmappnIsAcDataEntry ::= SEQUENCE {
+      ibmappnIsAcIndex                  INTEGER,
+      ibmappnIsAcEntryType              INTEGER,
+      ibmappnIsAcRecTime                TimeTicks,
+
+      ibmappnIsAcFqLuName               DisplayString,
+      ibmappnIsAcPcid                   OCTET STRING,
+      ibmappnIsAcPriLuName              DisplayString,
+      ibmappnIsAcSecLuName              DisplayString,
+      ibmappnIsAcCosName                DisplayString,
+      ibmappnIsAcModeName               DisplayString,
+      ibmappnIsAcTransPriority          INTEGER,
+
+      ibmappnIsAcSessType               INTEGER,
+      ibmappnIsAcSessState              INTEGER,
+      ibmappnIsAcSessStartTime          TimeTicks,
+      ibmappnIsAcSessUpTime             TimeTicks,
+      ibmappnIsAcCtrUpTime              TimeTicks,
+      ibmappnIsAcEndReason              OCTET STRING,
+
+      ibmappnIsAcP2SFmdPius             Counter,
+      ibmappnIsAcS2PFmdPius             Counter,
+      ibmappnIsAcP2SNonFmdPius          Counter,
+      ibmappnIsAcS2PNonFmdPius          Counter,
+      ibmappnIsAcP2SFmdBytes            Counter,
+      ibmappnIsAcS2PFmdBytes            Counter,
+      ibmappnIsAcP2SNonFmdBytes         Counter,
+      ibmappnIsAcS2PNonFmdBytes         Counter,
+
+      ibmappnIsAcRouteInfo              OCTET STRING
+                               }
+
+ibmappnIsAcIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Session accounting record index.  Upon initial startup, it
+           will begin with 0, and increase up to maximum value of
+           2**31-1 (2,147,483,647), and wraps.  Upon subsequent startups,
+           it will be initialized with the value of the oldest index
+           for any media type, or with 0 if no indices are found."
+
+      ::=  { ibmappnIsAcDataEntry 1 }
+
+ibmappnIsAcEntryType OBJECT-TYPE
+      SYNTAX INTEGER {
+                     startEntry(1),
+                     endEntry(2),
+                     thresholdEntry(3),
+                     checkpointEntry(4)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Indicates whether the entry was made as the result of:
+           1. a session starting or,
+           2. a session ending or,
+           3. a session threshold's being reached or
+           4. a session checkpoint request"
+
+      ::=  { ibmappnIsAcDataEntry 2 }
+
+ibmappnIsAcRecTime OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The time when the record was created.  This time is
+          represented in hundredths of a second since the node was
+          started, up to a value of 2**32-1 (4,294,967,295), after which
+          it wraps."
+
+      ::=  { ibmappnIsAcDataEntry 3 }
+
+ibmappnIsAcFqLuName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (3..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The network-qualified CP name or PU name of the node at which
+          the session and pcid originated.  For APPN and LEN nodes, this
+          is either CP name of the APPN node at which the origin LU is
+          located or the CP name of the NN serving the LEN node at which
+          the origin LU is located.  This field is from 3 to 17
+          characters in length, including a period (.) which separates
+          the NetId from the NAU name."
+
+      ::=  { ibmappnIsAcDataEntry 4 }
+
+ibmappnIsAcPcid OBJECT-TYPE
+      SYNTAX OCTET STRING  (SIZE (8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The procedure correlation identifier (pcid) of a session.  It
+          is an 8-octet value assigned by the primary LU."
+
+      ::=  { ibmappnIsAcDataEntry 5 }
+
+ibmappnIsAcPriLuName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (3..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Primary LU Name of the session."
+
+      ::=  { ibmappnIsAcDataEntry 6 }
+
+ibmappnIsAcSecLuName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (3..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Secondary LU Name of the session."
+
+      ::=  { ibmappnIsAcDataEntry 7 }
+
+ibmappnIsAcModeName OBJECT-TYPE
+      SYNTAX DisplayString  (SIZE (1..8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The mode name used for this session"
+
+      ::=  { ibmappnIsAcDataEntry 8 }
+
+ibmappnIsAcCosName OBJECT-TYPE
+      SYNTAX DisplayString  (SIZE (1..8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The class of service (cos) used for this session"
+
+      ::=  { ibmappnIsAcDataEntry 9 }
+
+ibmappnIsAcTransPriority OBJECT-TYPE
+      SYNTAX INTEGER {
+                     low(1),               --X'01'
+                     medium(2),            --X'02'
+                     high(3),              --X'03'
+                     network(4)            --X'04'
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "Transmission priority for this session.
+            The values are:
+            1. Low
+            2. Medium
+            3. High
+            4. Network"
+
+      ::=  { ibmappnIsAcDataEntry 10 }
+
+ibmappnIsAcSessType OBJECT-TYPE
+      SYNTAX INTEGER {
+                     lu62(1),
+                     lu0thru3(2),
+                     lu62dlur(3),
+                     lu0thru3dlur(4)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The type of intermediate session.  Defined values are
+
+              lu62         A session between LUs of type 6.2
+                           (as indicated by the LU type in Bind)
+
+              lu0thru3     A session between LUs of type 0, 1, 2, or 3
+                           (as indicated by the LU type in Bind)
+
+              lu62dlur     A session between LUs of type 6.2
+                           (as indicated by the LU type in Bind).
+                           One of the LUs is a dependent LU supported
+                           by the dependent LU requester (DLUR)
+                           function at this node.
+
+              lu0thru3dlur  A session between LUs of type 0, 1, 2, or 3
+                           (as indicated by the LU type in Bind)
+                           One of the LUs is a dependent LU supported
+                           by the dependent LU requester (DLUR)
+                           function at this node."
+
+      ::=  { ibmappnIsAcDataEntry 11 }
+
+ibmappnIsAcSessState OBJECT-TYPE
+      SYNTAX INTEGER {
+                      inactive(1),
+                      pendactive(2),
+                      active(3),
+                      pendinact(4)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Indicates the state of the session.
+           1. session is pending inactive or,
+           2. session is pending active or,
+           3. session is active or,
+           4. session is inactive "
+
+      ::=  { ibmappnIsAcDataEntry 12 }
+
+ibmappnIsAcSessStartTime OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The time when the session started.  This time is
+          represented in hundredths of a second since the node was
+          started, up to a value of 2**32-1 (4,294,967,295), after which
+          it wraps."
+
+      ::=  { ibmappnIsAcDataEntry 13 }
+
+ibmappnIsAcSessUpTime OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Length of time the session has been active in hundredths of a
+          second."
+
+      ::=  { ibmappnIsAcDataEntry 14 }
+
+ibmappnIsAcCtrUpTime OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Length of time the session counters have been active in
+          hundredths of a second."
+
+      ::=  { ibmappnIsAcDataEntry 15 }
+
+ibmappnIsAcEndReason OBJECT-TYPE
+      SYNTAX OCTET STRING  (SIZE (4))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The SNA sense data reported when the session ended."
+
+      ::=  { ibmappnIsAcDataEntry 16 }
+
+ibmappnIsAcP2SFmdPius OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of FMD PIU's sent from the primary LU to the
+          secondary LU."
+
+      ::=  { ibmappnIsAcDataEntry 17 }
+
+ibmappnIsAcS2PFmdPius OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of FMD PIU's sent from the secondary LU
+           to the primary LU."
+
+      ::=  { ibmappnIsAcDataEntry 18 }
+
+ibmappnIsAcP2SNonFmdPius OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of non-FMD PIU's sent from the primary LU
+           to the secondary LU."
+
+      ::=  { ibmappnIsAcDataEntry 19 }
+
+ibmappnIsAcS2PNonFmdPius OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of non-FMD PIU's sent from the secondary LU
+           to the primary LU."
+
+      ::=  { ibmappnIsAcDataEntry 20 }
+
+ibmappnIsAcP2SFmdBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of FMD bytes sent from the primary LU
+           to the secondary LU."
+
+      ::=  { ibmappnIsAcDataEntry 21 }
+
+ibmappnIsAcS2PFmdBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of FMD bytes sent from the secondary LU
+           to the primary LU."
+
+      ::=  { ibmappnIsAcDataEntry 22 }
+
+ibmappnIsAcP2SNonFmdBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of non-FMD bytes sent from the primary LU
+           to the secondary LU."
+
+      ::=  { ibmappnIsAcDataEntry 23 }
+
+ibmappnIsAcS2PNonFmdBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The number of non-FMD bytes sent from the secondary LU
+           to the primary LU."
+
+      ::=  { ibmappnIsAcDataEntry 24 }
+
+ibmappnIsAcRouteInfo OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (0..255))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The route selection control vector (RSCV x'2B') used for this
+          session.  It is present for APPN nodes; for LEN nodes, a zero-
+          length string is returned."
+
+      ::=  { ibmappnIsAcDataEntry 25 }
+
+
+-- ******************************************************************
+-- IBM APPN intermediate-session accounting conformance
+-- ******************************************************************
+
+END

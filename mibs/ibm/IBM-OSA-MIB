@@ -1,0 +1,2950 @@
+ --===================================================================
+ --
+ -- May   23, 2002
+ --
+ -- Joel Goldman,   Internet: jgoldman@us.ibm.com
+ -- IBM Server Group
+ -- Poughkeepsie, NY
+ --
+ -- Program name : IBM OSA-Express Direct SNMP Enterprise
+ --                Specific MIB ASN.1 Description file
+ --
+ -- SW Requires: IBM Communications Server for z/OS Version 1 Release 4
+ --                 -or-
+ --              Linux ucd-snmp 4.2.x package
+ --              IBM OSA-Express device driver QETH (Rev. 1.239 or higher)
+ --              IBM osasnmpd subagent Ver. 1.1 or higher
+ --
+ -- HW Requires: OSA-Express running in QDIO mode with
+ --              Licensed Internal Code level 3.0A or higher
+ --
+ -- Description: Manages the IBM Open Systems Adapter Express CHPID
+ --              Enterprise Specific MIB
+ --
+ -- Latest MIB: Located at website
+ --                 www.ibm.com/servers/resourcelink
+ --  logon on to Resourcelink
+ --   select "Library"
+ --   look to the right side under "Library short cuts" and select "OSA"
+ --   select the "OSA-Express Direct SNMP MIB module"
+ --
+ --===================================================================
+
+ IBM-OSA-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE,
+--          NOTIFICATION-TYPE, IpAddress, TimeTicks, Unsigned32
+            enterprises, Integer32, Gauge32, Counter32, Counter64
+               FROM SNMPv2-SMI                  -- RFC2578
+
+--          TEXTUAL-CONVENTION, DateAndTime, TruthValue, RowStatus,
+            DisplayString
+               FROM SNMPv2-TC                   -- RFC2579
+
+--         NOTIFICATION-GROUP
+           MODULE-COMPLIANCE, OBJECT-GROUP
+              FROM SNMPv2-CONF                 -- RFC2580
+
+--         SnmpAdminString
+--            FROM SNMP-FRAMEWORK-MIB
+--                                                RFC2571
+
+           ifIndex
+              FROM IF-MIB                      -- RFC2863
+     ;
+
+
+        ibmOSAMib       MODULE-IDENTITY
+           LAST-UPDATED "200205230000Z"
+           ORGANIZATION "IBM eServer Development"
+           CONTACT-INFO
+               "        Joel Goldman
+
+                Postal: International Business Machines Corporation
+                        2455 South Road
+                        Dept. B44G/Bldg. 706
+                        Poughkeepsie, NY 12601
+                        USA
+
+                   Tel: +1 845 435 5501
+
+              Internet: jgoldman@us.ibm.com"
+           DESCRIPTION
+               "The IBM Enterprise Specific MIB definitions for
+                enabling management of an IBM OSA-Express feature.
+
+                Licensed Materials - Property of IBM
+                Restricted Materials of IBM
+                5694-A01 (C) Copyright IBM Corp. 2002
+                US Government Users Restricted Rights -
+                Use, duplication or disclosure restricted by
+                GSA ADP Schedule Contract with IBM Corp."
+           REVISION "200205230000Z"
+           DESCRIPTION
+                  "Editorial revisions"
+           REVISION "200203260800Z"
+           DESCRIPTION
+                  "Initial release"
+        ::= { ibmProd  188 }
+
+   ibm       OBJECT IDENTIFIER ::= { enterprises 2 }
+   ibmProd   OBJECT IDENTIFIER ::= { ibm 6 }
+
+-- ibmOSAMibTraps          OBJECT IDENTIFIER ::= { ibmOSAMib 0 }
+ibmOSAMibObjects        OBJECT IDENTIFIER ::= { ibmOSAMib 1 }
+ibmOSAMibConformance    OBJECT IDENTIFIER ::= { ibmOSAMib 2 }
+ --===================================================================
+ -- IbmOSAMib
+ --===================================================================
+
+ -- IbmOSAExpChannelTable
+
+     ibmOSAExpChannelTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF IbmOSAExpChannelEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "Indexed by ifIndex. One entry in this table will exist per
+         OSA Device Interface."
+     ::= { ibmOSAMibObjects 1 }
+
+     ibmOSAExpChannelEntry OBJECT-TYPE
+     SYNTAX IbmOSAExpChannelEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "Definition of a single entry in the ibmOSAExpChannelTable.
+         Indexed by the ifIndex of the corresponding Device interface."
+     INDEX { ifIndex }
+     ::= { ibmOSAExpChannelTable 1 }
+
+     IbmOSAExpChannelEntry ::=
+     SEQUENCE
+       {
+       ibmOSAExpChannelNumber                  OCTET STRING,
+       ibmOSAExpChannelType                    INTEGER,
+       ibmOSAExpChannelHdwLevel                INTEGER,
+       ibmOSAExpChannelSubType                 INTEGER,
+       ibmOSAExpChannelShared                  INTEGER,
+       ibmOSAExpChannelNodeDesc                OCTET STRING,
+       ibmOSAExpChannelProcCodeLevel           OCTET STRING,
+       ibmOSAExpChannelPCIBusUtil1Min          Integer32,
+       ibmOSAExpChannelProcUtil1Min            Integer32,
+       ibmOSAExpChannelPCIBusUtil5Min          Integer32,
+       ibmOSAExpChannelProcUtil5Min            Integer32,
+       ibmOSAExpChannelPCIBusUtilHour          Integer32,
+       ibmOSAExpChannelProcUtilHour            Integer32
+       }
+
+     ibmOSAExpChannelNumber  OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(2))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The CHPID corresponding to this ifIndex."
+     ::= { ibmOSAExpChannelEntry 1 }
+
+     ibmOSAExpChannelType    OBJECT-TYPE
+     SYNTAX INTEGER {
+                      osaDirectExpress (17)
+                    }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The type of channel for this interface.
+           OSA Direct Express has a value of 17."
+     ::= { ibmOSAExpChannelEntry 2 }
+
+
+     ibmOSAExpChannelHdwLevel OBJECT-TYPE
+     SYNTAX INTEGER {
+                     unknown(1),
+                     osaExp150(2),
+                     osaExp175(3)
+                    }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Hardware model of the channel.
+            The value oasExp150(2) indicates a hardware level of 1.50.
+            The value oasExp175(3) indicates a hardware level of 1.75."
+     ::= { ibmOSAExpChannelEntry 3 }
+
+     ibmOSAExpChannelSubType OBJECT-TYPE
+     SYNTAX INTEGER
+         {
+           unknown                (1),
+           gigabitEthernet       (65),
+           fastEthernet          (81),
+           tokenRing             (82),
+           atmEmulatedEthernet (2304)
+         }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Indicates the type of OSA feature present."
+     ::= { ibmOSAExpChannelEntry 4 }
+
+
+     ibmOSAExpChannelShared    OBJECT-TYPE
+     SYNTAX INTEGER
+           {
+             notShared (0),
+             shared    (1)
+           }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "An OSA-Express feature can be shared across multiple LPs.
+            This object indicates if this feature is currently being
+            shared between LPs"
+     ::= { ibmOSAExpChannelEntry 5 }
+
+
+     ibmOSAExpChannelNodeDesc  OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(32))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the Node Descriptor of the OSA feature.
+            It represents the ND obtained from the Channel Subsystem.
+
+            Bits      Name          Flag is first byte
+            char(1) Validity        Valid - always '20'x
+            char(1) Reserved        Reserved by architecture
+            char(1) Class           Class for subsystem node
+            char(1) CHPID           CHP ID for specified int
+            char(6) TypeNum         Type number of the SDC
+            char(3) ModelNum        Model number in the form of 3
+                                              EBCDIC OCTETS
+            char(3) Manufacturer    Manufacturer in the form of 3
+                                              EBCDIC OCTETS
+            char(2) Mfr Plant       Plant of manufacture-2 digit code
+            char(12)SeqNum          Sequence number (12 EBCDIC OCTETS)
+            char(2) Tag             Tag"
+     ::= { ibmOSAExpChannelEntry 6 }
+
+
+     ibmOSAExpChannelProcCodeLevel      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(2))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the firmware (or micro code level) of the OSA
+           feature.  For example,  OSA code level 05.6A would be
+           represented as  0x056A."
+     ::= { ibmOSAExpChannelEntry 8  }
+
+     ibmOSAExpChannelPCIBusUtil1Min     OBJECT-TYPE
+     SYNTAX  Integer32  (0..100)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The average, over a 1 minute interval, of the percentage
+            of time that the PCI bus was utilized to transfer data.
+            It does not include idle time or time used by
+            routine maintenance tasks.  The range for this value
+            is from 0 to 100%."
+     ::= { ibmOSAExpChannelEntry 9 }
+
+     ibmOSAExpChannelProcUtil1Min  OBJECT-TYPE
+     SYNTAX  Integer32  (0..100)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The average, over a 1 minute interval, of the percentage
+            of time that the CHPID Processor was utilized to transfer
+            data.  It does not include idle time or time used by
+            routine maintenance tasks.  The range for this value
+            is from 0 to 100%."
+     ::= { ibmOSAExpChannelEntry 10 }
+
+     ibmOSAExpChannelPCIBusUtil5Min     OBJECT-TYPE
+     SYNTAX  Integer32  (0..100)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The average, over a 5 minute interval, of the percentage
+            of time that the PCI bus was utilized to transfer data.
+            It does not include idle time or time used by
+            routine maintenance tasks.  The range for this value
+            is from 0 to 100%."
+     ::= { ibmOSAExpChannelEntry 11 }
+
+     ibmOSAExpChannelProcUtil5Min  OBJECT-TYPE
+     SYNTAX  Integer32  (0..100)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The average, over a 5 minute interval, of the percentage
+            of time that the CHPID Processor was utilized to transfer
+            data.  It does not include idle time or time used by
+            routine maintenance tasks.  The range for this value
+            is from 0 to 100%."
+     ::= { ibmOSAExpChannelEntry 12 }
+
+     ibmOSAExpChannelPCIBusUtilHour     OBJECT-TYPE
+     SYNTAX  Integer32  (0..100)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The average, over an hour interval, of the percentage
+            of time that the PCI bus was utilized to transfer data.
+            It does not include idle time or time used by
+            routine maintenance tasks."
+     ::= { ibmOSAExpChannelEntry 13 }
+
+     ibmOSAExpChannelProcUtilHour  OBJECT-TYPE
+     SYNTAX  Integer32  (0..100)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The average, over an hour interval, of the percentage
+            of time that the CHPID Processor was utilized to transfer
+            data.  It does not include idle time or time used by
+            routine maintenance tasks.  The range for this value
+            is from 0 to 100%."
+     ::= { ibmOSAExpChannelEntry 14 }
+
+
+
+ -- ibmOSAExpPerfTable
+
+     ibmOSAExpPerfTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF IbmOSAExpPerfEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "This table provides performance information for each
+         Logical Partition (LP) the OSA can connect to."
+     ::= { ibmOSAMibObjects 2 }
+
+     ibmOSAExpPerfEntry OBJECT-TYPE
+     SYNTAX IbmOSAExpPerfEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "Definition of a single entry for a single LP
+         in the ibmOSAExpPerfTable.
+         Indexed by the ifIndex of the corresponding Device interface."
+     INDEX { ifIndex }
+     ::= { ibmOSAExpPerfTable 1 }
+
+     IbmOSAExpPerfEntry ::=
+     SEQUENCE
+       {
+       ibmOSAExpPerfDataLP0                  OCTET STRING,
+       ibmOSAExpPerfDataLP1                  OCTET STRING,
+       ibmOSAExpPerfDataLP2                  OCTET STRING,
+       ibmOSAExpPerfDataLP3                  OCTET STRING,
+       ibmOSAExpPerfDataLP4                  OCTET STRING,
+       ibmOSAExpPerfDataLP5                  OCTET STRING,
+       ibmOSAExpPerfDataLP6                  OCTET STRING,
+       ibmOSAExpPerfDataLP7                  OCTET STRING,
+       ibmOSAExpPerfDataLP8                  OCTET STRING,
+       ibmOSAExpPerfDataLP9                  OCTET STRING,
+       ibmOSAExpPerfDataLP10                 OCTET STRING,
+       ibmOSAExpPerfDataLP11                 OCTET STRING,
+       ibmOSAExpPerfDataLP12                 OCTET STRING,
+       ibmOSAExpPerfDataLP13                 OCTET STRING,
+       ibmOSAExpPerfDataLP14                 OCTET STRING,
+       ibmOSAExpPerfDataLP15                 OCTET STRING
+       }
+
+     ibmOSAExpPerfDataLP0      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 0.
+            The 40 bytes of hex data that are returned are decoded
+            as follows:
+              Offset   Bytes    Field Meaning
+                0        4      LP Number
+                4        4      Processor Util 1 Minute
+                8        4      In Kbytes Rate 1 Minute
+               12        4      Out Kbytes Rate 1 Minute
+               16        4      Processor Util 5 Minutes
+               20        4      In Kbytes Rate 5 Minutes
+               24        4      Out Kbytes Rate 5 Minutes
+               28        4      Processor Util 60 Minutes
+               32        4      In Kbytes Rate 60 Minutes
+               36        4      Out Kbytes Rate 60 Minutes
+
+            The Processor Util 1 Minute is defined as follows:
+            The average, over a 1 minute interval, of the percentage
+            of time that the CHPID Processor was utilized to
+            transfer data for a specific LP.  It does not include
+            idle time or time used by routine maintenance tasks.
+            The range for this value is from 0 to 100%.
+
+            The In Kbytes Rate 1 Minute is defined as follows:
+            The average, over a 1 minute interval, of the number of
+            inbound kilobytes processed for a specific LP.
+
+            The Out Kbytes Rate 1 Minute is defined as follows:
+            The average, over a 1 minute interval, of the number of
+            outbound kilobytes processed for a specific LP.
+
+            The 5 and 60 minute fields are defined similar to the
+            1 minute fields, but pertain to intervals of 5 and 60
+            minutes."
+     ::= { ibmOSAExpPerfEntry 1 }
+
+     ibmOSAExpPerfDataLP1      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 1.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 2 }
+
+     ibmOSAExpPerfDataLP2      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 2.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 3 }
+
+     ibmOSAExpPerfDataLP3      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 3.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 4 }
+
+     ibmOSAExpPerfDataLP4      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 4.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 5 }
+
+     ibmOSAExpPerfDataLP5      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 5.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 6 }
+
+     ibmOSAExpPerfDataLP6      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 6.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 7 }
+
+     ibmOSAExpPerfDataLP7      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 7.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 8 }
+
+     ibmOSAExpPerfDataLP8      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 8.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 9 }
+
+     ibmOSAExpPerfDataLP9      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 9.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 10  }
+
+     ibmOSAExpPerfDataLP10     OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 10.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 11 }
+
+     ibmOSAExpPerfDataLP11     OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 11.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 12 }
+
+     ibmOSAExpPerfDataLP12     OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 12.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 13 }
+
+     ibmOSAExpPerfDataLP13     OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 13.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 14 }
+
+     ibmOSAExpPerfDataLP14     OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 14.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 15 }
+
+     ibmOSAExpPerfDataLP15     OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(40))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The performance data on this OSA for partition 15.
+            The 40 bytes of hex data that are returned are decoded
+            the same as for partition 0."
+     ::= { ibmOSAExpPerfEntry 16 }
+
+
+ -- PE MIB Table starts here.  This is for IBM use.
+
+ -- ibmOSAExpPETable
+
+     ibmOSAExpPETable OBJECT-TYPE
+     SYNTAX SEQUENCE OF IbmOSAExpPEEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "This table provides PE information to help IBM diagnose any
+         OSA problems."
+     ::= { ibmOSAMibObjects 3 }
+
+     ibmOSAExpPEEntry OBJECT-TYPE
+     SYNTAX IbmOSAExpPEEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "Definition of a single entry in the ibmOSAExpPETable.
+         Indexed by the ifIndex of the corresponding Device interface"
+     INDEX { ifIndex }
+     ::= { ibmOSAExpPETable 1 }
+
+     IbmOSAExpPEEntry ::=
+     SEQUENCE
+       {
+       ibmOSAExpPEMaxSizeArpCache            Integer32,
+       ibmOSAExpPEArpPendingEntries          Gauge32,
+       ibmOSAExpPEArpActiveEntries           Gauge32,
+       ibmOSAExpPEIPEntries                  Gauge32,
+       ibmOSAExpPEMulticastEntries           Gauge32,
+       ibmOSAExpPEMulticastData              OCTET STRING
+       }
+
+     ibmOSAExpPEMaxSizeArpCache         OBJECT-TYPE
+     SYNTAX   Integer32 (0..214783647)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The maximum size of the OSA ARP Cache"
+     ::= { ibmOSAExpPEEntry 1  }
+
+     ibmOSAExpPEArpPendingEntries       OBJECT-TYPE
+     SYNTAX   Gauge32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+       "This is the number of Pending entries in the ARP cache."
+     ::= { ibmOSAExpPEEntry 2  }
+
+     ibmOSAExpPEArpActiveEntries        OBJECT-TYPE
+     SYNTAX   Gauge32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+       "This the number of active ARP entries."
+     ::= { ibmOSAExpPEEntry 3  }
+
+     ibmOSAExpPEIPEntries               OBJECT-TYPE
+     SYNTAX   Gauge32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of IP addresses known to the OSA
+            For OSD chpids, this is the maximum # of IP addresses
+            that are:
+            - home ip addresses (Version 4 and Version 6)
+            - remote ip addresses in the arp cache (Version 4 only)
+            - multicast ip addresses that the OSA must accept inbound
+              data packets for (Version 4 and Version 6)"
+     ::= { ibmOSAExpPEEntry 4  }
+
+     ibmOSAExpPEMulticastEntries        OBJECT-TYPE
+     SYNTAX   Gauge32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the number of IP multicast addresses currently
+            on the OSA"
+     ::= { ibmOSAExpPEEntry 5  }
+
+
+     ibmOSAExpPEMulticastData      OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(3360))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This contains information on the multicast entries that
+            are currently on the OSA. These are in a format that is
+            for IBM use only"
+     ::= { ibmOSAExpPEEntry 6  }
+
+
+ -- ibmOSAExpEthPortTable
+
+     ibmOSAExpEthPortTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF IbmOSAExpEthPortEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "This table represents the data associated with a port on an
+         OSA-Express Gigabit or Fast Ethernet OSA."
+     ::= { ibmOSAMibObjects 4 }
+
+     ibmOSAExpEthPortEntry        OBJECT-TYPE
+     SYNTAX IbmOSAExpEthPortEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "Definition of a single entry in the ibmOSAExpEthPortTable.
+         Indexed by the ifIndex of the corresponding Device interface."
+     INDEX { ifIndex }
+     ::= { ibmOSAExpEthPortTable  1 }
+
+     IbmOSAExpEthPortEntry ::=
+     SEQUENCE
+       {
+       ibmOsaExpEthPortNumber           Integer32,
+       ibmOsaExpEthPortType             INTEGER,
+       ibmOsaExpEthLanTrafficState      INTEGER,
+       ibmOsaExpEthServiceMode          INTEGER,
+       ibmOsaExpEthDisabledStatus       BITS,
+       ibmOsaExpEthConfigName           DisplayString,
+       ibmOsaExpEthConfigSpeedMode      INTEGER,
+       ibmOsaExpEthActiveSpeedMode      INTEGER,
+       ibmOsaExpEthMacAddrActive        OCTET STRING,
+       ibmOsaExpEthMacAddrBurntIn       OCTET STRING,
+       ibmOsaExpEthUserData             DisplayString,
+       ibmOsaExpEthOutPackets           Counter32,
+       ibmOsaExpEthInPackets            Counter32,
+       ibmOsaExpEthInGroupFrames        Counter32,
+       ibmOsaExpEthInBroadcastFrames    Counter32,
+       ibmOsaExpEthPortName             DisplayString,
+       ibmOsaExpEthInUnknownIPFrames    Counter32,
+       ibmOsaExpEthGroupAddrTable       OCTET STRING
+       }
+
+
+     ibmOsaExpEthPortNumber       OBJECT-TYPE
+     SYNTAX Integer32 (0..3)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The physical port number for this port."
+     ::= { ibmOSAExpEthPortEntry 1 }
+
+     ibmOsaExpEthPortType         OBJECT-TYPE
+     SYNTAX  INTEGER {
+                      gigabitEthernet (65),
+                      fastEthernet    (81)
+                     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The physical port type."
+     ::= { ibmOSAExpEthPortEntry 2 }
+
+     ibmOsaExpEthLanTrafficState OBJECT-TYPE
+     SYNTAX  INTEGER
+         {
+           undefined(0),
+           unavailable(1),
+           enabling(2),
+           disabling(3),
+           enabled(4),
+           disabled(5),
+           linkMonitor(6),
+           definitionError(7),
+           configuredOffline(8)
+         }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The LAN state value ranges from 0 to 8.  A value of 5,
+            disabled is further explained in object
+            ibmOsaExpEthDisabledStatus."
+
+     ::= { ibmOSAExpEthPortEntry 3 }
+
+     ibmOsaExpEthServiceMode  OBJECT-TYPE
+     SYNTAX  INTEGER
+          {
+            notInServiceMode (0),
+            inServiceMode    (1)
+          }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This object indicates if the processor is in service mode
+            or not."
+     ::= { ibmOSAExpEthPortEntry 4 }
+
+     ibmOsaExpEthDisabledStatus  OBJECT-TYPE
+     SYNTAX  BITS
+        {
+          reserved0                    (0),
+          internalPortFailure          (1),
+          reserved2                    (2),
+          reserved3                    (3),
+          reserved4                    (4),
+          reserved5                    (5),
+          portTemporarilyDisabled      (6),
+          reserved7                    (7),
+          reserved8                    (8),
+          serviceProcessorRequest      (9),
+          networkRequest               (10),
+          osasfRequest                 (11),
+          configurationChange          (12),
+          linkFailureThresholdExceeded (13),
+          reserved14                   (14),
+          reserved15                   (15)
+        }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "When the value of ibmOsaExpEthLanTrafficState is
+            NOT disabled, the value of this object will be zero.
+
+            When the value of ibmOsaExpEthLanTrafficState is
+            disabled(5), this object explains the reason for the
+            disabled state.  The value for this object may be a
+            combination of the bits shown."
+     ::= { ibmOSAExpEthPortEntry 5 }
+
+     ibmOsaExpEthConfigName   OBJECT-TYPE
+     SYNTAX  DisplayString        (SIZE(0..34))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the name of the configuration that is on the OSA.
+            It is set using OSA/SF. It is not used by OSA"
+     ::= { ibmOSAExpEthPortEntry 6 }
+
+     ibmOsaExpEthConfigSpeedMode   OBJECT-TYPE
+     SYNTAX  INTEGER
+         {
+            notValidGigabit          (-1),
+            autoNegotiate            (0),
+            tenMbHalfDuplex          (1),
+            tenMbFullDuplex          (2),
+            oneHundredMbHalfDuplex   (3),
+            oneHundredMbFullDuplex   (4),
+            oneThousandMbFullDuplex  (6)
+         }
+     UNITS    "Megabits per second"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The configured port speed.  This field shows the speed
+            that was configured by the user for the OSA-Express
+            Fast Ethernet feature.
+            It is not used by OSA-Express Gigabit features
+            and will return -1 (FFFF)"
+     ::= { ibmOSAExpEthPortEntry 7 }
+
+     ibmOsaExpEthActiveSpeedMode   OBJECT-TYPE
+     SYNTAX  INTEGER
+         {
+            unknown                  (0),
+            tenMbHalfDuplex          (1),
+            tenMbFullDuplex          (2),
+            oneHundredMbHalfDuplex   (3),
+            oneHundredMbFullDuplex   (4),
+            oneThousandMbFullDuplex  (6)
+         }
+     UNITS    "Megabits per second"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The actual speed and mode the OSA is running in"
+     ::= { ibmOSAExpEthPortEntry 8 }
+
+
+     ibmOsaExpEthMacAddrActive   OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(6))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "A 6 byte OCTET STRING which contains the current
+            MAC address in use on the adapter.
+            The values are in canonical format."
+     ::= { ibmOSAExpEthPortEntry 9 }
+
+     ibmOsaExpEthMacAddrBurntIn OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(6))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "A 6 byte OCTET STRING which contains the burned in
+            MAC address on the OSA.
+            The values are in canonical format."
+     ::= { ibmOSAExpEthPortEntry 10 }
+
+
+     ibmOsaExpEthUserData      OBJECT-TYPE
+     SYNTAX  DisplayString        (SIZE(0..32))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Data set by the user. It is ignored by the OSA."
+     ::= { ibmOSAExpEthPortEntry 11 }
+
+
+     ibmOsaExpEthOutPackets    OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the number of packets that have been transmitted
+            by the OSA since the last time the OSA port was reset"
+     ::= { ibmOSAExpEthPortEntry 12 }
+
+
+     ibmOsaExpEthInPackets    OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the number of packets that have been received
+            by the OSA since the last time the OSA port was reset"
+     ::= { ibmOSAExpEthPortEntry 13 }
+
+     ibmOsaExpEthInGroupFrames    OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the number of multicast frames that have been
+            received by the OSA."
+     ::= { ibmOSAExpEthPortEntry 14 }
+
+     ibmOsaExpEthInBroadcastFrames   OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the number of broadcast frames that have been
+            received by the OSA."
+     ::= { ibmOSAExpEthPortEntry 15 }
+
+
+     ibmOsaExpEthPortName      OBJECT-TYPE
+     SYNTAX  DisplayString       (SIZE(0..8))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Name of the port as used by TCP/IP"
+     ::= { ibmOSAExpEthPortEntry 16 }
+
+     ibmOsaExpEthInUnknownIPFrames   OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the number of non-IP received frames"
+     ::= { ibmOSAExpEthPortEntry 17 }
+
+
+     ibmOsaExpEthGroupAddrTable    OBJECT-TYPE
+     SYNTAX  OCTET STRING(SIZE(256))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "This field contains the active Group Addresses.
+             An individual Group Address is 6 bytes long with an
+             additional 2 bytes of padding.  There are 32 group
+             addresses."
+     ::= { ibmOSAExpEthPortEntry 18 }
+
+
+ -- ibmOSAExpTRPortTable
+
+     ibmOSAExpTRPortTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF IbmOSAExpTRPortEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "This table represents the data associated with a port on an
+         OSA-Express token ring feature."
+     ::= { ibmOSAMibObjects 5 }
+
+     ibmOSAExpTRPortEntry        OBJECT-TYPE
+     SYNTAX IbmOSAExpTRPortEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "Definition of a single entry in the ibmOSAExpTRPortTable.
+         Indexed by the ifIndex of the corresponding Device interface."
+     INDEX { ifIndex }
+     ::= { ibmOSAExpTRPortTable  1 }
+
+     IbmOSAExpTRPortEntry ::=
+     SEQUENCE
+       {
+       ibmOsaExpTRPortNumber           Integer32,
+       ibmOsaExpTRPortType             INTEGER,
+       ibmOsaExpTRLanTrafficState      INTEGER,
+       ibmOsaExpTRServiceMode          INTEGER,
+       ibmOsaExpTRDisabledStatus       BITS,
+       ibmOsaExpTRConfigName           DisplayString,
+       ibmOsaExpTRMacAddrActive        OCTET STRING,
+       ibmOsaExpTRMacAddrBurntIn       OCTET STRING,
+       ibmOsaExpTRConfigSpeedMode      INTEGER,
+       ibmOsaExpTRActiveSpeedMode      INTEGER,
+       ibmOsaExpTRUserData             DisplayString,
+       ibmOsaExpTRPortName             DisplayString,
+       ibmOsaExpTRGroupAddrTable       OCTET STRING,
+       ibmOsaExpTRFunctionalAddr       OCTET STRING,
+       ibmOsaExpTRRingStatus           BITS,
+       ibmOsaExpTRAllowAccessPriority  Integer32,
+       ibmOsaExpTREarlyTokenRelease    INTEGER,
+       ibmOsaExpTRBeaconingAddress     OCTET STRING,
+       ibmOsaExpTRUpstreamNeighbor     OCTET STRING,
+       ibmOsaExpTRRingState            INTEGER,
+       ibmOsaExpTRRingOpenStatus       INTEGER,
+       ibmOsaExpTRPacketsTransmitted   Counter32,
+       ibmOsaExpTRPacketsReceived      Counter32,
+       ibmOsaExpTRLineErrorCount       Counter32,
+       ibmOsaExpTRBurstErrorCount      Counter32,
+       ibmOsaExpTRACErrorCount         Counter32,
+       ibmOsaExpTRAbortTransErrorCount Counter32,
+       ibmOsaExpTRInternalErrorCount   Counter32,
+       ibmOsaExpTRLostFrameErrorCount  Counter32,
+       ibmOsaExpTRRcvCongestionCount   Counter32,
+       ibmOsaExpTRFrameCopyErrorCount  Counter32,
+       ibmOsaExpTRTokenErrorCount      Counter32,
+       ibmOsaExpTRFullDuplexErrorCount Counter32,
+       ibmOsaExpTRSoftErrorCount       Counter32,
+       ibmOsaExpTRHardErrorCount       Counter32,
+       ibmOsaExpTRSignalLossErrorCount Counter32,
+       ibmOsaExpTRTransmitBeaconCount  Counter32,
+       ibmOsaExpTRRecoveryCounter      Counter32,
+       ibmOsaExpTRLobeWireFaultCount   Counter32,
+       ibmOsaExpTRRemoveReceivedCount  Counter32,
+       ibmOsaExpTRSingleStationCount   Counter32
+       }
+
+     ibmOsaExpTRPortNumber       OBJECT-TYPE
+     SYNTAX Integer32 (0..3)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The physical port number for this port."
+     ::= { ibmOSAExpTRPortEntry 1 }
+
+
+     ibmOsaExpTRPortType         OBJECT-TYPE
+     SYNTAX  INTEGER {
+                      tokenring(82)
+                     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The physical port type."
+     ::= { ibmOSAExpTRPortEntry 2 }
+
+     ibmOsaExpTRLanTrafficState OBJECT-TYPE
+     SYNTAX  INTEGER
+         {
+           undefined(0),
+           unavailable(1),
+           enabling(2),
+           disabling(3),
+           enabled(4),
+           disabled(5),
+           linkMonitor(6),
+           definitionError(7),
+           configuredOffline(8)
+         }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The LAN state value ranges from 0 to 8.  A value of 5,
+            disabled is further explained in object
+            ibmOsaExpTRDisabledStatus"
+     ::= { ibmOSAExpTRPortEntry 3 }
+
+     ibmOsaExpTRServiceMode  OBJECT-TYPE
+     SYNTAX  INTEGER
+          {
+            notInServiceMode (0),
+            inServiceMode    (1)
+          }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This object indicates if the processor is in service mode
+            or not."
+     ::= { ibmOSAExpTRPortEntry 4 }
+
+     ibmOsaExpTRDisabledStatus  OBJECT-TYPE
+     SYNTAX  BITS
+        {
+          reserved0                    (0),
+          internalPortFailure          (1),
+          reserved2                    (2),
+          reserved3                    (3),
+          reserved4                    (4),
+          reserved5                    (5),
+          portTemporarilyDisabled      (6),
+          reserved7                    (7),
+          reserved8                    (8),
+          serviceProcessorRequest      (9),
+          networkRequest               (10),
+          osasfRequest                 (11),
+          configurationChange          (12),
+          linkFailureThresholdExceeded (13),
+          reserved14                   (14),
+          reserved15                   (15)
+        }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "When the value of ibmOsaExpTRLanTrafficState is
+            NOT disabled,  the value of this object will be zero.
+
+            When the value of ibmOsaExpTRLanTrafficState is
+            disabled(5), this object explains the reason for the
+            disabled state.  The value for this object may be a
+            combination of the bits shown."
+     ::= { ibmOSAExpTRPortEntry 5 }
+
+     ibmOsaExpTRConfigName   OBJECT-TYPE
+     SYNTAX  DisplayString       (SIZE(0..34))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the name of the configuration that is on the OSA.
+            It is set using OSA/SF.  It is not used by OSA"
+     ::= { ibmOSAExpTRPortEntry 6 }
+
+     ibmOsaExpTRMacAddrActive   OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(6))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "A 6 byte OCTET STRING which contains the current
+            MAC address in use on the OSA."
+     ::= { ibmOSAExpTRPortEntry 7 }
+
+     ibmOsaExpTRMacAddrBurntIn OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(6))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "A 6 byte OCTET STRING which contains the burned in
+            MAC address on the OSA"
+     ::= { ibmOSAExpTRPortEntry 8 }
+
+
+     ibmOsaExpTRConfigSpeedMode   OBJECT-TYPE
+     SYNTAX  INTEGER
+         {
+            autoNegotiate             (0),
+            fourMbHalfDuplex          (1),
+            fourMbFullDuplex          (2),
+            sixteenMbHalfDuplex       (3),
+            sixteenMbFullDuplex       (4),
+            oneHundredMbFullDuplex    (6)
+         }
+     UNITS    "Megabits per second"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The configured port speed.  This field shows the speed
+            that was configured by the user for the OSA-Express
+            Token Ring feature."
+     ::= { ibmOSAExpTRPortEntry 9 }
+
+     ibmOsaExpTRActiveSpeedMode   OBJECT-TYPE
+     SYNTAX  INTEGER
+         {
+            unknown                   (0),
+            fourMbHalfDuplex          (1),
+            fourMbFullDuplex          (2),
+            sixteenMbHalfDuplex       (3),
+            sixteenMbFullDuplex       (4),
+            oneHundredMbFullDuplex    (6)
+         }
+     UNITS    "Megabits per second"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The actual speed and mode the OSA is running in"
+     ::= { ibmOSAExpTRPortEntry 10 }
+
+
+     ibmOsaExpTRUserData      OBJECT-TYPE
+     SYNTAX  DisplayString       (SIZE(0..32))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Data set by the user. It is ignored by the OSA."
+     ::= { ibmOSAExpTRPortEntry 11 }
+
+
+     ibmOsaExpTRPortName      OBJECT-TYPE
+     SYNTAX  DisplayString       (SIZE(0..8))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Name of the port as used by TCP/IP"
+     ::= { ibmOSAExpTRPortEntry 12 }
+
+     ibmOsaExpTRGroupAddrTable    OBJECT-TYPE
+     SYNTAX  OCTET STRING(SIZE(256))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "This field contains the active Group Addresses.
+             An individual Group Address is 6 bytes long with an
+             additional 2 bytes of padding."
+     ::= { ibmOSAExpTRPortEntry 13 }
+
+
+     ibmOsaExpTRFunctionalAddr   OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(4))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "A 4 byte OCTET STRING which contains the OSA-Express's
+            functional address."
+     ::= { ibmOSAExpTRPortEntry 14 }
+
+
+     ibmOsaExpTRRingStatus   OBJECT-TYPE
+     SYNTAX  BITS
+         {
+          reserved0                  (0),
+          reserved1                  (1),
+          reserved2                  (2),
+          reserved3                  (3),
+          reserved4                  (4),
+          reserved5                  (5),
+          reserved6                  (6),
+          reserved7                  (7),
+          reserved8                  (8),
+          reserved9                  (9),
+          reserved10                 (10),
+          reserved11                 (11),
+          reserved12                 (12),
+          reserved13                 (13),
+          noStatusOpenNotCompleted   (14),
+          reserved15                 (15),
+          signalLoss                 (16),
+          hardError                  (17),
+          softError                  (18),
+          reserved19                 (19),
+          lobeWireFault              (20),
+          autoRemovalError           (21),
+          fdxProtocol                (22),
+          removeReceived             (23),
+          counterOverflow            (24),
+          singleStation              (25),
+          ringRecovery               (26),
+          sRCounterOverflow          (27),
+          reserved29                 (28),
+          openInFDXmode              (29),
+          fourMbFullDuplex           (30),
+          fourMbHalfDuplex           (31)
+         }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The current interface status which can be used to diagnose
+            fluctuating problems that can occur on token rings after a
+            station has successfully been added to the ring.
+            Before an open is completed, this object has the value
+            for the 'noStatusOpenNotCompleted' condition.
+            The ibmOsaExpTRRingState and ibmOsaExpTRRingOpenStatus
+            objects provide for debugging problems when the station
+            can not even enter the ring.
+
+            The object's value is a sum of values,
+            one for each currently applicable condition.
+            This information is essentially from RFC 1231."
+     ::= { ibmOSAExpTRPortEntry 15 }
+
+
+     ibmOsaExpTRAllowAccessPriority  OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This field contains the maximum token priority
+            the ring station defined by this entry in the
+            table is permitted to transmit."
+     ::= { ibmOSAExpTRPortEntry 16 }
+
+     ibmOsaExpTREarlyTokenRelease    OBJECT-TYPE
+     SYNTAX  INTEGER
+           {
+            true(0),
+            false(1)
+           }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Indicates if the ring station supports early token release.
+            Only valid when port is running in 16Mb half duplex mode.
+            Otherwise it is always set to false (1)"
+     ::= { ibmOSAExpTRPortEntry 17 }
+
+
+     ibmOsaExpTRBeaconingAddress    OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(6))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This field contains the node address of the NAUN as
+            reported in the most recently received Beacon MAC frame.
+            This field is valid when ibmOsaExpTRRingOpenStatus is
+            set to beaconing.  Otherwise it is ignored"
+     ::= { ibmOSAExpTRPortEntry 18 }
+
+
+     ibmOsaExpTRUpstreamNeighbor    OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(6))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The MAC-address of the up stream neighbor station in
+           the ring (NAUN)."
+     ::= { ibmOSAExpTRPortEntry 19 }
+
+
+     ibmOsaExpTRRingState            OBJECT-TYPE
+     SYNTAX  INTEGER {
+                       opened (1),
+                       closed (2),
+                       opening (3),
+                       closing (4),
+                       openFailure (5),
+                       ringFailure (6)
+                      }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The current interface state with respect
+            to entering or leaving the ring."
+     ::= { ibmOSAExpTRPortEntry 20 }
+
+
+     ibmOsaExpTRRingOpenStatus       OBJECT-TYPE
+     SYNTAX  INTEGER {
+                       noOpen (1),
+                       badParameter (2),
+                       lobeFailed (3),
+                       signalLoss (4),
+                       insertionTimeout (5),
+                       ringFailed (6),
+                       beaconing (7),
+                       duplicateMAC (8),
+                       requestFailed (9),
+                       removeReceived (10),
+                       open (11),
+                       sARecFrameNotEqualNAUNs (12),
+                       claimTokenRec (13),
+                       ringPurgeFramRec (14),
+                       activeMonPresRec (15),
+                       standbyMonPresRec (16),
+                       accessProtocolDenied (17),
+                       fDXInsDeniedDACfailOnOpen (18),
+                       fDXInsDeniedDACfailOnBeaconTest (19),
+                       beaconBeforeOpen (20),
+                       insertTimerExpDuringDAC (21),
+                       insertTimerExpDuringBeaconTest (22),
+                       lobeMedizTestFailure (23),
+                       heartbeatFailBeforeOpenCompleted (24),
+                       heartbeatFailDuringBeaconTest (25),
+                       recBeaconFrameWithInvalidSA (26)
+                      }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This object indicates the success, or the reason for failure
+            of the station's most recent attempt to enter the ring."
+     ::= { ibmOSAExpTRPortEntry 21 }
+
+
+     ibmOsaExpTRPacketsTransmitted   OBJECT-TYPE
+     SYNTAX Counter32
+     UNITS  "packets"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This field contains the count of the total number of packets
+            transmitted from this port since the OSA port was reset"
+     ::= { ibmOSAExpTRPortEntry 22 }
+
+
+     ibmOsaExpTRPacketsReceived      OBJECT-TYPE
+     SYNTAX Counter32
+     UNITS  "packets"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This field contains the count of the total number of
+            packets received by this port since the OSA port was reset"
+     ::= { ibmOSAExpTRPortEntry 23 }
+
+
+     ibmOsaExpTRLineErrorCount       OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This counter is incremented when a frame or token is
+            copied or repeated by a station, the E bit is zero in the
+            frame or token and one of the following conditions exists:
+            1) there is a non-data bit (J or K bit) between the SD
+               and the ED of the frame or token, or
+            2) there is an FCS error in the frame."
+     ::= { ibmOSAExpTRPortEntry 24 }
+
+
+     ibmOsaExpTRBurstErrorCount      OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This counter is incremented when a station detects the
+            absence of transitions for five half-bit timers
+            (burst-five error)."
+     ::= { ibmOSAExpTRPortEntry 25 }
+
+
+     ibmOsaExpTRACErrorCount         OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This counter is incremented when a station
+            receives an AMP or SMP frame in which A is
+            equal to C is equal to 0, and then receives
+            another SMP frame with A is equal to C is
+            equal to 0 without first receiving an AMP
+            frame. It denotes a station that cannot set
+            the AC bits properly."
+     ::= { ibmOSAExpTRPortEntry 26 }
+
+
+     ibmOsaExpTRAbortTransErrorCount   OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This counter is incremented when a station
+            transmits an abort delimiter while transmitting."
+     ::= { ibmOSAExpTRPortEntry 27 }
+
+
+     ibmOsaExpTRInternalErrorCount   OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This counter is incremented when a station
+            recognizes an internal error."
+     ::= { ibmOSAExpTRPortEntry 28 }
+
+
+     ibmOsaExpTRLostFrameErrorCount  OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This counter is incremented when a station is transmitting
+            and its TRR timer expires. This condition denotes a condition
+            transmitting station in strip mode does not receive the
+            trailer of the frame TRR timer goes off."
+     ::= { ibmOSAExpTRPortEntry 29 }
+
+
+     ibmOsaExpTRRcvCongestionCount   OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This counter is incremented when a station
+            recognizes a frame addressed to its specific address, but
+            has no available buffer space indicating that the station
+            is congested."
+     ::= { ibmOSAExpTRPortEntry 30 }
+
+
+     ibmOsaExpTRFrameCopyErrorCount  OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This counter is incremented when a station recognizes a
+            frame addressed to its specific address and detects that the
+            FS field A bits are set to 1 indicating a possible line hit
+            or duplicate address."
+     ::= { ibmOSAExpTRPortEntry 31 }
+
+
+     ibmOsaExpTRTokenErrorCount      OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This counter is incremented when a station acting as the
+            active monitor recognizes an error condition that needs a
+            token transmitted."
+     ::= { ibmOSAExpTRPortEntry 32 }
+
+
+     ibmOsaExpTRFullDuplexErrorCount   OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "An error has been detected by the FDX protocol"
+     ::= { ibmOSAExpTRPortEntry 33 }
+
+
+     ibmOsaExpTRSoftErrorCount       OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of Soft Errors the interface
+            has detected. It directly corresponds to
+            the number of Report Error MAC frames
+            that this interface has transmitted.
+            Soft Errors are those which are
+            recoverable by the MAC layer protocols."
+     ::= { ibmOSAExpTRPortEntry 34 }
+
+
+     ibmOsaExpTRHardErrorCount       OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of times this interface has
+            detected an immediately recoverable
+            fatal error.  It denotes the number of
+            times this interface is either
+            transmitting or receiving beacon MAC frames."
+     ::= { ibmOSAExpTRPortEntry 35 }
+
+
+     ibmOsaExpTRSignalLossErrorCount   OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of times this interface has
+            detected the loss of signal condition from the ring."
+     ::= { ibmOSAExpTRPortEntry 36 }
+
+
+     ibmOsaExpTRTransmitBeaconCount  OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of times this interface has
+            transmitted a beacon frame."
+     ::= { ibmOSAExpTRPortEntry 37 }
+
+
+     ibmOsaExpTRRecoveryCounter      OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of Claim Token MAC frames received or
+            transmitted after the interface has received a frame Ring
+            Ring Purge MAC counter signifies the number of times the
+            ring has been purged and is being recovered back into a
+            normal operating state."
+     ::= { ibmOSAExpTRPortEntry 38 }
+
+
+     ibmOsaExpTRLobeWireFaultCount   OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of times the interface has
+            detected an open or short circuit in the
+            lobe data path.  The adapter will be closed
+            and ibmOsaExpTRRingState will signify this condition."
+     ::= { ibmOSAExpTRPortEntry 39 }
+
+     ibmOsaExpTRRemoveReceivedCount  OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of times the interface has received a Remove
+            Ring Station MAC frame request.  When this frame is
+            received the interface will enter the closed state and
+            ibmOsaExpTRRingState will signify this condition."
+     ::= { ibmOSAExpTRPortEntry 40 }
+
+     ibmOsaExpTRSingleStationCount   OBJECT-TYPE
+     SYNTAX Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of times the interface has
+            sensed that it is the only station on the
+            ring.  This will happen if the interface
+            is the first one up on a ring, or if
+            there is a hardware problem."
+     ::= { ibmOSAExpTRPortEntry 41 }
+
+
+ -- ibmOSAExpATMPortTable
+
+     ibmOSAExpATMPortTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF IbmOSAExpATMPortEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "This table represents the data associated with an emulated
+         Ethernet port on an OSA-Express ATM feature.
+         There are a maximum of 2 logical ports on each ATM feature,
+         however, each port is shown as though it exists independently
+         with each having an entry in the ibmOSAExpChannelTable."
+     ::= { ibmOSAMibObjects 7 }
+
+     ibmOSAExpATMPortEntry        OBJECT-TYPE
+     SYNTAX IbmOSAExpATMPortEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "Definition of a single entry in the ibmOSAExpATMPortTable.
+         Indexed by the ifIndex of the corresponding Device interface."
+     INDEX { ifIndex }
+     ::= { ibmOSAExpATMPortTable  1  }
+
+     IbmOSAExpATMPortEntry ::=
+     SEQUENCE
+       {
+       ibmOsaExpATMPortNumber                 Integer32,
+       ibmOsaExpATMPortType                   INTEGER,
+       ibmOsaExpATMLanTrafficState            INTEGER,
+       ibmOsaExpATMServiceMode                INTEGER,
+       ibmOsaExpATMDisabledStatus             BITS,
+       ibmOsaExpATMConfigName                 DisplayString,
+       ibmOsaExpATMMacAddrActive              OCTET STRING,
+       ibmOsaExpATMMacAddrBurntIn             OCTET STRING,
+       ibmOsaExpATMUserData                   DisplayString,
+       ibmOsaExpATMPortName                   DisplayString,
+       ibmOsaExpATMGroupMacAddrTable          OCTET STRING,
+       ibmOsaExpATMIBMEnhancedMode            INTEGER,
+       ibmOsaExpATMBestEffortPeakRate         Integer32,
+       ibmOsaExpATMConfigMode                 INTEGER,
+       ibmOsaExpATMConfigLanType              INTEGER,
+       ibmOsaExpATMActualLanType              INTEGER,
+       ibmOsaExpATMConfigMaxDataFrmSz         INTEGER,
+       ibmOsaExpATMActualMaxDataFrmSz         INTEGER,
+       ibmOsaExpATMConfigELANName             DisplayString,
+       ibmOsaExpATMActualELANName             DisplayString,
+       ibmOsaExpATMConfigLESATMAddress        OCTET STRING,
+       ibmOsaExpATMActualLESATMAddress        OCTET STRING,
+       ibmOsaExpATMControlTimeout             Integer32,
+       ibmOsaExpATMMaxUnknownFrameCount       Integer32,
+       ibmOsaExpATMMaxUnknownFrameTime        Integer32,
+       ibmOsaExpATMVCCTimeoutPeriod           Integer32,
+       ibmOsaExpATMMaxRetryCount              Counter32,
+       ibmOsaExpATMAgingTime                  Integer32,
+       ibmOsaExpATMForwardDelayTime           Integer32,
+       ibmOsaExpATMExpectedARPRespTime        Integer32,
+       ibmOsaExpATMFlushTimeout               Integer32,
+       ibmOsaExpATMPathSwitchingDelay         Integer32,
+       ibmOsaExpATMLocalSegmentID             Integer32,
+       ibmOsaExpATMMltcstSendVCCType          INTEGER,
+       ibmOsaExpATMMltcstSendVCCAvgRate       Integer32,
+       ibmOsaExpATMMcastSendVCCPeakRate       Integer32,
+       ibmOsaExpATMConnectCompleteTimer       Integer32,
+       ibmOsaExpATMClientATMAddress           OCTET STRING,
+       ibmOsaExpATMClientIdentifier           Integer32,
+       ibmOsaExpATMClientCurrentState         INTEGER,
+       ibmOsaExpATMLastFailureRespCode        INTEGER,
+       ibmOsaExpATMLastFailureState           INTEGER,
+       ibmOsaExpATMProtocol                   Integer32,
+       ibmOsaExpATMLeVersion                  Integer32,
+       ibmOsaExpATMTopologyChange             INTEGER,
+       ibmOsaExpATMConfigServerATMAddr        OCTET STRING,
+       ibmOsaExpATMConfigSource               INTEGER,
+       ibmOsaExpATMProxyClient                INTEGER,
+       ibmOsaExpATMLePDUOctetsInbound         Counter64,
+       ibmOsaExpATMNonErrLePDUDiscIn          Counter32,
+       ibmOsaExpATMErrLePDUDiscIn             Counter32,
+       ibmOsaExpATMLePDUOctetsOutbound        Counter64,
+       ibmOsaExpATMNonErrLePDUDiscOut         Counter32,
+       ibmOsaExpATMErrLePDUDiscOut            Counter32,
+       ibmOsaExpATMLeARPRequestsOut           Counter32,
+       ibmOsaExpATMLeARPRequestsIn            Counter32,
+       ibmOsaExpATMLeARPRepliesOut            Counter32,
+       ibmOsaExpATMLeARPRepliesIn             Counter32,
+       ibmOsaExpATMControlFramesOut           Counter32,
+       ibmOsaExpATMControlFramesIn            Counter32,
+       ibmOsaExpATMSVCFailures                Counter32,
+       ibmOsaExpATMConfigDirectIntfc          Integer32,
+       ibmOsaExpATMConfigDirectVPI            Integer32,
+       ibmOsaExpATMConfigDirectVCI            Integer32,
+       ibmOsaExpATMControlDirectIntfc         Integer32,
+       ibmOsaExpATMControlDirectVPI           Integer32,
+       ibmOsaExpATMControlDirectVCI           Integer32,
+       ibmOsaExpATMControlDistIntfc           Integer32,
+       ibmOsaExpATMControlDistributeVPI       Integer32,
+       ibmOsaExpATMControlDistributeVCI       Integer32,
+       ibmOsaExpATMMulticastSendIntfc         Integer32,
+       ibmOsaExpATMMulticastSendVPI           Integer32,
+       ibmOsaExpATMMulticastSendVCI           Integer32,
+       ibmOsaExpATMMulticastFwdIntfc          Integer32,
+       ibmOsaExpATMMulticastForwardVPI        Integer32,
+       ibmOsaExpATMMulticastForwardVCI        Integer32
+      }
+
+
+     ibmOsaExpATMPortNumber       OBJECT-TYPE
+     SYNTAX Integer32 (0..3)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The logical port number of this port"
+     ::= { ibmOSAExpATMPortEntry 1 }
+
+     ibmOsaExpATMPortType         OBJECT-TYPE
+     SYNTAX  INTEGER {
+                      emulatedEthernet (17)
+                     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The logical port type."
+     ::= { ibmOSAExpATMPortEntry 2 }
+
+     ibmOsaExpATMLanTrafficState OBJECT-TYPE
+     SYNTAX  INTEGER
+         {
+           undefined(0),
+           unavailable(1),
+           enabling(2),
+           disabling(3),
+           enabled(4),
+           disabled(5),
+           linkMonitor(6),
+           definitionError(7),
+           configuredOffline(8)
+         }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The LAN state value ranges from 0 to 8.  A value of 5,
+            disabled is further explained in object
+            ibmOsaExpATMDisabledStatus."
+     ::= { ibmOSAExpATMPortEntry 3  }
+
+     ibmOsaExpATMServiceMode  OBJECT-TYPE
+     SYNTAX  INTEGER
+          {
+            notInServiceMode (0),
+            inServiceMode    (1)
+          }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This object indicates if the processor is in service mode
+            or not."
+     ::= { ibmOSAExpATMPortEntry 4  }
+
+     ibmOsaExpATMDisabledStatus  OBJECT-TYPE
+     SYNTAX  BITS
+        {
+          reserved0                    (0),
+          internalPortFailure          (1),
+          reserved2                    (2),
+          reserved3                    (3),
+          reserved4                    (4),
+          reserved5                    (5),
+          portTemporarilyDisabled      (6),
+          reserved7                    (7),
+          reserved8                    (8),
+          serviceProcessorRequest      (9),
+          networkRequest               (10),
+          osasfRequest                 (11),
+          configurationChange          (12),
+          linkFailureThresholdExceeded (13),
+          reserved14                   (14),
+          reserved15                   (15)
+        }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "When the value of ibmOsaExpATMLanTrafficState is NOT
+            disabled, the value of this object will be zero.
+
+            When the value of ibmOsaExpATMLanTrafficState is
+            disabled(5), this object explains the reason for the
+            disabled state.  The value for this object may be a
+            combination of the bits shown."
+     ::= { ibmOSAExpATMPortEntry 5  }
+
+     ibmOsaExpATMConfigName   OBJECT-TYPE
+     SYNTAX  DisplayString       (SIZE(0..34))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "This is the name of the configuration that is on the OSA.
+            It is set using OSA/SF.  It is not used by OSA"
+     ::= { ibmOSAExpATMPortEntry 6  }
+
+
+     ibmOsaExpATMMacAddrActive   OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(6))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "A 6 byte OCTET STRING which contains the current
+            MAC address in use on the OSA.
+            The values are in canonical format."
+     ::= { ibmOSAExpATMPortEntry 7  }
+
+     ibmOsaExpATMMacAddrBurntIn    OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(6))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "A 6 byte OCTET STRING which contains the burned in
+            MAC address on the OSA.
+            The values are in canonical format."
+     ::= { ibmOSAExpATMPortEntry 8  }
+
+
+     ibmOsaExpATMUserData      OBJECT-TYPE
+     SYNTAX  DisplayString       (SIZE(0..32))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Data set by the user. It is ignored by the OSA."
+     ::= { ibmOSAExpATMPortEntry 9  }
+
+
+     ibmOsaExpATMPortName      OBJECT-TYPE
+     SYNTAX  DisplayString       (SIZE(0..8))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Name of the port as used by TCP/IP"
+     ::= { ibmOSAExpATMPortEntry 12 }
+
+
+     ibmOsaExpATMGroupMacAddrTable    OBJECT-TYPE
+     SYNTAX  OCTET STRING(SIZE(256))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+            "This field contains the active Group Addresses.
+             An individual Group Address is 6 bytes long with an
+             additional 2 bytes of padding."
+     ::= { ibmOSAExpATMPortEntry 13 }
+
+     ibmOsaExpATMIBMEnhancedMode         OBJECT-TYPE
+     SYNTAX  INTEGER {
+                      no  (0),
+                      yes (1)
+                     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "When set to Yes, this keeps data connections active
+            when the connection to the LES is lost."
+     ::= { ibmOSAExpATMPortEntry 14 }
+
+     ibmOsaExpATMBestEffortPeakRate      OBJECT-TYPE
+     SYNTAX  Integer32
+     UNITS   "Megabytes per second"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Values range from 10-1550 and must be divided by 10 to
+            get the proper value.  A value of 1550 indicates 155.0
+            Mbytes/sec"
+     ::= { ibmOSAExpATMPortEntry 15 }
+
+
+     ibmOsaExpATMConfigMode              OBJECT-TYPE
+     SYNTAX  INTEGER {
+                      automatic  (1),
+                      manual     (2)
+                     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Indicates whether this LAN Emulation Client should
+            auto-configure the next time it is (re)started. In
+            automatic (1) mode, a client uses a LAN Emulation
+            Configuration Server to learn the ATM address of its
+            LAN Emulation Server, and to obtain other parameters.
+            lecConfig (LanType, MaxDataFrameSize, LanName) are
+            used in the configure request.
+            ibmOsaExpATMConfigLESATMAddress is ignored.
+
+            In manual (2) mode, management tells the
+            client the ATM address of its LAN Emulation Server
+            and the value of the other parmeters. lecConfig
+            (LanType, MaxDataFrameSize, LanName) are used in the
+            Join request. ibmOsaExpATMConfigLESATMAddress
+            tells the client which LES to call."
+     ::= { ibmOSAExpATMPortEntry 16 }
+
+
+     ibmOsaExpATMConfigLanType         OBJECT-TYPE
+     SYNTAX  INTEGER {
+                      emulatedEthernet (17)
+                     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "The logical port type that the user configured the port for"
+     ::= { ibmOSAExpATMPortEntry 17 }
+
+
+     ibmOsaExpATMActualLanType         OBJECT-TYPE
+     SYNTAX  INTEGER {
+                      emulatedEthernet (17)
+                     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+         "The actual logical port type the port is running in"
+     ::= { ibmOSAExpATMPortEntry 18 }
+
+
+     ibmOsaExpATMConfigMaxDataFrmSz  OBJECT-TYPE
+     SYNTAX  INTEGER {
+                         unspecified (1),
+                         f1516 (2),
+                         f4544 (3),
+                         f9234 (4),
+                         f18190 (5)
+                       }
+     UNITS "bytes"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The maximum data frame size (in bytes) which this
+            client will use the next time it returns to the Initial
+            State. Auto-configuring clients use this parameter in
+            their configure requests. Manually configured clients use
+            it in their join requests."
+     ::= { ibmOSAExpATMPortEntry 19 }
+
+     ibmOsaExpATMActualMaxDataFrmSz  OBJECT-TYPE
+     SYNTAX  INTEGER {
+                         unspecified (1),
+                         f1516 (2),
+                         f4544 (3),
+                         f9234 (4),
+                         f18190 (5)
+                       }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The maximum data frame size (in bytes) which this
+            client will use the next time it returns to the Initial
+            State. Auto-configuring clients use this parameter in
+            their configure requests. Manually configured clients use
+            it in their join requests."
+     ::= { ibmOSAExpATMPortEntry 20 }
+
+
+     ibmOsaExpATMConfigELANName      OBJECT-TYPE
+     SYNTAX   DisplayString       (SIZE(0..36))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The ELAN Name this client will use the
+            next time it returns to the Initial State.
+            Auto-configuring clients use this parameter in
+            their configure requests. Manually configured
+            clients use it in their join requests."
+     ::= { ibmOSAExpATMPortEntry 21 }
+
+     ibmOsaExpATMActualELANName      OBJECT-TYPE
+     SYNTAX   DisplayString       (SIZE(0..36))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The ELAN Name this client will use the
+            next time it returns to the Initial State.
+            Auto-configuring clients use this parameter in
+            their configure requests. Manually configured
+            clients use it in their join requests."
+     ::= { ibmOSAExpATMPortEntry 22 }
+
+
+     ibmOsaExpATMConfigLESATMAddress       OBJECT-TYPE
+     SYNTAX   OCTET STRING (SIZE(20))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "The LAN Emulation Server which this client will use the
+           next time it is started in manual configuration mode.
+           When ibmOsaExpATMConfigMode is 'automatic', there is no
+           need to set this address, Address) and no advantage to
+           doing so. The client will use the LECS to find a LES,
+           putting the auto-configured address in
+           ibmOsaExpATMActualLESATMAddress while leaving
+           ibmOsaExpATMConfigLESATMAddress alone.
+           Corresponds to Initial State Parameter C9.
+
+           In LAN Emulation MIB, the OCTET STRING has length 0 or 20.
+           For OSA, the length shall be 20, with  the value 0
+           defined to mean that ibmOsaExpATMConfigMode is 'automatic'."
+     ::= { ibmOSAExpATMPortEntry 23 }
+
+     ibmOsaExpATMActualLESATMAddress       OBJECT-TYPE
+     SYNTAX   OCTET STRING (SIZE(20))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "The LAN Emulation Server which this client will use the
+           next time it is started in manual configuration mode.
+           When lecConfigMode is 'automatic', there is no need to set
+           this address, Address) and no advantage to doing so. The
+           client will use the LECS to find a LES, putting the
+           auto-configured address in ibmOsaExpATMActualLESATMAddress
+           while leaving ibmOsaExpATMConfigLESATMAddress alone.
+           Corresponds to Initial State Parameter C9.
+
+           In LAN Emulation MIB, the OCTET STRING has length 0 or 20.
+           For OSA, the length shall be 20, with  the value 0 defined
+           to mean that ibmOsaExpATMConfigMode is 'automatic'."
+     ::= { ibmOSAExpATMPortEntry 24 }
+
+
+     ibmOsaExpATMControlTimeout   OBJECT-TYPE
+     SYNTAX   Integer32 (10..300)
+     UNITS    "seconds"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Control Time-out. Time out period used for timing out most
+           request/response control frame interactions, as specified
+           elsewhere in the LAN Emulation specification.
+           This time value is expressed in seconds. Corresponds to
+           Initial State Parameter C7."
+     ::= { ibmOSAExpATMPortEntry 25 }
+
+
+     ibmOsaExpATMMaxUnknownFrameCount     OBJECT-TYPE
+     SYNTAX   Integer32 (1..10)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Maximum Unknown Frame Count. See the description of
+           ibmOsaExpATMMaxUnknownFrameTime below. Corresponds to
+           Initial State Parameter C10."
+     ::= { ibmOSAExpATMPortEntry 26 }
+
+     ibmOsaExpATMMaxUnknownFrameTime  OBJECT-TYPE
+     SYNTAX   Integer32 (1..60)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Maximum Unknown Frame Time. Within the period of time
+           defined by the Maximum Unknown Frame Time, a LE Client
+           will send no more than Maximum Unknown Frame Count
+           frames to the BUS for a given unicast LAN Destination,
+           and it must also initiate the address resolution
+           protocol to resolve that LAN Destination. This time value
+           is expressed in seconds. Corresponds to Initial State
+           Parameter C11."
+     ::= { ibmOSAExpATMPortEntry 27 }
+
+     ibmOsaExpATMVCCTimeoutPeriod  OBJECT-TYPE
+     SYNTAX   Integer32
+     UNITS    "seconds"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "VCC Time-out Period. A LE Client SHOULD release any
+           Data Direct VCC that it has not used to transmit
+           or receive any data frames for the length of the VCC
+           Time-out Period. This parameter is only meaningful for
+           SVC Data Direct VCCs.
+           This time value is expressed in seconds. The default
+           value is 20 minutes. A value of 0 seconds means
+           that the timeout period is infinite.
+           Negative values will be rejected by the agent.
+           Corresponds to Initial State Parameter C12."
+     ::= { ibmOSAExpATMPortEntry 28 }
+
+     ibmOsaExpATMMaxRetryCount  OBJECT-TYPE
+     SYNTAX   Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Maximum Retry Count. A LE CLient MUST not retry a
+           LE_ARP_REQUEST for a given frame's LAN destination
+           more than Maximum Retry Count times, after the first
+           LE_ARP_REQUEST for that same frame's LAN destination.
+           Corresponds to Initial State Parameter C13."
+     ::= { ibmOSAExpATMPortEntry 29 }
+
+     ibmOsaExpATMAgingTime  OBJECT-TYPE
+     SYNTAX   Integer32 (10..300)
+     UNITS    "seconds"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Aging Time. The maximum time that a LE Client will
+           maintain an entry in its LE_ARP cache in the absence
+           of a verification of that relationship.
+           This time value is expressed in seconds. Corresponds to
+           Initial State Parameter C17."
+     ::= { ibmOSAExpATMPortEntry 30 }
+
+     ibmOsaExpATMForwardDelayTime  OBJECT-TYPE
+     SYNTAX   Integer32 (4..30)
+     UNITS    "seconds"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Forward Delay Time. The maximum time that a LE Client
+           will maintain an entry for a non-local MAC address in
+           its LE_ARP cache in the absence of a verification of
+           that relationship, as long as the Topology Change flag
+           C19 is true. ibmOsaExpATMForwardDelayTime SHOULD BE
+           less than ibmOsaExpATMAgingTIme.  When it is not,
+           ibmOsaExpATMAgingTime governs LE_ARP aging.
+           This time value is expressed in seconds. Corresponds to
+           Initial State Parameter C18."
+     ::= { ibmOSAExpATMPortEntry 31 }
+
+
+     ibmOsaExpATMExpectedARPRespTime    OBJECT-TYPE
+     SYNTAX   Integer32 (1..30)
+     UNITS    "seconds"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Expected LE_ARP Reponse Time. The maximum time that
+           the LEC expects an LE_ARP_REQUEST/LE_ARP_RESPONSE
+           cycle to take. Used for retries and verifies. This
+           time value is expressed in seconds.
+           Corresponds to Initial State Parameter C20."
+     ::= { ibmOSAExpATMPortEntry 32 }
+
+     ibmOsaExpATMFlushTimeout OBJECT-TYPE
+     SYNTAX   Integer32 (1..4)
+     UNITS    "seconds"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Flush Time-out. Time limit to wait to receive a
+           LE_FLUSH_RESPONSE after the LE_FLUSH_REQUEST has been
+           sent before taking recovery action. This time value
+           is expressed in seconds. Corresponds to Initial State
+           Parameter C21."
+     ::= { ibmOSAExpATMPortEntry 33 }
+
+     ibmOsaExpATMPathSwitchingDelay  OBJECT-TYPE
+     SYNTAX   Integer32 (1..8)
+     UNITS    "seconds"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Path Switching Delay. The time since sending a
+           frame to the BUS after which the LE Client may
+           assume that the frame has been either discarded
+           or delivered to the recipient. May be used to
+           bypass the Flush protocol. This time value is
+           expressed in seconds. Corresponds to Initial State
+           Parameter C22."
+     ::= { ibmOSAExpATMPortEntry 34 }
+
+     ibmOsaExpATMLocalSegmentID  OBJECT-TYPE
+     SYNTAX   Integer32 (0..4095)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Local Segment ID. The segment ID of the emulated LAN.
+           This is only required for IEEE 802.5 clients that
+           are Source Routing bridges. Corresponds to Initial
+           State Parameter C23."
+     ::= { ibmOSAExpATMPortEntry 35 }
+
+     ibmOsaExpATMMltcstSendVCCType  OBJECT-TYPE
+     SYNTAX   INTEGER {
+                          bestEffort(1),
+                          variableBitRate(2),
+                          constantBitRate(3)
+                        }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Multicast Send VCC Type. Signalling parameter that
+           SHOULD be used by the LE Client when establishing
+           the Multicast Send VCC. This is the method to be used
+           by the LE Client when specifying traffic parameters
+           when it sets up the Multicast Send VCC for this
+           emulated LAN. Corresponds to Initial State
+           Parameter C24."
+     ::= { ibmOSAExpATMPortEntry 36 }
+
+     ibmOsaExpATMMltcstSendVCCAvgRate  OBJECT-TYPE
+     SYNTAX   Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Multicast Send VCC AvgRate. Signalling parameter
+           that SHOULD be used by the LE Client when estabishing
+           the Multicast Send VCC. Forward and Backward Sustained
+           Cell Rate to be requested by LE Client when setting
+           up Multicast Send VCC, if using Variable bit rate
+           codings. Corresponds to Initial State Parameter C25."
+     ::= { ibmOSAExpATMPortEntry 37 }
+
+     ibmOsaExpATMMcastSendVCCPeakRate  OBJECT-TYPE
+     SYNTAX   Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Multicast Send VCC PeakRate. Signalling parameter that
+           SHOULD be used by the LE Client when establishing the
+           Multicast Send VCC. Forward and Backward Peak Cell
+           Rate to be requested by LE Client when setting up the
+           Multicast Send VCC when using either Variable or
+           Constant bit rate codings. Corresponds to Initial
+           State Parameter C26."
+     ::= { ibmOSAExpATMPortEntry 38 }
+
+     ibmOsaExpATMConnectCompleteTimer OBJECT-TYPE
+     SYNTAX   Integer32 (1..10)
+     UNITS    "seconds"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Connection Complete Timer. Optional. In Connection
+           Establish ment this is the time period in which
+           data or a READY_IND message is expected from a Calling
+           Party. This time value is expressed in seconds.
+           Corresponds to Initial State Parameter C28."
+     ::= { ibmOSAExpATMPortEntry 39 }
+
+
+     ibmOsaExpATMClientATMAddress  OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(20))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "LE Client's ATM Addresses. The primary ATM address
+           of this LAN Emulation Client. This address is used
+           to establish the Control Direct and Multicast Send
+           VCCs, and may also be used to set up Data Direct
+           VCCs. A client may have additional ATM addresses
+           for use with Data Direct VCCs.
+           Corresponds to Initial State Parameter C1."
+     ::= { ibmOSAExpATMPortEntry 40 }
+
+     ibmOsaExpATMClientIdentifier  OBJECT-TYPE
+     SYNTAX  Integer32 (0..65279)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "LE Client Identifier. Each LE Client requires a
+           LE Client Identifier (LECID) assigned by the LE
+           Server during the Join phase. The LECID is placed
+           in control requests by the LE Client and MAY be used
+           for echo suppression on multicast data frames sent
+           by that LE Client. This value MUST NOT change without
+           terminating the LE Client and returning to the Initial
+           state. A valid LECID MUST be in the range X'0001'
+           through X'FEFF'. The value of this object is only
+           meaningful for a LEC that is connected to a LES. For
+           a LEC which does not belong to an emulated LAN, the
+           value of this object is defined to be 0. Corresponds to
+           Initial State Parameter C14."
+     ::= { ibmOSAExpATMPortEntry 41 }
+
+     ibmOsaExpATMClientCurrentState  OBJECT-TYPE
+     SYNTAX  INTEGER {
+                         initialState (1),
+                         lecsConnect (2),
+                         configure (3),
+                         join (4),
+                         initialRegistration (5),
+                         busConnect (6),
+                         operational (7)
+                       }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "The current state of the LAN Emulation Client. Note
+           that 'ifOperStatus' is defined to be 'up' when, and
+           only when, this field is 'operational'."
+     ::= { ibmOSAExpATMPortEntry 42 }
+
+     ibmOsaExpATMLastFailureRespCode  OBJECT-TYPE
+     SYNTAX  INTEGER {
+                         none (1),
+                         timeout (2),
+                         undefinedError (3),
+                         versionNotSupported (4),
+                         invalidRequestParameters (5),
+                         duplicateLanDestination (6),
+                         duplicateAtmAddress (7),
+                         insufficientResources (8),
+                         accessDenied (9),
+                         invalidRequesterId (10),
+                         invalidLanDestination (11),
+                         invalidAtmAddress (12),
+                         noConfiguration (13),
+                         leConfigureError (14),
+                         insufficientInformation (15)
+                       }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Status code from the last failed Configure response
+           or Join response. Failed responses are those for which
+           the LE_CONFIGURE_RESPONSE / LE_JOIN_RESPONSE frame
+           contains a non-zero code, or fails to arrive within a
+           timeout period. If none of this client's requests have
+           failed, this object has the value 'none'. If the
+           failed response contained a STATUS code that is not
+           defined in the LAN Emulation specification, this
+           object has the value 'undefinedError'. The value
+           'timeout' is self explanatory. Other failure codes
+           correspond to those defined in the specification,
+           although they may have different numeric values."
+     ::= { ibmOSAExpATMPortEntry 43 }
+
+     ibmOsaExpATMLastFailureState  OBJECT-TYPE
+     SYNTAX  INTEGER {
+                          initialState (1),
+                          lecsConnect (2),
+                          configure (3),
+                          join (4),
+                          initialRegistration (5),
+                          busConnect (6),
+                          operational (7)
+                       }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "The state this client was in when it updated the
+           'ibmOsaExpATMLastFailureRespCode'.
+           If 'ibmOsaExpATMLastFailureRespCode'
+           is 'none', this object has the value initialState(1)."
+     ::= { ibmOSAExpATMPortEntry 44 }
+
+     ibmOsaExpATMProtocol  OBJECT-TYPE
+     SYNTAX  Integer32 (1..255)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "The LAN Emulation protocol which this client supports,
+           and specifies in its LE_JOIN_REQUESTs."
+     ::= { ibmOSAExpATMPortEntry 45 }
+
+     ibmOsaExpATMLeVersion  OBJECT-TYPE
+     SYNTAX  Integer32 (1..255)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "The LAN Emulation protocol version which this client
+           supports, and specifies in its LE_JOIN_REQUESTs."
+     ::= { ibmOSAExpATMPortEntry 46 }
+
+     ibmOsaExpATMTopologyChange  OBJECT-TYPE
+     SYNTAX  INTEGER {
+                         true (1),
+                         false (2)
+                       }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "Topology Change. Boolean indication that the LE Client
+           is using the Forward Delay Time C18, instead of the
+           Aging Time C17, to age non-local entries in its LE_ARP
+           cache C16. For a client which is not connected to the
+           LES, this object is defined to have the value 'false'.
+           Corresponds to Initial State Parameter C19."
+     ::= { ibmOSAExpATMPortEntry 47 }
+
+     ibmOsaExpATMConfigServerATMAddr  OBJECT-TYPE
+     SYNTAX  OCTET STRING (SIZE(20))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "The ATM address of the LAN Emulation Configuration
+           Server (if known) or 0 (otherwise). In LAN
+           Emulation MIB, the OCTET STRING is either 0 length
+           or 20 octets.
+
+           For OSA-ATM, this Address has been
+           changed to a constant 20 octets, with the value 0
+           equivalent to the 0 length OCTET STRING."
+     ::= { ibmOSAExpATMPortEntry 48 }
+
+     ibmOsaExpATMConfigSource   OBJECT-TYPE
+     SYNTAX  INTEGER {
+                       gotAddressViaIlmi(1),
+                       usedWellKnownAddress(2),
+                       usedLecsPvc(3),
+                       didNotUseLecs(4)
+                     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Indicates whether this LAN Emulation Client used the
+            LAN Emulation Configuration Server, and, if so, what
+            method it used to establish the Configuration Direct VCC"
+     ::= { ibmOSAExpATMPortEntry 49 }
+
+     ibmOsaExpATMProxyClient  OBJECT-TYPE
+     SYNTAX  INTEGER {
+                         true (1),
+                         false (2)
+                       }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "Indicates whether this client is acting as a proxy.
+            Proxy clients are allowed to represent unregistered
+            MAC addresses, and receive copies of LE_ARP_REQUEST
+            frames for such addresses. Corresponds to Initial
+            State Parameter C4."
+     ::= { ibmOSAExpATMPortEntry 50 }
+
+
+     ibmOsaExpATMLePDUOctetsInbound       OBJECT-TYPE
+     SYNTAX  Counter64
+     UNITS   "octets"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of Le PDU Octets received"
+     ::= { ibmOSAExpATMPortEntry 51 }
+
+     ibmOsaExpATMNonErrLePDUDiscIn   OBJECT-TYPE
+     SYNTAX  Counter32
+     UNITS   "octets"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of Non Error Le PDU Octets received"
+     ::= { ibmOSAExpATMPortEntry 52 }
+
+     ibmOsaExpATMErrLePDUDiscIn    OBJECT-TYPE
+     SYNTAX  Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of Errored Le PDU Discards received"
+     ::= { ibmOSAExpATMPortEntry 53 }
+
+     ibmOsaExpATMLePDUOctetsOutbound         OBJECT-TYPE
+     SYNTAX  Counter64
+     UNITS   "octets"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of Le PDU Discards sent"
+     ::= { ibmOSAExpATMPortEntry 54 }
+
+     ibmOsaExpATMNonErrLePDUDiscOut    OBJECT-TYPE
+     SYNTAX  Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of Non Error Le PDU Discards sent"
+     ::= { ibmOSAExpATMPortEntry 55 }
+
+     ibmOsaExpATMErrLePDUDiscOut     OBJECT-TYPE
+     SYNTAX  Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of Errored Le PDU Discards sent"
+     ::= { ibmOSAExpATMPortEntry 56 }
+
+     ibmOsaExpATMLeARPRequestsOut  OBJECT-TYPE
+     SYNTAX  Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of LE ARP Requests sent"
+     ::= { ibmOSAExpATMPortEntry 57 }
+
+     ibmOsaExpATMLeARPRequestsIn OBJECT-TYPE
+     SYNTAX  Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of LE ARP Requests received over the LUNI
+            by this LAN Emulation Client. Requests may arrive
+            on the Control Direct VCC or on the Control Distribute
+            VCC, depending upon how the LES is implemented and the
+            chances it has had for learning. This counter covers
+            both VCCs."
+     ::= { ibmOSAExpATMPortEntry 58 }
+
+     ibmOsaExpATMLeARPRepliesOut  OBJECT-TYPE
+     SYNTAX  Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of LE ARP Responses sent over the LUNI
+            by this LAN Emulation Client."
+     ::= { ibmOSAExpATMPortEntry 59 }
+
+     ibmOsaExpATMLeARPRepliesIn  OBJECT-TYPE
+     SYNTAX  Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The number of LE ARP Responses received over the
+            LUNI by this LAN Emulation Client. This count includes
+            all such replies, whether solicited or not. Replies
+            may arrive on the Control Direct VCC or on the
+            Control Distribute VCC, depending upon how the LES
+            is implemented. This counter covers both VCCs."
+     ::= { ibmOSAExpATMPortEntry 60 }
+
+     ibmOsaExpATMControlFramesOut OBJECT-TYPE
+     SYNTAX  Counter32
+     UNITS   "packets"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The total number of control packets sent by this
+            LAN Emulation Client over the LUNI."
+     ::= { ibmOSAExpATMPortEntry 61 }
+
+     ibmOsaExpATMControlFramesIn OBJECT-TYPE
+     SYNTAX  Counter32
+     UNITS   "packets"
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The total number of control packets received by this
+           LAN Emulation Client over the LUNI."
+     ::= { ibmOSAExpATMPortEntry 62 }
+
+     ibmOsaExpATMSVCFailures OBJECT-TYPE
+     SYNTAX  Counter32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The total number of outgoing LAN Emulation SVCs
+            which this client tried, but failed, to open;
+            incoming LAN Emulation SVCs which this client tried,
+            but failed to establish; and incoming LAN Emulation
+            SVCs which this client rejected for protocol or
+            security reasons."
+     ::= { ibmOSAExpATMPortEntry 63 }
+
+     ibmOsaExpATMConfigDirectIntfc  OBJECT-TYPE
+     SYNTAX  Integer32 (0..2147483647)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "The interface associated with the Configuration
+              Direct VCC. If no Configuration Direct VCC exists,
+              this object has the value 0. Otherwise, the objects
+              ( ibmOsaExpATMConfigDirectIntfc,
+                ibmOsaExpATMConfigDirectVPI,
+                ibmOsaExpATMConfigDirectVCI) identify the circuit."
+     ::= { ibmOSAExpATMPortEntry 64 }
+
+     ibmOsaExpATMConfigDirectVPI  OBJECT-TYPE
+     SYNTAX  Integer32 (0..255)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "If the Configuration Direct VCC exists, this object
+              contains the VPI which identifies that VCC at the
+              point where it connects to this LE client.
+              Otherwise, this object has the value 0."
+     ::= { ibmOSAExpATMPortEntry 65 }
+
+     ibmOsaExpATMConfigDirectVCI  OBJECT-TYPE
+     SYNTAX  Integer32 (0..65535)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+             "If the Configuration Direct VCC exists, this
+              object contains the VCI which identifies that
+              VCC at the point where it connects to this LE
+              client. Otherwise, this object has the value 0."
+     ::= { ibmOSAExpATMPortEntry 66 }
+
+     ibmOsaExpATMControlDirectIntfc  OBJECT-TYPE
+     SYNTAX  Integer32 (0..2147483647)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The interface associated with the Control Direct
+            VCC. If no Control Direct VCC exists, this object
+            has the value 0. Otherwise, the objects
+              ( ibmOsaExpATMConfigDirectIntfc,
+                ibmOsaExpATMConfigDirectVPI,
+                ibmOsaExpATMConfigDirectVCI) identify the circuit."
+     ::= { ibmOSAExpATMPortEntry 67 }
+
+     ibmOsaExpATMControlDirectVPI OBJECT-TYPE
+     SYNTAX  Integer32 (0..255)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "If the Control Direct VCC exists, this object
+            contains the VPI which identifies that VCC at
+            the point where it connects to this LE client.
+            Otherwise, this object has the value 0."
+     ::= { ibmOSAExpATMPortEntry 68 }
+
+     ibmOsaExpATMControlDirectVCI OBJECT-TYPE
+     SYNTAX  Integer32 (0..65535)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "If the Control Direct VCC exists, this object
+            contains the VCI which identifies that VCC at
+            the point where it connects to this LE client.
+            Otherwise, this object has the value 0."
+     ::= { ibmOSAExpATMPortEntry 69 }
+
+     ibmOsaExpATMControlDistIntfc OBJECT-TYPE
+     SYNTAX  Integer32 (0..2147483647)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The interface associated with the Control Distribute
+            VCC. If no Control Distribute VCC has been set up to
+            this client, this object has the value 0. Otherwise,
+            the objects ( ibmOsaExpATMControlDistIntfc,
+            ibmOsaExpATMControlDistributeVPI.
+            ibmOsaExpATMControlDistributeVCI) identify the circuit."
+     ::= { ibmOSAExpATMPortEntry 70 }
+
+     ibmOsaExpATMControlDistributeVPI  OBJECT-TYPE
+     SYNTAX  Integer32 (0..255)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "If the Control Distribute VCC exists, this object
+            contains the VPI which identifies that VCC at the
+            point where it connects to this LE client.
+            Otherwise, this object has the value 0."
+     ::= { ibmOSAExpATMPortEntry 71 }
+
+     ibmOsaExpATMControlDistributeVCI  OBJECT-TYPE
+     SYNTAX  Integer32 (0..65535)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "If the Control Distribute VCC exists, this object
+            contains the VCI which identifies that VCC at the
+            point where it connects to this LE client.
+            Otherwise, this object contains the value 0."
+     ::= { ibmOSAExpATMPortEntry 72 }
+
+     ibmOsaExpATMMulticastSendIntfc  OBJECT-TYPE
+     SYNTAX  Integer32 (0..2147483647)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "The interface associated with the Multicast Send
+           VCC. If no Multicast Send VCC exists, this object
+           has the value 0. Otherwise, the objects
+           ( ibmOsaExpATMMulticastSendIntfc,
+             ibmOsaExpATMMulticastSendVPI,
+             ibmOsaExpATMMulticastSendVCI) identify the circuit."
+     ::= { ibmOSAExpATMPortEntry 73 }
+
+     ibmOsaExpATMMulticastSendVPI  OBJECT-TYPE
+     SYNTAX  Integer32 (0..255)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "If the Multicast Send VCC exists, this object
+           contains the VPI which identifies that VCC at
+           the point where it connects to this LE client.
+           Otherwise, this object has the value 0."
+     ::= { ibmOSAExpATMPortEntry 74 }
+
+     ibmOsaExpATMMulticastSendVCI  OBJECT-TYPE
+     SYNTAX  Integer32 (0..65535)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+          "If the Multicast Send VCC exists, this object
+           contains the VCI which identifies that VCC at
+           the point where it connects to this LE client.
+           Otherwise, this object has the value 0."
+     ::= { ibmOSAExpATMPortEntry 75 }
+
+     ibmOsaExpATMMulticastFwdIntfc  OBJECT-TYPE
+     SYNTAX  Integer32 (0..2147483647)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "The interface associated with the Multicast
+            Forward VCC. If no Multicast Forward VCC has
+            been set up to this client, this object has the
+            value 0. Otherwise, the objects
+            ( ibmOsaExpATMMulticastFwdIntfc,
+              ibmOsaExpATMMulticastForwardVPI,
+              ibmOsaExpATMMulticastForwardVCI) identify the circuit."
+     ::= { ibmOSAExpATMPortEntry 76 }
+
+     ibmOsaExpATMMulticastForwardVPI  OBJECT-TYPE
+     SYNTAX  Integer32 (0..255)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "If the Multicast Forward VCC exists, this object
+            contains the VPI which identifies that VCC at the
+            point where it connects to this LE client.
+            Otherwise, this object has the value 0."
+     ::= { ibmOSAExpATMPortEntry 77 }
+
+     ibmOsaExpATMMulticastForwardVCI  OBJECT-TYPE
+     SYNTAX  Integer32 (0..65535)
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+           "If the Multicast Forward VCC exists, this object
+            contains the VCI which identifies that VCC at the
+            point where it connects to this LE client.
+            Otherwise, this object has the value 0."
+     ::= { ibmOSAExpATMPortEntry 78 }
+
+
+ --  Conformance information
+ --  Compliance statements
+ --===================================================================
+
+ ibmOSAMibCompliances  OBJECT
+                        IDENTIFIER ::= { ibmOSAMibConformance 1 }
+ ibmOSAMibGroups       OBJECT
+                        IDENTIFIER ::= { ibmOSAMibConformance 2 }
+ --===================================================================
+ --  Compliance statements
+ --===================================================================
+ ibmOSAMibCompliance  MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for the OSA DIrect SNMP product."
+    MODULE -- this module
+        MANDATORY-GROUPS {
+                           ibmOSAExpChannelGroup,
+                           ibmOSAExpPerfGroup,
+                           ibmOSAExpPEGroup
+                         }
+
+        GROUP    ibmOSAExpEthGroup
+        DESCRIPTION
+            "The objects in this group are required for Gigabit or
+             Fast Ethernet features."
+
+        GROUP    ibmOSAExpTRGroup
+        DESCRIPTION
+            "The objects in this group are required for OSA-Express
+             Token Ring features."
+
+        GROUP    ibmOSAExpATMGroup
+        DESCRIPTION
+            "The objects in this group are required for OSA-Express
+             ATM LAN Emulation features."
+    ::= { ibmOSAMibCompliances 1 }
+
+ --===================================================================
+ -- MIB groupings
+ --===================================================================
+  ibmOSAExpChannelGroup OBJECT-GROUP
+    OBJECTS {
+             ibmOSAExpChannelNumber,
+             ibmOSAExpChannelType,
+             ibmOSAExpChannelHdwLevel,
+             ibmOSAExpChannelSubType,
+             ibmOSAExpChannelShared,
+             ibmOSAExpChannelNodeDesc,
+             ibmOSAExpChannelProcCodeLevel,
+             ibmOSAExpChannelPCIBusUtil1Min,
+             ibmOSAExpChannelProcUtil1Min,
+             ibmOSAExpChannelPCIBusUtil5Min,
+             ibmOSAExpChannelProcUtil5Min,
+             ibmOSAExpChannelPCIBusUtilHour,
+             ibmOSAExpChannelProcUtilHour
+           }
+    STATUS  current
+    DESCRIPTION
+            "This group comprises those objects that are related
+             to OSA-Express Channel support."
+     ::= { ibmOSAMibGroups 1 }
+
+  ibmOSAExpPerfGroup OBJECT-GROUP
+    OBJECTS {
+       ibmOSAExpPerfDataLP0                  ,
+       ibmOSAExpPerfDataLP1                  ,
+       ibmOSAExpPerfDataLP2                  ,
+       ibmOSAExpPerfDataLP3                  ,
+       ibmOSAExpPerfDataLP4                  ,
+       ibmOSAExpPerfDataLP5                  ,
+       ibmOSAExpPerfDataLP6                  ,
+       ibmOSAExpPerfDataLP7                  ,
+       ibmOSAExpPerfDataLP8                  ,
+       ibmOSAExpPerfDataLP9                  ,
+       ibmOSAExpPerfDataLP10                 ,
+       ibmOSAExpPerfDataLP11                 ,
+       ibmOSAExpPerfDataLP12                 ,
+       ibmOSAExpPerfDataLP13                 ,
+       ibmOSAExpPerfDataLP14                 ,
+       ibmOSAExpPerfDataLP15
+           }
+    STATUS  current
+    DESCRIPTION
+            "This group comprises those objects that are related
+             to OSA-Express Performance data support."
+     ::= { ibmOSAMibGroups 2 }
+
+  ibmOSAExpPEGroup OBJECT-GROUP
+    OBJECTS {
+       ibmOSAExpPEMaxSizeArpCache            ,
+       ibmOSAExpPEArpPendingEntries          ,
+       ibmOSAExpPEArpActiveEntries           ,
+       ibmOSAExpPEIPEntries                  ,
+       ibmOSAExpPEMulticastEntries           ,
+       ibmOSAExpPEMulticastData
+      }
+    STATUS  current
+    DESCRIPTION
+            "This group comprises those objects that are related
+             to OSA-Express PE data support."
+     ::= { ibmOSAMibGroups 3 }
+
+  ibmOSAExpEthGroup   OBJECT-GROUP
+    OBJECTS {
+       ibmOsaExpEthPortNumber                                        ,
+       ibmOsaExpEthPortType                                          ,
+       ibmOsaExpEthLanTrafficState                                   ,
+       ibmOsaExpEthServiceMode                                       ,
+       ibmOsaExpEthDisabledStatus                                    ,
+       ibmOsaExpEthConfigName                                        ,
+       ibmOsaExpEthConfigSpeedMode                                   ,
+       ibmOsaExpEthActiveSpeedMode                                   ,
+       ibmOsaExpEthMacAddrActive                                     ,
+       ibmOsaExpEthMacAddrBurntIn                                    ,
+       ibmOsaExpEthUserData                                          ,
+       ibmOsaExpEthOutPackets                                        ,
+       ibmOsaExpEthInPackets                                         ,
+       ibmOsaExpEthInGroupFrames                                     ,
+       ibmOsaExpEthInBroadcastFrames                                 ,
+       ibmOsaExpEthPortName                                          ,
+       ibmOsaExpEthInUnknownIPFrames                                 ,
+       ibmOsaExpEthGroupAddrTable
+      }
+    STATUS  current
+    DESCRIPTION
+            "This group comprises those objects that are related
+             to OSA-Express Fast Ethernet and Gigabit features only"
+     ::= { ibmOSAMibGroups 4 }
+
+  ibmOSAExpTRGroup   OBJECT-GROUP
+    OBJECTS {
+       ibmOsaExpTRPortNumber                                         ,
+       ibmOsaExpTRPortType                                           ,
+       ibmOsaExpTRLanTrafficState                                    ,
+       ibmOsaExpTRServiceMode                                        ,
+       ibmOsaExpTRDisabledStatus                                     ,
+       ibmOsaExpTRConfigName                                         ,
+       ibmOsaExpTRMacAddrActive                                      ,
+       ibmOsaExpTRMacAddrBurntIn                                     ,
+       ibmOsaExpTRConfigSpeedMode                                    ,
+       ibmOsaExpTRActiveSpeedMode                                    ,
+       ibmOsaExpTRUserData                                           ,
+       ibmOsaExpTRPortName                                           ,
+       ibmOsaExpTRGroupAddrTable                                     ,
+       ibmOsaExpTRFunctionalAddr                                     ,
+       ibmOsaExpTRRingStatus                                         ,
+       ibmOsaExpTRAllowAccessPriority                                ,
+       ibmOsaExpTREarlyTokenRelease                                  ,
+       ibmOsaExpTRBeaconingAddress                                   ,
+       ibmOsaExpTRUpstreamNeighbor                                   ,
+       ibmOsaExpTRRingState                                          ,
+       ibmOsaExpTRRingOpenStatus                                     ,
+       ibmOsaExpTRPacketsTransmitted                                 ,
+       ibmOsaExpTRPacketsReceived                                    ,
+       ibmOsaExpTRLineErrorCount                                     ,
+       ibmOsaExpTRBurstErrorCount                                    ,
+       ibmOsaExpTRACErrorCount                                       ,
+       ibmOsaExpTRAbortTransErrorCount                               ,
+       ibmOsaExpTRInternalErrorCount                                 ,
+       ibmOsaExpTRLostFrameErrorCount                                ,
+       ibmOsaExpTRRcvCongestionCount                                 ,
+       ibmOsaExpTRFrameCopyErrorCount                                ,
+       ibmOsaExpTRTokenErrorCount                                    ,
+       ibmOsaExpTRFullDuplexErrorCount                               ,
+       ibmOsaExpTRSoftErrorCount                                     ,
+       ibmOsaExpTRHardErrorCount                                     ,
+       ibmOsaExpTRSignalLossErrorCount                               ,
+       ibmOsaExpTRTransmitBeaconCount                                ,
+       ibmOsaExpTRRecoveryCounter                                    ,
+       ibmOsaExpTRLobeWireFaultCount                                 ,
+       ibmOsaExpTRRemoveReceivedCount                                ,
+       ibmOsaExpTRSingleStationCount
+       }
+    STATUS  current
+    DESCRIPTION
+            "This group comprises those objects that are related
+             to OSA-Express Token Ring feature only"
+     ::= { ibmOSAMibGroups 5 }
+
+  ibmOSAExpATMGroup   OBJECT-GROUP
+    OBJECTS {
+       ibmOsaExpATMPortNumber                   ,
+       ibmOsaExpATMPortType                     ,
+       ibmOsaExpATMLanTrafficState              ,
+       ibmOsaExpATMServiceMode                  ,
+       ibmOsaExpATMDisabledStatus               ,
+       ibmOsaExpATMConfigName                   ,
+       ibmOsaExpATMMacAddrActive                ,
+       ibmOsaExpATMMacAddrBurntIn               ,
+       ibmOsaExpATMUserData                     ,
+       ibmOsaExpATMPortName                     ,
+       ibmOsaExpATMGroupMacAddrTable            ,
+       ibmOsaExpATMIBMEnhancedMode              ,
+       ibmOsaExpATMBestEffortPeakRate           ,
+       ibmOsaExpATMConfigMode                   ,
+       ibmOsaExpATMConfigLanType                ,
+       ibmOsaExpATMActualLanType                ,
+       ibmOsaExpATMConfigMaxDataFrmSz           ,
+       ibmOsaExpATMActualMaxDataFrmSz           ,
+       ibmOsaExpATMConfigELANName               ,
+       ibmOsaExpATMActualELANName               ,
+       ibmOsaExpATMConfigLESATMAddress          ,
+       ibmOsaExpATMActualLESATMAddress          ,
+       ibmOsaExpATMControlTimeout               ,
+       ibmOsaExpATMMaxUnknownFrameCount         ,
+       ibmOsaExpATMMaxUnknownFrameTime          ,
+       ibmOsaExpATMVCCTimeoutPeriod             ,
+       ibmOsaExpATMMaxRetryCount                ,
+       ibmOsaExpATMAgingTime                    ,
+       ibmOsaExpATMForwardDelayTime             ,
+       ibmOsaExpATMExpectedARPRespTime          ,
+       ibmOsaExpATMFlushTimeout                 ,
+       ibmOsaExpATMPathSwitchingDelay           ,
+       ibmOsaExpATMLocalSegmentID               ,
+       ibmOsaExpATMMltcstSendVCCType            ,
+       ibmOsaExpATMMltcstSendVCCAvgRate         ,
+       ibmOsaExpATMMcastSendVCCPeakRate         ,
+       ibmOsaExpATMConnectCompleteTimer         ,
+       ibmOsaExpATMClientATMAddress             ,
+       ibmOsaExpATMClientIdentifier             ,
+       ibmOsaExpATMClientCurrentState           ,
+       ibmOsaExpATMLastFailureRespCode          ,
+       ibmOsaExpATMLastFailureState             ,
+       ibmOsaExpATMProtocol                     ,
+       ibmOsaExpATMLeVersion                    ,
+       ibmOsaExpATMTopologyChange               ,
+       ibmOsaExpATMConfigServerATMAddr          ,
+       ibmOsaExpATMConfigSource                 ,
+       ibmOsaExpATMProxyClient                  ,
+       ibmOsaExpATMLePDUOctetsInbound           ,
+       ibmOsaExpATMNonErrLePDUDiscIn            ,
+       ibmOsaExpATMErrLePDUDiscIn               ,
+       ibmOsaExpATMLePDUOctetsOutbound          ,
+       ibmOsaExpATMNonErrLePDUDiscOut           ,
+       ibmOsaExpATMErrLePDUDiscOut              ,
+       ibmOsaExpATMLeARPRequestsOut             ,
+       ibmOsaExpATMLeARPRequestsIn              ,
+       ibmOsaExpATMLeARPRepliesOut              ,
+       ibmOsaExpATMLeARPRepliesIn               ,
+       ibmOsaExpATMControlFramesOut             ,
+       ibmOsaExpATMControlFramesIn              ,
+       ibmOsaExpATMSVCFailures                  ,
+       ibmOsaExpATMConfigDirectIntfc            ,
+       ibmOsaExpATMConfigDirectVPI              ,
+       ibmOsaExpATMConfigDirectVCI              ,
+       ibmOsaExpATMControlDirectIntfc           ,
+       ibmOsaExpATMControlDirectVPI             ,
+       ibmOsaExpATMControlDirectVCI             ,
+       ibmOsaExpATMControlDistIntfc             ,
+       ibmOsaExpATMControlDistributeVPI         ,
+       ibmOsaExpATMControlDistributeVCI         ,
+       ibmOsaExpATMMulticastSendIntfc           ,
+       ibmOsaExpATMMulticastSendVPI             ,
+       ibmOsaExpATMMulticastSendVCI             ,
+       ibmOsaExpATMMulticastFwdIntfc            ,
+       ibmOsaExpATMMulticastForwardVPI          ,
+       ibmOsaExpATMMulticastForwardVCI
+
+             }
+    STATUS  current
+    DESCRIPTION
+            "This group comprises those objects that are related
+             to OSA-Express ATM LAN Emulation feature only"
+     ::= { ibmOSAMibGroups 7 }
+
+  END
