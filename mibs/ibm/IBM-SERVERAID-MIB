@@ -1,0 +1,1424 @@
+-- MIB created 9/10/99 21:44:03, by
+--   SMICng version 2.2.06(PRO)(MS-DOS32), January 6, 1998. Enterprise key IBM
+
+IBM-SERVERAID-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmServeRaid.mi2"
+
+IMPORTS
+    enterprises
+            FROM SNMPv2-SMI-v1
+    DateAndTime, TruthValue
+            FROM SNMPv2-TC-v1
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+    Gauge
+            FROM RFC1155-SMI
+    OBJECT-TYPE
+            FROM RFC-1212
+    TRAP-TYPE
+            FROM RFC-1215;
+
+ibmServeRaidMIB OBJECT IDENTIFIER ::= { ibmServeRaid 2 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    200105290000Z
+--  OrgName
+--    IBM ServeRAID Group
+--  ContactInfo
+--    IBM http://www.ibm.com/support
+--  Descr
+--    The MIB module for managing IBM ServeRAID products
+--  RevDate
+--    9909090000Z
+--  RevDescr
+--    Initial Version of ibmServeRaid MIB.
+
+ibm             OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd         OBJECT IDENTIFIER ::= { ibm 6 }
+ibmServeRaid    OBJECT IDENTIFIER ::= { ibmProd 167 }
+ibmServeRaidNotifications OBJECT IDENTIFIER ::= { ibmServeRaidMIB 0 }
+ibmServeRaidMibObjects OBJECT IDENTIFIER ::= { ibmServeRaidMIB 1 }
+ibmServeRaidConformance OBJECT IDENTIFIER ::= { ibmServeRaidMIB 2 }
+ibmServeRaidAgentInfo OBJECT IDENTIFIER ::= { ibmServeRaidMibObjects 1 }
+ibmServeRaidInfo OBJECT IDENTIFIER ::= { ibmServeRaidMibObjects 2 }
+ibmServeRaidTrapInfo OBJECT IDENTIFIER ::= { ibmServeRaidMibObjects 3 }
+ibmServeRaidCompliances OBJECT IDENTIFIER ::= { ibmServeRaidConformance 1 }
+ibmServeRaidGroups OBJECT IDENTIFIER ::= { ibmServeRaidConformance 2 }
+
+ibmServeRaidAgentKeyIndex OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { ibmServeRaidAgentInfo 1 }
+
+ibmServeRaidAgentId OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID (sub-)agent ID string"
+    ::= { ibmServeRaidAgentInfo 2 }
+
+ibmServeRaidAgentCompany OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID (sub-)agent company string"
+    ::= { ibmServeRaidAgentInfo 3 }
+
+ibmServeRaidAgentVersion OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID (sub-)agent version string"
+    ::= { ibmServeRaidAgentInfo 4 }
+
+ibmServeRaidAgentBuildDate OBJECT-TYPE
+    SYNTAX DateAndTime
+--    Rsyntax OCTET STRING(SIZE(8|11))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID (sub-)agent build date and time"
+    ::= { ibmServeRaidAgentInfo 5 }
+
+ibmServeRaidAgentVersionMajor OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID (sub-)agent major version number"
+    ::= { ibmServeRaidAgentInfo 6 }
+
+ibmServeRaidAgentVersionMinor OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID (sub-)agent minor version number"
+    ::= { ibmServeRaidAgentInfo 7 }
+
+ibmServeRaidControllerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmServeRaidControllerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID Controller table"
+    ::= { ibmServeRaidInfo 1 }
+
+ibmServeRaidControllerEntry OBJECT-TYPE
+    SYNTAX IbmServeRaidControllerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID Controller table entry"
+    INDEX { ibmServeRaidKeyIndex }
+    ::= { ibmServeRaidControllerTable 1 }
+
+IbmServeRaidControllerEntry ::= SEQUENCE {
+    ibmServeRaidKeyIndex SnmpAdminString,    
+    ibmServeRaidControllerId INTEGER,
+    ibmServeRaidModel SnmpAdminString,
+    ibmServeRaidFirmwareVersion SnmpAdminString,
+    ibmServeRaidBiosVersion SnmpAdminString,
+    ibmServeRaidDefaultRebuildRate SnmpAdminString,
+    ibmServeRaidNumChannels Gauge,
+    ibmServeRaidMaxChannels INTEGER,
+    ibmServeRaidNumLogicalDrives Gauge,
+    ibmServeRaidMaxLogicalDrives INTEGER,
+    ibmServeRaidNumPhysicalDevices Gauge,
+    ibmServeRaidMaxPhysicalDevices INTEGER,
+    ibmServeRaidStripeSize INTEGER,
+    ibmServeRaidSlotNumber INTEGER,
+    ibmServeRaidVendorName SnmpAdminString,
+    ibmServeRaidGeneralStatus INTEGER
+    }
+
+ibmServeRaidKeyIndex OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { ibmServeRaidControllerEntry 1 }
+
+ibmServeRaidControllerId OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID Controller number (index)"
+    ::= { ibmServeRaidControllerEntry 2 }
+
+ibmServeRaidModel OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Controller model/submodel"
+    ::= { ibmServeRaidControllerEntry 3 }
+
+ibmServeRaidFirmwareVersion OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Firmware version"
+    ::= { ibmServeRaidControllerEntry 4 }
+
+ibmServeRaidBiosVersion OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "BIOS version"
+    ::= { ibmServeRaidControllerEntry 5 }
+
+ibmServeRaidDefaultRebuildRate OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Default rebuild/check rate"
+    ::= { ibmServeRaidControllerEntry 6 }
+
+ibmServeRaidNumChannels OBJECT-TYPE
+    SYNTAX Gauge
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of channels currently in use"
+    ::= { ibmServeRaidControllerEntry 7 }
+
+ibmServeRaidMaxChannels OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum number of channels"
+    ::= { ibmServeRaidControllerEntry 8 }
+
+ibmServeRaidNumLogicalDrives OBJECT-TYPE
+    SYNTAX Gauge
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Current number of logical drives "
+    ::= { ibmServeRaidControllerEntry 9 }
+
+ibmServeRaidMaxLogicalDrives OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum logical drives"
+    ::= { ibmServeRaidControllerEntry 10 }
+
+ibmServeRaidNumPhysicalDevices OBJECT-TYPE
+    SYNTAX Gauge
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Current number of physical devices"
+    ::= { ibmServeRaidControllerEntry 11 }
+
+ibmServeRaidMaxPhysicalDevices OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum physical devices"
+    ::= { ibmServeRaidControllerEntry 12 }
+
+ibmServeRaidStripeSize OBJECT-TYPE
+    SYNTAX INTEGER
+--  Units
+--    1K byte chunks
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Stripe Size (in 1K byte chunks)"
+    ::= { ibmServeRaidControllerEntry 13 }
+
+ibmServeRaidSlotNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Slot number the controller is in"
+    ::= { ibmServeRaidControllerEntry 14 }
+
+ibmServeRaidVendorName OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Name of the controller vendor"
+    ::= { ibmServeRaidControllerEntry 15 }
+
+ibmServeRaidGeneralStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        ok(1),
+        fail(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "General controller status"
+    ::= { ibmServeRaidControllerEntry 16 }
+
+ibmServeRaidPhysDeviceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmServeRaidPhysDeviceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Physical device info table"
+    ::= { ibmServeRaidInfo 2 }
+
+ibmServeRaidPhysDeviceEntry OBJECT-TYPE
+    SYNTAX IbmServeRaidPhysDeviceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Physical device info table entry"
+    INDEX { ibmServeRaidPhysDeviceKeyIndex }
+    ::= { ibmServeRaidPhysDeviceTable 1 }
+
+IbmServeRaidPhysDeviceEntry ::= SEQUENCE {
+    ibmServeRaidPhysDeviceKeyIndex SnmpAdminString,    
+    ibmServeRaidPhysDeviceChannelNr INTEGER,
+    ibmServeRaidPhysDeviceDevNr INTEGER,
+    ibmServeRaidPhysDeviceModel SnmpAdminString,
+    ibmServeRaidPhysDeviceCapacity INTEGER,
+    ibmServeRaidPhysDeviceStatus INTEGER,
+    ibmServeRaidPhysDeviceDiskConfigured TruthValue,
+    ibmServeRaidPhysDeviceScsiType INTEGER,
+    ibmServeRaidPhysDevicePfaStatus INTEGER
+    }
+
+ibmServeRaidPhysDeviceKeyIndex OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { ibmServeRaidPhysDeviceEntry 1 }
+
+ibmServeRaidPhysDeviceChannelNr OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Channel number (index)"
+    ::= { ibmServeRaidPhysDeviceEntry 2 }
+
+ibmServeRaidPhysDeviceDevNr OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Physical device number (index).  This corresponds to the SCSI ID."
+    ::= { ibmServeRaidPhysDeviceEntry 3 }
+
+ibmServeRaidPhysDeviceModel OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Physical device model name"
+    ::= { ibmServeRaidPhysDeviceEntry 4 }
+
+ibmServeRaidPhysDeviceCapacity OBJECT-TYPE
+    SYNTAX INTEGER
+--  Units
+--    MegaBytes
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Disk capacity (MBytes)"
+    ::= { ibmServeRaidPhysDeviceEntry 5 }
+
+ibmServeRaidPhysDeviceStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        dead(1),
+        online(2),
+        standby(3),
+        rebuild(4),
+        spare(5),
+        ready(6),
+        empty(7),
+        unknown(9)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Disk status"
+    ::= { ibmServeRaidPhysDeviceEntry 6 }
+
+ibmServeRaidPhysDeviceDiskConfigured OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates if device is a configured disk"
+    ::= { ibmServeRaidPhysDeviceEntry 7 }
+
+ibmServeRaidPhysDeviceScsiType OBJECT-TYPE
+    SYNTAX INTEGER {
+        disk(1),
+        tape(2),
+        printer(3),
+        processor(4),
+        writeOnce(5),
+        cdRom(6),
+        scanner(7),
+        optical(8),
+        jukebox(9),
+        commDev(10),
+        enclosure(97),
+        host(98),
+        unknown(99)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "SCSI device type"
+    ::= { ibmServeRaidPhysDeviceEntry 8 }
+
+ibmServeRaidPhysDevicePfaStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        ok(1),
+        failurePredicted(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Reports status of drive predictive failure analysis, 
+         drive should be replaced if failure-predicted. "
+    ::= { ibmServeRaidPhysDeviceEntry 9 }
+
+ibmServeRaidLogicalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmServeRaidLogicalEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "ServeRAID Logical drive info table"
+    ::= { ibmServeRaidInfo 3 }
+
+ibmServeRaidLogicalEntry OBJECT-TYPE
+    SYNTAX IbmServeRaidLogicalEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Logical drive info table entry"
+    INDEX { ibmServeRaidLogicalKeyIndex }
+    ::= { ibmServeRaidLogicalTable 1 }
+
+IbmServeRaidLogicalEntry ::= SEQUENCE {
+    ibmServeRaidLogicalKeyIndex SnmpAdminString,    
+    ibmServeRaidLogicalDriveNum INTEGER,
+    ibmServeRaidLogicalStatus INTEGER,
+    ibmServeRaidLogicalSize INTEGER,
+    ibmServeRaidLogicalRaidLevel SnmpAdminString,
+    ibmServeRaidLogicalWriteCacheMode INTEGER
+    }
+
+ibmServeRaidLogicalKeyIndex OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { ibmServeRaidLogicalEntry 1 }
+
+ibmServeRaidLogicalDriveNum OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Logical drive number (index)"
+    ::= { ibmServeRaidLogicalEntry 2 }
+
+ibmServeRaidLogicalStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        online(1),
+        critical(2),
+        offline(3),
+        migrating(4),
+        free(5),
+        unknown(9)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Logical drive status"
+    ::= { ibmServeRaidLogicalEntry 3 }
+
+ibmServeRaidLogicalSize OBJECT-TYPE
+    SYNTAX INTEGER
+--  Units
+--    MegaBytes
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Size of logical drive (MBytes)"
+    ::= { ibmServeRaidLogicalEntry 4 }
+
+ibmServeRaidLogicalRaidLevel OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Drive RAID level."
+    ::= { ibmServeRaidLogicalEntry 5 }
+
+ibmServeRaidLogicalWriteCacheMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        writeBack(1),
+        writeThrough(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Cache write back / write through"
+    ::= { ibmServeRaidLogicalEntry 6 }
+
+ibmServeRaidTrapController OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The controller number"
+    ::= { ibmServeRaidTrapInfo 1 }
+
+ibmServeRaidTrapLogicalDrive OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The logical drive number"
+    ::= { ibmServeRaidTrapInfo 2 }
+
+ibmServeRaidTrapChannel OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The SCSI Channel of the physical drive"
+    ::= { ibmServeRaidTrapInfo 3 }
+
+ibmServeRaidTrapScsiId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The SCSI Target id of the physical drive"
+    ::= { ibmServeRaidTrapInfo 4 }
+
+ibmServeRaidTrapFan OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The fan number in the drive enclosure"
+    ::= { ibmServeRaidTrapInfo 5 }
+
+ibmServeRaidTrapPowerSupply OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The power supply in the drive enclosure"
+    ::= { ibmServeRaidTrapInfo 6 }
+
+ibmServeRaidTrapErrorCode OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The error code reported by the controller"
+    ::= { ibmServeRaidTrapInfo 7 }
+
+ibmServeRaidTrapServerName OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Server name this trap comes from"
+    ::= { ibmServeRaidTrapInfo 8 }
+
+ibmServeRaidTrapArray OBJECT-TYPE
+    SYNTAX SnmpAdminString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Alphanumeric digit that identifies the array"
+    ::= { ibmServeRaidTrapInfo 9 }
+    
+ibmServeRaidTrapFru OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The fru number of the device"
+    ::= { ibmServeRaidTrapInfo 10 }
+
+ibmServeRaidNoControllers TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: No controllers were found in this system."
+    ::= 201
+
+ibmServeRaidControllerFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Commands not responding on Controller %d."
+    ::= 202
+
+ibmServeRaidDeadBattery TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: The battery-backup cache device on Controller %d needs a new battery."
+    ::= 203
+
+ibmServeRaidDeadBatteryCache TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: The battery-backup cache device on Controller %d is defective %d"
+    ::= 204
+
+ibmServeRaidPollingFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Background polling commands not responding on Controller %d %d"
+    ::= 205
+
+ibmServeRaidConfigFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Cannot read controller configuration."
+    ::= 206
+
+ibmServeRaidControllerAdded TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Controller %d has been added to the system."
+    ::= 207
+
+ibmServeRaidControllerReplaced TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Controller %d has been replaced in the system."
+    ::= 208
+
+ibmServeRaidControllerFailover TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Controller %d failover detected. Passive controller is now active."
+    ::= 209
+
+ibmServeRaidLogicalDriveCritical TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Warning: Logical Drive %d is Critical on Controller %d."
+    ::= 301
+
+ibmServeRaidLogicalDriveBlocked TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Logical Drive %d is Blocked on Controller %d."
+    ::= 302
+
+ibmServeRaidLogicalDriveOffLine TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Logical Drive %d is Offline on Controller %d."
+    ::= 303
+
+ibmServeRaidRebuildDetected TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Rebuilding Logical Drive %d on Controller %d."
+    ::= 304
+
+ibmServeRaidRebuildComplete TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Rebuild complete on Logical Drive %d of Controller %d."
+    ::= 305
+
+ibmServeRaidRebuildFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController, ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Rebuild failed on Logical Drive %d of Controller %d %d."
+    ::= 306
+
+ibmServeRaidSyncDetected TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Synchronizing Logical Drive %d on Controller %d."
+    ::= 307
+
+ibmServeRaidSyncComplete TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Synchronization complete on Logical Drive %d of Controller %d."
+    ::= 308
+
+ibmServeRaidSyncFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController, ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Synchronization failed on Logical Drive %d of Controller %d %d."
+    ::= 309
+
+ibmServeRaidMigrationDetected TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Migrating Logical Drive %d on Controller %d."
+    ::= 310
+
+ibmServeRaidMigrationComplete TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Migration complete on Logical Drive %d of Controller %d."
+    ::= 311
+
+ibmServeRaidMigrationFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController, ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Migration failed on Logical Drive %d of Controller %d %d."
+    ::= 312
+
+ibmServeRaidCompressionDetected TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Compressing Logical Drive %d on Controller %d."
+    ::= 313
+
+ibmServeRaidCompressionComplete TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Compression complete on Logical Drive %d of Controller %d."
+    ::= 314
+
+ibmServeRaidcompressionFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController, ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Compression failed on Logical Drive %d of Controller %d %d."
+    ::= 315
+
+ibmServeRaidDecompressionDetected TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Decompressing Logical Drive %d on Controller %d."
+    ::= 316
+
+ibmServeRaidDecompressionComplete TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Decompression complete on Logical Drive %d of Controller %d."
+    ::= 317
+
+ibmServeRaidDecompressionFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController, ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Decompression failed on Logical Drive %d of Controller %d %d."
+    ::= 318
+
+ibmServeRaidFlashCopyDetected TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: FlashCopying Logical Drive %d on Controller %d."
+    ::= 319
+
+ibmServeRaidFlashCopyComplete TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: FlashCopy complete on Logical Drive %d of Controller %d."
+    ::= 320
+
+ibmServeRaidFlashCopyFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController, ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: FlashCopy failed on Logical Drive %d of Controller %d %d."
+    ::= 321
+
+ibmServeRaidArrayRebuildDetected TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapArray, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Rebuilding Array %d on Controller %d."
+    ::= 322
+
+ibmServeRaidArrayRebuildComplete TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapArray, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Rebuild complete on Array %d of Controller %d."
+    ::= 323
+
+ibmServeRaidArrayRebuildFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapArray, 
+        ibmServeRaidTrapController, ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Rebuild failed on Array %d of Controller %d %d."
+    ::= 324
+
+ibmServeRaidArraySyncDetected TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapArray, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Synchronizing Array %d on Controller %d."
+    ::= 325
+
+ibmServeRaidArraySyncComplete TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapArray, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Synchronization complete on Array %d of Controller %d."
+    ::= 326
+
+ibmServeRaidArraySyncFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapArray, 
+        ibmServeRaidTrapController, ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Synchronization failed on Array %d of Controller %d %d."
+    ::= 327
+
+ibmServeRaidArrayFlashCopyDetected TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapArray, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: FlashCopying Array %d on Controller %d."
+    ::= 328
+
+ibmServeRaidArrayFlashCopyComplete TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapArray, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: FlashCopy complete on Array %d of Controller %d."
+    ::= 329
+
+ibmServeRaidArrayFlashCopyFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapArray, 
+        ibmServeRaidTrapController, ibmServeRaidTrapErrorCode }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: FlashCopy failed on Array %d of Controller %d %d."
+    ::= 330
+
+ibmServeRaidLogicalDriveUnblocked TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapLogicalDrive, 
+        ibmServeRaidTrapController }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Logical Drive %d is unblocked on Controller %d."
+    ::= 331
+
+ibmServeRaidDefunctDrive TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel, ibmServeRaidTrapScsiId }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Defunct drive on Controller %d, Channel %d, SCSI ID %d."
+    ::= 401
+
+ibmServeRaidPfaDrive TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel, ibmServeRaidTrapScsiId }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Warning: PFA drive on Controller %d, Channel %d, SCSI ID %d."
+    ::= 402
+
+ibmServeRaidDefunctReplaced TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel, ibmServeRaidTrapScsiId }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: A drive is set to Hot-Spare on Controller %d, Channel %d, SCSI ID %d."
+    ::= 403
+    
+ibmServeRaidDefunctDriveFru TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapFru, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel, ibmServeRaidTrapScsiId}
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Defunct drive (FRU Part # %d} on controller %d, channel %d, SCSI ID %d."
+    ::= 404
+
+ibmServeRaidPfaDriveFru TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapFru, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel, ibmServeRaidTrapScsiId }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Warning: PFA drive (FRU Part # %d) on Controller %d, Channel %d, SCSI ID %d."
+    ::= 405
+    
+ibmServeRaidUnsupportedDrive TRAP-TYPE
+ -- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel, ibmServeRaidTrapScsiId }
+--  Status
+--    optional, disable by using -DshowCounterfeitDrives=false on command line
+    DESCRIPTION
+        "Warning: Unsupported physical drive found on Controller %d, Channel %d, SCSI ID %d."
+    ::= 406
+    
+ibmServeRaidEnclosureOK TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Enclosure device responding on Controller %d, Channel %d."
+    ::= 501
+
+ibmServeRaidEnclosureFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Enclosure device not responding on Controller %d, Channel %d."
+    ::= 502
+
+ibmServeRaidFanOk TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapFan, 
+        ibmServeRaidTrapController, ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Enclosure fan %d on Controller %d, Channel %d is now operational."
+    ::= 503
+
+ibmServeRaidFanFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapFan, 
+        ibmServeRaidTrapController, ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Enclosure fan %d on Controller %d, Channel %d is malfunctioning."
+    ::= 504
+
+ibmServeRaidFanInstalled TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapFan, 
+        ibmServeRaidTrapController, ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Enclosure fan %d on Controller %d, Channel %d has been installed."
+    ::= 505
+
+ibmServeRaidFanRemoved TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapFan, 
+        ibmServeRaidTrapController, ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Warning: Enclosure fan %d on Controller %d, Channel %d has been removed."
+    ::= 506
+
+ibmServeRaidTempOk TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Enclosure temperature is in normal range on Controller %d, Channel %d."
+    ::= 507
+
+ibmServeRaidTempFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapController, 
+        ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Enclosure temperature is out of normal range on Controller %d, Channel %d."
+    ::= 508
+
+ibmServeRaidPowerSupplyOk TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapPowerSupply, 
+        ibmServeRaidTrapController, ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Enclosure power supply %d on Controller %d, Channel %d is now operational."
+    ::= 509
+
+ibmServeRaidPowerSupplyFail TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapPowerSupply, 
+        ibmServeRaidTrapController, ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Error: Enclosure power supply %d on Controller %d, Channel %d is malfunctioning."
+    ::= 510
+
+ibmServeRaidPowerSupplyInstalled TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapPowerSupply, 
+        ibmServeRaidTrapController, ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: Enclosure power supply %d on Controller %d, Channel %d has been installed."
+    ::= 511
+
+ibmServeRaidPowerSupplyRemoved TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName, ibmServeRaidTrapPowerSupply, 
+        ibmServeRaidTrapController, ibmServeRaidTrapChannel }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Warning: Enclosure power supply %d on Controller %d, Channel %d has been removed."
+    ::= 512
+
+ibmServeRaidTestTrap TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE ibmServeRaidMIB
+    VARIABLES {
+        ibmServeRaidTrapServerName }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "Informational: This is a test trap."
+    ::= 601
+
+ibmServeRaidAgentGroup OBJECT IDENTIFIER ::= { ibmServeRaidGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A group of objects providing information about the 
+--     ServeRAID (sub-)agent. 
+--  objects
+--    ibmServeRaidAgentId, ibmServeRaidAgentCompany, 
+--    ibmServeRaidAgentVersion, ibmServeRaidAgentBuildDate, 
+--    ibmServeRaidAgentVersionMajor, ibmServeRaidAgentVersionMinor
+
+ibmServeRaidControllerGroup OBJECT IDENTIFIER ::= { ibmServeRaidGroups 2 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A group of objects providing information about the 
+--     controllers in a ServeRAID. 
+--  objects
+--    ibmServeRaidModel, ibmServeRaidFirmwareVersion, 
+--    ibmServeRaidBiosVersion, ibmServeRaidDefaultRebuildRate, 
+--    ibmServeRaidNumChannels, ibmServeRaidMaxChannels, 
+--    ibmServeRaidNumLogicalDrives, ibmServeRaidMaxLogicalDrives, 
+--    ibmServeRaidNumPhysicalDevices, 
+--    ibmServeRaidMaxPhysicalDevices, ibmServeRaidStripeSize, 
+--    ibmServeRaidSlotNumber, ibmServeRaidVendorName, 
+--    ibmServeRaidGeneralStatus
+
+ibmServeRaidPhysicalGroup OBJECT IDENTIFIER ::= { ibmServeRaidGroups 3 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A group of objects providing information about the 
+--     physical devices in a ServeRAID. 
+--  objects
+--    ibmServeRaidPhysDeviceModel, ibmServeRaidPhysDeviceCapacity, 
+--    ibmServeRaidPhysDeviceStatus, 
+--    ibmServeRaidPhysDeviceDiskConfigured, 
+--    ibmServeRaidPhysDeviceScsiType, 
+--    ibmServeRaidPhysDevicePfaStatus
+
+ibmServeRaidLogicalGroup OBJECT IDENTIFIER ::= { ibmServeRaidGroups 4 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A group of objects providing information about the 
+--     logical devices in a ServeRAID. 
+--  objects
+--    ibmServeRaidLogicalStatus, ibmServeRaidLogicalSize, 
+--    ibmServeRaidLogicalRaidLevel, 
+--    ibmServeRaidLogicalWriteCacheMode
+
+ibmServeRaidTrapInfoGroup OBJECT IDENTIFIER ::= { ibmServeRaidGroups 5 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A group of objects providing information that is being 
+--     passed along with a trap/notification. 
+--  objects
+--    ibmServeRaidTrapController, ibmServeRaidTrapLogicalDrive, 
+--    ibmServeRaidTrapChannel, ibmServeRaidTrapScsiId, 
+--    ibmServeRaidTrapFan, ibmServeRaidTrapPowerSupply, 
+--    ibmServeRaidTrapFru, ibmServeRaidTrapErrorCode, 
+--    ibmServeRaidTrapServerName
+
+ibmServeRaidNotificationsGroup OBJECT IDENTIFIER ::= { ibmServeRaidGroups 6 }
+-- NOTIFICATION-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A group of notifications providing information about 
+--     significant events in a ServeRAID. 
+--  notifications
+--    ibmServeRaidNoControllers, ibmServeRaidControllerFail, 
+--    ibmServeRaidDeadBattery, ibmServeRaidDeadBatteryCache, 
+--    ibmServeRaidPollingFail, ibmServeRaidConfigFail, 
+--    ibmServeRaidControllerAdded, ibmServeRaidControllerReplaced, 
+--    ibmServeRaidControllerFailover, 
+--    ibmServeRaidLogicalDriveCritical, 
+--    ibmServeRaidLogicalDriveBlocked, 
+--    ibmServeRaidLogicalDriveOffLine, ibmServeRaidRebuildDetected, 
+--    ibmServeRaidRebuildComplete, ibmServeRaidRebuildFail, 
+--    ibmServeRaidSyncDetected, ibmServeRaidSyncComplete, 
+--    ibmServeRaidSyncFail, ibmServeRaidMigrationDetected, 
+--    ibmServeRaidMigrationComplete, ibmServeRaidMigrationFail, 
+--    ibmServeRaidCompressionDetected, 
+--    ibmServeRaidCompressionComplete, ibmServeRaidcompressionFail, 
+--    ibmServeRaidDecompressionDetected, 
+--    ibmServeRaidDecompressionComplete, 
+--    ibmServeRaidDecompressionFail, ibmServeRaidFlashCopyDetected, 
+--    ibmServeRaidFlashCopyComplete, ibmServeRaidFlashCopyFail,
+--    ibmServeRaidLogicalDriveUnblocked,
+--    ibmServeRaidArrayRebuildDetected, ibmServeRaidArrayRebuildComplete,
+--    ibmServeRaidArrayRebuildFail, ibmServeRaidArraySyncDetected,
+--    ibmServeRaidArraySyncComplete, ibmServeRaidArraySyncFail,
+--    ibmServeRaidArrayFlashCopyDetected, ibmServeRaidArrayFlashCopyComplete,
+--    ibmServeRaidArrayFlashCopyFail, 
+--    ibmServeRaidDefunctDrive, ibmServeRaidPfaDrive, 
+--    ibmServeRaidDefunctDriveFru, ibmServeRaidPfaDriveFru,
+--    ibmServeRaidUnsupportedDrive,
+--    ibmServeRaidDefunctReplaced, ibmServeRaidEnclosureOK, 
+--    ibmServeRaidEnclosureFail, ibmServeRaidFanOk, 
+--    ibmServeRaidFanFail, ibmServeRaidFanInstalled, 
+--    ibmServeRaidFanRemoved, ibmServeRaidTempOk, 
+--    ibmServeRaidTempFail, ibmServeRaidPowerSupplyOk, 
+--    ibmServeRaidPowerSupplyFail, ibmServeRaidPowerSupplyInstalled, 
+--    ibmServeRaidPowerSupplyRemoved, ibmServeRaidTestTrap
+
+ibmServeRaidCompliance OBJECT IDENTIFIER ::= { ibmServeRaidCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The compliance statement for SNMP entities which implement 
+--     this IBM-RAID-SERVER-MIB. 
+--  Module
+--    >>current<<
+--   MandGroup
+--    ibmServeRaidAgentGroup
+--   MandGroup
+--    ibmServeRaidControllerGroup
+--   MandGroup
+--    ibmServeRaidPhysicalGroup
+--   MandGroup
+--    ibmServeRaidLogicalGroup
+--   MandGroup
+--    ibmServeRaidTrapInfoGroup
+--   MandGroup
+--    ibmServeRaidNotificationsGroup
+
+
+END
+

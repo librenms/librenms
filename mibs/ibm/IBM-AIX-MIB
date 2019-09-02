@@ -1,0 +1,3755 @@
+-- IBM_PROLOG_BEGIN_TAG 
+-- This is an automatically generated prolog. 
+--  
+-- tcpip610 src/tcpip/usr/samples/snmpd/aixmib.my 1.23 
+--  
+-- Licensed Materials - Property of IBM 
+--  
+-- Restricted Materials of IBM 
+--  
+-- COPYRIGHT International Business Machines Corp. 2002,2004 
+-- All Rights Reserved 
+--  
+-- US Government Users Restricted Rights - Use, duplication or 
+-- disclosure restricted by GSA ADP Schedule Contract with IBM Corp. 
+--  
+-- @(#)58       1.23  src/tcpip/usr/samples/snmpd/aixmib.my, smsnmp, tcpip610 6/15/04 15:47:31 
+-- IBM_PROLOG_END_TAG 
+
+
+IBM-AIX-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,  enterprises, Integer32,
+	TimeTicks,NOTIFICATION-TYPE          	FROM SNMPv2-SMI
+	DisplayString      		     	FROM RFC1213-MIB
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                     	FROM SNMPv2-CONF;
+
+
+ibmAIX MODULE-IDENTITY
+	LAST-UPDATED "200402180000Z"
+	ORGANIZATION "IBM "
+	CONTACT-INFO
+                     "        Guoyou Chen
+                      Postal: IBM
+                              11400 Burnet Rd.
+                              Austin Tx, 78758
+                              US
+                      Tel:    +1 512 838 0355
+                      Fax:    +1 512 838 7939
+                      E-mail: gychen@us.ibm.com
+
+			      Kurt Taylor
+                      Postal: IBM
+                              11400 Burnet Rd.
+                              Austin Tx, 78758
+                              US
+                      Tel:    +1 512 838 2496
+                      Fax:    +1 512 838 7939
+                      E-mail: krtaylor@us.ibm.com
+
+			      Konrad Rzeszutek
+                      Postal: IBM
+                              11400 Burnet Rd.
+                              Austin Tx, 78758
+                              US
+                      Tel:    +1 512 838 0357
+                      Fax:    +1 512 838 7939
+                      E-mail: darnok@us.ibm.com"
+
+	DESCRIPTION
+                "This MIB module defines AIX system management objects, 
+		which model  devices (printer/plotter, tape, hard disk, 
+		memory, SCSI adapter, CDROM drive) 
+		physical and logical storage (volume group, 
+		physical volume, logical volume, and paging space), 
+		print spooling (printing queue),  
+		users/groups, agent action,  file systems, processes,
+		subsystem services (subsystem, subserver), login users,
+		system environment, events."
+	::= { ibmProd 191}
+
+ibm 	OBJECT IDENTIFIER	 	::= { enterprises 2 }
+
+ibmProd	OBJECT IDENTIFIER		::= { ibm 6 }
+
+aixSystem 	OBJECT IDENTIFIER  ::= {ibmAIX 1}
+	aixAgent OBJECT IDENTIFIER 		  ::= {aixSystem 1}
+	aixSystemEnvironment OBJECT IDENTIFIER 	  ::= {aixSystem 2}
+	aixAuxSystemEnvironment OBJECT IDENTIFIER ::= {aixSystem 3}
+	aixTrap OBJECT IDENTIFIER 		  ::= {aixSystem 4}
+-- 
+--  Deemed unnecessary:
+--	aixInformationalTrap  OBJECT IDENTIFIER   ::= {aixSystem 5}
+-- 
+	aixGeneralTrap OBJECT IDENTIFIER	  ::= {aixSystem 6}
+
+aixStorageSystem OBJECT IDENTIFIER ::= {ibmAIX 2}
+	aixVolumeGroup OBJECT IDENTIFIER        ::= {aixStorageSystem 1}
+	aixLogicalVolume OBJECT IDENTIFIER      ::= {aixStorageSystem 2}
+	aixPhysicalVolume OBJECT IDENTIFIER     ::= {aixStorageSystem 3}
+	aixPagingSpace OBJECT IDENTIFIER        ::= {aixStorageSystem 4}
+
+aixPrintSystem OBJECT IDENTIFIER   ::= {ibmAIX 3 }
+	aixPrtQueue OBJECT IDENTIFIER 		::= { aixPrintSystem 1}
+
+aixUser OBJECT IDENTIFIER  	   ::= {ibmAIX 4}
+	aixUsers  OBJECT IDENTIFIER 		::= {aixUser 1}
+	aixGroups  OBJECT IDENTIFIER 		::= {aixUser 2}
+
+aixService OBJECT IDENTIFIER 	   ::= {ibmAIX 5}
+	aixSrvSubsystem	OBJECT IDENTIFIER 	::= { aixService 1}
+	aixSrvSubserver	OBJECT IDENTIFIER 	::= { aixService 2}
+
+aixFileSystem OBJECT IDENTIFIER    ::= {ibmAIX 6}
+
+aixProcess OBJECT IDENTIFIER 	   ::= {ibmAIX 7}
+
+aixLogin OBJECT IDENTIFIER 	   ::= {ibmAIX 8}
+
+aixDevice OBJECT IDENTIFIER        ::= {ibmAIX 9}
+	aixPrinter  	OBJECT IDENTIFIER ::= {aixDevice 1}
+	aixTape     	OBJECT IDENTIFIER ::= {aixDevice 2}
+	aixHardDisk 	OBJECT IDENTIFIER ::= {aixDevice 3}
+	aixMemory   	OBJECT IDENTIFIER ::= {aixDevice 4}
+	aixCDROM    	OBJECT IDENTIFIER ::= {aixDevice 5}
+	aixScsi     	OBJECT IDENTIFIER ::= {aixDevice 6}
+	aixProcessor	OBJECT IDENTIFIER ::= {aixDevice 7}
+	aixNetwork		OBJECT IDENTIFIER ::= {aixDevice 8}
+	aixAdapter		OBJECT IDENTIFIER ::= {aixDevice 9}
+
+aixConformance  OBJECT IDENTIFIER ::= { ibmAIX 10}
+
+-- agent group
+
+aixAgentAction OBJECT-TYPE
+        SYNTAX	INTEGER {
+		    reset(1),
+		    debugOn(2),
+		    debugOff(3),
+            shutdown(4),
+            running(5)
+        }
+        MAX-ACCESS	read-write
+        STATUS		current
+        DESCRIPTION
+                "This variable is used to trigger an action on the 
+		agent itself . 5 (running) is the normal state. 
+		When set, this variable triggers the agent 
+		to do the following:
+
+		reset - flush cache, flush MIB, re-read configuration 
+			file.
+                debugOn - turns on debugging functionality in the agent
+                debugOff- turns off debugging functionality in the agent
+                shutdown- shutdown the agent
+		running - the normal state."
+        ::= { aixAgent 1 }
+
+aixAgentCmdString OBJECT-TYPE
+	SYNTAX		DisplayString	
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This string represents a runnable 
+		command on AIX with its parameters.
+		Once the command string is set, the system can 
+		trigger the execution of the command by 
+		setting the value of seExeCommand. "
+	::= {aixAgent 2}
+
+aixAgentExeCommand OBJECT-TYPE
+	SYNTAX		INTEGER {
+			    trigger(1),
+			    default(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The variable is used to trigger the execution of 
+		the command in seCommandString. The result is stored 
+		by seCmdResult, and the output is stored by 
+		aixAgentCmdOutTable. The normal state of this object
+		is 2(default). When set to 1(trigger), the command
+		stored in aixAgentCmdString will be run.
+		trigger(1) - when the value of the variable
+			     is set to trigger(1), the command
+			     stored at aixAgentCmdString will be
+			     executed.
+		default(2) - is the default value."
+	::= {aixAgent 3}
+
+aixAgentCmdResult OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This object stores the output result of executing 
+		the command stored by aixAgentCmdString."
+	::= {aixAgent 4}
+
+aixAgentPollInterval OBJECT-TYPE
+	SYNTAX	Integer32(6..2147483647)
+	UNITS	"seconds"
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	"The poll interval(in seconds) used by the agent.  The default
+	value is zero.  This value is used to define the minimum time 
+	interval during which the subagent must update an object's
+	value, check if any events occurred and send a trap
+	when an event occurs.  If the value is zero, the polling 
+	depends on each seperate configuration variable such as 
+	aixFsPollInterval, aixVgPollInterval, etc. if it is 
+	not zero, The value can not be less than 5 seconds. If it is 
+	set to 1, 2, 3, or 4, the agent automatically sets the poll 
+	interval to 5. 
+	aixAgentPollInterval works together with the other variables
+	such as aixFsPollInterval, aixCPUPollInterval, 
+	aixVgPollInterval, aixPagePollInterval, aixLFPollInterval
+	to decide the final polling interval of each group. 
+	In /etc/aixmibd.conf file, this variable is corresponding to
+	pollInterval. Originally, it is SYNTAX Integer32(0,6..2147483647),
+	but IT Director MIB compiler does not accept this and it is
+	changed to this. "
+	::= {aixAgent 5} 
+
+aixPollEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				enable(1),
+				disable(2)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enables or disables polling. It may change  
+		the following polling interval variables: 
+			aixAgentPollInterval
+			aixFsPollInterval
+			aixCPUPollInterval
+			aixVgPollInterval
+			aixPagePollInterval
+			aixLFPollInterval 
+		If one of the polling intervals above  is non-zero, 
+		its value is 1(enable), otherwise its valuse is 
+		2 (disable). 
+		If it is set to enable(1) and all polling intervals 
+		above are zero,  aixAgentPollInterval will be set to 
+		3600 seconds. If it is set to 1(enable) and one of 
+		the polling intervals  is non-zero, the agent will 
+		not change anything.  
+		If it is set to disable (2), the polling functionality 
+		is disabled, and all polling intervals are set to zero.
+		"
+	::= {aixAgent 6}
+
+aixLastTrapMsg OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This object holds the most recent trap message sent
+		from the subagent. Its default value is set to NULL."
+	::= {aixAgent 7}
+
+aixAgentCmdOutTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF AixAgentCmdOutTableEntry
+        MAX-ACCESS	not-accessible
+        STATUS     	current
+        DESCRIPTION
+                "The output from the execution of the command stored in
+		aixAgentCmdString"
+        ::= { aixAgent  8 }
+
+aixFsPollInterval OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION 
+	"The polling interval for file systems. This variable works 
+	together with the general polling interval 
+	aixAgentPollInterval.  Its default value is zero.
+	1) If aixAgentPollInterval is zero and aixFsPollInterval is 
+	zero, the polling of file systems is disabled. 
+	2) If aixAgentPollInterval is non-zero and aixFsPollInterval 
+	is zero, the polling interval is the value of 
+	aixAgentPollInterval. 
+	3) If both aixAgentPollInterval and aixFsPollInterval are 
+	non-zero, the polling interval of file systems is set to 
+	the value of aixFsPollInterval. That means aixFsPollInterval
+	has a higher priority than aixAgentPollInterval .
+	This corresponds to fsPollInterval in /etc/aixmibd.conf. "
+	::= {aixAgent 9 }
+
+aixCPUPollInterval OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION 
+	"The polling interval for CPU utilization. This variable works 
+	together with the general polling interval 
+	aixAgentPollInterval. Its default value is zero.
+	1) If aixAgentPollInterval is zero and aixCPUPollInterval is 
+	zero, the polling of CPU utilization is disabled. 
+	2) If aixAgentPollInterval is non-zero and aixCPUPollInterval 
+	is zero, the polling interval is the value of 
+	aixAgentPollInterval. 
+	3) If both aixAgentPollInterval and aixCPUPollInterval are 
+	non-zero, the polling interval of CPU utilization is set to 
+	the value of aixCPUPollInterval. That means aixCPUPollInterval
+	has a higher priority than aixAgentPollInterval .
+	This corresponds to cpuPollInterval in /etc/aixmibd.conf."
+	::= {aixAgent 10 }
+
+aixVgPollInterval OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION 
+	"The polling interval for volume groups. This variable works 
+	together with the general polling interval 
+	aixAgentPollInterval.  Its default value is zero.
+	1) If aixAgentPollInterval is zero and aixVgPollInterval is 
+	zero, the polling of file systems is disabled. 
+	2) If aixAgentPollInterval is non-zero and aixVgPollInterval 
+	is zero, the polling interval is the value of 
+	aixAgentPollInterval. 
+	3) If both aixAgentPollInterval and aixVgPollInterval are 
+	non-zero, the polling interval of volume groups is set to 
+	the value of aixVgPollInterval. That means aixVgPollInterval
+	has a higher priority than aixAgentPollInterval .
+	This corresponds to vgPollInterval in /etc/aixmibd.conf."
+	::= {aixAgent 11 }
+
+aixPagePollInterval OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION 
+	"The polling interval for paging spaces. This variable works 
+	together with the general polling interval 
+	aixAgentPollInterval. Its default value is zero.
+	1) If aixAgentPollInterval is zero and aixPagePollInterval is 
+	zero, the polling of file systems is disabled. 
+	2) If aixAgentPollInterval is non-zero and aixPagePollInterval 
+	is zero, the polling interval is the value of 
+	aixAgentPollInterval. 
+	3) If both aixAgentPollInterval and aixPagePollInterval are 
+	non-zero, the polling interval of paging spaces is set to 
+	the value of aixFsPollInterval. That means aixPagePollInterval
+	has a higher priority than aixAgentPollInterval .
+	This corresponds to pagePollInterval in /etc/aixmibd.conf."
+	::= {aixAgent 12 }
+
+aixLFPollInterval OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION 
+	"The polling interval for login failure. This variable works 
+	together with the general polling interval 
+	aixAgentPollInterval. Its default value is zero.
+	1) If aixAgentPollInterval is zero and aixLFPollInterval is 
+	zero, the polling of file systems is disabled. 
+	2) If aixAgentPollInterval is non-zero and aixLFPollInterval 
+	is zero, the polling interval is the value of 
+	aixAgentPollInterval. 
+	3) If both aixAgentPollInterval and aixFsPollInterval are 
+	non-zero, the polling interval of login failure is set to 
+	the value of aixLFPollInterval. That means aixLFPollInterval
+	has a higher priority than aixAgentPollInterval .
+	This corresponds to lfPollInterval in  /etc/aixmibd.conf."
+	::= {aixAgent 13 }
+
+
+aixAgentCmdOutTableEntry OBJECT-TYPE
+        SYNTAX		AixAgentCmdOutTableEntry
+        MAX-ACCESS	not-accessible
+        STATUS     	current
+        DESCRIPTION
+                "An entry of the agent command output table"
+        INDEX      { aixAgentCmdOutIndex }
+        ::= { aixAgentCmdOutTable 1 }
+
+AixAgentCmdOutTableEntry ::=
+    SEQUENCE { 
+        aixAgentCmdOutput
+            DisplayString,
+        aixAgentCmdOutIndex
+	    Integer32
+
+    	}
+
+aixAgentCmdOutput OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"After the command stored in aixAgentCmdString is run,
+		each line of the output is stored in one entry of this 
+		table."
+	::= {aixAgentCmdOutTableEntry 1 }
+aixAgentCmdOutIndex OBJECT-TYPE
+	SYNTAX	        Integer32(1..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index of the table."
+	::= {aixAgentCmdOutTableEntry 2 }
+
+-- aix system environment group
+
+aixSeCPUUtilization OBJECT-TYPE
+	SYNTAX		Integer32(0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"It is an aggregate view for utilization of multiple 
+		CPUs.  aixSeCPUUtilization equals  the sum of each CPU 
+		kernel time percentage  and user time percentage 
+		divided by the number of CPUs. When the CPU utilization
+		reaches the threshold aixSeCPUThreshold, an event will
+		be generated.  After the rising event is generated,
+		another similar event will not occur until it falls 
+		behind the threshold and reaches it again. This object
+		will be refreshed at least with each poll interval."
+	::= {aixSystemEnvironment 1}
+
+aixSeCPUThreshold OBJECT-TYPE
+	SYNTAX	 	Integer32(0..100)	
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Threshold for the CPU utilization. When it is set
+		to zero, the trap is disabled. The default value 
+		is 95 which means a trap would be generated 
+		if the aggregate CPU utilization reaches 95 percent."
+	::= {aixSystemEnvironment 2}
+
+
+aixSeSystemRunLevel OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   level0(1), 
+			   level1(2), 
+			   level2(3), 
+			   level3(4), 
+			   level4(5), 
+			   level5(6), 
+			   level6(7), 
+			   level7(8), 
+			   level8(9), 
+			   level9(10), 
+			   levelm(11)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Tells the init command to set the run level on
+		next system boot. "
+	::= {aixSystemEnvironment 3}
+
+aixSeSystemState OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   running(1),
+			   reboot(2), 
+			   shutdown(3)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The object is used to shutdown or reboot the system to 
+		the run level set by aixSeSystemRunLevel. 
+		running(1) - the system is running
+		reboot(2)  - when the value of the variable is set to
+			     reboot(2), the system will reboot.
+		shutdown(3) - shutdown the system.  "
+	::= {aixSystemEnvironment 4}
+
+aixSeSystemTrap OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   enable(1),
+			   disable(2)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable the aixUtilizationCPU trap in the 
+		system environment group. The default value is 
+		enable(1)."
+	::= {aixSystemEnvironment 5}
+
+aixSeDateAndTime OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The system date and time."
+	::= {aixAuxSystemEnvironment 1}
+
+
+aixSeMaxProcPerUser OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The number of processes each user can use at one time. 
+		This limit does not apply to a root user. The default 
+		number is 128. Increasing or decreasing this number 
+		takes effect at the next system boot."
+
+	::= {aixAuxSystemEnvironment 2}
+
+aixSeLicenseNum OBJECT-TYPE
+	SYNTAX		Integer32(1..32767)	
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies the maximum number of fixed licenses on the 
+		system. Valid values for this option are positive 
+		integers from 1 to 32767. When this object is set, its 
+		value is updated without rebooting the system. "
+	::= {aixAuxSystemEnvironment 3}
+
+aixSeRemainingLicenseNum OBJECT-TYPE
+	SYNTAX		Integer32(1..32767)	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Specifies the remaining number of fixed licenses on 
+		the system. Valid values for the is option are positive 
+		integers from 1 to 32767.  "
+	::= {aixAuxSystemEnvironment 4}
+
+aixSeNumCPUs OBJECT-TYPE
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of CPUs on the machine."
+	::= {aixAuxSystemEnvironment 5}
+
+aixSeMachineType OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The machine type. For example: IBM,7043-150"
+	::= {aixAuxSystemEnvironment 6}
+
+aixSeSerialNumber OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The serial number of the machine."
+        ::= {aixAuxSystemEnvironment 7}
+-- aix event group
+
+aixFileSystemMounted NOTIFICATION-TYPE 
+	OBJECTS { aixFsName }  
+	STATUS	current
+	DESCRIPTION 
+		"When a file system is mounted or unmounted through 
+		SNMP, an event is generated.  aixFsName is defined in 
+		aixFsTable."
+	::= {aixTrap 1}
+
+aixFileSystemFull NOTIFICATION-TYPE
+	OBJECTS {aixFsName, aixFsSize,aixFsFree,  aixFsThreshold}
+	STATUS		current
+	DESCRIPTION 
+		"When the current sampled used percentage of a file 
+		system is above aixFsThreshold and the value at  
+		last interval is less than the aixFsThreshold, an the
+		event will be generated. 
+		This event message contains the file system name, 
+		the total size of the file system and available size.
+		aixFsName - file system name,
+		aixFsSize - file system size in megabytes
+		aixFsFree - free file system size in megabytes
+		aixFsThreshold - the threshold for the file system size"
+	::= {aixTrap 2}
+
+aixVolumeGroupFull   NOTIFICATION-TYPE
+	OBJECTS {aixVgName, aixVgSize, aixVgFree, aixVgThreshold}
+	STATUS		current
+	DESCRIPTION 
+		"When the current sampled used percentage of a volume 
+		group is above aixVgThreshold and the value at the last 
+		interval is less than the aixVgThreshold, an event 
+		will be generated. This event message contains the 
+		volume group name, the size, the free size and the 
+		threshold. 
+		aixVgName - the name of the volume group.
+		aixVgSize - the total size of the volume group.
+		aixVgFree - the free size of the volume group.
+		aixVgThreshold - the threshold for the volume group."
+	::= {aixTrap 3}
+
+aixPageFull  NOTIFICATION-TYPE
+	OBJECTS  {aixPageName,aixPagePercentUsed, aixPageThreshold}
+	STATUS		current
+	DESCRIPTION 
+		"When the current used percentage of a paging 
+		space is above aixPageThreshold and the value at the last 
+		interval is less than the aixPageThreshold, an event will
+		be generated. The event message includes the 
+		name of the paging space, the total size, the used 
+		percentage, the volume group it belongs to, and 
+		threshold value.
+		aixPageName - the paging space name
+		aixPagePercentUsed - percentage of used Paging space.
+		aixPageThreshold - the threshold value of the paging 
+				   space. "
+	::= {aixTrap 4}
+
+aixUserLoginFailed	NOTIFICATION-TYPE
+	OBJECTS  {aixFailedLoginTimePeriod }
+	STATUS		current
+	DESCRIPTION
+		"If a user fails to log into the system in the number of
+		attempts defined by aixLoginFailedThreshold in the last 
+		time period defined by aixFailedLoginTimePeriod, 
+		an event is generated. The event message includes the 
+		attempts of all users who failed to log into the 
+		system and the time period during which these 
+		attempts occurred."
+
+	::= { aixTrap 5}
+
+aixUtilizationCPU NOTIFICATION-TYPE
+	OBJECTS   {aixSeCPUUtilization, aixSeCPUThreshold}
+	STATUS		current
+	DESCRIPTION 
+		"When the CPU utilization reaches the threshold, an 
+		event is generated. The event contains the utilization,
+		and threshold values.
+		aixSeCPUUtilization -  CPU Utilization value.
+		aixSeThresholdCPU - Threshold value.  "
+	::= { aixTrap 6}
+
+aixSnmptrapHolder NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION
+		"Together with the agent, the snmptrap command is 
+		delivered. The snmptrap command sends a trap message 
+		to the agent. This object is place holder for 
+		snmptrap command. "
+	::= {aixGeneralTrap 1}
+
+
+aixVgThreshold OBJECT-TYPE
+	SYNTAX		Integer32(0..100)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The percentage threshold for the volume group. 
+		When the current used percentage for the volume group
+		is above aixVgThreshold and the value of the last
+		poll interval is less than the threshold, an 
+		event is generated.  The value for aixVgThreshold 
+		should be between 0 and 100.  When it is zero, 
+		the related trap, aixVolumeGroupFull, is disabled. 
+		Its default value is 95. "
+	::= {aixVolumeGroup 1}
+
+aixVgTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixVgEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"A table of defined volume groups. The number of 
+		entries depends on the configuration of the system. On 
+		AIX, a volume group is a collection of 1 to 32 physical
+		volumes of varying size and type with a system-wide 
+		unique name of up to 15 characters. Each system can 
+		have one to 255 volume groups configured. 
+		This table will be refreshed at least with each poll 
+		interval."
+	::= {aixVolumeGroup 2}
+
+aixVgEntry OBJECT-TYPE 
+	SYNTAX		AixVgEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"An entry of vgTable. Each entry contains all
+		the attributes of each volume group."
+	INDEX {aixVgIndex}
+	::= {aixVgTable  1}
+
+AixVgEntry  ::= SEQUENCE {
+	aixVgName			DisplayString,
+	aixVgIdentifier			DisplayString,
+	aixVgState			INTEGER,	
+	aixVgSize			Integer32,
+	aixVgFree			Integer32,
+	aixVgCurNumLVs			Integer32,
+	aixVgOpenLVs			Integer32,
+	aixVgActivePVs			Integer32,
+	aixVgIndex			Integer32
+	}
+
+aixVgName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name of a volume group. The name must be 
+		system-wide unique and can range from 1 to 15 
+		characters"
+	::= {aixVgEntry 1}
+
+aixVgIdentifier OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"It is a series of numbers(e.g. 0038455182a7b5f6) 
+		to identify the volume group."
+	::= {aixVgEntry 2}
+
+aixVgState OBJECT-TYPE
+	SYNTAX		INTEGER  {
+			   activeComplete(1),
+			   activePartial(2),
+			   inactive(3),
+			   unknown(4)
+			}
+
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"State of the volume group. If the volume group is 
+		activated with the varyonvg command, the state is 
+		either active/complete (indicating all physical 
+		volumes are active) or active/partial (indicating some 
+		physical volumes are not active). If the volume group 
+		is not activated with the varyonvg command, the state 
+		is inactive ."
+	::= {aixVgEntry 3}
+
+aixVgSize OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	UNITS 		"megabytes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total size of the volume group in megabytes."
+	::= {aixVgEntry 4}
+
+aixVgFree OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	UNITS 		"megabytes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The available size of the volume group in megabytes."
+	::= {aixVgEntry 5}
+
+
+aixVgCurNumLVs OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The  number of logical volumes currently in the 
+		volume group."
+	::= {aixVgEntry 6}
+
+aixVgOpenLVs OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of logical volumes within the volume group 
+		that are currently open."
+	::= {aixVgEntry 7}
+
+aixVgActivePVs OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of active physical voulmes currently in 
+		the volume group."
+	::= {aixVgEntry 8}
+
+
+aixVgIndex OBJECT-TYPE
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The columnar index for the vgTable."
+	::= {aixVgEntry 9}
+
+--logical volume group
+
+aixLvTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixLvEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		" A logical volume is a collection of logical 
+		partitions made up of  physical partitions, all 
+		contained in a single volume group. Logical volumes 
+		are expandable and can span several physical volumes 
+		in a volume group. Because it is very slow to get
+		the data in the table, no data may be returned from
+		the snmp agent."
+	::= {aixLogicalVolume  1}
+
+aixLvEntry OBJECT-TYPE 
+	SYNTAX		AixLvEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		" An entry of lvTable"
+	INDEX {aixLvIndex}
+	::= {aixLvTable  1}
+
+AixLvEntry ::= SEQUENCE {
+		aixLvName		DisplayString,
+		aixLvNameVG		DisplayString,
+		aixLvType		INTEGER,
+		aixLvMountPoint		DisplayString,
+		aixLvSize		Integer32,
+		aixLvState		INTEGER,
+		aixLvIndex		Integer32
+		}
+
+aixLvName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		" Logical volume names must be system-wide unique and 
+		can range from 1 to 15 characters."
+	::= {aixLvEntry 1}
+
+aixLvNameVG OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Name of the volume group the logical volume belongs to.
+		Volume group names must be unique system wide and can 
+		range from 1 to 15 characters."
+	::= {aixLvEntry 2}
+            	     
+aixLvType OBJECT-TYPE 
+	SYNTAX		INTEGER {
+				jfs(1),
+				jfslog(2),
+				paging(3),
+				boot(4),
+				jfs2(5),
+				jfs2log(6),
+				other(7)
+				}
+				
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION 
+		"Logical volume type. The type may be boot, jfslog, 
+		jfs, and paging. "
+	::= {aixLvEntry 3}
+
+aixLvMountPoint OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"File system mount point for the logical volume, 
+		if applicable."
+	::= {aixLvEntry 4}
+
+aixLvSize OBJECT-TYPE 
+	SYNTAX	        Integer32(0..2147483647)
+	UNITS "megabytes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The size of the logical volume in PPS."
+	::= {aixLvEntry 5}
+
+
+aixLvState  OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   openStale(1),
+			   openSyncd(2),
+			   closeStale(3),
+			   closeSyncd(4),
+			   undefined(5)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The status of the logical volume. It may be open/syncd,
+		open/stale, close/syncd, close/stale or undefined."
+	::= {aixLvEntry 6}
+
+aixLvIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The columnar index for the lvTable."
+	::= {aixLvEntry 7}
+
+--physical volume group
+
+aixPvTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixPvEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"A physical volume is a read-write disk physically
+		 attached to a computer, with a permanently assigned 
+		system wide unique identifier. They are added to a 
+		volume group with the extendvg command and removed 
+		from a volume group with the reducevg command. When 
+		added to the volume group, physical volumes are 
+		partitioned into contiguous, equal-sized units of space
+		called physical partitions."
+	::= {aixPhysicalVolume 1}
+
+aixPvEntry OBJECT-TYPE 
+	SYNTAX		AixPvEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"An entry of pvTable "
+	INDEX { aixPvIndex}
+	::= {aixPvTable  1}
+
+AixPvEntry ::= SEQUENCE {
+	aixPvName	DisplayString,
+	aixPvNameVG	DisplayString,
+	aixPvState	INTEGER,
+	aixPvSize	Integer32,
+	aixPvFree	Integer32,
+	aixPvNumLVs 	Integer32,
+	aixPvIndex 	Integer32
+	}
+
+aixPvName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name of the physical volume. Physical volume names 
+		are typically in the form hdiskx where x is a system wide
+		unique number. This name is assigned when the disk is 
+		detected for the first time on a system startup or when 
+		the system management commands are used at runtime to 
+		add a disk to the system. "
+	::= {aixPvEntry 1}
+
+aixPvNameVG OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The volume group which is assigned to the physical 
+		volume. "
+	::= { aixPvEntry 2 }
+
+aixPvState OBJECT-TYPE 
+	SYNTAX		INTEGER {
+			   active(1),
+			   missing(2),
+			   removed(3),
+			   variedOff(4)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"State of the physical volume. If the volume group that 
+		contains the physical volume is varied on with the 
+		varyonvg command, the state is active , missing , or 
+		removed . If the physical volume is varied off with 
+		the varyoffvg command, the state is varied off . "
+	::= {aixPvEntry 3}
+
+aixPvSize OBJECT-TYPE 
+	SYNTAX	        Integer32(0..2147483647)
+	UNITS 		"megabytes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Total size of the physical volume in megabytes. "
+	::= {aixPvEntry 4}
+
+aixPvFree OBJECT-TYPE 
+	SYNTAX	        Integer32(0..2147483647)
+	UNITS 		"megabytes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Available size of the physical volume in megabytes"
+	::= {aixPvEntry 5}
+
+aixPvNumLVs OBJECT-TYPE 
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	 read-only
+	STATUS		 current
+	DESCRIPTION 
+		"Number of logical volumes using the physical volume."
+	::= {aixPvEntry 6}
+
+aixPvIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	 read-only
+	STATUS		 current
+	DESCRIPTION 
+		"The columnar index for the pvTable."
+	::= {aixPvEntry 7}
+
+--paging space
+
+aixPageThreshold  OBJECT-TYPE
+	SYNTAX		Integer32(0..100)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The percentage used threshold for the paging space. 
+		When the current used percentage for the page space 
+		is above aixVgThreshold and the value of the last
+		poll interval is less than the threshold, then an 
+		event will be generated. 
+		The value for aixPageThreshold should be between 0 and 
+		100.  When it is set to zero, the related trap, 
+		aixPageFull, is disabled. Its default value is 95."
+	::= {aixPagingSpace 1}
+
+aixPageTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixPageEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		" A paging space is fixed-disk storage for information 
+		that is resident in virtual memory, but is not currently
+		being accessed. When the amount	of free real memory in 
+		the system is low, programs or data that have not been 
+		used recently are moved from real memory to paging space
+		in order to free real memory for other activities.
+		This table will be refreshed at least with each poll 
+		interval."
+	::= {aixPagingSpace 2}
+
+aixPageEntry OBJECT-TYPE 
+	SYNTAX		AixPageEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		" An entry of the pageTable Table "
+	INDEX {aixPageIndex}
+	::= {aixPageTable  1}
+
+AixPageEntry ::= SEQUENCE {
+	aixPageName		DisplayString,
+	aixPageNameVG		DisplayString,
+	aixPageNamePV		DisplayString,
+	aixPageSize		Integer32,
+	aixPagePercentUsed	Integer32,
+	aixPageStatus		INTEGER,
+	aixPageType		INTEGER,
+	aixPageIndex		Integer32
+	}
+
+aixPageName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The name of the paging space. It is assigned by the 
+		system automatically when it is created. "
+	::= {aixPageEntry 1}
+
+aixPageNameVG OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Specifies the volume group within which the logical 
+		volume for the paging space is created. "
+	::= {aixPageEntry 2}
+
+aixPageNamePV  OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Specifies the physical volume of the volume group. "
+	::= {aixPageEntry 3}
+
+aixPageSize OBJECT-TYPE 
+	SYNTAX	        Integer32(0..2147483647)
+	UNITS 		"megabytes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The size of the paging space. "
+	::= {aixPageEntry 4}
+
+aixPagePercentUsed  OBJECT-TYPE 
+	SYNTAX		Integer32(0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The used percentage of the paging space. "
+	::= {aixPageEntry 5}
+
+aixPageStatus  OBJECT-TYPE 
+	SYNTAX		INTEGER {
+			   active(1),
+			   notActive(2)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Status of the paging space."
+	::= {aixPageEntry 6}
+
+
+aixPageType  OBJECT-TYPE 
+	SYNTAX		INTEGER {
+				lv(1),
+				nfs(2),
+				other(3)
+				}
+			
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The type of paging space. "
+	::= {aixPageEntry 7}
+
+aixPageIndex  OBJECT-TYPE 
+	SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The columnar index for the pageTable."
+	::= {aixPageEntry 8}
+
+
+-- the printer queue table
+
+
+aixPrtQueTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF AixPrtQueEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+                "The print queue table. If several devices are
+		attached to one queue, there are several entries 
+		whose keys are queue name and device name."
+        ::= { aixPrtQueue 1 }
+
+aixPrtQueEntry OBJECT-TYPE
+        SYNTAX		AixPrtQueEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+                "An entry for a queue in the print queue table."
+        INDEX      { aixPrtQueIndex }
+        ::= { aixPrtQueTable 1 }
+
+AixPrtQueEntry ::= SEQUENCE {
+        aixPrtQueName
+            DisplayString,
+        aixPrtQueDevice
+	    DisplayString,
+        aixPrtQueStatus
+            INTEGER,
+        aixPrtQueAction
+            INTEGER,
+	aixPrtQueDescipline
+	    DisplayString,
+	aixPrtQueAcctFile
+	    DisplayString,
+	aixPrtQueHost
+	    DisplayString,
+	aixPrtQueRQ
+	    DisplayString,
+	aixPrtQueJobNum
+	    Integer32,
+	aixPrtQueIndex
+	    Integer32
+    	}
+
+aixPrtQueName OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+                "The name of the queue ."
+        ::= { aixPrtQueEntry 1 }
+
+aixPrtQueDevice OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+		"Print Queue device "
+        ::= { aixPrtQueEntry 2 }
+
+aixPrtQueStatus OBJECT-TYPE
+        SYNTAX		INTEGER  {
+			ready(1),
+			running(2),
+			waiting(3),
+			off(4),
+			oprwait(5),
+			init(6),
+			sending(7),
+			gethost(8),
+			connect(9),
+			busy(10)
+			}
+	MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+
+		"ready(1) indicates that virtual device is up.
+		running(2) indicates that virtual device is running 
+			a job.
+		waiting(3) indicates that  virtual device is could not
+			open and is waiting on a device.
+		off(4)	indicates that  virtual device is down.
+		oprwait(5) indicates that  virtual device is waiting on 
+			operator message response.
+		init(6) indicates that  virtual device is running a job 
+			which has set status to initialize .
+		sending(7) indicates that virtual device is remote and
+			in the process of sending data to the foriegn 
+			server.
+		gethost(8) indicates that virtual device is remote and 
+			in the process of determining the foriegn 
+			server. 
+		connect(9) indicates that virtual device is remote and 
+			in the process of connecting to the foriegn 
+			server.
+		busy(10) indicates virtual device is busy printing 
+			another job. "
+        ::= { aixPrtQueEntry 3 }
+
+
+aixPrtQueAction OBJECT-TYPE
+        SYNTAX	INTEGER {
+                    default(1),
+                    start(2),
+                    stop(3) 
+               	    }
+        MAX-ACCESS	read-write
+        STATUS		current
+        DESCRIPTION
+                "A control variable used to trigger an action on a queue
+		in the printer table.  When read, this variable always
+		returns the most recent value that it was previously 
+		set to.  If it has not been set since the last 
+		initialization of the print subsystem on the node, it
+		returns default(1) . When set, this variable 
+		causes the queue to undertake the indicated action:
+		 default - the default value for this queue status.
+                 start - start the print queue.
+                 stop - stop  the print queue." 
+        ::= { aixPrtQueEntry 4 }
+
+aixPrtQueDescipline OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current	
+	DESCRIPTION
+		"Specifies the order of print jobs in the queue.
+		For example, the discipline may be first come first 
+		servei(fcfs) or shrtest job next (sjn).
+		The selected queuing discipline applies to all 
+		printers associated with the print queue. "
+	::= {aixPrtQueEntry 5}
+
+aixPrtQueAcctFile OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current	
+	DESCRIPTION
+		"Specify the full path name of an existing file where
+		accounting data for this print queue can be logged. If 
+		account is not wanted, it is set to FALSE."
+	::= {aixPrtQueEntry 6}
+
+aixPrtQueHost OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current	
+	DESCRIPTION
+		"Specifies the full path name of an existing file
+		where accounting data for this print queue can be
+		logged. If accounting is not wanted, FALSE is 
+		specified."
+	::= {aixPrtQueEntry 7}
+
+
+aixPrtQueRQ OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current	
+	DESCRIPTION
+		"Specifies the remote queue name. If the queue is 
+		defined on the local host, NULL string value will 
+		be assigned. "
+	::= {aixPrtQueEntry 8}
+
+aixPrtQueJobNum OBJECT-TYPE
+	SYNTAX		Integer32(1..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current	
+	DESCRIPTION
+		"the job number of currently running job in the queue.
+		If the queue is down, the job number of the currently
+		running job will be zero."
+	::= {aixPrtQueEntry 9}
+
+aixPrtQueIndex OBJECT-TYPE
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current	
+	DESCRIPTION
+		"The columnar index for the aixPrtQueTable."
+	::= {aixPrtQueEntry 10}
+
+
+aixUsrTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF AixUsrEntry
+        MAX-ACCESS	not-accessible
+        STATUS     	current
+        DESCRIPTION
+		"List of users."
+        ::= { aixUsers 1 }
+
+aixUsrEntry OBJECT-TYPE
+        SYNTAX		AixUsrEntry
+        MAX-ACCESS	not-accessible
+        STATUS     	current
+        DESCRIPTION
+                "An entry in the users table."
+        INDEX      { aixUsrIndex }
+        ::= { aixUsrTable 1 }
+
+AixUsrEntry ::=
+    SEQUENCE {
+        aixUsrName
+            DisplayString,
+        aixUsrID
+            Integer32,
+	aixUsrHome
+	    DisplayString,
+	aixUsrShell
+	    DisplayString,
+        aixUsrLocalLogin
+            INTEGER ,
+        aixUsrRemoteLogin
+            INTEGER ,
+	aixUsrPasswdMaxAge
+	    Integer32,
+        aixUsrStatus
+            INTEGER,
+	aixUsrGroups	
+	    DisplayString,
+	aixUsrAllowableAttempts
+	    Integer32,
+	aixUsrResetLoginCount
+	    INTEGER ,
+	aixUsrPrimaryGroup    
+	    DisplayString,
+	aixUsrIndex
+	    Integer32
+    	}
+
+aixUsrName OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-only 
+        STATUS     	current
+        DESCRIPTION
+                "Specifies a string that identifies this user account
+		on the system. A user name contains a string of one 
+		to eight bytes. They can be letters, numbers, and some
+		special characters in the user name.
+		The following restrictions apply:
+		The user name can not start  with a - (minus sign), 
+		+ (plus sign), or ~ (tilde).   It cannot have a , 
+		(comma), : (colon), =(equals sign), * (asterisk),  
+		(double quotes), or the keywords ALL and default in 
+		the user name."
+        ::= { aixUsrEntry 1 }
+
+aixUsrID OBJECT-TYPE
+        SYNTAX		INTEGER
+        MAX-ACCESS	read-write
+        STATUS     	current
+        DESCRIPTION
+                " Defines a unique decimal integer string to associate
+		with this user account on the system. It is strongly 
+		recommended to let the system generate the user
+ 		to incorporate all the security restrictions and 
+		conventions that may apply to your system. To have 
+		the system generate the ID, leave this field blank."
+        ::= { aixUsrEntry 2}
+
+aixUsrHome OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-write
+        STATUS     	current
+        DESCRIPTION
+                "The user home directory. "
+        ::= { aixUsrEntry 3 }
+
+aixUsrShell OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-write
+        STATUS		current
+        DESCRIPTION
+                "The user's initial shell. On AIX, it is also called
+		initial program. "
+        ::= { aixUsrEntry 4 }
+
+aixUsrLocalLogin OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   true(1), 
+			   false(2)
+			}	
+	MAX-ACCESS	read-write
+	STATUS   	current
+	DESCRIPTION
+		"Indicates whether the user can log into the system 
+		with the login command locally. default value is 
+		true(1)"
+	::= {aixUsrEntry 5}
+
+aixUsrRemoteLogin OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   true(1), 
+			   false(2)
+			}	
+	MAX-ACCESS	read-write
+	STATUS   	current
+	DESCRIPTION
+		"Indicates whether the user can log into the system 
+		with the login command. For example, if this is set to
+		false, the user can not login with the telnet remotely.
+		default value is true(1)."
+	::= {aixUsrEntry 6}
+
+aixUsrPasswdMaxAge  OBJECT-TYPE
+	SYNTAX		Integer32(0..52)
+	MAX-ACCESS	read-write
+	STATUS   	current
+	DESCRIPTION
+		"Defines the maximum age (in weeks) for the user's 
+		password. When the password reaches this age, the system
+		requires it to be changed before the user can login 
+		again. The value is a decimal integer string. If 0 is 
+		specified, this feature is disabled. default value is
+		0."
+	::= { aixUsrEntry 7}
+
+aixUsrStatus OBJECT-TYPE
+        SYNTAX	    INTEGER {
+			unlocked(1),
+			locked(2),
+		       disabled(3),
+		       enabled(4),
+		       error(5) }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "The user status. Determines the status of the user.
+		Changing this variable will affect the user. 'locked(2)'
+		is synonymous with 'disabled(3)', and unlocked(1) is 
+		the same as enabled(4). Default value is unlocked(1). "
+        ::= { aixUsrEntry 8 }
+
+
+aixUsrGroups  OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-only	
+        STATUS     	current
+        DESCRIPTION
+		"Lists the groups to which the user belongs seperated by
+		the \',\' delimiter. The first on group on the list is the
+		primary group.
+		Groups are collections of 
+		users that can share access authority to protected 
+		resources. Groups can be formed for users who access
+		the same applications or hardware resources, perform 
+		similar tasks, or have similar needs for information.
+		A user can be a member in up to 32 groups. However, 
+		only one primary  group for a user can be specified.
+		When a new user account is created and the primary 
+		group is not provided, the system assigns the user
+  		to the primary default group specified in the 
+		/usr/lib/security/mkuser.default file."    
+        ::= { aixUsrEntry 9 }
+
+aixUsrAllowableAttempts  OBJECT-TYPE
+        SYNTAX		INTEGER
+        MAX-ACCESS	read-write	
+        STATUS     	current
+        DESCRIPTION
+		"Number of failed logins times before the user account
+		is locked. Default value is 0. Zero or negative value
+		indicates no limit exists. "
+        ::= { aixUsrEntry 10 }
+
+
+aixUsrResetLoginCount  OBJECT-TYPE
+        SYNTAX		INTEGER {
+			default(1),
+			reset(2)
+			}
+        MAX-ACCESS	read-write	
+        STATUS     	current
+        DESCRIPTION
+		"After the number of unsuccessful login attempts 
+		defined by aixUsrAllowableAttempts, the user will 
+		not be able to log in until the user's 
+		unsuccessful_login_count attribute in 
+		/etc/security/lastlog to be less than the value 
+		defined by aixUsrAllowableAttempts. When this variable 
+		is set to 2(reset), the unsuccessful_login_count 
+		in /etc/security/lastlog will be set to zero. 
+		Default value is 1."
+        ::= { aixUsrEntry 11 }
+
+aixUsrPrimaryGroup  OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-write	
+        STATUS     	current
+        DESCRIPTION
+		"The primary group that the user belongs to ."	
+        ::= { aixUsrEntry 12 }
+
+aixUsrIndex  OBJECT-TYPE
+	SYNTAX	        Integer32(1..2147483647)
+        MAX-ACCESS	read-only	
+        STATUS     	current
+        DESCRIPTION
+		"The index of the user table ."	
+        ::= { aixUsrEntry 13 }
+
+
+-- the group table
+
+aixGrpTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF AixGrpEntry
+        MAX-ACCESS	not-accessible
+        STATUS     	current
+        DESCRIPTION
+		"List of groups."
+        ::= { aixGroups 1 }
+
+aixGrpEntry OBJECT-TYPE
+        SYNTAX		AixGrpEntry
+        MAX-ACCESS	not-accessible
+        STATUS     	current
+        DESCRIPTION
+                "An entry in the group table."
+        INDEX      { aixGrpIndex }
+        ::= { aixGrpTable 1 }
+
+AixGrpEntry ::=
+    SEQUENCE {
+	aixGrpIndex
+	   Integer32,
+        aixGrpName
+            DisplayString,
+        aixGrpID
+            Integer32,
+	aixGrpAdminGroup  
+	    INTEGER,
+	aixGrpUsrList
+	    DisplayString,
+	aixGrpAdmList
+	   DisplayString
+    	}
+
+aixGrpIndex OBJECT-TYPE
+        SYNTAX		Integer32(1..2147483647) 
+        MAX-ACCESS	read-only
+        STATUS     	current
+        DESCRIPTION
+                "The index of the group table."
+        ::= { aixGrpEntry 1}
+
+aixGrpName OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-only 
+        STATUS     	current
+        DESCRIPTION
+                "Specifies the string that identifies a collection 
+		of system users that can access and work with protected 
+		resources. The system uses groups to control access to 
+		files and resources by users who do not own them. 
+		When a user invokes a process, the system associates 
+		the process with the user's ID and the group IDs of 
+		the groups of which the user is a member. If the user 
+		owns the resource or is a member of a group that can 
+		access it, the system grants read, write, or execute 
+		access to it according to the access control list of 
+		the resource or file.  "
+        ::= { aixGrpEntry 2 }
+
+aixGrpID OBJECT-TYPE
+        SYNTAX		Integer32(-2147483648..2147483647) 
+        MAX-ACCESS	read-only
+        STATUS     	current
+        DESCRIPTION
+		"The system assigns a unique ID associated to the 
+		group name. The group IDs are stored in the 
+		/etc/group file." 
+	::= { aixGrpEntry 3 }
+
+aixGrpAdminGroup  OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   true(1), 
+			   false(2)
+			} 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates if the group is an administrative group. 
+		Only the root user can modify the attributes of 
+		an administrative group. This field is displayed 
+		with False or True as its value. True indicates 
+		that group is an administrative group. False 
+		indicates  that it is a non administrative group 
+		(its attributes can be modified by the group's 
+		specified administrators and the root user).
+		Default value is false(2)."
+	::= { aixGrpEntry 4 }
+
+aixGrpUsrList OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-only 
+        STATUS     	current
+        DESCRIPTION
+		" the users who are in this group."
+	::= { aixGrpEntry 5 }
+
+aixGrpAdmList OBJECT-TYPE
+        SYNTAX		DisplayString
+        MAX-ACCESS	read-only 
+        STATUS     	current
+        DESCRIPTION
+		" The administrator list for this group ."
+	::= { aixGrpEntry 6 }
+
+
+
+-- the file-system table
+
+aixFsThreshold  OBJECT-TYPE
+	SYNTAX		Integer32(0..100)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The percentage threshold for the file system. 
+		When the current used percentage for the file system
+		is above aixVgThreshold and the value of the last
+		poll interval is less than the threshold, then an 
+		event will be generated.  The value for aixFsThreshold 
+		should be between 0 and 100.  When it is zero, 
+		the related trap, aixFileSystemFull, is disabled. 
+		Its default value is 95. "
+	::= {aixFileSystem 1}
+
+aixFsTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF AixFsTableEntry
+        MAX-ACCESS	not-accessible
+        STATUS     	current
+        DESCRIPTION
+                "The file system table. This table will be refreshed 
+		at least with each poll interval."
+        ::= { aixFileSystem  2 }
+
+aixFsTableEntry OBJECT-TYPE
+        SYNTAX		AixFsTableEntry
+        MAX-ACCESS	not-accessible
+        STATUS     	current
+        DESCRIPTION
+                "An entry of the file system table"
+        INDEX      { aixFsIndex }
+        ::= { aixFsTable 1 }
+
+AixFsTableEntry ::=
+    SEQUENCE { 
+        aixFsIndex
+            Integer32,
+        aixFsName
+            DisplayString,
+        aixFsMountPoint
+            DisplayString,
+        aixFsType
+	    INTEGER,
+        aixFsSize
+            Integer32,
+        aixFsFree
+            Integer32 ,
+        aixFsNumINodes
+            Integer32,
+	aixFsUsedInodes
+            Integer32,
+	aixFsStatus
+	    INTEGER,
+	aixFsExecution
+	    INTEGER,
+	aixFsResultMsg
+	    DisplayString
+    	}
+
+aixFsIndex OBJECT-TYPE
+        SYNTAX		Integer32(1..2147483647) 
+        MAX-ACCESS	read-only
+        STATUS     	current
+        DESCRIPTION
+                "The index of the file system table."
+        ::= { aixFsTableEntry 1 }
+
+aixFsName OBJECT-TYPE
+        SYNTAX	    	DisplayString
+        MAX-ACCESS	read-only
+        STATUS     	current
+        DESCRIPTION
+                "The name of the file system."
+        ::= { aixFsTableEntry 2 }
+
+aixFsMountPoint OBJECT-TYPE
+        SYNTAX	    	DisplayString
+        MAX-ACCESS	read-only
+        STATUS     	current
+        DESCRIPTION
+		"Specifies the mount point, which is the directory 
+		where the file  system is available or will be made
+		available."
+        ::= { aixFsTableEntry 3 }
+
+aixFsType OBJECT-TYPE
+        SYNTAX	INTEGER {
+		   jfs(1),
+		   jfs2(2),
+		   cdrfs(3),
+		   procfs(4),
+		   cachefs(5),
+		   autofs(6),
+		   afs(7),
+		   dfs(8),
+		   nfs(9),
+		   nfs3(10),
+		   other(11)
+		}
+        MAX-ACCESS	read-only
+        STATUS     	current
+        DESCRIPTION
+		"The file system type. The type may be JFS(Journal 
+		File System), JFS2 (extented JFS), AFS, DFS, 
+		cashefs, autofs, procfs, cdrfs (CDROM file system), 
+		NFS(Network File System), NFS3 (NFSv3 file system) "
+        ::= { aixFsTableEntry 4 }
+
+aixFsSize OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	UNITS	   	"megabytes"
+        MAX-ACCESS	read-write
+        STATUS     	current
+        DESCRIPTION
+                "The size for this file system in megabytes."
+        ::= { aixFsTableEntry 5 }
+
+aixFsFree OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	UNITS	   	"megabytes"
+        MAX-ACCESS	read-only
+        STATUS     	current
+        DESCRIPTION
+                "Total number of megabytes free in file system."
+        ::= { aixFsTableEntry 6 }
+
+
+aixFsNumINodes OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+        MAX-ACCESS	read-only
+        STATUS     	current
+        DESCRIPTION
+                "Total number of i-nodes on this file system."
+        ::= { aixFsTableEntry 7 }
+
+aixFsUsedInodes	OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The used number of Inodes in the file system. "
+	::= {aixFsTableEntry  8}
+
+
+aixFsStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   mounted(1),
+			   unmounted(2)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The status of the file system. It is either mounted(1)
+		or unmounted(2)."
+	::= { aixFsTableEntry  9}
+
+aixFsExecution OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   other(1),
+			   mount(2),
+			   unmount(3)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The variable is used to trigger the mount action 
+		on unmounted file system and unmount action on mounted
+		file system. This state can only change from mount 
+		to unmount or unmount to mount. Its normal status
+		is other(1).  The execution result is kept at 
+		aixFsResultMsg."
+	::= { aixFsTableEntry  10}
+
+aixFsResultMsg OBJECT-TYPE
+	SYNTAX 		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The execution result message of mounting or 
+		umounting command. "
+	::= { aixFsTableEntry  11}
+
+-- The proces table
+
+
+aixProcNum OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of processes running."
+	::= { aixProcess 1 }
+
+
+aixProcTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixProcEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The Process Table."
+	::= { aixProcess 2 }
+
+aixProcEntry	OBJECT-TYPE
+	SYNTAX		AixProcEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Each entry contains information about a process
+		running on the system."
+	INDEX	{ aixProcPID }
+	::= { aixProcTable 1 }
+
+AixProcEntry ::= SEQUENCE {
+    aixProcPID
+	Integer32,
+    aixProcUID
+	Integer32,
+    aixProcPPID
+	Integer32,
+    aixProcGroup
+	Integer32,
+    aixProcPriority
+	Integer32,
+    aixProcCMD
+	DisplayString,
+    aixProcCPU
+	Integer32,
+    aixProcStart
+	TimeTicks,
+    aixProcStatus
+	INTEGER,
+    aixProcTTY
+	DisplayString
+    }
+
+aixProcPID OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The process ID (pid) of the process."
+	::= { aixProcEntry 1 }
+
+aixProcUID OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The user ID of the process owner."
+	::= { aixProcEntry 2 }
+
+aixProcPPID OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The process ID of the parent process."
+	::= { aixProcEntry 3 }
+
+aixProcGroup OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the effective group ID of the process."
+	::= { aixProcEntry 4 }
+
+aixProcPriority OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The priority of the process or kernel thread, 
+		higher numbers mean lower priority."
+	::= { aixProcEntry 5 }
+
+aixProcCMD OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The command name of the process. "
+	::= { aixProcEntry 6 }
+
+aixProcCPU OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"CPU utilization of process or thread, incremented 
+		each time the system clock ticks and the process 
+		or thread is found to be running. 
+		Large values indicate a CPU intensive process and results
+		in lower process priority whereas small values indicate 
+		an I/O intensive process and result in a more favorable 
+		priority. "
+	::= { aixProcEntry 7 }
+
+aixProcStart OBJECT-TYPE
+	SYNTAX		TimeTicks 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The start time of the process."
+	::= { aixProcEntry 8 }
+
+aixProcStatus OBJECT-TYPE
+	SYNTAX	INTEGER{
+		   nonexistentPS(1),
+		   activePS(2),
+		   swappedPS(3),
+		   idlePS(4),
+		   canceledPS(5),
+		   stoppedPS(6),
+		   other(7)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"For processes:
+			(1)O Nonexistent 
+			(2)A Active
+			(3)W Swapped 
+			(4)I Idle (waiting for startup) :
+			(5)Z Canceled 
+			(6)T Stopped
+		"
+	::= { aixProcEntry 9 }
+
+
+aixProcTTY OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the controlling terminal name of the 
+		process. "
+	::= { aixProcEntry 10 }
+
+--aix subsystem
+
+aixSubSystemNum OBJECT-TYPE 
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS 		current
+	DESCRIPTION
+		"The number of the subsystems in the current table."
+	::= { aixSrvSubsystem 1}
+
+
+aixSubSysTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixSubSysEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A table of subsystems."
+	::= {aixSrvSubsystem 2}
+
+aixSubSysEntry OBJECT-TYPE
+	SYNTAX		AixSubSysEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		" An entry in the subsystem table"	
+	INDEX {aixSubSysIndex}	
+	::= {aixSubSysTable 1}
+
+AixSubSysEntry ::=
+	SEQUENCE  {
+		aixSubSysName
+			DisplayString,
+		aixSubSysGroup
+			DisplayString,
+		aixSubSysPID
+			Integer32,
+		aixSubSysStatus
+			INTEGER,
+		aixSubSysIndex
+			Integer32
+		}
+
+aixSubSysName OBJECT-TYPE
+	SYNTAX		 DisplayString	
+	MAX-ACCESS	 read-only	
+	STATUS		 current
+	DESCRIPTION
+		"The name of the subsystem. "
+	::= {aixSubSysEntry 1}
+
+aixSubSysGroup OBJECT-TYPE
+	SYNTAX		 DisplayString	
+	MAX-ACCESS	 read-only	
+	STATUS		 current
+	DESCRIPTION
+		"A subsystem group is a group of any specified 
+		subsystems. Grouping subsystems together allows 
+		control over several subsystems at the same time. Examples 
+		of subsystem groups are TCP/IP, SNA Services, 
+		Network Information system (NIS), and Network File 
+		Systems (NFS)."
+	::= {aixSubSysEntry 2}
+
+aixSubSysPID OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	 read-only	
+	STATUS		 current
+	DESCRIPTION
+		"The process ID of the subsystem. When the subsystem 
+		is inoperative, the PID is zero."
+	::= {aixSubSysEntry 3}
+
+aixSubSysStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   active(1),
+			   inoperative(2)
+			}
+				
+	MAX-ACCESS	read-write	
+	STATUS		current
+	DESCRIPTION
+		"The status of the subsystem. When it is active(1),
+		it can be stopped by setting the status to 2. Or when
+		it is inoperative(2), it can be started by setting
+		the status to 1."
+	::= {aixSubSysEntry 4}
+
+aixSubSysIndex OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	 read-only	
+	STATUS		 current
+	DESCRIPTION
+		"The index of the subsystem table."
+	::= {aixSubSysEntry 5}
+
+aixSubSrvNum OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of subservers"
+	::= {aixSrvSubserver 1}
+
+
+aixSubSrvTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixSubSrvEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A table of subservers.
+		A subserver is a program or process that belongs 
+		to a subsystem. A subsystem can have multiple 
+		subservers and is responsible for starting, stopping,
+		and providing status of the subservers."
+	::= {aixSrvSubserver 2}
+
+aixSubSrvEntry OBJECT-TYPE
+	SYNTAX		AixSubSrvEntry 
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the subserver table."
+	INDEX { aixSubSrvIndex }
+	::= {aixSubSrvTable 1}
+
+AixSubSrvEntry  ::= SEQUENCE {
+		aixSubSrvName
+			DisplayString,
+		aixSubSrvDescr
+			DisplayString,
+		aixSubSrvCommand
+			DisplayString,
+		aixSubSrvStatus
+			INTEGER,
+		aixSubSrvSubsys
+			DisplayString,
+		aixSubSrvIndex
+			Integer32
+		}
+
+aixSubSrvName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" the subserver name."
+	::= {aixSubSrvEntry 1}
+
+aixSubSrvDescr OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The description of the subserver."
+	::= {aixSubSrvEntry 2}
+
+aixSubSrvCommand OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The command to start the subserver."
+	::= {aixSubSrvEntry 3}
+
+aixSubSrvStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   active(1),
+			   inoperative(2)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The status of the subserver."
+	::= {aixSubSrvEntry 4}
+
+aixSubSrvSubsys OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"the subsystem name which the subserver belongs to."
+	::= {aixSubSrvEntry 5}
+
+aixSubSrvIndex OBJECT-TYPE
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The index of the subserver table."
+	::= {aixSubSrvEntry 6}
+
+-- aix login user group
+
+aixFailedLoginTimePeriod  OBJECT-TYPE
+        SYNTAX		Integer32(0..2147483647) 
+	UNITS 		"minutes"
+	MAX-ACCESS	read-write
+	STATUS 		current
+	DESCRIPTION 
+		"The time period where failed login attempts
+		are recorded to compare against 
+		aixLoginFailedThreshold. The default is 300 seconds
+		(5 minutes). "
+	::= {aixLogin 1}
+
+
+aixLoginFailedThreshold OBJECT-TYPE 
+        SYNTAX		Integer32(0..2147483647) 
+	MAX-ACCESS	read-write
+	STATUS 		current
+	DESCRIPTION 
+		"Defines the number of attempts which a user can 
+		try to log onto the system in the time period defined 
+		by failedLoginTimePeriod  prior to the current time 
+		before a trap is generated and sent.
+		When this variable is set to zero,
+		the aixUserLoginFailed  trap is disabled.
+		The default is 20 which means that if 
+		users attempting and failing to log in
+		20 times in last time period defined by 
+		aixFailedLoginTimePeriod , a trap is generated.
+		These attempts are recorded in /etc/security/failedlogin
+		or /var/adm/wtmp ."
+	::= {aixLogin 2}
+
+aixLoginUserTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixLoginUserEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current	
+	DESCRIPTION 
+		"loginUserTable contains users who are logged in 
+		currently."
+	::= {aixLogin 3}
+
+aixLoginUserEntry OBJECT-TYPE 
+	SYNTAX		AixLoginUserEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		" An entry of loginUserTable "
+	INDEX { aixLoginUserIndex}
+	::= {aixLoginUserTable  1}
+
+AixLoginUserEntry ::= SEQUENCE {
+	aixLoginUserName	
+		DisplayString,
+	aixLoginUserTTY
+		DisplayString,
+	aixLoginUserHost
+		DisplayString,
+	aixLoginUserDateAndTime
+		DisplayString,
+	aixLoginUserIndex
+		Integer32
+	}
+
+aixLoginUserName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The user name. If the user name is unknown, 
+		its value is UNKNOWN_U."
+	::= {aixLoginUserEntry 1}
+
+aixLoginUserTTY OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		" The terminal tty name. "
+	::= {aixLoginUserEntry 2}
+
+aixLoginUserHost OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The IP address of the machine the user tried to
+		log onto the system from. "
+	::= {aixLoginUserEntry 3}
+
+aixLoginUserDateAndTime OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS 		current
+	DESCRIPTION 
+		"The date and time when the user logged in."
+	::= {aixLoginUserEntry 4}
+
+aixLoginUserIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS 		current
+	DESCRIPTION 
+		"Index for the table"
+	::= {aixLoginUserEntry 5}
+
+-- the hardware device group
+
+-- printer
+
+aixPrinterTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixPrinterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"A table of defined printers/plotters. On AIX, the 
+		printer is defined,  used and dealt with in the same 
+		way as the plotter. The number of entries depends on 
+		the configuration of the system such as the serial or 
+		parallel port number."
+	::= { aixPrinter 1 }
+
+aixPrinterEntry OBJECT-TYPE 
+	SYNTAX		AixPrinterEntry
+	MAX-ACCESS	not-accessible
+	STATUS 		current
+	DESCRIPTION 
+		"An entry of printerTable. Each entry contains all 
+		attributes of a defined printer or plotter."
+	INDEX {aixPrinterIndex}
+	::= {aixPrinterTable 1}
+
+AixPrinterEntry ::= SEQUENCE {
+	aixPrinterName		DisplayString,
+	aixPrinterIndex		Integer32,
+	aixPrinterType 		DisplayString,
+	aixPrinterInterface	DisplayString,
+	aixPrinterStatus	INTEGER,
+	aixPrinterDescr		DisplayString,
+	aixPrinterLocation	DisplayString, 
+	aixPrinterPortNumber	DisplayString
+	}
+
+aixPrinterName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"When a printer or plotter device is added to the 
+		system, a name is automatically assigned to the device.
+		On AIX, this name is in the format of lpx, for example, 
+		lp0, lp1."
+	::= { aixPrinterEntry 1 }
+
+aixPrinterIndex OBJECT-TYPE
+        SYNTAX		Integer32(1..2147483647) 
+        MAX-ACCESS	read-only
+        STATUS     	current
+        DESCRIPTION
+                "The index of the printer table."
+        ::= { aixPrinterEntry 2 }
+
+aixPrinterType  OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"This is the type of the printer/plotter. The type 
+		can be the defined printer/plotter name such as  
+		hplj-8100  which represents Hewlett-Packard LaserJet 
+		8100, or opp for Other parallel printer, or osp for  
+		other serial printer."
+	::= {aixPrinterEntry 3}
+
+aixPrinterInterface OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The printer/plotter interface with the computer. Its 
+		value can be parallel, rs232, or rs422."
+	::= {aixPrinterEntry 4}
+
+aixPrinterStatus OBJECT-TYPE 
+	SYNTAX	 	INTEGER {
+			   available(1),
+			   defined(2)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Indicates the current status of the device. Possible 
+		values are available(1), indicating that the device is 
+		configured in the system and ready to use; and defined(2),
+		indicating that the device is defined to the system 
+		but not configured. "
+	::= {aixPrinterEntry 5}
+
+aixPrinterDescr OBJECT-TYPE 
+	SYNTAX 		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The description for the printer/plotter. "
+	::= {aixPrinterEntry 6}
+
+aixPrinterLocation OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+
+		"Location codes of 00-00-S1-00 or 00-00-S2-0 indicate
+		the printer or plotter device is connected to the 
+		standard I/O serial ports s1 or s2.  
+		A location code of 00-00-0P-00 indicates that the 
+		parallel printer is connected to the standard I/O 
+		parallel port 
+ 		Any other location code will indicate a printer or 
+		plotter which is connected to an adapter card other 
+		than the Standard I/O board. For these printers and 
+		plotters the location code format is AA-BB-CC-DD
+ 		where AA-BB indicates the location code of the 
+		controlling adapter.  A value of 00 for the AA field 
+		indicates the adapter card is located in the CPU drawer
+		or system unit depending on the type of system.
+ 		Any other value for the AA field indicates the card 
+		is located in an I/O expansion drawer; in which case, 
+		the first digit identifies the I/O bus and the second
+		digit identifies the slot number on the bus, in the
+		CPU drawer, that contain the asynchronous expansion 
+		adapter to which the I/O expansion drawer is connected.
+ 		The first digit of this BB field identifies the I/O bus 
+		containing the adapter card. If the card is in the 
+		CPU drawer or system unit, this digit will be 0 for 
+		the standard I/O bus or 1 for the optional I/O bus. 
+		If the card is in an I/O expansion drawer, this digit
+		is 0. The second digit identifies the slot number on 
+		the I/O bus (or slot number in the I/O expansion drawer)
+		that contains the card.  
+		The CC field identifies the connector on the adapter 
+		card to where the asynchronous distribution box is 
+		connected. Possible values are 01, 02, 03, and 04.
+ 		The DD field identifies the port number on the 
+		asynchronous distribution box where the printer or 
+		plotter is attached."
+	::= {aixPrinterEntry 7}
+
+aixPrinterPortNumber OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The printer port number. This indicates the port on 
+		an adapter card or asynchronous distribution box 
+		to which the printer or plotter is connected. The 
+		value must be in the range 0 through 7 
+		for an 8-port adapter card, 0 through 15 for a 16-port 
+		adapter card, and 0 through 63 for a 64-port adapter 
+		card. The standard I/O ports are designated as s1 and 
+		s2 for the two serial ports and p for the parallel 
+		port."
+	::= {aixPrinterEntry 8}
+
+-- tape
+
+aixTapeDrvTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixTapeDrvEntry
+	MAX-ACCESS	not-accessible
+	STATUS 		current
+	DESCRIPTION 
+		"A table of defined tape drives. The number of entries 
+		depends on the configuration of the system. "
+	::= {aixTape 1}
+
+aixTapeDrvEntry OBJECT-TYPE 
+	SYNTAX		AixTapeDrvEntry
+	MAX-ACCESS	not-accessible
+	STATUS 		current
+	DESCRIPTION 
+		"An entry in the aixTapeDrvTable. Each entry contains all 
+		the attributes of a tape drive."
+	INDEX {aixTapeDrvIndex}
+	::= {aixTapeDrvTable  1}
+
+AixTapeDrvEntry ::= SEQUENCE {
+	aixTapeDrvName		DisplayString,
+	aixTapeDrvIndex		Integer32,
+	aixTapeDrvType 		DisplayString,
+	aixTapeDrvInterface	DisplayString,
+	aixTapeDrvStatus	INTEGER,
+	aixTapeDrvDescr		DisplayString,
+	aixTapeDrvLocation	DisplayString,
+	aixTapeDrvBlkSize	Integer32,
+	aixTapeDrvManufacturerName	DisplayString,
+	aixTapeDrvModelName	DisplayString,
+	aixTapeDrvSN		DisplayString,
+	aixTapeDrvFRU		DisplayString,
+	aixTapeDrvPN		DisplayString,
+	aixTapeDrvEC		DisplayString
+	}
+
+aixTapeDrvName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the logical name of the device. When a 
+		tape drive is added or defined in the system, a name 
+		is automatically assigned to the device. The format 
+		of the name looks like rmt0."
+	::= {aixTapeDrvEntry 1}
+	
+
+aixTapeDrvIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The index of the tape drive table."
+	::= {aixTapeDrvEntry 2}
+
+aixTapeDrvType OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the predefined device type of the tape 
+		drive. For example, 4mm2gb2 is a scsi 2.0 GB 4mm 
+		Tape Drive."
+	::= {aixTapeDrvEntry 3}
+
+aixTapeDrvInterface OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the type of tape drive interface. This is 
+		the same as the predefined device subclass of the 
+		device."
+	::= {aixTapeDrvEntry 4}
+
+aixTapeDrvStatus OBJECT-TYPE 
+	SYNTAX		INTEGER {
+			   available(1),
+			   defined(2)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Indicates the current status of the tape drive. 
+		Possible values are available (1), indicating that the 
+		tape drive is configured in the system and ready to 
+		be used, and defined(2), indicating that the tape drive 
+		is defined to the system but not configured."
+	::= {aixTapeDrvEntry 5}
+
+aixTapeDrvDescr OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Provides a short text description of the tape drive 
+		device."
+	::= {aixTapeDrvEntry 6}
+
+aixTapeDrvLocation OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"For all SCSI devices, including disks, CD-ROMs, 
+		read/write optical drives, tapes, target mode, and 
+		initiator devices, the location code format is 
+		AA-BB-CC-S,L. The AA-BB fields identify the location 
+		code of the SCSI adapter controlling the SCSI device.
+		. A value of 00 for the AA field indicates the 
+		controlling adapter card is located in the CPU drawer 
+		or system unit, depending on the type of system. 
+		. The BB field identifies the I/O bus and slot 
+		containing the card. The first digit indicates the 
+		I/O bus. It is 0 for the standard I/O bus and 1 for 
+		the optional I/O bus.
+		The second digit is the slot on the indicated I/O bus 
+		containing the card. A value of 00 for the BB field 
+		indicates the standard SCSI controller.
+		. The CC field identifies the card's SCSI bus that 
+		the device is attached to. For a card that provides 
+		only a single SCSI bus, this field will be set to 00. 
+		Otherwise, a value of 00 indicates a device attached 
+		to the card's internal SCSI bus and a value of 01 
+		indicates a device attached to the card's external 
+		SCSI bus. 
+		. The S,L field identifies the SCSI ID and logical 
+		unit number (LUN) of the SCSI device. The S value 
+		indicates the SCSI ID, and the L value indicates the 
+		LUN."
+	::= {aixTapeDrvEntry 7}
+
+aixTapeDrvBlkSize OBJECT-TYPE 
+	SYNTAX	        Integer32(1..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"Indicates the block size to use when reading or 
+		writing to the tape."
+	::= {aixTapeDrvEntry 8}
+
+aixTapeDrvManufacturerName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The name of the manufacturer of the tape drive."
+	::= {aixTapeDrvEntry 9 }
+
+aixTapeDrvModelName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The model name of the tape drive."
+	::= {aixTapeDrvEntry 10}
+
+aixTapeDrvSN OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The tape driver serial number."
+	::= {aixTapeDrvEntry 11}
+
+aixTapeDrvPN OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The tape driver part number."
+	::= {aixTapeDrvEntry 12 }
+
+aixTapeDrvFRU OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The tape drive FRU number (Field Replaceable Unit)."
+	::= {aixTapeDrvEntry 13 }
+
+aixTapeDrvEC OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The tape drive EC (Engineering Change)."
+	::= {aixTapeDrvEntry 14 }
+
+-- the hard disk device
+
+aixHdTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixHdEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"A table of defined hard disks. The number of entries 
+		depends on the configuration of the system. "
+	::= {aixHardDisk 1}
+
+aixHdEntry OBJECT-TYPE 
+	SYNTAX		AixHdEntry
+	MAX-ACCESS	not-accessible
+	STATUS 		current
+	DESCRIPTION 
+		"An entry in hdTable. Each entry contains all 
+		the attributes of the individual hard disk."
+	INDEX {aixHdIndex}
+	::= {aixHdTable  1}
+
+AixHdEntry  ::= SEQUENCE {
+	aixHdName	DisplayString,
+	aixHdIndex	Integer32,
+	aixHdType	DisplayString,
+	aixHdSize	INTEGER,
+	aixHdInterface	DisplayString,
+	aixHdStatus	INTEGER,
+	aixHdLocation	DisplayString,
+	aixHdIdentifier	DisplayString,
+	aixHdDescr	DisplayString,
+	aixHdManufacturerName	DisplayString,
+	aixHdModelName	DisplayString,
+	aixHdSN		DisplayString,
+	aixHdFRU	DisplayString,
+	aixHdPN		DisplayString,
+	aixHdEC		DisplayString
+	}
+
+aixHdName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Identifies the logical name of the disk device."
+	::= {aixHdEntry 1}
+
+aixHdIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The index for the hard disk table."
+	::= {aixHdEntry 2}
+
+aixHdType OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" Identifies the predefined device type of the disk."
+	::= {aixHdEntry 3}
+
+aixHdSize OBJECT-TYPE
+	SYNTAX	        Integer32(1..2147483647)
+	UNITS      	"megabytes"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The size in megabytes of the hard disk. "
+	::= {aixHdEntry 4}
+
+aixHdInterface OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Identifies the type of disk interface. This is 
+		the same as the predefined device subclass of the disk."
+	::= {aixHdEntry 5}
+
+aixHdStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   available(1),
+			   defined(2)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the current status of the disk device. 
+		Possible values are available(1), indicating that the 
+		disk device is configured in the system and ready 
+		to be used, and defined(2), indicating that the disk 
+		device is defined to the system but not configured."
+	::= {aixHdEntry 6}
+
+aixHdLocation  OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For all SCSI devices, including disks, CD-ROMs, 
+		read/write optical drives, tapes, target mode, and 
+		initiator devices, the location code format is 
+		AA-BB-CC-S,L. The AA-BB fields identify the location 
+		code of the SCSI adapter controlling the SCSI device.
+		For details, please refer to aixTapeDrvLocation. "
+	::= {aixHdEntry 7}
+
+
+aixHdIdentifier  OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Displays the unique physical volume identifier 
+		of the physical volume of a disk. If the disk is 
+		not a physical volume, this field value will be none."
+	::= {aixHdEntry 8}
+
+aixHdDescr OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" Provides a short text description of the disk device."
+	::= {aixHdEntry 9}
+
+
+aixHdManufacturerName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The name of the manufacturer of the hard drive."
+	::= {aixHdEntry 10 }
+
+aixHdModelName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The Model Name of the hard drive."
+        ::= {aixHdEntry 11}
+
+aixHdSN OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The hard driver serial number."
+	::= {aixHdEntry 12 }
+
+aixHdPN OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The hard driver part number."
+	::= {aixHdEntry 13 }
+
+aixHdFRU OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The hard drive FRU number (Field Replaceable Unit)."
+	::= {aixHdEntry 14 }
+
+aixHdEC OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The hard drive Engineering Change."
+	::= {aixHdEntry 15 }
+
+--the memory device
+
+aixMemTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixMemEntry
+	MAX-ACCESS	not-accessible
+	STATUS 		current
+	DESCRIPTION 
+		"A table of defined physical memory. 
+		The number of entries depends on the 
+		configuration of the system. "
+	::= {aixMemory 1}
+
+aixMemEntry OBJECT-TYPE
+	SYNTAX		AixMemEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"An entry in the memory table ."
+	INDEX  {aixMemIndex}
+	::= {aixMemTable 1 }
+
+AixMemEntry ::= SEQUENCE {
+	aixMemName	
+		DisplayString,
+	aixMemIndex
+		Integer32,
+	aixMemLocation
+		DisplayString,
+	aixMemSize
+		Integer32,
+	aixMemDescr
+		DisplayString
+	}
+		
+aixMemName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The name of the memory. For example, it may 
+		be mem0."
+	::= {aixMemEntry 1}
+
+aixMemIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The index for the memory table."
+	::= {aixMemEntry 2}
+
+aixMemLocation OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The memory location code. An example is 00-00."
+	::= {aixMemEntry 3}
+
+aixMemSize OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	UNITS  		"megabytes"
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The size of the physical memory in megabytes. "
+	::= {aixMemEntry 4}
+
+aixMemDescr OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The description of memory "
+	::= {aixMemEntry 5}
+
+
+-- CDROM drive
+
+aixCdromTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixCdromEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"A table of all defined cdroms."
+	::= {aixCDROM 1}
+
+aixCdromEntry OBJECT-TYPE
+	SYNTAX		AixCdromEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"An entry in the cdrom table ."
+	INDEX { aixCdromIndex }
+	::= {aixCdromTable 1 }
+
+AixCdromEntry ::= SEQUENCE {
+	aixCdromName	
+		DisplayString,
+	aixCdromIndex
+		Integer32,
+	aixCdromType
+		DisplayString,
+ 	aixCdromInterface	
+		DisplayString,
+	aixCdromDescr
+		DisplayString,
+	aixCdromStatus
+		INTEGER,
+	aixCdromLocation
+		DisplayString,
+	aixCdromManufacturerName
+		DisplayString,
+	aixCdromModelName
+		DisplayString,
+	aixCdromFRU	
+		DisplayString,
+	aixCdromPN	
+		DisplayString,
+	aixCdromEC
+		DisplayString
+	}
+		
+aixCdromName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the logical name of the CD-ROM drive."
+	::= {aixCdromEntry 1}
+
+aixCdromIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The index for the CD-ROM table."
+	::= {aixCdromEntry 2}
+
+aixCdromType OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the predefined device type of the 
+		CD-ROM drive."
+	::= {aixCdromEntry 3}
+
+
+aixCdromInterface OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the type of drive interface. This is the 
+		same as the predefined device subclass of the CD-ROM 
+		drive."
+	::= {aixCdromEntry 4}
+
+aixCdromDescr OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Provides a short text description of the CD-ROM 
+		drive device."
+	::= {aixCdromEntry 5}
+
+aixCdromStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   available(1),
+			   defined(2)
+			}
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Indicates the current status of the CD-ROM drive. 
+		Possible values are available(1), indicating that the 
+		CD-ROM drive is configured in the system and ready 
+		to be used, and defined(2), indicating that the drive
+		is defined to the system but not configured."
+	::= {aixCdromEntry 6}
+
+aixCdromLocation OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"For all SCSI devices, including disks, CD-ROMs, 
+		read/write optical drives, tapes, target mode, and 
+		initiator devices, the location code format is 
+		AA-BB-CC-S,L. The AA-BB fields identify the location 
+		code of the SCSI adapter controlling the SCSI device.
+		For details, please refer to aixTapeDrvLocation. "
+	::= {aixCdromEntry 7}
+
+aixCdromManufacturerName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The name of the manufacturer of the cdrom drive."
+	::= {aixCdromEntry 8 }
+
+aixCdromModelName OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The cdrom driver model name."
+	::= {aixCdromEntry 9 }
+
+aixCdromPN OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The cdrom driver part number."
+	::= {aixCdromEntry 10 }
+
+aixCdromFRU OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The cdrom drive FRU (Field Replaceable Unit)."
+	::= {aixCdromEntry 11 }
+
+aixCdromEC OBJECT-TYPE 
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The cdrom drive Engineering Change."
+	::= {aixCdromEntry 12 }
+
+-- SCSI
+
+aixScsiTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixScsiEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"A table of SCSI adapters." 
+	::= {aixScsi 1}
+
+aixScsiEntry OBJECT-TYPE
+	SYNTAX		AixScsiEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"An entry of the SCSI adapter ."
+	INDEX { aixScsiIndex }
+	::= {aixScsiTable 1 }
+
+AixScsiEntry ::= SEQUENCE {
+	aixScsiName	
+		DisplayString,
+	aixScsiIndex
+		Integer32,
+	aixScsiDescr
+		DisplayString,
+	aixScsiStatus
+		INTEGER,
+	aixScsiLocation
+		DisplayString,
+	aixScsiAdapterID	
+		Integer32
+	}
+
+aixScsiName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the logical name of the adapter."
+	::= {aixScsiEntry 1}
+
+aixScsiIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The index for the scsi adapter table."
+	::= {aixScsiEntry 2}
+
+aixScsiDescr OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		" Defines a short text description of the adapter."
+	::= {aixScsiEntry 3}
+
+aixScsiStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   available(1),
+			   defined(2)
+			}
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Indicates the current status of the adapter. 
+		Possible values are available, indicating that the 
+		adapter is configured in the system and ready  to 
+		be used, and defined, indicating that the adapter 
+		is defined on the system but not configured."
+
+	::= {aixScsiEntry 4}
+
+aixScsiLocation OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The location code for the SCSI adapter. An example
+		is 04-C0."
+	::= {aixScsiEntry 5}
+
+aixScsiAdapterID	OBJECT-TYPE
+	SYNTAX	        Integer32(0..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		" Specifies the SCSI ID value which the adapter 
+		will use when sending SCSI commands as an initiator 
+		device, and, if target mode is supported, 
+		specifies the SCSI ID the adapter will respond to 
+		when acting as a target device. "
+	::= {aixScsiEntry 6}
+
+-- Processor
+
+aixProcessorTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixProcessorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"A table of processors." 
+	::= {aixProcessor 1}
+
+aixProcessorEntry OBJECT-TYPE
+	SYNTAX		AixProcessorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"An entry of the Processor ."
+	INDEX { aixProcessorIndex }
+	::= {aixProcessorTable 1 }
+
+AixProcessorEntry ::= SEQUENCE {
+	aixProcessorName	DisplayString,
+	aixProcessorIndex 	Integer32,
+	aixProcessorType 	DisplayString,
+	aixProcessorDescr	DisplayString,
+	aixProcessorSpeed	Integer32
+	}
+
+aixProcessorName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the logical name of the processor."
+	::= {aixProcessorEntry 1}
+
+aixProcessorIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The index for the processor table."
+	::= {aixProcessorEntry 2}
+
+aixProcessorType OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Defines the model type of the processor. For example:
+		PowerPC_604e"
+	::= {aixProcessorEntry 3}
+
+aixProcessorDescr OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		" Defines a short text description of the processor."
+	::= {aixProcessorEntry 4}
+
+aixProcessorSpeed OBJECT-TYPE
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The speed of the processor in hertz."
+	::= {aixProcessorEntry 5}
+
+-- Network
+
+aixNetworkTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixNetworkEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"A table of Network adapters." 
+	::= {aixNetwork 1}
+
+aixNetworkEntry OBJECT-TYPE
+	SYNTAX		AixNetworkEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"An entry of the Network adapter ."
+	INDEX { aixNetworkIndex }
+	::= {aixNetworkTable 1 }
+
+AixNetworkEntry ::= SEQUENCE {
+	aixNetworkName		DisplayString,
+	aixNetworkIndex		Integer32,
+	aixNetworkType		DisplayString,
+	aixNetworkInterface	DisplayString,
+	aixNetworkStatus	INTEGER,
+	aixNetworkLocation	DisplayString,
+	aixNetworkDescr	DisplayString
+}
+
+aixNetworkName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the logical name of the network adapter."
+	::= {aixNetworkEntry 1}
+
+aixNetworkIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The index for the network adapter table."
+	::= {aixNetworkEntry 2}
+
+aixNetworkType OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The type of the network adapter. An example
+		is ie3."
+	::= {aixNetworkEntry 3}
+
+aixNetworkInterface OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The interface name for the Network adapter. An example
+		is LO."
+	::= {aixNetworkEntry 4}
+
+aixNetworkStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   available(1),
+			   defined(2)
+			}
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Indicates the current status of the adapter. 
+		Possible values are available, indicating that the 
+		adapter is configured in the system and ready  to 
+		be used, and defined, indicating that the adapter 
+		is defined on the system but not configured."
+
+	::= {aixNetworkEntry 5}
+
+aixNetworkLocation OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The location code for the Network adapter. An example
+		is 10-60."
+	::= {aixNetworkEntry 6}
+
+aixNetworkDescr OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		" Defines a short text description of the adapter. An example is
+		IEEE 802.3 Ethernet Network Interface"
+	::= {aixNetworkEntry 7}
+
+-- Adapter
+
+aixAdapterTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AixAdapterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"A table of adapters." 
+	::= {aixAdapter 1}
+
+aixAdapterEntry OBJECT-TYPE
+	SYNTAX		AixAdapterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 
+		"An entry of the adapter "
+	INDEX { aixAdapterIndex }
+	::= {aixAdapterTable 1 }
+
+AixAdapterEntry ::= SEQUENCE {
+	aixAdapterName		DisplayString,
+	aixAdapterIndex		INTEGER,
+	aixAdapterType		DisplayString,
+	aixAdapterInterface	DisplayString,
+	aixAdapterStatus	INTEGER,
+	aixAdapterLocation	DisplayString,
+	aixAdapterDescr		DisplayString
+}
+
+aixAdapterName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Identifies the logical name of the adapter."
+	::= { aixAdapterEntry 1 }
+
+aixAdapterIndex OBJECT-TYPE 
+        SYNTAX		Integer32(1..2147483647) 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 
+		"The index for the adapter table."
+	::= {aixAdapterEntry 2}
+
+aixAdapterType OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The type of the adapter. An example
+		is keyboard."
+	::= {aixAdapterEntry 3}
+
+aixAdapterInterface OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The interface name for the adapter. An example
+		is pci."
+	::= {aixAdapterEntry 4}
+
+aixAdapterStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			   available(1),
+			   defined(2)
+			}
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"Indicates the current status of the . 
+		Possible values are available, indicating that the 
+		 is configured in the system and ready  to 
+		be used, and defined, indicating that the  
+		is defined on the system but not configured."
+	::= {aixAdapterEntry 5}
+
+aixAdapterLocation OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		"The location code for the adapter. An example
+		is 01-K1-00."
+	::= {aixAdapterEntry 6}
+
+aixAdapterDescr OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only 
+	STATUS		current
+	DESCRIPTION 
+		" Defines a short text description of the . An example is
+		Keyboard Adapter"
+	::= {aixAdapterEntry 7}
+
+
+
+-- conformance information
+aixCfmGroup	OBJECT IDENTIFIER ::= { aixConformance 1}
+aixCompliances  OBJECT IDENTIFIER ::= { aixConformance 2}
+
+-- compliance statements
+aixCompliance MODULE-COMPLIANCE
+	STATUS		current
+	DESCRIPTION
+		"The statement of compliance. "
+	MODULE IBM-AIX-MIB
+	MANDATORY-GROUPS {
+		aixAgentGroup, aixVGGroup,aixPVGroup,
+		aixLVGroup, aixPagingSpaceGroup,
+		aixFsGroup, aixProcessGroup,
+		aixLoginUsrGroup, aixSeGroup,
+		aixPrtQueueGroup, aixUsrGroup,
+		aixGrpGroup, aixSubSystemGroup,
+		aixSubServerGroup, aixSeAuxGroup,
+		aixPrinterGroup, aixTapeGroup, aixHardDiskGroup,
+		aixMemoryGroup, aixCDROMGroup, aixScsiGroup,
+		aixProcessorGroup, aixNetworkGroup, aixAdapterGroup}
+
+	GROUP   criticalNotificationGroup
+	DESCRIPTION
+		"The notification group depends on  
+		aixAgentGroup, aixVGGroup, aixPVGroup, 
+		aixLVGroup, aixPagingSpaceGroup, aixFsGroup,
+		aixProcessGroup, aixLoginUsrGroup, aixSeGroup.
+		This group is mandatory."
+	::= {aixCompliances 1}
+
+
+aixAgentGroup OBJECT-GROUP
+	OBJECTS {
+		aixAgentAction, aixAgentCmdString, aixAgentExeCommand, 
+		aixAgentCmdResult, aixAgentCmdOutput, aixAgentCmdOutIndex,
+		aixAgentPollInterval, aixPollEnable, aixLastTrapMsg,
+		aixFsPollInterval, aixVgPollInterval,
+		aixCPUPollInterval, aixLFPollInterval,
+		aixPagePollInterval
+		}
+	STATUS		current
+	DESCRIPTION
+		"The objects necessary to control and show
+		information about the subagent. "
+	::= {aixCfmGroup 1}
+
+aixSeGroup OBJECT-GROUP
+	OBJECTS {
+	 aixSeCPUUtilization, aixSeCPUThreshold, 
+	 aixSeSystemRunLevel, aixSeSystemState, aixSeSystemTrap 
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary to control and show
+		information about the system environment. These objects 
+		are mandatory."
+	::= {aixCfmGroup 2}
+
+criticalNotificationGroup NOTIFICATION-GROUP 
+	NOTIFICATIONS
+		{
+		aixFileSystemMounted, aixFileSystemFull, 
+		aixVolumeGroupFull, aixPageFull,  aixUserLoginFailed, 
+		aixUtilizationCPU, aixSnmptrapHolder
+		}
+	STATUS		current 
+	DESCRIPTION
+		"These objects are used to send traps."
+	::= {aixCfmGroup 3}
+
+aixVGGroup OBJECT-GROUP
+	OBJECTS {
+	aixVgName, aixVgIdentifier, aixVgState, aixVgSize,
+	aixVgFree, aixVgCurNumLVs, aixVgOpenLVs, aixVgActivePVs, 
+	aixVgThreshold, aixVgIndex
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about the volume group."
+	::= {aixCfmGroup 4}
+
+aixLVGroup OBJECT-GROUP
+	OBJECTS {
+	aixLvName, aixLvNameVG, aixLvType,
+	aixLvMountPoint, aixLvSize, aixLvState, aixLvIndex
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about logical volumes."
+	::= {aixCfmGroup 5}
+
+aixPVGroup OBJECT-GROUP
+	OBJECTS {
+	aixPvName, aixPvNameVG, aixPvState, aixPvSize,
+	aixPvFree, aixPvNumLVs, aixPvIndex
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about physical volumes."
+	::= {aixCfmGroup 6}
+
+aixPagingSpaceGroup OBJECT-GROUP
+	OBJECTS {
+	aixPageName, aixPageNameVG, aixPageNamePV, aixPageSize,
+	aixPagePercentUsed, aixPageStatus, aixPageType,
+	aixPageThreshold, aixPageIndex
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about paging space."
+	::= {aixCfmGroup 7}
+
+aixFsGroup OBJECT-GROUP
+	OBJECTS {
+       	aixFsIndex,aixFsName, aixFsMountPoint, aixFsType, aixFsSize,
+       	aixFsFree, aixFsNumINodes, aixFsUsedInodes,  aixFsThreshold,
+	aixFsStatus, aixFsExecution, aixFsResultMsg
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about file systems."
+	::= {aixCfmGroup 8}
+
+aixProcessGroup OBJECT-GROUP
+	OBJECTS {
+    	aixProcPID, aixProcUID, aixProcPPID, aixProcGroup ,
+	aixProcPriority, aixProcCPU,  aixProcStart, 
+	aixProcStatus, aixProcTTY , aixProcCMD, aixProcNum
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about processes."
+	::= {aixCfmGroup 9}
+
+aixLoginUsrGroup OBJECT-GROUP
+	OBJECTS {
+	aixLoginUserName, aixLoginUserTTY, aixLoginUserHost, 
+	aixLoginUserDateAndTime, aixLoginUserIndex, 
+	aixLoginFailedThreshold,  aixFailedLoginTimePeriod 
+	  }
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about users currently logged in."
+	::= {aixCfmGroup 10}
+
+aixPrtQueueGroup OBJECT-GROUP
+	OBJECTS {
+       	aixPrtQueName, aixPrtQueDevice,  aixPrtQueStatus, 
+	aixPrtQueAction,  aixPrtQueIndex, aixPrtQueAcctFile, 
+	aixPrtQueRQ, aixPrtQueDescipline, aixPrtQueHost ,
+	aixPrtQueJobNum 
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about print queues."
+	::= {aixCfmGroup 11}
+
+
+
+aixUsrGroup OBJECT-GROUP
+	OBJECTS {
+       	aixUsrName, aixUsrID, aixUsrHome, aixUsrShell,
+       	aixUsrLocalLogin, aixUsrRemoteLogin, aixUsrPasswdMaxAge, 
+	aixUsrStatus, aixUsrGroups, aixUsrAllowableAttempts,
+	aixUsrResetLoginCount, aixUsrPrimaryGroup, aixUsrIndex
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about system users."
+	::= {aixCfmGroup 12}
+
+
+aixGrpGroup OBJECT-GROUP
+	OBJECTS {
+       	aixGrpName, aixGrpID, aixGrpAdminGroup,aixGrpIndex, 
+	aixGrpUsrList, aixGrpAdmList
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about system groups."
+	::= {aixCfmGroup 13}
+
+aixSubSystemGroup OBJECT-GROUP
+	OBJECTS {
+	aixSubSysName, aixSubSysGroup, aixSubSysPID,aixSubSysIndex,
+	aixSubSysStatus, aixSubSystemNum
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about subsystems."
+	::= {aixCfmGroup 14}
+
+
+aixSubServerGroup OBJECT-GROUP
+	OBJECTS {
+	aixSubSrvName, aixSubSrvDescr, aixSubSrvCommand,
+	aixSubSrvStatus, aixSubSrvNum, aixSubSrvIndex, aixSubSrvSubsys
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about subservers."
+	::= {aixCfmGroup 15}
+
+aixSeAuxGroup OBJECT-GROUP
+	OBJECTS {
+	aixSeDateAndTime, aixSeMaxProcPerUser, aixSeLicenseNum, 
+	aixSeRemainingLicenseNum, aixSeNumCPUs, aixSeMachineType, 
+	aixSeSerialNumber
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for controlling and showing
+		information about the system environment. These objects are
+		optional."
+	::= {aixCfmGroup 16}
+
+
+aixPrinterGroup OBJECT-GROUP
+	OBJECTS {
+	aixPrinterName, aixPrinterType, aixPrinterInterface, 
+	aixPrinterStatus, aixPrinterDescr, aixPrinterLocation, 
+	aixPrinterPortNumber, aixPrinterIndex
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for showing
+		information about the printer."
+	::= {aixCfmGroup 17}
+
+aixTapeGroup OBJECT-GROUP
+	OBJECTS {
+	aixTapeDrvName, aixTapeDrvType, aixTapeDrvInterface, 
+	aixTapeDrvStatus, aixTapeDrvLocation,  
+	aixTapeDrvBlkSize, aixTapeDrvDescr, aixTapeDrvIndex,
+	aixTapeDrvManufacturerName, aixTapeDrvModelName, aixTapeDrvSN,
+	aixTapeDrvFRU, aixTapeDrvPN, aixTapeDrvEC
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for showing
+		information about the tape."
+	::= {aixCfmGroup 18}
+
+
+aixHardDiskGroup OBJECT-GROUP
+	OBJECTS {
+	aixHdName, aixHdType, aixHdSize, aixHdInterface, aixHdStatus,
+	aixHdLocation, aixHdIdentifier, aixHdDescr, aixHdIndex,
+	aixHdManufacturerName, aixHdModelName, aixHdSN,
+	aixHdFRU, aixHdPN, aixHdEC
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for showing
+		information about the hard disk. "
+	::= {aixCfmGroup 19}
+
+
+aixMemoryGroup OBJECT-GROUP
+	OBJECTS {
+	aixMemName, aixMemLocation, aixMemSize, 
+	aixMemDescr, aixMemIndex
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for showing
+		information about the memory. "
+	::= {aixCfmGroup 20}
+
+
+aixCDROMGroup OBJECT-GROUP
+	OBJECTS {
+	aixCdromName, aixCdromType, aixCdromInterface, aixCdromDescr,
+	aixCdromStatus, aixCdromLocation, aixCdromIndex,
+	aixCdromManufacturerName, aixCdromModelName,
+	aixCdromFRU, aixCdromPN, aixCdromEC
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for showing
+		information about the CDROM. "
+	::= {aixCfmGroup 21}
+
+
+aixScsiGroup OBJECT-GROUP
+	OBJECTS {
+	aixScsiName, aixScsiDescr, aixScsiStatus, aixScsiLocation,
+	aixScsiAdapterID,  aixScsiIndex
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for showing
+		information about the SCSI adapter."
+	::= {aixCfmGroup 22}
+
+aixProcessorGroup OBJECT-GROUP
+	OBJECTS {
+	aixProcessorName, aixProcessorDescr, 
+	aixProcessorSpeed, aixProcessorType,
+	aixProcessorIndex
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for showing
+		information about the processors."
+	::= {aixCfmGroup 23}
+
+aixNetworkGroup OBJECT-GROUP
+	OBJECTS {
+	aixNetworkName, aixNetworkDescr, aixNetworkStatus, aixNetworkLocation,
+	aixNetworkType,  aixNetworkIndex, aixNetworkInterface
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for showing
+		information about the Network adapters."
+	::= {aixCfmGroup 24}
+
+aixAdapterGroup OBJECT-GROUP
+	OBJECTS {
+	aixAdapterName, aixAdapterDescr, aixAdapterStatus, aixAdapterLocation,
+	aixAdapterType,  aixAdapterIndex, aixAdapterInterface
+	}
+	STATUS		current
+	DESCRIPTION
+		"The objects neccessary for showing
+		information about the adapters."
+	::= {aixCfmGroup 25}
+END
