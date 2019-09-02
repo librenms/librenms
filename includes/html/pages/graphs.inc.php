@@ -152,6 +152,11 @@ if (!$auth) {
     } else {
         echo(generate_link("Show RRD Command", $vars, array('page' => "graphs", 'showcommand' => "yes")));
     }
+
+    if ($vars['type'] == 'port_bits') {
+        echo ' | To show trend, set to future date';
+    }
+
     echo('</center>');
 
     echo generate_graph_js_state($graph_array);
