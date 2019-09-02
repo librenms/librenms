@@ -1,0 +1,603 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.15",
+                    "sysDescr": "AIX testhost 1 7 <private>",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "aix",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "aix.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.15",
+                    "sysDescr": "AIX testhost 1 7 <private>",
+                    "sysContact": "<private>",
+                    "version": "7.1",
+                    "hardware": null,
+                    "features": null,
+                    "os": "aix",
+                    "type": "server",
+                    "serial": "<private>",
+                    "icon": "aix.svg",
+                    "location": "<private>"
+                }
+            ]
+        }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 768,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.768",
+                    "processor_index": "768",
+                    "processor_type": "hr",
+                    "processor_usage": 1,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 769,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.769",
+                    "processor_index": "769",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 770,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.770",
+                    "processor_index": "770",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 771,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.771",
+                    "processor_index": "771",
+                    "processor_type": "hr",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 4096,
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                },
+                {
+                    "mempool_index": "2",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 4096,
+                    "mempool_descr": "Real memory",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 4096,
+                    "mempool_descr": "Virtual memory",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                },
+                {
+                    "mempool_index": "10",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 4096,
+                    "mempool_descr": "Swap space",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                }
+            ]
+        },
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 4096,
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": 28,
+                    "mempool_used": 2370166784,
+                    "mempool_free": 6219767808,
+                    "mempool_total": 8589934592,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                },
+                {
+                    "mempool_index": "2",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 4096,
+                    "mempool_descr": "Real memory",
+                    "mempool_perc": 28,
+                    "mempool_used": 2370166784,
+                    "mempool_free": 6219767808,
+                    "mempool_total": 8589934592,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 4096,
+                    "mempool_descr": "Virtual memory",
+                    "mempool_perc": 11,
+                    "mempool_used": 2381922304,
+                    "mempool_free": 19092914176,
+                    "mempool_total": 21474836480,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                },
+                {
+                    "mempool_index": "10",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 4096,
+                    "mempool_descr": "Swap space",
+                    "mempool_perc": 0,
+                    "mempool_used": 11755520,
+                    "mempool_free": 12873146368,
+                    "mempool_total": 12884901888,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                }
+            ]
+        }
+    },
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "31",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/",
+                    "storage_size": 1073741824,
+                    "storage_units": 4096,
+                    "storage_used": 86388736,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "32",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/usr",
+                    "storage_size": 3489660928,
+                    "storage_units": 4096,
+                    "storage_used": 2066071552,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "33",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/var",
+                    "storage_size": 2147483648,
+                    "storage_units": 4096,
+                    "storage_used": 415449088,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "34",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/tmp",
+                    "storage_size": 2147483648,
+                    "storage_units": 4096,
+                    "storage_used": 4329472,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "35",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/home",
+                    "storage_size": 5368709120,
+                    "storage_units": 4096,
+                    "storage_used": 44503040,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "36",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/opt",
+                    "storage_size": 1073741824,
+                    "storage_units": 4096,
+                    "storage_used": 127275008,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "37",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/soft",
+                    "storage_size": 10737418240,
+                    "storage_units": 4096,
+                    "storage_used": 6191235072,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "38",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/admin",
+                    "storage_size": 268435456,
+                    "storage_units": 4096,
+                    "storage_used": 409600,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "39",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/var/adm/ras/livedump",
+                    "storage_size": 268435456,
+                    "storage_units": 4096,
+                    "storage_used": 1474560,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "40",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/data",
+                    "storage_size": 10737418240,
+                    "storage_units": 4096,
+                    "storage_used": 1990656,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "41",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/tftpboot",
+                    "storage_size": 1073741824,
+                    "storage_units": 4096,
+                    "storage_used": 499712,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "42",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/aha",
+                    "storage_size": 2199023255040,
+                    "storage_units": 512,
+                    "storage_used": 2199023255040,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "43",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/data/backup",
+                    "storage_size": 101602820096,
+                    "storage_units": 4096,
+                    "storage_used": 15847424,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "44",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/soft/private",
+                    "storage_size": 5234491392,
+                    "storage_units": 4096,
+                    "storage_used": 1134592,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "31",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/",
+                    "storage_size": 1073741824,
+                    "storage_units": 4096,
+                    "storage_used": 86388736,
+                    "storage_free": 987353088,
+                    "storage_perc": 8,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "32",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/usr",
+                    "storage_size": 3489660928,
+                    "storage_units": 4096,
+                    "storage_used": 2066071552,
+                    "storage_free": 1423589376,
+                    "storage_perc": 59,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "33",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/var",
+                    "storage_size": 2147483648,
+                    "storage_units": 4096,
+                    "storage_used": 415449088,
+                    "storage_free": 1732034560,
+                    "storage_perc": 19,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "34",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/tmp",
+                    "storage_size": 2147483648,
+                    "storage_units": 4096,
+                    "storage_used": 4329472,
+                    "storage_free": 2143154176,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "35",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/home",
+                    "storage_size": 5368709120,
+                    "storage_units": 4096,
+                    "storage_used": 44503040,
+                    "storage_free": 5324206080,
+                    "storage_perc": 1,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "36",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/opt",
+                    "storage_size": 1073741824,
+                    "storage_units": 4096,
+                    "storage_used": 127275008,
+                    "storage_free": 946466816,
+                    "storage_perc": 12,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "37",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/soft",
+                    "storage_size": 10737418240,
+                    "storage_units": 4096,
+                    "storage_used": 6191235072,
+                    "storage_free": 4546183168,
+                    "storage_perc": 58,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "38",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/admin",
+                    "storage_size": 268435456,
+                    "storage_units": 4096,
+                    "storage_used": 409600,
+                    "storage_free": 268025856,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "39",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/var/adm/ras/livedump",
+                    "storage_size": 268435456,
+                    "storage_units": 4096,
+                    "storage_used": 1474560,
+                    "storage_free": 266960896,
+                    "storage_perc": 1,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "40",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/data",
+                    "storage_size": 10737418240,
+                    "storage_units": 4096,
+                    "storage_used": 1990656,
+                    "storage_free": 10735427584,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "41",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/tftpboot",
+                    "storage_size": 1073741824,
+                    "storage_units": 4096,
+                    "storage_used": 499712,
+                    "storage_free": 1073242112,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "42",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/aha",
+                    "storage_size": 2199023255040,
+                    "storage_units": 512,
+                    "storage_used": 2199023255040,
+                    "storage_free": 0,
+                    "storage_perc": 100,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "43",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/data/backup",
+                    "storage_size": 101602820096,
+                    "storage_units": 4096,
+                    "storage_used": 15847424,
+                    "storage_free": 101586972672,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "44",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "/soft/private",
+                    "storage_size": 5234491392,
+                    "storage_units": 4096,
+                    "storage_used": 1134592,
+                    "storage_free": 5233356800,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,436 @@
+IBMHPRROUTETEST-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+          enterprises, Gauge
+                 FROM RFC1155-SMI
+
+          DisplayString
+                 FROM RFC1213-MIB
+
+          OBJECT-TYPE
+                 FROM RFC-1212;
+
+
+-- IMPORTS
+--    MODULE-IDENTITY, Unsigned32, OBJECT-TYPE, enterprises
+--          FROM SNMPv2-SMI
+--    OBJECT-GROUP, MODULE-COMPLIANCE
+--          FROM SNMPv2-CONF
+--    DisplayString
+--          FROM SNMPv2-TC;
+
+-- ibmHprRouteTest MODULE-IDENTITY
+--    LAST-UPDATED "9701282100Z"
+--    ORGANIZATION "IBM"
+--    CONTACT-INFO "Bob Moore (remoore @ ralvm6)
+--                  IBM Corporation
+--                  800 Park Offices Drive
+--                  RHJA/664
+--                  P.O. Box 12195
+--                  Research Triangle Park, NC 27709, USA
+--                  Tel:    1 919 254 4436
+--                  E-mail: remoore@ralvm6.vnet.ibm.com"
+
+--    DESCRIPTION
+--        "This MIB module represents the HPR route test group from the
+--        original IBM version of the HPR MIB, updated to SNMPv2 SMI.  It
+--        is set up to use as its anchor point the same OID that
+--        identified the group in the IBM-HPR-MIB, so that existing
+--        manager applications will not need to change."
+
+--    ::= { hpr 4 }
+
+-- The following OID assignments result in the same OIDs for the
+-- objects in the port DLC trace group as those in the IBM-6611-APPN-MIB.
+ibm                     OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmArchitecture         OBJECT IDENTIFIER ::= { ibm 5 }
+hpr                     OBJECT IDENTIFIER ::= { ibmArchitecture 10 }
+ibmHprRouteTest         OBJECT IDENTIFIER ::= { hpr 4 }
+
+-- **********************************************************************
+-- HPR Route Test
+-- ----------------------------------------------------------------------
+-- This group applies to HPR tower nodes which support the
+-- HPR Route Test Function.
+-- **********************************************************************
+
+ibmHprRtGlobe           OBJECT IDENTIFIER ::= { ibmHprRouteTest 1 }
+-- **********************************************************************
+-- HPR Route Test Global Objects
+-- ----------------------------------------------------------------------
+-- The following simple objects allow a HPR route test to be
+-- triggered by specifying an:
+-- 1. existing rtp connection id (nceid and tcid), or
+-- 2. destination lu name and a mode name
+--
+-- The results of the route test will be placed in the HPR Route
+-- Test General and Detail Result tables.
+-- **********************************************************************
+
+
+ibmHprRtGlobeConnTrigger OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (0 | 10..17))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "This object is used to trigger an HPR route test of the
+          physical path of an existing RTP Connection.  The format of
+          this object is:  nceid-length.nceid.tcid, where
+
+              - nceid-length: 1 octet. valid values are 1-8.
+              - nceid:        1-8 octets.
+              - tcid:         8 octets."
+
+      ::= { ibmHprRtGlobe 1}
+
+ibmHprRtGlobeNameTrigger OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0 | 5..26))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "This object is used to trigger an HPR route test of the
+          physical path of an existing or non-existing RTP Connection.
+          The names will be used to generate a HPR Route which may or may
+          not match an existing RTP Connection; but must be reside on a
+          current or potential RTP Connection endpoint node.  The format
+          of this object is:  netid.lu-name.mode-name, where
+
+              - netid:     1-8 octets.
+              - period:    1 octet.
+              - lu-name:   1-8 octets.
+              - period:    1 octet.
+              - mode-name: 1-8 octets."
+
+      ::= { ibmHprRtGlobe 2}
+
+ibmHprRtGenResults      OBJECT IDENTIFIER ::= { ibmHprRouteTest 2 }
+-- **********************************************************************
+-- HPR Route Test General Results
+-- ----------------------------------------------------------------------
+-- The each entry in the following table provides the general results
+-- from a specific HPR route test.
+-- **********************************************************************
+
+ibmHprRtGenTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmHprRtGenEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "The HPR Route Test General Results Table."
+
+      ::= { ibmHprRtGenResults 1}
+
+
+ibmHprRtGenEntry OBJECT-TYPE
+      SYNTAX IbmHprRtGenEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "The HPR Route Test Id is used to index to this table.  This Id
+          is an integer that begins at 1 and is incremented with each
+          route test executed on the agent node."
+
+      INDEX { ibmHprRtGenTestId }
+
+      ::= { ibmHprRtGenTable   1}
+
+IbmHprRtGenEntry ::= SEQUENCE {
+     ibmHprRtGenTestId               Gauge,         -- route test id
+     ibmHprRtGenTestType             INTEGER,       -- route test type
+     ibmHprRtGenConnTrigger          OCTET STRING,  -- connection trigger
+     ibmHprRtGenNameTrigger          DisplayString, -- name trigger
+     ibmHprRtGenResult               INTEGER,       -- result
+     ibmHprRtGenSenseCode            OCTET STRING,  -- sense code
+     ibmHprRtGenCosName              DisplayString, -- cos name
+     ibmHprRtGenRscv                 OCTET STRING   -- rscv
+        }
+
+ibmHprRtGenTestId OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The route test id.  This Id is an integer that begins at 1 and
+          is incremented with each route test execution."
+
+      ::= { ibmHprRtGenEntry  1}
+
+ibmHprRtGenTestType OBJECT-TYPE
+      SYNTAX INTEGER {
+                      connTrigger(1),
+                      nameTrigger(2)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The route test type.  This indicates whether the route test
+          was triggered by setting the:
+
+              1. global connection trigger, or
+              2. global name trigger."
+
+      ::= { ibmHprRtGenEntry  2}
+
+ibmHprRtGenConnTrigger OBJECT-TYPE
+
+      SYNTAX OCTET STRING (SIZE (0 | 10..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object will be valid if the route test was triggered by
+          setting the global connection trigger.  If the route test was
+          triggered by setting the global name trigger, this object will
+          return the zero-length string.  When it is not null, the format
+          of this object is:  nceid-length.nceid.tcid, where
+
+              - nceid-length: 1 octet. valid values are 1-8.
+              - nceid:        1-8 octets.
+              - tcid:         8 octets."
+
+      ::= { ibmHprRtGenEntry  3}
+
+ibmHprRtGenNameTrigger OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0 | 5..26))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "This object will be valid if the route test was triggered by
+          setting the global name trigger.  If the route test was
+          triggered by setting the global connection trigger, this object
+          will return the zero-length string.  When it is not null, the
+          format of this object is:  netid.lu-name.mode-name, where
+
+              - netid:     1-8 octets.
+              - period:    1 octet.
+              - lu-name:   1-8 octets.
+              - period:    1 octet.
+              - mode-name: 1-8 octets."
+
+      ::= { ibmHprRtGenEntry  4}
+
+ibmHprRtGenResult OBJECT-TYPE
+      SYNTAX INTEGER {
+                      successful(1),
+                      inProgess(2),
+                      noResponse(3),
+                      nceidInvalid(4),
+                      tcidInvalid(5),
+                      luInvalid(6),
+                      modeInvalid(7),
+                      noHprRoute(8)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The route test result.  This indicates whether the route test
+          was:
+
+            1. successfully executed, or
+            2. in progress and has not completed yet, or
+            3. no response was received from one or more nodes, or
+            4. the nce id used to trigger the route test was invalid, or
+            5. the tcid used to trigger the route test was invalid, or
+            6. the lu name used to trigger the route test was invalid, or
+            7. the mode name used to trigger the route test was invalid
+               for the lu name specified, or
+            8. a contiguous hpr route from this node to the target lu
+               does not exist and cannot be created."
+
+      ::= { ibmHprRtGenEntry  5}
+
+ibmHprRtGenSenseCode OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (4))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The SNA sense data that corresponds to the route test result."
+
+      ::= { ibmHprRtGenEntry  6}
+
+ibmHprRtGenCosName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (1..8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The class of service name used for this route test."
+
+      ::= { ibmHprRtGenEntry  7}
+
+ibmHprRtGenRscv OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (0..255))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The route selection control vector used for this route test."
+
+      ::= { ibmHprRtGenEntry  8}
+
+ibmHprRtDetResults      OBJECT IDENTIFIER ::= { ibmHprRouteTest 3 }
+-- **********************************************************************
+-- HPR Route Test Detailed Results
+-- ----------------------------------------------------------------------
+-- Each entry in the following table provides detailed results from a
+-- a specific HPR route test.
+-- **********************************************************************
+
+ibmHprRtDetTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmHprRtDetEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "The HPR Route Test Detailed Results Table."
+
+      ::= { ibmHprRtDetResults 1}
+
+ibmHprRtDetEntry OBJECT-TYPE
+      SYNTAX IbmHprRtDetEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "The HPR Route Test Id and HPR Route Sub Test Id are used to
+          index this table.  The Test Id is an integer that begins at 1
+          and is incremented with each route test execution.  The Sub
+          Test Id is an integer that begins at 1 and is incremented with
+          each node along the path being tested."
+
+      INDEX { ibmHprRtDetTestId,
+              ibmHprRtDetSubTestId }
+
+      ::= { ibmHprRtDetTable   1}
+
+IbmHprRtDetEntry ::= SEQUENCE {
+     ibmHprRtDetTestId               Gauge,         -- route test id
+     ibmHprRtDetSubTestId            INTEGER,       -- node  test id
+     ibmHprRtDetDestNode             DisplayString, -- destination node
+     ibmHprRtDetPriorNode            DisplayString, -- prior node
+     ibmHprRtDetLastTgNumber         INTEGER,       -- last tg number
+     ibmHprRtDetRtripTime            Gauge,         -- round trip time
+     ibmHprRtDetResult               INTEGER        -- result
+        }
+
+ibmHprRtDetTestId OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The route test id.  This Id is an integer that begins at 1 and
+          is incremented with each route test execution.  If this object
+          has the same value as the ibmHprRtGenTestId, then the two
+          objects apply to the same route test."
+
+      ::= { ibmHprRtDetEntry  1}
+
+ibmHprRtDetSubTestId OBJECT-TYPE
+      SYNTAX INTEGER (1..255)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The sub test id.  This Id is an integer that begins at 1 and
+          is incremented with each node along the path being tested.  The
+          last entry of the test will be designated by a value 255."
+
+      ::= { ibmHprRtDetEntry  2}
+
+
+ibmHprRtDetDestNode OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The destination node name for this portion of the route test."
+
+      ::= { ibmHprRtDetEntry  3}
+
+ibmHprRtDetPriorNode OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The name of the node which is prior to the destination node
+          for this portion of the route test."
+
+      ::= { ibmHprRtDetEntry  4}
+
+ibmHprRtDetLastTgNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..255)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The last TG number for this portion of the route test."
+
+      ::= { ibmHprRtDetEntry  5}
+
+ibmHprRtDetRtripTime OBJECT-TYPE
+      SYNTAX Gauge
+--    UNITS "1/1000ths of a second"
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The round trip time for this portion of the route test.  It is
+          the total time from when the test frame was sent by this node
+          to the time when the test frame was received back at this
+          node."
+
+      ::= { ibmHprRtDetEntry  6}
+
+ibmHprRtDetResult OBJECT-TYPE
+      SYNTAX INTEGER {
+                      successful(1),
+                      noResponse(2)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The result of this portion of the route test.  It indicates
+          whether this portion of the route test was:
+
+
+              1. successfully executed, or
+              2. no response was received."
+
+      ::= { ibmHprRtDetEntry  7}
+
+-- ******************************************************************
+-- IBM HPR route test conformance
+-- ******************************************************************
+
+-- ibmHprRtCompliances OBJECT IDENTIFIER ::= { ibmHprRouteTest 4 }
+-- ibmHprRtConfGroups OBJECT IDENTIFIER ::= { ibmHprRouteTest 5 }
+
+-- ibmHprRtCompliance MODULE-COMPLIANCE
+--    STATUS mandatory
+--    DESCRIPTION
+--        "The compliance statement for the SNMPv2 entities that
+--        implement the IBM HPR Route Test function."
+
+--    MODULE
+
+--    MANDATORY-GROUPS
+--           { ibmHprRtObjectsConfGroup }
+
+--    ::= { ibmHprRtCompliances 1 }
+
+-- ibmHprRtObjectsConfGroup OBJECT-GROUP
+--    OBJECTS {
+--             ibmHprRtGlobeConnTrigger,
+--             ibmHprRtGlobeNameTrigger,
+--             ibmHprRtGenTestType,
+--             ibmHprRtGenConnTrigger,
+--             ibmHprRtGenNameTrigger,
+--             ibmHprRtGenResult,
+--             ibmHprRtGenSenseCode,
+--             ibmHprRtGenCosName,
+--             ibmHprRtGenRscv,
+--             ibmHprRtDetDestNode,
+--             ibmHprRtDetPriorNode,
+--             ibmHprRtDetLastTgNumber,
+--             ibmHprRtDetRtripTime,
+--             ibmHprRtDetResult
+--            }
+--    STATUS mandatory
+--    DESCRIPTION
+--        "All of the accessible objects in this module."
+
+--    ::= { ibmHprRtConfGroups 1 }
+
+END

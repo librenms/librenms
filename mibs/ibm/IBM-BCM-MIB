@@ -1,0 +1,1186 @@
+IBM-BCM-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmlesrv.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Counter32, Integer32
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    RowStatus, MacAddress, TruthValue
+            FROM SNMPv2-TC-v1
+    AtmLaneAddress
+            FROM LAN-EMULATION-CLIENT-MIB
+    busConfEntry, busConfIndex
+            FROM LAN-EMULATION-BUS-MIB
+    mssServerLanE
+            FROM NWAYSMSS-MIB;
+
+ibmBcmMIB OBJECT IDENTIFIER ::= { mssServerLanE 3 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9701161200Z
+--  OrgName
+--    IBM Corporation
+--  ContactInfo
+--     Florian K Kandefer
+--       Postal:  IBM Corporation
+--                800 Park Offices Drive
+--                Research Triangle Park, NC 27709
+--                US
+--       Tel:     +1 919 254 0685
+--       Fax:     +1 919 254 0391
+--       E-mail:  kandefer@vnet.ibm.com     
+--  Descr
+--    
+--    These are proprietary extensions for managing
+--    the LAN Emulation Broadcast Manager.
+--  RevDate
+--    9701161200Z
+--  RevDescr
+--    
+--    2)  Updated MIB import names to match ATM Forum MIB names.
+--    
+--        Updated some of the description fields.
+--    
+--        Removed bcmStaticTargetsProtocol enumerations for
+--        ip(1) and netbios(8) since they are not supported in
+--        any level of code. Added noStaticProtocolDefined(0).
+--    
+--        Updated the description clause of bcmStaticTargetsRowStatus
+--        since the bcmStaticTargetsTable has a unique behavior.
+--    
+--  RevDate
+--    9608281200Z
+--  RevDescr
+--    
+--    1)  This is the first version of this MIB
+
+bcmConfGroup    OBJECT IDENTIFIER ::= { ibmBcmMIB 1 }
+bcmStatGroup    OBJECT IDENTIFIER ::= { ibmBcmMIB 2 }
+bcmMIBConformance OBJECT IDENTIFIER ::= { ibmBcmMIB 3 }
+bcmMIBGroups    OBJECT IDENTIFIER ::= { bcmMIBConformance 1 }
+bcmMIBCompliances OBJECT IDENTIFIER ::= { bcmMIBConformance 2 }
+
+BcmCacheAge ::= INTEGER(0..255)
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    The maxmimum number of minutes an address entry is
+--     kept without re-verification of its location.
+
+bcmConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BcmConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains configuration values for the
+        broadcast management functions of a BUS.  It is
+        an extension to the busConfTable."
+    ::= { bcmConfGroup 1 }
+
+bcmConfEntry OBJECT-TYPE
+    SYNTAX BcmConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table represents an extension
+        of a corresponding enty in the busConfTable."
+    INDEX { busConfIndex }
+-- Augments busConfEntry FROM LAN-EMULATION-BUS-MIB
+    ::= { bcmConfTable 1 }
+
+BcmConfEntry ::= SEQUENCE {
+    bcmRouteCacheEnabled TruthValue
+    }
+
+bcmRouteCacheEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When 'true', the BCM will cache routes.  When 'false', it will not."
+    ::= { bcmConfEntry 1 }
+
+bcmStaticTargetsNextId OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The next available index in the bcmStaticTargetsTable.
+        The value of this object can be used as the index by the
+        network manager to create an entry in the table.
+        
+        Note: since the bcmStaticTargetsTable is statically defined,
+        by the MSS agent this object has no meaning. This object
+        always has a value of 1. The agent statically defines
+        three rows in this table and sets rowStatus based on initial
+        configuration."
+    ::= { bcmConfGroup 2 }
+
+bcmStaticTargetsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BcmStaticTargetsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains static broadcast target addresses for all
+        the BCMs at this agent.  Each BCM may have multiple
+        entries. Object bcmStaticTargetsRowStatus is required
+        during row creation and deletion."
+    ::= { bcmConfGroup 3 }
+
+bcmStaticTargetsEntry OBJECT-TYPE
+    SYNTAX BcmStaticTargetsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table defines a broadcast target
+         address for a BCM."
+    INDEX { bcmStaticTargetsIndex, busConfIndex }
+    ::= { bcmStaticTargetsTable 1 }
+
+BcmStaticTargetsEntry ::= SEQUENCE {
+    bcmStaticTargetsIndex Integer32,
+    bcmStaticTargetsAtmAddress AtmLaneAddress,
+    bcmStaticTargetsMacAddress MacAddress,
+    bcmStaticTargetsProtocol INTEGER,
+    bcmStaticTargetsRowStatus RowStatus
+    }
+
+bcmStaticTargetsIndex OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "A value which uniquely identifies a conceptual row
+         in the bcmStaticTargetsTable."
+    ::= { bcmStaticTargetsEntry 1 }
+
+bcmStaticTargetsAtmAddress OBJECT-TYPE
+    SYNTAX AtmLaneAddress
+--    Rsyntax OCTET STRING(SIZE(0 | 20))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The ATM address of the static broadcast target."
+    ::= { bcmStaticTargetsEntry 2 }
+
+bcmStaticTargetsMacAddress OBJECT-TYPE
+    SYNTAX MacAddress
+--    Rsyntax OCTET STRING(SIZE(6))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The MAC address of the static broadcast target.
+         This object is optional."
+    ::= { bcmStaticTargetsEntry 3 }
+
+bcmStaticTargetsProtocol OBJECT-TYPE
+    SYNTAX INTEGER {
+        noStaticProtocolDefined(0),
+        ipx(4)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The protocol designation for static broadcast target.
+         Indicates for which protocol broadcast frames are
+         forwarded.  Currently, only IPX is supported
+         (i.e., configured static entries only apply to IPX)."
+    ::= { bcmStaticTargetsEntry 4 }
+
+bcmStaticTargetsRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+--    Rsyntax INTEGER {
+--        active(1),
+--        notInService(2),
+--        notReady(3),
+--        createAndGo(4),
+--        createAndWait(5),
+--        destroy(6)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to create or
+         activate and inactivate entries in the bcmStaticTargetsTable.
+        
+         Note: in order to set RowStatus active
+         bcmStaticTargetsProtocol and bcmStaticTargetsAtmAddress
+         must be set to in the same SET bindings. If
+         the optional object bcmStaticTargetsMacAddress is
+         desired it must also be SET in the same bindings.
+        
+         Once the RowStatus is set to active, objects maybe individually
+         set.
+        
+         Only values of active(1) and inActive(2) are supported for
+         this table.
+        "
+    REFERENCE
+        "RFC1903, Textual Conventions
+        for version 2 of the Simple Network Management
+        Protocol (SNMPv2)."
+    ::= { bcmStaticTargetsEntry 5 }
+
+bcmIpConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BcmIpConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains configuration parameters for
+         the IP protocol for the BCMs at the agent.  This
+         table augments the bcmConfTable."
+    ::= { bcmConfGroup 4 }
+
+bcmIpConfEntry OBJECT-TYPE
+    SYNTAX BcmIpConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table represents the configuration
+         for the IP protocol of a single BCM."
+    INDEX { busConfIndex }
+-- Augments busConfEntry FROM LAN-EMULATION-BUS-MIB
+    ::= { bcmIpConfTable 1 }
+
+BcmIpConfEntry ::= SEQUENCE {
+    bcmIpConfOperStatus INTEGER,
+    bcmIpConfAdminStatus INTEGER,
+    bcmIpConfCacheAge BcmCacheAge
+    }
+
+bcmIpConfOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        other(1),
+        up(2),
+        down(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The operational state of BCM/IP on this entry.
+        
+         Other defines the transition states between up and down."
+    ::= { bcmIpConfEntry 1 }
+
+bcmIpConfAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        up(2),
+        down(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The administrative state of the BCM/IP  on this entry."
+    ::= { bcmIpConfEntry 2 }
+
+bcmIpConfCacheAge OBJECT-TYPE
+    SYNTAX BcmCacheAge
+--    Rsyntax INTEGER(0..255)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of minutes an IP Address entry is
+         kept without re-verification of its location."
+    ::= { bcmIpConfEntry 3 }
+
+bcmIpxConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BcmIpxConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains configuration parameters for
+         the IPX protocol for the BCMs at the agent.  This
+         table augments the bcmConfTable."
+    ::= { bcmConfGroup 5 }
+
+bcmIpxConfEntry OBJECT-TYPE
+    SYNTAX BcmIpxConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table represents the configuration
+         for the IPX protocol of a single BCM."
+    INDEX { busConfIndex }
+-- Augments busConfEntry FROM LAN-EMULATION-BUS-MIB
+    ::= { bcmIpxConfTable 1 }
+
+BcmIpxConfEntry ::= SEQUENCE {
+    bcmIpxConfOperStatus INTEGER,
+    bcmIpxConfAdminStatus INTEGER,
+    bcmIpxConfCacheAge BcmCacheAge
+    }
+
+bcmIpxConfOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        other(1),
+        up(2),
+        down(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The operational state of BCM/IPX on this entry.
+        
+         Other defines the transition states between up and down."
+    ::= { bcmIpxConfEntry 1 }
+
+bcmIpxConfAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        up(2),
+        down(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The administrative state of the BCM/IPX  on this entry."
+    ::= { bcmIpxConfEntry 2 }
+
+bcmIpxConfCacheAge OBJECT-TYPE
+    SYNTAX BcmCacheAge
+--    Rsyntax INTEGER(0..255)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of minutes an IPX Address entry is
+         kept without re-verification of its location."
+    ::= { bcmIpxConfEntry 3 }
+
+bcmNbConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BcmNbConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains configuration parameters for
+         the NetBIOS protocol for the BCMs at the agent.  This
+         table augments the bcmConfTable."
+    ::= { bcmConfGroup 6 }
+
+bcmNbConfEntry OBJECT-TYPE
+    SYNTAX BcmNbConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table represents the configuration
+         for the NetBIOS protocol of a single BCM."
+    INDEX { busConfIndex }
+-- Augments busConfEntry FROM LAN-EMULATION-BUS-MIB
+    ::= { bcmNbConfTable 1 }
+
+BcmNbConfEntry ::= SEQUENCE {
+    bcmNbConfOperStatus INTEGER,
+    bcmNbConfAdminStatus INTEGER,
+    bcmNbConfCacheAge BcmCacheAge
+    }
+
+bcmNbConfOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        other(1),
+        up(2),
+        down(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The operational state of BCM/NetBIOS on this entry.
+        
+        
+         Other defines the transition states between up and down."
+    ::= { bcmNbConfEntry 1 }
+
+bcmNbConfAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        up(2),
+        down(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The administrative state of the BCM/NetBIOS  on this entry."
+    ::= { bcmNbConfEntry 2 }
+
+bcmNbConfCacheAge OBJECT-TYPE
+    SYNTAX BcmCacheAge
+--    Rsyntax INTEGER(0..255)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of minutes an NetBIOS Address entry is
+         kept without re-verification of its location."
+    ::= { bcmNbConfEntry 3 }
+
+bcmStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BcmStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains all the counters maintained by
+        the BCMs within the scope of an agent.  This table
+        augments the bcmConfTable."
+    ::= { bcmStatGroup 1 }
+
+bcmStatEntry OBJECT-TYPE
+    SYNTAX BcmStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains a BCM and its counters.
+        These counters accumulate totals for all protocols."
+    INDEX { busConfIndex }
+-- Augments busConfEntry FROM LAN-EMULATION-BUS-MIB
+    ::= { bcmStatTable 1 }
+
+BcmStatEntry ::= SEQUENCE {
+    bcmFramesReceived Counter32,
+    bcmOctetsReceived Counter32,
+    bcmFramesReturned Counter32,
+    bcmOctetsReturned Counter32,
+    bcmFramesDiscarded Counter32,
+    bcmOctetsDiscarded Counter32,
+    bcmFramesTransmitted Counter32,
+    bcmOctetsTransmitted Counter32,
+    bcmTransmitErrorFrames Counter32,
+    bcmTransmitErrorOctets Counter32,
+    bcmBroadcastFramesDirectedNoRif Counter32,
+    bcmBroadcastFramesDirectedAre Counter32,
+    bcmBroadcastFramesDirectedSte Counter32,
+    bcmBroadcastFramesDirectedSrf Counter32
+    }
+
+bcmFramesReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of frames received by BCM for all protocols."
+    ::= { bcmStatEntry 1 }
+
+bcmOctetsReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of octets received by BCM for all protocols."
+    ::= { bcmStatEntry 2 }
+
+bcmFramesReturned OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of frames, for all protocols, not managed by BCM and
+         returned to BUS for transmission."
+    ::= { bcmStatEntry 3 }
+
+bcmOctetsReturned OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of octets, for all protocols, not managed by BCM and
+         returned to BUS for transmission."
+    ::= { bcmStatEntry 4 }
+
+bcmFramesDiscarded OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of frames discarded (filtered) by BCM for all protocols."
+    ::= { bcmStatEntry 5 }
+
+bcmOctetsDiscarded OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of octets discarded (filtered) by BCM for all protocols."
+    ::= { bcmStatEntry 6 }
+
+bcmFramesTransmitted OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of frames transmitted by BCM for all protocols."
+    ::= { bcmStatEntry 7 }
+
+bcmOctetsTransmitted OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of octets transmitted by BCM for all protocols."
+    ::= { bcmStatEntry 8 }
+
+bcmTransmitErrorFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of frames, for all protocols, that the BCM could
+         not sent due to an error."
+    ::= { bcmStatEntry 9 }
+
+bcmTransmitErrorOctets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of octets, for all protocols, that the BCM could
+         not sent due to an error."
+    ::= { bcmStatEntry 10 }
+
+bcmBroadcastFramesDirectedNoRif OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of frames, for all protocols, transmitted by BCM
+         with no RI Field."
+    ::= { bcmStatEntry 11 }
+
+bcmBroadcastFramesDirectedAre OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of frames, for all protocols, transmitted by BCM
+         left as ARE."
+    ::= { bcmStatEntry 12 }
+
+bcmBroadcastFramesDirectedSte OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of frames, for all protocols, transmitted by BCM
+         that were converted from ARE or STE to SRF by Source Route
+         Management, or left as SRF multicast frame (a rare frame type)."
+    ::= { bcmStatEntry 13 }
+
+bcmBroadcastFramesDirectedSrf OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Frames sent on one VCC, changed to SRF."
+    ::= { bcmStatEntry 14 }
+
+bcmIpStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BcmIpStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains the counters for the
+         IP operation of a BCM. The table augments the bcmStatTable."
+    ::= { bcmStatGroup 2 }
+
+bcmIpStatEntry OBJECT-TYPE
+    SYNTAX BcmIpStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains the counters for the
+         IP operation of a BCM. The table augments the bcmStatTable."
+    INDEX { busConfIndex }
+-- Augments busConfEntry FROM LAN-EMULATION-BUS-MIB
+    ::= { bcmIpStatTable 1 }
+
+BcmIpStatEntry ::= SEQUENCE {
+    bcmIpFramesReceived Counter32,
+    bcmIpOctetsReceived Counter32,
+    bcmIpFramesReturned Counter32,
+    bcmIpOctetsReturned Counter32,
+    bcmIpFramesDiscarded Counter32,
+    bcmIpOctetsDiscarded Counter32,
+    bcmIpFramesTransmitted Counter32,
+    bcmIpOctetsTransmitted Counter32,
+    bcmIpTransmitErrorFrames Counter32,
+    bcmIpTransmitErrorOctets Counter32,
+    bcmIpBroadcastFramesDirectedNoRif Counter32,
+    bcmIpBroadcastFramesDirectedAre Counter32,
+    bcmIpBroadcastFramesDirectedSte Counter32,
+    bcmIpBroadcastFramesDirectedSrf Counter32
+    }
+
+bcmIpFramesReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) frames received by BCM."
+    ::= { bcmIpStatEntry 1 }
+
+bcmIpOctetsReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) octets received by BCM."
+    ::= { bcmIpStatEntry 2 }
+
+bcmIpFramesReturned OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) frames not managed by BCM and
+         returned to BUS for transmission."
+    ::= { bcmIpStatEntry 3 }
+
+bcmIpOctetsReturned OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) octets not managed by BCM and
+         returned to BUS for transmission."
+    ::= { bcmIpStatEntry 4 }
+
+bcmIpFramesDiscarded OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) frames discarded (filtered) by BCM."
+    ::= { bcmIpStatEntry 5 }
+
+bcmIpOctetsDiscarded OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) octets discarded (filtered) by BCM."
+    ::= { bcmIpStatEntry 6 }
+
+bcmIpFramesTransmitted OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) frames transmitted by BCM."
+    ::= { bcmIpStatEntry 7 }
+
+bcmIpOctetsTransmitted OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) octets transmitted by BCM."
+    ::= { bcmIpStatEntry 8 }
+
+bcmIpTransmitErrorFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) frames that the BCM could not sent due to an error."
+    ::= { bcmIpStatEntry 9 }
+
+bcmIpTransmitErrorOctets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) octets that the BCM could not sent due to an error."
+    ::= { bcmIpStatEntry 10 }
+
+bcmIpBroadcastFramesDirectedNoRif OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) frames transmitted by BCM with no RI Field."
+    ::= { bcmIpStatEntry 11 }
+
+bcmIpBroadcastFramesDirectedAre OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) frames transmitted by BCM left as ARE."
+    ::= { bcmIpStatEntry 12 }
+
+bcmIpBroadcastFramesDirectedSte OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) frames transmitted by BCM left as STE."
+    ::= { bcmIpStatEntry 13 }
+
+bcmIpBroadcastFramesDirectedSrf OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IP) frames transmitted by BCM that were converted from
+         ARE or STE to SRF by Source Route Management, or left as SRF
+         multicast frame (a rare frame type)."
+    ::= { bcmIpStatEntry 14 }
+
+bcmIpxStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BcmIpxStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains the counters for the
+         IPX operation of a BCM. The table augments the bcmStatTable."
+    ::= { bcmStatGroup 3 }
+
+bcmIpxStatEntry OBJECT-TYPE
+    SYNTAX BcmIpxStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains the counters for the
+         IPX operation of a BCM. The table augments the bcmStatTable."
+    INDEX { busConfIndex }
+-- Augments busConfEntry FROM LAN-EMULATION-BUS-MIB
+    ::= { bcmIpxStatTable 1 }
+
+BcmIpxStatEntry ::= SEQUENCE {
+    bcmIpxFramesReceived Counter32,
+    bcmIpxOctetsReceived Counter32,
+    bcmIpxFramesReturned Counter32,
+    bcmIpxOctetsReturned Counter32,
+    bcmIpxFramesDiscarded Counter32,
+    bcmIpxOctetsDiscarded Counter32,
+    bcmIpxFramesTransmitted Counter32,
+    bcmIpxOctetsTransmitted Counter32,
+    bcmIpxTransmitErrorFrames Counter32,
+    bcmIpxTransmitErrorOctets Counter32,
+    bcmIpxBroadcastFramesDirectedNoRif Counter32,
+    bcmIpxBroadcastFramesDirectedAre Counter32,
+    bcmIpxBroadcastFramesDirectedSte Counter32,
+    bcmIpxBroadcastFramesDirectedSrf Counter32
+    }
+
+bcmIpxFramesReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) frames received by BCM."
+    ::= { bcmIpxStatEntry 1 }
+
+bcmIpxOctetsReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) octets received by BCM."
+    ::= { bcmIpxStatEntry 2 }
+
+bcmIpxFramesReturned OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) frames not managed by BCM and
+         returned to BUS for transmission."
+    ::= { bcmIpxStatEntry 3 }
+
+bcmIpxOctetsReturned OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) octets not managed by BCM and
+         returned to BUS for transmission."
+    ::= { bcmIpxStatEntry 4 }
+
+bcmIpxFramesDiscarded OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) frames discarded (filtered) by BCM."
+    ::= { bcmIpxStatEntry 5 }
+
+bcmIpxOctetsDiscarded OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) octets discarded (filtered) by BCM."
+    ::= { bcmIpxStatEntry 6 }
+
+bcmIpxFramesTransmitted OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) frames transmitted by BCM."
+    ::= { bcmIpxStatEntry 7 }
+
+bcmIpxOctetsTransmitted OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) octets transmitted by BCM."
+    ::= { bcmIpxStatEntry 8 }
+
+bcmIpxTransmitErrorFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) frames that the BCM could not sent due to an error."
+    ::= { bcmIpxStatEntry 9 }
+
+bcmIpxTransmitErrorOctets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) octets that the BCM could not sent due to an error."
+    ::= { bcmIpxStatEntry 10 }
+
+bcmIpxBroadcastFramesDirectedNoRif OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Frame  sent on one VCC, no RIF in them."
+    ::= { bcmIpxStatEntry 11 }
+
+bcmIpxBroadcastFramesDirectedAre OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) frames transmitted by BCM left as ARE."
+    ::= { bcmIpxStatEntry 12 }
+
+bcmIpxBroadcastFramesDirectedSte OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) frames transmitted by BCM left as STE."
+    ::= { bcmIpxStatEntry 13 }
+
+bcmIpxBroadcastFramesDirectedSrf OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (IPX) frames transmitted by BCM that were converted from
+         ARE or STE to SRF by Source Route Management, or left as SRF
+         multicast frame (a rare frame type)."
+    ::= { bcmIpxStatEntry 14 }
+
+bcmNbStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BcmNbStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains the counters for the
+         NetBIOS operation of a BCM. The table augments the bcmStatTable."
+    ::= { bcmStatGroup 4 }
+
+bcmNbStatEntry OBJECT-TYPE
+    SYNTAX BcmNbStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains the counters for the
+         NetBIOS operation of a BCM. The table augments the bcmStatTable."
+    INDEX { busConfIndex }
+-- Augments busConfEntry FROM LAN-EMULATION-BUS-MIB
+    ::= { bcmNbStatTable 1 }
+
+BcmNbStatEntry ::= SEQUENCE {
+    bcmNbFramesReceived Counter32,
+    bcmNbOctetsReceived Counter32,
+    bcmNbFramesReturned Counter32,
+    bcmNbOctetsReturned Counter32,
+    bcmNbFramesDiscarded Counter32,
+    bcmNbOctetsDiscarded Counter32,
+    bcmNbFramesTransmitted Counter32,
+    bcmNbOctetsTransmitted Counter32,
+    bcmNbTransmitErrorFrames Counter32,
+    bcmNbTransmitErrorOctets Counter32,
+    bcmNbBroadcastFramesDirectedNoRif Counter32,
+    bcmNbBroadcastFramesDirectedAre Counter32,
+    bcmNbBroadcastFramesDirectedSte Counter32,
+    bcmNbBroadcastFramesDirectedSrf Counter32
+    }
+
+bcmNbFramesReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) frames received by BCM."
+    ::= { bcmNbStatEntry 1 }
+
+bcmNbOctetsReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) octets received by BCM."
+    ::= { bcmNbStatEntry 2 }
+
+bcmNbFramesReturned OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) frames not managed by BCM and
+         returned to BUS for transmission."
+    ::= { bcmNbStatEntry 3 }
+
+bcmNbOctetsReturned OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) octets not managed by BCM and
+         returned to BUS for transmission."
+    ::= { bcmNbStatEntry 4 }
+
+bcmNbFramesDiscarded OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) frames discarded (filtered) by BCM."
+    ::= { bcmNbStatEntry 5 }
+
+bcmNbOctetsDiscarded OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) octets discarded (filtered) by BCM."
+    ::= { bcmNbStatEntry 6 }
+
+bcmNbFramesTransmitted OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) frames transmitted by BCM."
+    ::= { bcmNbStatEntry 7 }
+
+bcmNbOctetsTransmitted OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) octets transmitted by BCM."
+    ::= { bcmNbStatEntry 8 }
+
+bcmNbTransmitErrorFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) frames that the BCM could not sent due to an error."
+    ::= { bcmNbStatEntry 9 }
+
+bcmNbTransmitErrorOctets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) octets that the BCM could not sent due to an error."
+    ::= { bcmNbStatEntry 10 }
+
+bcmNbBroadcastFramesDirectedNoRif OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) frames transmitted by BCM with no RI Field."
+    ::= { bcmNbStatEntry 11 }
+
+bcmNbBroadcastFramesDirectedAre OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) frames transmitted by BCM left as ARE."
+    ::= { bcmNbStatEntry 12 }
+
+bcmNbBroadcastFramesDirectedSte OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) frames transmitted by BCM left as STE."
+    ::= { bcmNbStatEntry 13 }
+
+bcmNbBroadcastFramesDirectedSrf OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of (NetBIOS) frames transmitted by BCM that were converted
+         from ARE or STE to SRF by Source Route Management, or left as SRF
+         ulticast frame (a rare frame type)."
+    ::= { bcmNbStatEntry 14 }
+
+bcmCConfGroup OBJECT IDENTIFIER ::= { bcmMIBGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing configuration information
+--    about the broadcast manager.
+--  objects
+--    bcmRouteCacheEnabled
+
+bcmCStaticTargetsConfigGroup OBJECT IDENTIFIER ::= { bcmMIBGroups 2 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing configuration information
+--    about the static targets.
+--  objects
+--    bcmStaticTargetsNextId, bcmStaticTargetsIndex, 
+--    bcmStaticTargetsAtmAddress, bcmStaticTargetsMacAddress, 
+--    bcmStaticTargetsProtocol, bcmStaticTargetsRowStatus
+
+bcmCIpConfigGroup OBJECT IDENTIFIER ::= { bcmMIBGroups 3 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing configuration information
+--    about the IP protocol operation in the BCM.
+--  objects
+--    bcmIpConfOperStatus, bcmIpConfAdminStatus, bcmIpConfCacheAge
+
+bcmCIpxConfigGroup OBJECT IDENTIFIER ::= { bcmMIBGroups 4 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing configuration information
+--    about the IPX protocol operation in the BCM.
+--  objects
+--    bcmIpxConfOperStatus, bcmIpxConfAdminStatus, 
+--    bcmIpxConfCacheAge
+
+bcmCNbConfigGroup OBJECT IDENTIFIER ::= { bcmMIBGroups 5 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing configuration information
+--    about the NetBIOS protocol operation in the BCM.
+--  objects
+--    bcmNbConfOperStatus, bcmNbConfAdminStatus, bcmNbConfCacheAge
+
+bcmCStatGroup OBJECT IDENTIFIER ::= { bcmMIBGroups 6 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing statistics
+--    about the BCM operation.
+--  objects
+--    bcmFramesReceived, bcmOctetsReceived, bcmFramesReturned, 
+--    bcmOctetsReturned, bcmFramesDiscarded, bcmOctetsDiscarded, 
+--    bcmFramesTransmitted, bcmOctetsTransmitted, 
+--    bcmTransmitErrorFrames, bcmTransmitErrorOctets, 
+--    bcmBroadcastFramesDirectedNoRif, 
+--    bcmBroadcastFramesDirectedAre, bcmBroadcastFramesDirectedSte, 
+--    bcmBroadcastFramesDirectedSrf
+
+bcmCIpStatGroup OBJECT IDENTIFIER ::= { bcmMIBGroups 7 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing statistics
+--    about the BCM operation.
+--  objects
+--    bcmIpFramesReceived, bcmIpOctetsReceived, bcmIpFramesReturned, 
+--    bcmIpOctetsReturned, bcmIpFramesDiscarded, 
+--    bcmIpOctetsDiscarded, bcmIpFramesTransmitted, 
+--    bcmIpOctetsTransmitted, bcmIpTransmitErrorFrames, 
+--    bcmIpTransmitErrorOctets, bcmIpBroadcastFramesDirectedNoRif, 
+--    bcmIpBroadcastFramesDirectedAre, 
+--    bcmIpBroadcastFramesDirectedSte, 
+--    bcmIpBroadcastFramesDirectedSrf
+
+bcmCIpxStatGroup OBJECT IDENTIFIER ::= { bcmMIBGroups 8 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing statistics
+--    about the BCM operation.
+--  objects
+--    bcmIpxFramesReceived, bcmIpxOctetsReceived, 
+--    bcmIpxFramesReturned, bcmIpxOctetsReturned, 
+--    bcmIpxFramesDiscarded, bcmIpxOctetsDiscarded, 
+--    bcmIpxFramesTransmitted, bcmIpxOctetsTransmitted, 
+--    bcmIpxTransmitErrorFrames, bcmIpxTransmitErrorOctets, 
+--    bcmIpxBroadcastFramesDirectedNoRif, 
+--    bcmIpxBroadcastFramesDirectedAre, 
+--    bcmIpxBroadcastFramesDirectedSte, 
+--    bcmIpxBroadcastFramesDirectedSrf
+
+bcmCNbStatGroup OBJECT IDENTIFIER ::= { bcmMIBGroups 9 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing statistics
+--    about the BCM operation.
+--  objects
+--    bcmNbFramesReceived, bcmNbOctetsReceived, bcmNbFramesReturned, 
+--    bcmNbOctetsReturned, bcmNbFramesDiscarded, 
+--    bcmNbOctetsDiscarded, bcmNbFramesTransmitted, 
+--    bcmNbOctetsTransmitted, bcmNbTransmitErrorFrames, 
+--    bcmNbTransmitErrorOctets, bcmNbBroadcastFramesDirectedNoRif, 
+--    bcmNbBroadcastFramesDirectedAre, 
+--    bcmNbBroadcastFramesDirectedSte, 
+--    bcmNbBroadcastFramesDirectedSrf
+
+bcmMIBCompliance OBJECT IDENTIFIER ::= { bcmMIBCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The compliance statement for SNMP IBM extensions
+--    to for broadcast management in ATM emulated LANS.
+--  Module
+--    >>current<<
+--   OptGroup
+--    bcmCConfGroup
+--   OptGroup
+--    bcmCStaticTargetsConfigGroup
+--   OptGroup
+--    bcmCIpConfigGroup
+--   OptGroup
+--    bcmCIpxConfigGroup
+--   OptGroup
+--    bcmCNbConfigGroup
+--   OptGroup
+--    bcmCStatGroup
+--   OptGroup
+--    bcmCIpStatGroup
+--   OptGroup
+--    bcmCIpxStatGroup
+--   OptGroup
+--    bcmCNbStatGroup
+
+
+END
