@@ -33,8 +33,7 @@ to run ping checks as quickly as possible without increasing snmp load on your d
 *    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
 ```
 
-> **NOTE**: If you are using distributed pollers append the **`-g #`** with the group number of the poller on **ALL**
-> pollers that you are running these checks from, otherwise you will have false up/down status if some pollers can't reach all devices.  Alternatively, you can just run ping.php on a single node.
+> **NOTE**: If you are using distributed pollers you can restrict a poller to a group by appending the `-g` to the cron entry.  Alternatively, you should only run ping.php on a single node.
 
 #### Sub minute ping check
 
