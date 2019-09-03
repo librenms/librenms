@@ -4,23 +4,44 @@ path: blob/master/doc/
 
 **Please note the minimum supported PHP version is 7.1.3**
 
-## Install Required Packages ##
+## Install Common Required Packages ##
 
     yum install epel-release
-    yum install git cronie fping jwhois ImageMagick mtr MySQL-python MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server
+    yum install git cronie fping jwhois ImageMagick mtr MySQL-python MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip
 
-Running with webmatic php
+
+### Install PHP
+
+CentOS 7 comes with php 5.4 which is not compatible with LibreNMS.
+There are multiple ways to install php 7.x on CentOS 7, like Webtatic, Remi or SCL, the two latters being maintained by Remi Collet of RedHat.
+
+#### Running with remi php
+
+    yum localinstall http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    yum install composer php72-php-fpm php72-php-cli php72-php-common php72-php-curl php72-php-gd php72-php-mbstring php72-php-process php72-php-snmp php72-php-xml php72-php-zip php72-php-memcached php72-php-mysqlnd
+
+#### Running with webtatic php
 
     rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-    yum install composer php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip python-memcached rrdtool
+    yum install composer php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip
 
-Running with CentOS SCL php-fpm
+#### Running with CentOS SCL php
 
     yum install centos-release-scl
-    yum install composer rh-php72-php-fpm rh-php72-php-cli rh-php72-php-common rh-php72-php-curl rh-php72-php-gd rh-php72-php-mbstring rh-php72-php-process rh-php72-php-snmp rh-php72-php-xml rh-php72-php-zip rh-php72-php-memcached rh-php72-php-mysqlnd
+    yum install rh-php72-php-fpm rh-php72-php-cli rh-php72-php-common rh-php72-php-curl rh-php72-php-gd rh-php72-php-mbstring rh-php72-php-process rh-php72-php-snmp rh-php72-php-xml rh-php72-php-zip rh-php72-php-memcached rh-php72-php-mysqlnd
 
     ln -s /opt/rh/rh-php72/root/usr/bin/php /usr/bin/php
+    
+Composer needs to be installed manually when using SCL repository.
+Install composer with the following commands (don't forget to update the sha384 checksum with the current one found at https://getcomposer.org/download/ )
+
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    php -r "if (hash_file('sha384', 'composer-setup.php') === 'a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+    php composer-setup.php
+    php -r "unlink('composer-setup.php');"
+    
+    ln -s /usr/local/bin/composer.phar /usr/bin/composer.phar
 
 #### Add librenms user
 
