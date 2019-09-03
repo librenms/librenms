@@ -34,7 +34,7 @@ to run ping checks as quickly as possible without increasing snmp load on your d
 ```
 
 > **NOTE**: If you are using distributed pollers append the **`-g #`** with the group number of the poller on **ALL**
-> devices that you are running these cheks from, otherwise you will __may__ false up/down status depending on network setup
+> pollers that you are running these checks from, otherwise you will have false up/down status if some pollers can't reach all devices.  Alternatively, you can just run ping.php on a single node.
 
 #### Sub minute ping check
 
