@@ -46,4 +46,3 @@ modules:
             - { value: 34, generic: 0, graph: 1, descr: '4096Qam' }
             - { value: 35, generic: 0, graph: 1, descr: '4096QamLight' }
             - { value: 36, generic: 0, graph: 1, descr: '4096QamStrong' }
-        -
