@@ -37,7 +37,7 @@
 @endsection
 
 @section('scripts')
-<script type="application/javascript">
+<script>
     var authlog_grid = $("#authlog");
     authlog_grid.bootgrid();
     authlog_grid.css('display', 'table'); // done loading, show
