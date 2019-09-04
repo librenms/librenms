@@ -71,6 +71,7 @@ return [
               'username' => env('DB_SLAVE_USERNAME', env('DB_USERNAME', $fallback_db_config['db_user'])),
               'password' => env('DB_SLAVE_PASSWORD', env('DB_PASSWORD', $fallback_db_config['db_pass'])),
             ],
+            'sticky' => boolval(env('DB_SLAVE_STICKY')),
             'unix_socket' => env('DB_SOCKET', $fallback_db_config['db_socket']),
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
