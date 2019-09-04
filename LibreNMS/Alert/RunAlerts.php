@@ -523,8 +523,8 @@ class RunAlerts
                 $obj['alert']['title'] = $obj['title'];
                 $obj['msg']       = $type->getBody($obj);
                 c_echo(" :: $transport_title => ");
-                $instance = new $class($item['transport_id']);
                 try {
+                    $instance = new $class($item['transport_id']);
                     $tmp = $instance->deliverAlert($obj, $item['opts']);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (\Exception $e) {
