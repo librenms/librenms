@@ -58,7 +58,7 @@
         </div>
     </div>
     <div class="container-fluid">
-        <div id="manage-device-groups-panel" class="panel panel-default">
+        <div id="unmanaged-devices-panel" class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
                 @lang('Ungrouped Devices') ({{ $ungrouped_devices->count() }})
@@ -69,7 +69,7 @@
                     <table id="ungrouped-devices-table" class="table table-condensed table-hover">
                         <thead>
                         <tr>
-                            <th>@lang('Vendor')</th>
+                            <th style="width:32px">@lang('Vendor')</th>
                             <th>@lang('Device')</th>
                             <th>@lang('Platform')</th>
                             <th>@lang('Operating System')</th>
@@ -78,10 +78,14 @@
                         <tbody>
                         @foreach($ungrouped_devices as $device)
                             <tr id="row_{{ $device->device_id }}">
-                                <td><img alt="{{ $device->os }} "src="{{ asset($device->icon) }}" width="32px" height="32px" title="{{ $device->os }}"></td>
-                                <td><a class="list-device" href="{{ url("device/device=$device->device_id") }}"><b>{{ $device->hostname }}</b></a><br>{{$device->sysName}}</td>
+                                <td><img alt="{{ $device->os }}" src="{{ asset($device->icon) }}" width="32px" height="32px" title="{{ $device->os }}"></td>
+                                <td>{!! \LibreNMS\Util\Url::deviceLink($device) !!}<br />{{ $device->sysName }}</td>
                                 <td>{{ $device->hardware }}</td>
+                                @if ($device->features)
                                 <td>{{ $device->os }} {{ $device->version }} ({{ $device->features }})</td>
+                                                                @else
+                                <td>{{ $device->os }} {{ $device->version }}</td>
+                                                                @endif
                             </tr>
                         @endforeach
                         </tbody>
