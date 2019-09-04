@@ -103,7 +103,7 @@ snmpd restart` will activate this config.
 
 In `/etc/php5/apache2/php.ini` and `/etc/php5/cli/php.ini`, ensure
  date.timezone is set to your preferred time zone.  See
-< http://php.net/manual/en/timezones.php> for a list of
+<http://php.net/manual/en/timezones.php> for a list of
 supported timezones.  Valid examples are: "America/New York",
  "Australia/Brisbane", "Etc/UTC".
 
