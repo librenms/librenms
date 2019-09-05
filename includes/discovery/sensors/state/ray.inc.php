@@ -40,7 +40,7 @@ if (is_numeric($state)) {
     //Create Sensor To State Index
     create_sensor_to_state_index($device, $state_name, $sensor_index);
 } else {
-// System Status Ray1 and Ray2 (Value : na (0) unknown, ok (1) ok, warning (2) warning, alarm (3) alarm)
+// System Status Ray3 (Value : na (0) unknown, ok (1) ok, warning (2) warning, alarm (3) alarm)
     $state = snmp_get($device, "systemStatus.0", "-Ovqe", 'RAY-MIB');
     if (is_numeric($state)) {
     //Create State Index
