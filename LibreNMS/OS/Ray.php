@@ -57,9 +57,16 @@ class Ray extends OS implements
             Processor::discover(
                 $this->getName(),
                 $this->getDeviceId(),
+                '.1.3.6.1.4.1.33555.1.1.5.1.0',
+                0
+            ),
+            Processor::discover(
+                $this->getName(),
+                $this->getDeviceId(),
                 '.1.3.6.1.4.1.33555.1.1.5.1',
                 0
             )
+
         );
     }
 
@@ -73,9 +80,14 @@ class Ray extends OS implements
     {
         return array(
             // RAY-MIB::txFreq.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.4', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.4.0', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
             // RAY-MIB::rxFreq.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.3', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.3.0', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
+         // RAY-MIB::txFreq.0
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.4', 'racom-tx-old', 1, 'TX Frequency', null, 1, 1000),
+            // RAY-MIB::rxFreq.0
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.3', 'racom-rx-old', 1, 'RX Frequency', null, 1, 1000),
+
         );
     }
 
@@ -89,9 +101,15 @@ class Ray extends OS implements
     {
         return array(
             // RAY-MIB::rfPowerCurrent.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.17', 'racom-pow-cur', 1, 'Tx Power Current'),
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.17.0', 'racom-pow-cur', 1, 'Tx Power Current'),
             //RAY-MIB::rfPowerConfigured.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.12', 'racom-pow-conf', 1, 'Tx Power Configured'),
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.12.0', 'racom-pow-conf', 1, 'Tx Power Configured'),
+            // RAY-MIB::rfPowerCurrent.0
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.17', 'racom-pow-cur-old', 1, 'Tx Power Current'),
+            //RAY-MIB::rfPowerConfigured.0
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.12', 'racom-pow-conf-old', 1, 'Tx Power Configured'),
+
+
         );
     }
 
@@ -103,9 +121,10 @@ class Ray extends OS implements
      */
     public function discoverWirelessRssi()
     {
-        $oid = '.1.3.6.1.4.1.33555.1.3.2.1'; // RAY-MIB::rss.0
         return array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'racom', 1, 'RSSI', null, 1, 10),
+            new WirelessSensor('rssi', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.3.2.1.0', 'racom', 1, 'RSSI', null, 1, 10),
+            new WirelessSensor('rssi', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.3.2.1', 'racom-old', 1, 'RSSI', null, 1, 10),
+
         );
     }
 
@@ -117,9 +136,10 @@ class Ray extends OS implements
      */
     public function discoverWirelessSnr()
     {
-        $oid = '.1.3.6.1.4.1.33555.1.3.2.2'; // RAY-MIB::snr.0
         return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'racom', 1, 'CINR', null, 1, 10),
+            new WirelessSensor('snr', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.3.2.2.0', 'racom', 1, 'CINR', null, 1, 10),
+            new WirelessSensor('snr', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.3.2.2', 'racom-old', 1, 'CINR', null, 1, 10),
+
         );
     }
     /**
@@ -130,11 +150,12 @@ class Ray extends OS implements
      */
     public function discoverWirelessRate()
     {
-        $oid_bitrate = '.1.3.6.1.4.1.33555.1.2.1.13'; // RAY-MIB::netBitrate.0
-        $oid_maxbitrate = '.1.3.6.1.4.1.33555.1.2.1.14'; // RAY-MIB::maxNetBitrate.0
         return array(
-            new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
-            new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate, 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000, 1),
+            new WirelessSensor('rate', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.13.0', 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
+            new WirelessSensor('rate', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.14.0', 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000000, 1),
+            new WirelessSensor('rate', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.13', 'racom-netBitrate-old', 1, 'Net Bitrate', null, 1000, 1),
+            new WirelessSensor('rate', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.14', 'racom-maxNetBitrate-old', 2, 'Max Net Bitrate', null, 1000000, 1),
+
         );
     }
 }

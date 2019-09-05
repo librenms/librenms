@@ -11,13 +11,26 @@
  */
 
 
-d_echo('RAY');
+d_echo('RAY-OLD');
 $oid = ".1.3.6.1.4.1.33555.1.1.4.3";
 $index = 0;
 $sensor_type = 'voltageUnit';
 $descr = 'Voltage';
 $divisor = 10;
-$voltage = (snmp_get($device, $oid, '-Oqv', 'RAY-MIB') / $divisor);
+$voltage = (snmp_get($device, $oid, '-Oqv', 'RAY-MIB') );
 if (is_numeric($voltage)) {
+    $voltage = $voltage / $divisor;
     discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $sensor_type, $descr, $divisor, null, null, null, null, null, $voltage);
+} else {
+    d_echo('RAY');
+    $oid = ".1.3.6.1.4.1.33555.1.1.4.3.0";
+    $index = 0;
+    $sensor_type = 'voltageUnit';
+    $descr = 'Voltage';
+    $divisor = 10;
+    $voltage = (snmp_get($device, $oid, '-Oqv', 'RAY-MIB'));
+    if (is_numeric($voltage)) {
+        $voltage = $voltage / $divisor;
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $sensor_type, $descr, $divisor, null, null, null, null, null, $voltage);
+    }
 }

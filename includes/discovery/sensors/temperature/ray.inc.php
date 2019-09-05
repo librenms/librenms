@@ -10,13 +10,26 @@
  * the source code distribution for details.
  */
 
-d_echo('RAY');
+d_echo('RAY-OLD');
 $oid = ".1.3.6.1.4.1.33555.1.1.4.2";
 $index = 0;
 $sensor_type = ' temperatureRadio';
 $descr = 'Internal Temp';
 $divisor = 100;
-$temperature = (snmp_get($device, $oid, '-Oqv', 'RAY-MIB') / $divisor);
+$temperature = (snmp_get($device, $oid, '-Oqv', 'RAY-MIB'));
 if (is_numeric($temperature)) {
+    $temperature = $temperature / $divisor;
     discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, null, null, null, null, null, $temperature);
+} else {
+    d_echo('RAY');
+    $oid = ".1.3.6.1.4.1.33555.1.1.4.2.0";
+    $index = 0;
+    $sensor_type = ' temperatureRadio';
+    $descr = 'Internal Temp';
+    $divisor = 100;
+    $temperature = (snmp_get($device, $oid, '-Oqv', 'RAY-MIB'));
+    if (is_numeric($temperature)) {
+        $temperature = $temperature / $divisor;
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, null, null, null, null, null, $temperature);
+    }
 }
