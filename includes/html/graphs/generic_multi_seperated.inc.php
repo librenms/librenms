@@ -79,11 +79,6 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' CDEF:bits' . $i . 'X=inbits' . $i . 'X,outbits' . $i . 'X,+';
         $rrd_options .= ' SHIFT:inB' . $i . "X:$period";
         $rrd_options .= ' SHIFT:outB' . $i . "X:$period";
-        //$in_thingX .= $seperatorX . 'inB' . $i . 'X,UN,0,' . 'inB' . $i . 'X,IF';
-        //$out_thingX .= $seperatorX . 'outB' . $i . 'X,UN,0,' . 'outB' . $i . 'X,IF';
-        //$plusesX .= $plusX;
-        //$seperatorX = ',';
-        //$plusX = ',+';
     }
 
     if (!$args['nototal']) {
@@ -232,21 +227,18 @@ if (!$args['nototal']) {
         $rrd_options .= " COMMENT:' \\n'";
         $rrd_options .= " COMMENT:' \t\t\t\t\t\t'";
         $rrd_options .= " HRULE:999999999999999#FFFFFF:'" . str_pad('Perv Total', $rrddescr_len + 1) . "In '\t\t";
-        //$rrd_options .= ' GPRINT:inbitsX:LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:inbitsX:AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:inbitsX:MAX:%6.2lf%s';
         $rrd_options .= " GPRINT:totinX:%6.2lf%s$total_units";
         $rrd_options .= " COMMENT:'\\n'";
         $rrd_options .= " COMMENT:' \t\t\t\t\t\t'";
         $rrd_options .= " HRULE:999999999999990#FFFFFF:'" . str_pad('', $rrddescr_len + 1) . "Out'\t\t";
-        //$rrd_options .= ' GPRINT:outbitsX:LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:outbitsX:AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:outbitsX:MAX:%6.2lf%s';
         $rrd_options .= " GPRINT:totoutX:%6.2lf%s$total_units";
         $rrd_options .= " COMMENT:'\\n'";
         $rrd_options .= " COMMENT:' \t\t\t\t\t\t'";
         $rrd_options .= " HRULE:999999999999990#FFFFFF:'" . str_pad('', $rrddescr_len + 1) . "Agg'\t\t";
-        //$rrd_options .= ' GPRINT:bitsX:LAST:%6.2lf%s';
         $rrd_options .= ' GPRINT:bitsX:AVERAGE:%6.2lf%s';
         $rrd_options .= ' GPRINT:bitsX:MAX:%6.2lf%s';
         $rrd_options .= " GPRINT:totX:%6.2lf%s$total_units";
