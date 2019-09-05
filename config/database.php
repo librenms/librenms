@@ -63,6 +63,7 @@ return [
               'database' => env('DB_DATABASE', $fallback_db_config['db_name']),
               'username' => env('DB_USERNAME', $fallback_db_config['db_user']),
               'password' => env('DB_PASSWORD', $fallback_db_config['db_pass']),
+              'unix_socket' => env('DB_SOCKET', $fallback_db_config['db_socket']),
             ],
             'read' => [
               'host' => env('DB_SLAVE', env('DB_HOST', $fallback_db_config['db_host'])),
@@ -70,9 +71,9 @@ return [
               'database' => env('DB_SLAVE_DATABASE', env('DB_DATABASE', $fallback_db_config['db_name'])),
               'username' => env('DB_SLAVE_USERNAME', env('DB_USERNAME', $fallback_db_config['db_user'])),
               'password' => env('DB_SLAVE_PASSWORD', env('DB_PASSWORD', $fallback_db_config['db_pass'])),
+              'unix_socket' => env('DB_SLAVE_SOCKET', env('DB_SOCKET', $fallback_db_config['db_socket'])),
             ],
             'sticky' => boolval(env('DB_SLAVE_STICKY')),
-            'unix_socket' => env('DB_SOCKET', $fallback_db_config['db_socket']),
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix' => '',
