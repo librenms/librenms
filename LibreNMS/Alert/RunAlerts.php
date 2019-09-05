@@ -1,7 +1,7 @@
 <?php
 /*
  * RunAlerts.php
- * 
+ *
  * Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
  *
  * Modified by:
  * @author Heath Barnhart <barnhart@kanren.net>
- * 
+ *
  */
 
 namespace LibreNMS\Alert;
@@ -523,9 +523,13 @@ class RunAlerts
                 $obj['alert']['title'] = $obj['title'];
                 $obj['msg']       = $type->getBody($obj);
                 c_echo(" :: $transport_title => ");
-                $instance = new $class($item['transport_id']);
-                $tmp = $instance->deliverAlert($obj, $item['opts']);
-                $this->alertLog($tmp, $obj, $obj['transport']);
+                try {
+                    $instance = new $class($item['transport_id']);
+                    $tmp = $instance->deliverAlert($obj, $item['opts']);
+                    $this->alertLog($tmp, $obj, $obj['transport']);
+                } catch (\Exception $e) {
+                    $this->alertLog($e, $obj, $obj['transport']);
+                }
                 unset($instance);
                 echo PHP_EOL;
             }
