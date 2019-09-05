@@ -64,7 +64,6 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= " COMMENT:' \\n'";
     $rrd_options .= " CDEF:pollerX=" . implode(',', $cdefX);
     $rrd_options .= " CDEF:avgpolX=pollerX," . count($cdefX) .",/";
-    //$rrd_options .= " 'COMMENT:Seconds      Cur     Min     Max     Avg\\n'";
     $rrd_options .= " LINE1.25:pollerX#CCCCCC:'Prev Poller'\t";
     $rrd_options .= " GPRINT:pollerX:MIN:%6.2lf";
     $rrd_options .= ' GPRINT:pollerX:MAX:%6.2lf  GPRINT:pollerX:AVERAGE:%6.2lf';
