@@ -288,6 +288,18 @@ LibreNMS database.
 | Jira Username | myjirauser |
 | Jira Password | myjirapass |
 
+## LINE Notify
+
+[LINE Notify](https://notify-bot.line.me/)
+
+[LINE Notify API Document](https://notify-bot.line.me/doc/)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Token | AbCdEf12345 |
+
 ## Mail
 
 For all but the default contact, we support setting multiple email
