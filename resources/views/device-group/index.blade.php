@@ -81,11 +81,7 @@
                                 <td><img alt="{{ $device->os }}" src="{{ asset($device->icon) }}" width="32px" height="32px" title="{{ $device->os }}"></td>
                                 <td>{!! \LibreNMS\Util\Url::deviceLink($device) !!}<br />{{ $device->sysName }}</td>
                                 <td>{{ $device->hardware }}</td>
-                                @if ($device->features)
-                                <td>{{ $device->os }} {{ $device->version }} ({{ $device->features }})</td>
-                                                                @else
-                                <td>{{ $device->os }} {{ $device->version }}</td>
-                                                                @endif
+                                <td>{{ $device->os }} {{ $device->version }} @if($device->features) ({{ $device->features }}) @endif </td>
                             </tr>
                         @endforeach
                         </tbody>
