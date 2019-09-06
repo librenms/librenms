@@ -316,13 +316,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                           </div>';
     }
     if (!empty($text)) {
-        if (isset($previous_config)) {
-            $language = 'diff';
-        } elseif (isset(Config::get('os')[$device['os']]['config_highlighting'])) {
-            $language = Config::get('os')[$device['os']]['config_highlighting'];
-        } else {
-            $language = 'ios';
-        }
+        $language = isset($previous_config) ? 'diff' : Config::getOsSetting($device['os'], 'config_highlighting', 'ios');
         $geshi = new GeSHi(htmlspecialchars_decode($text), $language);
         $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
