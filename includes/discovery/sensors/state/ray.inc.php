@@ -3,10 +3,10 @@
 echo 'RAy Racom State';
 
 // System Status Ray1 and Ray2 (Value : na (0) unknown, ok (1) ok, warning (2) warning, alarm (3) alarm)
-$state = snmp_get($device, "systemStatus", "-Ovqe", 'RAY-MIB');
-if (is_numeric($state)) {
+$state = explode(' ', snmp_getnext($device, "systemStatus", "-Onqe", 'RAY-MIB'));
+if (is_numeric($state[1])) {
     //Create State Index
-    $state_name = 'systemStatus-old';
+    $state_name = 'systemStatus';
     create_state_index(
         $state_name,
         [
@@ -22,7 +22,7 @@ if (is_numeric($state)) {
         $valid['sensor'],
         'state',
         $device,
-        '.1.3.6.1.4.1.33555.1.1.3.1',
+        $state[0],
         $sensor_index,
         $state_name,
         'System Status',
@@ -32,52 +32,13 @@ if (is_numeric($state)) {
         null,
         null,
         null,
-        $state,
+        $state[1],
         'snmp',
         0
     );
 
     //Create Sensor To State Index
     create_sensor_to_state_index($device, $state_name, $sensor_index);
-} else {
-// System Status Ray3 (Value : na (0) unknown, ok (1) ok, warning (2) warning, alarm (3) alarm)
-    $state = snmp_get($device, "systemStatus.0", "-Ovqe", 'RAY-MIB');
-    if (is_numeric($state)) {
-    //Create State Index
-        $state_name = 'systemStatus';
-        create_state_index(
-            $state_name,
-            [
-                ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
-                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Ok'],
-                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Warning'],
-                ['value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'Alarm'],
-            ]
-        );
-
-                $sensor_index = 0;
-                discover_sensor(
-                    $valid['sensor'],
-                    'state',
-                    $device,
-                    '.1.3.6.1.4.1.33555.1.1.3.1.0',
-                    $sensor_index,
-                    $state_name,
-                    'System Status',
-                    1,
-                    1,
-                    null,
-                    null,
-                    null,
-                    null,
-                    $state,
-                    'snmp',
-                    0
-                );
-
-    //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $sensor_index);
-    }
 }
 
 
