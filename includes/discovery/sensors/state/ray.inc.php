@@ -34,7 +34,7 @@ if (is_numeric($state)) {
         null,
         null,
         null,
-        $state[1],
+        $state,
         'snmp',
         0
     );
