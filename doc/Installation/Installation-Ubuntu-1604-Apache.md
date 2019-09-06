@@ -158,6 +158,13 @@ setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 ```
 
+# generate Laravel Key
+
+```
+cd /opt/librenms
+php artisan key:generate
+```
+
 # Web installer
 
 Now head to the web installer and follow the on-screen instructions.
