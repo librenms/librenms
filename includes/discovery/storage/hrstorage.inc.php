@@ -43,6 +43,10 @@ if (is_array($hrstorage_array)) {
             continue;
         }
 
+        if ($device['os'] == 'aix') {
+            continue;
+        }
+
         if (ignore_storage($device['os'], $descr)) {
             continue;
         }
