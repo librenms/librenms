@@ -3,8 +3,10 @@
 echo 'RAy Racom State';
 
 // System Status Ray1 and Ray2 (Value : na (0) unknown, ok (1) ok, warning (2) warning, alarm (3) alarm)
-$state = explode(' ', snmp_getnext($device, "systemStatus", "-Onqe", 'RAY-MIB'));
-if (is_numeric($state[1])) {
+$data = explode(' ', snmp_getnext($device, "systemStatus", "-Onqe", 'RAY-MIB'));
+$oid = $data[0];
+$state = $data[1];
+if (is_numeric($state)) {
     //Create State Index
     $state_name = 'systemStatus';
     create_state_index(
@@ -22,7 +24,7 @@ if (is_numeric($state[1])) {
         $valid['sensor'],
         'state',
         $device,
-        $state[0],
+        $oid,
         $sensor_index,
         $state_name,
         'System Status',
@@ -41,7 +43,7 @@ if (is_numeric($state[1])) {
     create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
-
+unset($data);
 
 
 
