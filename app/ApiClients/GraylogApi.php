@@ -129,7 +129,7 @@ class GraylogApi
             return '*';
         }
 
-        return implode('&&', $query);
+        return implode(' && ', $query);
     }
 
     public function getAddresses(Device $device)
