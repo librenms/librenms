@@ -30,6 +30,7 @@ modules:
                         - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
                         - { descr: critical, graph: 0, value: 18, generic: 2 }
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
+                    skip_values: 4
                 -
                     oid: mains
                     value: mainsStatus
@@ -57,11 +58,12 @@ modules:
                         - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
                         - { descr: critical, graph: 0, value: 18, generic: 2 }
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
+                    skip_values: 4
                 -
-                    oid: rectifiers.rectifierTable.rectifierEntry
+                    oid: rectifierTable
                     value: rectifierStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.2.{{ $index }}'
-                    descr: Rectifier {{ $index }} Status
+                    descr: '{{ $rectifierType }} {{ $index }} Status'
                     state_name: rectifierStatus
                     states:
                         - { descr: error, graph: 0, value: 0, generic: 2 }
@@ -84,12 +86,33 @@ modules:
                         - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
                         - { descr: critical, graph: 0, value: 18, generic: 2 }
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
+                    skip_values: 4
                 -
-                    oid: load
-                    value: loadFusesStatus
-                    num_oid: '.1.3.6.1.4.1.12148.10.9.3.{{ $index }}'
-                    descr: Load Fuses {{ $index }} Status
-                    state_name: loadFusesStatus
+                    oid: loadFuseTable
+                    value: loadFuseStatus
+                    num_oid: '.1.3.6.1.4.1.12148.10.9.7.1.1.{{ $index }}'
+                    descr: loadFuseDescription
+                    state_name: loadFuseStatus
+                    states:
+                        - { descr: error, graph: 0, value: 0, generic: 2 }
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
+                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
+                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
+                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
+                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
+                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
+                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
+                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
+                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
+                    skip_values: 4
+                -
+                    oid: batteryBankFuseTable
+                    value: batteryFuseStatus
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.18.5.1.2.{{ $index }}'
+                    descr: batteryFuseDescription
+                    state_name: batteryFuseStatus
                     states:
                         - { descr: error, graph: 0, value: 0, generic: 2 }
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
@@ -111,12 +134,13 @@ modules:
                         - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
                         - { descr: critical, graph: 0, value: 18, generic: 2 }
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
+                    skip_values: 4
                 -
-                    oid: battery
-                    value: batteryStatus
-                    num_oid: '.1.3.6.1.4.1.12148.10.10.1.{{ $index }}'
-                    descr: Battery Status
-                    state_name: batteryStatus
+                    oid: batteryBankTable
+                    value: batteryBankStatus
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.18.2.1.2.{{ $index }}'
+                    descr: Battery Bank {{ $index }} Status
+                    state_name: batteryBankStatus
                     states:
                         - { descr: error, graph: 0, value: 0, generic: 2 }
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
@@ -138,61 +162,121 @@ modules:
                         - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
                         - { descr: critical, graph: 0, value: 18, generic: 2 }
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
+                    skip_values: 4
+                -
+                    oid: inputControlUnitInputTable
+                    value: inputControlUnitInputStatus
+                    num_oid: '.1.3.6.1.4.1.12148.10.11.2.1.2.{{ $index }}'
+                    descr: 'Input {{ $inputControlUnitInputDescription }} = {{ $inputControlUnitInputValue }}'
+                    state_name: inputStatus
+                    states:
+                        - { descr: error, graph: 0, value: 0, generic: 2 }
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
+                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
+                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
+                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
+                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
+                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
+                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
+                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
+                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
+                        - { descr: event, graph: 0, value: 12, generic: 1 }
+                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
+                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
+                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
+                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
+                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
+                        - { descr: critical, graph: 0, value: 18, generic: 2 }
+                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                    skip_values: 4
+                -
+                    oid: outputControlUnitOutputTable
+                    value: outputControlUnitOutputStatus
+                    num_oid: '.1.3.6.1.4.1.12148.10.12.2.1.2.{{ $index }}'
+                    descr: 'Output {{ $outputControlUnitOutputDescription }}'
+                    state_name: outputStatus
+                    states:
+                        - { descr: notenergized, graph: 0, value: 0, generic: 3 }
+                        - { descr: energized, graph: 0, value: 1, generic: 3 }
+                        - { descr: disconnected, graph: 0, value: 2, generic: 3 }
+                        - { descr: connected, graph: 0, value: 3, generic: 3 }
+                    skip_values: 4
         voltage:
             data:
                 -
-                    oid: mains.mainsVoltageTable.mainsVoltageEntry
+                    oid: mainsVoltageTable
                     value: mainsVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.3.4.1.6.{{ $index }}'
-                    descr: Mains Input Voltage
-                    index: 'mains.{{ $index }}'
+                    descr: mainsVoltageDescription
+                    low_limit: mainsVoltageMajorLowLevel
+                    low_warn_limit: mainsVoltageMinorLowLevel
+                    warn_limit: mainsVoltageMinorHighLevel
+                    high_limit: mainsVoltageMajorHighLevel 
                 -
-                    oid: rectifiers.rectifierTable.rectifierEntry
+                    oid: rectifierTable
                     value: rectifierInputVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.4.{{ $index }}'
-                    descr: Rectifier {{ $index }} Input Voltage
-                    index: 'input.{{ $index }}'
+                    descr:  '{{ $rectifierType }} {{ $index }} Input Voltage'
                 -
-                    oid: battery.batteryVoltage
+                    oid: batteryVoltage
                     value: batteryVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.5.5.{{ $index }}'
-                    descr: Battery Voltage
-                    index: 'battery.{{ $index }}'
+                    descr: batteryVoltageDescription
                     divisor: 100
+                    low_limit: batteryVoltageMajorLowLevel
+                    low_warn_limit: batteryVoltageMinorLowLevel
+                    warn_limit: batteryVoltageMinorHighLevel
+                    high_limit: batteryVoltageMajorHighLevel 
         current:
             data:
                 -
-                    oid: rectifiers.rectifiersCurrent
+                    oid: rectifiersCurrent
                     value: rectifiersCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
                     descr: System Output Current
-                    index: 'current.{{ $index }}'
                     divisor: 10
+                    warn_limit: rectifiersCurrentMinorAlarmLevel
+                    high_limit: rectifiersCurrentMajorAlarmLevel
                 -
-                    oid: rectifiers.rectifierTable.rectifierEntry
+                    oid: rectifierTable
                     value: rectifierOutputCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.3.{{ $index }}'
-                    descr: Rectifier {{ $index }} Output Current
-                    index: 'output.{{ $index }}'
+                    descr: '{{ $rectifierType }} {{ $index }} Output Current'
                     divisor: 10
                 -
-                    oid: battery.batteryCurrents
-                    value: batteryCurrentsValue
-                    num_oid: '.1.3.6.1.4.1.12148.10.10.6.5.{{ $index }}'
-                    descr: Battery Current
-                    index: 'battery.{{ $index }}'
+                    oid: batteryBankCurrentTable
+                    value: batteryCurrentValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.18.4.1.6.{{ $index }}'
+                    descr: batteryCurrentDescription
                     divisor: 10
+                    low_limit: batteryCurrentMinorLowLevel
+                    low_warn_limit: batteryCurrentMinorLowLevel
+                    warn_limit: batteryCurrentMinorHighLevel
+                    high_limit: batteryCurrentMajorHighLevel
         temperature:
             data:
                 -
-                    oid: battery.batteryTemperatures
-                    value: batteryTemperaturesValue
-                    num_oid: '.1.3.6.1.4.1.12148.10.10.7.5.{{ $index }}'
-                    descr: Battery Temperature
+                    oid: batteryBankTemperatureTable
+                    value: batteryTemperatureValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.18.3.1.6.{{ $index }}'
+                    descr: batteryTemperatureDescription
+                    low_limit: batteryTemperatureMinorLowLevel
+                    low_warn_limit: batteryTemperatureMinorLowLevel
+                    warn_limit: batteryTemperatureMinorHighLevel
+                    high_limit: batteryTemperatureMajorHighLevel
+                    skip_values:
+                    -
+                      oid: batteryTemperatureStatus
+                      op: '='
+                      value: 4
         runtime:
             data:
                 -
-                    oid: battery.batteryTimeLeft
+                    oid: batteryTimeLeft
                     value: batteryTimeLeftValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.8.5.{{ $index }}'
-                    descr: Battery Run Time Remaining
+                    descr: batteryTimeLeftDescription
+                    warn_limit: batteryTimeLeftMinorAlarmLevel
+                    high_limit: batteryTimeLeftMajorAlarmLevel
