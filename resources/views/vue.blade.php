@@ -4,16 +4,21 @@
     <div class="container-fluid">
         <div class="container">
             <div id="app">
-                <accordion>
+                <accordion :multiple="false">
                     <accordion-item name="Test">
                         Test Content
                     </accordion-item>
                     <accordion-item name="Test 2">
                         Test 2 Content
                     </accordion-item>
+                    <accordion-item name="Test 3">
+                        Test 3 Content
+                    </accordion-item>
                 </accordion>
             </div>
         </div>
+        <hr />
+
     </div>
 @endsection
 

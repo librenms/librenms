@@ -24,58 +24,60 @@
 
 <template>
     <div class="panel panel-default">
-        <div class="panel-heading" role="tab" id="headingOne">
+        <div class="panel-heading" role="tab" :id="slug()">
             <h4 class="panel-title">
-                <a :class="{'collapsed': !active}" role="button" data-parent="#accordion" @click="active = !active" :data-href="'#' + group + '-' + name" aria-expanded="true" aria-controls="collapseOne">
-                    {{ name }}
+                <a class="accordion-item-trigger" :class="{'collapsed': !active}" role="button" data-parent="#accordion" @click="active = !active" :data-href="'#' + slug()">
+                    <i class="fa fa-chevron-down accordion-item-trigger-icon"></i> {{ name }}
                 </a>
             </h4>
         </div>
-        <transition
-            name="accordion-item"
-            @enter="startTransition"
-            @after-enter="endTransition"
-            @before-leave="startTransition"
-            @after-leave="endTransition">
-            <div :id="group + '-' + name" v-if="active" :class="['panel-collapse', 'collapse', {'in': active}]" role="tabpanel" aria-labelledby="headingOne">
+        <transition-collapse-height>
+            <div :id="slug() + '-content'" v-if="active" :class="['panel-collapse', 'collapse', {'in': active}]" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                     <slot></slot>
                 </div>
             </div>
-        </transition>
+        </transition-collapse-height>
     </div>
 </template>
 
 <script>
     export default {
         name: "AccordionItem",
-        props: ['name'],
+        props: {
+            name: {
+                type: String,
+                required: true
+            },
+            group: {
+                type: String,
+                default: ''
+            },
+            expanded: {
+                type: Boolean,
+                default: false
+            }
+        },
         data() {
             return {
-                group: null,
-                multiple: false,
-                active: false,
-                details: 'banana'
+                active: this.expanded
+            }
+        },
+        watch: {
+            active: function (active) {
+                if (!this.$parent.multiple && active) {
+                    this.$parent.$children.forEach((item, index) => {
+                        if (this.name !== item.name) {
+                            item.active = false
+                        }
+                    })
+                }
             }
         },
         methods: {
-            toggle(event) {
-                if (this.multiple) {
-                    this.active = !this.active
-                } else {
-                    this.$parent.$children.forEach((item, index) => {
-                        if (this.name === item.name) item.active = !item.active
-                        else item.active = false
-                    })
-                }
-            },
-
-            startTransition(el) {
-                el.style.height = el.scrollHeight + 'px'
-            },
-
-            endTransition(el) {
-                el.style.height = ''
+            slug () {
+                return (this.group ? (this.group + '-' + this.name) : this.name).toString().toLowerCase()
+                    .replace(/\s+/g, '-');
             }
         }
     }
@@ -83,42 +85,9 @@
 
 <style scoped>
     .accordion-item-trigger-icon {
-        $size: 8px;
-        display: block;
-        position: absolute;
-        top: 0; right: 1.25rem; bottom: 0;
-        margin: auto;
-        width: $size;
-        height: $size;
-        border-right: 2px solid #363636;
-        border-bottom: 2px solid #363636;
-        transform: translateY(-$size / 4) rotate(45deg);
         transition: transform 0.2s ease;
-
-    .is-active & {
-        transform: translateY($size / 4) rotate(225deg);
     }
-    }
-
-    .accordion-item-enter-active, .accordion-item-leave-active {
-        will-change: height;
-        transition: height 0.2s ease;
-    }
-    .accordion-item-enter, .accordion-item-leave-to {
-        height: 0 !important;
-    }
-
-    /* Enter and leave animations can use different */
-    /* durations and timing functions.              */
-    .slide-fade-enter-active {
-        transition: height 1s ease;
-    }
-    .slide-fade-leave-active {
-        transition: height 1s ease;
-    }
-    .slide-fade-enter, .slide-fade-leave-to
-        /* .slide-fade-leave-active below version 2.1.8 */ {
-        transform: translateX(10px);
-        opacity: 0;
+    .accordion-item-trigger.collapsed .accordion-item-trigger-icon {
+        transform: rotate(-90deg);
     }
 </style>
