@@ -1082,6 +1082,7 @@ notifications_attribs:
     - { Field: value, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [attrib_id], Unique: true, Type: BTREE }
+    notifications_attribs_notifications_id_user_id_index: { Name: notifications_attribs_notifications_id_user_id_index, Columns: [notifications_id, user_id], Unique: false, Type: BTREE }
 ospf_areas:
   Columns:
     - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
