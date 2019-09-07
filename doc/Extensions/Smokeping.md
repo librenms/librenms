@@ -197,7 +197,7 @@ After that you need to create password for your user
 htpasswd -c /etc/nginx/.htpasswd USER
 ```
 
-You can verify your user and password witt
+You can verify your user and password with
 
 ```
 cat /etc/nginx/.htpasswd
