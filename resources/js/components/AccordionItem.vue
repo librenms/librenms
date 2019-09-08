@@ -26,13 +26,13 @@
     <div class="panel panel-default">
         <div class="panel-heading" role="tab" :id="slug()">
             <h4 class="panel-title">
-                <a class="accordion-item-trigger" :class="{'collapsed': !active}" role="button" data-parent="#accordion" @click="active = !active" :data-href="'#' + slug()">
+                <a class="accordion-item-trigger" :class="{'collapsed': !active}" role="button" data-parent="#accordion" @click="active = !active" :data-href="hash()">
                     <i class="fa fa-chevron-down accordion-item-trigger-icon"></i> {{ name }}
                 </a>
             </h4>
         </div>
         <transition-collapse-height>
-            <div :id="slug() + '-content'" v-if="active" :class="['panel-collapse', 'collapse', {'in': active}]" role="tabpanel" aria-labelledby="headingOne">
+            <div :id="slug() + '-content'" v-if="active" :class="['panel-collapse', 'collapse', {'in': active}]" role="tabpanel">
                 <div class="panel-body">
                     <slot></slot>
                 </div>
@@ -63,21 +63,33 @@
                 active: this.expanded
             }
         },
+        mounted() {
+            if (window.location.hash === this.hash()) {
+                this.active = true;
+            }
+        },
         watch: {
             active: function (active) {
-                if (!this.$parent.multiple && active) {
-                    this.$parent.$children.forEach((item, index) => {
-                        if (this.name !== item.name) {
-                            item.active = false
-                        }
-                    })
+                if (active) {
+                    window.location.hash = this.hash();
+
+                    if (!this.$parent.multiple) {
+                        this.$parent.$children.forEach((item, index) => {
+                            if (this.name !== item.name) {
+                                item.active = false
+                            }
+                        })
+                    }
                 }
             }
         },
         methods: {
-            slug () {
+            slug() {
                 return (this.group ? (this.group + '-' + this.name) : this.name).toString().toLowerCase()
                     .replace(/\s+/g, '-');
+            },
+            hash() {
+                return '#' + this.slug();
             }
         }
     }

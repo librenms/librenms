@@ -1965,22 +1965,34 @@ __webpack_require__.r(__webpack_exports__);
       active: this.expanded
     };
   },
+  mounted: function mounted() {
+    if (window.location.hash === this.hash()) {
+      this.active = true;
+    }
+  },
   watch: {
     active: function active(_active) {
       var _this = this;
 
-      if (!this.$parent.multiple && _active) {
-        this.$parent.$children.forEach(function (item, index) {
-          if (_this.name !== item.name) {
-            item.active = false;
-          }
-        });
+      if (_active) {
+        window.location.hash = this.hash();
+
+        if (!this.$parent.multiple) {
+          this.$parent.$children.forEach(function (item, index) {
+            if (_this.name !== item.name) {
+              item.active = false;
+            }
+          });
+        }
       }
     }
   },
   methods: {
     slug: function slug() {
       return (this.group ? this.group + '-' + this.name : this.name).toString().toLowerCase().replace(/\s+/g, '-');
+    },
+    hash: function hash() {
+      return '#' + this.slug();
     }
   }
 });
@@ -28358,7 +28370,7 @@ var render = function() {
                 attrs: {
                   role: "button",
                   "data-parent": "#accordion",
-                  "data-href": "#" + _vm.slug()
+                  "data-href": _vm.hash()
                 },
                 on: {
                   click: function($event) {
@@ -28383,11 +28395,7 @@ var render = function() {
               "div",
               {
                 class: ["panel-collapse", "collapse", { in: _vm.active }],
-                attrs: {
-                  id: _vm.slug() + "-content",
-                  role: "tabpanel",
-                  "aria-labelledby": "headingOne"
-                }
+                attrs: { id: _vm.slug() + "-content", role: "tabpanel" }
               },
               [_c("div", { staticClass: "panel-body" }, [_vm._t("default")], 2)]
             )
