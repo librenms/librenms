@@ -328,7 +328,7 @@ By Default windows has no native way to send logs to a remote syslog server.
 Using this how to you can download Datagram-Syslog Agent to send logs
 to a remote syslog server (LibreNMS).
 
-#### Note
+### Note
 
 Keep in mind you can use any agent or program to send the logs. We are
 just using this Datagram-Syslog Agent for this example.

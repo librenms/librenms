@@ -196,7 +196,6 @@ mkdir -p /var/cache/librenms/
 3: On the device page in Librenms, edit your host and check the
 `Apache` under the Applications tab.
 
-
 # Asterisk
 
 A small shell script that reports various Asterisk call status.
@@ -727,19 +726,22 @@ Extend` heading top of page.
 This shell script checks mdadm health and array data
 
 ## SNMP Extend
-1. Download the script onto the desired host.
+
+1: Download the script onto the desired host.
+
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
 ```
 
-2. Run `chmod +x /etc/snmp/mdadm`
+2: Run `chmod +x /etc/snmp/mdadm`
 
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+
 ```
 extend mdadm /etc/snmp/mdadm
 ```
 
-4. Restart snmpd on your host
+4: Restart snmpd on your host
 
 The application should be auto-discovered as described at the
 top of the page. If it is not, please follow the steps set out
