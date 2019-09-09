@@ -14,13 +14,13 @@ these addresses will be Geocoded by Google and stored in the database.
 
 Location resolution happens as follows
 
- 1. If `device['location']` contains `[lat, lng]` (note the square
-    brackets), that is used
- 1. If there is a location overide for the device in the WebUI and it
-    contains `[lat, lng]` (note the square brackets), that is used.
- 1. Attempt to resolve lat, lng using `$config['geoloc']['engine']`
- 1. Properly formatted addresses in sysLocation or sysLocation
-    override, under device settings.
+1. If `device['location']` contains `[lat, lng]` (note the square
+   brackets), that is used
+1. If there is a location overide for the device in the WebUI and it
+   contains `[lat, lng]` (note the square brackets), that is used.
+1. Attempt to resolve lat, lng using `$config['geoloc']['engine']`
+1. Properly formatted addresses in sysLocation or sysLocation
+   override, under device settings.
 
 Example:
 
@@ -65,8 +65,9 @@ $config['leaflet']['tile_url'] = 'localhost.com';
 $config['map']['engine']                                = "leaflet";
 $config['leaflet']['default_lat']                       = "51.981074";
 $config['leaflet']['default_lng']                       = "5.350342";
-$config['leaflet']['default_zoom']                      = 8;    
-$config['leaflet']['group_radius']                      = 1;    // Device grouping radius in KM default 80KM
+$config['leaflet']['default_zoom']                      = 8;
+// Device grouping radius in KM default 80KM
+$config['leaflet']['group_radius']                      = 1;
 ```
 
 # Geocode engine config
@@ -87,7 +88,6 @@ Cons: inaccurate: most addresses are returned as locations at the center of the 
 Bing:
 Pros: free, no credit card required, accurate
 Cons: Microsoft(debatable)
-
 
 # Jquery-Mapael config
 
