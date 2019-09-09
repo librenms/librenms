@@ -1,4 +1,6 @@
 {
+    "Priority": "重要性",
+    "Program": "程式",
     "Authlog": "驗證歷程",
     "User": "使用者",
     "IP Address": "IP 位址",
@@ -169,7 +171,7 @@
     "Description": "描述",
     "Level": "等級",
     "Normal": "正常",
-    "Global Read": "全部已讀",
+    "Global Read": "全域讀取",
     "Admin": "Admin",
     "Demo": "Demo",
     "Dashboard": "資訊看版",
