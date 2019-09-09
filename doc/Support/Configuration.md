@@ -459,12 +459,12 @@ Default SNMP options including retry and timeout settings and also
 default version and port.
 
 ```php
-$config['snmp']['timeout'] = 1;            				# timeout in seconds
-$config['snmp']['retries'] = 5;            				# how many times to retry the query
-$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');	# Transports to use
-$config['snmp']['version'] = ['v2c', 'v3', 'v1'];         		# Default versions to use
-$config['snmp']['port'] = 161;						# Default port
-$config['snmp']['exec_timeout'] = 1200;					# execution time limit in seconds
+$config['snmp']['timeout'] = 1;                         # timeout in seconds
+$config['snmp']['retries'] = 5;                         # how many times to retry the query
+$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');    # Transports to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];               # Default versions to use
+$config['snmp']['port'] = 161;                      # Default port
+$config['snmp']['exec_timeout'] = 1200;                 # execution time limit in seconds
 ```
 
 >NOTE: `timeout` is the time to wait for an answer and `exec_timeout`
@@ -743,7 +743,7 @@ $config['disabled_sensors_regex'][] = '/PEM Iout/';
 $config['os']['vrp']['disabled_sensors']['current'] = true;
 ```
 
-- Filter all sensors matching regexp ``` '/PEM Iout/' ``` for 
+- Filter all sensors matching regexp ``` '/PEM Iout/' ``` for
 Operating System iosxe.
 
 ```php

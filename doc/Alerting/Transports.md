@@ -66,12 +66,12 @@ entered as a new line.
 
 The API transport allows to reach any service provider using POST or GET URLs
 (Like SMS provider, etc). It can be used in multiple ways:
-- The same text built from the Alert template is available in the variable 
+- The same text built from the Alert template is available in the variable
 ``` $msg ```, which can then be sent as an option to the API. Be carefull that
 HTTP GET requests are usually limited in length.
 - The API-Option fields can be directly built from the variables defined in
 [Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
-For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the 
+For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the
 API transport
 
 A few variables commonly used :
@@ -96,7 +96,7 @@ A few variables commonly used :
 **Example:**
 
 The example below will use the API named sms-api of my.example.com and send
-the title of the alert to the provided number using the provided service key. 
+the title of the alert to the provided number using the provided service key.
 Refer to your service documentation to configure it properly.
 
 | Config | Example |

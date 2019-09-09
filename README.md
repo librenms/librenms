@@ -45,7 +45,7 @@ VM image
 You can try LibreNMS by downloading a VM image.  Currently, a Ubuntu-based
 image is supplied and has been tested with [VirtualBox][8].
 
-Download one of the [VirtualBox images][11] we have available, documentation is provided which details 
+Download one of the [VirtualBox images][11] we have available, documentation is provided which details
 login credentials and setup details.
 
 License

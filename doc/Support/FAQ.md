@@ -489,12 +489,12 @@ whilst you are still in it, do the following:
 git pull f0o issue-1337
 ```
 
-## <a name="faq29"> Why can't Normal and Global View users see Oxidized?</a> 
+## <a name="faq29"> Why can't Normal and Global View users see Oxidized?</a>
 
 Configs can often contain sensitive data. Because of that only global
 admins can see configs.
 
-## <a name="faq30"> What is the Demo User for?</a> 
+## <a name="faq30"> What is the Demo User for?</a>
 
 Demo users allow full access except adding/editing users and deleting
 devices and can't change passwords.
@@ -508,7 +508,7 @@ this from the LibreNMS directory:
 php artisan db:seed --class=DefaultAlertTemplateSeeder
 ```
 
-## <a name="faq32"> Why would alert un-mute itself?</a> 
+## <a name="faq32"> Why would alert un-mute itself?</a>
 
 If alert un-mutes itself then it most likely means that the alert
 cleared and is then triggered again. Please review eventlog as it will
@@ -576,13 +576,13 @@ this new syntax (including the titles).
 
 ## <a name='how-do-i-use-trend-prediction-in-graphs'>How do I use trend prediction in graphs</a>
 
-As of [Ver. 1.55](https://community.librenms.org/t/v1-55-release-changelog-august-2019/9428) a new feature has been added where you can view a simple linear prediction in port graphs. 
+As of [Ver. 1.55](https://community.librenms.org/t/v1-55-release-changelog-august-2019/9428) a new feature has been added where you can view a simple linear prediction in port graphs.
 
 > It doesn't work on non-port graphs or consolidated graphs at the time this FAQ entry was written.
 
 To view a prediction:
 - Click on any `port` graph of any network device
-- Select a `From` date to your liking (not earlier than the device was actually added to LNMS), and then select a future date in the `To` field. 
+- Select a `From` date to your liking (not earlier than the device was actually added to LNMS), and then select a future date in the `To` field.
 - Click update
 
 You should now see a linear prediction line on the graph.

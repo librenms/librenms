@@ -3,7 +3,7 @@ path: blob/master/doc/
 
 # Templates
 
-Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content. 
+Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content.
 
 The template-parser understands `if` and `foreach` controls and replaces certain placeholders with information gathered about the alert.
 
@@ -27,7 +27,7 @@ Placeholders are special variables that if used within the template will be repl
 - sysName of the Device: `%sysName`
 - sysDescr of the Device: `%sysDescr`
 - hardware of the Device: `%hardware`
-- Software version of the Device: `%version` 
+- Software version of the Device: `%version`
 - location of the Device: `%location`
 - uptime of the Device (in seconds): `%uptime`
 - short uptime of the Device (28d 22h 30m 7s): `%uptime_short`
@@ -107,7 +107,7 @@ Storage:
 %title
 
 Device Name: %hostname
-Severity: %severity 
+Severity: %severity
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp
@@ -126,7 +126,7 @@ Temperature Sensors:
 %title
 
 Device Name: %hostname
-Severity: %severity 
+Severity: %severity
 Timestamp: %timestamp
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
@@ -153,7 +153,7 @@ Value Sensors:
 %title
 
 Device Name: %hostname
-Severity: %severity 
+Severity: %severity
 Timestamp: %timestamp
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
@@ -179,7 +179,7 @@ Memory Alert:
 %title
 
 Device Name: %hostname
-Severity: %severity 
+Severity: %severity
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp
@@ -188,7 +188,7 @@ Description: %description
 Notes: %notes
 
 Server: %hostname {foreach %faults}
-Memory Description: %value.mempool_descr 
+Memory Description: %value.mempool_descr
 Percent Utilized: %value.mempool_perc{/foreach}
 ```
 
@@ -209,7 +209,7 @@ Note: To use HTML emails you must set HTML email to Yes in the WebUI under Globa
 
 Note: To include Graphs you must enable unauthorized graphs in config.php. Allow_unauth_graphs_cidr is optional, but more secure.
 ```
-$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');  
+$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 
@@ -225,11 +225,11 @@ Service Alert:
 <b>Duration:</b> %elapsed<br>
 <br>
 
-{if %faults}                                                                                       
-{foreach %faults}<b>%value.service_desc - %value.service_type</b><br>                                         
+{if %faults}
+{foreach %faults}<b>%value.service_desc - %value.service_type</b><br>
 %value.service_message<br>
-<br>                                                                                         
-{/foreach}                                                                                                             
+<br>
+{/foreach}
 {/if}
 </div>
 ```
@@ -257,7 +257,7 @@ Template: CPU alert <br>
 
 ## Included
 
-We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can 
+We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can
 assign the BGP template to this rule to provide more information.
 
 The included templates apart from the default template are:
