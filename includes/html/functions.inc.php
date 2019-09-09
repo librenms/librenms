@@ -1798,3 +1798,91 @@ function has_ipmi($device_id)
     }
     return true;
 }
+
+/**
+ * @params int device_id
+ * @return null
+ *
+ * Prints a general overivew to STDOUT
+ * of the current IPMI status for a device.
+ *
+ * Includes name, power status, sensors, and
+ * last 20 items in the SEL.
+ */
+function ipmi_overview($device_id)
+{
+    $hostname=escapeshellarg(get_dev_attrib($device_id, 'ipmi_hostname'));
+    $username=escapeshellarg(get_dev_attrib($device_id, 'ipmi_username'));
+    $password=escapeshellarg(get_dev_attrib($device_id, 'ipmi_password'));
+    $ipmi_general='-h '.$hostname.' -u '.$username.' -p '.$password;
+
+    echo '<pre>';
+    system('ipmi-power --stat '.$ipmi_general);
+    echo("\n");
+    system('ipmi-sensors --output-sensor-state  '.$ipmi_general);
+    echo("\n");
+    system('ipmi-sel --tail=20 '.$ipmi_general);
+    echo '</pre>';
+}
+
+/**
+ * @params int device_id
+ * @return null
+ *
+ * Prints a chassis information to STDOUT
+ * of the current IPMI status for a device.
+ */
+function ipmi_chassis($device_id)
+{
+    $hostname=escapeshellarg(get_dev_attrib($device_id, 'ipmi_hostname'));
+    $username=escapeshellarg(get_dev_attrib($device_id, 'ipmi_username'));
+    $password=escapeshellarg(get_dev_attrib($device_id, 'ipmi_password'));
+    $ipmi_general='-h '.$hostname.' -u '.$username.' -p '.$password;
+
+    echo '<pre>';
+    echo "Status...\n";
+    system('ipmi-chassis --get-chassis-status '.$ipmi_general);
+    system('ipmi-chassis --get-power-on-hours-counter '.$ipmi_general);
+    system('ipmi-chassis --get-system-restart-cause '.$ipmi_general);
+    echo "\nCapabilities...\n";
+    system('ipmi-chassis --get-chassis-capabilities '.$ipmi_general);
+    echo '</pre>';
+}
+
+/**
+ * @params int device_id
+ * @return null
+ *
+ * Prints a chassis sel to STDOUT
+ * of the current IPMI status for a device.
+ */
+function ipmi_sel($device_id)
+{
+    $hostname=escapeshellarg(get_dev_attrib($device_id, 'ipmi_hostname'));
+    $username=escapeshellarg(get_dev_attrib($device_id, 'ipmi_username'));
+    $password=escapeshellarg(get_dev_attrib($device_id, 'ipmi_password'));
+    $ipmi_general='-h '.$hostname.' -u '.$username.' -p '.$password;
+
+    echo '<pre>';
+    system('ipmi-sel '.$ipmi_general);
+    echo '</pre>';
+}
+
+/**
+ * @params int device_id
+ * @return null
+ *
+ * Prints a sensor information to STDOUT
+ * of the current IPMI status for a device.
+ */
+function ipmi_sensors($device_id)
+{
+    $hostname=escapeshellarg(get_dev_attrib($device_id, 'ipmi_hostname'));
+    $username=escapeshellarg(get_dev_attrib($device_id, 'ipmi_username'));
+    $password=escapeshellarg(get_dev_attrib($device_id, 'ipmi_password'));
+    $ipmi_general='-h '.$hostname.' -u '.$username.' -p '.$password;
+
+    echo '<pre>';
+    system('ipmi-sensors --output-sensor-state  '.$ipmi_general);
+    echo '</pre>';
+}
