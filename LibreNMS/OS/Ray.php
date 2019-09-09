@@ -53,21 +53,21 @@ class Ray extends OS implements
     {
         // RAY-MIB::useCpu has no index, so it won't work in yaml
 
-        return array(
-            Processor::discover(
+        $processor = Processor::discover(
+            $this->getName(),
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.33555.1.1.5.1',
+            0
+        );
+        if (!$processor->isValid()) {
+            $processor = Processor::discover(
                 $this->getName(),
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.33555.1.1.5.1.0',
                 0
-            ),
-            Processor::discover(
-                $this->getName(),
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.33555.1.1.5.1',
-                0
-            )
-
-        );
+            );
+        }
+        return array($processor);
     }
 
     /**
