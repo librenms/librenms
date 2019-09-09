@@ -1,13 +1,17 @@
 source: Extensions/Rancid.md
 path: blob/master/doc/
+
 # Rancid integration
 
-Librenms can generate a list of hosts that can be monitored by RANCID.
-We assume you have currently a running Rancid, and you just need to create and update the file 'router.db'
+Librenms can generate a list of hosts that can be monitored by
+RANCID. We assume you have currently a running Rancid, and you just
+need to create and update the file 'router.db'
 
-### Included Rancid script
+# Included Rancid script
 
-To generate the config file (maybe even add a cron to schedule this). We've assumed a few locations for Rancid, the config file you want to call it and where LibreNMS is:
+To generate the config file (maybe even add a cron to schedule
+this). We've assumed a few locations for Rancid, the config file you
+want to call it and where LibreNMS is:
 
 ```bash
 cd /opt/librenms/scripts/
@@ -29,7 +33,7 @@ $config['rancid_ignorecomments'] = 0;
 
 After that, you should see some "config" tab on routers that have a rancid update.
 
-#### Ubuntu Rancid Install
+# Ubuntu Rancid Install
 
 The options shown below also contains the default values.
 
@@ -37,42 +41,52 @@ The options shown below also contains the default values.
 
 `sudo apt-get install rancid subversion`
 
-Edit Rancid config file to use subversion or git instead of default cvs, and adds a group:
+Edit Rancid config file to use subversion or git instead of default
+cvs, and adds a group:
 `sudo vi /etc/rancid/rancid.conf`
 
 `LIST_OF_GROUPS="librenms"`
 
 Now change these two lines:
+
 ```
 CVSROOT=$BASEDIR/CVS; export CVSROOT
 RCSSYS=cvs; export RCSSYS
 ```
+
 to:
+
 ```
 CVSROOT=$BASEDIR/SVN; export CVSROOT
 RCSSYS=svn; export RCSSYS
 ```
 
-> NOTE - This only creates 1 group! You can of course make more when you get the hang of it, this is just a basic 'Need it to work" deal.
+NOTE - This only creates 1 group! You can of course make more when you
+get the hang of it, this is just a basic 'Need it to work" deal.
 
 `sudo su -c /var/lib/rancid/bin/rancid-cvs -s /bin/bash -l rancid`
 > NOTE - do NOT change cvs to svn here! Leave command as is!
 
 Get a list of devices from Librenms you can pull configs from:
+
 ```
 cd /opt/librenms/scripts
 sudo ./gen_rancid.php
 ```
 
 Copy the output. Replace all ":" with ";" example:
+
 ```
 alphcr1:cisco:up will change to:
 alphcr1;cisco;up
+
 ```
-copy and past results into the below file: 
+
+copy and past results into the below file:
 `sudo vi /var/lib/rancid/librenms/router.db`
 
-> NOTE - This ONLY applies to newer RANCID versions and Linux distros. Older versions will need to retain the : and not the ;
+NOTE - This ONLY applies to newer RANCID versions and Linux
+distros. Older versions will need to retain the : and not the ;
 
 Create/edit rancids login file:
 
@@ -97,9 +111,11 @@ sudo chmod 600 /var/lib/rancid/.cloginrc
 Test config:
 `sudo /usr/lib/rancid/bin/clogin -f /var/lib/rancid/.cloginrc <device hostname>`
 
-> NOTE: IF you run into a 'diffie-hellmen' kind of error, then it is because your Linux distro is using newer encyryprtion methods etc. 
-This is basically just letting you know that the device you tested on is running an outdated encryption type. I recommend updating downstream device if able. 
-If not, the following should fix:
+NOTE: IF you run into a 'diffie-hellmen' kind of error, then it is
+because your Linux distro is using newer encyryprtion methods
+etc. This is basically just letting you know that the device you
+tested on is running an outdated encryption type. I recommend updating
+downstream device if able.  If not, the following should fix:
 
 `sudo vi /etc/ssh/ssh_config`
 
@@ -128,6 +144,7 @@ cd /opt/librenms/
 ```
 
 Add Rancid into LibreNMS config.php:
+
 ```php
 ### Rancid
 $config['rancid_configs'][]             = '/var/lib/rancid/librenms/configs/';

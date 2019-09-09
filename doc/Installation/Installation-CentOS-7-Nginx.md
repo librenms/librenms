@@ -320,7 +320,7 @@ cd /opt/librenms
 ```
 
 There are various options for getting help listed on the LibreNMS web
-site: https://www.librenms.org/#support
+site: <https://www.librenms.org/#support>
 
 # What next?
 

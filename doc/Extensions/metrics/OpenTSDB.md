@@ -15,7 +15,7 @@ like Grafana for graphing.
 
  Pretty graphs, this is why at present you need Grafana. You need to
  build your own graphs within Grafana.
- 
+
 RRD will continue to function normally so LibreNMS itself should
 continue to function normally.
 
