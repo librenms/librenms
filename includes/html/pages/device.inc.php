@@ -392,7 +392,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
 
         if (has_ipmi($vars[device])) {
             echo '<li role="presentation" '.$select['ipmi'].'>
-                <a href="'.generate_device_url($device, array('tab' => 'IPMI')).'">
+                <a href="'.generate_device_url($device, array('tab' => 'ipmi')).'">
                 <i class="fa fa-tint fa-lg icon-theme"  aria-hidden="true"></i> IPMI
                 </a>
                 </li>';
