@@ -1754,7 +1754,7 @@ function time_to_nfsen_subpath($time)
  *
  * Takes a hostname and transforms it to the name
  * used by nfsen.
-*/
+ */
 function nfsen_hostname($hostname)
 {
     $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
@@ -1771,7 +1771,7 @@ function nfsen_hostname($hostname)
  *
  * Takes a hostname and returns the path to the nfsen
  * live dir.
-*/
+ */
 function nfsen_live_dir($hostname)
 {
     $hostname=nfsen_hostname($hostname);
@@ -1781,4 +1781,20 @@ function nfsen_live_dir($hostname)
             return $base_dir.'/profiles-data/live/'.$hostname;
         }
     }
+}
+
+/**
+ * @params int device_id
+ * @return boolean
+ *
+ * Checks if the device_id has a ipmi_hostname attribute
+ * set and returns true if it does.
+ */
+function has_ipmi($device_id)
+{
+    $hostname=get_dev_attrib($device_id, 'ipmi_hostname');
+    if (! isset($hostname)) {
+        return false;
+    }
+    return true;
 }
