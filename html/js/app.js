@@ -1868,6 +1868,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Accordion",
   props: {
@@ -1879,14 +1881,36 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       groupId: null,
-      items: []
+      prefix: 'vue'
     };
   },
-  created: function created() {
-    this.items = this.$children;
+  methods: {
+    setActive: function setActive(name) {
+      this.$children.forEach(function (item, index) {
+        if (item.slug() === name) {
+          item.active = true;
+        }
+      });
+    },
+    activeChanged: function activeChanged(name) {
+      if (!this.multiple) {
+        this.$children.forEach(function (item, index) {
+          if (item.slug() !== name) {
+            item.active = false;
+          }
+        });
+      }
+    }
   },
   mounted: function mounted() {
-    this.groupId = this.$el.id;
+    this.$on('active-changed', this.activeChanged);
+    this.groupId = this.$el.id; // TODO url parsing doesn't belong here
+
+    var search = window.location.toString().match(new RegExp(this.prefix + '/?(?<tab>[^/]*)/?(?<setting>[^/]*)'));
+
+    if (search && search.groups.setting) {
+      this.setActive(search.groups.setting);
+    }
   }
 });
 
@@ -1951,10 +1975,6 @@ __webpack_require__.r(__webpack_exports__);
       type: String,
       required: true
     },
-    group: {
-      type: String,
-      "default": ''
-    },
     expanded: {
       type: Boolean,
       "default": false
@@ -1972,24 +1992,14 @@ __webpack_require__.r(__webpack_exports__);
   },
   watch: {
     active: function active(_active) {
-      var _this = this;
-
       if (_active) {
-        window.location.hash = this.hash();
-
-        if (!this.$parent.multiple) {
-          this.$parent.$children.forEach(function (item, index) {
-            if (_this.name !== item.name) {
-              item.active = false;
-            }
-          });
-        }
+        this.$parent.$emit('active-changed', this.slug());
       }
     }
   },
   methods: {
     slug: function slug() {
-      return (this.group ? this.group + '-' + this.name : this.name).toString().toLowerCase().replace(/\s+/g, '-');
+      return this.name.toString().toLowerCase().replace(/\s+/g, '-');
     },
     hash: function hash() {
       return '#' + this.slug();
@@ -28318,11 +28328,8 @@ var render = function() {
     "div",
     {
       staticClass: "panel-group",
-      attrs: {
-        id: "accordion",
-        role: "tablist",
-        "aria-multiselectable": "true"
-      }
+      attrs: { role: "tablist" },
+      on: { "active-changed": _vm.activeChanged }
     },
     [_vm._t("default")],
     2

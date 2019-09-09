@@ -1,7 +1,7 @@
 <!--
   - Accordian.vue
   -
-  - Description-
+  - Accordion component contains multiple
   -
   - This program is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License as published by
@@ -23,7 +23,9 @@
   -->
 
 <template>
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel-group" role="tablist"
+         v-on:active-changed="activeChanged"
+    >
         <slot></slot>
     </div>
 </template>
@@ -40,14 +42,37 @@
         data() {
             return {
                 groupId: null,
-                items: []
+                prefix: 'vue'
             }
         },
-        created() {
-            this.items = this.$children;
+        methods: {
+            setActive(name) {
+                this.$children.forEach((item, index) => {
+                    if (item.slug() === name) {
+                        item.active = true;
+                    }
+                })
+            },
+            activeChanged(name) {
+                if (!this.multiple) {
+                    this.$children.forEach((item, index) => {
+                        if (item.slug() !== name) {
+                            item.active = false
+                        }
+                    })
+                }
+            }
         },
         mounted() {
-            this.groupId = this.$el.id
+            this.$on('active-changed', this.activeChanged);
+
+            this.groupId = this.$el.id;
+
+            // TODO url parsing doesn't belong here
+            let search = window.location.toString().match(new RegExp(this.prefix + '/?(?<tab>[^/]*)/?(?<setting>[^/]*)'));
+            if (search && search.groups.setting) {
+                this.setActive(search.groups.setting)
+            }
         }
     }
 </script>

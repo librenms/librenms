@@ -1,7 +1,7 @@
 <!--
   - AccordionItem.vue
   -
-  - Description-
+  - Accordion Entry should be inside an Accordion component
   -
   - This program is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License as published by
@@ -49,10 +49,6 @@
                 type: String,
                 required: true
             },
-            group: {
-                type: String,
-                default: ''
-            },
             expanded: {
                 type: Boolean,
                 default: false
@@ -71,22 +67,13 @@
         watch: {
             active: function (active) {
                 if (active) {
-                    window.location.hash = this.hash();
-
-                    if (!this.$parent.multiple) {
-                        this.$parent.$children.forEach((item, index) => {
-                            if (this.name !== item.name) {
-                                item.active = false
-                            }
-                        })
-                    }
+                    this.$parent.$emit('active-changed', this.slug());
                 }
             }
         },
         methods: {
             slug() {
-                return (this.group ? (this.group + '-' + this.name) : this.name).toString().toLowerCase()
-                    .replace(/\s+/g, '-');
+                return this.name.toString().toLowerCase().replace(/\s+/g, '-');
             },
             hash() {
                 return '#' + this.slug();

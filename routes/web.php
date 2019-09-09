@@ -17,9 +17,9 @@ Auth::routes();
 // WebUI
 Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     // Test
-    Route::get('/vue', function () {
+    Route::get('/vue/{sub?}', function () {
         return view('vue');
-    });
+    })->where('sub', '.*');
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
