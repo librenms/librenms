@@ -1929,7 +1929,7 @@ function ipmi_overview($device_id)
 {
     system(ipmi_command($device_id).'power status');
     echo("\n");
-    ipmi_sensor_table($device);
+    ipmi_sensor_table($device_id);
     echo("\n");
     ipmi_sel_table($device_id, '20');
 }
