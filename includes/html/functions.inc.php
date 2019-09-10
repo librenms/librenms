@@ -1861,11 +1861,14 @@ function ipmi_sel_table($device, $limit = null)
 
 /**
  * @params int device_id
+ * @params bool defails
  * @return null
  *
  * Prints a the IPMI sensor info for the device ID specifiied.
+ *
+ * If details is set to true, then high/low thresholds are displayed.
  */
-function ipmi_sensor_table($device)
+function ipmi_sensor_table($device, $details = false)
 {
     $sel=array();
     exec(ipmi_command($device).' sensor', $sel);
@@ -1875,14 +1878,18 @@ function ipmi_sensor_table($device)
         "    <th> Name </th>\n".
         "    <th> Value </th>\n".
         "    <th> Unit </th>\n".
-        "    <th> Status </th>\n".
-        "    <th> Low NR </th>\n".
-        "    <th> Low CT </th>\n".
-        "    <th> Low NC </th>\n".
-        "    <th> High NC </th>\n".
-        "    <th> High CT </th>\n".
-        "    <th> High NR </th>\n".
-        "  </tr>\n";
+        "    <th> Status </th>\n";
+
+    if ($details) {
+        echo "    <th> Low NR </th>\n".
+            "    <th> Low CT </th>\n".
+            "    <th> Low NC </th>\n".
+            "    <th> High NC </th>\n".
+            "    <th> High CT </th>\n".
+            "    <th> High NR </th>\n";
+    }
+
+    echo "  </tr>\n";
 
     foreach ($sel as $line) {
         $line_items=explode('|', $line);
@@ -1891,14 +1898,18 @@ function ipmi_sensor_table($device)
             "    <td> ".trim($line_items[0])." </td>\n".
             "    <td> ".trim($line_items[1])." </td>\n".
             "    <td> ".trim($line_items[2])." </td>\n".
-            "    <td> ".trim($line_items[3])." </td>\n".
-            "    <td> ".trim($line_items[4])." </td>\n".
-            "    <td> ".trim($line_items[5])." </td>\n".
-            "    <td> ".trim($line_items[6])." </td>\n".
-            "    <td> ".trim($line_items[7])." </td>\n".
-            "    <td> ".trim($line_items[8])." </td>\n".
-            "    <td> ".trim($line_items[9])." </td>\n".
-            "  </tr>\n";
+            "    <td> ".trim($line_items[3])." </td>\n";
+
+        if ($details) {
+            echo "    <td> ".trim($line_items[4])." </td>\n".
+                "    <td> ".trim($line_items[5])." </td>\n".
+                "    <td> ".trim($line_items[6])." </td>\n".
+                "    <td> ".trim($line_items[7])." </td>\n".
+                "    <td> ".trim($line_items[8])." </td>\n".
+                "    <td> ".trim($line_items[9])." </td>\n";
+        }
+
+        echo "  </tr>\n";
     }
 
     echo "</table>\n";
@@ -1927,27 +1938,52 @@ function ipmi_overview($device_id)
  * @params int device_id
  * @return null
  *
- * Prints a chassis information to STDOUT
+ * Prints a HTML table of chassis information to STDOUT
  * of the current IPMI status for a device.
  */
-function ipmi_chassis($device_id)
+function ipmi_chassis_table($device_id)
 {
-    system(ipmi_command($device_id).'chassis status');
-    system(ipmi_command($device_id).'chassis poh');
-    system(ipmi_command($device_id).'chassis restart_cause');
-    system(ipmi_command($device_id).'chassis policy list');
-}
+    $output=array();
 
-/**
- * @params int device_id
- * @return null
- *
- * Prints a chassis sel to STDOUT
- * of the current IPMI status for a device.
- */
-function ipmi_sel($device_id)
-{
-    ipmi_sel_table($device_id);
+    echo "<table>\n";
+
+    exec(ipmi_command($device_id).' chassis status', $output);
+
+    foreach ($output as $line) {
+        $line_items=explode(':', $line);
+
+        echo "  <tr>\n".
+            "    <td> ".trim($line_items[0])." </td>\n".
+            "    <td>:</td>\n".
+            "    <td> ".trim($line_items[1])." </td>\n".
+            "  </tr>\n";
+    }
+
+    exec(ipmi_command($device_id).' chassis poh', $output);
+    $line_items=explode(':', $output[0]);
+    echo "  <tr>\n".
+        "    <td> Powered On Hours </td>\n".
+        "    <td>:</td>\n".
+        "    <td> ".trim($line_items[1])." </td>\n".
+        "  </tr>\n";
+
+    exec(ipmi_command($device_id).' chassis restart_cause', $output);
+    $line_items=explode(':', $output[0]);
+    echo "  <tr>\n".
+        "    <td> Last Restart Cause </td>\n".
+        "    <td>:</td>\n".
+        "    <td> ".trim($line_items[1])." </td>\n".
+        "  </tr>\n";
+
+    exec(ipmi_command($device_id).' chassis policy list', $output);
+    $line_items=explode(':', $output[0]);
+    echo "  <tr>\n".
+        "    <td> Power Return Policy </td>\n".
+        "    <td>:</td>\n".
+        "    <td> ".trim($line_items[1])." </td>\n".
+        "  </tr>\n";
+
+    echo "</table>\n";
 }
 
 /**

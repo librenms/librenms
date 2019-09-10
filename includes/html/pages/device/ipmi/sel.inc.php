@@ -1,5 +1,5 @@
 <?php
 
 echo '<pre>';
-ipmi_sel($device);
+ipmi_sel_table($device);
 echo '</pre>';
