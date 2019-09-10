@@ -1808,10 +1808,55 @@ function has_ipmi($device_id)
  */
 function ipmi_command($device_id)
 {
-    return \LibreNMS\Config::get('ipmi').
+    return Config::get('ipmitool').
         ' -H '.escapeshellarg(get_dev_attrib($device_id, 'ipmi_hostname')).
         ' -U '.escapeshellarg(get_dev_attrib($device_id, 'ipmi_username')).
-        ' -O '.escapeshellarg(get_dev_attrib($device_id, 'ipmi_password'));
+        ' -P '.escapeshellarg(get_dev_attrib($device_id, 'ipmi_password')).' ';
+}
+
+/**
+ * @params int device_id
+ * @params int limit
+ * @return null
+ *
+ * Prints a the SEL for the device ID specifiied.
+ *
+ * If limit is not defined or not numeric, then
+ * the entire SEL is printed.
+ */
+function ipmi_sel_table($device, $limit = null)
+{
+
+    if ((! isset($limit) ) ||
+        (! is_numeric($limit))) {
+        $limit='';
+    }
+
+    $sel=array();
+    exec(ipmi_command($device).' sel list '.$limit, $sel);
+
+    echo "<table>\n".
+        "  <tr>\n".
+        "    <th> ID </th>\n".
+        "    <th> Date </th>\n".
+        "    <th> Time </th>\n".
+        "    <th> Type </th>\n".
+        "    <th> Event </th>\n".
+        "  </tr>\n";
+
+    foreach ($sel as $line) {
+        $line_items=explode('|', $line);
+
+        echo "  <tr>\n".
+            "    <td> ".trim($line_items[0])." </td>\n".
+            "    <td> ".trim($line_items[1])." </td>\n".
+            "    <td> ".trim($line_items[2])." </td>\n".
+            "    <td> ".trim($line_items[3])." </td>\n".
+            "    <td> ".trim($line_items[4])." </td>\n".
+            "  </tr>\n";
+    }
+
+    echo "</table>\n";
 }
 
 /**
@@ -1826,11 +1871,11 @@ function ipmi_command($device_id)
  */
 function ipmi_overview($device_id)
 {
-    system(ipmi_command($device_id).' power status');
+    system(ipmi_command($device_id).'power status');
     echo("\n");
-    system(ipmi_command($device_id).' sensor');
+    system(ipmi_command($device_id).'sensor');
     echo("\n");
-    system(ipmi_command($device_id).' sel list 20');
+    ipmi_sel_table($device_id, '20');
 }
 
 /**
@@ -1842,12 +1887,10 @@ function ipmi_overview($device_id)
  */
 function ipmi_chassis($device_id)
 {
-    system(ipmi_command($device_id).' chassis status');
-    system('chassis poh');
-    system('chassis restart_cause');
-    system('chassis policy list');
-    echo "\nCapabilities...\n";
-    system('ipmi-chassis --get-chassis-capabilities '.$ipmi_general);
+    system(ipmi_command($device_id).'chassis status');
+    system(ipmi_command($device_id).'chassis poh');
+    system(ipmi_command($device_id).'chassis restart_cause');
+    system(ipmi_command($device_id).'chassis policy list');
 }
 
 /**
@@ -1859,7 +1902,7 @@ function ipmi_chassis($device_id)
  */
 function ipmi_sel($device_id)
 {
-    system(ipmi_command($device_id).' sel list');
+    ipmi_sel_table($device_id);
 }
 
 /**
