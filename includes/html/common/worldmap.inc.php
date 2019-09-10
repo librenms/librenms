@@ -96,9 +96,9 @@ var greenMarker = L.AwesomeMarkers.icon({
                 LEFT JOIN `locations` ON `devices`.location_id=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
                 AND `devices`.`device_id` = `devices_perms`.`device_id`
-                AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($status_select)) .
+                AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($show_status)) .
                 " ORDER BY `status` ASC, `hostname`";
-        $param = array_merge([Auth::id()], $status_select);
+        $param = array_merge([Auth::id()], $show_status);
     }
 
     foreach (dbFetchRows($sql, $param) as $map_devices) {
