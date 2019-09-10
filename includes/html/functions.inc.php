@@ -1863,6 +1863,51 @@ function ipmi_sel_table($device, $limit = null)
  * @params int device_id
  * @return null
  *
+ * Prints a the IPMI sensor info for the device ID specifiied.
+ */
+function ipmi_sensor_table($device)
+{
+    $sel=array();
+    exec(ipmi_command($device).' sensor', $sel);
+
+    echo "<table>\n".
+        "  <tr>\n".
+        "    <th> Name </th>\n".
+        "    <th> Value </th>\n".
+        "    <th> Unit </th>\n".
+        "    <th> Status </th>\n".
+        "    <th> Low NR </th>\n".
+        "    <th> Low CT </th>\n".
+        "    <th> Low NC </th>\n".
+        "    <th> High NC </th>\n".
+        "    <th> High CT </th>\n".
+        "    <th> High NR </th>\n".
+        "  </tr>\n";
+
+    foreach ($sel as $line) {
+        $line_items=explode('|', $line);
+
+        echo "  <tr>\n".
+            "    <td> ".trim($line_items[0])." </td>\n".
+            "    <td> ".trim($line_items[1])." </td>\n".
+            "    <td> ".trim($line_items[2])." </td>\n".
+            "    <td> ".trim($line_items[3])." </td>\n".
+            "    <td> ".trim($line_items[4])." </td>\n".
+            "    <td> ".trim($line_items[5])." </td>\n".
+            "    <td> ".trim($line_items[6])." </td>\n".
+            "    <td> ".trim($line_items[7])." </td>\n".
+            "    <td> ".trim($line_items[8])." </td>\n".
+            "    <td> ".trim($line_items[9])." </td>\n".
+            "  </tr>\n";
+    }
+
+    echo "</table>\n";
+}
+
+/**
+ * @params int device_id
+ * @return null
+ *
  * Prints a general overivew to STDOUT
  * of the current IPMI status for a device.
  *
@@ -1873,7 +1918,7 @@ function ipmi_overview($device_id)
 {
     system(ipmi_command($device_id).'power status');
     echo("\n");
-    system(ipmi_command($device_id).'sensor');
+    ipmi_sensor_table($device);
     echo("\n");
     ipmi_sel_table($device_id, '20');
 }
@@ -1903,18 +1948,6 @@ function ipmi_chassis($device_id)
 function ipmi_sel($device_id)
 {
     ipmi_sel_table($device_id);
-}
-
-/**
- * @params int device_id
- * @return null
- *
- * Prints a sensor information to STDOUT
- * of the current IPMI status for a device.
- */
-function ipmi_sensors($device_id)
-{
-    system(ipmi_command($device_id).' sensors');
 }
 
 /**
