@@ -12,6 +12,8 @@ echo generate_link('Overview', $link_array, array('ipmi' => 'overview'));
 echo '|';
 echo generate_link('Chassis', $link_array, array('ipmi' => 'chassis'));
 echo ',';
+echo generate_link('LAN', $link_array, array('ipmi' => 'sel'));
+echo ',';
 echo generate_link('SEL', $link_array, array('ipmi' => 'sel'));
 echo ',';
 echo generate_link('Sensors', $link_array, array('ipmi' => 'Sensors'));

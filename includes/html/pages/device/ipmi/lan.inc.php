@@ -1,5 +1,5 @@
 <?php
 
 echo '<pre>';
-ipmi_sensors($device);
+ipmi_lan($device);
 echo '</pre>';
