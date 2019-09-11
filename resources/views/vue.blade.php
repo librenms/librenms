@@ -3,9 +3,9 @@
 @section('content')
     <div class="container-fluid">
         <div class="container">
-            <div id="app">
+            <div id="app" v-cloak>
                 <tabs>
-                    <tab name="One" :selected="true">
+                    <tab name="One" selected>
                         <accordion :multiple="false">
                             <accordion-item name="Test">
                                 Test Content
@@ -27,6 +27,12 @@
         <hr />
 
     </div>
+@endsection
+
+@section('css')
+    <style>
+        [v-cloak] {display: none}
+    </style>
 @endsection
 
 @push('scripts')

@@ -2255,9 +2255,7 @@ __webpack_require__.r(__webpack_exports__);
     name: {
       required: true
     },
-    selected: {
-      "default": false
-    }
+    selected: Boolean
   },
   data: function data() {
     return {

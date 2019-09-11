@@ -33,7 +33,7 @@
         name: "Tab",
         props: {
             name: { required: true },
-            selected: { default: false}
+            selected: Boolean
         },
         data() {
             return {
