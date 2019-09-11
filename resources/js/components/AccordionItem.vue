@@ -26,13 +26,15 @@
     <div class="panel panel-default">
         <div class="panel-heading" role="tab" :id="slug()">
             <h4 class="panel-title">
-                <a class="accordion-item-trigger" :class="{'collapsed': !active}" role="button" data-parent="#accordion" @click="active = !active" :data-href="hash()">
-                    <i class="fa fa-chevron-down accordion-item-trigger-icon"></i> {{ name }}
+                <a class="accordion-item-trigger" :class="{'collapsed': !isActive}" role="button" data-parent="#accordion" @click="isActive = !isActive" :data-href="hash()">
+                    <i class="fa fa-chevron-down accordion-item-trigger-icon"></i>
+                    <i v-if="icon" :class="['fa', 'fa-fw', icon]"></i>
+                    {{ name }}
                 </a>
             </h4>
         </div>
         <transition-collapse-height>
-            <div :id="slug() + '-content'" v-if="active" :class="['panel-collapse', 'collapse', {'in': active}]" role="tabpanel">
+            <div :id="slug() + '-content'" v-if="isActive" :class="['panel-collapse', 'collapse', {'in': isActive}]" role="tabpanel">
                 <div class="panel-body">
                     <slot></slot>
                 </div>
@@ -49,23 +51,21 @@
                 type: String,
                 required: true
             },
-            expanded: {
-                type: Boolean,
-                default: false
-            }
+            active: Boolean,
+            icon: String
         },
         data() {
             return {
-                active: this.expanded
+                isActive: this.active
             }
         },
         mounted() {
             if (window.location.hash === this.hash()) {
-                this.active = true;
+                this.isActive = true;
             }
         },
         watch: {
-            active: function (active) {
+            isActive: function (active) {
                 if (active) {
                     this.$parent.$emit('active-changed', this.slug());
                 }

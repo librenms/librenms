@@ -5,20 +5,20 @@
         <div class="container">
             <div id="app" v-cloak>
                 <tabs>
-                    <tab name="One" selected>
+                    <tab name="One" selected icon="fa-ambulance">
                         <accordion :multiple="false">
-                            <accordion-item name="Test">
+                            <accordion-item name="Test" icon="fa-wrench" active>
                                 Test Content
                             </accordion-item>
-                            <accordion-item name="Test 2">
+                            <accordion-item name="Test 2" icon="fa-archive">
                                 Test 2 Content
                             </accordion-item>
-                            <accordion-item name="Test 3">
+                            <accordion-item name="Test 3" icon="fa-android">
                                 Test 3 Content
                             </accordion-item>
                         </accordion>
                     </tab>
-                    <tab name="Dave">
+                    <tab name="Dave" icon="fa-bomb">
                         Dave's not here man
                     </tab>
                 </tabs>

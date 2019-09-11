@@ -28,7 +28,10 @@
             <div class="panel-heading">
                 <ul class="nav nav-tabs" role="tablist">
                     <li v-for="tab in tabs" :key="tab.name" :class="{ 'active': tab.isActive }" role="presentation">
-                        <a role="tab" :href="tab.href" :aria-controls="tab.name" @click="selectTab(tab)">{{ tab.name }}&nbsp;</a>
+                        <a role="tab" :href="tab.href" :aria-controls="tab.name" @click="selectTab(tab)">
+                            <i v-if="tab.icon" :class="['fa', 'fa-fw', tab.icon]"></i>
+                            {{ tab.name }}&nbsp;
+                        </a>
                     </li>
                     <li class="pull-right">
                         <slot name="header"></slot>

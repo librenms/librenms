@@ -1888,7 +1888,7 @@ __webpack_require__.r(__webpack_exports__);
     setActive: function setActive(name) {
       this.$children.forEach(function (item, index) {
         if (item.slug() === name) {
-          item.active = true;
+          item.isActive = true;
         }
       });
     },
@@ -1896,7 +1896,7 @@ __webpack_require__.r(__webpack_exports__);
       if (!this.multiple) {
         this.$children.forEach(function (item, index) {
           if (item.slug() !== name) {
-            item.active = false;
+            item.isActive = false;
           }
         });
       }
@@ -1968,6 +1968,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "AccordionItem",
   props: {
@@ -1975,24 +1977,22 @@ __webpack_require__.r(__webpack_exports__);
       type: String,
       required: true
     },
-    expanded: {
-      type: Boolean,
-      "default": false
-    }
+    active: Boolean,
+    icon: String
   },
   data: function data() {
     return {
-      active: this.expanded
+      isActive: this.active
     };
   },
   mounted: function mounted() {
     if (window.location.hash === this.hash()) {
-      this.active = true;
+      this.isActive = true;
     }
   },
   watch: {
-    active: function active(_active) {
-      if (_active) {
+    isActive: function isActive(active) {
+      if (active) {
         this.$parent.$emit('active-changed', this.slug());
       }
     }
@@ -2255,7 +2255,8 @@ __webpack_require__.r(__webpack_exports__);
     name: {
       required: true
     },
-    selected: Boolean
+    selected: Boolean,
+    icon: String
   },
   data: function data() {
     return {
@@ -2283,6 +2284,9 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
 //
 //
 //
@@ -28369,7 +28373,7 @@ var render = function() {
               "a",
               {
                 staticClass: "accordion-item-trigger",
-                class: { collapsed: !_vm.active },
+                class: { collapsed: !_vm.isActive },
                 attrs: {
                   role: "button",
                   "data-parent": "#accordion",
@@ -28377,7 +28381,7 @@ var render = function() {
                 },
                 on: {
                   click: function($event) {
-                    _vm.active = !_vm.active
+                    _vm.isActive = !_vm.isActive
                   }
                 }
               },
@@ -28385,7 +28389,13 @@ var render = function() {
                 _c("i", {
                   staticClass: "fa fa-chevron-down accordion-item-trigger-icon"
                 }),
-                _vm._v(" " + _vm._s(_vm.name) + "\n            ")
+                _vm._v(" "),
+                _vm.icon
+                  ? _c("i", { class: ["fa", "fa-fw", _vm.icon] })
+                  : _vm._e(),
+                _vm._v(
+                  "\n                " + _vm._s(_vm.name) + "\n            "
+                )
               ]
             )
           ])
@@ -28393,11 +28403,11 @@ var render = function() {
       ),
       _vm._v(" "),
       _c("transition-collapse-height", [
-        _vm.active
+        _vm.isActive
           ? _c(
               "div",
               {
-                class: ["panel-collapse", "collapse", { in: _vm.active }],
+                class: ["panel-collapse", "collapse", { in: _vm.isActive }],
                 attrs: { id: _vm.slug() + "-content", role: "tabpanel" }
               },
               [_c("div", { staticClass: "panel-body" }, [_vm._t("default")], 2)]
@@ -28628,7 +28638,16 @@ var render = function() {
                         }
                       }
                     },
-                    [_vm._v(_vm._s(tab.name) + " ")]
+                    [
+                      tab.icon
+                        ? _c("i", { class: ["fa", "fa-fw", tab.icon] })
+                        : _vm._e(),
+                      _vm._v(
+                        "\n                        " +
+                          _vm._s(tab.name) +
+                          " \n                    "
+                      )
+                    ]
                   )
                 ]
               )

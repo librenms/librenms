@@ -49,7 +49,7 @@
             setActive(name) {
                 this.$children.forEach((item, index) => {
                     if (item.slug() === name) {
-                        item.active = true;
+                        item.isActive = true;
                     }
                 })
             },
@@ -57,7 +57,7 @@
                 if (!this.multiple) {
                     this.$children.forEach((item, index) => {
                         if (item.slug() !== name) {
-                            item.active = false
+                            item.isActive = false
                         }
                     })
                 }
