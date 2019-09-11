@@ -5,6 +5,9 @@
         <div class="container">
             <div id="app" v-cloak>
                 <tabs>
+                    <template v-slot:header>
+                        <div>Banana</div>
+                    </template>
                     <tab name="One" selected icon="fa-ambulance">
                         <accordion :multiple="false">
                             <accordion-item name="Test" icon="fa-wrench" active>

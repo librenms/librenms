@@ -27,23 +27,25 @@
         <template v-slot:header>
             <form class="form-inline">
                 <div class="input-group">
-                    <input id="settings-search" type="search" class="form-control" placeholder="Search Settings" style="border-radius: 4px">
+                    <input id="settings-search" type="search" class="form-control" placeholder="Search Settings" v-model.trim="search_phrase">
                 </div>
             </form>
         </template>
-        <tab v-for="(tab, index) in tabs" :key="index" :name="tab" :selected="tab === active_tab">
+        <tab v-for="(groups, tab) in sections" :key="tab" :name="tab" :selected="tab === active_tab">
             <accordion>
-                <accordion-item>{{ tab }}</accordion-item>
+                <accordion-item v-for="group in groups" :name="group">
+                    <ul>
+                        <li v-for="setting in getSectionSettings(tab, group)">{{ setting.name }}</li>
+                    </ul>
+                </accordion-item>
             </accordion>
         </tab>
     </tabs>
 </template>
 
 <script>
-    import AccordianItem from "./AccordionItem";
     export default {
         name: "LibrenmsSettings",
-        components: {AccordianItem},
         props: ['sections'],
         data: function () {
             return {
@@ -51,11 +53,6 @@
                 active_section: '',
                 search_phrase: '',
                 settings: {}
-            }
-        },
-        computed: {
-            tabs: function () {
-                return this.sections ? Object.keys(this.sections) : []
             }
         },
         methods: {
@@ -71,8 +68,7 @@
             }
         },
         mounted() {
-            axios
-                .get(route('settings.list'))
+            axios.get(route('settings.list'))
                 .then(response => (this.settings = response.data))
         }
     }

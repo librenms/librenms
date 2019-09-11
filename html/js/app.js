@@ -2125,7 +2125,6 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _AccordionItem__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AccordionItem */ "./resources/js/components/AccordionItem.vue");
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -2171,12 +2170,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LibrenmsSettings",
-  components: {
-    AccordianItem: _AccordionItem__WEBPACK_IMPORTED_MODULE_0__["default"]
-  },
   props: ['sections'],
   data: function data() {
     return {
@@ -2185,11 +2184,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       search_phrase: '',
       settings: {}
     };
-  },
-  computed: {
-    tabs: function tabs() {
-      return this.sections ? Object.keys(this.sections) : [];
-    }
   },
   methods: {
     getSectionSettings: function getSectionSettings(group, section) {
@@ -2255,6 +2249,7 @@ __webpack_require__.r(__webpack_exports__);
     name: {
       required: true
     },
+    title: String,
     selected: Boolean,
     icon: String
   },
@@ -2270,6 +2265,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {
     this.isActive = this.selected;
+  },
+  methods: {
+    getTitle: function getTitle() {
+      return this.title ? this.title : this.name.charAt(0).toUpperCase() + this.name.slice(1);
+    }
   }
 });
 
@@ -28522,12 +28522,32 @@ var render = function() {
               _c("form", { staticClass: "form-inline" }, [
                 _c("div", { staticClass: "input-group" }, [
                   _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model.trim",
+                        value: _vm.search_phrase,
+                        expression: "search_phrase",
+                        modifiers: { trim: true }
+                      }
+                    ],
                     staticClass: "form-control",
-                    staticStyle: { "border-radius": "4px" },
                     attrs: {
                       id: "settings-search",
                       type: "search",
                       placeholder: "Search Settings"
+                    },
+                    domProps: { value: _vm.search_phrase },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.search_phrase = $event.target.value.trim()
+                      },
+                      blur: function($event) {
+                        return _vm.$forceUpdate()
+                      }
                     }
                   })
                 ])
@@ -28540,14 +28560,29 @@ var render = function() {
     },
     [
       _vm._v(" "),
-      _vm._l(_vm.tabs, function(tab, index) {
+      _vm._l(_vm.sections, function(groups, tab) {
         return _c(
           "tab",
-          {
-            key: index,
-            attrs: { name: tab, selected: tab === _vm.active_tab }
-          },
-          [_c("accordion", [_c("accordion-item", [_vm._v(_vm._s(tab))])], 1)],
+          { key: tab, attrs: { name: tab, selected: tab === _vm.active_tab } },
+          [
+            _c(
+              "accordion",
+              _vm._l(groups, function(group) {
+                return _c("accordion-item", { attrs: { name: group } }, [
+                  _c(
+                    "ul",
+                    _vm._l(_vm.getSectionSettings(tab, group), function(
+                      setting
+                    ) {
+                      return _c("li", [_vm._v(_vm._s(setting.name))])
+                    }),
+                    0
+                  )
+                ])
+              }),
+              1
+            )
+          ],
           1
         )
       })
@@ -28644,7 +28679,7 @@ var render = function() {
                         : _vm._e(),
                       _vm._v(
                         "\n                        " +
-                          _vm._s(tab.name) +
+                          _vm._s(tab.getTitle()) +
                           " \n                    "
                       )
                     ]

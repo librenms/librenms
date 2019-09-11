@@ -251,9 +251,3 @@
         }
     </style>
 @endpush
-<script>
-    import LibrenmsSettings from "../../js/components/LibrenmsSettings";
-    export default {
-        components: {LibrenmsSettings}
-    }
-</script>

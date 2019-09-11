@@ -33,6 +33,7 @@
         name: "Tab",
         props: {
             name: { required: true },
+            title: String,
             selected: Boolean,
             icon: String
         },
@@ -49,6 +50,11 @@
         },
         mounted() {
             this.isActive = this.selected;
+        },
+        methods: {
+            getTitle() {
+                return this.title ? this.title : this.name.charAt(0).toUpperCase() + this.name.slice(1);
+            }
         }
     }
 </script>
