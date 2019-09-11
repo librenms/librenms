@@ -87,7 +87,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
 
         d_echo("");
-        if( isset($tagness_by_vlan_index[$vlan_index]) ) {
+        if (isset($tagness_by_vlan_index[$vlan_index])) {
             d_echo("JunOS: vlanID $vlan_id, index $vlan_index");
 
             foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
