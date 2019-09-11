@@ -4,17 +4,24 @@
     <div class="container-fluid">
         <div class="container">
             <div id="app">
-                <accordion :multiple="false">
-                    <accordion-item name="Test">
-                        Test Content
-                    </accordion-item>
-                    <accordion-item name="Test 2">
-                        Test 2 Content
-                    </accordion-item>
-                    <accordion-item name="Test 3">
-                        Test 3 Content
-                    </accordion-item>
-                </accordion>
+                <tabs>
+                    <tab name="One" :selected="true">
+                        <accordion :multiple="false">
+                            <accordion-item name="Test">
+                                Test Content
+                            </accordion-item>
+                            <accordion-item name="Test 2">
+                                Test 2 Content
+                            </accordion-item>
+                            <accordion-item name="Test 3">
+                                Test 3 Content
+                            </accordion-item>
+                        </accordion>
+                    </tab>
+                    <tab name="Dave">
+                        Dave's not here man
+                    </tab>
+                </tabs>
             </div>
         </div>
         <hr />

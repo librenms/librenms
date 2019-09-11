@@ -2329,8 +2329,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Tabs",
   data: function data() {
@@ -2494,7 +2492,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.nav-tabs[data-v-6e9bbb69] { border-bottom: none;\n}\n", ""]);
+exports.push([module.i, "\n.panel.with-nav-tabs .panel-heading[data-v-6e9bbb69]{\n    padding: 5px 5px 0 5px;\n}\n.panel.with-nav-tabs .nav-tabs[data-v-6e9bbb69]{\n    border-bottom: none;\n}\n.panel.with-nav-tabs .nav-justified[data-v-6e9bbb69]{\n    margin-bottom: -1px;\n}\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69],\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69]:focus {\n    color: #777;\n}\n.with-nav-tabs.panel-default .nav-tabs > .open > a[data-v-6e9bbb69],\n.with-nav-tabs.panel-default .nav-tabs > .open > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > .open > a[data-v-6e9bbb69]:focus,\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69]:focus {\n    color: #777;\n    background-color: #ddd;\n    border-color: transparent;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.active > a[data-v-6e9bbb69],\n.with-nav-tabs.panel-default .nav-tabs > li.active > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li.active > a[data-v-6e9bbb69]:focus {\n    color: #555;\n    background-color: #fff;\n    border-color: #ddd;\n    border-bottom-color: transparent;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu[data-v-6e9bbb69] {\n    background-color: #f5f5f5;\n    border-color: #ddd;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > li > a[data-v-6e9bbb69] {\n    color: #777;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > li > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > li > a[data-v-6e9bbb69]:focus {\n    background-color: #ddd;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > .active > a[data-v-6e9bbb69],\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > .active > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > .active > a[data-v-6e9bbb69]:focus {\n    color: #fff;\n    background-color: #555;\n}\n", ""]);
 
 // exports
 
@@ -28605,45 +28603,43 @@ var render = function() {
   return _c("div", [
     _c("div", { staticClass: "panel with-nav-tabs panel-default" }, [
       _c("div", { staticClass: "panel-heading" }, [
-        _c("div", { staticClass: "tabs" }, [
-          _c(
-            "ul",
-            { staticClass: "nav nav-tabs", attrs: { role: "tablist" } },
-            [
-              _vm._l(_vm.tabs, function(tab) {
-                return _c(
-                  "li",
-                  {
-                    key: tab.name,
-                    class: { active: tab.isActive },
-                    attrs: { role: "presentation" }
-                  },
-                  [
-                    _c(
-                      "a",
-                      {
-                        attrs: {
-                          role: "tab",
-                          href: tab.href,
-                          "aria-controls": tab.name
-                        },
-                        on: {
-                          click: function($event) {
-                            return _vm.selectTab(tab)
-                          }
-                        }
+        _c(
+          "ul",
+          { staticClass: "nav nav-tabs", attrs: { role: "tablist" } },
+          [
+            _vm._l(_vm.tabs, function(tab) {
+              return _c(
+                "li",
+                {
+                  key: tab.name,
+                  class: { active: tab.isActive },
+                  attrs: { role: "presentation" }
+                },
+                [
+                  _c(
+                    "a",
+                    {
+                      attrs: {
+                        role: "tab",
+                        href: tab.href,
+                        "aria-controls": tab.name
                       },
-                      [_vm._v(_vm._s(tab.name))]
-                    )
-                  ]
-                )
-              }),
-              _vm._v(" "),
-              _c("li", { staticClass: "pull-right" }, [_vm._t("header")], 2)
-            ],
-            2
-          )
-        ])
+                      on: {
+                        click: function($event) {
+                          return _vm.selectTab(tab)
+                        }
+                      }
+                    },
+                    [_vm._v(_vm._s(tab.name) + " ")]
+                  )
+                ]
+              )
+            }),
+            _vm._v(" "),
+            _c("li", { staticClass: "pull-right" }, [_vm._t("header")], 2)
+          ],
+          2
+        )
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "panel-body" }, [_vm._t("default")], 2)
