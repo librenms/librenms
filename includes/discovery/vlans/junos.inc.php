@@ -62,7 +62,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     }
     foreach ($vlans as $vlan_index => $vlan) {
         $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
-        d_echo(" $vlan_id");
+        d_echo("VLAN --> $vlan_id");
         if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
             $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
             if ($vlan_data['vlan_name'] != $vlan[$tmp_name]) {
@@ -84,8 +84,19 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             echo '+';
         }
         $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
-        foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
-            $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = $tag['tag'];
+
+
+        d_echo("");
+        if( isset($tagness_by_vlan_index[$vlan_index]) ) {
+            d_echo("JunOS: vlanID $vlan_id, index $vlan_index");
+
+            foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
+                $f_portType = $tag['tag'] ? 'access' : 'trunk';
+
+                d_echo("JunOS:  port-ifIndex $ifIndex - is a $f_portType port");
+ 
+                $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = $tag['tag'];
+            }
         }
     }
 }
