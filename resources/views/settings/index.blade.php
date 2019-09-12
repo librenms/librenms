@@ -3,63 +3,15 @@
 @section('title', __('Settings'))
 
 @section('content')
-<div class="container">
-    <div id="app">
-    <librenms-settings prefix="{{ url('settings') }}"></librenms-settings>
+    <div class="container">
+        <div id="app">
+            <librenms-settings
+                prefix="{{ url('settings') }}"
+                tab="{{ $active_tab }}"
+                section="{{ $active_section }}"
+            ></librenms-settings>
+        </div>
     </div>
-    <div class="panel with-nav-tabs panel-default">
-        <div class="panel-heading">
-            <ul class="nav nav-tabs settings-group-tabs">
-                @foreach($tabs as $group)
-                    <li @if($group == $active_tab)class="active"@endif>
-                        <a href="#tab-{{ $group }}" data-toggle="tab" data-group="{{ $group }}">@lang("settings.groups.$group")</a>
-                    </li>
-                @endforeach
-                <li class="pull-right">
-{{--                    @include('settings.search')--}}
-                </li>
-            </ul>
-        </div>
-        <div class="panel-body">
-            <div class="tab-content">
-                @foreach($groups as $group => $sections)
-                    <div class="tab-pane fade @if($group == $active_tab)in active @endif" id="tab-{{ $group }}">
-                        <div class="panel-group settings-sections" id="accordion-{{ $group }}">
-                            @foreach($sections as $section => $configs)
-                                @if($group == 'global')
-                                    @foreach($configs as $config)
-                                        <b>{{ $config->getName() }}</b>
-                                        = {{ stripslashes(json_encode($config->getValue())) }} <br/>
-                                    @endforeach
-                                @else
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h4 class="panel-title">
-                                                <a data-toggle="collapse" data-parent="#accordion-{{ $group }}" href="#{{ "$group-$section" }}">
-                                                    <i class="fa fa-caret-down"></i> @lang("settings.sections.$group.$section")
-                                                </a>
-                                            </h4>
-                                        </div>
-                                        <div id="{{ "$group-$section" }}" data-group="{{ $group }}" data-section="{{ $section }}"
-                                             class="panel-collapse collapse @if($group == $active_tab && $section == $active_section) in @endif">
-                                            <div class="panel-body">
-                                                <form class="form-horizontal section-form" role="form">
-                                                    @foreach($configs as $config)
-                                                        @includeIf('settings.types.' . $config->getType(), compact('config'))
-                                                    @endforeach
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
-                        </div>
-                    </div>
-                @endforeach
-                </div>
-            </div>
-        </div>
-</div>
 @endsection
 
 
@@ -209,45 +161,3 @@
     </script>
 @endpush
 
-@push('styles')
-    <style>
-        /* format tabs */
-        .panel.with-nav-tabs > .panel-heading {
-            padding: 5px 5px 0 5px;
-        }
-
-        .panel.with-nav-tabs > .panel-heading > .nav-tabs {
-            border-bottom: none;
-        }
-
-        .panel.with-nav-tabs {
-            margin-bottom: -1px;
-        }
-
-        /* colorize tab links */
-        .with-nav-tabs.panel-default .nav-tabs > li > a,
-        .with-nav-tabs.panel-default .nav-tabs > li > a:hover,
-        .with-nav-tabs.panel-default .nav-tabs > li > a:focus {
-            color: #777;
-        }
-
-        .with-nav-tabs.panel-default .nav-tabs > .open > a,
-        .with-nav-tabs.panel-default .nav-tabs > .open > a:hover,
-        .with-nav-tabs.panel-default .nav-tabs > .open > a:focus,
-        .with-nav-tabs.panel-default .nav-tabs > li > a:hover,
-        .with-nav-tabs.panel-default .nav-tabs > li > a:focus {
-            color: #777;
-            background-color: #ddd;
-            border-color: transparent;
-        }
-
-        .with-nav-tabs.panel-default .nav-tabs > li.active > a,
-        .with-nav-tabs.panel-default .nav-tabs > li.active > a:hover,
-        .with-nav-tabs.panel-default .nav-tabs > li.active > a:focus {
-            color: #555;
-            background-color: #fff;
-            border-color: #ddd;
-            border-bottom-color: transparent;
-        }
-    </style>
-@endpush

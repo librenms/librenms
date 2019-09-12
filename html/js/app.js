@@ -2249,11 +2249,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LibrenmsSettings",
-  props: ['prefix'],
+  props: ['prefix', 'tab', 'section'],
   data: function data() {
     return {
-      active_tab: '',
-      active_section: '',
       search_phrase: '',
       settings: {},
       groups: {}
@@ -2293,22 +2291,15 @@ __webpack_require__.r(__webpack_exports__);
       this.groups = Object.keys(groups).sort().reduce(function (a, c) {
         return a[c] = groups[c], a;
       }, {});
-    },
-    parseUrl: function parseUrl() {
-      var search = window.location.toString().match(new RegExp(this.prefix + '/?(?<tab>[^/]*)/?(?<setting>[^/]*)'));
-      var tab = search ? search.groups.tab : '';
-      var section = search && search.groups.setting ? search.setting in this.settings ? this.settings[search.groups.setting].section : search.groups.setting : '';
-      return {
-        tab: tab,
-        section: section
-      };
+    }
+  },
+  computed: {
+    activeSection: function activeSection() {
+      return this.section in this.settings ? this.settings[this.section].section : this.section;
     }
   },
   mounted: function mounted() {
-    var location = this.parseUrl();
-    this.active_tab = location.tab;
-    this.active_section = location.section; // window.history.pushState(group, '', '/settings/' + group)
-
+    // window.history.pushState(group, '', '/settings/' + group)
     axios.get(route('settings.list')).then(this.loadData);
   }
 });
@@ -2381,6 +2372,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2397,7 +2392,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     addItem: function addItem() {
       var newList = this.value;
-      newList.push(this.newItem);
+      console.log(newList.push(this.newItem));
       this.$emit('input', newList);
       this.newItem = "";
     },
@@ -2410,6 +2405,11 @@ __webpack_require__.r(__webpack_exports__);
       var newList = this.value;
       newList[index] = value;
       this.$emit('input', newList);
+    }
+  },
+  computed: {
+    localList: function localList() {
+      return this.value;
     }
   }
 });
@@ -32637,21 +32637,21 @@ var render = function() {
       _vm._v(" "),
       _c("tab", { attrs: { name: "global" } }),
       _vm._v(" "),
-      _vm._l(_vm.groups, function(sections, tab) {
+      _vm._l(_vm.groups, function(sections, group) {
         return _c(
           "tab",
-          { key: tab, attrs: { name: tab, selected: tab === _vm.active_tab } },
+          { key: group, attrs: { name: group, selected: group === _vm.tab } },
           [
             _c(
               "accordion",
-              _vm._l(_vm.groups[tab], function(items, section) {
+              _vm._l(_vm.groups[group], function(items, section) {
                 return _c(
                   "accordion-item",
                   {
                     key: section,
                     attrs: {
                       name: section,
-                      active: section === _vm.active_section
+                      active: section === _vm.activeSection
                     }
                   },
                   [
@@ -32707,56 +32707,81 @@ var render = function() {
       attrs: { title: _vm.disabled ? _vm.trans("setttings.readonly") : false }
     },
     [
-      _vm._l(_vm.value, function(item, index) {
-        return _c("li", [
-          _c("div", { staticClass: "input-group" }, [
-            _c("span", { staticClass: "input-group-addon" }, [
-              _vm._v(_vm._s(index + 1) + ".")
-            ]),
-            _vm._v(" "),
-            _c("input", {
-              staticClass: "form-control",
-              attrs: { type: "text", readonly: _vm.disabled },
-              domProps: { value: item },
-              on: {
-                blur: function($event) {
-                  return _vm.updateItem(index, $event.target.value)
-                },
-                keyup: function($event) {
-                  if (
-                    !$event.type.indexOf("key") &&
-                    _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                  ) {
-                    return null
-                  }
-                  return _vm.updateItem(index, $event.target.value)
-                }
-              }
-            }),
-            _vm._v(" "),
-            _c("span", { staticClass: "input-group-btn" }, [
-              !_vm.disabled
-                ? _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-danger",
-                      attrs: { type: "button" },
-                      on: {
-                        click: function($event) {
-                          return _vm.removeItem(index)
+      _c(
+        "draggable",
+        {
+          model: {
+            value: _vm.localList,
+            callback: function($$v) {
+              _vm.localList = $$v
+            },
+            expression: "localList"
+          }
+        },
+        [
+          _c(
+            "transition-group",
+            _vm._l(_vm.value, function(item, index) {
+              return _c("div", [
+                _c("div", { staticClass: "input-group" }, [
+                  _c("span", { staticClass: "input-group-addon" }, [
+                    _vm._v(_vm._s(index + 1) + ".")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "form-control",
+                    attrs: { type: "text", readonly: _vm.disabled },
+                    domProps: { value: item },
+                    on: {
+                      blur: function($event) {
+                        return _vm.updateItem(index, $event.target.value)
+                      },
+                      keyup: function($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "enter",
+                            13,
+                            $event.key,
+                            "Enter"
+                          )
+                        ) {
+                          return null
                         }
+                        return _vm.updateItem(index, $event.target.value)
                       }
-                    },
-                    [_c("i", { staticClass: "fa fa-minus-circle" })]
-                  )
-                : _vm._e()
-            ])
-          ])
-        ])
-      }),
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("span", { staticClass: "input-group-btn" }, [
+                    !_vm.disabled
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                return _vm.removeItem(index)
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "fa fa-minus-circle" })]
+                        )
+                      : _vm._e()
+                  ])
+                ])
+              ])
+            }),
+            0
+          )
+        ],
+        1
+      ),
       _vm._v(" "),
       !_vm.disabled
-        ? _c("li", [
+        ? _c("div", [
             _c("div", { staticClass: "input-group" }, [
               _c("input", {
                 directives: [
@@ -32804,7 +32829,7 @@ var render = function() {
           ])
         : _vm._e()
     ],
-    2
+    1
   )
 }
 var staticRenderFns = []

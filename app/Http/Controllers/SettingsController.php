@@ -25,10 +25,6 @@ class SettingsController extends Controller
             'active_section' => $section,
         ];
 
-        $data['groups'] = $dynamic_config->getGrouped();
-        $data['tabs'] = $data['groups']->keys();
-        $data['sections'] = $dynamic_config->getSections();
-
         return view('settings.index', $data);
     }
 
