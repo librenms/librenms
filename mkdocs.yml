@@ -78,7 +78,7 @@ nav:
       - SNMP Trap Handler: Extensions/SNMP-Trap-Handler.md
       - Customizing the Web UI: Extensions/Customizing-the-Web-UI.md
       - Cleanup Options: Support/Cleanup-options.md
-      - Master/Slave Database: Support/Slave-Database.md
+      - Read-only Database: Support/Read-Database.md
   - 6. 3rd Party Integration:
       - Gateone: Extensions/Gateone.md
       - Graylog: Extensions/Graylog.md
