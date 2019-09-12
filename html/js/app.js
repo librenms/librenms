@@ -2372,6 +2372,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingArray",
@@ -2391,6 +2397,11 @@ __webpack_require__.r(__webpack_exports__);
     removeItem: function removeItem(index) {
       var newList = this.value;
       newList.splice(index, 1);
+      this.$emit('input', newList);
+    },
+    updateItem: function updateItem(index, value) {
+      var newList = this.value;
+      newList[index] = value;
       this.$emit('input', newList);
     }
   }
@@ -30216,19 +30227,28 @@ var render = function() {
       _vm._l(_vm.value, function(item, index) {
         return _c("li", [
           _c("div", { staticClass: "input-group" }, [
-            _c(
-              "span",
-              {
-                staticClass: "input-group-addon",
-                attrs: { id: "basic-addon1" }
-              },
-              [_vm._v(_vm._s(index + 1) + ".")]
-            ),
+            _c("span", { staticClass: "input-group-addon" }, [
+              _vm._v(_vm._s(index + 1) + ".")
+            ]),
             _vm._v(" "),
             _c("input", {
               staticClass: "form-control",
               attrs: { type: "text", readonly: _vm.disabled },
-              domProps: { value: item }
+              domProps: { value: item },
+              on: {
+                blur: function($event) {
+                  return _vm.updateItem(index, $event.target.value)
+                },
+                keyup: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                  ) {
+                    return null
+                  }
+                  return _vm.updateItem(index, $event.target.value)
+                }
+              }
             }),
             _vm._v(" "),
             _c("span", { staticClass: "input-group-btn" }, [

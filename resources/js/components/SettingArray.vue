@@ -28,8 +28,14 @@
     >
         <li v-for="(item, index) in value">
             <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1">{{ index+1 }}.</span>
-                <input type="text" :value="item" :readonly="disabled" class="form-control">
+                <span class="input-group-addon">{{ index+1 }}.</span>
+                <input type="text"
+                       class="form-control"
+                       :value="item"
+                       :readonly="disabled"
+                       @blur="updateItem(index, $event.target.value)"
+                       @keyup.enter="updateItem(index, $event.target.value)"
+                >
                 <span class="input-group-btn">
                     <button v-if="!disabled" @click="removeItem(index)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
                 </span>
@@ -67,6 +73,11 @@
             removeItem(index) {
                 let newList = this.value;
                 newList.splice(index, 1);
+                this.$emit('input', newList);
+            },
+            updateItem(index, value) {
+                let newList = this.value;
+                newList[index] = value;
                 this.$emit('input', newList);
             }
         }
