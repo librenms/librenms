@@ -23,7 +23,7 @@
   -->
 
 <template>
-    <div class="form-group has-feedback">
+    <div :class="['form-group', 'has-feedback', setting.class]">
         <label :for="setting.name" class="col-sm-4 control-label" :title="setting.name">
             {{ getDescription() }}
             <span v-if="setting.units !== null">({{ setting.units }})</span>
@@ -63,10 +63,10 @@
                 this.previous = this.saved
             },
             getDescription() {
-                return this.trans('settings' + this.setting.name + '.description')
+                return this.trans('settings.' + this.setting.name + '.description')
             },
             getHelp() {
-                return this.trans('settings' + this.setting.name + '.help')
+                return this.trans('settings.' + this.setting.name + '.help')
             },
             hasHelp() {
                 return true // TODO implement hasHelp

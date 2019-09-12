@@ -2170,10 +2170,10 @@ __webpack_require__.r(__webpack_exports__);
       this.previous = this.saved;
     },
     getDescription: function getDescription() {
-      return this.trans('settings' + this.setting.name + '.description');
+      return this.trans('settings.' + this.setting.name + '.description');
     },
     getHelp: function getHelp() {
-      return this.trans('settings' + this.setting.name + '.help');
+      return this.trans('settings.' + this.setting.name + '.help');
     },
     hasHelp: function hasHelp() {
       return true; // TODO implement hasHelp
@@ -2788,11 +2788,6 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {
     this.isActive = this.selected;
-  },
-  methods: {
-    getTitle: function getTitle() {
-      return this.title ? this.title : this.name.charAt(0).toUpperCase() + this.name.slice(1);
-    }
   }
 });
 
@@ -29798,7 +29793,9 @@ var render = function() {
                   ? _c("i", { class: ["fa", "fa-fw", _vm.icon] })
                   : _vm._e(),
                 _vm._v(
-                  "\n                " + _vm._s(_vm.name) + "\n            "
+                  "\n                " +
+                    _vm._s(_vm._f("ucfirst")(_vm._f("trans")(_vm.name))) +
+                    "\n            "
                 )
               ]
             )
@@ -29891,93 +29888,97 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "form-group has-feedback" }, [
-    _c(
-      "label",
-      {
-        staticClass: "col-sm-4 control-label",
-        attrs: { for: _vm.setting.name, title: _vm.setting.name }
-      },
-      [
-        _vm._v("\n        " + _vm._s(_vm.getDescription()) + "\n        "),
-        _vm.setting.units !== null
-          ? _c("span", [_vm._v("(" + _vm._s(_vm.setting.units) + ")")])
-          : _vm._e()
-      ]
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "col-sm-6 col-lg-4" },
-      [
-        _c(_vm.getComponent(), {
-          tag: "component",
-          attrs: {
-            name: _vm.setting.name,
-            pattern: _vm.setting.pattern,
-            disabled: _vm.setting.overridden,
-            required: _vm.setting.required,
-            options: _vm.setting.options
-          },
-          model: {
-            value: _vm.value,
-            callback: function($$v) {
-              _vm.value = $$v
+  return _c(
+    "div",
+    { class: ["form-group", "has-feedback", _vm.setting.class] },
+    [
+      _c(
+        "label",
+        {
+          staticClass: "col-sm-4 control-label",
+          attrs: { for: _vm.setting.name, title: _vm.setting.name }
+        },
+        [
+          _vm._v("\n        " + _vm._s(_vm.getDescription()) + "\n        "),
+          _vm.setting.units !== null
+            ? _c("span", [_vm._v("(" + _vm._s(_vm.setting.units) + ")")])
+            : _vm._e()
+        ]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm-6 col-lg-4" },
+        [
+          _c(_vm.getComponent(), {
+            tag: "component",
+            attrs: {
+              name: _vm.setting.name,
+              pattern: _vm.setting.pattern,
+              disabled: _vm.setting.overridden,
+              required: _vm.setting.required,
+              options: _vm.setting.options
             },
-            expression: "value"
-          }
-        }),
+            model: {
+              value: _vm.value,
+              callback: function($$v) {
+                _vm.value = $$v
+              },
+              expression: "value"
+            }
+          }),
+          _vm._v(" "),
+          _c("span", { staticClass: "form-control-feedback" })
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-2" }, [
+        _c(
+          "button",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showUndo(),
+                expression: "showUndo()"
+              }
+            ],
+            staticClass: "btn btn-primary",
+            attrs: { title: _vm._f("trans")("Undo") },
+            on: { click: _vm.resetToInitial }
+          },
+          [_c("i", { staticClass: "fa fa-undo" })]
+        ),
         _vm._v(" "),
-        _c("span", { staticClass: "form-control-feedback" })
-      ],
-      1
-    ),
-    _vm._v(" "),
-    _c("div", { staticClass: "col-sm-2" }, [
-      _c(
-        "button",
-        {
-          directives: [
-            {
-              name: "show",
-              rawName: "v-show",
-              value: _vm.showUndo(),
-              expression: "showUndo()"
-            }
-          ],
-          staticClass: "btn btn-primary",
-          attrs: { title: _vm._f("trans")("Undo") },
-          on: { click: _vm.resetToInitial }
-        },
-        [_c("i", { staticClass: "fa fa-undo" })]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          directives: [
-            {
-              name: "show",
-              rawName: "v-show",
-              value: _vm.showResetToDefault(),
-              expression: "showResetToDefault()"
-            }
-          ],
-          staticClass: "btn btn-default",
-          attrs: { title: _vm._f("trans")("Reset to default") },
-          on: { click: _vm.resetToDefault }
-        },
-        [_c("i", { staticClass: "fa fa-refresh" })]
-      ),
-      _vm._v(" "),
-      _vm.hasHelp()
-        ? _c("div", {
-            staticClass: "toolTip fa fa-fw fa-lg fa-question-circle",
-            attrs: { "data-toggle": "tooltip", title: _vm.getHelp() }
-          })
-        : _vm._e()
-    ])
-  ])
+        _c(
+          "button",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showResetToDefault(),
+                expression: "showResetToDefault()"
+              }
+            ],
+            staticClass: "btn btn-default",
+            attrs: { title: _vm._f("trans")("Reset to default") },
+            on: { click: _vm.resetToDefault }
+          },
+          [_c("i", { staticClass: "fa fa-refresh" })]
+        ),
+        _vm._v(" "),
+        _vm.hasHelp()
+          ? _c("div", {
+              staticClass: "toolTip fa fa-fw fa-lg fa-question-circle",
+              attrs: { "data-toggle": "tooltip", title: _vm.getHelp() }
+            })
+          : _vm._e()
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -30467,7 +30468,7 @@ var render = function() {
                         : _vm._e(),
                       _vm._v(
                         "\n                        " +
-                          _vm._s(tab.getTitle()) +
+                          _vm._s(_vm._f("ucfirst")(_vm._f("trans")(tab.name))) +
                           " \n                    "
                       )
                     ]
@@ -42760,6 +42761,11 @@ Vue.mixin({
   methods: {
     route: route
   }
+});
+Vue.filter('ucfirst', function (value) {
+  if (!value) return '';
+  value = value.toString();
+  return value.charAt(0).toUpperCase() + value.slice(1);
 });
 Vue.filter('trans', function () {
   var _lang;

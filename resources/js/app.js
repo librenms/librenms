@@ -30,6 +30,12 @@ Vue.mixin({
         route: route
     }
 });
+
+Vue.filter('ucfirst', function (value) {
+    if (!value) return '';
+    value = value.toString();
+    return value.charAt(0).toUpperCase() + value.slice(1)
+});
 Vue.filter('trans', (...args) => {
     return args[0];
     return lang.get(...args); // TODO implement translation
