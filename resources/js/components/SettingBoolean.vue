@@ -24,15 +24,21 @@
 
 <template>
     <div :class="['form-group', 'has-feedback', setting.class]">
-        <label :for="setting.name" class="col-sm-4 control-label" :title="setting.name">Description: {{ setting.name | trans }}</label>
+        <label :for="setting.name" class="col-sm-4 control-label" :title="setting.name">{{ getDescription() }}</label>
         <div class="col-sm-6 col-lg-4">
-            <input type="checkbox"
-                   v-model="value"
-                   :id="setting.name"
-                   :name="setting.name"
-                   :disabled="isReadOnly()"
-                   :title="isReadOnly() ? trans('settings.readonly') : false"
-            >
+            <toggle-button
+                v-model="value"
+                :sync="true"
+                :name="setting.name"
+                :disabled="isReadOnly()"
+                :title="isReadOnly() ? trans('settings.readonly') : false"
+            ></toggle-button>
+<!--            <input type="checkbox"-->
+<!--                   v-model="value"-->
+<!--                   :name="setting.name"-->
+<!--                   :disabled="isReadOnly()"-->
+<!--                   :title="isReadOnly() ? trans('settings.readonly') : false"-->
+<!--            >-->
         </div>
         <div class="col-sm-2">
             <button v-show="showUndo()" @click="resetToInitial" class="btn btn-primary" :title="'Undo' | trans"><i class="fa fa-undo"></i></button>

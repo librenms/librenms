@@ -35,8 +35,11 @@
             commit() {
                 this.previous = this.saved
             },
+            getDescription() {
+                return this.trans('settings' + this.setting.name + '.description')
+            },
             getHelp() {
-                return trans(this.setting.name + '.help')
+                return this.trans('settings' + this.setting.name + '.help')
             },
             hasHelp() {
                 return true // TODO implement hasHelp

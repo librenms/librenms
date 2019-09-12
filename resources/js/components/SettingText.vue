@@ -24,16 +24,15 @@
 
 <template>
     <div :class="['form-group', 'has-feedback', setting.class]">
-        <label :for="setting.name" class="col-sm-4 control-label" :title="setting.name">Description: {{ setting.name | trans }}</label>
+        <label :for="setting.name" class="col-sm-4 control-label" :title="setting.name">{{ getDescription() }}</label>
         <div class="col-sm-6 col-lg-4">
             <input type="text" class="form-control validation"
                    v-model="value"
-                   :id="setting.name"
                    :name="setting.name"
                    :pattern="setting.pattern"
                    :required="!!setting.required"
-                   :disabled="settings.overridden"
-                   :title="settings.overridden ? trans('settings.readonly') : undefined"
+                   :disabled="isReadOnly()"
+                   :title="isReadOnly() ? trans('settings.readonly') : false"
             >
             <span class="form-control-feedback"></span>
         </div>

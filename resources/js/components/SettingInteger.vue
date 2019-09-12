@@ -25,7 +25,7 @@
 <template>
     <div :class="['form-group', 'has-feedback', setting.class]">
         <label :for="setting.name" class="col-sm-4 control-label" :title="setting.name">
-            Description here {{ setting.name }}
+            {{ getDescription() }}
             <span v-if="setting.units !== null">({{ setting.units }})</span>
         </label>
         <div class="col-sm-6 col-lg-4">
@@ -33,8 +33,9 @@
                    v-model.number="value"
                    :name="setting.name"
                    :required="!!setting.required"
+                   :disabled="isReadOnly()"
+                   :title="isReadOnly() ? trans('settings.readonly') : false"
                    >
-<!--            @if(in_array($config->name, $readonly)) disabled title="@lang('settings.readonly')" @endif-->
             <span class="form-control-feedback"></span>
         </div>
         <div class="col-sm-2">
