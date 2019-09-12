@@ -3641,51 +3641,44 @@
     "snmp.community": {
         "group": "poller",
         "section": "snmp",
-        "order": 1,
+        "order": 2,
         "type": "array",
         "default": ["public"]
     },
     "snmp.port": {
+        "group": "poller",
+        "section": "snmp",
+        "order": 1,
+        "type": "integer",
         "default": 161
     },
-    "snmp.transports.0": {
-        "default": "udp"
+    "snmp.transports": {
+        "group": "poller",
+        "section": "snmp",
+        "order": 0,
+        "type": "array",
+        "default": ["udp", "udp6", "tcp", "tcp6"]
     },
-    "snmp.transports.1": {
-        "default": "udp6"
+    "snmp.v3": {
+        "group": "poller",
+        "section": "snmp",
+        "order": 3,
+        "type": "snmp3auth",
+        "default": [{
+            "authalgo": "MD5",
+            "authlevel": "noAuthNoPriv",
+            "authname": "root",
+            "authpass": "",
+            "cryptoalgo": "AES",
+            "cryptopass": ""
+        }]
     },
-    "snmp.transports.2": {
-        "default": "tcp"
-    },
-    "snmp.transports.3": {
-        "default": "tcp6"
-    },
-    "snmp.v3.0.authalgo": {
-        "default": "MD5"
-    },
-    "snmp.v3.0.authlevel": {
-        "default": "noAuthNoPriv"
-    },
-    "snmp.v3.0.authname": {
-        "default": "root"
-    },
-    "snmp.v3.0.authpass": {
-        "default": ""
-    },
-    "snmp.v3.0.cryptoalgo": {
-        "default": "AES"
-    },
-    "snmp.v3.0.cryptopass": {
-        "default": ""
-    },
-    "snmp.version.0": {
-        "default": "v2c"
-    },
-    "snmp.version.1": {
-        "default": "v3"
-    },
-    "snmp.version.2": {
-        "default": "v1"
+    "snmp.version": {
+        "group": "poller",
+        "section": "snmp",
+        "order": 1,
+        "type": "array",
+        "default": ["v2c", "v3", "v1"]
     },
     "snmpbulkwalk": {
         "default": "/usr/bin/snmpbulkwalk",
