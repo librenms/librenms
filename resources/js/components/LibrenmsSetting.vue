@@ -71,9 +71,6 @@
             hasHelp() {
                 return true // TODO implement hasHelp
             },
-            isReadOnly() {
-                return this.setting.overridden
-            },
             resetToDefault() {
                 this.value = this.setting.default
             },
@@ -81,10 +78,12 @@
                 this.value = this.setting.value
             },
             showResetToDefault() {
-                return this.setting.default !== null && this.value !== this.setting.default
+                return this.setting.default !== null
+                    && !this.setting.overridden
+                    && !_.isEqual(this.value, this.setting.default)
             },
             showUndo() {
-                return this.setting.value !== this.value
+                return !_.isEqual(this.setting.value, this.value);
             },
             getComponent() {
                 const component = 'Setting' + this.setting.type.charAt(0).toUpperCase() + this.setting.type.toString().slice(1);

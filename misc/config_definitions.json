@@ -3638,8 +3638,12 @@
     "smokeping.pings": {
         "default": 20
     },
-    "snmp.community.0": {
-        "default": "public"
+    "snmp.community": {
+        "group": "poller",
+        "section": "snmp",
+        "order": 1,
+        "type": "array",
+        "default": ["public"]
     },
     "snmp.port": {
         "default": 161

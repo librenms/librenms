@@ -38,10 +38,9 @@ class DynamicConfig
         // prepare to mark overridden settings
         $config = [];
         @include base_path('config.php');
-        $readonly = Arr::dot($config);
 
-        $this->definitions = collect(Config::getDefinitions())->map(function ($item, $key) use ($readonly) {
-            $item['overridden'] = isset($readonly[$key]);
+        $this->definitions = collect(Config::getDefinitions())->map(function ($item, $key) use ($config) {
+            $item['overridden'] = Arr::has($config, $key);
             return new DynamicConfigItem($key, $item);
         });
     }

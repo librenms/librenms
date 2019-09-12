@@ -32,6 +32,7 @@ return [
         'poller' => [
             'ping' => 'Ping',
             'rrdtool' => 'RRDTool Setup',
+            'snmp' => 'SNMP',
         ],
         'system' => [
             'cleanup' => 'Cleanup',

@@ -23,16 +23,49 @@
   -->
 
 <template>
-    <div>Array: {{ name }}</div>
+    <ul
+        :title="disabled ? trans('setttings.readonly') : false"
+    >
+        <li v-for="(item, index) in value">
+            {{ index+1 }}. <input :value="item" :readonly="disabled">
+            <button v-if="!disabled" @click="removeItem(index)"><i class="fa fa-minus-circle"></i></button>
+        </li>
+        <li v-if="!disabled">
+            <input v-model="newItem" @keyup.enter="addItem">
+            <button @click="addItem"><i class="fa fa-plus-circle"></i></button>
+        </li>
+    </ul>
 </template>
 
 <script>
+    import BaseSetting from "./BaseSetting";
+
     export default {
         name: "SettingArray",
-        props: ['name']
+        mixins: [BaseSetting],
+        data() {
+            return {
+                newItem: ""
+            }
+        },
+        methods: {
+            addItem() {
+                let newList = this.value;
+                newList.push(this.newItem);
+                this.$emit('input', newList);
+                this.newItem = "";
+            },
+            removeItem(index) {
+                let newList = this.value;
+                newList.splice(index, 1);
+                this.$emit('input', newList);
+            }
+        }
     }
 </script>
 
 <style scoped>
-
+    ul {
+        list-style-type: none;
+    }
 </style>

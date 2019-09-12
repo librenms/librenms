@@ -31,7 +31,7 @@
             disabled: Boolean,
             required: Boolean,
             pattern: String,
-            options: Object
+            options: {}
         }
     }
 </script>
