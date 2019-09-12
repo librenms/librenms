@@ -2143,32 +2143,8 @@ __webpack_require__.r(__webpack_exports__);
     },
     getComponent: function getComponent(setting) {
       var type = this.settings[setting].type;
-
-      switch (type) {
-        case 'array':
-          return 'SettingArray';
-
-        case 'boolean':
-          return 'SettingBoolean';
-
-        case 'email':
-          return 'SettingEmail';
-
-        case 'integer':
-          return 'SettingInteger';
-
-        case 'password':
-          return 'SettingPassword';
-
-        case 'select':
-          return 'SettingSelect';
-
-        case 'text':
-          return 'SettingText';
-
-        default:
-          return 'SettingNull';
-      }
+      var component = 'Setting' + type.charAt(0).toUpperCase() + type.toString().slice(1);
+      return typeof Vue.options.components[component] !== 'undefined' ? component : 'SettingNull';
     }
   },
   mounted: function mounted() {
