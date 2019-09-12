@@ -35,7 +35,9 @@
         <tab v-for="(sections, tab) in groups" :key="tab" :name="tab" :selected="tab === active_tab">
             <accordion>
                 <accordion-item v-for="(items, section) in groups[tab]" :key="section" :name="section">
-                    <librenms-setting v-for="setting in items" :key="setting" :setting="settings[setting]"></librenms-setting>
+                    <form class="form-horizontal">
+                        <librenms-setting v-for="setting in items" :key="setting" :setting="settings[setting]"></librenms-setting>
+                    </form>
                 </accordion-item>
             </accordion>
         </tab>

@@ -27,12 +27,21 @@
         :title="disabled ? trans('setttings.readonly') : false"
     >
         <li v-for="(item, index) in value">
-            {{ index+1 }}. <input :value="item" :readonly="disabled">
-            <button v-if="!disabled" @click="removeItem(index)"><i class="fa fa-minus-circle"></i></button>
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">{{ index+1 }}.</span>
+                <input type="text" :value="item" :readonly="disabled" class="form-control">
+                <span class="input-group-btn">
+                    <button v-if="!disabled" @click="removeItem(index)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
+                </span>
+            </div>
         </li>
         <li v-if="!disabled">
-            <input v-model="newItem" @keyup.enter="addItem">
-            <button @click="addItem"><i class="fa fa-plus-circle"></i></button>
+            <div class="input-group">
+                <input type="text" v-model="newItem" @keyup.enter="addItem" class="form-control">
+                <span class="input-group-btn">
+                    <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
+                </span>
+            </div>
         </li>
     </ul>
 </template>
@@ -67,5 +76,8 @@
 <style scoped>
     ul {
         list-style-type: none;
+    }
+    li {
+        margin-bottom: 2px;
     }
 </style>

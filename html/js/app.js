@@ -2258,6 +2258,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LibrenmsSettings",
   data: function data() {
@@ -2322,6 +2324,15 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -3040,7 +3051,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\nul[data-v-2cf33d54] {\n    list-style-type: none;\n}\n", ""]);
+exports.push([module.i, "\nul[data-v-2cf33d54] {\n    list-style-type: none;\n}\nli[data-v-2cf33d54] {\n    margin-bottom: 2px;\n}\n", ""]);
 
 // exports
 
@@ -29972,7 +29983,7 @@ var render = function() {
       _c(
         "label",
         {
-          staticClass: "col-sm-4 control-label",
+          staticClass: "col-sm-5 control-label",
           attrs: { for: _vm.setting.name, title: _vm.setting.name }
         },
         [
@@ -29986,7 +29997,7 @@ var render = function() {
       _c(
         "div",
         {
-          staticClass: "col-sm-6 col-lg-4",
+          staticClass: "col-sm-5",
           attrs: {
             title: _vm.setting.disabled ? _vm.trans("settings.readonly") : false
           }
@@ -30028,7 +30039,7 @@ var render = function() {
               }
             ],
             staticClass: "btn btn-primary",
-            attrs: { title: _vm._f("trans")("Undo") },
+            attrs: { type: "button", title: _vm._f("trans")("Undo") },
             on: { click: _vm.resetToInitial }
           },
           [_c("i", { staticClass: "fa fa-undo" })]
@@ -30046,7 +30057,10 @@ var render = function() {
               }
             ],
             staticClass: "btn btn-default",
-            attrs: { title: _vm._f("trans")("Reset to default") },
+            attrs: {
+              type: "button",
+              title: _vm._f("trans")("Reset to default")
+            },
             on: { click: _vm.resetToDefault }
           },
           [_c("i", { staticClass: "fa fa-refresh" })]
@@ -30146,13 +30160,19 @@ var render = function() {
                 return _c(
                   "accordion-item",
                   { key: section, attrs: { name: section } },
-                  _vm._l(items, function(setting) {
-                    return _c("librenms-setting", {
-                      key: setting,
-                      attrs: { setting: _vm.settings[setting] }
-                    })
-                  }),
-                  1
+                  [
+                    _c(
+                      "form",
+                      { staticClass: "form-horizontal" },
+                      _vm._l(items, function(setting) {
+                        return _c("librenms-setting", {
+                          key: setting,
+                          attrs: { setting: _vm.settings[setting] }
+                        })
+                      }),
+                      1
+                    )
+                  ]
                 )
               }),
               1
@@ -30195,61 +30215,88 @@ var render = function() {
     [
       _vm._l(_vm.value, function(item, index) {
         return _c("li", [
-          _vm._v("\n        " + _vm._s(index + 1) + ". "),
-          _c("input", {
-            attrs: { readonly: _vm.disabled },
-            domProps: { value: item }
-          }),
-          _vm._v(" "),
-          !_vm.disabled
-            ? _c(
-                "button",
-                {
-                  on: {
-                    click: function($event) {
-                      return _vm.removeItem(index)
-                    }
-                  }
-                },
-                [_c("i", { staticClass: "fa fa-minus-circle" })]
-              )
-            : _vm._e()
+          _c("div", { staticClass: "input-group" }, [
+            _c(
+              "span",
+              {
+                staticClass: "input-group-addon",
+                attrs: { id: "basic-addon1" }
+              },
+              [_vm._v(_vm._s(index + 1) + ".")]
+            ),
+            _vm._v(" "),
+            _c("input", {
+              staticClass: "form-control",
+              attrs: { type: "text", readonly: _vm.disabled },
+              domProps: { value: item }
+            }),
+            _vm._v(" "),
+            _c("span", { staticClass: "input-group-btn" }, [
+              !_vm.disabled
+                ? _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-danger",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.removeItem(index)
+                        }
+                      }
+                    },
+                    [_c("i", { staticClass: "fa fa-minus-circle" })]
+                  )
+                : _vm._e()
+            ])
+          ])
         ])
       }),
       _vm._v(" "),
       !_vm.disabled
         ? _c("li", [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.newItem,
-                  expression: "newItem"
-                }
-              ],
-              domProps: { value: _vm.newItem },
-              on: {
-                keyup: function($event) {
-                  if (
-                    !$event.type.indexOf("key") &&
-                    _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                  ) {
-                    return null
+            _c("div", { staticClass: "input-group" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.newItem,
+                    expression: "newItem"
                   }
-                  return _vm.addItem($event)
-                },
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text" },
+                domProps: { value: _vm.newItem },
+                on: {
+                  keyup: function($event) {
+                    if (
+                      !$event.type.indexOf("key") &&
+                      _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                    ) {
+                      return null
+                    }
+                    return _vm.addItem($event)
+                  },
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.newItem = $event.target.value
                   }
-                  _vm.newItem = $event.target.value
                 }
-              }
-            }),
-            _vm._v(" "),
-            _c("button", { on: { click: _vm.addItem } }, [
-              _c("i", { staticClass: "fa fa-plus-circle" })
+              }),
+              _vm._v(" "),
+              _c("span", { staticClass: "input-group-btn" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: { click: _vm.addItem }
+                  },
+                  [_c("i", { staticClass: "fa fa-plus-circle" })]
+                )
+              ])
             ])
           ])
         : _vm._e()
