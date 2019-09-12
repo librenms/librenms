@@ -23,13 +23,13 @@
   -->
 
 <template>
-    <div>Array: {{ setting.name }}</div>
+    <div>Array: {{ name }}</div>
 </template>
 
 <script>
     export default {
         name: "SettingArray",
-        props: ['setting']
+        props: ['name']
     }
 </script>
 

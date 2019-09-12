@@ -23,29 +23,15 @@
   -->
 
 <template>
-    <div :class="['form-group', 'has-feedback', setting.class]">
-        <label :for="setting.name" class="col-sm-4 control-label" :title="setting.name">{{ getDescription() }}</label>
-        <div class="col-sm-6 col-lg-4">
-            <toggle-button
-                v-model="value"
-                :sync="true"
-                :name="setting.name"
-                :disabled="isReadOnly()"
-                :title="isReadOnly() ? trans('settings.readonly') : false"
-            ></toggle-button>
-<!--            <input type="checkbox"-->
-<!--                   v-model="value"-->
-<!--                   :name="setting.name"-->
-<!--                   :disabled="isReadOnly()"-->
-<!--                   :title="isReadOnly() ? trans('settings.readonly') : false"-->
-<!--            >-->
-        </div>
-        <div class="col-sm-2">
-            <button v-show="showUndo()" @click="resetToInitial" class="btn btn-primary" :title="'Undo' | trans"><i class="fa fa-undo"></i></button>
-            <button v-show="showResetToDefault()" @click="resetToDefault" class="btn btn-default" :title="'Reset to default' | trans"><i class="fa fa-refresh"></i></button>
-            <div v-if="hasHelp()" data-toggle="tooltip" :title="getHelp" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
-        </div>
-    </div>
+    <toggle-button
+        :name="name"
+        :value="value"
+        @change="$emit('change', $event.target.value)"
+        :sync="true"
+        :required="required"
+        :disabled="disabled"
+        :title="disabled ? trans('settings.readonly') : false"
+    ></toggle-button>
 </template>
 
 <script>

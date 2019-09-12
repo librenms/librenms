@@ -35,7 +35,7 @@
         <tab v-for="(sections, tab) in groups" :key="tab" :name="tab" :selected="tab === active_tab">
             <accordion>
                 <accordion-item v-for="(items, section) in groups[tab]" :key="section" :name="section">
-                    <component v-for="setting in items" :key="setting" :is="getComponent(setting)" :setting="settings[setting]">{{ setting }}</component>
+                    <librenms-setting v-for="setting in items" :key="setting" :setting="settings[setting]"></librenms-setting>
                 </accordion-item>
             </accordion>
         </tab>
@@ -84,11 +84,6 @@
 
                 // set groups to trigger reactivity (also sort)
                 this.groups = Object.keys(groups).sort().reduce((a, c) => (a[c] = groups[c], a), {});
-            },
-            getComponent(setting) {
-                const type = this.settings[setting].type;
-                const component = 'Setting' + type.charAt(0).toUpperCase() + type.toString().slice(1);
-                return typeof Vue.options.components[component] !== 'undefined' ? component : 'SettingNull';
             }
         },
         mounted() {

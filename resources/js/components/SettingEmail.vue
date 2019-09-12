@@ -23,13 +23,23 @@
   -->
 
 <template>
-    <div>Email: {{ setting.name }}</div>
+    <input type="email" class="form-control validation"
+           :name="name"
+           :value="value"
+           @input="$emit('input', $event.target.value)"
+           :pattern="pattern"
+           :required="required"
+           :disabled="disabled"
+           :title="disabled ? trans('settings.readonly') : false"
+    >
 </template>
 
 <script>
+    import BaseSetting from "./BaseSetting";
+
     export default {
         name: "SettingEmail",
-        props: ['setting']
+        mixins: [BaseSetting]
     }
 </script>
 

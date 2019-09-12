@@ -23,13 +23,24 @@
   -->
 
 <template>
-    <div>Select: {{ setting.name }}</div>
+    <select class="form-control bootselect"
+            :name="name"
+            :value="value"
+            @input="$emit('input', $event.target.value)"
+            :required="required"
+            :disabled="disabled"
+            :title="disabled ? trans('settings.readonly') : false"
+    >
+        <option v-for="(text, option) in options" :value="option" :selected="value === option" v-text="text"></option>
+    </select>
 </template>
 
 <script>
+    import BaseSetting from "./BaseSetting";
+
     export default {
         name: "SettingSelect",
-        props: ['setting']
+        mixins: [BaseSetting]
     }
 </script>
 

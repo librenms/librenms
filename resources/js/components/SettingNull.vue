@@ -23,13 +23,13 @@
   -->
 
 <template>
-    <div>Invalid type for: {{ setting.name }}</div>
+    <div>Invalid type for: {{ name }}</div>
 </template>
 
 <script>
     export default {
         name: "SettingNull",
-        props: ['setting']
+        props: ['name']
     }
 </script>
 

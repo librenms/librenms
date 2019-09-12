@@ -2044,40 +2044,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "BaseSetting",
-  props: ['setting'],
-  data: function data() {
-    return {
-      value: this.setting.value
-    };
-  },
-  methods: {
-    commit: function commit() {
-      this.previous = this.saved;
+  props: {
+    name: {
+      type: String,
+      required: true
     },
-    getDescription: function getDescription() {
-      return this.trans('settings' + this.setting.name + '.description');
+    value: {
+      required: true
     },
-    getHelp: function getHelp() {
-      return this.trans('settings' + this.setting.name + '.help');
-    },
-    hasHelp: function hasHelp() {
-      return true; // TODO implement hasHelp
-    },
-    isReadOnly: function isReadOnly() {
-      return this.setting.overridden;
-    },
-    resetToDefault: function resetToDefault() {
-      this.value = this.setting["default"];
-    },
-    resetToInitial: function resetToInitial() {
-      this.value = this.setting.value;
-    },
-    showResetToDefault: function showResetToDefault() {
-      return this.setting["default"] !== null && this.value !== this.setting["default"];
-    },
-    showUndo: function showUndo() {
-      return this.setting.value !== this.value;
-    }
+    disabled: Boolean,
+    required: Boolean,
+    pattern: String,
+    options: Object
   }
 });
 
@@ -2167,9 +2145,59 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LibrenmsSetting",
-  props: ['name', 'units']
+  props: {
+    'setting': {
+      type: Object,
+      required: true
+    }
+  },
+  data: function data() {
+    return {
+      value: this.setting.value
+    };
+  },
+  methods: {
+    commit: function commit() {
+      this.previous = this.saved;
+    },
+    getDescription: function getDescription() {
+      return this.trans('settings' + this.setting.name + '.description');
+    },
+    getHelp: function getHelp() {
+      return this.trans('settings' + this.setting.name + '.help');
+    },
+    hasHelp: function hasHelp() {
+      return true; // TODO implement hasHelp
+    },
+    isReadOnly: function isReadOnly() {
+      return this.setting.overridden;
+    },
+    resetToDefault: function resetToDefault() {
+      this.value = this.setting["default"];
+    },
+    resetToInitial: function resetToInitial() {
+      this.value = this.setting.value;
+    },
+    showResetToDefault: function showResetToDefault() {
+      return this.setting["default"] !== null && this.value !== this.setting["default"];
+    },
+    showUndo: function showUndo() {
+      return this.setting.value !== this.value;
+    },
+    getComponent: function getComponent() {
+      var component = 'Setting' + this.setting.type.charAt(0).toUpperCase() + this.setting.type.toString().slice(1);
+      return typeof Vue.options.components[component] !== 'undefined' ? component : 'SettingNull';
+    }
+  }
 });
 
 /***/ }),
@@ -2272,11 +2300,6 @@ __webpack_require__.r(__webpack_exports__);
       this.groups = Object.keys(groups).sort().reduce(function (a, c) {
         return a[c] = groups[c], a;
       }, {});
-    },
-    getComponent: function getComponent(setting) {
-      var type = this.settings[setting].type;
-      var component = 'Setting' + type.charAt(0).toUpperCase() + type.toString().slice(1);
-      return typeof Vue.options.components[component] !== 'undefined' ? component : 'SettingNull';
     }
   },
   mounted: function mounted() {
@@ -2325,7 +2348,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingArray",
-  props: ['setting']
+  props: ['name']
 });
 
 /***/ }),
@@ -2340,20 +2363,6 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -2407,6 +2416,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
 //
 //
 //
@@ -2435,9 +2445,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingEmail",
-  props: ['setting']
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]]
 });
 
 /***/ }),
@@ -2487,23 +2506,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingInteger",
-  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]]
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]],
+  methods: {
+    parseNumber: function parseNumber(number) {
+      var value = parseFloat(number);
+      return isNaN(value) ? number : value;
+    }
+  }
 });
 
 /***/ }),
@@ -2547,7 +2559,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingNull",
-  props: ['setting']
+  props: ['name']
 });
 
 /***/ }),
@@ -2556,94 +2568,6 @@ __webpack_require__.r(__webpack_exports__);
 /*!**************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingPassword.vue?vue&type=script&lang=js& ***!
   \**************************************************************************************************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ __webpack_exports__["default"] = ({
-  name: "SettingPassword",
-  props: ['setting']
-});
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSelect.vue?vue&type=script&lang=js&":
-/*!************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingSelect.vue?vue&type=script&lang=js& ***!
-  \************************************************************************************************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ __webpack_exports__["default"] = ({
-  name: "SettingSelect",
-  props: ['setting']
-});
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingText.vue?vue&type=script&lang=js&":
-/*!**********************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingText.vue?vue&type=script&lang=js& ***!
-  \**********************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2660,6 +2584,105 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "SettingPassword",
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]]
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSelect.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingSelect.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "SettingSelect",
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]]
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingText.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingText.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
 //
 //
 //
@@ -29873,12 +29896,12 @@ var render = function() {
       "label",
       {
         staticClass: "col-sm-4 control-label",
-        attrs: { for: _vm.name, title: _vm.name }
+        attrs: { for: _vm.setting.name, title: _vm.setting.name }
       },
       [
         _vm._v("\n        " + _vm._s(_vm.getDescription()) + "\n        "),
-        _vm.units !== null
-          ? _c("span", [_vm._v("(" + _vm._s(_vm.units) + ")")])
+        _vm.setting.units !== null
+          ? _c("span", [_vm._v("(" + _vm._s(_vm.setting.units) + ")")])
           : _vm._e()
       ]
     ),
@@ -29887,11 +29910,27 @@ var render = function() {
       "div",
       { staticClass: "col-sm-6 col-lg-4" },
       [
-        _vm._t("default", [_vm._v("Undefined!")]),
+        _c(_vm.getComponent(), {
+          tag: "component",
+          attrs: {
+            name: _vm.setting.name,
+            pattern: _vm.setting.pattern,
+            disabled: _vm.setting.overridden,
+            required: _vm.setting.required,
+            options: _vm.setting.options
+          },
+          model: {
+            value: _vm.value,
+            callback: function($$v) {
+              _vm.value = $$v
+            },
+            expression: "value"
+          }
+        }),
         _vm._v(" "),
         _c("span", { staticClass: "form-control-feedback" })
       ],
-      2
+      1
     ),
     _vm._v(" "),
     _c("div", { staticClass: "col-sm-2" }, [
@@ -30025,15 +30064,10 @@ var render = function() {
                   "accordion-item",
                   { key: section, attrs: { name: section } },
                   _vm._l(items, function(setting) {
-                    return _c(
-                      _vm.getComponent(setting),
-                      {
-                        key: setting,
-                        tag: "component",
-                        attrs: { setting: _vm.settings[setting] }
-                      },
-                      [_vm._v(_vm._s(setting))]
-                    )
+                    return _c("librenms-setting", {
+                      key: setting,
+                      attrs: { setting: _vm.settings[setting] }
+                    })
                   }),
                   1
                 )
@@ -30070,7 +30104,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Array: " + _vm._s(_vm.setting.name))])
+  return _c("div", [_vm._v("Array: " + _vm._s(_vm.name))])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -30094,88 +30128,21 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { class: ["form-group", "has-feedback", _vm.setting.class] },
-    [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-4 control-label",
-          attrs: { for: _vm.setting.name, title: _vm.setting.name }
-        },
-        [_vm._v(_vm._s(_vm.getDescription()))]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "col-sm-6 col-lg-4" },
-        [
-          _c("toggle-button", {
-            attrs: {
-              sync: true,
-              name: _vm.setting.name,
-              disabled: _vm.isReadOnly(),
-              title: _vm.isReadOnly() ? _vm.trans("settings.readonly") : false
-            },
-            model: {
-              value: _vm.value,
-              callback: function($$v) {
-                _vm.value = $$v
-              },
-              expression: "value"
-            }
-          })
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-2" }, [
-        _c(
-          "button",
-          {
-            directives: [
-              {
-                name: "show",
-                rawName: "v-show",
-                value: _vm.showUndo(),
-                expression: "showUndo()"
-              }
-            ],
-            staticClass: "btn btn-primary",
-            attrs: { title: _vm._f("trans")("Undo") },
-            on: { click: _vm.resetToInitial }
-          },
-          [_c("i", { staticClass: "fa fa-undo" })]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            directives: [
-              {
-                name: "show",
-                rawName: "v-show",
-                value: _vm.showResetToDefault(),
-                expression: "showResetToDefault()"
-              }
-            ],
-            staticClass: "btn btn-default",
-            attrs: { title: _vm._f("trans")("Reset to default") },
-            on: { click: _vm.resetToDefault }
-          },
-          [_c("i", { staticClass: "fa fa-refresh" })]
-        ),
-        _vm._v(" "),
-        _vm.hasHelp()
-          ? _c("div", {
-              staticClass: "toolTip fa fa-fw fa-lg fa-question-circle",
-              attrs: { "data-toggle": "tooltip", title: _vm.getHelp }
-            })
-          : _vm._e()
-      ])
-    ]
-  )
+  return _c("toggle-button", {
+    attrs: {
+      name: _vm.name,
+      value: _vm.value,
+      sync: true,
+      required: _vm.required,
+      disabled: _vm.disabled,
+      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+    },
+    on: {
+      change: function($event) {
+        return _vm.$emit("change", $event.target.value)
+      }
+    }
+  })
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -30199,7 +30166,23 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Email: " + _vm._s(_vm.setting.name))])
+  return _c("input", {
+    staticClass: "form-control validation",
+    attrs: {
+      type: "email",
+      name: _vm.name,
+      pattern: _vm.pattern,
+      required: _vm.required,
+      disabled: _vm.disabled,
+      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+    },
+    domProps: { value: _vm.value },
+    on: {
+      input: function($event) {
+        return _vm.$emit("input", $event.target.value)
+      }
+    }
+  })
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -30223,106 +30206,22 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { class: ["form-group", "has-feedback", _vm.setting.class] },
-    [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-4 control-label",
-          attrs: { for: _vm.setting.name, title: _vm.setting.name }
-        },
-        [
-          _vm._v("\n        " + _vm._s(_vm.getDescription()) + "\n        "),
-          _vm.setting.units !== null
-            ? _c("span", [_vm._v("(" + _vm._s(_vm.setting.units) + ")")])
-            : _vm._e()
-        ]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-6 col-lg-4" }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model.number",
-              value: _vm.value,
-              expression: "value",
-              modifiers: { number: true }
-            }
-          ],
-          staticClass: "form-control",
-          attrs: {
-            type: "number",
-            name: _vm.setting.name,
-            required: !!_vm.setting.required,
-            disabled: _vm.isReadOnly(),
-            title: _vm.isReadOnly() ? _vm.trans("settings.readonly") : false
-          },
-          domProps: { value: _vm.value },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.value = _vm._n($event.target.value)
-            },
-            blur: function($event) {
-              return _vm.$forceUpdate()
-            }
-          }
-        }),
-        _vm._v(" "),
-        _c("span", { staticClass: "form-control-feedback" })
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-2" }, [
-        _c(
-          "button",
-          {
-            directives: [
-              {
-                name: "show",
-                rawName: "v-show",
-                value: _vm.showUndo(),
-                expression: "showUndo()"
-              }
-            ],
-            staticClass: "btn btn-primary",
-            attrs: { title: _vm._f("trans")("Undo") },
-            on: { click: _vm.resetToInitial }
-          },
-          [_c("i", { staticClass: "fa fa-undo" })]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            directives: [
-              {
-                name: "show",
-                rawName: "v-show",
-                value: _vm.showResetToDefault(),
-                expression: "showResetToDefault()"
-              }
-            ],
-            staticClass: "btn btn-default",
-            attrs: { title: _vm._f("trans")("Reset to default") },
-            on: { click: _vm.resetToDefault }
-          },
-          [_c("i", { staticClass: "fa fa-refresh" })]
-        ),
-        _vm._v(" "),
-        _vm.hasHelp()
-          ? _c("div", {
-              staticClass: "toolTip fa fa-fw fa-lg fa-question-circle",
-              attrs: { "data-toggle": "tooltip", title: _vm.getHelp }
-            })
-          : _vm._e()
-      ])
-    ]
-  )
+  return _c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "number",
+      name: _vm.name,
+      required: _vm.required,
+      disabled: _vm.disabled,
+      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+    },
+    domProps: { value: _vm.value },
+    on: {
+      input: function($event) {
+        _vm.$emit("input", _vm.parseNumber($event.target.value))
+      }
+    }
+  })
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -30346,7 +30245,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Invalid type for: " + _vm._s(_vm.setting.name))])
+  return _c("div", [_vm._v("Invalid type for: " + _vm._s(_vm.name))])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -30370,7 +30269,23 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Password: " + _vm._s(_vm.setting.name))])
+  return _c("input", {
+    staticClass: "form-control validation",
+    attrs: {
+      type: "password",
+      name: _vm.name,
+      pattern: _vm.pattern,
+      required: _vm.required,
+      disabled: _vm.disabled,
+      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+    },
+    domProps: { value: _vm.value },
+    on: {
+      input: function($event) {
+        return _vm.$emit("input", $event.target.value)
+      }
+    }
+  })
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -30394,7 +30309,34 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Select: " + _vm._s(_vm.setting.name))])
+  return _c(
+    "select",
+    {
+      staticClass: "form-control bootselect",
+      attrs: {
+        name: _vm.name,
+        required: _vm.required,
+        disabled: _vm.disabled,
+        title: _vm.disabled ? _vm.trans("settings.readonly") : false
+      },
+      domProps: { value: _vm.value },
+      on: {
+        input: function($event) {
+          return _vm.$emit("input", $event.target.value)
+        }
+      }
+    },
+    _vm._l(_vm.options, function(text, option) {
+      return _c("option", {
+        domProps: {
+          value: option,
+          selected: _vm.value === option,
+          textContent: _vm._s(text)
+        }
+      })
+    }),
+    0
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -30418,98 +30360,23 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { class: ["form-group", "has-feedback", _vm.setting.class] },
-    [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-4 control-label",
-          attrs: { for: _vm.setting.name, title: _vm.setting.name }
-        },
-        [_vm._v(_vm._s(_vm.getDescription()))]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-6 col-lg-4" }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.value,
-              expression: "value"
-            }
-          ],
-          staticClass: "form-control validation",
-          attrs: {
-            type: "text",
-            name: _vm.setting.name,
-            pattern: _vm.setting.pattern,
-            required: !!_vm.setting.required,
-            disabled: _vm.isReadOnly(),
-            title: _vm.isReadOnly() ? _vm.trans("settings.readonly") : false
-          },
-          domProps: { value: _vm.value },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.value = $event.target.value
-            }
-          }
-        }),
-        _vm._v(" "),
-        _c("span", { staticClass: "form-control-feedback" })
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-2" }, [
-        _c(
-          "button",
-          {
-            directives: [
-              {
-                name: "show",
-                rawName: "v-show",
-                value: _vm.showUndo(),
-                expression: "showUndo()"
-              }
-            ],
-            staticClass: "btn btn-primary",
-            attrs: { title: _vm._f("trans")("Undo") },
-            on: { click: _vm.resetToInitial }
-          },
-          [_c("i", { staticClass: "fa fa-undo" })]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            directives: [
-              {
-                name: "show",
-                rawName: "v-show",
-                value: _vm.showResetToDefault(),
-                expression: "showResetToDefault()"
-              }
-            ],
-            staticClass: "btn btn-default",
-            attrs: { title: _vm._f("trans")("Reset to default") },
-            on: { click: _vm.resetToDefault }
-          },
-          [_c("i", { staticClass: "fa fa-refresh" })]
-        ),
-        _vm._v(" "),
-        _vm.hasHelp()
-          ? _c("div", {
-              staticClass: "toolTip fa fa-fw fa-lg fa-question-circle",
-              attrs: { "data-toggle": "tooltip", title: _vm.getHelp }
-            })
-          : _vm._e()
-      ])
-    ]
-  )
+  return _c("input", {
+    staticClass: "form-control validation",
+    attrs: {
+      type: "text",
+      name: _vm.name,
+      pattern: _vm.pattern,
+      required: _vm.required,
+      disabled: _vm.disabled,
+      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+    },
+    domProps: { value: _vm.value },
+    on: {
+      input: function($event) {
+        return _vm.$emit("input", $event.target.value)
+      }
+    }
+  })
 }
 var staticRenderFns = []
 render._withStripped = true

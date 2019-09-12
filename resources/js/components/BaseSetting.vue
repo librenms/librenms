@@ -25,40 +25,13 @@
 <script>
     export default {
         name: "BaseSetting",
-        props: ['setting'],
-        data() {
-            return {
-                value: this.setting.value
-            }
-        },
-        methods: {
-            commit() {
-                this.previous = this.saved
-            },
-            getDescription() {
-                return this.trans('settings' + this.setting.name + '.description')
-            },
-            getHelp() {
-                return this.trans('settings' + this.setting.name + '.help')
-            },
-            hasHelp() {
-                return true // TODO implement hasHelp
-            },
-            isReadOnly() {
-                return this.setting.overridden
-            },
-            resetToDefault() {
-                this.value = this.setting.default
-            },
-            resetToInitial() {
-                this.value = this.setting.value
-            },
-            showResetToDefault() {
-                return this.setting.default !== null && this.value !== this.setting.default
-            },
-            showUndo() {
-                return this.setting.value !== this.value
-            }
+        props: {
+            name: {type: String, required: true},
+            value: {required: true},
+            disabled: Boolean,
+            required: Boolean,
+            pattern: String,
+            options: Object
         }
     }
 </script>

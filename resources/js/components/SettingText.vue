@@ -23,25 +23,15 @@
   -->
 
 <template>
-    <div :class="['form-group', 'has-feedback', setting.class]">
-        <label :for="setting.name" class="col-sm-4 control-label" :title="setting.name">{{ getDescription() }}</label>
-        <div class="col-sm-6 col-lg-4">
-            <input type="text" class="form-control validation"
-                   v-model="value"
-                   :name="setting.name"
-                   :pattern="setting.pattern"
-                   :required="!!setting.required"
-                   :disabled="isReadOnly()"
-                   :title="isReadOnly() ? trans('settings.readonly') : false"
-            >
-            <span class="form-control-feedback"></span>
-        </div>
-        <div class="col-sm-2">
-            <button v-show="showUndo()" @click="resetToInitial" class="btn btn-primary" :title="'Undo' | trans"><i class="fa fa-undo"></i></button>
-            <button v-show="showResetToDefault()" @click="resetToDefault" class="btn btn-default" :title="'Reset to default' | trans"><i class="fa fa-refresh"></i></button>
-            <div v-if="hasHelp()" data-toggle="tooltip" :title="getHelp" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
-        </div>
-    </div>
+        <input type="text" class="form-control validation"
+               :name="name"
+               :value="value"
+               @input="$emit('input', $event.target.value)"
+               :pattern="pattern"
+               :required="required"
+               :disabled="disabled"
+               :title="disabled ? trans('settings.readonly') : false"
+        >
 </template>
 
 <script>
