@@ -30,7 +30,6 @@
         :sync="true"
         :required="required"
         :disabled="disabled"
-        :title="disabled ? trans('settings.readonly') : false"
     ></toggle-button>
 </template>
 

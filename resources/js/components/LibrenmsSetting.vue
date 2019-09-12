@@ -28,7 +28,7 @@
             {{ getDescription() }}
             <span v-if="setting.units !== null">({{ setting.units }})</span>
         </label>
-        <div class="col-sm-6 col-lg-4">
+        <div class="col-sm-6 col-lg-4" :title="setting.disabled ? trans('settings.readonly') : false">
             <component :is="getComponent()"
                        v-model="value"
                        :name="setting.name"
@@ -63,10 +63,15 @@
                 this.previous = this.saved
             },
             getDescription() {
-                return this.trans('settings.' + this.setting.name + '.description')
+                return this.trans('settings.settings.' + this.setting.name + '.description')
             },
             getHelp() {
-                return this.trans('settings.' + this.setting.name + '.help')
+                let help = this.trans('settings.settings.' + this.setting.name + '.help');
+                if (this.setting.overridden) {
+                    help += "\n" + this.trans('settings.readonly')
+                }
+
+                return help
             },
             hasHelp() {
                 return true // TODO implement hasHelp

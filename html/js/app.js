@@ -2170,10 +2170,16 @@ __webpack_require__.r(__webpack_exports__);
       this.previous = this.saved;
     },
     getDescription: function getDescription() {
-      return this.trans('settings.' + this.setting.name + '.description');
+      return this.trans('settings.settings.' + this.setting.name + '.description');
     },
     getHelp: function getHelp() {
-      return this.trans('settings.' + this.setting.name + '.help');
+      var help = this.trans('settings.settings.' + this.setting.name + '.help');
+
+      if (this.setting.overridden) {
+        help += "\n" + this.trans('settings.readonly');
+      }
+
+      return help;
     },
     hasHelp: function hasHelp() {
       return true; // TODO implement hasHelp
@@ -2426,7 +2432,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingBoolean",
@@ -2480,7 +2485,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingEmail",
@@ -2499,7 +2503,6 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
-//
 //
 //
 //
@@ -2637,7 +2640,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingPassword",
@@ -2692,7 +2694,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingSelect",
@@ -2711,7 +2712,6 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
-//
 //
 //
 //
@@ -29985,7 +29985,12 @@ var render = function() {
       _vm._v(" "),
       _c(
         "div",
-        { staticClass: "col-sm-6 col-lg-4" },
+        {
+          staticClass: "col-sm-6 col-lg-4",
+          attrs: {
+            title: _vm.setting.disabled ? _vm.trans("settings.readonly") : false
+          }
+        },
         [
           _c(_vm.getComponent(), {
             tag: "component",
@@ -30280,8 +30285,7 @@ var render = function() {
       value: _vm.value,
       sync: true,
       required: _vm.required,
-      disabled: _vm.disabled,
-      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+      disabled: _vm.disabled
     },
     on: {
       change: function($event) {
@@ -30319,8 +30323,7 @@ var render = function() {
       name: _vm.name,
       pattern: _vm.pattern,
       required: _vm.required,
-      disabled: _vm.disabled,
-      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+      disabled: _vm.disabled
     },
     domProps: { value: _vm.value },
     on: {
@@ -30358,8 +30361,7 @@ var render = function() {
       type: "number",
       name: _vm.name,
       required: _vm.required,
-      disabled: _vm.disabled,
-      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+      disabled: _vm.disabled
     },
     domProps: { value: _vm.value },
     on: {
@@ -30422,8 +30424,7 @@ var render = function() {
       name: _vm.name,
       pattern: _vm.pattern,
       required: _vm.required,
-      disabled: _vm.disabled,
-      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+      disabled: _vm.disabled
     },
     domProps: { value: _vm.value },
     on: {
@@ -30459,12 +30460,7 @@ var render = function() {
     "select",
     {
       staticClass: "form-control bootselect",
-      attrs: {
-        name: _vm.name,
-        required: _vm.required,
-        disabled: _vm.disabled,
-        title: _vm.disabled ? _vm.trans("settings.readonly") : false
-      },
+      attrs: { name: _vm.name, required: _vm.required, disabled: _vm.disabled },
       domProps: { value: _vm.value },
       on: {
         input: function($event) {
@@ -30513,8 +30509,7 @@ var render = function() {
       name: _vm.name,
       pattern: _vm.pattern,
       required: _vm.required,
-      disabled: _vm.disabled,
-      title: _vm.disabled ? _vm.trans("settings.readonly") : false
+      disabled: _vm.disabled
     },
     domProps: { value: _vm.value },
     on: {

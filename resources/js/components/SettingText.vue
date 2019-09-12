@@ -30,7 +30,6 @@
                :pattern="pattern"
                :required="required"
                :disabled="disabled"
-               :title="disabled ? trans('settings.readonly') : false"
         >
 </template>
 
