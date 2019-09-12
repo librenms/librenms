@@ -2009,6 +2009,77 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BaseSetting.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BaseSetting.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "BaseSetting",
+  props: ['setting'],
+  data: function data() {
+    return {
+      value: this.setting.value
+    };
+  },
+  methods: {
+    commit: function commit() {
+      this.previous = this.saved;
+    },
+    getHelp: function getHelp() {
+      return trans(this.setting.name + '.help');
+    },
+    hasHelp: function hasHelp() {
+      return true; // TODO implement hasHelp
+    },
+    isReadOnly: function isReadOnly() {
+      return this.setting.overridden;
+    },
+    resetToDefault: function resetToDefault() {
+      this.value = this.setting["default"];
+    },
+    resetToInitial: function resetToInitial() {
+      this.value = this.setting.value;
+    },
+    showResetToDefault: function showResetToDefault() {
+      return this.setting["default"] !== null && this.value !== this.setting["default"];
+    },
+    showUndo: function showUndo() {
+      return this.setting.value !== this.value;
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ExampleComponent.vue?vue&type=script&lang=js&":
 /*!***************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ExampleComponent.vue?vue&type=script&lang=js& ***!
@@ -2207,6 +2278,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
 //
 //
 //
@@ -2235,9 +2307,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingBoolean",
-  props: ['setting']
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]]
 });
 
 /***/ }),
@@ -2295,6 +2384,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
 //
 //
 //
@@ -2342,20 +2432,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingInteger",
-  props: ['setting']
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]]
 });
 
 /***/ }),
@@ -2501,6 +2581,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
 //
 //
 //
@@ -2529,9 +2610,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingText",
-  props: ['setting']
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]]
 });
 
 /***/ }),
@@ -29000,7 +29101,109 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Boolean: " + _vm._s(_vm.setting.name))])
+  return _c(
+    "div",
+    { class: ["form-group", "has-feedback", _vm.setting.class] },
+    [
+      _c(
+        "label",
+        {
+          staticClass: "col-sm-4 control-label",
+          attrs: { for: _vm.setting.name, title: _vm.setting.name }
+        },
+        [_vm._v("Description: " + _vm._s(_vm._f("trans")(_vm.setting.name)))]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-6 col-lg-4" }, [
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.value,
+              expression: "value"
+            }
+          ],
+          attrs: {
+            type: "checkbox",
+            id: _vm.setting.name,
+            name: _vm.setting.name,
+            disabled: _vm.isReadOnly(),
+            title: _vm.isReadOnly() ? _vm.trans("settings.readonly") : false
+          },
+          domProps: {
+            checked: Array.isArray(_vm.value)
+              ? _vm._i(_vm.value, null) > -1
+              : _vm.value
+          },
+          on: {
+            change: function($event) {
+              var $$a = _vm.value,
+                $$el = $event.target,
+                $$c = $$el.checked ? true : false
+              if (Array.isArray($$a)) {
+                var $$v = null,
+                  $$i = _vm._i($$a, $$v)
+                if ($$el.checked) {
+                  $$i < 0 && (_vm.value = $$a.concat([$$v]))
+                } else {
+                  $$i > -1 &&
+                    (_vm.value = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
+                }
+              } else {
+                _vm.value = $$c
+              }
+            }
+          }
+        })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-2" }, [
+        _c(
+          "button",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showUndo(),
+                expression: "showUndo()"
+              }
+            ],
+            staticClass: "btn btn-primary",
+            attrs: { title: _vm._f("trans")("Undo") },
+            on: { click: _vm.resetToInitial }
+          },
+          [_c("i", { staticClass: "fa fa-undo" })]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showResetToDefault(),
+                expression: "showResetToDefault()"
+              }
+            ],
+            staticClass: "btn btn-default",
+            attrs: { title: _vm._f("trans")("Reset to default") },
+            on: { click: _vm.resetToDefault }
+          },
+          [_c("i", { staticClass: "fa fa-refresh" })]
+        ),
+        _vm._v(" "),
+        _vm.hasHelp()
+          ? _c("div", {
+              staticClass: "toolTip fa fa-fw fa-lg fa-question-circle",
+              attrs: { "data-toggle": "tooltip", title: _vm.getHelp }
+            })
+          : _vm._e()
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -29048,7 +29251,108 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Integer: " + _vm._s(_vm.setting.name))])
+  return _c(
+    "div",
+    { class: ["form-group", "has-feedback", _vm.setting.class] },
+    [
+      _c(
+        "label",
+        {
+          staticClass: "col-sm-4 control-label",
+          attrs: { for: _vm.setting.name, title: _vm.setting.name }
+        },
+        [
+          _vm._v(
+            "\n            Description here " +
+              _vm._s(_vm.setting.name) +
+              "\n            "
+          ),
+          _vm.setting.units !== null
+            ? _c("span", [_vm._v("(" + _vm._s(_vm.setting.units) + ")")])
+            : _vm._e()
+        ]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-6 col-lg-4" }, [
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model.number",
+              value: _vm.value,
+              expression: "value",
+              modifiers: { number: true }
+            }
+          ],
+          staticClass: "form-control",
+          attrs: {
+            type: "number",
+            name: _vm.setting.name,
+            required: !!_vm.setting.required
+          },
+          domProps: { value: _vm.value },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.value = _vm._n($event.target.value)
+            },
+            blur: function($event) {
+              return _vm.$forceUpdate()
+            }
+          }
+        }),
+        _vm._v(" "),
+        _c("span", { staticClass: "form-control-feedback" })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-2" }, [
+        _c(
+          "button",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showUndo(),
+                expression: "showUndo()"
+              }
+            ],
+            staticClass: "btn btn-primary",
+            attrs: { title: _vm._f("trans")("Undo") },
+            on: { click: _vm.resetToInitial }
+          },
+          [_c("i", { staticClass: "fa fa-undo" })]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showResetToDefault(),
+                expression: "showResetToDefault()"
+              }
+            ],
+            staticClass: "btn btn-default",
+            attrs: { title: _vm._f("trans")("Reset to default") },
+            on: { click: _vm.resetToDefault }
+          },
+          [_c("i", { staticClass: "fa fa-refresh" })]
+        ),
+        _vm._v(" "),
+        _vm.hasHelp()
+          ? _c("div", {
+              staticClass: "toolTip fa fa-fw fa-lg fa-question-circle",
+              attrs: { "data-toggle": "tooltip", title: _vm.getHelp }
+            })
+          : _vm._e()
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -29144,7 +29448,101 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Text: " + _vm._s(_vm.setting.name))])
+  return _c(
+    "div",
+    { class: ["form-group", "has-feedback", _vm.setting.class] },
+    [
+      _c(
+        "label",
+        {
+          staticClass: "col-sm-4 control-label",
+          attrs: { for: _vm.setting.name, title: _vm.setting.name }
+        },
+        [_vm._v("Description: " + _vm._s(_vm._f("trans")(_vm.setting.name)))]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-6 col-lg-4" }, [
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.value,
+              expression: "value"
+            }
+          ],
+          staticClass: "form-control validation",
+          attrs: {
+            type: "text",
+            id: _vm.setting.name,
+            name: _vm.setting.name,
+            pattern: _vm.setting.pattern,
+            required: !!_vm.setting.required,
+            disabled: _vm.settings.overridden,
+            title: _vm.settings.overridden
+              ? _vm.trans("settings.readonly")
+              : undefined
+          },
+          domProps: { value: _vm.value },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.value = $event.target.value
+            }
+          }
+        }),
+        _vm._v(" "),
+        _c("span", { staticClass: "form-control-feedback" })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm-2" }, [
+        _c(
+          "button",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showUndo(),
+                expression: "showUndo()"
+              }
+            ],
+            staticClass: "btn btn-primary",
+            attrs: { title: _vm._f("trans")("Undo") },
+            on: { click: _vm.resetToInitial }
+          },
+          [_c("i", { staticClass: "fa fa-undo" })]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showResetToDefault(),
+                expression: "showResetToDefault()"
+              }
+            ],
+            staticClass: "btn btn-default",
+            attrs: { title: _vm._f("trans")("Reset to default") },
+            on: { click: _vm.resetToDefault }
+          },
+          [_c("i", { staticClass: "fa fa-refresh" })]
+        ),
+        _vm._v(" "),
+        _vm.hasHelp()
+          ? _c("div", {
+              staticClass: "toolTip fa fa-fw fa-lg fa-question-circle",
+              attrs: { "data-toggle": "tooltip", title: _vm.getHelp }
+            })
+          : _vm._e()
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -41449,6 +41847,7 @@ module.exports = function(module) {
 var map = {
 	"./components/Accordion.vue": "./resources/js/components/Accordion.vue",
 	"./components/AccordionItem.vue": "./resources/js/components/AccordionItem.vue",
+	"./components/BaseSetting.vue": "./resources/js/components/BaseSetting.vue",
 	"./components/ExampleComponent.vue": "./resources/js/components/ExampleComponent.vue",
 	"./components/LibrenmsSettings.vue": "./resources/js/components/LibrenmsSettings.vue",
 	"./components/SettingArray.vue": "./resources/js/components/SettingArray.vue",
@@ -41526,11 +41925,23 @@ Vue.mixin({
     route: route
   }
 });
+Vue.filter('trans', function () {
+  var _lang;
+
+  return arguments.length <= 0 ? undefined : arguments[0];
+  return (_lang = lang).get.apply(_lang, arguments); // TODO implement translation
+});
+
+Vue.prototype.trans = function (text) {
+  return text;
+  return lang.get(text);
+};
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+
 
 var app = new Vue({
   el: '#app'
@@ -41747,6 +42158,56 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AccordionItem_vue_vue_type_template_id_bf6d92c0_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
+
+/***/ }),
+
+/***/ "./resources/js/components/BaseSetting.vue":
+/*!*************************************************!*\
+  !*** ./resources/js/components/BaseSetting.vue ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseSetting_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting.vue?vue&type=script&lang=js& */ "./resources/js/components/BaseSetting.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+var render, staticRenderFns
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__["default"])(
+  _BaseSetting_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"],
+  render,
+  staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/BaseSetting.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/BaseSetting.vue?vue&type=script&lang=js&":
+/*!**************************************************************************!*\
+  !*** ./resources/js/components/BaseSetting.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BaseSetting_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./BaseSetting.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BaseSetting.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BaseSetting_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 

@@ -100,7 +100,8 @@
         "group": "alerting",
         "section": "general",
         "order": 8,
-        "type": "integer"
+        "type": "integer",
+        "units": "m"
     },
     "alert.users": {
         "default": false,

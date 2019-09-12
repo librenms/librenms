@@ -28,6 +28,14 @@ Vue.mixin({
         route: route
     }
 });
+Vue.filter('trans', (...args) => {
+    return args[0];
+    return lang.get(...args); // TODO implement translation
+});
+Vue.prototype.trans = text => {
+    return text;
+    return lang.get(text);
+};
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

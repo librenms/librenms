@@ -23,43 +23,34 @@
   -->
 
 <template>
-<!--    <div class="form-group has-feedback "> {{ $config->class }}-->
-<!--        <label for="{{ $config->name }}" class="col-sm-4 control-label" title="{{ $config->name }}">-->
-<!--            {{ $config->getDescription() }}-->
-<!--            @if($config->hasUnits()) ({{ $config->getUnits() }}) @endif-->
-<!--        </label>-->
-<!--        <div class="col-sm-6 col-lg-4">-->
-<!--            <input type="number" class="form-control"-->
-<!--                   name="{{ $config->name }}"-->
-<!--                   value="{{ $config->value }}"-->
-<!--                   @if($config->required) required @endif-->
+    <div :class="['form-group', 'has-feedback', setting.class]">
+        <label :for="setting.name" class="col-sm-4 control-label" :title="setting.name">
+            Description here {{ setting.name }}
+            <span v-if="setting.units !== null">({{ setting.units }})</span>
+        </label>
+        <div class="col-sm-6 col-lg-4">
+            <input type="number" class="form-control"
+                   v-model.number="value"
+                   :name="setting.name"
+                   :required="!!setting.required"
+                   >
 <!--            @if(in_array($config->name, $readonly)) disabled title="@lang('settings.readonly')" @endif-->
-<!--            >-->
-<!--            <span class="form-control-feedback"></span>-->
-<!--        </div>-->
-<!--        <div class="col-sm-2">-->
-<!--            <button class="config-undo btn btn-primary"-->
-<!--                    title="@lang('Undo')"-->
-<!--                    data-target="{{ $config->name }}"-->
-<!--                    style="display: none;"-->
-<!--            ><i class="fa fa-undo"></i></button>-->
-<!--            <button class="config-default btn btn-default"-->
-<!--                    title="@lang('Reset to default')"-->
-<!--                    data-target="{{ $config->name }}"-->
-<!--                    @if(empty($config->default) || $config->value == $config->default) style="display: none;" @endif-->
-<!--                ><i class="fa fa-refresh"></i></button>-->
-<!--            @if($config->hasHelp())-->
-<!--            <div data-toggle="tooltip" title="{{ $config->getHelp() }}" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>-->
-<!--            @endif-->
-<!--        </div>-->
-<!--    </div>-->
-    <div>Integer: {{ setting.name }}</div>
+            <span class="form-control-feedback"></span>
+        </div>
+        <div class="col-sm-2">
+            <button v-show="showUndo()" @click="resetToInitial" class="btn btn-primary" :title="'Undo' | trans"><i class="fa fa-undo"></i></button>
+            <button v-show="showResetToDefault()" @click="resetToDefault" class="btn btn-default" :title="'Reset to default' | trans"><i class="fa fa-refresh"></i></button>
+            <div v-if="hasHelp()" data-toggle="tooltip" :title="getHelp" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
+        </div>
+    </div>
 </template>
 
 <script>
+    import BaseSetting from "./BaseSetting";
+
     export default {
         name: "SettingInteger",
-        props: ['setting']
+        mixins: [BaseSetting],
     }
 </script>
 
