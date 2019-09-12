@@ -31,11 +31,12 @@
                 </div>
             </form>
         </template>
-        <tab v-for="(groups, tab) in sections" :key="tab" :name="tab" :selected="tab === active_tab">
+        <tab name="global"></tab>
+        <tab v-for="(sections, tab) in groups" :key="tab" :name="tab" :selected="tab === active_tab">
             <accordion>
-                <accordion-item v-for="group in groups" :name="group">
+                <accordion-item v-for="(items, section) in groups[tab]" :key="section" :name="section">
                     <ul>
-                        <li v-for="setting in getSectionSettings(tab, group)">{{ setting.name }}</li>
+                        <li v-for="setting in items">{{ settings[setting].name }}</li>
                     </ul>
                 </accordion-item>
             </accordion>
@@ -46,30 +47,49 @@
 <script>
     export default {
         name: "LibrenmsSettings",
-        props: ['sections'],
-        data: function () {
+        data() {
             return {
                 active_tab: 'alerting',
                 active_section: '',
                 search_phrase: '',
-                settings: {}
+                settings: {},
+                groups: {}
             }
         },
         methods: {
-            getSectionSettings: function (group, section) {
-                let settings = this.settings;
-                return Object.keys(settings).reduce(function (acc, val) {
-                    return (settings[val]['group'] !== group && settings[val]['section'] !== section) ? acc : {
-                        ...acc,
-                        [val]: settings[val]
-                    };
-                }, {});
+            loadData(response) {
+                this.settings = response.data;
 
+                // populate layout data
+                let groups = {};
+                for (const key of Object.keys(this.settings)) {
+                    let setting = this.settings[key];
+                    if (setting.group) {
+                        if (!(setting.group in groups)) {
+                            groups[setting.group] = {};
+                        }
+
+                        if (setting.section) {
+                            if (!(setting.section in groups[setting.group])) {
+                                groups[setting.group][setting.section] = [];
+                            }
+
+                            // insert based on order
+                            groups[setting.group][setting.section].splice(setting.order, 0, setting.name);
+                        }
+                    }
+                }
+                let sorted = {};
+                Object.keys(groups).sort().forEach(function(key) {
+                    sorted[key] = groups[key];
+                });
+
+                // set groups to trigger reactivity (also sort)
+                this.groups = Object.keys(groups).sort().reduce((a, c) => (a[c] = groups[c], a), {});
             }
         },
         mounted() {
-            axios.get(route('settings.list'))
-                .then(response => (this.settings = response.data))
+            axios.get(route('settings.list')).then(this.loadData)
         }
     }
 </script>

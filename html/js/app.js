@@ -2125,10 +2125,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
+//
 //
 //
 //
@@ -2176,29 +2173,53 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LibrenmsSettings",
-  props: ['sections'],
   data: function data() {
     return {
       active_tab: 'alerting',
       active_section: '',
       search_phrase: '',
-      settings: {}
+      settings: {},
+      groups: {}
     };
   },
   methods: {
-    getSectionSettings: function getSectionSettings(group, section) {
-      var settings = this.settings;
-      return Object.keys(settings).reduce(function (acc, val) {
-        return settings[val]['group'] !== group && settings[val]['section'] !== section ? acc : _objectSpread({}, acc, _defineProperty({}, val, settings[val]));
+    loadData: function loadData(response) {
+      this.settings = response.data; // populate layout data
+
+      var groups = {};
+
+      for (var _i = 0, _Object$keys = Object.keys(this.settings); _i < _Object$keys.length; _i++) {
+        var key = _Object$keys[_i];
+        var setting = this.settings[key];
+
+        if (setting.group) {
+          if (!(setting.group in groups)) {
+            groups[setting.group] = {};
+          }
+
+          if (setting.section) {
+            if (!(setting.section in groups[setting.group])) {
+              groups[setting.group][setting.section] = [];
+            } // insert based on order
+
+
+            groups[setting.group][setting.section].splice(setting.order, 0, setting.name);
+          }
+        }
+      }
+
+      var sorted = {};
+      Object.keys(groups).sort().forEach(function (key) {
+        sorted[key] = groups[key];
+      }); // set groups to trigger reactivity (also sort)
+
+      this.groups = Object.keys(groups).sort().reduce(function (a, c) {
+        return a[c] = groups[c], a;
       }, {});
     }
   },
   mounted: function mounted() {
-    var _this = this;
-
-    axios.get(route('settings.list')).then(function (response) {
-      return _this.settings = response.data;
-    });
+    axios.get(route('settings.list')).then(this.loadData);
   }
 });
 
@@ -28560,25 +28581,31 @@ var render = function() {
     },
     [
       _vm._v(" "),
-      _vm._l(_vm.sections, function(groups, tab) {
+      _c("tab", { attrs: { name: "global" } }),
+      _vm._v(" "),
+      _vm._l(_vm.groups, function(sections, tab) {
         return _c(
           "tab",
           { key: tab, attrs: { name: tab, selected: tab === _vm.active_tab } },
           [
             _c(
               "accordion",
-              _vm._l(groups, function(group) {
-                return _c("accordion-item", { attrs: { name: group } }, [
-                  _c(
-                    "ul",
-                    _vm._l(_vm.getSectionSettings(tab, group), function(
-                      setting
-                    ) {
-                      return _c("li", [_vm._v(_vm._s(setting.name))])
-                    }),
-                    0
-                  )
-                ])
+              _vm._l(_vm.groups[tab], function(items, section) {
+                return _c(
+                  "accordion-item",
+                  { key: section, attrs: { name: section } },
+                  [
+                    _c(
+                      "ul",
+                      _vm._l(items, function(setting) {
+                        return _c("li", [
+                          _vm._v(_vm._s(_vm.settings[setting].name))
+                        ])
+                      }),
+                      0
+                    )
+                  ]
+                )
               }),
               1
             )

@@ -5,7 +5,7 @@
 @section('content')
 <div class="container">
     <div id="app">
-    <librenms-settings :sections='{!! json_encode($sections) !!}'></librenms-settings>
+    <librenms-settings></librenms-settings>
     </div>
     <div class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
@@ -16,7 +16,7 @@
                     </li>
                 @endforeach
                 <li class="pull-right">
-                    @include('settings.search')
+{{--                    @include('settings.search')--}}
                 </li>
             </ul>
         </div>
