@@ -169,7 +169,7 @@
         "group": "webui",
         "section": "graph",
         "order": 4,
-        "type": "booean"
+        "type": "boolean"
     },
     "allow_unauth_graphs_cidr": {
         "default": [],

@@ -53,12 +53,12 @@
 <!--            @endif-->
 <!--        </div>-->
 <!--    </div>-->
-
+    <div>Integer: {{ setting.name }}</div>
 </template>
 
 <script>
     export default {
-        name: "IntegerSetting",
+        name: "SettingInteger",
         props: ['setting']
     }
 </script>

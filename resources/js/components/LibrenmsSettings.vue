@@ -35,9 +35,7 @@
         <tab v-for="(sections, tab) in groups" :key="tab" :name="tab" :selected="tab === active_tab">
             <accordion>
                 <accordion-item v-for="(items, section) in groups[tab]" :key="section" :name="section">
-                    <ul>
-                        <li v-for="setting in items">{{ settings[setting].name }}</li>
-                    </ul>
+                    <component v-for="setting in items" :key="setting" :is="getComponent(setting)" :setting="settings[setting]">{{ setting }}</component>
                 </accordion-item>
             </accordion>
         </tab>
@@ -86,6 +84,20 @@
 
                 // set groups to trigger reactivity (also sort)
                 this.groups = Object.keys(groups).sort().reduce((a, c) => (a[c] = groups[c], a), {});
+            },
+            getComponent(setting) {
+                const type = this.settings[setting].type;
+
+                switch(type) {
+                    case 'array': return 'SettingArray';
+                    case 'boolean': return 'SettingBoolean';
+                    case 'email': return 'SettingEmail';
+                    case 'integer': return 'SettingInteger';
+                    case 'password': return 'SettingPassword';
+                    case 'select': return 'SettingSelect';
+                    case 'text': return 'SettingText';
+                    default: return 'SettingNull';
+                }
             }
         },
         mounted() {
