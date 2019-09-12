@@ -34,7 +34,7 @@
         <tab name="global"></tab>
         <tab v-for="(sections, tab) in groups" :key="tab" :name="tab" :selected="tab === active_tab">
             <accordion>
-                <accordion-item v-for="(items, section) in groups[tab]" :key="section" :name="section">
+                <accordion-item v-for="(items, section) in groups[tab]" :key="section" :name="section" :active="section === active_section">
                     <form class="form-horizontal">
                         <librenms-setting v-for="setting in items" :key="setting" :setting="settings[setting]"></librenms-setting>
                     </form>
@@ -47,9 +47,10 @@
 <script>
     export default {
         name: "LibrenmsSettings",
+        props: ['prefix'],
         data() {
             return {
-                active_tab: 'alerting',
+                active_tab: '',
                 active_section: '',
                 search_phrase: '',
                 settings: {},
@@ -80,15 +81,28 @@
                     }
                 }
                 let sorted = {};
-                Object.keys(groups).sort().forEach(function(key) {
+                Object.keys(groups).sort().forEach(function (key) {
                     sorted[key] = groups[key];
                 });
 
                 // set groups to trigger reactivity (also sort)
                 this.groups = Object.keys(groups).sort().reduce((a, c) => (a[c] = groups[c], a), {});
+            },
+            parseUrl() {
+                let search = window.location.toString().match(new RegExp(this.prefix + '/?(?<tab>[^/]*)/?(?<setting>[^/]*)'));
+                let tab = search ? search.groups.tab : '';
+                let section = (search && search.groups.setting) ?
+                    ((search.setting in this.settings) ? this.settings[search.groups.setting].section : search.groups.setting)
+                    : '';
+
+                return {tab: tab, section: section}
             }
         },
         mounted() {
+            let location = this.parseUrl();
+            this.active_tab = location.tab;
+            this.active_section = location.section;
+            // window.history.pushState(group, '', '/settings/' + group)
             axios.get(route('settings.list')).then(this.loadData)
         }
     }

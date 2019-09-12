@@ -59,6 +59,7 @@
                 this.tabs.forEach(tab => {
                     tab.isActive = (tab.name === selectedTab.name);
                 });
+                this.$emit('tab-selected', selectedTab.name)
             }
         }
     }

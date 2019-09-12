@@ -39,12 +39,6 @@
                 default: false
             }
         },
-        data() {
-            return {
-                groupId: null,
-                prefix: 'vue'
-            }
-        },
         methods: {
             setActive(name) {
                 this.$children.forEach((item, index) => {
@@ -65,14 +59,6 @@
         },
         mounted() {
             this.$on('active-changed', this.activeChanged);
-
-            this.groupId = this.$el.id;
-
-            // TODO url parsing doesn't belong here
-            let search = window.location.toString().match(new RegExp(this.prefix + '/?(?<tab>[^/]*)/?(?<setting>[^/]*)'));
-            if (search && search.groups.setting) {
-                this.setActive(search.groups.setting)
-            }
         }
     }
 </script>

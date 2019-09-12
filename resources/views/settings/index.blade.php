@@ -5,7 +5,7 @@
 @section('content')
 <div class="container">
     <div id="app">
-    <librenms-settings></librenms-settings>
+    <librenms-settings prefix="{{ url('settings') }}"></librenms-settings>
     </div>
     <div class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
