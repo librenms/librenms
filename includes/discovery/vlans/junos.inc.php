@@ -99,7 +99,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             }
         } else {
             d_echo("JunOS: No tag/untagged interfaces found for L2 associated" .
-                   " with vlanID: $vlan_id - Index $vlan_index");            
+                   " with vlanID: $vlan_id - Index $vlan_index");
         }
     }
 }
