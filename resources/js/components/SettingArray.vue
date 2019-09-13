@@ -26,8 +26,8 @@
     <ul
         :title="disabled ? trans('setttings.readonly') : false"
     >
-        <li v-for="(item, index) in value">
-            <div class="input-group">
+        <draggable v-model="localList" @end="dragged()">
+            <div v-for="(item, index) in localList" class="input-group">
                 <span class="input-group-addon">{{ index+1 }}.</span>
                 <input type="text"
                        class="form-control"
@@ -40,55 +40,67 @@
                     <button v-if="!disabled" @click="removeItem(index)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
                 </span>
             </div>
-        </li>
-        <li v-if="!disabled">
+        </draggable>
+        <div v-if="!disabled">
             <div class="input-group">
                 <input type="text" v-model="newItem" @keyup.enter="addItem" class="form-control">
                 <span class="input-group-btn">
                     <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
                 </span>
             </div>
-        </li>
+        </div>
     </ul>
 </template>
 
 <script>
     import BaseSetting from "./BaseSetting";
+    import draggable from 'vuedraggable'
 
     export default {
         name: "SettingArray",
         mixins: [BaseSetting],
+        components: {
+            draggable,
+        },
         data() {
             return {
+                localList: this.value,
                 newItem: ""
             }
         },
         methods: {
             addItem() {
-                let newList = this.value;
-                newList.push(this.newItem);
-                this.$emit('input', newList);
+                this.localList.push(this.newItem);
+                this.$emit('input', this.localList);
                 this.newItem = "";
             },
             removeItem(index) {
-                let newList = this.value;
-                newList.splice(index, 1);
-                this.$emit('input', newList);
+                this.localList.splice(index, 1);
+                this.$emit('input', this.localList);
             },
             updateItem(index, value) {
-                let newList = this.value;
-                newList[index] = value;
-                this.$emit('input', newList);
+                this.localList[index] = value;
+                this.$emit('input', this.localList);
+            },
+            dragged() {
+                this.$emit('input', this.localList);
+            }
+        },
+        watch: {
+            value(updated) {
+                // careful to avoid loops with this
+                this.localList = updated;
             }
         }
     }
 </script>
 
 <style scoped>
-    ul {
-        list-style-type: none;
+    .input-group {
+        margin-bottom: 3px;
     }
-    li {
-        margin-bottom: 2px;
+
+    .input-group-addon {
+        cursor: move;
     }
 </style>

@@ -2372,10 +2372,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2386,30 +2382,32 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
+      localList: this.value,
       newItem: ""
     };
   },
   methods: {
     addItem: function addItem() {
-      var newList = this.value;
-      console.log(newList.push(this.newItem));
-      this.$emit('input', newList);
+      this.localList.push(this.newItem);
+      this.$emit('input', this.localList);
       this.newItem = "";
     },
     removeItem: function removeItem(index) {
-      var newList = this.value;
-      newList.splice(index, 1);
-      this.$emit('input', newList);
+      this.localList.splice(index, 1);
+      this.$emit('input', this.localList);
     },
     updateItem: function updateItem(index, value) {
-      var newList = this.value;
-      newList[index] = value;
-      this.$emit('input', newList);
+      this.localList[index] = value;
+      this.$emit('input', this.localList);
+    },
+    dragged: function dragged() {
+      this.$emit('input', this.localList);
     }
   },
-  computed: {
-    localList: function localList() {
-      return this.value;
+  watch: {
+    value: function value(updated) {
+      // careful to avoid loops with this
+      this.localList = updated;
     }
   }
 });
@@ -3070,7 +3068,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\nul[data-v-2cf33d54] {\n    list-style-type: none;\n}\nli[data-v-2cf33d54] {\n    margin-bottom: 2px;\n}\n.input-group-addon[data-v-2cf33d54] {\n    cursor: move;\n}\n", ""]);
+exports.push([module.i, "\n.input-group[data-v-2cf33d54] {\n    margin-bottom: 3px;\n}\n.input-group-addon[data-v-2cf33d54] {\n    cursor: move;\n}\n", ""]);
 
 // exports
 
@@ -32710,6 +32708,11 @@ var render = function() {
       _c(
         "draggable",
         {
+          on: {
+            end: function($event) {
+              return _vm.dragged()
+            }
+          },
           model: {
             value: _vm.localList,
             callback: function($$v) {
@@ -32718,66 +32721,52 @@ var render = function() {
             expression: "localList"
           }
         },
-        [
-          _c(
-            "transition-group",
-            _vm._l(_vm.value, function(item, index) {
-              return _c("div", [
-                _c("div", { staticClass: "input-group" }, [
-                  _c("span", { staticClass: "input-group-addon" }, [
-                    _vm._v(_vm._s(index + 1) + ".")
-                  ]),
-                  _vm._v(" "),
-                  _c("input", {
-                    staticClass: "form-control",
-                    attrs: { type: "text", readonly: _vm.disabled },
-                    domProps: { value: item },
-                    on: {
-                      blur: function($event) {
-                        return _vm.updateItem(index, $event.target.value)
-                      },
-                      keyup: function($event) {
-                        if (
-                          !$event.type.indexOf("key") &&
-                          _vm._k(
-                            $event.keyCode,
-                            "enter",
-                            13,
-                            $event.key,
-                            "Enter"
-                          )
-                        ) {
-                          return null
-                        }
-                        return _vm.updateItem(index, $event.target.value)
-                      }
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("span", { staticClass: "input-group-btn" }, [
-                    !_vm.disabled
-                      ? _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.removeItem(index)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-minus-circle" })]
-                        )
-                      : _vm._e()
-                  ])
-                ])
-              ])
+        _vm._l(_vm.localList, function(item, index) {
+          return _c("div", { staticClass: "input-group" }, [
+            _c("span", { staticClass: "input-group-addon" }, [
+              _vm._v(_vm._s(index + 1) + ".")
+            ]),
+            _vm._v(" "),
+            _c("input", {
+              staticClass: "form-control",
+              attrs: { type: "text", readonly: _vm.disabled },
+              domProps: { value: item },
+              on: {
+                blur: function($event) {
+                  return _vm.updateItem(index, $event.target.value)
+                },
+                keyup: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                  ) {
+                    return null
+                  }
+                  return _vm.updateItem(index, $event.target.value)
+                }
+              }
             }),
-            0
-          )
-        ],
-        1
+            _vm._v(" "),
+            _c("span", { staticClass: "input-group-btn" }, [
+              !_vm.disabled
+                ? _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-danger",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.removeItem(index)
+                        }
+                      }
+                    },
+                    [_c("i", { staticClass: "fa fa-minus-circle" })]
+                  )
+                : _vm._e()
+            ])
+          ])
+        }),
+        0
       ),
       _vm._v(" "),
       !_vm.disabled
