@@ -3,6 +3,11 @@ text: 'Eltek Valere eNexus'
 type: power
 icon: eltek
 nobulk: true
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_runtime, text: Runtime }
+    - { graph: device_voltage, text: Voltage }
+
 mib_dir:
     - eltek
 discovery:
