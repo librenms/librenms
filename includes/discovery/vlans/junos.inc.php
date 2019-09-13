@@ -93,10 +93,13 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
                 $f_portType = $tag['tag'] ? 'access' : 'trunk';
 
-                d_echo("JunOS:  port-ifIndex $ifIndex - is a $f_portType port");
+                d_echo("JunOS:  port-ifIndex $ifIndex - $f_portType port");
  
                 $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = $tag['tag'];
             }
+        } else {
+            d_echo("JunOS: No tag/untagged interfaces found for L2 associated" .
+                   " with vlanID: $vlan_id - Index $vlan_index");            
         }
     }
 }
