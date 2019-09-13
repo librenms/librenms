@@ -24,11 +24,11 @@
 
 <template>
     <ul
-        :title="disabled ? trans('setttings.readonly') : false"
+        v-tooltip="disabled ? trans('setttings.readonly') : false"
     >
-        <draggable v-model="localList" @end="dragged()">
+        <draggable v-model="localList" @end="dragged()" :disabled="disabled">
             <div v-for="(item, index) in localList" class="input-group">
-                <span class="input-group-addon">{{ index+1 }}.</span>
+                <span :class="['input-group-addon', disabled ? 'disabled' : '']">{{ index+1 }}.</span>
                 <input type="text"
                        class="form-control"
                        :value="item"
@@ -100,7 +100,7 @@
         margin-bottom: 3px;
     }
 
-    .input-group-addon {
+    .input-group-addon:not(.disabled) {
         cursor: move;
     }
 </style>

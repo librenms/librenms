@@ -31,7 +31,7 @@
                 </div>
             </form>
         </template>
-        <tab name="global"></tab>
+        <tab name="global">Global tab</tab>
         <tab v-for="(sections, group) in groups" :key="group" :name="group" :selected="group === tab">
             <accordion>
                 <accordion-item v-for="(items, section) in groups[group]" :key="section" :name="section" :active="section === activeSection">
@@ -47,7 +47,11 @@
 <script>
     export default {
         name: "LibrenmsSettings",
-        props: ['prefix', 'tab', 'section'],
+        props: {
+            prefix: String,
+            tab: {type: String, default: 'alerting'},
+            section: String
+        },
         data() {
             return {
                 search_phrase: '',
