@@ -1,0 +1,186 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.6.1.94.48.1",
+                    "sysDescr": "SG350X-48 48-Port Gigabit Stackable Managed Switch",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "ciscosb",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.6.1.94.48.1",
+                    "sysDescr": "SG350X-48 48-Port Gigabit Stackable Managed Switch",
+                    "sysContact": "<private>",
+                    "version": "Software ",
+                    "hardware": null,
+                    "features": null,
+                    "os": "ciscosb",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg",
+                    "location": "<private>"
+                }
+            ]
+        }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.9.6.1.101.1.8.0",
+                    "processor_index": "0",
+                    "processor_type": "ciscosb",
+                    "processor_usage": 13,
+                    "processor_descr": "CPU",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "current",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.52.7",
+                    "sensor_index": "52",
+                    "sensor_type": "rlPhyTestTableTxBias",
+                    "sensor_descr": " Bias Current",
+                    "group": null,
+                    "sensor_divisor": 1000000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0.019951,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "52",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "dbm",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.52.9",
+                    "sensor_index": "rx-52",
+                    "sensor_type": "rlPhyTestTableRxOpticalPower",
+                    "sensor_descr": " Receive Power",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": -10.926,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "52",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "dbm",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.52.8",
+                    "sensor_index": "tx-52",
+                    "sensor_type": "rlPhyTestTableTxOutput",
+                    "sensor_descr": " Transmit Power",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": -0.284,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "52",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.52.5",
+                    "sensor_index": "52",
+                    "sensor_type": "rlPhyTestTableTransceiverTemp",
+                    "sensor_descr": " Module",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 40,
+                    "sensor_limit": 60,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 30,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "52",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.52.6",
+                    "sensor_index": "52",
+                    "sensor_type": "rlPhyTestTableTransceiverSupply",
+                    "sensor_descr": " Supply Voltage",
+                    "group": null,
+                    "sensor_divisor": 1000000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.2656,
+                    "sensor_limit": 3.75544,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 2.77576,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "52",
+                    "entPhysicalIndex_measured": "ports",
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": []
+        },
+        "poller": "matches discovery"
+    }
+}
