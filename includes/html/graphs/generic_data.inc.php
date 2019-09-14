@@ -52,13 +52,19 @@ if ($_GET['previous'] == 'yes') {
     if ($multiplier) {
         $rrd_options .= ' DEF:p' . $out . 'octetsX=' . $rrd_filename_out . ':' . $ds_out . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' DEF:p' . $in . 'octetsX=' . $rrd_filename_in . ':' . $ds_in . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
+        $rrd_options .= ' DEF:p' . $out . 'octets_maxX=' . $rrd_filename_out . ':' . $ds_out . ':MAX:start=' . $prev_from . ':end=' . $from;
+        $rrd_options .= ' DEF:p' . $in . 'octets_maxX=' . $rrd_filename_in . ':' . $ds_in . ':MAX:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' SHIFT:p' . $out . "octetsX:$period";
         $rrd_options .= ' SHIFT:p' . $in . "octetsX:$period";
         $rrd_options .= " CDEF:inoctetsX=pinoctetsX,$multiplier,*";
         $rrd_options .= " CDEF:outoctetsX=poutoctetsX,$multiplier,*";
+        $rrd_options .= " CDEF:inoctets_maxX=pinoctets_maxX,$multiplier,*";
+        $rrd_options .= " CDEF:outoctets_maxX=poutoctets_maxX,$multiplier,*";
     } else {
         $rrd_options .= ' DEF:' . $out . 'octetsX=' . $rrd_filename_out . ':' . $ds_out . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' DEF:' . $in . 'octetsX=' . $rrd_filename_in . ':' . $ds_in . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
+        $rrd_options .= ' DEF:' . $out . 'octets_maxX=' . $rrd_filename_out . ':' . $ds_out . ':MAX:start=' . $prev_from . ':end=' . $from;
+        $rrd_options .= ' DEF:' . $in . 'octets_maxX=' . $rrd_filename_in . ':' . $ds_in . ':MAX:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' SHIFT:' . $out . "octetsX:$period";
         $rrd_options .= ' SHIFT:' . $in . "octetsX:$period";
     }
@@ -66,11 +72,19 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' CDEF:octetsX=inoctetsX,outoctetsX,+';
     $rrd_options .= ' CDEF:doutoctetsX=outoctetsX,' . $stacked['stacked'] . ',*';
     $rrd_options .= ' CDEF:outbitsX=outoctetsX,8,*';
+    $rrd_options .= ' CDEF:outbits_maxX=outoctets_maxX,8,*';
+    $rrd_options .= ' CDEF:doutoctets_maxX=outoctets_maxX,' . $stacked['stacked'] . ',*';
     $rrd_options .= ' CDEF:doutbitsX=doutoctetsX,8,*';
+    $rrd_options .= ' CDEF:doutbits_maxX=doutoctets_maxX,8,*';
     $rrd_options .= ' CDEF:inbitsX=inoctetsX,8,*';
+    $rrd_options .= ' CDEF:inbits_maxX=inoctets_maxX,8,*';
     $rrd_options .= ' VDEF:totinX=inoctetsX,TOTAL';
     $rrd_options .= ' VDEF:totoutX=outoctetsX,TOTAL';
     $rrd_options .= ' VDEF:totX=octetsX,TOTAL';
+    $rrd_options .= ' CDEF:dpercentile_outnX=doutbitsX,' . $stacked['stacked'] . ',*';
+    $rrd_options .= ' VDEF:dpercentile_outnpX=dpercentile_outnX,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' CDEF:dpercentile_outnpnX=doutbitsX,doutbitsX,-,dpercentile_outnpX,' . $stacked['stacked'] . ',*,+';
+    $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outnpnX,FIRST';
 }
 
 $rrd_options .= ' CDEF:octets=inoctets,outoctets,+';
@@ -86,6 +100,10 @@ $rrd_options .= ' CDEF:inbits_max=inoctets_max,8,*';
 if (Config::get('rrdgraph_real_percentile')) {
     $rrd_options .= ' CDEF:highbits=inoctets,outoctets,MAX,8,*';
     $rrd_options .= ' VDEF:percentilehigh=highbits,' . Config::get('percentile_value') . ',PERCENT';
+    if ($_GET['previous'] == 'yes') {
+        $rrd_options .= ' CDEF:highbitsX=inoctetsX,outoctetsX,MAX:start=' . $prev_from . ':end=' . $from . ',8,*';
+        $rrd_options .= ' VDEF:percentilehighX=highbitsX,' . Config::get('percentile_value') . ',PERCENT';
+    }
 }
 
 $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
@@ -99,11 +117,19 @@ $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 if ($format == 'octets' || $format == 'bytes') {
     $rrd_options .= ' VDEF:percentile_in=inoctets,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' VDEF:percentile_out=outoctets,' . Config::get('percentile_value') . ',PERCENT';
+    if ($_GET['previous'] == 'yes') {
+        $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . Config::get('percentile_value') . ',PERCENT';
+    }
     $units = 'Bps';
     $format = 'octets';
 } else {
     $rrd_options .= ' VDEF:percentile_in=inbits,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
+    if ($_GET['previous'] == 'yes') {
+        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
+    }
     $units = 'bps';
     $format = 'bits';
 }
@@ -151,8 +177,20 @@ if ($to > time()) {
 }
 
 if ($_GET['previous'] == 'yes') {
-    $rrd_options .= ' LINE1.25:in' . $format . "X#009900:'Prev In \\n'";
-    $rrd_options .= ' LINE1.25:dout' . $format . "X#000099:'Prev Out'";
+    $rrd_options .= " COMMENT:' \\n'";
+    $rrd_options .= ' LINE1.25:in' . $format . "X#333300:'Prev In '\t";
+    $rrd_options .= ' GPRINT:in' . $format . 'X:AVERAGE:%6.2lf%s';
+    $rrd_options .= ' GPRINT:in' . $format . '_maxX:MAX:%6.2lf%s';
+    $rrd_options .= " GPRINT:percentile_inX:%6.2lf%s\\n";
+    $rrd_options .= ' LINE1.25:dout' . $format . "X#000099:'Prev Out '\t";
+    $rrd_options .= ' GPRINT:out' . $format . 'X:AVERAGE:%6.2lf%s';
+    $rrd_options .= ' GPRINT:out' . $format . '_maxX:MAX:%6.2lf%s';
+    $rrd_options .= " GPRINT:percentile_outX:%6.2lf%s\\n";
+    $rrd_options .= " GPRINT:totX:'Total %6.2lf%sB'";
+    $rrd_options .= " GPRINT:totinX:'(In %6.2lf%sB'";
+    $rrd_options .= " GPRINT:totoutX:'Out %6.2lf%sB)\\l'";
+    $rrd_options .= ' LINE1:percentile_inX#00aaaa';
+    $rrd_options .= ' LINE1:dpercentile_outX#00aaaa';
 }
 
 unset($stacked);
