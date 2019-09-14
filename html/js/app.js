@@ -2349,8 +2349,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
     axios.get(route('settings.list')).then(this.loadData);
   },
-  tab: function tab(_tab) {
-    console.log('tab changed: ' + _tab);
+  computed: {// groups() {
+    //     this.settings
+    // }
   }
 });
 

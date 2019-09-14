@@ -124,6 +124,11 @@
         mounted() {
             window.onpopstate = this.handleBack; // handle back button
             axios.get(route('settings.list')).then(this.loadData)
+        },
+        computed: {
+            // groups() {
+            //     this.settings
+            // }
         }
     }
 </script>
