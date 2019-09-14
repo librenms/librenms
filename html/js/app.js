@@ -1868,8 +1868,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Accordion",
   props: {
@@ -1880,7 +1878,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     setActive: function setActive(name) {
-      this.$children.forEach(function (item, index) {
+      this.$children.forEach(function (item) {
         if (item.slug() === name) {
           item.isActive = true;
         }
@@ -1888,7 +1886,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     activeChanged: function activeChanged(name) {
       if (!this.multiple) {
-        this.$children.forEach(function (item, index) {
+        this.$children.forEach(function (item) {
           if (item.slug() !== name) {
             item.isActive = false;
           }
@@ -1897,7 +1895,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
-    this.$on('active-changed', this.activeChanged);
+    this.$on('expanded', this.activeChanged);
   }
 });
 
@@ -1978,10 +1976,11 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   watch: {
+    active: function active(_active) {
+      this.isActive = _active;
+    },
     isActive: function isActive(active) {
-      if (active) {
-        this.$parent.$emit('active-changed', this.slug());
-      }
+      this.$parent.$emit(active ? 'expanded' : 'collapsed', this.slug());
     }
   },
   methods: {
@@ -2201,6 +2200,14 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 //
 //
 //
@@ -2251,27 +2258,64 @@ __webpack_require__.r(__webpack_exports__);
   name: "LibrenmsSettings",
   props: {
     prefix: String,
-    tab: {
+    initialTab: {
       type: String,
       "default": 'alerting'
     },
-    section: String
+    initialSection: String
   },
   data: function data() {
     return {
+      tab: this.initialTab,
+      section: this.initialSection,
       search_phrase: '',
       settings: {},
       groups: {}
     };
   },
   methods: {
+    tabChanged: function tabChanged(group) {
+      if (this.tab !== group) {
+        this.tab = group;
+        this.section = null;
+        this.updateUrl();
+      }
+    },
+    sectionExpanded: function sectionExpanded(section) {
+      this.section = section;
+      this.updateUrl();
+    },
+    sectionCollapsed: function sectionCollapsed(section) {
+      if (this.section === section) {
+        // don't do anything if section was changed instead of just closed
+        this.section = null;
+        this.updateUrl();
+      }
+    },
+    updateUrl: function updateUrl() {
+      var slug = this.tab;
+
+      if (this.section) {
+        slug += '/' + this.section;
+      }
+
+      window.history.pushState(slug, '', this.prefix + '/' + slug);
+    },
+    handleBack: function handleBack(event) {
+      var _event$state$split = event.state.split('/');
+
+      var _event$state$split2 = _slicedToArray(_event$state$split, 2);
+
+      this.tab = _event$state$split2[0];
+      this.section = _event$state$split2[1];
+    },
     loadData: function loadData(response) {
       this.settings = response.data; // populate layout data
 
       var groups = {};
 
-      for (var _i = 0, _Object$keys = Object.keys(this.settings); _i < _Object$keys.length; _i++) {
-        var key = _Object$keys[_i];
+      for (var _i2 = 0, _Object$keys = Object.keys(this.settings); _i2 < _Object$keys.length; _i2++) {
+        var key = _Object$keys[_i2];
         var setting = this.settings[key];
 
         if (setting.group) {
@@ -2300,14 +2344,13 @@ __webpack_require__.r(__webpack_exports__);
       }, {});
     }
   },
-  computed: {
-    activeSection: function activeSection() {
-      return this.section in this.settings ? this.settings[this.section].section : this.section;
-    }
-  },
   mounted: function mounted() {
-    // window.history.pushState(group, '', '/settings/' + group)
+    window.onpopstate = this.handleBack; // handle back button
+
     axios.get(route('settings.list')).then(this.loadData);
+  },
+  tab: function tab(_tab) {
+    console.log('tab changed: ' + _tab);
   }
 });
 
@@ -2835,21 +2878,16 @@ __webpack_require__.r(__webpack_exports__);
       required: true
     },
     title: String,
-    selected: Boolean,
+    selected: {
+      type: Boolean,
+      "default": false
+    },
     icon: String
   },
   data: function data() {
     return {
-      isActive: false
+      isActive: this.selected
     };
-  },
-  computed: {
-    href: function href() {
-      return '#' + this.name.toLowerCase().replace(/ /g, '-');
-    }
-  },
-  mounted: function mounted() {
-    this.isActive = this.selected;
   }
 });
 
@@ -2913,20 +2951,30 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Tabs",
+  props: {
+    selected: String
+  },
   data: function data() {
     return {
-      tabs: []
+      tabs: [],
+      activeTab: null
     };
   },
   created: function created() {
     this.tabs = this.$children;
   },
-  methods: {
-    selectTab: function selectTab(selectedTab) {
+  mounted: function mounted() {
+    this.activeTab = this.selected;
+  },
+  watch: {
+    selected: function selected(name) {
+      this.activeTab = name;
+    },
+    activeTab: function activeTab(name) {
       this.tabs.forEach(function (tab) {
-        tab.isActive = tab.name === selectedTab.name;
+        return tab.isActive = tab.name === name;
       });
-      this.$emit('tab-selected', selectedTab.name);
+      this.$emit('tab-selected', name);
     }
   }
 });
@@ -36710,11 +36758,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    {
-      staticClass: "panel-group",
-      attrs: { role: "tablist" },
-      on: { "active-changed": _vm.activeChanged }
-    },
+    { staticClass: "panel-group", attrs: { role: "tablist" } },
     [_vm._t("default")],
     2
   )
@@ -37030,6 +37074,8 @@ var render = function() {
   return _c(
     "tabs",
     {
+      attrs: { selected: this.tab },
+      on: { "tab-selected": _vm.tabChanged },
       scopedSlots: _vm._u([
         {
           key: "header",
@@ -37076,7 +37122,9 @@ var render = function() {
     },
     [
       _vm._v(" "),
-      _c("tab", { attrs: { name: "global" } }, [_vm._v("Global tab")]),
+      _c("tab", { attrs: { name: "global", selected: "global" === _vm.tab } }, [
+        _vm._v("Global tab")
+      ]),
       _vm._v(" "),
       _vm._l(_vm.groups, function(sections, group) {
         return _c(
@@ -37085,15 +37133,18 @@ var render = function() {
           [
             _c(
               "accordion",
-              _vm._l(_vm.groups[group], function(items, section) {
+              {
+                on: {
+                  expanded: _vm.sectionExpanded,
+                  collapsed: _vm.sectionCollapsed
+                }
+              },
+              _vm._l(_vm.groups[group], function(items, item) {
                 return _c(
                   "accordion-item",
                   {
-                    key: section,
-                    attrs: {
-                      name: section,
-                      active: section === _vm.activeSection
-                    }
+                    key: item,
+                    attrs: { name: item, active: item === _vm.section }
                   },
                   [
                     _c(
@@ -37558,14 +37609,23 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm.isActive
-    ? _c(
-        "div",
-        { staticClass: "tab-pane", attrs: { role: "tabpanel", id: _vm.name } },
-        [_vm._t("default")],
-        2
-      )
-    : _vm._e()
+  return _c(
+    "div",
+    {
+      directives: [
+        {
+          name: "show",
+          rawName: "v-show",
+          value: _vm.isActive,
+          expression: "isActive"
+        }
+      ],
+      staticClass: "tab-pane",
+      attrs: { role: "tabpanel", id: _vm.name }
+    },
+    [_vm._t("default")],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -37608,14 +37668,10 @@ var render = function() {
                   _c(
                     "a",
                     {
-                      attrs: {
-                        role: "tab",
-                        href: tab.href,
-                        "aria-controls": tab.name
-                      },
+                      attrs: { role: "tab", "aria-controls": tab.name },
                       on: {
                         click: function($event) {
-                          return _vm.selectTab(tab)
+                          _vm.activeTab = tab.name
                         }
                       }
                     },

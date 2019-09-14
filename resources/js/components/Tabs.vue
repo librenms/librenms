@@ -28,7 +28,7 @@
             <div class="panel-heading">
                 <ul class="nav nav-tabs" role="tablist">
                     <li v-for="tab in tabs" :key="tab.name" :class="{ 'active': tab.isActive }" role="presentation">
-                        <a role="tab" :href="tab.href" :aria-controls="tab.name" @click="selectTab(tab)">
+                        <a role="tab" :aria-controls="tab.name" @click="activeTab = tab.name">
                             <i v-if="tab.icon" :class="['fa', 'fa-fw', tab.icon]"></i>
                             {{ tab.name | trans | ucfirst }}&nbsp;
                         </a>
@@ -48,18 +48,26 @@
 <script>
     export default {
         name: "Tabs",
+        props: {selected: String},
         data() {
-            return {tabs: []};
+            return {
+                tabs: [],
+                activeTab: null
+            };
         },
         created() {
             this.tabs = this.$children;
         },
-        methods: {
-            selectTab(selectedTab) {
-                this.tabs.forEach(tab => {
-                    tab.isActive = (tab.name === selectedTab.name);
-                });
-                this.$emit('tab-selected', selectedTab.name)
+        mounted() {
+            this.activeTab = this.selected;
+        },
+        watch: {
+            selected(name) {
+                this.activeTab = name
+            },
+            activeTab(name) {
+                this.tabs.forEach(tab => tab.isActive = (tab.name === name));
+                this.$emit('tab-selected', name)
             }
         }
     }

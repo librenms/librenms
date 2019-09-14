@@ -23,7 +23,7 @@
   -->
 
 <template>
-    <div v-if="isActive" role="tabpanel" class="tab-pane" :id="name">
+    <div v-show="isActive" role="tabpanel" class="tab-pane" :id="name">
         <slot></slot>
     </div>
 </template>
@@ -34,22 +34,13 @@
         props: {
             name: { required: true },
             title: String,
-            selected: Boolean,
+            selected: {type: Boolean, default: false},
             icon: String
         },
         data() {
             return {
-                isActive: false
-            };
-
-        },
-        computed: {
-            href() {
-                return '#' + this.name.toLowerCase().replace(/ /g, '-');
+                isActive: this.selected
             }
-        },
-        mounted() {
-            this.isActive = this.selected;
         }
     }
 </script>

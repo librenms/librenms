@@ -7,8 +7,8 @@
         <div id="app">
             <librenms-settings
                 prefix="{{ url('settings') }}"
-                tab="{{ $active_tab }}"
-                section="{{ $active_section }}"
+                initial-tab="{{ $active_tab }}"
+                initial-section="{{ $active_section }}"
             ></librenms-settings>
         </div>
     </div>

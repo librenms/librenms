@@ -8,7 +8,7 @@
                     <template v-slot:header>
                         <div>Banana</div>
                     </template>
-                    <tab name="One" selected icon="fa-ambulance">
+                    <tab name="One" selected icon="fa-ambulance" selected>
                         <accordion :multiple="false">
                             <accordion-item name="Test" icon="fa-wrench" active>
                                 Test Content

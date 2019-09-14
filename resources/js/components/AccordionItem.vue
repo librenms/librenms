@@ -65,10 +65,11 @@
             }
         },
         watch: {
-            isActive: function (active) {
-                if (active) {
-                    this.$parent.$emit('active-changed', this.slug());
-                }
+            active(active) {
+                this.isActive = active;
+            },
+            isActive(active) {
+                this.$parent.$emit(active ? 'expanded' : 'collapsed', this.slug())
             }
         },
         methods: {

@@ -23,7 +23,7 @@
   -->
 
 <template>
-    <tabs>
+    <tabs @tab-selected="tabChanged" :selected="this.tab">
         <template v-slot:header>
             <form class="form-inline">
                 <div class="input-group">
@@ -31,10 +31,10 @@
                 </div>
             </form>
         </template>
-        <tab name="global">Global tab</tab>
+        <tab name="global" :selected="'global' === tab">Global tab</tab>
         <tab v-for="(sections, group) in groups" :key="group" :name="group" :selected="group === tab">
-            <accordion>
-                <accordion-item v-for="(items, section) in groups[group]" :key="section" :name="section" :active="section === activeSection">
+            <accordion @expanded="sectionExpanded" @collapsed="sectionCollapsed">
+                <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :active="item === section">
                     <form class="form-horizontal">
                         <librenms-setting v-for="setting in items" :key="setting" :setting="settings[setting]"></librenms-setting>
                     </form>
@@ -49,17 +49,47 @@
         name: "LibrenmsSettings",
         props: {
             prefix: String,
-            tab: {type: String, default: 'alerting'},
-            section: String
+            initialTab: {type: String, default: 'alerting'},
+            initialSection: String
         },
         data() {
             return {
+                tab: this.initialTab,
+                section: this.initialSection,
                 search_phrase: '',
                 settings: {},
                 groups: {}
             }
         },
         methods: {
+            tabChanged(group) {
+                if (this.tab !== group) {
+                    this.tab = group;
+                    this.section = null;
+                    this.updateUrl();
+                }
+            },
+            sectionExpanded(section) {
+                this.section = section;
+                this.updateUrl()
+            },
+            sectionCollapsed(section) {
+                if (this.section === section) { // don't do anything if section was changed instead of just closed
+                    this.section = null;
+                    this.updateUrl();
+                }
+            },
+            updateUrl() {
+                let slug = this.tab;
+                if (this.section) {
+                    slug += '/' + this.section
+                }
+
+                window.history.pushState(slug, '', this.prefix + '/' + slug)
+            },
+            handleBack(event) {
+                [this.tab, this.section] = event.state.split('/');
+            },
             loadData(response) {
                 this.settings = response.data;
 
@@ -91,13 +121,8 @@
                 this.groups = Object.keys(groups).sort().reduce((a, c) => (a[c] = groups[c], a), {});
             }
         },
-        computed: {
-            activeSection() {
-                return (this.section in this.settings) ? this.settings[this.section].section : this.section
-            }
-        },
         mounted() {
-            // window.history.pushState(group, '', '/settings/' + group)
+            window.onpopstate = this.handleBack; // handle back button
             axios.get(route('settings.list')).then(this.loadData)
         }
     }

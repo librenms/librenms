@@ -23,9 +23,7 @@
   -->
 
 <template>
-    <div class="panel-group" role="tablist"
-         v-on:active-changed="activeChanged"
-    >
+    <div class="panel-group" role="tablist">
         <slot></slot>
     </div>
 </template>
@@ -41,7 +39,7 @@
         },
         methods: {
             setActive(name) {
-                this.$children.forEach((item, index) => {
+                this.$children.forEach((item) => {
                     if (item.slug() === name) {
                         item.isActive = true;
                     }
@@ -49,7 +47,7 @@
             },
             activeChanged(name) {
                 if (!this.multiple) {
-                    this.$children.forEach((item, index) => {
+                    this.$children.forEach((item)=> {
                         if (item.slug() !== name) {
                             item.isActive = false
                         }
@@ -58,7 +56,7 @@
             }
         },
         mounted() {
-            this.$on('active-changed', this.activeChanged);
+            this.$on('expanded', this.activeChanged);
         }
     }
 </script>
