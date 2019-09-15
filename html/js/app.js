@@ -37361,7 +37361,7 @@ var render = function() {
     },
     on: {
       change: function($event) {
-        return _vm.$emit("change", $event.target.value)
+        return _vm.$emit("change", $event.value)
       }
     }
   })

@@ -26,7 +26,7 @@
     <toggle-button
         :name="name"
         :value="value"
-        @change="$emit('change', $event.target.value)"
+        @change="$emit('change', $event.value)"
         :sync="true"
         :required="required"
         :disabled="disabled"
