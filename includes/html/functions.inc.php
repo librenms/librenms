@@ -1678,7 +1678,13 @@ function get_sensor_label_color($sensor, $type = 'sensors')
         $label_style = "label-danger";
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");
-    return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
+    if ($sensor['sensor_class'] == 'runtime') {
+        $sensor['sensor_current'] = formatUptime($sensor['sensor_current'] * 60, 'short');
+        $return = "<span class='label $label_style'>".trim($sensor['sensor_current'])."</span>";
+    } else {
+        $return = "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
+    }
+    return $return;
 }
 
 /**
