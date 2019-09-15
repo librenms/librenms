@@ -2328,7 +2328,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
       for (var _i2 = 0, _Object$keys = Object.keys(this.settings); _i2 < _Object$keys.length; _i2++) {
         var key = _Object$keys[_i2];
-        var setting = this.settings[key];
+        var setting = this.settings[key]; // filter
+
+        if (!setting.name.includes(this.search_phrase)) {
+          continue;
+        }
 
         if (setting.group) {
           if (!(setting.group in groups)) {
@@ -3104,7 +3108,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#settings-search[data-v-d702796c] {\n    border-radius: 4px\n}\n", ""]);
+exports.push([module.i, "\n#settings-search[data-v-d702796c] {\n    border-radius: 4px\n}\n#settings-search[data-v-d702796c]::-webkit-search-cancel-button {\n    -webkit-appearance: searchfield-cancel-button;\n}\n", ""]);
 
 // exports
 
@@ -37097,7 +37101,7 @@ var render = function() {
                     attrs: {
                       id: "settings-search",
                       type: "search",
-                      placeholder: "Search Settings"
+                      placeholder: "Filter Settings"
                     },
                     domProps: { value: _vm.search_phrase },
                     on: {

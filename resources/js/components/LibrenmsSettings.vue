@@ -27,7 +27,7 @@
         <template v-slot:header>
             <form class="form-inline">
                 <div class="input-group">
-                    <input id="settings-search" type="search" class="form-control" placeholder="Search Settings" v-model.trim="search_phrase">
+                    <input id="settings-search" type="search" class="form-control" placeholder="Filter Settings" v-model.trim="search_phrase">
                 </div>
             </form>
         </template>
@@ -103,6 +103,12 @@
                 let groups = {};
                 for (const key of Object.keys(this.settings)) {
                     let setting = this.settings[key];
+
+                    // filter
+                    if (!setting.name.includes(this.search_phrase)) {
+                        continue
+                    }
+
                     if (setting.group) {
                         if (!(setting.group in groups)) {
                             groups[setting.group] = {};
@@ -129,5 +135,8 @@
 <style scoped>
     #settings-search {
         border-radius: 4px
+    }
+    #settings-search::-webkit-search-cancel-button {
+        -webkit-appearance: searchfield-cancel-button;
     }
 </style>
