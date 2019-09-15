@@ -57,8 +57,7 @@
                 tab: this.initialTab,
                 section: this.initialSection,
                 search_phrase: '',
-                settings: {},
-                groups: {}
+                settings: {}
             }
         },
         methods: {
@@ -92,7 +91,14 @@
             },
             loadData(response) {
                 this.settings = response.data;
-
+            }
+        },
+        mounted() {
+            window.onpopstate = this.handleBack; // handle back button
+            axios.get(route('settings.list')).then((response) => this.settings = response.data)
+        },
+        computed: {
+            groups() {
                 // populate layout data
                 let groups = {};
                 for (const key of Object.keys(this.settings)) {
@@ -112,23 +118,10 @@
                         }
                     }
                 }
-                let sorted = {};
-                Object.keys(groups).sort().forEach(function (key) {
-                    sorted[key] = groups[key];
-                });
 
-                // set groups to trigger reactivity (also sort)
-                this.groups = Object.keys(groups).sort().reduce((a, c) => (a[c] = groups[c], a), {});
+                // sort groups
+                return Object.keys(groups).sort().reduce((a, c) => (a[c] = groups[c], a), {});
             }
-        },
-        mounted() {
-            window.onpopstate = this.handleBack; // handle back button
-            axios.get(route('settings.list')).then(this.loadData)
-        },
-        computed: {
-            // groups() {
-            //     this.settings
-            // }
         }
     }
 </script>

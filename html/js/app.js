@@ -2269,8 +2269,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       tab: this.initialTab,
       section: this.initialSection,
       search_phrase: '',
-      settings: {},
-      groups: {}
+      settings: {}
     };
   },
   methods: {
@@ -2310,8 +2309,21 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       this.section = _event$state$split2[1];
     },
     loadData: function loadData(response) {
-      this.settings = response.data; // populate layout data
+      this.settings = response.data;
+    }
+  },
+  mounted: function mounted() {
+    var _this = this;
 
+    window.onpopstate = this.handleBack; // handle back button
+
+    axios.get(route('settings.list')).then(function (response) {
+      return _this.settings = response.data;
+    });
+  },
+  computed: {
+    groups: function groups() {
+      // populate layout data
       var groups = {};
 
       for (var _i2 = 0, _Object$keys = Object.keys(this.settings); _i2 < _Object$keys.length; _i2++) {
@@ -2332,26 +2344,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
             groups[setting.group][setting.section].splice(setting.order, 0, setting.name);
           }
         }
-      }
+      } // sort groups
 
-      var sorted = {};
-      Object.keys(groups).sort().forEach(function (key) {
-        sorted[key] = groups[key];
-      }); // set groups to trigger reactivity (also sort)
 
-      this.groups = Object.keys(groups).sort().reduce(function (a, c) {
+      return Object.keys(groups).sort().reduce(function (a, c) {
         return a[c] = groups[c], a;
       }, {});
     }
-  },
-  mounted: function mounted() {
-    window.onpopstate = this.handleBack; // handle back button
-
-    axios.get(route('settings.list')).then(this.loadData);
-  },
-  computed: {// groups() {
-    //     this.settings
-    // }
   }
 });
 
