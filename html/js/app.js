@@ -1962,6 +1962,7 @@ __webpack_require__.r(__webpack_exports__);
       type: String,
       required: true
     },
+    text: String,
     active: Boolean,
     icon: String
   },
@@ -2156,19 +2157,19 @@ __webpack_require__.r(__webpack_exports__);
       this.previous = this.saved;
     },
     getDescription: function getDescription() {
-      return this.trans('settings.settings.' + this.setting.name + '.description');
+      return this.$t('settings.settings.' + this.setting.name + '.description');
     },
     getHelp: function getHelp() {
-      var help = this.trans('settings.settings.' + this.setting.name + '.help');
+      var help = this.$t('settings.settings.' + this.setting.name + '.help');
 
       if (this.setting.overridden) {
-        help += "\n" + this.trans('settings.readonly');
+        help += "\n" + this.$t('settings.readonly');
       }
 
       return help;
     },
     hasHelp: function hasHelp() {
-      return true; // TODO implement hasHelp
+      return this.$te('settings.settings.' + this.setting.name + '.help');
     },
     resetToDefault: function resetToDefault() {
       this.value = this.setting["default"];
@@ -2204,7 +2205,7 @@ function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArra
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
 
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
@@ -2881,7 +2882,7 @@ __webpack_require__.r(__webpack_exports__);
     name: {
       required: true
     },
-    title: String,
+    text: String,
     selected: {
       type: Boolean,
       "default": false
@@ -3089,7 +3090,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.accordion-item-trigger-icon[data-v-bf6d92c0] {\n    -webkit-transition: -webkit-transform 0.2s ease;\n    transition: -webkit-transform 0.2s ease;\n    transition: transform 0.2s ease;\n    transition: transform 0.2s ease, -webkit-transform 0.2s ease;\n}\n.accordion-item-trigger.collapsed .accordion-item-trigger-icon[data-v-bf6d92c0] {\n    -webkit-transform: rotate(-90deg);\n            transform: rotate(-90deg);\n}\n", ""]);
+exports.push([module.i, "\n.accordion-item-trigger-icon[data-v-bf6d92c0] {\n    transition: transform 0.2s ease;\n}\n.accordion-item-trigger.collapsed .accordion-item-trigger-icon[data-v-bf6d92c0] {\n    transform: rotate(-90deg);\n}\n", ""]);
 
 // exports
 
@@ -3184,7 +3185,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.enter-active[data-v-41d51ed4],\n.leave-active[data-v-41d51ed4] {\n    overflow: hidden;\n    -webkit-transition: height 0.2s linear;\n    transition: height 0.2s linear;\n}\n", ""]);
+exports.push([module.i, "\n.enter-active[data-v-41d51ed4],\n.leave-active[data-v-41d51ed4] {\n    overflow: hidden;\n    transition: height 0.2s linear;\n}\n", ""]);
 
 // exports
 
@@ -35913,6 +35914,1956 @@ if (GlobalVue) {
 
 /***/ }),
 
+/***/ "./node_modules/vue-i18n/dist/vue-i18n.esm.js":
+/*!****************************************************!*\
+  !*** ./node_modules/vue-i18n/dist/vue-i18n.esm.js ***!
+  \****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/*!
+ * vue-i18n v8.14.1 
+ * (c) 2019 kazuya kawaguchi
+ * Released under the MIT License.
+ */
+/*  */
+
+/**
+ * constants
+ */
+
+var numberFormatKeys = [
+  'style',
+  'currency',
+  'currencyDisplay',
+  'useGrouping',
+  'minimumIntegerDigits',
+  'minimumFractionDigits',
+  'maximumFractionDigits',
+  'minimumSignificantDigits',
+  'maximumSignificantDigits',
+  'localeMatcher',
+  'formatMatcher'
+];
+
+/**
+ * utilities
+ */
+
+function warn (msg, err) {
+  if (typeof console !== 'undefined') {
+    console.warn('[vue-i18n] ' + msg);
+    /* istanbul ignore if */
+    if (err) {
+      console.warn(err.stack);
+    }
+  }
+}
+
+function error (msg, err) {
+  if (typeof console !== 'undefined') {
+    console.error('[vue-i18n] ' + msg);
+    /* istanbul ignore if */
+    if (err) {
+      console.error(err.stack);
+    }
+  }
+}
+
+function isObject (obj) {
+  return obj !== null && typeof obj === 'object'
+}
+
+var toString = Object.prototype.toString;
+var OBJECT_STRING = '[object Object]';
+function isPlainObject (obj) {
+  return toString.call(obj) === OBJECT_STRING
+}
+
+function isNull (val) {
+  return val === null || val === undefined
+}
+
+function parseArgs () {
+  var args = [], len = arguments.length;
+  while ( len-- ) args[ len ] = arguments[ len ];
+
+  var locale = null;
+  var params = null;
+  if (args.length === 1) {
+    if (isObject(args[0]) || Array.isArray(args[0])) {
+      params = args[0];
+    } else if (typeof args[0] === 'string') {
+      locale = args[0];
+    }
+  } else if (args.length === 2) {
+    if (typeof args[0] === 'string') {
+      locale = args[0];
+    }
+    /* istanbul ignore if */
+    if (isObject(args[1]) || Array.isArray(args[1])) {
+      params = args[1];
+    }
+  }
+
+  return { locale: locale, params: params }
+}
+
+function looseClone (obj) {
+  return JSON.parse(JSON.stringify(obj))
+}
+
+function remove (arr, item) {
+  if (arr.length) {
+    var index = arr.indexOf(item);
+    if (index > -1) {
+      return arr.splice(index, 1)
+    }
+  }
+}
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+function hasOwn (obj, key) {
+  return hasOwnProperty.call(obj, key)
+}
+
+function merge (target) {
+  var arguments$1 = arguments;
+
+  var output = Object(target);
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments$1[i];
+    if (source !== undefined && source !== null) {
+      var key = (void 0);
+      for (key in source) {
+        if (hasOwn(source, key)) {
+          if (isObject(source[key])) {
+            output[key] = merge(output[key], source[key]);
+          } else {
+            output[key] = source[key];
+          }
+        }
+      }
+    }
+  }
+  return output
+}
+
+function looseEqual (a, b) {
+  if (a === b) { return true }
+  var isObjectA = isObject(a);
+  var isObjectB = isObject(b);
+  if (isObjectA && isObjectB) {
+    try {
+      var isArrayA = Array.isArray(a);
+      var isArrayB = Array.isArray(b);
+      if (isArrayA && isArrayB) {
+        return a.length === b.length && a.every(function (e, i) {
+          return looseEqual(e, b[i])
+        })
+      } else if (!isArrayA && !isArrayB) {
+        var keysA = Object.keys(a);
+        var keysB = Object.keys(b);
+        return keysA.length === keysB.length && keysA.every(function (key) {
+          return looseEqual(a[key], b[key])
+        })
+      } else {
+        /* istanbul ignore next */
+        return false
+      }
+    } catch (e) {
+      /* istanbul ignore next */
+      return false
+    }
+  } else if (!isObjectA && !isObjectB) {
+    return String(a) === String(b)
+  } else {
+    return false
+  }
+}
+
+/*  */
+
+function extend (Vue) {
+  if (!Vue.prototype.hasOwnProperty('$i18n')) {
+    // $FlowFixMe
+    Object.defineProperty(Vue.prototype, '$i18n', {
+      get: function get () { return this._i18n }
+    });
+  }
+
+  Vue.prototype.$t = function (key) {
+    var values = [], len = arguments.length - 1;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 1 ];
+
+    var i18n = this.$i18n;
+    return i18n._t.apply(i18n, [ key, i18n.locale, i18n._getMessages(), this ].concat( values ))
+  };
+
+  Vue.prototype.$tc = function (key, choice) {
+    var values = [], len = arguments.length - 2;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 2 ];
+
+    var i18n = this.$i18n;
+    return i18n._tc.apply(i18n, [ key, i18n.locale, i18n._getMessages(), this, choice ].concat( values ))
+  };
+
+  Vue.prototype.$te = function (key, locale) {
+    var i18n = this.$i18n;
+    return i18n._te(key, i18n.locale, i18n._getMessages(), locale)
+  };
+
+  Vue.prototype.$d = function (value) {
+    var ref;
+
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+    return (ref = this.$i18n).d.apply(ref, [ value ].concat( args ))
+  };
+
+  Vue.prototype.$n = function (value) {
+    var ref;
+
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+    return (ref = this.$i18n).n.apply(ref, [ value ].concat( args ))
+  };
+}
+
+/*  */
+
+var mixin = {
+  beforeCreate: function beforeCreate () {
+    var options = this.$options;
+    options.i18n = options.i18n || (options.__i18n ? {} : null);
+
+    if (options.i18n) {
+      if (options.i18n instanceof VueI18n) {
+        // init locale messages via custom blocks
+        if (options.__i18n) {
+          try {
+            var localeMessages = {};
+            options.__i18n.forEach(function (resource) {
+              localeMessages = merge(localeMessages, JSON.parse(resource));
+            });
+            Object.keys(localeMessages).forEach(function (locale) {
+              options.i18n.mergeLocaleMessage(locale, localeMessages[locale]);
+            });
+          } catch (e) {
+            if (true) {
+              warn("Cannot parse locale messages via custom blocks.", e);
+            }
+          }
+        }
+        this._i18n = options.i18n;
+        this._i18nWatcher = this._i18n.watchI18nData();
+      } else if (isPlainObject(options.i18n)) {
+        // component local i18n
+        if (this.$root && this.$root.$i18n && this.$root.$i18n instanceof VueI18n) {
+          options.i18n.root = this.$root;
+          options.i18n.formatter = this.$root.$i18n.formatter;
+          options.i18n.fallbackLocale = this.$root.$i18n.fallbackLocale;
+          options.i18n.formatFallbackMessages = this.$root.$i18n.formatFallbackMessages;
+          options.i18n.silentTranslationWarn = this.$root.$i18n.silentTranslationWarn;
+          options.i18n.silentFallbackWarn = this.$root.$i18n.silentFallbackWarn;
+          options.i18n.pluralizationRules = this.$root.$i18n.pluralizationRules;
+          options.i18n.preserveDirectiveContent = this.$root.$i18n.preserveDirectiveContent;
+        }
+
+        // init locale messages via custom blocks
+        if (options.__i18n) {
+          try {
+            var localeMessages$1 = {};
+            options.__i18n.forEach(function (resource) {
+              localeMessages$1 = merge(localeMessages$1, JSON.parse(resource));
+            });
+            options.i18n.messages = localeMessages$1;
+          } catch (e) {
+            if (true) {
+              warn("Cannot parse locale messages via custom blocks.", e);
+            }
+          }
+        }
+
+        var ref = options.i18n;
+        var sharedMessages = ref.sharedMessages;
+        if (sharedMessages && isPlainObject(sharedMessages)) {
+          options.i18n.messages = merge(options.i18n.messages, sharedMessages);
+        }
+
+        this._i18n = new VueI18n(options.i18n);
+        this._i18nWatcher = this._i18n.watchI18nData();
+
+        if (options.i18n.sync === undefined || !!options.i18n.sync) {
+          this._localeWatcher = this.$i18n.watchLocale();
+        }
+      } else {
+        if (true) {
+          warn("Cannot be interpreted 'i18n' option.");
+        }
+      }
+    } else if (this.$root && this.$root.$i18n && this.$root.$i18n instanceof VueI18n) {
+      // root i18n
+      this._i18n = this.$root.$i18n;
+    } else if (options.parent && options.parent.$i18n && options.parent.$i18n instanceof VueI18n) {
+      // parent i18n
+      this._i18n = options.parent.$i18n;
+    }
+  },
+
+  beforeMount: function beforeMount () {
+    var options = this.$options;
+    options.i18n = options.i18n || (options.__i18n ? {} : null);
+
+    if (options.i18n) {
+      if (options.i18n instanceof VueI18n) {
+        // init locale messages via custom blocks
+        this._i18n.subscribeDataChanging(this);
+        this._subscribing = true;
+      } else if (isPlainObject(options.i18n)) {
+        this._i18n.subscribeDataChanging(this);
+        this._subscribing = true;
+      } else {
+        if (true) {
+          warn("Cannot be interpreted 'i18n' option.");
+        }
+      }
+    } else if (this.$root && this.$root.$i18n && this.$root.$i18n instanceof VueI18n) {
+      this._i18n.subscribeDataChanging(this);
+      this._subscribing = true;
+    } else if (options.parent && options.parent.$i18n && options.parent.$i18n instanceof VueI18n) {
+      this._i18n.subscribeDataChanging(this);
+      this._subscribing = true;
+    }
+  },
+
+  beforeDestroy: function beforeDestroy () {
+    if (!this._i18n) { return }
+
+    var self = this;
+    this.$nextTick(function () {
+      if (self._subscribing) {
+        self._i18n.unsubscribeDataChanging(self);
+        delete self._subscribing;
+      }
+
+      if (self._i18nWatcher) {
+        self._i18nWatcher();
+        self._i18n.destroyVM();
+        delete self._i18nWatcher;
+      }
+
+      if (self._localeWatcher) {
+        self._localeWatcher();
+        delete self._localeWatcher;
+      }
+
+      self._i18n = null;
+    });
+  }
+};
+
+/*  */
+
+var interpolationComponent = {
+  name: 'i18n',
+  functional: true,
+  props: {
+    tag: {
+      type: String
+    },
+    path: {
+      type: String,
+      required: true
+    },
+    locale: {
+      type: String
+    },
+    places: {
+      type: [Array, Object]
+    }
+  },
+  render: function render (h, ref) {
+    var data = ref.data;
+    var parent = ref.parent;
+    var props = ref.props;
+    var slots = ref.slots;
+
+    var $i18n = parent.$i18n;
+    if (!$i18n) {
+      if (true) {
+        warn('Cannot find VueI18n instance!');
+      }
+      return
+    }
+
+    var path = props.path;
+    var locale = props.locale;
+    var places = props.places;
+    var params = slots();
+    var children = $i18n.i(
+      path,
+      locale,
+      onlyHasDefaultPlace(params) || places
+        ? useLegacyPlaces(params.default, places)
+        : params
+    );
+
+    var tag = props.tag || 'span';
+    return tag ? h(tag, data, children) : children
+  }
+};
+
+function onlyHasDefaultPlace (params) {
+  var prop;
+  for (prop in params) {
+    if (prop !== 'default') { return false }
+  }
+  return Boolean(prop)
+}
+
+function useLegacyPlaces (children, places) {
+  var params = places ? createParamsFromPlaces(places) : {};
+  
+  if (!children) { return params }
+
+  // Filter empty text nodes
+  children = children.filter(function (child) {
+    return child.tag || child.text.trim() !== ''
+  });
+
+  var everyPlace = children.every(vnodeHasPlaceAttribute);
+  if ( true && everyPlace) {
+    warn('`place` attribute is deprecated in next major version. Please switch to Vue slots.');
+  }
+
+  return children.reduce(
+    everyPlace ? assignChildPlace : assignChildIndex,
+    params
+  )
+}
+
+function createParamsFromPlaces (places) {
+  if (true) {
+    warn('`places` prop is deprecated in next major version. Please switch to Vue slots.');
+  }
+
+  return Array.isArray(places)
+    ? places.reduce(assignChildIndex, {})
+    : Object.assign({}, places)
+}
+
+function assignChildPlace (params, child) {
+  if (child.data && child.data.attrs && child.data.attrs.place) {
+    params[child.data.attrs.place] = child;
+  }
+  return params
+}
+
+function assignChildIndex (params, child, index) {
+  params[index] = child;
+  return params
+}
+
+function vnodeHasPlaceAttribute (vnode) {
+  return Boolean(vnode.data && vnode.data.attrs && vnode.data.attrs.place)
+}
+
+/*  */
+
+var numberComponent = {
+  name: 'i18n-n',
+  functional: true,
+  props: {
+    tag: {
+      type: String,
+      default: 'span'
+    },
+    value: {
+      type: Number,
+      required: true
+    },
+    format: {
+      type: [String, Object]
+    },
+    locale: {
+      type: String
+    }
+  },
+  render: function render (h, ref) {
+    var props = ref.props;
+    var parent = ref.parent;
+    var data = ref.data;
+
+    var i18n = parent.$i18n;
+
+    if (!i18n) {
+      if (true) {
+        warn('Cannot find VueI18n instance!');
+      }
+      return null
+    }
+
+    var key = null;
+    var options = null;
+
+    if (typeof props.format === 'string') {
+      key = props.format;
+    } else if (isObject(props.format)) {
+      if (props.format.key) {
+        key = props.format.key;
+      }
+
+      // Filter out number format options only
+      options = Object.keys(props.format).reduce(function (acc, prop) {
+        var obj;
+
+        if (numberFormatKeys.includes(prop)) {
+          return Object.assign({}, acc, ( obj = {}, obj[prop] = props.format[prop], obj ))
+        }
+        return acc
+      }, null);
+    }
+
+    var locale = props.locale || i18n.locale;
+    var parts = i18n._ntp(props.value, locale, key, options);
+
+    var values = parts.map(function (part, index) {
+      var obj;
+
+      var slot = data.scopedSlots && data.scopedSlots[part.type];
+      return slot ? slot(( obj = {}, obj[part.type] = part.value, obj.index = index, obj.parts = parts, obj )) : part.value
+    });
+
+    return h(props.tag, {
+      attrs: data.attrs,
+      'class': data['class'],
+      staticClass: data.staticClass
+    }, values)
+  }
+};
+
+/*  */
+
+function bind (el, binding, vnode) {
+  if (!assert(el, vnode)) { return }
+
+  t(el, binding, vnode);
+}
+
+function update (el, binding, vnode, oldVNode) {
+  if (!assert(el, vnode)) { return }
+
+  var i18n = vnode.context.$i18n;
+  if (localeEqual(el, vnode) &&
+    (looseEqual(binding.value, binding.oldValue) &&
+     looseEqual(el._localeMessage, i18n.getLocaleMessage(i18n.locale)))) { return }
+
+  t(el, binding, vnode);
+}
+
+function unbind (el, binding, vnode, oldVNode) {
+  var vm = vnode.context;
+  if (!vm) {
+    warn('Vue instance does not exists in VNode context');
+    return
+  }
+
+  var i18n = vnode.context.$i18n || {};
+  if (!binding.modifiers.preserve && !i18n.preserveDirectiveContent) {
+    el.textContent = '';
+  }
+  el._vt = undefined;
+  delete el['_vt'];
+  el._locale = undefined;
+  delete el['_locale'];
+  el._localeMessage = undefined;
+  delete el['_localeMessage'];
+}
+
+function assert (el, vnode) {
+  var vm = vnode.context;
+  if (!vm) {
+    warn('Vue instance does not exists in VNode context');
+    return false
+  }
+
+  if (!vm.$i18n) {
+    warn('VueI18n instance does not exists in Vue instance');
+    return false
+  }
+
+  return true
+}
+
+function localeEqual (el, vnode) {
+  var vm = vnode.context;
+  return el._locale === vm.$i18n.locale
+}
+
+function t (el, binding, vnode) {
+  var ref$1, ref$2;
+
+  var value = binding.value;
+
+  var ref = parseValue(value);
+  var path = ref.path;
+  var locale = ref.locale;
+  var args = ref.args;
+  var choice = ref.choice;
+  if (!path && !locale && !args) {
+    warn('value type not supported');
+    return
+  }
+
+  if (!path) {
+    warn('`path` is required in v-t directive');
+    return
+  }
+
+  var vm = vnode.context;
+  if (choice) {
+    el._vt = el.textContent = (ref$1 = vm.$i18n).tc.apply(ref$1, [ path, choice ].concat( makeParams(locale, args) ));
+  } else {
+    el._vt = el.textContent = (ref$2 = vm.$i18n).t.apply(ref$2, [ path ].concat( makeParams(locale, args) ));
+  }
+  el._locale = vm.$i18n.locale;
+  el._localeMessage = vm.$i18n.getLocaleMessage(vm.$i18n.locale);
+}
+
+function parseValue (value) {
+  var path;
+  var locale;
+  var args;
+  var choice;
+
+  if (typeof value === 'string') {
+    path = value;
+  } else if (isPlainObject(value)) {
+    path = value.path;
+    locale = value.locale;
+    args = value.args;
+    choice = value.choice;
+  }
+
+  return { path: path, locale: locale, args: args, choice: choice }
+}
+
+function makeParams (locale, args) {
+  var params = [];
+
+  locale && params.push(locale);
+  if (args && (Array.isArray(args) || isPlainObject(args))) {
+    params.push(args);
+  }
+
+  return params
+}
+
+var Vue;
+
+function install (_Vue) {
+  /* istanbul ignore if */
+  if ( true && install.installed && _Vue === Vue) {
+    warn('already installed.');
+    return
+  }
+  install.installed = true;
+
+  Vue = _Vue;
+
+  var version = (Vue.version && Number(Vue.version.split('.')[0])) || -1;
+  /* istanbul ignore if */
+  if ( true && version < 2) {
+    warn(("vue-i18n (" + (install.version) + ") need to use Vue 2.0 or later (Vue: " + (Vue.version) + ")."));
+    return
+  }
+
+  extend(Vue);
+  Vue.mixin(mixin);
+  Vue.directive('t', { bind: bind, update: update, unbind: unbind });
+  Vue.component(interpolationComponent.name, interpolationComponent);
+  Vue.component(numberComponent.name, numberComponent);
+
+  // use simple mergeStrategies to prevent i18n instance lose '__proto__'
+  var strats = Vue.config.optionMergeStrategies;
+  strats.i18n = function (parentVal, childVal) {
+    return childVal === undefined
+      ? parentVal
+      : childVal
+  };
+}
+
+/*  */
+
+var BaseFormatter = function BaseFormatter () {
+  this._caches = Object.create(null);
+};
+
+BaseFormatter.prototype.interpolate = function interpolate (message, values) {
+  if (!values) {
+    return [message]
+  }
+  var tokens = this._caches[message];
+  if (!tokens) {
+    tokens = parse(message);
+    this._caches[message] = tokens;
+  }
+  return compile(tokens, values)
+};
+
+
+
+var RE_TOKEN_LIST_VALUE = /^(?:\d)+/;
+var RE_TOKEN_NAMED_VALUE = /^(?:\w)+/;
+
+function parse (format) {
+  var tokens = [];
+  var position = 0;
+
+  var text = '';
+  while (position < format.length) {
+    var char = format[position++];
+    if (char === '{') {
+      if (text) {
+        tokens.push({ type: 'text', value: text });
+      }
+
+      text = '';
+      var sub = '';
+      char = format[position++];
+      while (char !== undefined && char !== '}') {
+        sub += char;
+        char = format[position++];
+      }
+      var isClosed = char === '}';
+
+      var type = RE_TOKEN_LIST_VALUE.test(sub)
+        ? 'list'
+        : isClosed && RE_TOKEN_NAMED_VALUE.test(sub)
+          ? 'named'
+          : 'unknown';
+      tokens.push({ value: sub, type: type });
+    } else if (char === '%') {
+      // when found rails i18n syntax, skip text capture
+      if (format[(position)] !== '{') {
+        text += char;
+      }
+    } else {
+      text += char;
+    }
+  }
+
+  text && tokens.push({ type: 'text', value: text });
+
+  return tokens
+}
+
+function compile (tokens, values) {
+  var compiled = [];
+  var index = 0;
+
+  var mode = Array.isArray(values)
+    ? 'list'
+    : isObject(values)
+      ? 'named'
+      : 'unknown';
+  if (mode === 'unknown') { return compiled }
+
+  while (index < tokens.length) {
+    var token = tokens[index];
+    switch (token.type) {
+      case 'text':
+        compiled.push(token.value);
+        break
+      case 'list':
+        compiled.push(values[parseInt(token.value, 10)]);
+        break
+      case 'named':
+        if (mode === 'named') {
+          compiled.push((values)[token.value]);
+        } else {
+          if (true) {
+            warn(("Type of token '" + (token.type) + "' and format of value '" + mode + "' don't match!"));
+          }
+        }
+        break
+      case 'unknown':
+        if (true) {
+          warn("Detect 'unknown' type of token!");
+        }
+        break
+    }
+    index++;
+  }
+
+  return compiled
+}
+
+/*  */
+
+/**
+ *  Path parser
+ *  - Inspired:
+ *    Vue.js Path parser
+ */
+
+// actions
+var APPEND = 0;
+var PUSH = 1;
+var INC_SUB_PATH_DEPTH = 2;
+var PUSH_SUB_PATH = 3;
+
+// states
+var BEFORE_PATH = 0;
+var IN_PATH = 1;
+var BEFORE_IDENT = 2;
+var IN_IDENT = 3;
+var IN_SUB_PATH = 4;
+var IN_SINGLE_QUOTE = 5;
+var IN_DOUBLE_QUOTE = 6;
+var AFTER_PATH = 7;
+var ERROR = 8;
+
+var pathStateMachine = [];
+
+pathStateMachine[BEFORE_PATH] = {
+  'ws': [BEFORE_PATH],
+  'ident': [IN_IDENT, APPEND],
+  '[': [IN_SUB_PATH],
+  'eof': [AFTER_PATH]
+};
+
+pathStateMachine[IN_PATH] = {
+  'ws': [IN_PATH],
+  '.': [BEFORE_IDENT],
+  '[': [IN_SUB_PATH],
+  'eof': [AFTER_PATH]
+};
+
+pathStateMachine[BEFORE_IDENT] = {
+  'ws': [BEFORE_IDENT],
+  'ident': [IN_IDENT, APPEND],
+  '0': [IN_IDENT, APPEND],
+  'number': [IN_IDENT, APPEND]
+};
+
+pathStateMachine[IN_IDENT] = {
+  'ident': [IN_IDENT, APPEND],
+  '0': [IN_IDENT, APPEND],
+  'number': [IN_IDENT, APPEND],
+  'ws': [IN_PATH, PUSH],
+  '.': [BEFORE_IDENT, PUSH],
+  '[': [IN_SUB_PATH, PUSH],
+  'eof': [AFTER_PATH, PUSH]
+};
+
+pathStateMachine[IN_SUB_PATH] = {
+  "'": [IN_SINGLE_QUOTE, APPEND],
+  '"': [IN_DOUBLE_QUOTE, APPEND],
+  '[': [IN_SUB_PATH, INC_SUB_PATH_DEPTH],
+  ']': [IN_PATH, PUSH_SUB_PATH],
+  'eof': ERROR,
+  'else': [IN_SUB_PATH, APPEND]
+};
+
+pathStateMachine[IN_SINGLE_QUOTE] = {
+  "'": [IN_SUB_PATH, APPEND],
+  'eof': ERROR,
+  'else': [IN_SINGLE_QUOTE, APPEND]
+};
+
+pathStateMachine[IN_DOUBLE_QUOTE] = {
+  '"': [IN_SUB_PATH, APPEND],
+  'eof': ERROR,
+  'else': [IN_DOUBLE_QUOTE, APPEND]
+};
+
+/**
+ * Check if an expression is a literal value.
+ */
+
+var literalValueRE = /^\s?(?:true|false|-?[\d.]+|'[^']*'|"[^"]*")\s?$/;
+function isLiteral (exp) {
+  return literalValueRE.test(exp)
+}
+
+/**
+ * Strip quotes from a string
+ */
+
+function stripQuotes (str) {
+  var a = str.charCodeAt(0);
+  var b = str.charCodeAt(str.length - 1);
+  return a === b && (a === 0x22 || a === 0x27)
+    ? str.slice(1, -1)
+    : str
+}
+
+/**
+ * Determine the type of a character in a keypath.
+ */
+
+function getPathCharType (ch) {
+  if (ch === undefined || ch === null) { return 'eof' }
+
+  var code = ch.charCodeAt(0);
+
+  switch (code) {
+    case 0x5B: // [
+    case 0x5D: // ]
+    case 0x2E: // .
+    case 0x22: // "
+    case 0x27: // '
+      return ch
+
+    case 0x5F: // _
+    case 0x24: // $
+    case 0x2D: // -
+      return 'ident'
+
+    case 0x09: // Tab
+    case 0x0A: // Newline
+    case 0x0D: // Return
+    case 0xA0:  // No-break space
+    case 0xFEFF:  // Byte Order Mark
+    case 0x2028:  // Line Separator
+    case 0x2029:  // Paragraph Separator
+      return 'ws'
+  }
+
+  return 'ident'
+}
+
+/**
+ * Format a subPath, return its plain form if it is
+ * a literal string or number. Otherwise prepend the
+ * dynamic indicator (*).
+ */
+
+function formatSubPath (path) {
+  var trimmed = path.trim();
+  // invalid leading 0
+  if (path.charAt(0) === '0' && isNaN(path)) { return false }
+
+  return isLiteral(trimmed) ? stripQuotes(trimmed) : '*' + trimmed
+}
+
+/**
+ * Parse a string path into an array of segments
+ */
+
+function parse$1 (path) {
+  var keys = [];
+  var index = -1;
+  var mode = BEFORE_PATH;
+  var subPathDepth = 0;
+  var c;
+  var key;
+  var newChar;
+  var type;
+  var transition;
+  var action;
+  var typeMap;
+  var actions = [];
+
+  actions[PUSH] = function () {
+    if (key !== undefined) {
+      keys.push(key);
+      key = undefined;
+    }
+  };
+
+  actions[APPEND] = function () {
+    if (key === undefined) {
+      key = newChar;
+    } else {
+      key += newChar;
+    }
+  };
+
+  actions[INC_SUB_PATH_DEPTH] = function () {
+    actions[APPEND]();
+    subPathDepth++;
+  };
+
+  actions[PUSH_SUB_PATH] = function () {
+    if (subPathDepth > 0) {
+      subPathDepth--;
+      mode = IN_SUB_PATH;
+      actions[APPEND]();
+    } else {
+      subPathDepth = 0;
+      if (key === undefined) { return false }
+      key = formatSubPath(key);
+      if (key === false) {
+        return false
+      } else {
+        actions[PUSH]();
+      }
+    }
+  };
+
+  function maybeUnescapeQuote () {
+    var nextChar = path[index + 1];
+    if ((mode === IN_SINGLE_QUOTE && nextChar === "'") ||
+      (mode === IN_DOUBLE_QUOTE && nextChar === '"')) {
+      index++;
+      newChar = '\\' + nextChar;
+      actions[APPEND]();
+      return true
+    }
+  }
+
+  while (mode !== null) {
+    index++;
+    c = path[index];
+
+    if (c === '\\' && maybeUnescapeQuote()) {
+      continue
+    }
+
+    type = getPathCharType(c);
+    typeMap = pathStateMachine[mode];
+    transition = typeMap[type] || typeMap['else'] || ERROR;
+
+    if (transition === ERROR) {
+      return // parse error
+    }
+
+    mode = transition[0];
+    action = actions[transition[1]];
+    if (action) {
+      newChar = transition[2];
+      newChar = newChar === undefined
+        ? c
+        : newChar;
+      if (action() === false) {
+        return
+      }
+    }
+
+    if (mode === AFTER_PATH) {
+      return keys
+    }
+  }
+}
+
+
+
+
+
+var I18nPath = function I18nPath () {
+  this._cache = Object.create(null);
+};
+
+/**
+ * External parse that check for a cache hit first
+ */
+I18nPath.prototype.parsePath = function parsePath (path) {
+  var hit = this._cache[path];
+  if (!hit) {
+    hit = parse$1(path);
+    if (hit) {
+      this._cache[path] = hit;
+    }
+  }
+  return hit || []
+};
+
+/**
+ * Get path value from path string
+ */
+I18nPath.prototype.getPathValue = function getPathValue (obj, path) {
+  if (!isObject(obj)) { return null }
+
+  var paths = this.parsePath(path);
+  if (paths.length === 0) {
+    return null
+  } else {
+    var length = paths.length;
+    var last = obj;
+    var i = 0;
+    while (i < length) {
+      var value = last[paths[i]];
+      if (value === undefined) {
+        return null
+      }
+      last = value;
+      i++;
+    }
+
+    return last
+  }
+};
+
+/*  */
+
+
+
+var htmlTagMatcher = /<\/?[\w\s="/.':;#-\/]+>/;
+var linkKeyMatcher = /(?:@(?:\.[a-z]+)?:(?:[\w\-_|.]+|\([\w\-_|.]+\)))/g;
+var linkKeyPrefixMatcher = /^@(?:\.([a-z]+))?:/;
+var bracketsMatcher = /[()]/g;
+var formatters = {
+  'upper': function (str) { return str.toLocaleUpperCase(); },
+  'lower': function (str) { return str.toLocaleLowerCase(); }
+};
+
+var defaultFormatter = new BaseFormatter();
+
+var VueI18n = function VueI18n (options) {
+  var this$1 = this;
+  if ( options === void 0 ) options = {};
+
+  // Auto install if it is not done yet and `window` has `Vue`.
+  // To allow users to avoid auto-installation in some cases,
+  // this code should be placed here. See #290
+  /* istanbul ignore if */
+  if (!Vue && typeof window !== 'undefined' && window.Vue) {
+    install(window.Vue);
+  }
+
+  var locale = options.locale || 'en-US';
+  var fallbackLocale = options.fallbackLocale || 'en-US';
+  var messages = options.messages || {};
+  var dateTimeFormats = options.dateTimeFormats || {};
+  var numberFormats = options.numberFormats || {};
+
+  this._vm = null;
+  this._formatter = options.formatter || defaultFormatter;
+  this._missing = options.missing || null;
+  this._root = options.root || null;
+  this._sync = options.sync === undefined ? true : !!options.sync;
+  this._fallbackRoot = options.fallbackRoot === undefined
+    ? true
+    : !!options.fallbackRoot;
+  this._formatFallbackMessages = options.formatFallbackMessages === undefined
+    ? false
+    : !!options.formatFallbackMessages;
+  this._silentTranslationWarn = options.silentTranslationWarn === undefined
+    ? false
+    : options.silentTranslationWarn;
+  this._silentFallbackWarn = options.silentFallbackWarn === undefined
+    ? false
+    : !!options.silentFallbackWarn;
+  this._dateTimeFormatters = {};
+  this._numberFormatters = {};
+  this._path = new I18nPath();
+  this._dataListeners = [];
+  this._preserveDirectiveContent = options.preserveDirectiveContent === undefined
+    ? false
+    : !!options.preserveDirectiveContent;
+  this.pluralizationRules = options.pluralizationRules || {};
+  this._warnHtmlInMessage = options.warnHtmlInMessage || 'off';
+
+  this._exist = function (message, key) {
+    if (!message || !key) { return false }
+    if (!isNull(this$1._path.getPathValue(message, key))) { return true }
+    // fallback for flat key
+    if (message[key]) { return true }
+    return false
+  };
+
+  if (this._warnHtmlInMessage === 'warn' || this._warnHtmlInMessage === 'error') {
+    Object.keys(messages).forEach(function (locale) {
+      this$1._checkLocaleMessage(locale, this$1._warnHtmlInMessage, messages[locale]);
+    });
+  }
+
+  this._initVM({
+    locale: locale,
+    fallbackLocale: fallbackLocale,
+    messages: messages,
+    dateTimeFormats: dateTimeFormats,
+    numberFormats: numberFormats
+  });
+};
+
+var prototypeAccessors = { vm: { configurable: true },messages: { configurable: true },dateTimeFormats: { configurable: true },numberFormats: { configurable: true },availableLocales: { configurable: true },locale: { configurable: true },fallbackLocale: { configurable: true },formatFallbackMessages: { configurable: true },missing: { configurable: true },formatter: { configurable: true },silentTranslationWarn: { configurable: true },silentFallbackWarn: { configurable: true },preserveDirectiveContent: { configurable: true },warnHtmlInMessage: { configurable: true } };
+
+VueI18n.prototype._checkLocaleMessage = function _checkLocaleMessage (locale, level, message) {
+  var paths = [];
+
+  var fn = function (level, locale, message, paths) {
+    if (isPlainObject(message)) {
+      Object.keys(message).forEach(function (key) {
+        var val = message[key];
+        if (isPlainObject(val)) {
+          paths.push(key);
+          paths.push('.');
+          fn(level, locale, val, paths);
+          paths.pop();
+          paths.pop();
+        } else {
+          paths.push(key);
+          fn(level, locale, val, paths);
+          paths.pop();
+        }
+      });
+    } else if (Array.isArray(message)) {
+      message.forEach(function (item, index) {
+        if (isPlainObject(item)) {
+          paths.push(("[" + index + "]"));
+          paths.push('.');
+          fn(level, locale, item, paths);
+          paths.pop();
+          paths.pop();
+        } else {
+          paths.push(("[" + index + "]"));
+          fn(level, locale, item, paths);
+          paths.pop();
+        }
+      });
+    } else if (typeof message === 'string') {
+      var ret = htmlTagMatcher.test(message);
+      if (ret) {
+        var msg = "Detected HTML in message '" + message + "' of keypath '" + (paths.join('')) + "' at '" + locale + "'. Consider component interpolation with '<i18n>' to avoid XSS. See https://bit.ly/2ZqJzkp";
+        if (level === 'warn') {
+          warn(msg);
+        } else if (level === 'error') {
+          error(msg);
+        }
+      }
+    }
+  };
+
+  fn(level, locale, message, paths);
+};
+
+VueI18n.prototype._initVM = function _initVM (data) {
+  var silent = Vue.config.silent;
+  Vue.config.silent = true;
+  this._vm = new Vue({ data: data });
+  Vue.config.silent = silent;
+};
+
+VueI18n.prototype.destroyVM = function destroyVM () {
+  this._vm.$destroy();
+};
+
+VueI18n.prototype.subscribeDataChanging = function subscribeDataChanging (vm) {
+  this._dataListeners.push(vm);
+};
+
+VueI18n.prototype.unsubscribeDataChanging = function unsubscribeDataChanging (vm) {
+  remove(this._dataListeners, vm);
+};
+
+VueI18n.prototype.watchI18nData = function watchI18nData () {
+  var self = this;
+  return this._vm.$watch('$data', function () {
+    var i = self._dataListeners.length;
+    while (i--) {
+      Vue.nextTick(function () {
+        self._dataListeners[i] && self._dataListeners[i].$forceUpdate();
+      });
+    }
+  }, { deep: true })
+};
+
+VueI18n.prototype.watchLocale = function watchLocale () {
+  /* istanbul ignore if */
+  if (!this._sync || !this._root) { return null }
+  var target = this._vm;
+  return this._root.$i18n.vm.$watch('locale', function (val) {
+    target.$set(target, 'locale', val);
+    target.$forceUpdate();
+  }, { immediate: true })
+};
+
+prototypeAccessors.vm.get = function () { return this._vm };
+
+prototypeAccessors.messages.get = function () { return looseClone(this._getMessages()) };
+prototypeAccessors.dateTimeFormats.get = function () { return looseClone(this._getDateTimeFormats()) };
+prototypeAccessors.numberFormats.get = function () { return looseClone(this._getNumberFormats()) };
+prototypeAccessors.availableLocales.get = function () { return Object.keys(this.messages).sort() };
+
+prototypeAccessors.locale.get = function () { return this._vm.locale };
+prototypeAccessors.locale.set = function (locale) {
+  this._vm.$set(this._vm, 'locale', locale);
+};
+
+prototypeAccessors.fallbackLocale.get = function () { return this._vm.fallbackLocale };
+prototypeAccessors.fallbackLocale.set = function (locale) {
+  this._vm.$set(this._vm, 'fallbackLocale', locale);
+};
+
+prototypeAccessors.formatFallbackMessages.get = function () { return this._formatFallbackMessages };
+prototypeAccessors.formatFallbackMessages.set = function (fallback) { this._formatFallbackMessages = fallback; };
+
+prototypeAccessors.missing.get = function () { return this._missing };
+prototypeAccessors.missing.set = function (handler) { this._missing = handler; };
+
+prototypeAccessors.formatter.get = function () { return this._formatter };
+prototypeAccessors.formatter.set = function (formatter) { this._formatter = formatter; };
+
+prototypeAccessors.silentTranslationWarn.get = function () { return this._silentTranslationWarn };
+prototypeAccessors.silentTranslationWarn.set = function (silent) { this._silentTranslationWarn = silent; };
+
+prototypeAccessors.silentFallbackWarn.get = function () { return this._silentFallbackWarn };
+prototypeAccessors.silentFallbackWarn.set = function (silent) { this._silentFallbackWarn = silent; };
+
+prototypeAccessors.preserveDirectiveContent.get = function () { return this._preserveDirectiveContent };
+prototypeAccessors.preserveDirectiveContent.set = function (preserve) { this._preserveDirectiveContent = preserve; };
+
+prototypeAccessors.warnHtmlInMessage.get = function () { return this._warnHtmlInMessage };
+prototypeAccessors.warnHtmlInMessage.set = function (level) {
+    var this$1 = this;
+
+  var orgLevel = this._warnHtmlInMessage;
+  this._warnHtmlInMessage = level;
+  if (orgLevel !== level && (level === 'warn' || level === 'error')) {
+    var messages = this._getMessages();
+    Object.keys(messages).forEach(function (locale) {
+      this$1._checkLocaleMessage(locale, this$1._warnHtmlInMessage, messages[locale]);
+    });
+  }
+};
+
+VueI18n.prototype._getMessages = function _getMessages () { return this._vm.messages };
+VueI18n.prototype._getDateTimeFormats = function _getDateTimeFormats () { return this._vm.dateTimeFormats };
+VueI18n.prototype._getNumberFormats = function _getNumberFormats () { return this._vm.numberFormats };
+
+VueI18n.prototype._warnDefault = function _warnDefault (locale, key, result, vm, values) {
+  if (!isNull(result)) { return result }
+  if (this._missing) {
+    var missingRet = this._missing.apply(null, [locale, key, vm, values]);
+    if (typeof missingRet === 'string') {
+      return missingRet
+    }
+  } else {
+    if ( true && !this._isSilentTranslationWarn(key)) {
+      warn(
+        "Cannot translate the value of keypath '" + key + "'. " +
+        'Use the value of keypath as default.'
+      );
+    }
+  }
+
+  if (this._formatFallbackMessages) {
+    var parsedArgs = parseArgs.apply(void 0, values);
+    return this._render(key, 'string', parsedArgs.params, key)
+  } else {
+    return key
+  }
+};
+
+VueI18n.prototype._isFallbackRoot = function _isFallbackRoot (val) {
+  return !val && !isNull(this._root) && this._fallbackRoot
+};
+
+VueI18n.prototype._isSilentFallbackWarn = function _isSilentFallbackWarn (key) {
+  return this._silentFallbackWarn instanceof RegExp
+    ? this._silentFallbackWarn.test(key)
+    : this._silentFallbackWarn
+};
+
+VueI18n.prototype._isSilentFallback = function _isSilentFallback (locale, key) {
+  return this._isSilentFallbackWarn(key) && (this._isFallbackRoot() || locale !== this.fallbackLocale)
+};
+
+VueI18n.prototype._isSilentTranslationWarn = function _isSilentTranslationWarn (key) {
+  return this._silentTranslationWarn instanceof RegExp
+    ? this._silentTranslationWarn.test(key)
+    : this._silentTranslationWarn
+};
+
+VueI18n.prototype._interpolate = function _interpolate (
+  locale,
+  message,
+  key,
+  host,
+  interpolateMode,
+  values,
+  visitedLinkStack
+) {
+  if (!message) { return null }
+
+  var pathRet = this._path.getPathValue(message, key);
+  if (Array.isArray(pathRet) || isPlainObject(pathRet)) { return pathRet }
+
+  var ret;
+  if (isNull(pathRet)) {
+    /* istanbul ignore else */
+    if (isPlainObject(message)) {
+      ret = message[key];
+      if (typeof ret !== 'string') {
+        if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallback(locale, key)) {
+          warn(("Value of key '" + key + "' is not a string!"));
+        }
+        return null
+      }
+    } else {
+      return null
+    }
+  } else {
+    /* istanbul ignore else */
+    if (typeof pathRet === 'string') {
+      ret = pathRet;
+    } else {
+      if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallback(locale, key)) {
+        warn(("Value of key '" + key + "' is not a string!"));
+      }
+      return null
+    }
+  }
+
+  // Check for the existence of links within the translated string
+  if (ret.indexOf('@:') >= 0 || ret.indexOf('@.') >= 0) {
+    ret = this._link(locale, message, ret, host, 'raw', values, visitedLinkStack);
+  }
+
+  return this._render(ret, interpolateMode, values, key)
+};
+
+VueI18n.prototype._link = function _link (
+  locale,
+  message,
+  str,
+  host,
+  interpolateMode,
+  values,
+  visitedLinkStack
+) {
+  var ret = str;
+
+  // Match all the links within the local
+  // We are going to replace each of
+  // them with its translation
+  var matches = ret.match(linkKeyMatcher);
+  for (var idx in matches) {
+    // ie compatible: filter custom array
+    // prototype method
+    if (!matches.hasOwnProperty(idx)) {
+      continue
+    }
+    var link = matches[idx];
+    var linkKeyPrefixMatches = link.match(linkKeyPrefixMatcher);
+    var linkPrefix = linkKeyPrefixMatches[0];
+      var formatterName = linkKeyPrefixMatches[1];
+
+    // Remove the leading @:, @.case: and the brackets
+    var linkPlaceholder = link.replace(linkPrefix, '').replace(bracketsMatcher, '');
+
+    if (visitedLinkStack.includes(linkPlaceholder)) {
+      if (true) {
+        warn(("Circular reference found. \"" + link + "\" is already visited in the chain of " + (visitedLinkStack.reverse().join(' <- '))));
+      }
+      return ret
+    }
+    visitedLinkStack.push(linkPlaceholder);
+
+    // Translate the link
+    var translated = this._interpolate(
+      locale, message, linkPlaceholder, host,
+      interpolateMode === 'raw' ? 'string' : interpolateMode,
+      interpolateMode === 'raw' ? undefined : values,
+      visitedLinkStack
+    );
+
+    if (this._isFallbackRoot(translated)) {
+      if ( true && !this._isSilentTranslationWarn(linkPlaceholder)) {
+        warn(("Fall back to translate the link placeholder '" + linkPlaceholder + "' with root locale."));
+      }
+      /* istanbul ignore if */
+      if (!this._root) { throw Error('unexpected error') }
+      var root = this._root.$i18n;
+      translated = root._translate(
+        root._getMessages(), root.locale, root.fallbackLocale,
+        linkPlaceholder, host, interpolateMode, values
+      );
+    }
+    translated = this._warnDefault(
+      locale, linkPlaceholder, translated, host,
+      Array.isArray(values) ? values : [values]
+    );
+    if (formatters.hasOwnProperty(formatterName)) {
+      translated = formatters[formatterName](translated);
+    }
+
+    visitedLinkStack.pop();
+
+    // Replace the link with the translated
+    ret = !translated ? ret : ret.replace(link, translated);
+  }
+
+  return ret
+};
+
+VueI18n.prototype._render = function _render (message, interpolateMode, values, path) {
+  var ret = this._formatter.interpolate(message, values, path);
+
+  // If the custom formatter refuses to work - apply the default one
+  if (!ret) {
+    ret = defaultFormatter.interpolate(message, values, path);
+  }
+
+  // if interpolateMode is **not** 'string' ('row'),
+  // return the compiled data (e.g. ['foo', VNode, 'bar']) with formatter
+  return interpolateMode === 'string' ? ret.join('') : ret
+};
+
+VueI18n.prototype._translate = function _translate (
+  messages,
+  locale,
+  fallback,
+  key,
+  host,
+  interpolateMode,
+  args
+) {
+  var res =
+    this._interpolate(locale, messages[locale], key, host, interpolateMode, args, [key]);
+  if (!isNull(res)) { return res }
+
+  res = this._interpolate(fallback, messages[fallback], key, host, interpolateMode, args, [key]);
+  if (!isNull(res)) {
+    if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+      warn(("Fall back to translate the keypath '" + key + "' with '" + fallback + "' locale."));
+    }
+    return res
+  } else {
+    return null
+  }
+};
+
+VueI18n.prototype._t = function _t (key, _locale, messages, host) {
+    var ref;
+
+    var values = [], len = arguments.length - 4;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 4 ];
+  if (!key) { return '' }
+
+  var parsedArgs = parseArgs.apply(void 0, values);
+  var locale = parsedArgs.locale || _locale;
+
+  var ret = this._translate(
+    messages, locale, this.fallbackLocale, key,
+    host, 'string', parsedArgs.params
+  );
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+      warn(("Fall back to translate the keypath '" + key + "' with root locale."));
+    }
+    /* istanbul ignore if */
+    if (!this._root) { throw Error('unexpected error') }
+    return (ref = this._root).$t.apply(ref, [ key ].concat( values ))
+  } else {
+    return this._warnDefault(locale, key, ret, host, values)
+  }
+};
+
+VueI18n.prototype.t = function t (key) {
+    var ref;
+
+    var values = [], len = arguments.length - 1;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 1 ];
+  return (ref = this)._t.apply(ref, [ key, this.locale, this._getMessages(), null ].concat( values ))
+};
+
+VueI18n.prototype._i = function _i (key, locale, messages, host, values) {
+  var ret =
+    this._translate(messages, locale, this.fallbackLocale, key, host, 'raw', values);
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key)) {
+      warn(("Fall back to interpolate the keypath '" + key + "' with root locale."));
+    }
+    if (!this._root) { throw Error('unexpected error') }
+    return this._root.$i18n.i(key, locale, values)
+  } else {
+    return this._warnDefault(locale, key, ret, host, [values])
+  }
+};
+
+VueI18n.prototype.i = function i (key, locale, values) {
+  /* istanbul ignore if */
+  if (!key) { return '' }
+
+  if (typeof locale !== 'string') {
+    locale = this.locale;
+  }
+
+  return this._i(key, locale, this._getMessages(), null, values)
+};
+
+VueI18n.prototype._tc = function _tc (
+  key,
+  _locale,
+  messages,
+  host,
+  choice
+) {
+    var ref;
+
+    var values = [], len = arguments.length - 5;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 5 ];
+  if (!key) { return '' }
+  if (choice === undefined) {
+    choice = 1;
+  }
+
+  var predefined = { 'count': choice, 'n': choice };
+  var parsedArgs = parseArgs.apply(void 0, values);
+  parsedArgs.params = Object.assign(predefined, parsedArgs.params);
+  values = parsedArgs.locale === null ? [parsedArgs.params] : [parsedArgs.locale, parsedArgs.params];
+  return this.fetchChoice((ref = this)._t.apply(ref, [ key, _locale, messages, host ].concat( values )), choice)
+};
+
+VueI18n.prototype.fetchChoice = function fetchChoice (message, choice) {
+  /* istanbul ignore if */
+  if (!message && typeof message !== 'string') { return null }
+  var choices = message.split('|');
+
+  choice = this.getChoiceIndex(choice, choices.length);
+  if (!choices[choice]) { return message }
+  return choices[choice].trim()
+};
+
+/**
+ * @param choice {number} a choice index given by the input to $tc: `$tc('path.to.rule', choiceIndex)`
+ * @param choicesLength {number} an overall amount of available choices
+ * @returns a final choice index
+*/
+VueI18n.prototype.getChoiceIndex = function getChoiceIndex (choice, choicesLength) {
+  // Default (old) getChoiceIndex implementation - english-compatible
+  var defaultImpl = function (_choice, _choicesLength) {
+    _choice = Math.abs(_choice);
+
+    if (_choicesLength === 2) {
+      return _choice
+        ? _choice > 1
+          ? 1
+          : 0
+        : 1
+    }
+
+    return _choice ? Math.min(_choice, 2) : 0
+  };
+
+  if (this.locale in this.pluralizationRules) {
+    return this.pluralizationRules[this.locale].apply(this, [choice, choicesLength])
+  } else {
+    return defaultImpl(choice, choicesLength)
+  }
+};
+
+VueI18n.prototype.tc = function tc (key, choice) {
+    var ref;
+
+    var values = [], len = arguments.length - 2;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 2 ];
+  return (ref = this)._tc.apply(ref, [ key, this.locale, this._getMessages(), null, choice ].concat( values ))
+};
+
+VueI18n.prototype._te = function _te (key, locale, messages) {
+    var args = [], len = arguments.length - 3;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 3 ];
+
+  var _locale = parseArgs.apply(void 0, args).locale || locale;
+  return this._exist(messages[_locale], key)
+};
+
+VueI18n.prototype.te = function te (key, locale) {
+  return this._te(key, this.locale, this._getMessages(), locale)
+};
+
+VueI18n.prototype.getLocaleMessage = function getLocaleMessage (locale) {
+  return looseClone(this._vm.messages[locale] || {})
+};
+
+VueI18n.prototype.setLocaleMessage = function setLocaleMessage (locale, message) {
+  if (this._warnHtmlInMessage === 'warn' || this._warnHtmlInMessage === 'error') {
+    this._checkLocaleMessage(locale, this._warnHtmlInMessage, message);
+    if (this._warnHtmlInMessage === 'error') { return }
+  }
+  this._vm.$set(this._vm.messages, locale, message);
+};
+
+VueI18n.prototype.mergeLocaleMessage = function mergeLocaleMessage (locale, message) {
+  if (this._warnHtmlInMessage === 'warn' || this._warnHtmlInMessage === 'error') {
+    this._checkLocaleMessage(locale, this._warnHtmlInMessage, message);
+    if (this._warnHtmlInMessage === 'error') { return }
+  }
+  this._vm.$set(this._vm.messages, locale, merge(this._vm.messages[locale] || {}, message));
+};
+
+VueI18n.prototype.getDateTimeFormat = function getDateTimeFormat (locale) {
+  return looseClone(this._vm.dateTimeFormats[locale] || {})
+};
+
+VueI18n.prototype.setDateTimeFormat = function setDateTimeFormat (locale, format) {
+  this._vm.$set(this._vm.dateTimeFormats, locale, format);
+};
+
+VueI18n.prototype.mergeDateTimeFormat = function mergeDateTimeFormat (locale, format) {
+  this._vm.$set(this._vm.dateTimeFormats, locale, merge(this._vm.dateTimeFormats[locale] || {}, format));
+};
+
+VueI18n.prototype._localizeDateTime = function _localizeDateTime (
+  value,
+  locale,
+  fallback,
+  dateTimeFormats,
+  key
+) {
+  var _locale = locale;
+  var formats = dateTimeFormats[_locale];
+
+  // fallback locale
+  if (isNull(formats) || isNull(formats[key])) {
+    if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+      warn(("Fall back to '" + fallback + "' datetime formats from '" + locale + "' datetime formats."));
+    }
+    _locale = fallback;
+    formats = dateTimeFormats[_locale];
+  }
+
+  if (isNull(formats) || isNull(formats[key])) {
+    return null
+  } else {
+    var format = formats[key];
+    var id = _locale + "__" + key;
+    var formatter = this._dateTimeFormatters[id];
+    if (!formatter) {
+      formatter = this._dateTimeFormatters[id] = new Intl.DateTimeFormat(_locale, format);
+    }
+    return formatter.format(value)
+  }
+};
+
+VueI18n.prototype._d = function _d (value, locale, key) {
+  /* istanbul ignore if */
+  if ( true && !VueI18n.availabilities.dateTimeFormat) {
+    warn('Cannot format a Date value due to not supported Intl.DateTimeFormat.');
+    return ''
+  }
+
+  if (!key) {
+    return new Intl.DateTimeFormat(locale).format(value)
+  }
+
+  var ret =
+    this._localizeDateTime(value, locale, this.fallbackLocale, this._getDateTimeFormats(), key);
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+      warn(("Fall back to datetime localization of root: key '" + key + "'."));
+    }
+    /* istanbul ignore if */
+    if (!this._root) { throw Error('unexpected error') }
+    return this._root.$i18n.d(value, key, locale)
+  } else {
+    return ret || ''
+  }
+};
+
+VueI18n.prototype.d = function d (value) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+  var locale = this.locale;
+  var key = null;
+
+  if (args.length === 1) {
+    if (typeof args[0] === 'string') {
+      key = args[0];
+    } else if (isObject(args[0])) {
+      if (args[0].locale) {
+        locale = args[0].locale;
+      }
+      if (args[0].key) {
+        key = args[0].key;
+      }
+    }
+  } else if (args.length === 2) {
+    if (typeof args[0] === 'string') {
+      key = args[0];
+    }
+    if (typeof args[1] === 'string') {
+      locale = args[1];
+    }
+  }
+
+  return this._d(value, locale, key)
+};
+
+VueI18n.prototype.getNumberFormat = function getNumberFormat (locale) {
+  return looseClone(this._vm.numberFormats[locale] || {})
+};
+
+VueI18n.prototype.setNumberFormat = function setNumberFormat (locale, format) {
+  this._vm.$set(this._vm.numberFormats, locale, format);
+};
+
+VueI18n.prototype.mergeNumberFormat = function mergeNumberFormat (locale, format) {
+  this._vm.$set(this._vm.numberFormats, locale, merge(this._vm.numberFormats[locale] || {}, format));
+};
+
+VueI18n.prototype._getNumberFormatter = function _getNumberFormatter (
+  value,
+  locale,
+  fallback,
+  numberFormats,
+  key,
+  options
+) {
+  var _locale = locale;
+  var formats = numberFormats[_locale];
+
+  // fallback locale
+  if (isNull(formats) || isNull(formats[key])) {
+    if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+      warn(("Fall back to '" + fallback + "' number formats from '" + locale + "' number formats."));
+    }
+    _locale = fallback;
+    formats = numberFormats[_locale];
+  }
+
+  if (isNull(formats) || isNull(formats[key])) {
+    return null
+  } else {
+    var format = formats[key];
+
+    var formatter;
+    if (options) {
+      // If options specified - create one time number formatter
+      formatter = new Intl.NumberFormat(_locale, Object.assign({}, format, options));
+    } else {
+      var id = _locale + "__" + key;
+      formatter = this._numberFormatters[id];
+      if (!formatter) {
+        formatter = this._numberFormatters[id] = new Intl.NumberFormat(_locale, format);
+      }
+    }
+    return formatter
+  }
+};
+
+VueI18n.prototype._n = function _n (value, locale, key, options) {
+  /* istanbul ignore if */
+  if (!VueI18n.availabilities.numberFormat) {
+    if (true) {
+      warn('Cannot format a Number value due to not supported Intl.NumberFormat.');
+    }
+    return ''
+  }
+
+  if (!key) {
+    var nf = !options ? new Intl.NumberFormat(locale) : new Intl.NumberFormat(locale, options);
+    return nf.format(value)
+  }
+
+  var formatter = this._getNumberFormatter(value, locale, this.fallbackLocale, this._getNumberFormats(), key, options);
+  var ret = formatter && formatter.format(value);
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+      warn(("Fall back to number localization of root: key '" + key + "'."));
+    }
+    /* istanbul ignore if */
+    if (!this._root) { throw Error('unexpected error') }
+    return this._root.$i18n.n(value, Object.assign({}, { key: key, locale: locale }, options))
+  } else {
+    return ret || ''
+  }
+};
+
+VueI18n.prototype.n = function n (value) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+  var locale = this.locale;
+  var key = null;
+  var options = null;
+
+  if (args.length === 1) {
+    if (typeof args[0] === 'string') {
+      key = args[0];
+    } else if (isObject(args[0])) {
+      if (args[0].locale) {
+        locale = args[0].locale;
+      }
+      if (args[0].key) {
+        key = args[0].key;
+      }
+
+      // Filter out number format options only
+      options = Object.keys(args[0]).reduce(function (acc, key) {
+          var obj;
+
+        if (numberFormatKeys.includes(key)) {
+          return Object.assign({}, acc, ( obj = {}, obj[key] = args[0][key], obj ))
+        }
+        return acc
+      }, null);
+    }
+  } else if (args.length === 2) {
+    if (typeof args[0] === 'string') {
+      key = args[0];
+    }
+    if (typeof args[1] === 'string') {
+      locale = args[1];
+    }
+  }
+
+  return this._n(value, locale, key, options)
+};
+
+VueI18n.prototype._ntp = function _ntp (value, locale, key, options) {
+  /* istanbul ignore if */
+  if (!VueI18n.availabilities.numberFormat) {
+    if (true) {
+      warn('Cannot format to parts a Number value due to not supported Intl.NumberFormat.');
+    }
+    return []
+  }
+
+  if (!key) {
+    var nf = !options ? new Intl.NumberFormat(locale) : new Intl.NumberFormat(locale, options);
+    return nf.formatToParts(value)
+  }
+
+  var formatter = this._getNumberFormatter(value, locale, this.fallbackLocale, this._getNumberFormats(), key, options);
+  var ret = formatter && formatter.formatToParts(value);
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key)) {
+      warn(("Fall back to format number to parts of root: key '" + key + "' ."));
+    }
+    /* istanbul ignore if */
+    if (!this._root) { throw Error('unexpected error') }
+    return this._root.$i18n._ntp(value, locale, key, options)
+  } else {
+    return ret || []
+  }
+};
+
+Object.defineProperties( VueI18n.prototype, prototypeAccessors );
+
+var availabilities;
+// $FlowFixMe
+Object.defineProperty(VueI18n, 'availabilities', {
+  get: function get () {
+    if (!availabilities) {
+      var intlDefined = typeof Intl !== 'undefined';
+      availabilities = {
+        dateTimeFormat: intlDefined && typeof Intl.DateTimeFormat !== 'undefined',
+        numberFormat: intlDefined && typeof Intl.NumberFormat !== 'undefined'
+      };
+    }
+
+    return availabilities
+  }
+});
+
+VueI18n.install = install;
+VueI18n.version = '8.14.1';
+
+/* harmony default export */ __webpack_exports__["default"] = (VueI18n);
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-js-toggle-button/dist/index.js":
 /*!*********************************************************!*\
   !*** ./node_modules/vue-js-toggle-button/dist/index.js ***!
@@ -36827,7 +38778,7 @@ var render = function() {
                   : _vm._e(),
                 _vm._v(
                   "\n                " +
-                    _vm._s(_vm._f("ucfirst")(_vm._f("trans")(_vm.name))) +
+                    _vm._s(_vm.text || _vm.name) +
                     "\n            "
                 )
               ]
@@ -36954,11 +38905,8 @@ var render = function() {
             {
               name: "tooltip",
               rawName: "v-tooltip",
-              value: _vm.setting.disabled
-                ? _vm.trans("settings.readonly")
-                : false,
-              expression:
-                "setting.disabled ? trans('settings.readonly') : false"
+              value: _vm.setting.disabled ? _vm.$t("settings.readonly") : false,
+              expression: "setting.disabled ? $t('settings.readonly') : false"
             }
           ],
           staticClass: "col-sm-5"
@@ -37001,8 +38949,8 @@ var render = function() {
               {
                 name: "tooltip",
                 rawName: "v-tooltip",
-                value: _vm.trans("Undo"),
-                expression: "trans('Undo')"
+                value: _vm.$t("Undo"),
+                expression: "$t('Undo')"
               }
             ],
             staticClass: "btn btn-primary",
@@ -37025,8 +38973,8 @@ var render = function() {
               {
                 name: "tooltip",
                 rawName: "v-tooltip",
-                value: _vm.trans("Reset to default"),
-                expression: "trans('Reset to default')"
+                value: _vm.$t("Reset to default"),
+                expression: "$t('Reset to default')"
               }
             ],
             staticClass: "btn btn-default",
@@ -37126,14 +39074,29 @@ var render = function() {
     },
     [
       _vm._v(" "),
-      _c("tab", { attrs: { name: "global", selected: "global" === _vm.tab } }, [
-        _vm._v("Global tab")
-      ]),
+      _c(
+        "tab",
+        {
+          attrs: {
+            name: "global",
+            selected: "global" === _vm.tab,
+            text: _vm.$t("settings.groups.global")
+          }
+        },
+        [_vm._v("Global tab")]
+      ),
       _vm._v(" "),
       _vm._l(_vm.groups, function(sections, group) {
         return _c(
           "tab",
-          { key: group, attrs: { name: group, selected: group === _vm.tab } },
+          {
+            key: group,
+            attrs: {
+              name: group,
+              selected: group === _vm.tab,
+              text: _vm.$t("settings.groups." + group)
+            }
+          },
           [
             _c(
               "accordion",
@@ -37148,7 +39111,11 @@ var render = function() {
                   "accordion-item",
                   {
                     key: item,
-                    attrs: { name: item, active: item === _vm.section }
+                    attrs: {
+                      name: item,
+                      text: _vm.$t("settings.sections." + group + "." + item),
+                      active: item === _vm.section
+                    }
                   },
                   [
                     _c(
@@ -37204,8 +39171,8 @@ var render = function() {
         {
           name: "tooltip",
           rawName: "v-tooltip",
-          value: _vm.disabled ? _vm.trans("setttings.readonly") : false,
-          expression: "disabled ? trans('setttings.readonly') : false"
+          value: _vm.disabled ? _vm.$t("setttings.readonly") : false,
+          expression: "disabled ? $t('setttings.readonly') : false"
         }
       ]
     },
@@ -37685,7 +39652,7 @@ var render = function() {
                         : _vm._e(),
                       _vm._v(
                         "\n                        " +
-                          _vm._s(_vm._f("ucfirst")(_vm._f("trans")(tab.name))) +
+                          _vm._s(tab.text || tab.name) +
                           " \n                    "
                       )
                     ]
@@ -53353,6 +55320,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_js_toggle_button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-js-toggle-button */ "./node_modules/vue-js-toggle-button/dist/index.js");
 /* harmony import */ var vue_js_toggle_button__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue_js_toggle_button__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var v_tooltip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! v-tooltip */ "./node_modules/v-tooltip/dist/v-tooltip.esm.js");
+/* harmony import */ var vue_i18n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-i18n */ "./node_modules/vue-i18n/dist/vue-i18n.esm.js");
+/* harmony import */ var _vue_i18n_locales_generated__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./vue-i18n-locales.generated */ "./resources/js/vue-i18n-locales.generated.js");
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -53389,26 +55358,24 @@ Vue.filter('ucfirst', function (value) {
   value = value.toString();
   return value.charAt(0).toUpperCase() + value.slice(1);
 });
-Vue.filter('trans', function () {
-  var _lang;
 
-  return arguments.length <= 0 ? undefined : arguments[0];
-  return (_lang = lang).get.apply(_lang, arguments); // TODO implement translation
+
+Vue.use(vue_i18n__WEBPACK_IMPORTED_MODULE_3__["default"]);
+var lang = document.documentElement.lang.substr(0, 2); // or however you determine your current app locale
+
+var i18n = new vue_i18n__WEBPACK_IMPORTED_MODULE_3__["default"]({
+  locale: lang,
+  messages: _vue_i18n_locales_generated__WEBPACK_IMPORTED_MODULE_4__["default"]
 });
-
-Vue.prototype.trans = function (text) {
-  return text;
-  return lang.get(text);
-};
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-
 var app = new Vue({
-  el: '#app'
+  el: '#app',
+  i18n: i18n
 });
 
 /***/ }),
@@ -54728,6 +56695,3184 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_template_id_41d51ed4_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
+
+/***/ }),
+
+/***/ "./resources/js/vue-i18n-locales.generated.js":
+/*!****************************************************!*\
+  !*** ./resources/js/vue-i18n-locales.generated.js ***!
+  \****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  "en": {
+    "Undo": "Undo",
+    "Reset to default": "Reset to default",
+    "syslog": {
+      "severity": ["Emergency", "Alert", "Critical", "Error", "Warning", "Notice", "Informational", "Debug"],
+      "facility": ["kernel messages", "user-level messages", "mail-system", "system daemons", "security/authorization messages", "messages generated internally by syslogd", "line printer subsystem", "network news subsystem", "UUCP subsystem", "clock daemon", "security/authorization messages", "FTP daemon", "NTP subsystem", "log audit", "log alert", "clock daemon (note 2)", "local use 0  (local0)", "local use 1  (local1)", "local use 2  (local2)", "local use 3  (local3)", "local use 4  (local4)", "local use 5  (local5)", "local use 6  (local6)", "local use 7  (local7)"]
+    },
+    "settings": {
+      "readonly": "Set in config.php, remove from config.php to enable.",
+      "groups": {
+        "alerting": "Alerting",
+        "auth": "Authentication",
+        "external": "External",
+        "global": "Global",
+        "os": "OS",
+        "poller": "Poller",
+        "system": "System",
+        "webui": "Web UI"
+      },
+      "sections": {
+        "alerting": {
+          "general": "General Alert Settings",
+          "email": "Email Options"
+        },
+        "auth": {
+          "general": "General Authentication Settings",
+          "ad": "Active Directory Settings",
+          "ldap": "LDAP Settings"
+        },
+        "external": {
+          "location": "Location Settings",
+          "oxidized": "Oxidized Integration",
+          "binaries": "Binary Locations",
+          "peeringdb": "PeeringDB Integration",
+          "unix-agent": "Unix-Agent Integration"
+        },
+        "poller": {
+          "ping": "Ping",
+          "rrdtool": "RRDTool Setup",
+          "snmp": "SNMP"
+        },
+        "system": {
+          "cleanup": "Cleanup",
+          "server": "Server",
+          "updates": "Updates"
+        },
+        "webui": {
+          "availability-map": "Availability Map Settings",
+          "graph": "Graph Settings",
+          "dashboard": "Dashboard Settings",
+          "search": "Search Settings",
+          "style": "Style"
+        }
+      },
+      "settings": {
+        "active_directory": {
+          "users_purge": {
+            "description": "Keep inactive users for",
+            "help": "Delete users from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in."
+          }
+        },
+        "addhost_alwayscheckip": {
+          "description": "Check for duplicate IP when adding devices",
+          "help": "If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts."
+        },
+        "alert": {
+          "ack_until_clear": {
+            "description": "Default acknowledge until alert clears option",
+            "help": "Default acknowledge until alert clears"
+          },
+          "admins": {
+            "description": "Issue alerts to admins",
+            "help": "Alert administrators"
+          },
+          "default_copy": {
+            "description": "Copy all email alerts to default contact",
+            "help": "Copy all email alerts to default contact"
+          },
+          "default_if_none": {
+            "description": "cannot set in webui?",
+            "help": "Send mail to default contact if no other contacts are found"
+          },
+          "default_mail": {
+            "description": "Default contact",
+            "help": "The default mail contact"
+          },
+          "default_only": {
+            "description": "Send alerts to default contact only",
+            "help": "Only alert default mail contact"
+          },
+          "disable": {
+            "description": "Disable alerting",
+            "help": "Stop alerts being generated"
+          },
+          "fixed-contacts": {
+            "description": "Updates to contact email addresses not honored",
+            "help": "If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active"
+          },
+          "globals": {
+            "description": "Issue alerts to read only users",
+            "help": "Alert read only administrators"
+          },
+          "syscontact": {
+            "description": "Issue alerts to sysContact",
+            "help": "Send alert to email in SNMP sysContact"
+          },
+          "transports": {
+            "mail": {
+              "description": "Enable email alerting",
+              "help": "Mail alerting transport"
+            }
+          },
+          "tolerance_window": {
+            "description": "Tolerance window for cron",
+            "help": "Tolerance window in seconds"
+          },
+          "users": {
+            "description": "Issue alerts to normal users",
+            "help": "Alert normal users"
+          }
+        },
+        "alert_log_purge": {
+          "description": "Alert log entries older than",
+          "help": "Cleanup done by daily.sh"
+        },
+        "allow_unauth_graphs": {
+          "description": "Allow unauthenticated graph access",
+          "help": "Allows any one to access graphs without login"
+        },
+        "allow_unauth_graphs_cidr": {
+          "description": "Allow the given networks graph access",
+          "help": "Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)"
+        },
+        "api_demo": {
+          "description": "This is the demo"
+        },
+        "apps": {
+          "powerdns-recursor": {
+            "api-key": {
+              "description": "API key for PowerDNS Recursor",
+              "help": "API key for the PowerDNS Recursor app when connecting directly"
+            },
+            "https": {
+              "description": "PowerDNS Recursor use HTTPS?",
+              "help": "Use HTTPS instead of HTTP for the PowerDNS Recursor app when connecting directly"
+            },
+            "port": {
+              "description": "PowerDNS Recursor port",
+              "help": "TCP port to use for the PowerDNS Recursor app when connecting directly"
+            }
+          }
+        },
+        "astext": {
+          "description": "Key to hold cache of autonomous systems descriptions"
+        },
+        "auth_ad_base_dn": {
+          "description": "Base DN",
+          "help": "groups and users must be under this dn. Example: dc=example,dc=com"
+        },
+        "auth_ad_check_certificates": {
+          "description": "Check certificate",
+          "help": "Check certificates for validity. Some servers use self signed certificates, disabling this allows those."
+        },
+        "auth_ad_group_filter": {
+          "description": "Group LDAP filter",
+          "help": "Active Directory LDAP filter for selecting groups"
+        },
+        "auth_ad_groups": {
+          "description": "Group access",
+          "help": "Define groups that have access and level"
+        },
+        "auth_ad_user_filter": {
+          "description": "User LDAP filter",
+          "help": "Active Directory LDAP filter for selecting users"
+        },
+        "auth_ldap_attr": {
+          "uid": {
+            "description": "Attribute to check username against",
+            "help": "Attribute used to identify users by username"
+          }
+        },
+        "auth_ldap_binddn": {
+          "description": "Bind DN (overrides bind username)",
+          "help": "Full DN of bind user"
+        },
+        "auth_ldap_bindpassword": {
+          "description": "Bind password",
+          "help": "Password for bind user"
+        },
+        "auth_ldap_binduser": {
+          "description": "Bind username",
+          "help": "Used to query the LDAP server when no user is logged in (alerts, API, etc)"
+        },
+        "auth_ad_binddn": {
+          "description": "Bind DN (overrides bind username)",
+          "help": "Full DN of bind user"
+        },
+        "auth_ad_bindpassword": {
+          "description": "Bind password",
+          "help": "Password for bind user"
+        },
+        "auth_ad_binduser": {
+          "description": "Bind username",
+          "help": "Used to query the AD server when no user is logged in (alerts, API, etc)"
+        },
+        "auth_ldap_cache_ttl": {
+          "description": "LDAP cache expiration",
+          "help": "Temporarily stores LDAP query results.  Improves speeds, but the data may be stale."
+        },
+        "auth_ldap_debug": {
+          "description": "Show debug",
+          "help": "Shows debug information.  May expose private information, do not leave enabled."
+        },
+        "auth_ldap_emailattr": {
+          "description": "Mail attribute"
+        },
+        "auth_ldap_group": {
+          "description": "Access group DN",
+          "help": "Distinguished name for a group to give normal level access. Example: cn=groupname,ou=groups,dc=example,dc=com"
+        },
+        "auth_ldap_groupbase": {
+          "description": "Group base DN",
+          "help": "Distinguished name to search for groups Example: ou=group,dc=example,dc=com"
+        },
+        "auth_ldap_groupmemberattr": {
+          "description": "Group member attribute"
+        },
+        "auth_ldap_groupmembertype": {
+          "description": "Find group members by",
+          "options": {
+            "username": "Username",
+            "fulldn": "Full DN (using prefix and suffix)",
+            "puredn": "DN Search (search using uid attribute)"
+          }
+        },
+        "auth_ldap_groups": {
+          "description": "Group access",
+          "help": "Define groups that have access and level"
+        },
+        "auth_ldap_port": {
+          "description": "LDAP port",
+          "help": "Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636"
+        },
+        "auth_ldap_prefix": {
+          "description": "User prefix",
+          "help": "Used to turn a username into a distinguished name"
+        },
+        "auth_ldap_server": {
+          "description": "LDAP Server(s)",
+          "help": "Set server(s), space separated. Prefix with ldaps:// for ssl"
+        },
+        "auth_ldap_starttls": {
+          "description": "Use STARTTLS",
+          "help": "Use STARTTLS to secure the connection.  Alternative to LDAPS.",
+          "options": {
+            "disabled": "Disabled",
+            "optional": "Optional",
+            "required": "Required"
+          }
+        },
+        "auth_ldap_suffix": {
+          "description": "User suffix",
+          "help": "Used to turn a username into a distinguished name"
+        },
+        "auth_ldap_timeout": {
+          "description": "Connection timeout",
+          "help": "If one or more servers are unresponsive, higher timeouts will cause slow access. To low may cause connection failures in some cases"
+        },
+        "auth_ldap_uid_attribute": {
+          "description": "Unique ID attribute",
+          "help": "LDAP attribute to use to identify users, must be numeric"
+        },
+        "auth_ldap_userdn": {
+          "description": "Use full user DN",
+          "help": "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it’s member: uid=username,ou=groups,dc=domain,dc=com)"
+        },
+        "auth_ldap_version": {
+          "description": "LDAP version",
+          "help": "LDAP version to use to talk to the server.  Usually this should be v3",
+          "options": {
+            "2": "2",
+            "3": "3"
+          }
+        },
+        "auth_mechanism": {
+          "description": "Authorization Method (Caution!)",
+          "help": "Authorization method.  Caution, you may lose the ability to log in. You can override this back to mysql by setting $config['auth_mechanism'] = 'mysql'; in your config.php",
+          "options": {
+            "mysql": "MySQL (default)",
+            "active_directory": "Active Directory",
+            "ldap": "LDAP",
+            "radius": "Radius",
+            "http-auth": "HTTP Authentication",
+            "ad-authorization": "Externally authenticated AD",
+            "ldap-authorization": "Externally authenticated LDAP",
+            "sso": "Single Sign On"
+          }
+        },
+        "auth_remember": {
+          "description": "Remember me duration",
+          "help": "Number of days to keep a user logged in when checking the remember me checkbox at log in."
+        },
+        "authlog_purge": {
+          "description": "Auth log entries older than (days)",
+          "help": "Cleanup done by daily.sh"
+        },
+        "device_perf_purge": {
+          "description": "Device performance entries older than (days)",
+          "help": "Cleanup done by daily.sh"
+        },
+        "email_auto_tls": {
+          "description": "Enable / disable Auto TLS support",
+          "options": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
+        "email_backend": {
+          "description": "How to deliver mail",
+          "help": "The backend to use for sending email, can be mail, sendmail or SMTP",
+          "options": {
+            "mail": "mail",
+            "sendmail": "sendmail",
+            "smtp": "SMTP"
+          }
+        },
+        "email_from": {
+          "description": "From email address",
+          "help": "Email address used for sending emails (from)"
+        },
+        "email_html": {
+          "description": "Use HTML emails",
+          "help": "Send HTML emails"
+        },
+        "email_sendmail_path": {
+          "description": "Location of sendmail if using this option"
+        },
+        "email_smtp_auth": {
+          "description": "Enable / disable smtp authentication"
+        },
+        "email_smtp_host": {
+          "description": "SMTP Host for sending email if using this option"
+        },
+        "email_smtp_password": {
+          "description": "SMTP Auth password"
+        },
+        "email_smtp_port": {
+          "description": "SMTP port setting"
+        },
+        "email_smtp_secure": {
+          "description": "Enable / disable encryption (use tls or ssl)",
+          "options": {
+            "": "Disabled",
+            "tls": "TLS",
+            "ssl": "SSL"
+          }
+        },
+        "email_smtp_timeout": {
+          "description": "SMTP timeout setting"
+        },
+        "email_smtp_username": {
+          "description": "SMTP Auth username"
+        },
+        "email_user": {
+          "description": "From name",
+          "help": "Name used as part of the from address"
+        },
+        "eventlog_purge": {
+          "description": "Event log entries older than (days)",
+          "help": "Cleanup done by daily.sh"
+        },
+        "favicon": {
+          "description": "Favicon",
+          "help": "Overrides the default favicon."
+        },
+        "fping": {
+          "description": "Path to fping"
+        },
+        "fping6": {
+          "description": "Path to fping6"
+        },
+        "fping_options": {
+          "count": {
+            "description": "fping count",
+            "help": "The number of pings to send when checking if a host is up or down via icmp"
+          },
+          "interval": {
+            "description": "fping interval",
+            "help": "The amount of milliseconds to wait between pings"
+          },
+          "timeout": {
+            "description": "fping timeout",
+            "help": "The amount of milliseconds to wait for an echo response before giving up"
+          }
+        },
+        "geoloc": {
+          "api_key": {
+            "description": "Geocoding API Key",
+            "help": "Geocoding API Key (Required to function)"
+          },
+          "engine": {
+            "description": "Geocoding Engine",
+            "options": {
+              "google": "Google Maps",
+              "openstreetmap": "OpenStreetMap",
+              "mapquest": "MapQuest",
+              "bing": "Bing Maps"
+            }
+          }
+        },
+        "ipmitool": {
+          "description": "Path to ipmtool"
+        },
+        "login_message": {
+          "description": "Logon Message",
+          "help": "Displayed on the login page"
+        },
+        "mono_font": {
+          "description": "Monospaced Font"
+        },
+        "mtr": {
+          "description": "Path to mtr"
+        },
+        "nmap": {
+          "description": "Path to nmap"
+        },
+        "own_hostname": {
+          "description": "LibreNMS hostname",
+          "help": "Should be set to the hostname/ip the librenms server is added as"
+        },
+        "oxidized": {
+          "default_group": {
+            "description": "Set the default group returned"
+          },
+          "enabled": {
+            "description": "Enable Oxidized support"
+          },
+          "features": {
+            "versioning": {
+              "description": "Enable config versioning access",
+              "help": "Enable Oxidized config versioning (requires git backend)"
+            }
+          },
+          "group_support": {
+            "description": "Enable the return of groups to Oxidized"
+          },
+          "reload_nodes": {
+            "description": "Reload Oxidized nodes list, each time a device is added"
+          },
+          "url": {
+            "description": "URL to your Oxidized API",
+            "help": "Oxidized API url (For example: http://127.0.0.1{8888})"
+          }
+        },
+        "peeringdb": {
+          "enabled": {
+            "description": "Enable PeeringDB lookup",
+            "help": "Enable PeeringDB lookup (data is downloaded with daily.sh)"
+          }
+        },
+        "perf_times_purge": {
+          "description": "Poller performance log entries older than (days)",
+          "help": "Cleanup done by daily.sh"
+        },
+        "ping": {
+          "description": "Path to ping"
+        },
+        "public_status": {
+          "description": "Show status publicly",
+          "help": "Shows the status of some devices on the logon page without authentication."
+        },
+        "rrd": {
+          "heartbeat": {
+            "description": "Change the rrd heartbeat value (default 600)"
+          },
+          "step": {
+            "description": "Change the rrd step value (default 300)"
+          }
+        },
+        "rrd_dir": {
+          "description": "RRD Location",
+          "help": "Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files."
+        },
+        "rrd_rra": {
+          "description": "RRD Format Settings",
+          "help": "These cannot be changed without deleting your existing RRD files. Though one could conceivably increase or decrease the size of each RRA if one had performance problems or if one had a very fast I/O subsystem with no performance worries."
+        },
+        "rrdcached": {
+          "description": "Enable rrdcached (socket)",
+          "help": "Enables rrdcached by setting the location of the rrdcached socket. Can be unix or network socket (unix:/run/rrdcached.sock or localhost{42217})"
+        },
+        "rrdtool": {
+          "description": "Path to rrdtool"
+        },
+        "rrdtool_tune": {
+          "description": "Tune all rrd port files to use max values",
+          "help": "Auto tune maximum value for rrd port files"
+        },
+        "sfdp": {
+          "description": "Path to sfdp"
+        },
+        "site_style": {
+          "description": "Set the site css style",
+          "options": {
+            "blue": "Blue",
+            "dark": "Dark",
+            "light": "Light",
+            "mono": "Mono"
+          }
+        },
+        "snmpbulkwalk": {
+          "description": "Path to snmpbulkwalk"
+        },
+        "snmpget": {
+          "description": "Path to snmpget"
+        },
+        "snmpgetnext": {
+          "description": "Path to snmpgetnext"
+        },
+        "snmptranslate": {
+          "description": "Path to snmptranslate"
+        },
+        "snmpwalk": {
+          "description": "Path to snmpwalk"
+        },
+        "syslog_filter": {
+          "description": "Filter syslog messages containing"
+        },
+        "syslog_purge": {
+          "description": "Syslog entries older than (days)",
+          "help": "Cleanup done by daily.sh"
+        },
+        "traceroute": {
+          "description": "Path to traceroute"
+        },
+        "traceroute6": {
+          "description": "Path to traceroute6"
+        },
+        "unix-agent": {
+          "connection-timeout": {
+            "description": "Unix-agent connection timeout"
+          },
+          "port": {
+            "description": "Default unix-agent port",
+            "help": "Default port for the unix-agent (check_mk)"
+          },
+          "read-timeout": {
+            "description": "Unix-agent read timeout"
+          }
+        },
+        "update": {
+          "description": "Enable updates in ./daily.sh"
+        },
+        "update_channel": {
+          "description": "Set update Channel",
+          "options": {
+            "master": "master",
+            "release": "release"
+          }
+        },
+        "virsh": {
+          "description": "Path to virsh"
+        },
+        "webui": {
+          "availability_map_box_size": {
+            "description": "Availability box width",
+            "help": "Input desired tile width in pixels for box size in full view"
+          },
+          "availability_map_compact": {
+            "description": "Availability map compact view",
+            "help": "Availability map view with small indicators"
+          },
+          "availability_map_sort_status": {
+            "description": "Sort by status",
+            "help": "Sort devices and services by status"
+          },
+          "availability_map_use_device_groups": {
+            "description": "Use device groups filter",
+            "help": "Enable usage of device groups filter"
+          },
+          "default_dashboard_id": {
+            "description": "Global default dashboard_id for all users who do not have their own default set"
+          },
+          "dynamic_graphs": {
+            "description": "Enable dynamic graphs",
+            "help": "Enable dynamic graphs, enables zooming and panning on graphs"
+          },
+          "global_search_result_limit": {
+            "description": "Set the max search result limit",
+            "help": "Global search results limit"
+          },
+          "graph_stacked": {
+            "description": "Use stacked graphs",
+            "help": "Display stacked graphs instead of inverted graphs"
+          },
+          "graph_type": {
+            "description": "Set the graph type",
+            "help": "Set the default graph type",
+            "options": {
+              "png": "PNG",
+              "svg": "SVG"
+            }
+          },
+          "min_graph_height": {
+            "description": "Set the minimum graph height",
+            "help": "Minimum Graph Height (default: 300)"
+          }
+        },
+        "whois": {
+          "description": "Path to whois"
+        }
+      },
+      "units": {
+        "days": "days",
+        "ms": "ms",
+        "seconds": "seconds"
+      },
+      "validate": {
+        "boolean": "{value} is not a valid boolean",
+        "email": "{value} is not a valid email",
+        "integer": "{value} is not an integer",
+        "password": "The password is incorrect",
+        "select": "{value} is not an allowed value",
+        "text": "{value} is not allowed"
+      }
+    },
+    "passwords": {
+      "password": "Passwords must be at least eight characters and match the confirmation.",
+      "reset": "Your password has been reset!",
+      "sent": "We have e-mailed your password reset link!",
+      "token": "This password reset token is invalid.",
+      "user": "We can't find a user with that e-mail address."
+    },
+    "sensors": {
+      "airflow": {
+        "short": "Airflow",
+        "long": "Airflow",
+        "unit": "cfm",
+        "unit_long": "Cubic Feet per Minute"
+      },
+      "ber": {
+        "short": "BER",
+        "long": "Bit Error Rate",
+        "unit": "",
+        "unit_long": ""
+      },
+      "charge": {
+        "short": "Charge",
+        "long": "Charge Percent",
+        "unit": "%",
+        "unit_long": "Percent"
+      },
+      "chromatic_dispersion": {
+        "short": "Chromatic Dispersion",
+        "long": "Chromatic Dispersion",
+        "unit": "ps/nm/km",
+        "unit_long": "Picoseconds per Nanometer per Kilometer"
+      },
+      "cooling": {
+        "short": "Cooling",
+        "long": "",
+        "unit": "W",
+        "unit_long": "Watts"
+      },
+      "count": {
+        "short": "Count",
+        "long": "Count",
+        "unit": "",
+        "unit_long": ""
+      },
+      "current": {
+        "short": "Current",
+        "long": "Current",
+        "unit": "A",
+        "unit_long": "Amperes"
+      },
+      "dbm": {
+        "short": "dBm",
+        "long": "dBm",
+        "unit": "dBm",
+        "unit_long": "Decibel-Milliwatts"
+      },
+      "delay": {
+        "short": "Delay",
+        "long": "Delay",
+        "unit": "s",
+        "unit_long": "Seconds"
+      },
+      "eer": {
+        "short": "EER",
+        "long": "Energy Efficient Ratio",
+        "unit": "",
+        "unit_long": ""
+      },
+      "fanspeed": {
+        "short": "Fanspeed",
+        "long": "Fan Speed",
+        "unit": "RPM",
+        "unit_long": "Rotations per Minute"
+      },
+      "frequency": {
+        "short": "Frequency",
+        "long": "Frequency",
+        "unit": "Hz",
+        "unit_long": "Hertz"
+      },
+      "humidity": {
+        "short": "Humidity",
+        "long": "Humidity Percent",
+        "unit": "%",
+        "unit_long": "Percent"
+      },
+      "load": {
+        "short": "Load",
+        "long": "Load Percent",
+        "unit": "%",
+        "unit_long": "Percent"
+      },
+      "power": {
+        "short": "Power",
+        "long": "Power",
+        "unit": "W",
+        "unit_long": "Watts"
+      },
+      "power_consumed": {
+        "short": "Power Consumed",
+        "long": "Power Consumed",
+        "unit": "kWh",
+        "unit_long": "Killowatt-Hours"
+      },
+      "power_factor": {
+        "short": "Power Factor",
+        "long": "Power Factor",
+        "unit": "",
+        "unit_long": ""
+      },
+      "pressure": {
+        "short": "Pressure",
+        "long": "Pressure",
+        "unit": "kPa",
+        "unit_long": "Kilopascals"
+      },
+      "quality_factor": {
+        "short": "Quality Factor",
+        "long": "Quality Factor",
+        "unit": "",
+        "unit_long": ""
+      },
+      "runtime": {
+        "short": "Runtime",
+        "long": "Runtime",
+        "unit": "Min",
+        "unit_long": "Minutes"
+      },
+      "signal": {
+        "short": "Signal",
+        "long": "Signal",
+        "unit": "dBm",
+        "unit_long": "Decibal-Milliwatts"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "Signal to Noise Ratio",
+        "unit": "dB",
+        "unit_long": "Decibels"
+      },
+      "state": {
+        "short": "State",
+        "long": "State",
+        "unit": ""
+      },
+      "temperature": {
+        "short": "Temperature",
+        "long": "Temperature",
+        "unit": "°C",
+        "unit_long": "° Celsius"
+      },
+      "voltage": {
+        "short": "Voltage",
+        "long": "voltage",
+        "unit": "V",
+        "unit_long": "Volts"
+      },
+      "waterflow": {
+        "short": "Waterflow",
+        "long": "Water Flow",
+        "unit": "l/m",
+        "unit_long": "Liters Per Minute"
+      }
+    },
+    "wireless": {
+      "ap-count": {
+        "short": "APs",
+        "long": "AP Count",
+        "unit": ""
+      },
+      "clients": {
+        "short": "Clients",
+        "long": "Client Count",
+        "unit": ""
+      },
+      "capacity": {
+        "short": "Capacity",
+        "long": "Capacity",
+        "unit": "%"
+      },
+      "ccq": {
+        "short": "CCQ",
+        "long": "Client Connection Quality",
+        "unit": "%"
+      },
+      "errors": {
+        "short": "Errors",
+        "long": "Error Count",
+        "unit": ""
+      },
+      "error-ratio": {
+        "short": "Error Ratio",
+        "long": "Bit/Packet Error Ratio",
+        "unit": "%"
+      },
+      "error-rate": {
+        "short": "BER",
+        "long": "Bit Error Rate",
+        "unit": "bps"
+      },
+      "frequency": {
+        "short": "Frequency",
+        "long": "Frequency",
+        "unit": "MHz"
+      },
+      "distance": {
+        "short": "Distance",
+        "long": "Distance",
+        "unit": "km"
+      },
+      "mse": {
+        "short": "MSE",
+        "long": "Mean Square Error",
+        "unit": "dB"
+      },
+      "noise-floor": {
+        "short": "Noise Floor",
+        "long": "Noise Floor",
+        "unit": "dBm/Hz"
+      },
+      "power": {
+        "short": "Power/Signal",
+        "long": "TX/RX Power or Signal",
+        "unit": "dBm"
+      },
+      "quality": {
+        "short": "Quality",
+        "long": "Quality",
+        "unit": "%"
+      },
+      "rate": {
+        "short": "Rate",
+        "long": "TX/RX Rate",
+        "unit": "bps"
+      },
+      "rssi": {
+        "short": "RSSI",
+        "long": "Received Signal Strength Indicator",
+        "unit": "dBm"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "Signal-to-Noise Ratio",
+        "unit": "dB"
+      },
+      "ssr": {
+        "short": "SSR",
+        "long": "Signal Strength Ratio",
+        "unit": "dB"
+      },
+      "utilization": {
+        "short": "Utilization",
+        "long": "utilization",
+        "unit": "%"
+      },
+      "xpi": {
+        "short": "XPI",
+        "long": "Cross Polar Interference",
+        "unit": "dB"
+      }
+    },
+    "auth": {
+      "failed": "These credentials do not match our records.",
+      "throttle": "Too many login attempts. Please try again in {seconds} seconds."
+    },
+    "pagination": {
+      "previous": "&laquo; Previous",
+      "next": "Next &raquo;"
+    },
+    "validation": {
+      "accepted": "The {attribute} must be accepted.",
+      "active_url": "The {attribute} is not a valid URL.",
+      "after": "The {attribute} must be a date after {date}.",
+      "after_or_equal": "The {attribute} must be a date after or equal to {date}.",
+      "alpha": "The {attribute} may only contain letters.",
+      "alpha_dash": "The {attribute} may only contain letters, numbers, dashes and underscores.",
+      "alpha_num": "The {attribute} may only contain letters and numbers.",
+      "alpha_space": "The {attribute} may only contain letters, numbers, underscores and spaces.",
+      "array": "The {attribute} must be an array.",
+      "before": "The {attribute} must be a date before {date}.",
+      "before_or_equal": "The {attribute} must be a date before or equal to {date}.",
+      "between": {
+        "numeric": "The {attribute} must be between {min} and {max}.",
+        "file": "The {attribute} must be between {min} and {max} kilobytes.",
+        "string": "The {attribute} must be between {min} and {max} characters.",
+        "array": "The {attribute} must have between {min} and {max} items."
+      },
+      "boolean": "The {attribute} field must be true or false.",
+      "confirmed": "The {attribute} confirmation does not match.",
+      "date": "The {attribute} is not a valid date.",
+      "date_equals": "The {attribute} must be a date equal to {date}.",
+      "date_format": "The {attribute} does not match the format {format}.",
+      "different": "The {attribute} and {other} must be different.",
+      "digits": "The {attribute} must be {digits} digits.",
+      "digits_between": "The {attribute} must be between {min} and {max} digits.",
+      "dimensions": "The {attribute} has invalid image dimensions.",
+      "distinct": "The {attribute} field has a duplicate value.",
+      "email": "The {attribute} must be a valid email address.",
+      "ends_with": "The {attribute} must end with one of the following: {values}",
+      "exists": "The selected {attribute} is invalid.",
+      "file": "The {attribute} must be a file.",
+      "filled": "The {attribute} field must have a value.",
+      "gt": {
+        "numeric": "The {attribute} must be greater than {value}.",
+        "file": "The {attribute} must be greater than {value} kilobytes.",
+        "string": "The {attribute} must be greater than {value} characters.",
+        "array": "The {attribute} must have more than {value} items."
+      },
+      "gte": {
+        "numeric": "The {attribute} must be greater than or equal {value}.",
+        "file": "The {attribute} must be greater than or equal {value} kilobytes.",
+        "string": "The {attribute} must be greater than or equal {value} characters.",
+        "array": "The {attribute} must have {value} items or more."
+      },
+      "image": "The {attribute} must be an image.",
+      "in": "The selected {attribute} is invalid.",
+      "in_array": "The {attribute} field does not exist in {other}.",
+      "integer": "The {attribute} must be an integer.",
+      "ip": "The {attribute} must be a valid IP address.",
+      "ipv4": "The {attribute} must be a valid IPv4 address.",
+      "ipv6": "The {attribute} must be a valid IPv6 address.",
+      "json": "The {attribute} must be a valid JSON string.",
+      "lt": {
+        "numeric": "The {attribute} must be less than {value}.",
+        "file": "The {attribute} must be less than {value} kilobytes.",
+        "string": "The {attribute} must be less than {value} characters.",
+        "array": "The {attribute} must have less than {value} items."
+      },
+      "lte": {
+        "numeric": "The {attribute} must be less than or equal {value}.",
+        "file": "The {attribute} must be less than or equal {value} kilobytes.",
+        "string": "The {attribute} must be less than or equal {value} characters.",
+        "array": "The {attribute} must not have more than {value} items."
+      },
+      "max": {
+        "numeric": "The {attribute} may not be greater than {max}.",
+        "file": "The {attribute} may not be greater than {max} kilobytes.",
+        "string": "The {attribute} may not be greater than {max} characters.",
+        "array": "The {attribute} may not have more than {max} items."
+      },
+      "mimes": "The {attribute} must be a file of type: {values}.",
+      "mimetypes": "The {attribute} must be a file of type: {values}.",
+      "min": {
+        "numeric": "The {attribute} must be at least {min}.",
+        "file": "The {attribute} must be at least {min} kilobytes.",
+        "string": "The {attribute} must be at least {min} characters.",
+        "array": "The {attribute} must have at least {min} items."
+      },
+      "not_in": "The selected {attribute} is invalid.",
+      "not_regex": "The {attribute} format is invalid.",
+      "numeric": "The {attribute} must be a number.",
+      "present": "The {attribute} field must be present.",
+      "regex": "The {attribute} format is invalid.",
+      "required": "The {attribute} field is required.",
+      "required_if": "The {attribute} field is required when {other} is {value}.",
+      "required_unless": "The {attribute} field is required unless {other} is in {values}.",
+      "required_with": "The {attribute} field is required when {values} is present.",
+      "required_with_all": "The {attribute} field is required when {values} are present.",
+      "required_without": "The {attribute} field is required when {values} is not present.",
+      "required_without_all": "The {attribute} field is required when none of {values} are present.",
+      "same": "The {attribute} and {other} must match.",
+      "size": {
+        "numeric": "The {attribute} must be {size}.",
+        "file": "The {attribute} must be {size} kilobytes.",
+        "string": "The {attribute} must be {size} characters.",
+        "array": "The {attribute} must contain {size} items."
+      },
+      "starts_with": "The {attribute} must start with one of the following: {values}",
+      "string": "The {attribute} must be a string.",
+      "timezone": "The {attribute} must be a valid zone.",
+      "unique": "The {attribute} has already been taken.",
+      "uploaded": "The {attribute} failed to upload.",
+      "url": "The {attribute} format is invalid.",
+      "uuid": "The {attribute} must be a valid UUID.",
+      "custom": {
+        "attribute-name": {
+          "rule-name": "custom-message"
+        }
+      },
+      "attributes": []
+    },
+    "preferences": {
+      "lang": "English"
+    },
+    "commands": {
+      "user{add}": {
+        "description": "Add a local user, you can only log in with this user if auth is set to mysql",
+        "arguments": {
+          "username": "The username the user will log in with"
+        },
+        "options": {
+          "descr": "User description",
+          "email": "Email to use for the user",
+          "password": "Password for the user, if not given, you will be prompted",
+          "full-name": "Full name for the user",
+          "role": "Set the user to the desired role {roles}"
+        },
+        "password-request": "Please enter the user's password",
+        "success": "Successfully added user: {username}",
+        "wrong-auth": "Warning! You will not be able to log in with this user because you are not using MySQL auth"
+      }
+    }
+  },
+  "fr": {
+    "Shutdown": "Shutdown",
+    "The {attribute} must a valid IP address/network or hostname.": "{attribute} doit avoir une adresse IP valide ou un nom d'hôte valide.",
+    "Never polled": "Jamais sondé",
+    "This indicates the most likely endpoint switchport": "Ceci indique le port de commutation le plus probable",
+    "Two-Factor unlocked.": "Double-facteurs déverrouillé.",
+    "Failed to unlock Two-Factor.": "Échec de déverrouilliage double-facteurs .",
+    "Two-Factor removed.": "Double-facteurs supprimé.",
+    "Failed to remove Two-Factor.": "Échec d'enlevent  .",
+    "TwoFactor auth removed.": "Authentification à deux facteurs supprimée.",
+    "Too many two-factor failures, please contact administrator.": "Trop d'échecs à deux facteurs, veuillez contacter l'administrateur.",
+    "Too many two-factor failures, please wait {time} seconds": "Trop d'échecs à deux facteurs, veuillez patienter {time} secondes",
+    "No Two-Factor Token entered.": "Aucun jeton à deux facteurs n'est entré.",
+    "No Two-Factor settings, how did you get here?": "Pas de réglages à deux facteurs, comment êtes-vous arrivé ici ?",
+    "Wrong Two-Factor Token.": "Mauvais jeton à deux facteurs.",
+    "TwoFactor auth added.": "Authentification à deux facteurs ajoutée.",
+    "User {username} created": "Utilisateur {username} créé",
+    "Failed to create user": "Échec de création de l'utilisateur",
+    "Updated dashboard for {username}": "Mise à jour du tableau de bord pour {username}",
+    "User {username} updated": "Utilisateur {username} mise à jour",
+    "Failed to update user {username}": "Échec de mise à jour de l'utilisateur {username}",
+    "User {username} deleted.": "Utilisateur {username} supprimé.",
+    "Device does not exist": "L'appareil n'existe pas",
+    "Port does not exist": "Le port n'existe pas",
+    "App does not exist": "L'application n'existe pas",
+    "Bill does not exist": "La facture n'existe pas",
+    "Munin plugin does not exist": "Le module d'extension Munin n'existe pas",
+    "Ok": "Ok",
+    "Warning": "Attention",
+    "Critical": "Critique",
+    "Existing password did not match": "Le mot de passe existant ne correspond pas",
+    "The {attribute} field is required.": "l'{attribute} champ est obligatoire.",
+    "Edit User": "Modifier l'utilisateur",
+    "Unlock": "Déverrouiller",
+    "User exceeded failures": "L'utilisateur à dépassé le nombre de tentative",
+    "Disable TwoFactor": "Désactiver le double facteur",
+    "No TwoFactor key generated for this user, Nothing to do.": "Pas de clé à deux facteurs générée pour cet utilisateur, Rien à faire.",
+    "Save": "Enregistrer",
+    "Cancel": "Annuler",
+    "Unlocked Two Factor.": "Déverrouillé le double-facteurs.",
+    "Failed to unlock Two Factor": "N'a pas réussi à déverrouiller le double-facteurs",
+    "Removed Two Factor.": "Supprimé le double-facteurs.",
+    "Failed to remove Two Factor": "N'a pas réussi à supprimer le double facteur",
+    "Real Name": "Nom réel",
+    "Email": "E-mail",
+    "Description": "Description",
+    "Level": "Rôle",
+    "Normal": "Normal",
+    "Global Read": "Lecture globale",
+    "Admin": "Admin",
+    "Demo": "Démonstration",
+    "Dashboard": "Tableau de bord",
+    "Password": "Mot de passe",
+    "Current Password": "Mot de passe actuel",
+    "New Password": "Nouveau mot de passe",
+    "Confirm Password": "Mot de passe confirmer",
+    "Can Modify Password": "Peut modifier le mot de passe",
+    "Create User": "créer un utilisateur",
+    "Username": "nom d'utilisateur",
+    "Manage Users": "Gestion des utilisateurs",
+    "ID": "ID",
+    "Access": "Accès",
+    "Auth": "Auth",
+    "Actions": "Actions",
+    "Edit": "Edit",
+    "Delete": "Supprimer",
+    "Manage Access": "Gérer les accès",
+    "Add User": "Add User",
+    "Are you sure you want to delete ": "Are you sure you want to delete ",
+    "The user could not be deleted": "The user could not be deleted",
+    "Whoops, the web server could not write required files to the filesystem.": "Whoops, the web server could not write required files to the filesystem.",
+    "Running the following commands will fix the issue most of the time:": "Running the following commands will fix the issue most of the time:",
+    "Whoops, looks like something went wrong. Check your librenms.log.": "Whoops, looks like something went wrong. Check your librenms.log.",
+    "Public Devices": "Public Devices",
+    "System Status": "System Status",
+    "Logon": "Logon",
+    "Device": "Device",
+    "Platform": "Platform",
+    "Uptime": "Uptime",
+    "Location": "Location",
+    "Status": "Status",
+    "Remember Me": "Remember Me",
+    "Login": "Connexion",
+    "Please enter auth token": "Please enter auth token",
+    "Submit": "Submit",
+    "Logout": "Logout",
+    "Locations": "Locations",
+    "Coordinates": "Coordinates",
+    "Devices": "Appareils",
+    "Network": "Réseau",
+    "Servers": "Servers",
+    "Firewalls": "Firewalls",
+    "Down": "inaccessible",
+    "Save changes": "Save changes",
+    "N/A": "N/A",
+    "Location must have devices to show graphs": "Location must have devices to show graphs",
+    "Traffic": "Traffic",
+    "Cannot delete locations used by devices": "Cannot delete locations used by devices",
+    "Location deleted": "Location deleted",
+    "Failed to delete location": "Failed to delete location",
+    "Timestamp": "Timestamp",
+    "Source": "Source",
+    "Message": "Message",
+    "Facility": "Facility",
+    "Total hosts": "Total hosts",
+    "ignored": "ignored",
+    "disabled": "disabled",
+    "up": "up",
+    "warn": "warn",
+    "down": "down",
+    "Total services": "Total services",
+    "Widget title": "Widget title",
+    "Default Title": "Default Title",
+    "Columns": "Columns",
+    "Markers": "Markers",
+    "Ports": "Ports",
+    "Resolution": "Resolution",
+    "Countries": "Countries",
+    "Provinces": "Provinces",
+    "Metros": "Metros",
+    "Region": "Region",
+    "Help": "Help",
+    "Stream": "Stream",
+    "All Messages": "All Messages",
+    "All Devices": "Tous les appareils",
+    "Page Size": "Page Size",
+    "Time Range": "Time Range",
+    "Search all time": "Search all time",
+    "Search last 5 minutes": "Search last 5 minutes",
+    "Search last 15 minutes": "Search last 15 minutes",
+    "Search last 30 minutes": "Search last 30 minutes",
+    "Search last 1 hour": "Search last 1 hour",
+    "Search last 2 hours": "Search last 2 hours",
+    "Search last 8 hours": "Search last 8 hours",
+    "Search last 1 day": "Search last 1 day",
+    "Search last 2 days": "Search last 2 days",
+    "Search last 5 days": "Search last 5 days",
+    "Search last 7 days": "Search last 7 days",
+    "Search last 14 days": "Search last 14 days",
+    "Search last 30 days": "Search last 30 days",
+    "Custom title": "Custom title",
+    "Initial Latitude": "Initial Latitude",
+    "ie. 51.4800 for Greenwich": "ie. 51.4800 for Greenwich",
+    "Initial Longitude": "Initial Longitude",
+    "ie. 0 for Greenwich": "ie. 0 for Greenwich",
+    "Initial Zoom": "Initial Zoom",
+    "Grouping radius": "Grouping radius",
+    "default 80": "default 80",
+    "Show devices": "Show devices",
+    "Up + Down": "Up + Down",
+    "Up": "Up",
+    "Show Services": "Show Services",
+    "no": "no",
+    "yes": "yes",
+    "Show Port Errors": "Show Port Errors",
+    "Notes": "Notes",
+    "Custom title for widget": "Custom title for widget",
+    "Display type": "Display type",
+    "boxes": "boxes",
+    "compact": "compact",
+    "Uniform Tiles": "Uniform Tiles",
+    "Tile size": "Tile size",
+    "Disabled/ignored": "Disabled/ignored",
+    "Show": "Show",
+    "Hide": "Hide",
+    "Mode select": "Mode select",
+    "only devices": "only devices",
+    "only services": "only services",
+    "devices and services": "devices and services",
+    "Order By": "Order By",
+    "Hostname": "Hostname",
+    "Device group": "Groupe d'appareil",
+    "Automatic Title": "Automatic Title",
+    "Graph type": "Graph type",
+    "Select a graph": "Select a graph",
+    "Show legend": "Show legend",
+    "Date range": "Date range",
+    "One Hour": "One Hour",
+    "Four Hours": "Four Hours",
+    "Six Hours": "Six Hours",
+    "Twelve Hours": "Twelve Hours",
+    "One Day": "One Day",
+    "One Week": "One Week",
+    "Two Weeks": "Two Weeks",
+    "One Month": "One Month",
+    "Two Months": "Two Months",
+    "Three Months": "Three Months",
+    "One Year": "One Year",
+    "Two Years": "Two Years",
+    "Select a device": "Select a device",
+    "Port": "Port",
+    "Select a port": "Select a port",
+    "Application": "Application",
+    "Select an application": "Select an application",
+    "Munin plugin": "Munin plugin",
+    "Select a Munin plugin": "Select a Munin plugin",
+    "Bill": "Bill",
+    "Select a bill": "Select a bill",
+    "Custom Aggregator(s)": "Custom Aggregator(s)",
+    "Select or add one or more": "Select or add one or more",
+    "Select one or more": "Select one or more",
+    "Top query": "Top query",
+    "Response time": "Response time",
+    "Poller duration": "Poller duration",
+    "Processor load": "Processor load",
+    "Memory usage": "Memory usage",
+    "Disk usage": "Disk usage",
+    "Sort order": "Sort order",
+    "Ascending": "Ascending",
+    "Descending": "Descending",
+    "Number of Devices": "Number of Devices",
+    "Last Polled (minutes)": "Last Polled (minutes)",
+    "Image URL": "Image URL",
+    "Target URL": "Target URL",
+    "Show acknowledged": "Show acknowledged",
+    "not filtered": "not filtered",
+    "show only acknowledged": "show only acknowledged",
+    "hide acknowledged": "hide acknowledged",
+    "Show only fired": "Show only fired",
+    "show only fired alerts": "show only fired alerts",
+    "Displayed severity": "Displayed severity",
+    "any severity": "any severity",
+    "or higher": "or higher",
+    "State": "State",
+    "any state": "any state",
+    "All alerts": "All alerts",
+    "Show Procedure field": "Show Procedure field",
+    "show": "show",
+    "hide": "hide",
+    "Sort alerts by": "Sort alerts by",
+    "timestamp, descending": "timestamp, descending",
+    "severity, descending": "severity, descending",
+    "All devices": "All devices",
+    "Event type": "Event type",
+    "All types": "All types",
+    "Number of interfaces": "Number of interfaces",
+    "Last polled (minutes)": "Last polled (minutes)",
+    "Interface type": "Interface type",
+    "All Ports": "Tous les ports",
+    "Total": "Total",
+    "Ignored": "Ignored",
+    "Disabled": "Désactiver",
+    "Errored": "Errored",
+    "Services": "Services",
+    "No devices found within interval.": "No devices found within interval.",
+    "Summary": "Summary",
+    "Interface": "Interface",
+    "Total traffic": "Total traffic",
+    "Check your log for more details.": "Regarder vos log pour plus de détails",
+    "If you need additional help, you can find how to get help at": "si vous avez besoin d’aide supplémentaire, vous pouvez trouver comment l'obtenir sur:",
+    "Geo Locations": "Emplacements Géographique",
+    "All Locations": "Tous les Emplacements",
+    "Pollers": "Gestionnaires",
+    "Groups": "Groups",
+    "Performance": "Performance",
+    "History": "History",
+    "passwords": {
+      "password": "Le mot de passe doit comporter au moins six caractères et doit être le même que la confirmation.",
+      "reset": "Votre mot de passe a été réinitialisé !",
+      "sent": "Nous vous avons envoyé un lien pour mettre à jour votre mot de passe",
+      "token": "Le jeton de mise à jour du mot de passe est valide.",
+      "user": "Nous ne trouvons pas d'utilisateur avec cette adresse e-mail."
+    },
+    "auth": {
+      "failed": "Échec d'authentification",
+      "throttle": "Trop de tentatives. Essaie dans quelques secondes."
+    },
+    "pagination": {
+      "previous": "&laquo; Précédent",
+      "next": "Suivant &raquo;"
+    },
+    "preferences": {
+      "lang": "français"
+    },
+    "commands": {
+      "user{add}": {
+        "description": "Création d'un utilisateur local. Vous pourrez utiliser les identifiants créés si vous utilisez l'authentification mysql",
+        "arguments": {
+          "username": "Le nom d'utilisateur avec lequel l'utilisateur se connectera"
+        },
+        "options": {
+          "descr": "Description de l'utilisateur",
+          "email": "Email à utiliser pour l'utilisateur",
+          "password": "Mot de passe de l'utilisateur, s'il n'est pas donné, il vous sera demandé de saisir un mot de passe.",
+          "full-name": "Nom complet de l'utilisateur",
+          "role": "Définir le rôle de l'utilisateur {roles}"
+        },
+        "password-request": "Veuillez entrer le mot de passe de l'utilisateur",
+        "success": "Utilisateur ajouté avec succès : {username}",
+        "wrong-auth": "Attention !  Vous ne pourrez pas vous connecter avec cet utilisateur car vous n'utilisez pas les auth MySQL."
+      }
+    }
+  },
+  "ru": {
+    "Shutdown": "Shutdown",
+    "The {attribute} must a valid IP address/network or hostname.": "{attribute} должен быть правильным IP адресом/подсетью или именем устройства.",
+    "Never polled": "Никогда не опрашивался",
+    "This indicates the most likely endpoint switchport": "Это указывает на наиболее вероятый порт устройства",
+    "Two-Factor unlocked.": "Второй этап аутентификации разблокирован.",
+    "Failed to unlock Two-Factor.": "Не удалось проверить второй этап аутентификации",
+    "Two-Factor removed.": "Второй этап аутентификации удален.",
+    "Failed to remove Two-Factor.": "Не удалось удалить второй этап аутентификации.",
+    "TwoFactor auth removed.": "Двуфакторная аутентификация удалена.",
+    "Too many two-factor failures, please contact administrator.": "Слишком много не удачных попыток, свяжитесь с администратором.",
+    "Too many two-factor failures, please wait {time} seconds": "Слишком много неудачных попыток, подождите {time} секунд",
+    "No Two-Factor Token entered.": "Не введен проверочный токен второго этап аутентификации.",
+    "No Two-Factor settings, how did you get here?": "Второй этап аутентификации не настроен, как вы сюда смогли попасть?",
+    "Wrong Two-Factor Token.": "Не правильный токен второго этап аутентификации.",
+    "TwoFactor auth added.": "Второй этап аутентификации добавлен.",
+    "User {username} created": "Пользователь {username} создан",
+    "Failed to create user": "Не удалось создать пользователя",
+    "Updated dashboard for {username}": "Обновлен главный жкран пользователя {username}",
+    "User {username} updated": "Пользователь {username} обновлен",
+    "Failed to update user {username}": "Не удалось обновить пользователя{username}",
+    "User {username} deleted.": "Пользователь {username} удален.",
+    "Device does not exist": "Устройство не существует",
+    "Port does not exist": "Порт не существует",
+    "App does not exist": "Приложение не существует",
+    "Bill does not exist": "Счет не существует",
+    "Munin plugin does not exist": "Munin плагин не существует",
+    "Ok": "Ok",
+    "Warning": "Предупреждение",
+    "Critical": "Критический",
+    "Existing password did not match": "Не совпадает с существующим паролем",
+    "The {attribute} field is required.": "Поле {attribute} обязательно.",
+    "Edit User": "Изменить пользователя",
+    "Unlock": "Разблокировать",
+    "User exceeded failures": "Пользователь допустил много ошибок",
+    "Disable TwoFactor": "Отключить двуфакторную аутентификацию",
+    "No TwoFactor key generated for this user, Nothing to do.": "Не сгенерирован ключ для двуфакторной аутентификации.",
+    "Save": "Сохранить",
+    "Cancel": "Отмена",
+    "Unlocked Two Factor.": "Разблокирован двуфакторная аутентификация.",
+    "Failed to unlock Two Factor": "Не удалось разблокировать двухфакторную аутентификацию",
+    "Removed Two Factor.": "Убрана второй фактор.",
+    "Failed to remove Two Factor": "Не удалось убрать второй фактор",
+    "Real Name": "Настоящее имя",
+    "Email": "Email",
+    "Description": "Описание",
+    "Level": "Уровень",
+    "Normal": "Нормально",
+    "Global Read": "Глобальное Чтение",
+    "Admin": "Admin",
+    "Demo": "Demo",
+    "Dashboard": "Панель",
+    "Password": "Пароль",
+    "Current Password": "Действующий пароль",
+    "New Password": "Новый пароль",
+    "Confirm Password": "Подтверждение пароля",
+    "Can Modify Password": "Можно изменить пароль",
+    "Create User": "Создать пользователя",
+    "Username": "Имя пользователя",
+    "Manage Users": "Управление пользователями",
+    "ID": "ID",
+    "Access": "Доступ",
+    "Auth": "Аутентификация",
+    "Actions": "Действие",
+    "Edit": "Изменить",
+    "Delete": "Удалить",
+    "Manage Access": "Управление доступом",
+    "Add User": "Создать пользователя",
+    "Are you sure you want to delete ": "Вы уверены, что хотите удалить ",
+    "The user could not be deleted": "Пользователь не может быть удален",
+    "Whoops, the web server could not write required files to the filesystem.": "Ой, вэб сервер не может записать файл в файловую систему.",
+    "Running the following commands will fix the issue most of the time:": "Выполнение данной команды исправить ошибку в четении time:",
+    "Whoops, looks like something went wrong. Check your librenms.log.": "Ой, что-то сломалось, проверьте librenms.log.",
+    "Public Devices": "Общее устройство",
+    "System Status": "Статус Системы",
+    "Logon": "Вход",
+    "Device": "Устройство",
+    "Platform": "Платформа",
+    "Uptime": "Аптайм",
+    "Location": "Расположение",
+    "Status": "Статус",
+    "Remember Me": "Запомнить меня",
+    "Login": "Логин",
+    "Please enter auth token": "Пожалуйста введите токен авторизации",
+    "Submit": "Выполнить",
+    "Logout": "Выйти",
+    "Locations": "Расположения",
+    "Coordinates": "Координаты",
+    "Devices": "Устройства",
+    "Network": "Сеть",
+    "Servers": "Сервера",
+    "Firewalls": "Фаерволы",
+    "Down": "Лежит",
+    "Save changes": "Сохранить изменения",
+    "N/A": "N/A",
+    "Location must have devices to show graphs": "Расположение должно иметь устройства для отображения графиков",
+    "Traffic": "Траффик",
+    "Cannot delete locations used by devices": "Не могу удалить расположение, применяемое устройством",
+    "Location deleted": "Расположение удалено",
+    "Failed to delete location": "Не удалось удалить расположение",
+    "Timestamp": "Метка времени",
+    "Source": "Источник",
+    "Message": "Сообщение",
+    "Facility": "Объект",
+    "Total hosts": "Всего хостов",
+    "ignored": "Игнорируемо",
+    "disabled": "Откючено",
+    "up": "работает",
+    "warn": "внимание",
+    "down": "лежит",
+    "Total services": "Всего сервисов",
+    "Widget title": "Заготовок виджета",
+    "Default Title": "Заголовок по умолчанию",
+    "Columns": "Колонка",
+    "Markers": "Маркеры",
+    "Ports": "Порты",
+    "Resolution": "Разрешение",
+    "Countries": "Страны",
+    "Provinces": "Провинции",
+    "Metros": "Метро",
+    "Region": "Регион",
+    "Help": "Помощь",
+    "Stream": "Поток",
+    "All Messages": "Все сообщения",
+    "All Devices": "Все устройства",
+    "Page Size": "Размер страницы",
+    "Time Range": "Интервал времени",
+    "Search all time": "Искать постоянно",
+    "Search last 5 minutes": "Искать последние 5 минут",
+    "Search last 15 minutes": "Искать последние 15 минут",
+    "Search last 30 minutes": "Искать последние 30 минут",
+    "Search last 1 hour": "Искать последний 1 час",
+    "Search last 2 hours": "Искать последние 2 часа",
+    "Search last 8 hours": "Искать последние 8 часов",
+    "Search last 1 day": "Искать последний 1 день",
+    "Search last 2 days": "Искать последние 2 дня",
+    "Search last 5 days": "Искать последние 5 дней",
+    "Search last 7 days": "Искать последние 7 дней",
+    "Search last 14 days": "Искать последние 14 дней",
+    "Search last 30 days": "Искать последние 30 дней",
+    "Custom title": "Изменяемое название",
+    "Initial Latitude": "Начальная широта",
+    "ie. 51.4800 for Greenwich": "51.4800 по Гринвичу",
+    "Initial Longitude": "Начальная долгота",
+    "ie. 0 for Greenwich": "0 по Гринвичу",
+    "Initial Zoom": "Начальное увеличение",
+    "Grouping radius": "Радиус группировки",
+    "default 80": "по умолчанию 80",
+    "Show devices": "показать устройства",
+    "Up + Down": "подняты + лежат",
+    "Up": "Поднято",
+    "Show Services": "Показать сервисы",
+    "no": "нет",
+    "yes": "да",
+    "Show Port Errors": "Показать ошибки портов",
+    "Notes": "Заметки",
+    "Custom title for widget": "Изменяемый заголовок для виджета",
+    "Display type": "Отображаемый тип",
+    "boxes": "боксы",
+    "compact": "компактный",
+    "Uniform Tiles": "Равномерная плитка",
+    "Tile size": "Размер заголовка",
+    "Disabled/ignored": "Выключенно/игнорированно",
+    "Show": "Показать",
+    "Hide": "Скрыть",
+    "Mode select": "Выюбр режима",
+    "only devices": "только устройства",
+    "only services": "только сервисы",
+    "devices and services": "устройства и сервисы",
+    "Order By": "Группировать по",
+    "Hostname": "Имя устройства",
+    "Device group": "Группа устройств",
+    "Automatic Title": "Автоматическое наименование",
+    "Graph type": "Тип графика",
+    "Select a graph": "Выберите граф",
+    "Show legend": "Показать пояснение",
+    "Date range": "Интервал дат",
+    "One Hour": "Один час",
+    "Four Hours": "Четыре часа",
+    "Six Hours": "Шесть часов",
+    "Twelve Hours": "Двенадцать часов",
+    "One Day": "Один день",
+    "One Week": "Одна неделя",
+    "Two Weeks": "Две недели",
+    "One Month": "Один месяц",
+    "Two Months": "Два месяца",
+    "Three Months": "Три месяца",
+    "One Year": "Один Год",
+    "Two Years": "Два Года",
+    "Select a device": "Выберите устройство",
+    "Port": "Порт",
+    "Select a port": "Выберите порт",
+    "Application": "Приложение",
+    "Select an application": "Выберите приложение",
+    "Munin plugin": "Munin плагин",
+    "Select a Munin plugin": "Выберите Munin плагин",
+    "Bill": "Счет",
+    "Select a bill": "Выберите счйт",
+    "Custom Aggregator(s)": "Пользовательский аггрегатор(ций)",
+    "Select or add one or more": "Выберите или добавьте один или более",
+    "Select one or more": "Выберите один или более",
+    "Top query": "Основной запрос",
+    "Response time": "Время ответа",
+    "Poller duration": "Длительнось обработки",
+    "Processor load": "Загрузка процессора",
+    "Memory usage": "Использвание памяти",
+    "Disk usage": "Использование диска",
+    "Sort order": "Сортировка",
+    "Ascending": "по возрастанию",
+    "Descending": "по убыванию",
+    "Number of Devices": "Номер устройсва",
+    "Last Polled (minutes)": "Последняя обработка (минут)",
+    "Image URL": "URL изображения",
+    "Target URL": "URL цели",
+    "Show acknowledged": "показать подтвержденные",
+    "not filtered": "не отфильтрованно",
+    "show only acknowledged": "показать только подтвержденные",
+    "hide acknowledged": "скрыть подтвержденные",
+    "Show only fired": "показать пропущенные",
+    "show only fired alerts": "показать только пропущенные",
+    "Displayed severity": "Отобразить важные",
+    "any severity": "любая важность",
+    "or higher": "или высокая",
+    "State": "Состояние",
+    "any state": "любое состояние",
+    "All alerts": "Все предупреждения",
+    "Show Procedure field": "Показать процедуру",
+    "show": "показать",
+    "hide": "скрыть",
+    "Sort alerts by": "Отсортировать предупреждения по",
+    "timestamp, descending": "метка времени, по возрастанию",
+    "severity, descending": "важность, по возрастанию",
+    "All devices": "Все устройства",
+    "Event type": "Тип события",
+    "All types": "Все типы",
+    "Number of interfaces": "Количество интерфейсов",
+    "Last polled (minutes)": "Последня обработка (минут)",
+    "Interface type": "Тип интерфейса",
+    "All Ports": "Все порты",
+    "Total": "Всего",
+    "Ignored": "Игнорированно",
+    "Disabled": "Отключено",
+    "Errored": "Ошибок",
+    "Services": "Сервисы",
+    "No devices found within interval.": "В этот интервал не попало ни одного устройсктва.",
+    "Summary": "Суммарно",
+    "Interface": "Интерфейс",
+    "Total traffic": "Общий трафик",
+    "Check your log for more details.": "Проверьте лог для большей информации..",
+    "If you need additional help, you can find how to get help at": "Если вам нужна дополнительная помощь, вы можете узнать как ее получить",
+    "Geo Locations": "Гео расположение",
+    "All Locations": "Все расположения",
+    "Pollers": "Обработчики",
+    "Groups": "Группы",
+    "Performance": "Производительность",
+    "History": "История",
+    "passwords": {
+      "password": "Пароль должен содержать не менее шести символов и должен совпадать с подтверждением.",
+      "reset": "Ваш пароль был сброшен!",
+      "sent": "Мы отправили вам ссылку на email для обновления пароля",
+      "token": "Токен обновления пароля валиден.",
+      "user": "Мы не можем найти пользователя с таким адресом email."
+    },
+    "auth": {
+      "failed": "Таких учетных данных нет",
+      "throttle": "Слишком большое количество попыток. Попробуйте через {seconds} секунд."
+    },
+    "pagination": {
+      "previous": "&laquo; Предидущая",
+      "next": "Следующая &raquo;"
+    },
+    "validation": {
+      "accepted": "Вы подтвердить {attribute}.",
+      "active_url": "Данная {attribute} ссылка не является валидным URL.",
+      "after": "{attribute} должна быть дата больше чем {date}.",
+      "after_or_equal": "{attribute} должна быть дата больше или равная чем {date}.",
+      "alpha": "{attribute} может содержать только буквы.",
+      "alpha_dash": "{attribute} может содержать только буквы, числа тире и подчекивания.",
+      "alpha_num": "{attribute} ожет содержать только буквыи числа.",
+      "array": "{attribute} должен быть массивом.",
+      "before": "{attribute} должна быть дыты меньше чем  {date}.",
+      "before_or_equal": "{attribute} должна быть меньше или равно to {date}.",
+      "between": {
+        "numeric": "{attribute} должен быть в интервале между {min} и {max}.",
+        "file": "{attribute} размер должен составлять от {min} до {max} kilobytes.",
+        "string": "{attribute} должно быть от {min} до {max} символов.",
+        "array": "{attribute} долже содержать от  {min} до {max} элементов."
+      },
+      "boolean": "{attribute} поле может иметь значения true или false.",
+      "confirmed": "{attribute} не совпадает с подтверждением.",
+      "date": "{attribute} даиа не валидна.",
+      "date_equals": "{attribute} дата должна соответствовать {date}.",
+      "date_format": "{attribute} не совпадает формат с {format}.",
+      "different": "{attribute} и {other} должны отличаться друг от друга.",
+      "digits": "{attribute} должен содержать {digits} чисел.",
+      "digits_between": "{attribute} должен содержать не менее {min} и  не более {max} чисел.",
+      "dimensions": "{attribute} не рисунок.",
+      "distinct": "{attribute} поле содержит повторения.",
+      "email": "{attribute} должен быть валидным email адресом.",
+      "exists": "выбран не верный параметр: {attribute}.",
+      "file": "{attribute} должен быть файлом.",
+      "filled": "{attribute} поле должно иметь значения.",
+      "gt": {
+        "numeric": "{attribute} должно быть больше {value}.",
+        "file": "{attribute} должен быть больше {value} kilobytes.",
+        "string": "{attribute} должен иметь больше {value} символов.",
+        "array": "{attribute} должен содержать не менее{value} элементов."
+      },
+      "gte": {
+        "numeric": "{attribute} должно быть больше или равно {value}.",
+        "file": "{attribute} должно быть больше или равно {value} kilobytes.",
+        "string": "{attribute} должно быть больше или равно {value} символов.",
+        "array": "{attribute} должно быть больше или равно {value} элементов."
+      },
+      "image": "{attribute} должно быть рисунком.",
+      "in": "Вы выбрали не верный {attribute}.",
+      "in_array": "{attribute} не относиться {other}.",
+      "integer": "{attribute} должен быть цислом.",
+      "ip": "{attribute} должен быть правильным IP адресом.",
+      "ipv4": "{attribute} должен быть правильным IPv4 адресом.",
+      "ipv6": "{attribute} должен быть правильным IPv6 адресом.",
+      "json": "{attribute} должен быть правильным JSON.",
+      "lt": {
+        "numeric": "{attribute} должен быть меньше чем {value}.",
+        "file": "{attribute} должен быть меньше чем  {value} kilobytes.",
+        "string": "{attribute} должен быть меньше чем {value} символов.",
+        "array": "{attribute} должен быть меньше чем  {value} элементов."
+      },
+      "lte": {
+        "numeric": "{attribute} должен быть меньше или равен {value}.",
+        "file": "{attribute} должен быть меньше или равен  {value} kilobytes.",
+        "string": "{attribute} должен быть меньше или равен  {value} символам.",
+        "array": "{attribute} должен быть меньше или равен  {value} элементам."
+      },
+      "max": {
+        "numeric": "{attribute} не может быть больше {max}.",
+        "file": "{attribute} не может быть больше {max} kilobytes.",
+        "string": "{attribute} не может быть больше {max} символов.",
+        "array": "{attribute} не может быть больше {max} элементов."
+      },
+      "mimes": "{attribute} должен соответствовать типу: {values}.",
+      "mimetypes": "{attribute} должны соответствовать типу: {values}.",
+      "min": {
+        "numeric": "{attribute} должен быть меньше {min}.",
+        "file": "{attribute} должен быть меньше {min} kilobytes.",
+        "string": "{attribute} должен быть меньше {min} символов.",
+        "array": "{attribute} должен быть меньше {min} элементов."
+      },
+      "not_in": "Выбран не верный {attribute}.",
+      "not_regex": "{attribute} имеет не верный формат.",
+      "numeric": "{attribute} должен быть числом.",
+      "present": "{attribute} поле должно быть заполнено.",
+      "regex": "{attribute} не верный формат.",
+      "required": "{attribute} поля обязательно к заполнению.",
+      "required_if": "{attribute} обязательно к заполнению {other} если {value}.",
+      "required_unless": "{attribute} обязательно к заполнению если {other} содержить {values}.",
+      "required_with": "{attribute} обязательно к заполению если {values} присутствует.",
+      "required_with_all": "{attribute} надо заполнить если {values} заполнены.",
+      "required_without": "{attribute} надо заполнить если {values} отсутствуют.",
+      "required_without_all": "{attribute} надо заполнить если нет ни одного {values} ",
+      "same": "The {attribute} and {other} must match.",
+      "size": {
+        "numeric": "{attribute} должен иметь {size}.",
+        "file": "{attribute} должен иметь {size} kilobytes.",
+        "string": "{attribute} должен иметь {size} символов.",
+        "array": "{attribute} должен иметь {size} элементов."
+      },
+      "starts_with": "{attribute} должен начинаться с: {values}",
+      "string": "{attribute} должен быть строкой.",
+      "timezone": "{attribute} не верный часовой пояс.",
+      "unique": "{attribute} уже используется.",
+      "uploaded": "{attribute} не удалось загрузить.",
+      "url": "{attribute} не верный фомат URL.",
+      "uuid": "{attribute} должен иметь правильный UUID.",
+      "custom": {
+        "attribute-name": {
+          "rule-name": "custom-message"
+        }
+      },
+      "attributes": []
+    },
+    "preferences": {
+      "lang": "русский"
+    },
+    "commands": {
+      "user{add}": {
+        "description": "Создание локального пользователя. Вы сможете воспользоваться созданными учетными данными если вы используете авторизацию mysql",
+        "arguments": {
+          "username": "Имя пользователя с которым вы будете проходить авторизацию"
+        },
+        "options": {
+          "descr": "Описание пользователя",
+          "email": "Email пользователя",
+          "password": "Пароль пользователя, если не введен, то будет предложенно",
+          "full-name": "Полное имя пользователя",
+          "role": "Пользователю будет назначена роль {roles}"
+        },
+        "password-request": "Пожалуйста введите пароль",
+        "success": "Успешно создан пользователь: {username}",
+        "wrong-auth": "Внимание! вы не смогли пройти авторизация, так как вы не используете  MySQL авторизацию"
+      }
+    }
+  },
+  "uk": {
+    "Shutdown": "Shutdown",
+    "Login": "Вхід",
+    "Register": "Реєстрація",
+    "Check your log for more details": "Для отримання детальної інформації перегляньте лог-файл",
+    "If you need additional help, you can find how to get help at": "За додатковою допомогою можливо звернутися до",
+    "Overview": "Огляд",
+    "Dashboard": "Дашборд",
+    "Maps": "Мапи",
+    "Availability": "Доступність",
+    "Network": "Мережа",
+    "Device Groups Maps": "Мапа груп пристроїв",
+    "Geographical": "Географічна",
+    "Plugins": "Плагіни",
+    "Plugin Admin": "Управління плагінами",
+    "Tools": "Інструменти",
+    "Eventlog": "Лог подій",
+    "Inventory": "Інвентар",
+    "MIB definitions": "Визначення MIB",
+    "Devices": "Пристрої",
+    "All Devices": "Усі пристрої",
+    "No devices": "Пристрої відсутні",
+    "Geo Locations": "Місцезнаходження",
+    "All Locations": "Усі місця",
+    "MIB associations": "Визначені MIB",
+    "Manage Groups": "Управління групами",
+    "Device Dependencies": "Залежності пристроїв",
+    "Add Device": "Додати пристрій",
+    "Delete Device": "Видалити пристрій",
+    "Services": "Сервіси",
+    "All Services": "Усі сервіси",
+    "Warning": "Попередження",
+    "Critical": "Критичний стан",
+    "Add Service": "Додати сервіс",
+    "Ports": "Порти",
+    "All Ports": "Усі порти",
+    "Traffic Bills": "Білінг трафіку",
+    "Pseudowires": "Псевдовайри",
+    "Customers": "Споживачі",
+    "Transit": "Транзит",
+    "Core": "Ядро",
+    "Alerts": "Сповіщення",
+    "Down": "Недоступно",
+    "Disabled": "Вимкнено",
+    "Deleted": "Видалено",
+    "Health": "Стан систем",
+    "Memory": "Пам'ять",
+    "Processor": "Процесор",
+    "Storage": "Накопичувачі",
+    "Wireless": "Бездротові",
+    "Apps": "Застосунки",
+    "Routing": "Маршрутизація",
+    "Alerted": "Сповіщено",
+    "Notifications": "Оповіщення",
+    "Alert History": "Історія сповіщень",
+    "Statistics": "Статистика",
+    "Alert Rules": "Правила сповіщень",
+    "Scheduled Maintenance": "Заплановане обслуговування",
+    "Alert Templates": "Шаблони сповіщень",
+    "Alert Transports": "Транспорт сповіщень",
+    "My Settings": "Мої налаштування",
+    "Settings": "Налаштування",
+    "Global Settings": "Глобальні налаштування",
+    "Validate Config": "Перевірка конфігурації",
+    "Manage Users": "Управління користувачами",
+    "Auth History": "Історія авторизації",
+    "Peering": "Піринг",
+    "Pollers": "Опитувачі",
+    "API Settings": "Налаштування API",
+    "API Docs": "Документація API",
+    "The {attribute} must a valid IP address/network or hostname.": "{attribute} має бути правильною IP адресою/підмережею або ім'ям пристрою.",
+    "Never polled": "Ніколи не опитувався",
+    "This indicates the most likely endpoint switchport": "Це вказує на найбільш імовірний кінцевий switchport",
+    "Two-Factor unlocked.": "Двофакторну автентифікацію пройдено.",
+    "Failed to unlock Two-Factor.": "Не вдалося пройти двофакторну автентифікацію",
+    "Two-Factor removed.": "Другий етап прибрано.",
+    "Failed to remove Two-Factor.": "Не вдалося прибрати другий етап.",
+    "TwoFactor auth removed.": "Двофакторну автентифікацію прибрано.",
+    "Too many two-factor failures, please contact administrator.": "Забагато невдалих спроб двофакторної автентифікації, зв'яжіться з адміністратором.",
+    "Too many two-factor failures, please wait {time} seconds": "Забагато невдалих спроб двофакторної автентифікації, зачекайте {time} секунд",
+    "No Two-Factor Token entered.": "Не введено токен двофакторної автентифікації.",
+    "No Two-Factor settings, how did you get here?": "Налаштування двофакторної автентифікації відсутні, як ви тут опинилися?",
+    "Wrong Two-Factor Token.": "Невірний токен двофакторної автентифікації.",
+    "TwoFactor auth added.": "Додано двофакторну автентифікацію.",
+    "User {username} created": "Створено користувача {username}",
+    "Failed to create user": "Не вдалося створити користувача",
+    "Updated dashboard for {username}": "Оновлено дашборд користувача {username}",
+    "User {username} updated": "Оновлено користувача {username}",
+    "Failed to update user {username}": "Не вдалося оновити користувача {username}",
+    "User {username} deleted.": "Видалено користувача {username}.",
+    "Device does not exist": "Пристрою не існує",
+    "Port does not exist": "Порта не існує",
+    "App does not exist": "Застосунку не існує",
+    "Bill does not exist": "Рахунку не існує",
+    "Munin plugin does not exist": "Плагіну для Munin не існує",
+    "Ok": "Ок",
+    "Existing password did not match": "Не співпадає з існуючим паролем",
+    "The {attribute} field is required.": "Поле {attribute} є обов'язковим.",
+    "Edit User": "Редагувати користувача",
+    "Unlock": "Розблокувати",
+    "User exceeded failures": "Користувач допустив забагато помилок",
+    "Disable TwoFactor": "Вимкнути другий етап",
+    "No TwoFactor key generated for this user, Nothing to do.": "Не сгенерирован ключ для двуфакторной аутентификации.",
+    "Save": "Сохранить",
+    "Cancel": "Отмена",
+    "Unlocked Two Factor.": "Разблокирован двуфакторная аутентификация.",
+    "Failed to unlock Two Factor": "Не удалось разблокировать двухфакторную аутентификацию",
+    "Removed Two Factor.": "Убрана второй фактор.",
+    "Failed to remove Two Factor": "Не удалось убрать второй фактор",
+    "Real Name": "Повне ім'я",
+    "Email": "Адреса електронної пошти",
+    "Description": "Опис",
+    "Level": "Рівень",
+    "Normal": "Звичайний",
+    "Global Read": "Глобальне читання",
+    "Admin": "Адміністратор",
+    "Demo": "Демо",
+    "Password": "Пароль",
+    "Current Password": "Поточний пароль",
+    "New Password": "Новий пароль",
+    "Confirm Password": "Підтвердження пароля",
+    "Can Modify Password": "Може змінити пароль",
+    "Create User": "Створити користувача",
+    "Username": "Ім'я користувача",
+    "ID": "ID",
+    "Access": "Доступ",
+    "Auth": "Автентифікація",
+    "Actions": "Дії",
+    "Edit": "Редагувати",
+    "Delete": "Видалити",
+    "Manage Access": "Управління доступом",
+    "Add User": "Додати користувача",
+    "Are you sure you want to delete ": "Ви впевнені, що бажаєте видалити ",
+    "The user could not be deleted": "Користувач не може бути видалений",
+    "Whoops, the web server could not write required files to the filesystem.": "Упс, веб сервер не зміг записати необхідні файли до файлової системи.",
+    "Running the following commands will fix the issue most of the time:": "Виконання наступних команд у більшості випадків призведе до вирішення проблеми:",
+    "Whoops, looks like something went wrong. Check your librenms.log.": "Упс, щось пішло не так. Перевірте свій librenms.log.",
+    "Public Devices": "Публічні пристрої",
+    "System Status": "Статус системи",
+    "Logon": "Вхід",
+    "Device": "Пристрій",
+    "Platform": "Платформа",
+    "Uptime": "Час роботи",
+    "Location": "Місцезнаходження",
+    "Status": "Статус",
+    "Remember Me": "Запам'ятати мене",
+    "Please enter auth token": "Будь ласка, введіть токен авторизації",
+    "Submit": "Надіслати",
+    "Logout": "Вийти",
+    "Locations": "Місцезнаходження",
+    "Coordinates": "Координати",
+    "Servers": "Сервери",
+    "Firewalls": "Фаєрволи",
+    "Save changes": "Зберегти зміни",
+    "N/A": "N/A",
+    "Location must have devices to show graphs": "Для відображення графіків місцезнаходження повинне містити пристрої",
+    "Traffic": "Трафік",
+    "Cannot delete locations used by devices": "Неможливо видалити місцезнаходження що використовується пристроєм",
+    "Location deleted": "Місцезнаходження видалено",
+    "Failed to delete location": "Не вдалося видалиити місцезнаходження",
+    "Timestamp": "Часова мітка",
+    "Source": "Джерело",
+    "Message": "Повідомлення",
+    "Facility": "Об'єкт",
+    "Total hosts": "Усього хостів",
+    "ignored": "проігноровано",
+    "disabled": "відключено",
+    "up": "норма",
+    "warn": "попередження",
+    "down": "недоступно",
+    "Total services": "Усього сервісів",
+    "Widget title": "Назва віджета",
+    "Default Title": "Назва за замовчуванням",
+    "Columns": "Колонки",
+    "Markers": "Маркери",
+    "Resolution": "Отримання адреси",
+    "Countries": "Країни",
+    "Provinces": "Провінції",
+    "Metros": "Мегаполіси",
+    "Region": "Регіон",
+    "Help": "Допомога",
+    "Stream": "Потік",
+    "All Messages": "Усі повідомлення",
+    "Page Size": "Розмір сторінки",
+    "Time Range": "Інтервал часу",
+    "Search all time": "Шукати за весь час",
+    "Search last 5 minutes": "Шукати за останні 5 хвилин",
+    "Search last 15 minutes": "Шукати за останні 15 хвилин",
+    "Search last 30 minutes": "Шукати за останні 30 хвилин",
+    "Search last 1 hour": "Шукати за останню 1 годину",
+    "Search last 2 hours": "Шукати за останні 2 години",
+    "Search last 8 hours": "Шукати за останні 8 годин",
+    "Search last 1 day": "Шукати за останній 1 день",
+    "Search last 2 days": "Шукати за останні 2 дні",
+    "Search last 5 days": "Шукати за останні 5 днів",
+    "Search last 7 days": "Шукати за останні 7 днів",
+    "Search last 14 days": "Шукати за останні 14 днів",
+    "Search last 30 days": "Шукати за останні 30 днів",
+    "Custom title": "Користувацька назва",
+    "Initial Latitude": "Початкова широта",
+    "ie. 51.4800 for Greenwich": "наприклад, 51.4800 для Гринвіча",
+    "Initial Longitude": "Початкова довгота",
+    "ie. 0 for Greenwich": "наприклад, 0 для Гринвіча",
+    "Initial Zoom": "Початкове збільшення",
+    "Grouping radius": "Радіус групування",
+    "default 80": "за замовчуванням 80",
+    "Show devices": "Показати пристрої",
+    "Up + Down": "Норма + Недоступно",
+    "Up": "Норма",
+    "Show Services": "Показати сервіси",
+    "no": "ні",
+    "yes": "так",
+    "Show Port Errors": "Показати помилки на портах",
+    "Notes": "Нотатки",
+    "Custom title for widget": "Користувацька назва віджета",
+    "Display type": "Тип відображення",
+    "boxes": "прямокутниками",
+    "compact": "компактний",
+    "Uniform Tiles": "Рівномірні плитки",
+    "Tile size": "Розмір плиток",
+    "Disabled/ignored": "Відключено/проігноровано",
+    "Show": "Показати",
+    "Hide": "Приховати",
+    "Mode select": "Вибір режиму",
+    "only devices": "лише пристрої",
+    "only services": "лише сервіси",
+    "devices and services": "пристрої та сервіси",
+    "Order By": "Впорядкувати за",
+    "Hostname": "Ім'я хосту",
+    "Device group": "Група пристроїв",
+    "Automatic Title": "Автоматично назва",
+    "Graph type": "Тип графіка",
+    "Select a graph": "Оберіть графік",
+    "Show legend": "Показати легенду",
+    "Date range": "Часовий проміжок",
+    "One Hour": "Одна година",
+    "Four Hours": "Чотири години",
+    "Six Hours": "Шість годин",
+    "Twelve Hours": "Дванадцять годин",
+    "One Day": "Один день",
+    "One Week": "Один тиждень",
+    "Two Weeks": "Два тижні",
+    "One Month": "Один місяць",
+    "Two Months": "Два місяця",
+    "Three Months": "Три місяця",
+    "One Year": "Один рік",
+    "Two Years": "Два роки",
+    "Select a device": "Оберіть пристрій",
+    "Port": "Порт",
+    "Select a port": "Оберіть порт",
+    "Application": "Застосунок",
+    "Select an application": "Оберіть застосунок",
+    "Munin plugin": "Плагін Munin",
+    "Select a Munin plugin": "Оберіть плагін Munin",
+    "Bill": "Рахунок",
+    "Select a bill": "Оберіть рахунок",
+    "Custom Aggregator(s)": "Користувацький агрегатор(и)",
+    "Select or add one or more": "Оберіть або додайте один або більше",
+    "Select one or more": "Оберіть один або більше",
+    "Top query": "Найпопулярнійший запит",
+    "Response time": "Час відповіді",
+    "Poller duration": "Тривалість опитування",
+    "Processor load": "Завантаження процесору",
+    "Memory usage": "Використання пам'яті",
+    "Disk usage": "Використання дискового простору",
+    "Sort order": "Порядок сортування",
+    "Ascending": "За зростанням",
+    "Descending": "За спаданням",
+    "Number of Devices": "Кількість пристроїв",
+    "Last Polled (minutes)": "Останній раз опитувався (хвилин)",
+    "Image URL": "URL зображення",
+    "Target URL": "Цільовий URL",
+    "Show acknowledged": "Показати підтверджені",
+    "not filtered": "не відфільтровано",
+    "show only acknowledged": "показати лише підтверджені",
+    "hide acknowledged": "приховати підтверджені",
+    "Show only fired": "Показати лише спрацювання",
+    "show only fired alerts": "показати лише спрацювавші сповіщення",
+    "Displayed severity": "Відображувана важливість",
+    "any severity": "будь-якої важливості",
+    "or higher": "або вищої",
+    "State": "Стан",
+    "any state": "будь-який стан",
+    "All alerts": "Усі сповіщення",
+    "Show Procedure field": "Показати процедуру",
+    "show": "показати",
+    "hide": "приховати",
+    "Sort alerts by": "Сортувати сповіщення за",
+    "timestamp, descending": "часом, за спаданням",
+    "severity, descending": "важливістю, за спаданням",
+    "Event type": "Тип події",
+    "All types": "Усі типи",
+    "Number of interfaces": "Кількість інтерфейсів",
+    "Last polled (minutes)": "Останнє опитування (хвилин)",
+    "Interface type": "Тип інтерфейса",
+    "Total": "Усього",
+    "Ignored": "Ігноровано",
+    "Errored": "Мають помилки",
+    "No devices found within interval.": "У інтервалі не було знайдено жодного пристрою.",
+    "Summary": "Загалом",
+    "Interface": "Інтерфейс",
+    "Total traffic": "Спільний трафік",
+    "Groups": "Групи",
+    "Performance": "Продуктивність",
+    "History": "Історія",
+    "passwords": {
+      "password": "Паролі мають бути щонайменш шість символів у довжину та співпадати з повтореним.",
+      "reset": "Ваш пароль було скинуто!",
+      "sent": "Ми надіслали посилання на скид паролю на вашу адресу електронної пошти!",
+      "token": "Цей токен скиду паролю не валідний.",
+      "user": "Ми не можемо знайти користувача з такою адресою електронної пошти."
+    },
+    "sensors": {
+      "airflow": {
+        "short": "Повітряний потік",
+        "long": "Повітряний потік",
+        "unit": "cfm",
+        "unit_long": "Кубічний фут в хвилину"
+      },
+      "ber": {
+        "short": "BER",
+        "long": "Частота бітових помилок",
+        "unit": "",
+        "unit_long": ""
+      },
+      "charge": {
+        "short": "Заряд",
+        "long": "Процент заряду",
+        "unit": "%",
+        "unit_long": "процентів"
+      },
+      "chromatic_dispersion": {
+        "short": "Хроматична дисперсія",
+        "long": "Хроматична дисперсія",
+        "unit": "ps/nm/km",
+        "unit_long": "Пікосекунди на нанометри на кілометри"
+      },
+      "cooling": {
+        "short": "Охолодження",
+        "long": "",
+        "unit": "W",
+        "unit_long": "Ват"
+      },
+      "count": {
+        "short": "Лічильник",
+        "long": "Лічильник",
+        "unit": "",
+        "unit_long": ""
+      },
+      "current": {
+        "short": "Сила струму",
+        "long": "Сила струму",
+        "unit": "A",
+        "unit_long": "Ампер"
+      },
+      "dbm": {
+        "short": "dBm",
+        "long": "dBm",
+        "unit": "dBm",
+        "unit_long": "Децибел-мілівати"
+      },
+      "delay": {
+        "short": "Затримка",
+        "long": "Затримка",
+        "unit": "s",
+        "unit_long": "Секунди"
+      },
+      "eer": {
+        "short": "EER",
+        "long": "Коефіцієнт енергоефективності",
+        "unit": "",
+        "unit_long": ""
+      },
+      "fanspeed": {
+        "short": "Оберти вентилятора",
+        "long": "Швидкість обертів вентилятора",
+        "unit": "RPM",
+        "unit_long": "Обертів за хвилину"
+      },
+      "frequency": {
+        "short": "Частота",
+        "long": "Частота",
+        "unit": "Hz",
+        "unit_long": "Герц"
+      },
+      "humidity": {
+        "short": "Вологість",
+        "long": "Процент вологості повітря",
+        "unit": "%",
+        "unit_long": "Проценти"
+      },
+      "load": {
+        "short": "Навантаження",
+        "long": "Процент навантаження",
+        "unit": "%",
+        "unit_long": "Проценти"
+      },
+      "power": {
+        "short": "Потужність",
+        "long": "Потужність",
+        "unit": "W",
+        "unit_long": "Ват"
+      },
+      "power_consumed": {
+        "short": "Спожита потужність",
+        "long": "Спожита потужність",
+        "unit": "kWh",
+        "unit_long": "Кіловат-години"
+      },
+      "power_factor": {
+        "short": "Коефіцієнт потужності",
+        "long": "Коефіцієнт потужності",
+        "unit": "",
+        "unit_long": ""
+      },
+      "pressure": {
+        "short": "Тиск",
+        "long": "Тиск",
+        "unit": "kPa",
+        "unit_long": "Кілопаскалі"
+      },
+      "quality_factor": {
+        "short": "Добротність",
+        "long": "Добротність",
+        "unit": "",
+        "unit_long": ""
+      },
+      "runtime": {
+        "short": "Час роботи",
+        "long": "Час роботи",
+        "unit": "хвилини",
+        "unit_long": "Хвилини"
+      },
+      "signal": {
+        "short": "Сигнал",
+        "long": "Сигнал",
+        "unit": "dBm",
+        "unit_long": "Децибел-мілівати"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "Відношення сигналу до шуму",
+        "unit": "dB",
+        "unit_long": "Децибели"
+      },
+      "state": {
+        "short": "Стан",
+        "long": "Стан",
+        "unit": ""
+      },
+      "temperature": {
+        "short": "Температура",
+        "long": "Температура",
+        "unit": "°C",
+        "unit_long": "° Цельсія"
+      },
+      "voltage": {
+        "short": "Напруга",
+        "long": "Напруга",
+        "unit": "V",
+        "unit_long": "Вольт"
+      },
+      "waterflow": {
+        "short": "Потік води",
+        "long": "Потік води",
+        "unit": "l/m",
+        "unit_long": "Літри за хвилину"
+      }
+    },
+    "wireless": {
+      "ap-count": {
+        "short": "AP",
+        "long": "Кількість точок доступу",
+        "unit": ""
+      },
+      "clients": {
+        "short": "Споживачі",
+        "long": "Кількість споживачів",
+        "unit": ""
+      },
+      "capacity": {
+        "short": "Ємність",
+        "long": "Ємність",
+        "unit": "%"
+      },
+      "ccq": {
+        "short": "CCQ",
+        "long": "Якість з'єднання споживача",
+        "unit": "%"
+      },
+      "errors": {
+        "short": "Помилки",
+        "long": "Кількість помилок",
+        "unit": ""
+      },
+      "error-ratio": {
+        "short": "Відсоток помилок",
+        "long": "Відсоток помилкових бітів/пакетів",
+        "unit": "%"
+      },
+      "error-rate": {
+        "short": "BER",
+        "long": "Частота бітових помилок",
+        "unit": "bps"
+      },
+      "frequency": {
+        "short": "Частота",
+        "long": "Частота",
+        "unit": "MHz"
+      },
+      "distance": {
+        "short": "Відстань",
+        "long": "Відстань",
+        "unit": "km"
+      },
+      "mse": {
+        "short": "MSE",
+        "long": "Середньоквадратична помилка",
+        "unit": "dB"
+      },
+      "noise-floor": {
+        "short": "Рівень шуму",
+        "long": "Рівень шуму",
+        "unit": "dBm/Hz"
+      },
+      "power": {
+        "short": "Сила сигналу",
+        "long": "TX/RX Сила сигналу",
+        "unit": "dBm"
+      },
+      "quality": {
+        "short": "Якість",
+        "long": "Якість",
+        "unit": "%"
+      },
+      "rate": {
+        "short": "Швидкість передачі даних",
+        "long": "Швидкість передачі даних TX/RX",
+        "unit": "bps"
+      },
+      "rssi": {
+        "short": "RSSI",
+        "long": "Індикатор потужності отриманого сигналу",
+        "unit": "dBm"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "Співвідношення сигнал/шум",
+        "unit": "dB"
+      },
+      "ssr": {
+        "short": "SSR",
+        "long": "Коефіцієнт потужності сигналу",
+        "unit": "dB"
+      },
+      "utilization": {
+        "short": "Використання",
+        "long": "Використання",
+        "unit": "%"
+      },
+      "xpi": {
+        "short": "XPI",
+        "long": "Крос-поляризаційні завади",
+        "unit": "dB"
+      }
+    },
+    "auth": {
+      "failed": "Ці облікові дані не відповідають нашим записам.",
+      "throttle": "Перевищено кількість спроб входу. Будь ласка, спробуйте ще раз через {seconds} секунд."
+    },
+    "pagination": {
+      "previous": "&laquo; Попередня",
+      "next": "Наступна &raquo;"
+    },
+    "validation": {
+      "accepted": "{attribute} має бути прийнято.",
+      "active_url": "{attribute} не є дійсним URL.",
+      "after": "{attribute} має бути датою пізнішою за {date}.",
+      "after_or_equal": "{attribute} має бути датою не ранішою за {date}.",
+      "alpha": "{attribute} має містити лише літери.",
+      "alpha_dash": "{attribute} може містити лише літери, цифри, тире та підкреслення.",
+      "alpha_num": "{attribute} може містити лише літери та цифри.",
+      "array": "{attribute} має бути масивом.",
+      "before": "{attribute} має бути датою ранішою за {date}.",
+      "before_or_equal": "{attribute} має бути датою не пізнішою за {date}.",
+      "between": {
+        "numeric": "{attribute} має бути у проміжку між {min} та {max}.",
+        "file": "{attribute} має бути у проміжку між {min} та {max} кілобайт.",
+        "string": "{attribute} має містити від {min} до {max} символів.",
+        "array": "{attribute} має містити від {min} до {max} елементів."
+      },
+      "boolean": "{attribute} має бути true чи false.",
+      "confirmed": "Підтвердження {attribute} не співпадає.",
+      "date": "{attribute} не є коректною датою.",
+      "date_equals": "{attribute} має бути рівним {date}.",
+      "date_format": "{attribute} не співпадає з форматом {format}.",
+      "different": "{attribute} та {other} повинні мати різні значення.",
+      "digits": "{attribute} має містити {digits} цифр.",
+      "digits_between": "{attribute} має містити від {min} до {max} цифр.",
+      "dimensions": "{attribute} містить некоректні виміри зображення.",
+      "distinct": "Поле {attribute} містить однакове значення.",
+      "email": "{attribute} має бути дійсною адресою електронної пошти.",
+      "exists": "Обраний {attribute} не є валідним.",
+      "file": "{attribute} має бути файлом.",
+      "filled": "Поле {attribute} повинне мати значення.",
+      "gt": {
+        "numeric": "{attribute} має бути більшим за {value}.",
+        "file": "{attribute} має бути більшим за {value} кілобайт.",
+        "string": "{attribute} має бути довшим за {value} символів.",
+        "array": "{attribute} повинен містити більше ніж {value} елементів."
+      },
+      "gte": {
+        "numeric": "{attribute} має бути не меншим за {value}.",
+        "file": "{attribute} має бути не меншим за {value} кілобайт.",
+        "string": "{attribute} має бути не коротшим за {value} символів.",
+        "array": "{attribute} повинен містити не менше ніж {value} елементів."
+      },
+      "image": "{attribute} має бути зображенням.",
+      "in": "Обраний {attribute} не є валідним.",
+      "in_array": "Поле {attribute} не існує у {other}.",
+      "integer": "{attribute} має бути типу integer.",
+      "ip": "{attribute} має бути валідною IP адресою.",
+      "ipv4": "{attribute} має бути валідною IPv4.",
+      "ipv6": "{attribute} має бути валідною IPv6 адресою.",
+      "json": "{attribute} має бути валідним JSON.",
+      "lt": {
+        "numeric": "{attribute} має бути меншим за {value}.",
+        "file": "{attribute} має бути меншим за {value} кілобайт.",
+        "string": "{attribute} має бути коротшим за {value} символів.",
+        "array": "{attribute} повинен містити менше ніж {value} елементів."
+      },
+      "lte": {
+        "numeric": "{attribute} має бути не більшим за {value}.",
+        "file": "{attribute} має бути не більшим за {value} кілобайт.",
+        "string": "{attribute} має бути не довшим за {value} символів.",
+        "array": "{attribute} повинен містити не більше ніж {value} елементів."
+      },
+      "max": {
+        "numeric": "{attribute} не може бути більшим за {max}.",
+        "file": "{attribute} не може бути більшим за {max} кілобайт.",
+        "string": "{attribute} не може бути довшим за {max} символів.",
+        "array": "{attribute} не може мати більше ніж {max} елементів."
+      },
+      "mimes": "{attribute} має бути файлом типу: {values}.",
+      "mimetypes": "{attribute} має бути файлом типу: {values}.",
+      "min": {
+        "numeric": "{attribute} має бути щонайменше {min}.",
+        "file": "{attribute} має бути щонайменше {min} кілобайт.",
+        "string": "{attribute} має бути щонайменше {min} символів.",
+        "array": "{attribute} має містити щонайменше {min} елементів."
+      },
+      "not_in": "Обраний {attribute} не валідний.",
+      "not_regex": "Формат {attribute} не валідний.",
+      "numeric": "{attribute} має бути числом.",
+      "present": "Поле {attribute} має бути наявним.",
+      "regex": "Формат {attribute} не валідний.",
+      "required": "Необхідне поле {attribute}.",
+      "required_if": "Поле {attribute} необхідне коли {other} має значення {value}.",
+      "required_unless": "Поле {attribute} необхідне, окрім випадків коли {other} має значення {values}.",
+      "required_with": "Поле {attribute} необхідне при наявності одного з {values}.",
+      "required_with_all": "Поле {attribute} необхідне при наявності усіх перерахованих {values}.",
+      "required_without": "Поле {attribute} необхідне за відсутності одного з {values}.",
+      "required_without_all": "Поле {attribute} необхідне за відсутності усіх перерахованих {values}.",
+      "same": "{attribute} та {other} повинні співпадати.",
+      "size": {
+        "numeric": "{attribute} має бути {size}.",
+        "file": "{attribute} має бути {size} кілобайт.",
+        "string": "{attribute} повинен складати {size} символів.",
+        "array": "{attribute} повинен містити {size} елементів."
+      },
+      "starts_with": "{attribute} повинен починатися з одного з наступних: {values}",
+      "string": "{attribute} має бути типу string.",
+      "timezone": "{attribute} має бути валідною часовою зоною.",
+      "unique": "{attribute} вже призначений.",
+      "uploaded": "{attribute} не було завантажено успішно.",
+      "url": "Формат {attribute} є не валідним.",
+      "uuid": "{attribute} має бути валідним UUID.",
+      "custom": {
+        "attribute-name": {
+          "rule-name": "custom-message"
+        }
+      },
+      "attributes": []
+    },
+    "preferences": {
+      "lang": "Українська"
+    },
+    "commands": {
+      "user{add}": {
+        "description": "Додати локального користувача, вхід доступний лише при використанні mysql автентифікації",
+        "arguments": {
+          "username": "Ім'я користувача для входу"
+        },
+        "options": {
+          "descr": "Опис користувача",
+          "email": "Електронна пошта користувача",
+          "password": "Пароль користувача, якщо не наданий, то буде запропоновано",
+          "full-name": "Повне ім'я користувача",
+          "role": "Користувачеві буде назначено роль {roles}"
+        },
+        "password-request": "Будь ласка, введіть пароль користувача",
+        "success": "Успішно додано користувача: {username}",
+        "wrong-auth": "Увага! Ви не зможете авторизуватися, оскільки не використовуєте MySQL авторизацію"
+      }
+    }
+  },
+  "zh-TW": {
+    "Shutdown": "關機",
+    "Select Devices": "選擇裝置",
+    "Dynamic": "動態",
+    "Static": "靜態",
+    "Define Rules": "預設規則",
+    "Create Device Group": "建立裝置群組",
+    "Edit Device Group": "編輯裝置群組",
+    "New Device Group": "新增裝置群組",
+    "Pattern": "模式",
+    "Type": "類型",
+    "Name": "名稱",
+    "User Preferences": "使用者喜好設定",
+    "Global Administrative Access": "全域管理存取",
+    "Device Permissions": "裝置權限",
+    "Preferences": "喜好設定",
+    "Language": "語言",
+    "Change Password": "變更密碼",
+    "Verify New Password": "確認新密碼",
+    "Peering + Transit": "對等互連 + 轉送",
+    "FDB Tables": "FDB 對照表",
+    "ARP Tables": "ARP 對照表",
+    "MAC Address": "MAC 位址",
+    "IPv6 Address": "IPv6 位址",
+    "IPv4 Address": "IPv4 位址",
+    "Package": "軟體包",
+    "Virtual Machines": "虛擬機器",
+    "Device Groups": "裝置群組",
+    "Register": "註冊",
+    "Overview": "概觀",
+    "Maps": "地圖",
+    "Availability": "可用性",
+    "Device Groups Maps": "裝置群組地圖",
+    "Geographical": "地理",
+    "Plugins": "外掛",
+    "Plugin Admin": "外掛管理",
+    "Tools": "工具",
+    "Eventlog": "事件記錄",
+    "Inventory": "設備",
+    "MIB definitions": "MIB 定義",
+    "No devices": "沒有裝置",
+    "MIB associations": "MIB 關聯",
+    "Manage Groups": "群組管理",
+    "Device Dependencies": "裝置相依性",
+    "Add Device": "新增裝置",
+    "Delete Device": "刪除裝置",
+    "All Services": "所有服務",
+    "Add Service": "新增服務",
+    "Traffic Bills": "流量帳單",
+    "Pseudowires": "虛擬線路",
+    "Customers": "客戶",
+    "Transit": "轉送",
+    "Core": "核心",
+    "Alerts": "警報",
+    "Deleted": "已刪除",
+    "Health": "健康情況",
+    "Memory": "記憶體",
+    "Processor": "處理器",
+    "Storage": "儲存",
+    "Wireless": "無線",
+    "Apps": "應用程式",
+    "Routing": "路由",
+    "Alerted": "已警報",
+    "Notifications": "通知",
+    "Alert History": "警報歷程",
+    "Statistics": "統計資料",
+    "Alert Rules": "警報規則",
+    "Scheduled Maintenance": "定期維護",
+    "Alert Templates": "警報範本",
+    "Alert Transports": "警報傳送",
+    "My Settings": "我的設定",
+    "Settings": "設定",
+    "Global Settings": "全域設定",
+    "Validate Config": "組態驗證",
+    "Auth History": "驗證歷程",
+    "Peering": "對等互連",
+    "API Settings": "API 設定",
+    "API Docs": "API 文件",
+    "The {attribute} must a valid IP address/network or hostname.": "這個 {attribute} 必需為有效的 IP 位址/網路或主機名稱。",
+    "Never polled": "從未輪詢",
+    "This indicates the most likely endpoint switchport": "這將表示為最有可能的交換器連接埠端點",
+    "Two-Factor unlocked.": "雙因素驗證已解鎖。",
+    "Failed to unlock Two-Factor.": "雙因素驗證解鎖失敗。",
+    "Two-Factor removed.": "雙因素驗證已移除。",
+    "Failed to remove Two-Factor.": "雙因素驗證移除失敗。",
+    "TwoFactor auth removed.": "雙因素驗證已移除。",
+    "Too many two-factor failures, please contact administrator.": "雙因素驗證失敗次數太多，請年繫您的系統管理員，",
+    "Too many two-factor failures, please wait {time} seconds": "雙因素驗證失敗次數太多，請等候 {time} 秒再試",
+    "No Two-Factor Token entered.": "沒有輸入雙因素驗證權仗。",
+    "No Two-Factor settings, how did you get here?": "沒有設定雙因素驗證，您要如何使用呢？",
+    "Wrong Two-Factor Token.": "錯誤的雙因素驗證權仗。",
+    "TwoFactor auth added.": "雙因素驗證已加入。",
+    "User {username} created": "使用者 {username} 已建立",
+    "Failed to create user": "建立使用者失敗",
+    "Updated dashboard for {username}": "已更新 {username} 的資訊看版",
+    "User {username} updated": "使用者 {username} 已更新",
+    "Failed to update user {username}": "更新使用者 {username} 失敗",
+    "User {username} deleted.": "使用者 {username} 已刪除。",
+    "Device does not exist": "裝置不存在",
+    "Port does not exist": "連接埠不存在",
+    "App does not exist": "應用不存在",
+    "Bill does not exist": "帳單不存在",
+    "Munin plugin does not exist": "Munin 外掛程式不存在",
+    "Ok": "確認",
+    "Warning": "警告",
+    "Critical": "嚴重",
+    "Existing password did not match": "與既有的密碼不符",
+    "The {attribute} field is required.": "{attribute} 是必要欄位。",
+    "Edit User": "編輯使用者",
+    "Unlock": "解除鎖定",
+    "User exceeded failures": "使用者達到失敗上限",
+    "Disable TwoFactor": "取消雙因素驗證",
+    "No TwoFactor key generated for this user, Nothing to do.": "沒有為這個使用者產生雙因素驗證金鑰，暫不動作。",
+    "Save": "儲存",
+    "Cancel": "取消",
+    "Unlocked Two Factor.": "解儲雙因素驗證鎖定。",
+    "Failed to unlock Two Factor": "雙因素驗證解除鎖定失敗",
+    "Removed Two Factor.": "雙因素驗證已經移除。",
+    "Failed to remove Two Factor": "移除雙因素驗證失敗",
+    "Real Name": "真實姓名",
+    "Email": "郵件",
+    "Description": "描述",
+    "Level": "等級",
+    "Normal": "正常",
+    "Global Read": "全部已讀",
+    "Admin": "Admin",
+    "Demo": "Demo",
+    "Dashboard": "資訊看版",
+    "Password": "密碼",
+    "Current Password": "目前密碼",
+    "New Password": "新密碼",
+    "Confirm Password": "確認新密碼",
+    "Can Modify Password": "允許修改密碼",
+    "Create User": "建立使用者",
+    "Username": "使用者名稱",
+    "Manage Users": "管理使用者",
+    "ID": "ID",
+    "Access": "存取權限",
+    "Auth": "驗證",
+    "Actions": "動作",
+    "Edit": "編輯",
+    "Delete": "刪除",
+    "Manage Access": "管理存取權限",
+    "Add User": "新增使用者",
+    "Are you sure you want to delete ": "您確定要刪除 ",
+    "The user could not be deleted": "這個使用者無法刪除",
+    "Whoops, the web server could not write required files to the filesystem.": "噢，Web Server 無法寫入檔案到檔案系統。",
+    "Running the following commands will fix the issue most of the time:": "Running the following commands will fix the issue most of the time:",
+    "Whoops, looks like something went wrong. Check your librenms.log.": "噢，看起來發生了一些錯誤。請您查閱 librenms.log。",
+    "Public Devices": "公開裝置",
+    "System Status": "系統裝態",
+    "Logon": "登入",
+    "Device": "裝置",
+    "Platform": "平台",
+    "Uptime": "運作時間",
+    "Location": "位置",
+    "Status": "狀態",
+    "Remember Me": "記住我",
+    "Login": "登入",
+    "Please enter auth token": "請輸入驗證權仗",
+    "Submit": "提交",
+    "Logout": "登出",
+    "Locations": "位置",
+    "Coordinates": "座標",
+    "Devices": "裝置",
+    "Network": "網路",
+    "Servers": "伺服器",
+    "Firewalls": "防火牆",
+    "Down": "離線",
+    "Save changes": "儲存變更",
+    "N/A": "無",
+    "Location must have devices to show graphs": "此位置必需有裝置才能顯示圖表",
+    "Traffic": "流量",
+    "Cannot delete locations used by devices": "無法刪除已有裝置使用的位置",
+    "Location deleted": "位置已刪除",
+    "Failed to delete location": "刪除位置失敗",
+    "Timestamp": "時間戳記",
+    "Source": "來源",
+    "Message": "訊息",
+    "Facility": "設備",
+    "Total hosts": "所有主機",
+    "ignored": "已忽略",
+    "disabled": "已取消",
+    "up": "上線",
+    "warn": "警告",
+    "down": "離線",
+    "Total services": "所有服務",
+    "Widget title": "小工具標題",
+    "Default Title": "預設標題",
+    "Columns": "欄位",
+    "Markers": "標記",
+    "Ports": "連接埠",
+    "Resolution": "解析度",
+    "Countries": "國家",
+    "Provinces": "省份",
+    "Metros": "Metros",
+    "Region": "地區",
+    "Help": "說明",
+    "Stream": "串流",
+    "All Messages": "所有訊息",
+    "All Devices": "所有裝置",
+    "Page Size": "頁面大小",
+    "Time Range": "時間範圍",
+    "Search all time": "搜尋所有時間",
+    "Search last 5 minutes": "搜尋最近 5 分鐘內",
+    "Search last 15 minutes": "搜尋最近 15 分鐘內",
+    "Search last 30 minutes": "搜尋最近 30 分鐘內",
+    "Search last 1 hour": "搜尋最近 1 小時內",
+    "Search last 2 hours": "搜尋最近 2 小時內",
+    "Search last 8 hours": "搜尋最近 8 小時內",
+    "Search last 1 day": "搜尋最近 1 天內",
+    "Search last 2 days": "搜尋最近 2 天內",
+    "Search last 5 days": "搜尋最近 5 天內",
+    "Search last 7 days": "搜尋最近 7 天內",
+    "Search last 14 days": "搜尋最近 14 天內",
+    "Search last 30 days": "搜尋最近 30 天內",
+    "Custom title": "自訂標題",
+    "Initial Latitude": "初始緯度",
+    "ie. 51.4800 for Greenwich": "例如 51.4800 為格林威治",
+    "Initial Longitude": "初始經度",
+    "ie. 0 for Greenwich": "例如 0 為格林威治",
+    "Initial Zoom": "初始 Zoom 縮放等級",
+    "Grouping radius": "Grouping radius",
+    "default 80": "預設 80",
+    "Show devices": "顯示裝置",
+    "Up + Down": "上線 + 離線",
+    "Up": "上線",
+    "Show Services": "顯示服務",
+    "no": "否",
+    "yes": "是",
+    "Show Port Errors": "顯示連接埠錯誤",
+    "Notes": "附註",
+    "Custom title for widget": "自訂小工具標題",
+    "Display type": "顯示類型",
+    "boxes": "區塊",
+    "compact": "精簡",
+    "Uniform Tiles": "Uniform Tiles",
+    "Tile size": "Tile size",
+    "Disabled/ignored": "Disabled/ignored",
+    "Show": "顯示",
+    "Hide": "隱藏",
+    "Mode select": "模式選擇",
+    "only devices": "僅裝置",
+    "only services": "僅服務",
+    "devices and services": "裝置與服務",
+    "Order By": "排序",
+    "Hostname": "主機名稱",
+    "Device group": "裝置群組",
+    "Automatic Title": "自動產生標題",
+    "Graph type": "圖表類型",
+    "Select a graph": "選擇圖表",
+    "Show legend": "顯示圖例",
+    "Date range": "日期範圍",
+    "One Hour": "1 小時",
+    "Four Hours": "4 小時",
+    "Six Hours": "6 小時",
+    "Twelve Hours": "12 小時",
+    "One Day": "1 天",
+    "One Week": "1 週",
+    "Two Weeks": "2 週",
+    "One Month": "1 個月",
+    "Two Months": "2 個月",
+    "Three Months": "3 個月",
+    "One Year": "1 年",
+    "Two Years": "2 年",
+    "Select a device": "選擇裝置",
+    "Port": "連接埠",
+    "Select a port": "選擇連接埠",
+    "Application": "應用",
+    "Select an application": "選擇應用",
+    "Munin plugin": "Munin 外掛程式",
+    "Select a Munin plugin": "選擇 Munin 外掛程式",
+    "Bill": "帳單",
+    "Select a bill": "選擇帳單",
+    "Custom Aggregator(s)": "Custom Aggregator(s)",
+    "Select or add one or more": "選擇或加入一或多個",
+    "Select one or more": "選擇一或多個",
+    "Top query": "排行榜查詢",
+    "Response time": "回應時間",
+    "Poller duration": "輪詢器花費時間",
+    "Processor load": "處理器負載",
+    "Memory usage": "記憶體使用量",
+    "Disk usage": "磁碟使用量",
+    "Sort order": "排序",
+    "Ascending": "升冪",
+    "Descending": "降冪",
+    "Number of Devices": "裝置數量",
+    "Last Polled (minutes)": "最後一次輪詢 (分鐘)",
+    "Image URL": "圖片 URL",
+    "Target URL": "連結目標 URL",
+    "Show acknowledged": "顯示已通知",
+    "not filtered": "不要篩選",
+    "show only acknowledged": "僅顯示已通知",
+    "hide acknowledged": "隱藏已通知",
+    "Show only fired": "僅顯示已觸發",
+    "show only fired alerts": "僅顯示已觸發警報",
+    "Displayed severity": "顯示嚴重程度",
+    "any severity": "任何嚴重程度",
+    "or higher": "或更高者",
+    "State": "狀態",
+    "any state": "任何狀態",
+    "All alerts": "所有警報",
+    "Show Procedure field": "顯示處理欄位",
+    "show": "顯示",
+    "hide": "隱藏",
+    "Sort alerts by": "排序警報依據",
+    "timestamp, descending": "時間戳記、降冪",
+    "severity, descending": "嚴重程度、降冪",
+    "All devices": "所有裝置",
+    "Event type": "事件類型",
+    "All types": "所有類型",
+    "Number of interfaces": "介面數量",
+    "Last polled (minutes)": "最後一次輪詢 (分鐘)",
+    "Interface type": "介面類型",
+    "All Ports": "所有連接埠",
+    "Total": "總計",
+    "Ignored": "已忽略",
+    "Disabled": "已取消",
+    "Errored": "已錯誤",
+    "Services": "服務",
+    "No devices found within interval.": "在最近一次輪詢間隔內尚未找到裝置。",
+    "Summary": "摘要",
+    "Interface": "介面",
+    "Total traffic": "流量總計",
+    "Check your log for more details.": "查閱您的記錄檔以取得更詳細的資訊。",
+    "If you need additional help, you can find how to get help at": "若您需要更多的說明，您可以在這裡找到更多相關資訊。",
+    "Geo Locations": "地理位置",
+    "All Locations": "所有位置",
+    "Pollers": "輪詢器",
+    "Groups": "群組",
+    "Performance": "效能",
+    "History": "歷程",
+    "passwords": {
+      "password": "密碼至少需要六個字元，並且要確認兩者相符。",
+      "reset": "您的密碼已重置。",
+      "sent": "已經寄送密碼重置連結至您的電子郵件信箱。",
+      "token": "此密碼重置權仗無效。",
+      "user": "找不到使用者的電子郵件位址。"
+    },
+    "sensors": {
+      "airflow": {
+        "short": "氣流",
+        "long": "氣流",
+        "unit": "cfm",
+        "unit_long": "每分鐘標準立方呎"
+      },
+      "ber": {
+        "short": "BER",
+        "long": "位元錯誤率",
+        "unit": "",
+        "unit_long": ""
+      },
+      "charge": {
+        "short": "電量",
+        "long": "電量百分比",
+        "unit": "%",
+        "unit_long": "百分比"
+      },
+      "chromatic_dispersion": {
+        "short": "色散",
+        "long": "色散",
+        "unit": "ps/nm/km",
+        "unit_long": "Picoseconds per Nanometer per Kilometer"
+      },
+      "cooling": {
+        "short": "Cooling",
+        "long": "",
+        "unit": "W",
+        "unit_long": "瓦特"
+      },
+      "count": {
+        "short": "Count",
+        "long": "Count",
+        "unit": "",
+        "unit_long": ""
+      },
+      "current": {
+        "short": "電流",
+        "long": "電流",
+        "unit": "A",
+        "unit_long": "安培"
+      },
+      "dbm": {
+        "short": "dBm",
+        "long": "dBm",
+        "unit": "dBm",
+        "unit_long": "毫瓦分貝"
+      },
+      "delay": {
+        "short": "延遲",
+        "long": "延遲",
+        "unit": "s",
+        "unit_long": "秒"
+      },
+      "eer": {
+        "short": "EER",
+        "long": "能效比",
+        "unit": "",
+        "unit_long": ""
+      },
+      "fanspeed": {
+        "short": "風扇轉速",
+        "long": "風扇轉速",
+        "unit": "RPM",
+        "unit_long": "每分鐘旋轉次數"
+      },
+      "frequency": {
+        "short": "頻率",
+        "long": "頻率",
+        "unit": "Hz",
+        "unit_long": "赫茲"
+      },
+      "humidity": {
+        "short": "濕度",
+        "long": "濕度百分比",
+        "unit": "%",
+        "unit_long": "百分比"
+      },
+      "load": {
+        "short": "負載",
+        "long": "負載百分比",
+        "unit": "%",
+        "unit_long": "百分比"
+      },
+      "power": {
+        "short": "電力",
+        "long": "電力",
+        "unit": "W",
+        "unit_long": "瓦特"
+      },
+      "power_consumed": {
+        "short": "消耗功率",
+        "long": "消耗功率",
+        "unit": "kWh",
+        "unit_long": "千瓦小時"
+      },
+      "power_factor": {
+        "short": "功率因數",
+        "long": "功率因數",
+        "unit": "",
+        "unit_long": ""
+      },
+      "pressure": {
+        "short": "壓力",
+        "long": "壓力",
+        "unit": "kPa",
+        "unit_long": "千帕"
+      },
+      "quality_factor": {
+        "short": "品質因子",
+        "long": "品質因子",
+        "unit": "",
+        "unit_long": ""
+      },
+      "runtime": {
+        "short": "Runtime",
+        "long": "Runtime",
+        "unit": "分",
+        "unit_long": "分鐘"
+      },
+      "signal": {
+        "short": "訊號",
+        "long": "訊號",
+        "unit": "dBm",
+        "unit_long": "毫瓦分貝"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "訊號雜訊比",
+        "unit": "dB",
+        "unit_long": "分貝"
+      },
+      "state": {
+        "short": "狀態",
+        "long": "狀態",
+        "unit": ""
+      },
+      "temperature": {
+        "short": "溫度",
+        "long": "溫度",
+        "unit": "°C",
+        "unit_long": "° 攝氏"
+      },
+      "voltage": {
+        "short": "電壓",
+        "long": "電壓",
+        "unit": "V",
+        "unit_long": "伏特"
+      },
+      "waterflow": {
+        "short": "水流",
+        "long": "水流",
+        "unit": "l/m",
+        "unit_long": "升每分鐘"
+      }
+    },
+    "wireless": {
+      "ap-count": {
+        "short": "AP 數量",
+        "long": "AP 數量",
+        "unit": ""
+      },
+      "clients": {
+        "short": "用戶端",
+        "long": "用戶端數量",
+        "unit": ""
+      },
+      "capacity": {
+        "short": "容量",
+        "long": "容量",
+        "unit": "%"
+      },
+      "ccq": {
+        "short": "CCQ",
+        "long": "客戶端連線品質",
+        "unit": "%"
+      },
+      "errors": {
+        "short": "錯誤",
+        "long": "錯誤數量",
+        "unit": ""
+      },
+      "error-ratio": {
+        "short": "錯誤率",
+        "long": "位元/封包錯誤率",
+        "unit": "%"
+      },
+      "error-rate": {
+        "short": "BER",
+        "long": "位元錯誤率",
+        "unit": "bps"
+      },
+      "frequency": {
+        "short": "頻率",
+        "long": "頻率",
+        "unit": "MHz"
+      },
+      "distance": {
+        "short": "距離",
+        "long": "距離",
+        "unit": "km"
+      },
+      "mse": {
+        "short": "MSE",
+        "long": "平均誤差",
+        "unit": "dB"
+      },
+      "noise-floor": {
+        "short": "背景雜訊",
+        "long": "背景雜訊",
+        "unit": "dBm/Hz"
+      },
+      "power": {
+        "short": "電力/訊號",
+        "long": "TX/RX 電力或訊號",
+        "unit": "dBm"
+      },
+      "quality": {
+        "short": "品質",
+        "long": "品質",
+        "unit": "%"
+      },
+      "rate": {
+        "short": "傳送率",
+        "long": "TX/RX 傳送率",
+        "unit": "bps"
+      },
+      "rssi": {
+        "short": "RSSI",
+        "long": "接收訊號強度指標",
+        "unit": "dBm"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "訊號噪訊比",
+        "unit": "dB"
+      },
+      "ssr": {
+        "short": "SSR",
+        "long": "訊號強度比",
+        "unit": "dB"
+      },
+      "utilization": {
+        "short": "使用率",
+        "long": "使用率",
+        "unit": "%"
+      },
+      "xpi": {
+        "short": "XPI",
+        "long": "交互極化干擾",
+        "unit": "dB"
+      }
+    },
+    "auth": {
+      "failed": "這些憑證與我們的記錄不符。",
+      "throttle": "嘗試登入次數過多。請稍候 {seconds} 秒再試。"
+    },
+    "pagination": {
+      "previous": "&laquo; 往前",
+      "next": "往後 &raquo;"
+    },
+    "validation": {
+      "accepted": "{attribute} 須同意。",
+      "active_url": "{attribute} 不是有效的 URL。",
+      "after": "{attribute} 須為 {date} 之後的日期。",
+      "after_or_equal": "{attribute} 須等於 {date} 或之後的日期。",
+      "alpha": "The {attribute} may only contain letters.",
+      "alpha_dash": "The {attribute} may only contain letters, numbers, dashes and underscores.",
+      "alpha_num": "The {attribute} may only contain letters and numbers.",
+      "array": "{attribute} 需為陣列。",
+      "before": "{attribute} 須為 {date} 之前的日期。",
+      "before_or_equal": "{attribute} 須等於 {date} 或之前的日期。",
+      "between": {
+        "numeric": "The {attribute} must be between {min} and {max}.",
+        "file": "The {attribute} must be between {min} and {max} kilobytes.",
+        "string": "The {attribute} must be between {min} and {max} characters.",
+        "array": "The {attribute} must have between {min} and {max} items."
+      },
+      "boolean": "The {attribute} field must be true or false.",
+      "confirmed": "The {attribute} confirmation does not match.",
+      "date": "The {attribute} is not a valid date.",
+      "date_equals": "The {attribute} must be a date equal to {date}.",
+      "date_format": "The {attribute} does not match the format {format}.",
+      "different": "The {attribute} and {other} must be different.",
+      "digits": "The {attribute} must be {digits} digits.",
+      "digits_between": "The {attribute} must be between {min} and {max} digits.",
+      "dimensions": "The {attribute} has invalid image dimensions.",
+      "distinct": "The {attribute} field has a duplicate value.",
+      "email": "The {attribute} must be a valid email address.",
+      "exists": "The selected {attribute} is invalid.",
+      "file": "The {attribute} must be a file.",
+      "filled": "The {attribute} field must have a value.",
+      "gt": {
+        "numeric": "The {attribute} must be greater than {value}.",
+        "file": "The {attribute} must be greater than {value} kilobytes.",
+        "string": "The {attribute} must be greater than {value} characters.",
+        "array": "The {attribute} must have more than {value} items."
+      },
+      "gte": {
+        "numeric": "The {attribute} must be greater than or equal {value}.",
+        "file": "The {attribute} must be greater than or equal {value} kilobytes.",
+        "string": "The {attribute} must be greater than or equal {value} characters.",
+        "array": "The {attribute} must have {value} items or more."
+      },
+      "image": "The {attribute} must be an image.",
+      "in": "The selected {attribute} is invalid.",
+      "in_array": "The {attribute} field does not exist in {other}.",
+      "integer": "The {attribute} must be an integer.",
+      "ip": "The {attribute} must be a valid IP address.",
+      "ipv4": "The {attribute} must be a valid IPv4 address.",
+      "ipv6": "The {attribute} must be a valid IPv6 address.",
+      "json": "The {attribute} must be a valid JSON string.",
+      "lt": {
+        "numeric": "The {attribute} must be less than {value}.",
+        "file": "The {attribute} must be less than {value} kilobytes.",
+        "string": "The {attribute} must be less than {value} characters.",
+        "array": "The {attribute} must have less than {value} items."
+      },
+      "lte": {
+        "numeric": "The {attribute} must be less than or equal {value}.",
+        "file": "The {attribute} must be less than or equal {value} kilobytes.",
+        "string": "The {attribute} must be less than or equal {value} characters.",
+        "array": "The {attribute} must not have more than {value} items."
+      },
+      "max": {
+        "numeric": "The {attribute} may not be greater than {max}.",
+        "file": "The {attribute} may not be greater than {max} kilobytes.",
+        "string": "The {attribute} may not be greater than {max} characters.",
+        "array": "The {attribute} may not have more than {max} items."
+      },
+      "mimes": "The {attribute} must be a file of type: {values}.",
+      "mimetypes": "The {attribute} must be a file of type: {values}.",
+      "min": {
+        "numeric": "The {attribute} must be at least {min}.",
+        "file": "The {attribute} must be at least {min} kilobytes.",
+        "string": "The {attribute} must be at least {min} characters.",
+        "array": "The {attribute} must have at least {min} items."
+      },
+      "not_in": "The selected {attribute} is invalid.",
+      "not_regex": "The {attribute} format is invalid.",
+      "numeric": "The {attribute} must be a number.",
+      "present": "The {attribute} field must be present.",
+      "regex": "The {attribute} format is invalid.",
+      "required": "The {attribute} field is required.",
+      "required_if": "The {attribute} field is required when {other} is {value}.",
+      "required_unless": "The {attribute} field is required unless {other} is in {values}.",
+      "required_with": "The {attribute} field is required when {values} is present.",
+      "required_with_all": "The {attribute} field is required when {values} are present.",
+      "required_without": "The {attribute} field is required when {values} is not present.",
+      "required_without_all": "The {attribute} field is required when none of {values} are present.",
+      "same": "The {attribute} and {other} must match.",
+      "size": {
+        "numeric": "The {attribute} must be {size}.",
+        "file": "The {attribute} must be {size} kilobytes.",
+        "string": "The {attribute} must be {size} characters.",
+        "array": "The {attribute} must contain {size} items."
+      },
+      "starts_with": "The {attribute} must start with one of the following: {values}",
+      "string": "{attribute} 須是字串。",
+      "timezone": "The {attribute} must be a valid zone.",
+      "unique": "The {attribute} has already been taken.",
+      "uploaded": "{attribute} 上傳失敗。",
+      "url": "{attribute} 格式無效。",
+      "uuid": "{attribute} 須是有效的 UUID。",
+      "custom": {
+        "attribute-name": {
+          "rule-name": "custom-message"
+        }
+      },
+      "attributes": []
+    },
+    "preferences": {
+      "lang": "繁體中文"
+    },
+    "commands": {
+      "user{add}": {
+        "description": "新增一個本機使用者，只有在設定驗證使用 mysql 時才可以使用此使用者帳號登入",
+        "arguments": {
+          "username": "使用者用來登入的名稱"
+        },
+        "options": {
+          "descr": "使用者描述",
+          "email": "使用者的郵件",
+          "password": "使用者的密碼，如果沒有提供，您將會收到提示",
+          "full-name": "使用者的全名",
+          "role": "將使用者指派至角色 {roles}"
+        },
+        "password-request": "請輸入使用者的密碼",
+        "success": "已成功新增使用者: {username}",
+        "wrong-auth": "警告，您將無法以這個使用者登入，因為您沒有使用 MySQL 驗證"
+      }
+    }
+  }
+});
 
 /***/ }),
 

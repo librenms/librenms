@@ -29,7 +29,7 @@
                 <a class="accordion-item-trigger" :class="{'collapsed': !isActive}" role="button" data-parent="#accordion" @click="isActive = !isActive" :data-href="hash()">
                     <i class="fa fa-chevron-down accordion-item-trigger-icon"></i>
                     <i v-if="icon" :class="['fa', 'fa-fw', icon]"></i>
-                    {{ name | trans | ucfirst }}
+                    {{ text || name  }}
                 </a>
             </h4>
         </div>
@@ -51,6 +51,7 @@
                 type: String,
                 required: true
             },
+            text: String,
             active: Boolean,
             icon: String
         },

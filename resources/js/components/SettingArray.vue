@@ -24,7 +24,7 @@
 
 <template>
     <ul
-        v-tooltip="disabled ? trans('setttings.readonly') : false"
+        v-tooltip="disabled ? $t('setttings.readonly') : false"
     >
         <draggable v-model="localList" @end="dragged()" :disabled="disabled">
             <div v-for="(item, index) in localList" class="input-group">

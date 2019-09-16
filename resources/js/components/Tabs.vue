@@ -30,7 +30,7 @@
                     <li v-for="tab in tabs" :key="tab.name" :class="{ 'active': tab.isActive }" role="presentation">
                         <a role="tab" :aria-controls="tab.name" @click="activeTab = tab.name">
                             <i v-if="tab.icon" :class="['fa', 'fa-fw', tab.icon]"></i>
-                            {{ tab.name | trans | ucfirst }}&nbsp;
+                            {{ tab.text || tab.name }}&nbsp;
                         </a>
                     </li>
                     <li class="pull-right">

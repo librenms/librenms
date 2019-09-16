@@ -33,7 +33,7 @@
         name: "Tab",
         props: {
             name: { required: true },
-            title: String,
+            text: String,
             selected: {type: Boolean, default: false},
             icon: String
         },

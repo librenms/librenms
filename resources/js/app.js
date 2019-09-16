@@ -38,14 +38,19 @@ Vue.filter('ucfirst', function (value) {
     value = value.toString();
     return value.charAt(0).toUpperCase() + value.slice(1)
 });
-Vue.filter('trans', (...args) => {
-    return args[0];
-    return lang.get(...args); // TODO implement translation
+
+import VueInternationalization from 'vue-i18n';
+import Locale from './vue-i18n-locales.generated';
+
+Vue.use(VueInternationalization);
+
+const lang = document.documentElement.lang.substr(0, 2);
+// or however you determine your current app locale
+
+const i18n = new VueInternationalization({
+    locale: lang,
+    messages: Locale
 });
-Vue.prototype.trans = text => {
-    return text;
-    return lang.get(text);
-};
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -55,4 +60,5 @@ Vue.prototype.trans = text => {
 
 const app = new Vue({
     el: '#app',
+    i18n,
 });

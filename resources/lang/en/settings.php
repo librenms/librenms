@@ -273,8 +273,8 @@ return [
             'description' => 'LDAP version',
             'help' => 'LDAP version to use to talk to the server.  Usually this should be v3',
             'options' => [
-                2 => 2,
-                3 => 3
+                "2" => "2",
+                "3" => "3"
             ]
         ],
         'auth_mechanism' => [

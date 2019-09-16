@@ -28,7 +28,7 @@
             {{ getDescription() }}
             <span v-if="setting.units !== null">({{ setting.units }})</span>
         </label>
-        <div class="col-sm-5" v-tooltip="setting.disabled ? trans('settings.readonly') : false">
+        <div class="col-sm-5" v-tooltip="setting.disabled ? $t('settings.readonly') : false">
             <component :is="getComponent()"
                        v-model="value"
                        :name="setting.name"
@@ -40,8 +40,8 @@
             <span class="form-control-feedback"></span>
         </div>
         <div class="col-sm-2">
-            <button v-show="showUndo()" @click="resetToInitial" class="btn btn-primary" type="button" v-tooltip="trans('Undo')"><i class="fa fa-undo"></i></button>
-            <button v-show="showResetToDefault()" @click="resetToDefault" class="btn btn-default" type="button" v-tooltip="trans('Reset to default')"><i class="fa fa-refresh"></i></button>
+            <button v-show="showUndo()" @click="resetToInitial" class="btn btn-primary" type="button" v-tooltip="$t('Undo')"><i class="fa fa-undo"></i></button>
+            <button v-show="showResetToDefault()" @click="resetToDefault" class="btn btn-default" type="button" v-tooltip="$t('Reset to default')"><i class="fa fa-refresh"></i></button>
             <div v-if="hasHelp()" v-tooltip="{content: getHelp(), trigger: 'hover click'}" class="fa fa-fw fa-lg fa-question-circle"></div>
         </div>
     </div>
@@ -63,18 +63,18 @@
                 this.previous = this.saved
             },
             getDescription() {
-                return this.trans('settings.settings.' + this.setting.name + '.description')
+                return this.$t('settings.settings.' + this.setting.name + '.description')
             },
             getHelp() {
-                let help = this.trans('settings.settings.' + this.setting.name + '.help');
+                let help = this.$t('settings.settings.' + this.setting.name + '.help');
                 if (this.setting.overridden) {
-                    help += "\n" + this.trans('settings.readonly')
+                    help += "\n" + this.$t('settings.readonly')
                 }
 
                 return help
             },
             hasHelp() {
-                return true // TODO implement hasHelp
+                return this.$te('settings.settings.' + this.setting.name + '.help')
             },
             resetToDefault() {
                 this.value = this.setting.default

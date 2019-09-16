@@ -31,10 +31,10 @@
                 </div>
             </form>
         </template>
-        <tab name="global" :selected="'global' === tab">Global tab</tab>
-        <tab v-for="(sections, group) in groups" :key="group" :name="group" :selected="group === tab">
+        <tab name="global" :selected="'global' === tab" :text="$t('settings.groups.global')">Global tab</tab>
+        <tab v-for="(sections, group) in groups" :key="group" :name="group" :selected="group === tab" :text="$t('settings.groups.' + group)">
             <accordion @expanded="sectionExpanded" @collapsed="sectionCollapsed">
-                <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :active="item === section">
+                <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :text="$t('settings.sections.' + group + '.' + item)" :active="item === section">
                     <form class="form-horizontal">
                         <librenms-setting v-for="setting in items" :key="setting" :setting="settings[setting]"></librenms-setting>
                     </form>
