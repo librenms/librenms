@@ -150,3 +150,5 @@ class HiveosWireless extends OS implements
         return $sensors;
     }
 }
+
+
