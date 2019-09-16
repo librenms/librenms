@@ -63,7 +63,8 @@
                 this.previous = this.saved
             },
             getDescription() {
-                return this.$t('settings.settings.' + this.setting.name + '.description')
+                let key = 'settings.settings.' + this.setting.name + '.description';
+                return this.$te(key) ? this.$t(key) : this.setting.name;
             },
             getHelp() {
                 let help = this.$t('settings.settings.' + this.setting.name + '.help');

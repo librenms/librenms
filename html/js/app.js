@@ -2157,7 +2157,8 @@ __webpack_require__.r(__webpack_exports__);
       this.previous = this.saved;
     },
     getDescription: function getDescription() {
-      return this.$t('settings.settings.' + this.setting.name + '.description');
+      var key = 'settings.settings.' + this.setting.name + '.description';
+      return this.$te(key) ? this.$t(key) : this.setting.name;
     },
     getHelp: function getHelp() {
       var help = this.$t('settings.settings.' + this.setting.name + '.help');
@@ -39171,8 +39172,8 @@ var render = function() {
         {
           name: "tooltip",
           rawName: "v-tooltip",
-          value: _vm.disabled ? _vm.$t("setttings.readonly") : false,
-          expression: "disabled ? $t('setttings.readonly') : false"
+          value: _vm.disabled ? _vm.$t("settings.readonly") : false,
+          expression: "disabled ? $t('settings.readonly') : false"
         }
       ]
     },
