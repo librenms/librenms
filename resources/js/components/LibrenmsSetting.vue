@@ -64,7 +64,7 @@
             },
             getDescription() {
                 let key = 'settings.settings.' + this.setting.name + '.description';
-                return this.$te(key) ? this.$t(key) : this.setting.name;
+                return (this.$te(key) || this.$te(key, this.$i18n.fallbackLocale)) ? this.$t(key) : this.setting.name;
             },
             getHelp() {
                 let help = this.$t('settings.settings.' + this.setting.name + '.help');
@@ -75,7 +75,8 @@
                 return help
             },
             hasHelp() {
-                return this.$te('settings.settings.' + this.setting.name + '.help')
+                var key = 'settings.settings.' + this.setting.name + '.help';
+                return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale)
             },
             resetToDefault() {
                 this.value = this.setting.default

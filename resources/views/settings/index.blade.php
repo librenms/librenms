@@ -17,27 +17,9 @@
 
 @push('scripts')
     @routes
+    <script>window.lang = "{{ App::getLocale() }}"</script>
     <script src="{{ asset('js/app.js') }}"></script>
     <script>
-        $(".toolTip").click(function () {
-            $(this).tooltip('toggle'); // toggle on tap for mobile
-        }).tooltip();
-
-        // tab and section update address bar
-        $('.settings-group-tabs a[data-toggle="tab"]').on('show.bs.tab', function (e) {
-            var group = $(e.target).data('group');
-            window.history.pushState(group, '', '/settings/' + group);
-        });
-
-        $('.settings-sections .collapse').on('show.bs.collapse', function (e) {
-            var $target = $(e.target);
-            var slug = $target.data('group') + '/' + $target.data('section');
-            window.history.pushState(slug, '', '/settings/' + slug);
-        }).on('hide.bs.collapse', function (e) {
-            var group = $(e.target).data('group');
-            window.history.pushState(group, '', '/settings/' + group);
-        });
-
         $('#email_backend').change(function () {
             var type = this.value;
             if (type === 'sendmail') {
@@ -60,50 +42,6 @@
                 $('.geoloc_api_key').show();
             }
         }).change(); // trigger initially
-
-        // Checkbox config ajax calls
-        $('.section-form input[type=checkbox]').on('switchChange.bootstrapSwitch', function (event, state) {
-            event.preventDefault();
-            var $this = $(this);
-            globalConfigUpdateValue($this, state);
-        }).bootstrapSwitch('offColor', 'danger');
-
-        // Input field config ajax calls
-        $('.section-form input:not([type=checkbox])').on('blur keyup', function (event) {
-            if (event.type === 'keyup' && event.keyCode !== 13) {
-                return;
-            }
-            event.preventDefault();
-            var $this = $(this);
-            var value = $this.val();
-
-            globalConfigUpdateValue($this, value);
-        });
-
-        $('.section-form select').change(function (event) {
-            event.preventDefault();
-            var $this = $(this);
-            var value = $this.val();
-            globalConfigUpdateValue($this, value);
-        });
-
-        $('.config-undo').click(function (event) {
-            event.preventDefault();
-            var target = $(this).data('target');
-            var $target = $('#' + target.replace('.', '\\.'));
-            var value = $target.data('previous');
-            $target.val(value);
-            globalConfigUpdateValue($target, value);
-        });
-
-        $('.config-default').click(function (event) {
-            event.preventDefault();
-            var target = $(this).data('target');
-            var $target = $('#' + target.replace('.', '\\.'));
-            var value = $target.data('default');
-            $target.val(value);
-            globalConfigUpdateValue($target, value);
-        });
 
         function globalConfigUpdateValue(target, value) {
             var name = target.attr('name');

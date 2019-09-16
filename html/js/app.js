@@ -2158,7 +2158,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     getDescription: function getDescription() {
       var key = 'settings.settings.' + this.setting.name + '.description';
-      return this.$te(key) ? this.$t(key) : this.setting.name;
+      return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale) ? this.$t(key) : this.setting.name;
     },
     getHelp: function getHelp() {
       var help = this.$t('settings.settings.' + this.setting.name + '.help');
@@ -2170,7 +2170,8 @@ __webpack_require__.r(__webpack_exports__);
       return help;
     },
     hasHelp: function hasHelp() {
-      return this.$te('settings.settings.' + this.setting.name + '.help');
+      var key = 'settings.settings.' + this.setting.name + '.help';
+      return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale);
     },
     resetToDefault: function resetToDefault() {
       this.value = this.setting["default"];
@@ -55362,10 +55363,10 @@ Vue.filter('ucfirst', function (value) {
 
 
 Vue.use(vue_i18n__WEBPACK_IMPORTED_MODULE_3__["default"]);
-var lang = document.documentElement.lang.substr(0, 2); // or however you determine your current app locale
-
 var i18n = new vue_i18n__WEBPACK_IMPORTED_MODULE_3__["default"]({
   locale: lang,
+  fallbackLocale: 'en',
+  silentFallbackWarn: true,
   messages: _vue_i18n_locales_generated__WEBPACK_IMPORTED_MODULE_4__["default"]
 });
 /**
