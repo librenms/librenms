@@ -84,6 +84,7 @@ been up for 30344 seconds`.
 - Severity: `$alert->severity`
 - Rule: `$alert->rule`
 - Rule-Name: `$alert->name`
+- Procedure URL: `$alert->proc`
 - Timestamp: `$alert->timestamp`
 - Transport type: `$alert->transport`
 - Transport name: `$alert->transport_name`
