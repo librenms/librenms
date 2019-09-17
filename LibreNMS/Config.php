@@ -247,6 +247,7 @@ class Config
      * @param mixed $key period separated config variable name
      * @param mixed $value
      * @param bool $persist set the setting in the database so it persists across runs
+     * @return bool returns false if persisting failed
      */
     public static function set($key, $value, $persist = false)
     {
@@ -264,10 +265,12 @@ class Config
                 if ($debug) {
                     echo $e;
                 }
+                return false;
             }
         }
 
         Arr::set(self::$config, $key, $value);
+        return true;
     }
 
     /**

@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Config;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use LibreNMS\Util\DynamicConfig;
 
 class SettingsController extends Controller
@@ -84,19 +82,21 @@ class SettingsController extends Controller
         $value = $request->get('value');
 
         if (!$config->isValidSetting($id)) {
-            return $this->jsonResponse($id, ":id is not a valid setting", 400);
+            return $this->jsonResponse($id, ":id is not a valid setting", null, 400);
         }
 
+        $current = \LibreNMS\Config::get($id);
         $config_item = $config->get($id);
+
         if (!$config_item->checkValue($value)) {
-            return $this->jsonResponse($id, __('settings.validate.' . $config_item->getType(), ['id' => $id, 'value' => $value]), 400);
+            return $this->jsonResponse($id, __('settings.validate.' . $config_item->getType(), ['id' => $id, 'value' => $value]), $current, 400);
         }
 
-        if (Config::updateOrCreate(['config_name' => $id], ['config_name' => $id, 'config_value' => $value])) {
-            return $this->jsonResponse($id, "Successfully set $id");
+        if (\LibreNMS\Config::set($id, $value, true)) {
+            return $this->jsonResponse($id, "Successfully set $id", $value);
         }
 
-        return $this->jsonResponse($id, "Failed to update :id", 400);
+        return $this->jsonResponse($id, "Failed to update :id", $current, 400);
     }
 
     /**
@@ -109,14 +109,14 @@ class SettingsController extends Controller
     public function destroy(DynamicConfig $config, $id)
     {
         if (!$config->isValidSetting($id)) {
-            return $this->jsonResponse($id, ":id is not a valid setting", 400);
+            return $this->jsonResponse($id, ":id is not a valid setting", null, 400);
         }
 
-        if (Config::destroy($id)) {
-            return $this->jsonResponse($id, ":id reset to default");
+        if (\App\Models\Config::destroy($id)) {
+            return $this->jsonResponse($id, ":id reset to default", $config->get($id)->default);
         }
 
-        return $this->jsonResponse($id, ":id is not set", 400);
+        return $this->jsonResponse($id, ":id is not set", null, 400);
     }
 
     public function listAll(DynamicConfig $config)
@@ -127,13 +127,15 @@ class SettingsController extends Controller
     /**
      * @param string $id
      * @param string $message
+     * @param mixed $value
      * @param int $status
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function jsonResponse($id, $message, $status = 200)
+    protected function jsonResponse($id, $message, $value = null, $status = 200)
     {
         return new JsonResponse([
             'message' => __($message, ['id' => $id]),
+            'value' => $value,
         ], $status);
     }
 }

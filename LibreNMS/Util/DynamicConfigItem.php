@@ -65,7 +65,7 @@ class DynamicConfigItem implements \ArrayAccess
         if ($this->type == 'boolean') {
             return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
         } elseif ($this->type == 'integer') {
-            return filter_var($value, FILTER_VALIDATE_INT);
+            return filter_var($value, FILTER_VALIDATE_INT) || $value === "0" || $value === 0;
         } elseif ($this->type == 'select') {
             return in_array($value, $this->options);
         } elseif ($this->type == 'email') {

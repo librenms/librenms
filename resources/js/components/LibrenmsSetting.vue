@@ -23,19 +23,21 @@
   -->
 
 <template>
-    <div :class="['form-group', 'has-feedback', setting.class]">
+    <div :class="['form-group', 'has-feedback', setting.class, feedback]">
         <label :for="setting.name" class="col-sm-5 control-label" v-tooltip="setting.name">
             {{ getDescription() }}
             <span v-if="setting.units !== null">({{ setting.units }})</span>
         </label>
         <div class="col-sm-5" v-tooltip="setting.disabled ? $t('settings.readonly') : false">
             <component :is="getComponent()"
-                       v-model="value"
+                       :value="value"
                        :name="setting.name"
                        :pattern="setting.pattern"
                        :disabled="setting.overridden"
                        :required="setting.required"
                        :options="setting.options"
+                       @input="changeValue($event)"
+                       @change="changeValue($event)"
             ></component>
             <span class="form-control-feedback"></span>
         </div>
@@ -55,12 +57,30 @@
         },
         data() {
             return {
-                value: this.setting.value
+                value: this.setting.value,
+                inhibit: false,
+                feedback: ''
             }
         },
         methods: {
-            commit() {
-                this.previous = this.saved
+            persistValue: _.debounce(function (value) {
+                axios.put(route('settings.update', this.setting.name), {value: value})
+                    .then((response) => {
+                        this.value = response.data.value;
+                        this.feedback = 'has-success';
+                        setTimeout(() => this.feedback = '', 3000);
+                    })
+                    .catch((error) => {
+                        this.value = error.response.data.value;
+                        this.feedback = 'has-error';
+                        setTimeout(() => this.feedback = '', 3000);
+                        toastr.error(error.response.data.message);
+                    })
+            }, 500),
+            changeValue(event) {
+                const value = event.target ? event.target.value : event;
+                this.persistValue(value);
+                this.value = value
             },
             getDescription() {
                 let key = 'settings.settings.' + this.setting.name + '.description';
@@ -79,10 +99,10 @@
                 return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale)
             },
             resetToDefault() {
-                this.value = this.setting.default
+                this.changeValue(this.setting.default)
             },
             resetToInitial() {
-                this.value = this.setting.value
+                this.changeValue(this.setting.value)
             },
             showResetToDefault() {
                 return this.setting.default !== null

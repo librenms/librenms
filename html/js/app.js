@@ -310,6 +310,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LibrenmsSetting",
   props: {
@@ -320,12 +322,36 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      value: this.setting.value
+      value: this.setting.value,
+      inhibit: false,
+      feedback: ''
     };
   },
   methods: {
-    commit: function commit() {
-      this.previous = this.saved;
+    persistValue: _.debounce(function (value) {
+      var _this = this;
+
+      axios.put(route('settings.update', this.setting.name), {
+        value: value
+      }).then(function (response) {
+        _this.value = response.data.value;
+        _this.feedback = 'has-success';
+        setTimeout(function () {
+          return _this.feedback = '';
+        }, 3000);
+      })["catch"](function (error) {
+        _this.value = error.response.data.value;
+        _this.feedback = 'has-error';
+        setTimeout(function () {
+          return _this.feedback = '';
+        }, 3000);
+        toastr.error(error.response.data.message);
+      });
+    }, 500),
+    changeValue: function changeValue(event) {
+      var value = event.target ? event.target.value : event;
+      this.persistValue(value);
+      this.value = value;
     },
     getDescription: function getDescription() {
       var key = 'settings.settings.' + this.setting.name + '.description';
@@ -345,10 +371,10 @@ __webpack_require__.r(__webpack_exports__);
       return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale);
     },
     resetToDefault: function resetToDefault() {
-      this.value = this.setting["default"];
+      this.changeValue(this.setting["default"]);
     },
     resetToInitial: function resetToInitial() {
-      this.value = this.setting.value;
+      this.changeValue(this.setting.value);
     },
     showResetToDefault: function showResetToDefault() {
       return this.setting["default"] !== null && !this.setting.overridden && !_.isEqual(this.value, this.setting["default"]);
@@ -1723,7 +1749,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    { class: ["form-group", "has-feedback", _vm.setting.class] },
+    { class: ["form-group", "has-feedback", _vm.setting.class, _vm.feedback] },
     [
       _c(
         "label",
@@ -1764,18 +1790,20 @@ var render = function() {
           _c(_vm.getComponent(), {
             tag: "component",
             attrs: {
+              value: _vm.value,
               name: _vm.setting.name,
               pattern: _vm.setting.pattern,
               disabled: _vm.setting.overridden,
               required: _vm.setting.required,
               options: _vm.setting.options
             },
-            model: {
-              value: _vm.value,
-              callback: function($$v) {
-                _vm.value = $$v
+            on: {
+              input: function($event) {
+                return _vm.changeValue($event)
               },
-              expression: "value"
+              change: function($event) {
+                return _vm.changeValue($event)
+              }
             }
           }),
           _vm._v(" "),
