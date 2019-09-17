@@ -1,15 +1,14 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+
 require('./bootstrap');
 
 window.Vue = require('vue');
-import * as uiv from 'uiv'
-
+import { i18n } from "./plugins/i18n.js"; // translation
 
 /**
  * The following block of code may be used to automatically register your
@@ -37,18 +36,6 @@ Vue.filter('ucfirst', function (value) {
     if (!value) return '';
     value = value.toString();
     return value.charAt(0).toUpperCase() + value.slice(1)
-});
-
-import VueInternationalization from 'vue-i18n';
-import Locale from './vue-i18n-locales.generated';
-
-Vue.use(VueInternationalization);
-
-const i18n = new VueInternationalization({
-    locale: lang,
-    fallbackLocale: 'en',
-    silentFallbackWarn: true,
-    messages: Locale,
 });
 
 /**

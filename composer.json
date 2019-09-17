@@ -112,7 +112,8 @@
         ],
         "post-install-cmd": [
             "LibreNMS\\ComposerHelper::postInstall",
-            "Illuminate\\Foundation\\ComposerScripts::postInstall"
+            "Illuminate\\Foundation\\ComposerScripts::postInstall",
+            "@php artisan vue-i18n:generate"
         ],
         "post-update-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate"

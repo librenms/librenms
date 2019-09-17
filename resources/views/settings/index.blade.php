@@ -14,11 +14,15 @@
     </div>
 @endsection
 
+@push('css')
+    <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
+@endpush
 
 @push('scripts')
     @routes
-    <script>window.lang = "{{ App::getLocale() }}"</script>
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ mix('/js/manifest.js') }}"></script>
+    <script src="{{ mix('/js/vendor.js') }}"></script>
+    <script src="{{ mix('/js/app.js') }}"></script>
     <script>
         $('#email_backend').change(function () {
             var type = this.value;
