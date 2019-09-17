@@ -1159,9 +1159,9 @@ function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache,
  */
 function sensors($types, $device, $valid, $pre_cache = array())
 {
-    foreach ((array)$types as $sensor_type) {
-        echo ucfirst($sensor_type) . ': ';
-        $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_type .'/';
+    foreach ((array)$types as $sensor_class) {
+        echo ucfirst($sensor_class) . ': ';
+        $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class .'/';
 
         if (is_file($dir . $device['os_group'] . '.inc.php')) {
             include $dir . $device['os_group'] . '.inc.php';
@@ -1174,9 +1174,9 @@ function sensors($types, $device, $valid, $pre_cache = array())
                 include $dir . '/rfc1628.inc.php';
             }
         }
-        discovery_process($valid, $device, $sensor_type, $pre_cache);
-        d_echo($valid['sensor'][$sensor_type]);
-        check_valid_sensors($device, $sensor_type, $valid['sensor']);
+        discovery_process($valid, $device, $sensor_class, $pre_cache);
+        d_echo($valid['sensor'][$sensor_class]);
+        check_valid_sensors($device, $sensor_class, $valid['sensor']);
         echo "\n";
     }
 }
