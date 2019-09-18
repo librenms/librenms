@@ -9,7 +9,7 @@
                     "processor_index": "1",
                     "processor_type": "voss",
                     "processor_usage": "88",
-                    "processor_descr": "VSP Processor",
+                    "processor_descr": "VOSS Processor",
                     "processor_precision": "1",
                     "processor_perc_warn": "75"
                 }

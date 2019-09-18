@@ -1,0 +1,438 @@
+-- start_Copyright_Notice
+-- Licensed Materials - Property of IBM
+--
+--
+-- (C) Copyright IBM Corp. 2016, 2017
+--
+-- US Government Users Restricted Rights - Use, duplication or
+-- disclosure restricted by GSA ADP Schedule Contract with
+-- IBM Corp.
+-- end_Copyright_Notice
+
+IBM-SVC-MIB DEFINITIONS ::=
+BEGIN 
+IMPORTS 
+	OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, 
+	enterprises 
+          FROM SNMPv2-SMI 
+
+        MODULE-COMPLIANCE, OBJECT-GROUP,
+        NOTIFICATION-GROUP
+          FROM SNMPv2-CONF                 
+
+        SnmpAdminString
+          FROM SNMP-FRAMEWORK-MIB;         -- RFC2571
+          
+ibm2145TSVE MODULE-IDENTITY 
+        LAST-UPDATED "201701120000Z"
+	ORGANIZATION "IBM SSG" 
+	CONTACT-INFO 
+		"Contact IBM Support"
+	DESCRIPTION 
+                "This file defines the private IBM SAN Volume Controller
+                 (previously TSVE) MIB extensions used to receive traps from SVC 
+                 "
+        REVISION "201701120000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.8.1
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.8.1 release.
+                 There have been no additional objects defined."
+        REVISION "201611010000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.8.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.8.0 release.
+                 There have been no additional objects defined."
+        REVISION "201607140000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.7.1
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.7.1 release.
+                 There have been no additional objects defined."
+        REVISION "201604280000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.7.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.7.0 release.
+                 The tsveIDAL object has been defined since the previous
+                 release."
+        REVISION "201601220000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.6.1
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.6.1 release.
+                 There have been no additional objects defined."
+        REVISION "201511250000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.6.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.6.0 release.
+                 There have been no additional objects defined."
+        REVISION "201504170000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.5.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.5.0 release.
+                 There have been no additional objects defined."
+        REVISION "201409010000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.4.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.4.0 release. 
+                 There have been no additional objects defined.
+                 A typo was fixed in the derived type name SnmpAdminString
+                 of the tsveOBJN object definition."
+        REVISION "201309240000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.3.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.3.0 release. 
+                 There have been no additional objects defined."
+        REVISION "201309240000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.2.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.2.0 release. 
+                 There have been no additional objects defined."
+        REVISION "201309240000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 7.1.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 7.1.0 release.
+                 The tsveOBJN object has been defined since the previous
+                 release."             
+        REVISION "201211060000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 6.4.1
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 6.4.1 release.
+                 The tsveMPNO object has been defined since the previous
+                 release."
+        REVISION "201204190000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 6.4.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 6.4.0 release.
+                 There have been no additional objects defined."
+        REVISION "201105260000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 6.3.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 6.3.0 release.
+                 There have been no additional objects defined."
+        REVISION "201105260000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 6.2.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 6.2.0 release.
+                 There have been no additional objects defined."
+        REVISION "201005070000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 6.1.0
+                 The SVC MIB has been renamed to indicate that it is
+                 for SVC Lodestone 6.1.0 release.
+                 There have been no additional objects defined."
+        REVISION "200909010000Z"
+        DESCRIPTION
+                "IBM San Volume Controller MIB for SVC 5.1.0
+                 The SVC MIB has been extensively tidied within this release.
+                 The MIB label has been corrected to IBM-SVC-MIB. This name
+                 will be maintained in future releases.
+                 There have been no additional objects defined."
+        REVISION "200805120000Z"
+        DESCRIPTION
+                "IBM TSVE MIB for SVC 4.3.1
+                 A number of previous TSVE (SVC) MIB revisions exist.
+                 The tsveADD1, tsveADD2 and tsveCOPY objects have been defined
+                 since the original release."
+	::= { ibmProd 190 } 
+
+
+ibm              OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd   	 OBJECT IDENTIFIER ::= { ibm 6 }
+
+ibm2145TSVEObjects OBJECT IDENTIFIER ::= { ibm2145TSVE 4 }
+ibm2145TSVEConformance OBJECT IDENTIFIER ::= { ibm2145TSVE 5 }
+
+tsveETrap NOTIFICATION-TYPE
+	OBJECTS { 
+		tsveMACH,
+		tsveSERI,
+		tsveERRI,
+		tsveERRC,
+		tsveSWVE,
+		tsveFRUP,
+		tsveCLUS,
+		tsveNODE,
+		tsveERRS,
+                tsveTIME,
+                tsveOBJT,
+                tsveOBJI,
+                tsveADD1, 
+                tsveADD2,
+                tsveCOPY,
+                tsveMPNO,
+                tsveOBJN,
+                tsveIDAL
+	}
+	STATUS current
+      DESCRIPTION
+          "tsve error trap"
+
+      ::= { ibm2145TSVE 1 }
+
+tsveWTrap NOTIFICATION-TYPE
+	OBJECTS { 
+		tsveMACH,
+		tsveSERI,
+		tsveERRI,
+		tsveERRC,
+		tsveSWVE,
+		tsveFRUP,
+		tsveCLUS,
+		tsveNODE,
+		tsveERRS,
+                tsveTIME,
+                tsveOBJT,
+                tsveOBJI,
+                tsveADD1, 
+                tsveADD2,
+                tsveCOPY,
+                tsveMPNO,
+                tsveOBJN,
+                tsveIDAL
+	}
+	STATUS current
+      DESCRIPTION
+          "tsve warning trap"
+
+      ::= { ibm2145TSVE 2 }
+
+tsveITrap NOTIFICATION-TYPE
+	OBJECTS { 
+		tsveMACH,
+		tsveSERI,
+		tsveERRI,
+		tsveERRC,
+		tsveSWVE,
+		tsveFRUP,
+		tsveCLUS,
+		tsveNODE,
+		tsveERRS,
+                tsveTIME,
+                tsveOBJT,
+                tsveOBJI,
+                tsveADD1, 
+                tsveADD2,
+                tsveCOPY,
+                tsveMPNO,
+                tsveOBJN,
+                tsveIDAL
+	}
+	STATUS current
+      DESCRIPTION
+          "tsve information trap"
+
+      ::= { ibm2145TSVE 3 }
+
+tsveMACH OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE machine type"
+	::= { ibm2145TSVEObjects 1 }
+
+tsveSERI OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE serial number"
+	::= { ibm2145TSVEObjects 2 }
+
+tsveERRI OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE error ID"
+	::= { ibm2145TSVEObjects 3 }
+
+tsveERRC OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE error code"
+	::= { ibm2145TSVEObjects 4 }
+
+tsveSWVE OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE software version"
+	::= { ibm2145TSVEObjects 5 }
+
+tsveFRUP OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE FRU part number"
+	::= { ibm2145TSVEObjects 6 }
+
+tsveCLUS OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE cluster name"
+	::= { ibm2145TSVEObjects 7 }
+
+tsveNODE OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE node identifier"
+	::= { ibm2145TSVEObjects 8 }
+
+tsveERRS OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE error sequence number"
+	::= { ibm2145TSVEObjects 9 }
+
+tsveTIME OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE last error time stamp"
+	::= { ibm2145TSVEObjects 10 }
+
+tsveOBJT OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE object type"
+	::= { ibm2145TSVEObjects 11 }
+
+tsveOBJI OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE object ID"
+	::= { ibm2145TSVEObjects 12 }
+
+tsveADD1 OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE Additional data"
+	::= { ibm2145TSVEObjects 13 }
+
+tsveADD2 OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE Additional data"
+	::= { ibm2145TSVEObjects 14 }
+
+tsveCOPY OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE Copy ID"
+	::= { ibm2145TSVEObjects 15 }
+
+tsveMPNO OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"IBM TSVE Machine Part Number"
+	::= { ibm2145TSVEObjects 16 }
+
+tsveOBJN OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+                "IBM (orginally TSVE) object name"
+        ::= { ibm2145TSVEObjects 17 }
+        
+tsveIDAL OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+                "IBM (orginally TSVE) cluster alias"
+        ::= { ibm2145TSVEObjects 18 }
+        
+tsveCompliances OBJECT IDENTIFIER ::= { ibm2145TSVEConformance 1 }
+tsveGroups      OBJECT IDENTIFIER ::= { ibm2145TSVEConformance 2 }
+
+tsveCompliance MODULE-COMPLIANCE
+      STATUS  current
+      DESCRIPTION
+              "The compliance statement for the TSVE-MIB."
+      MODULE  -- this module
+          MANDATORY-GROUPS {
+                              tsveRequiredObjectsGroup,
+                              tsveNotifGroup
+                           }
+      ::= { tsveCompliances 1 }
+
+-- MIB groupings
+
+tsveRequiredObjectsGroup OBJECT-GROUP
+     OBJECTS {
+		tsveMACH,
+		tsveSERI,
+		tsveERRI,
+		tsveERRC,
+		tsveSWVE,
+		tsveFRUP,
+		tsveCLUS,
+		tsveNODE,
+		tsveERRS,
+                tsveTIME,
+                tsveOBJT,
+                tsveOBJI,
+                tsveADD1, 
+                tsveADD2,
+                tsveCOPY,
+                tsveMPNO,
+                tsveOBJN,
+                tsveIDAL
+              }
+    STATUS current
+    DESCRIPTION
+        "The objects defined in this MIB module that MUST
+         be implemented by a compliant implementation."
+    ::= { tsveGroups 1 }
+
+tsveNotifGroup NOTIFICATION-GROUP
+     NOTIFICATIONS {
+                    tsveETrap,
+                    tsveWTrap,
+                    tsveITrap
+                   }
+     STATUS  current
+     DESCRIPTION
+        "All notifications defined in this MIB module MUST
+         be implemented by a compliant implementation."
+     ::= { tsveGroups 2 }
+
+END

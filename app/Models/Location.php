@@ -141,10 +141,23 @@ class Location extends Model
         return $query->whereIn('id', $ids);
     }
 
+    public function scopeInDeviceGroup($query, $deviceGroup)
+    {
+        return $query->whereHas('devices.groups', function ($query) use ($deviceGroup) {
+            $query->where('device_groups.id', $deviceGroup);
+        });
+    }
+
+
     // ---- Define Relationships ----
 
     public function devices()
     {
         return $this->hasMany('App\Models\Device', 'location_id');
+    }
+
+    public function __toString()
+    {
+        return $this->location;
     }
 }

@@ -868,6 +868,10 @@ foreach ($ports as $port) {
             $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
             $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
+            // Add delta rate between current poll and last poll.
+            $fields['ifInBits_rate'] = $port['stats']['ifInBits_rate'];
+            $fields['ifOutBits_rate'] = $port['stats']['ifOutBits_rate'];
+            
             prometheus_push($device, 'ports', rrd_array_filter($tags), $fields);
             influx_update($device, 'ports', rrd_array_filter($tags), $fields);
             graphite_update($device, 'ports|' . $ifName, $tags, $fields);

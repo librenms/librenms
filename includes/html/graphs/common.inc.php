@@ -3,11 +3,11 @@
 use LibreNMS\Util\Clean;
 
 if ($_GET['from']) {
-    $from = preg_match('/(-\d+[hdm]|now)/', $_GET['from']) ? $_GET['from'] : (int)$_GET['from'];
+    $from = parse_at_time($_GET['from']);
 }
 
 if ($_GET['to']) {
-    $to = preg_match('/(-?\d+[hdm]|now)/', $_GET['to']) ? $_GET['to'] : (int)$_GET['to'];
+    $to = parse_at_time($_GET['to']);
 }
 
 if ($_GET['width']) {

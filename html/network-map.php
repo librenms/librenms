@@ -11,7 +11,6 @@
  *
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 $links = 1;
@@ -19,7 +18,7 @@ $links = 1;
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!LegacyAuth::check()) {
+if (!Auth::check()) {
     die('Unauthorized');
 }
 
@@ -53,7 +52,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
             graph [bgcolor=transparent];
 ';
 
-    if (!LegacyAuth::check()) {
+    if (!Auth::check()) {
         $map .= "\"Not authenticated\" [fontsize=20 fillcolor=\"lightblue\", URL=\"/\" shape=box3d]\n";
     } else {
         $locations = getlocations();
@@ -223,7 +222,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
     }
     echo $img;
 } else {
-    if (LegacyAuth::check()) {
+    if (Auth::check()) {
         // FIXME level 10 only?
         echo '<center>
                   <object width=1200 height=1000 data="' . Config::get('base_url') . '/network-map.php?format=svg" type="image/svg+xml"></object>

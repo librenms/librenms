@@ -13,8 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $pagetitle[] = "Ports";
 
 // Set Defaults here
@@ -87,16 +85,16 @@ $displayLists .= '</div>';
 if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars['searchbar'])) {
     $output = "<div class='pull-left'>";
     $output .= "<form method='post' action='' class='form-inline' role='form'>";
-
+    $output .= addslashes(csrf_field());
     $output .= "<div style='margin-bottom:4px;text-align:left;'>";
     $output .= "<div class='form-group'>";
     $output .= "<select name='device_id' id='device_id' class='form-control input-sm'>";
     $output .= "<option value=''>All Devices</option>";
 
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         $results = dbFetchRows("SELECT `device_id`,`hostname`, `sysName` FROM `devices` ORDER BY `hostname`");
     } else {
-        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array(LegacyAuth::id()));
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array(Auth::id()));
     }
     foreach ($results as $data) {
         if ($data['device_id'] == $vars['device_id']) {
@@ -108,8 +106,8 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . ">" . $ui_device . "</option>";
     }
 
-    if (!LegacyAuth::user()->hasGlobalRead()) {
-        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array(LegacyAuth::id()));
+    if (!Auth::user()->hasGlobalRead()) {
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array(Auth::id()));
     } else {
         $results = array();
     }
@@ -164,11 +162,11 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<select name='ifSpeed' id='ifSpeed' class='form-control input-sm'>";
     $output .= "<option value=''>All Speeds</option>";
 
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         $sql = "SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
     } else {
         $sql = "SELECT `ifSpeed` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
-        $param[] = array(LegacyAuth::id(), LegacyAuth::id());
+        $param[] = array(Auth::id(), Auth::id());
     }
 
     foreach (dbFetchRows($sql, $param) as $data) {
@@ -188,11 +186,11 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<select name='ifType' id='ifType' class='form-control input-sm'>";
     $output .= "<option value=''>All Media</option>";
 
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         $sql = "SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`";
     } else {
         $sql = "SELECT `ifType` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifType` ORDER BY `ifType`";
-        $param[] = array(LegacyAuth::id(), LegacyAuth::id());
+        $param[] = array(Auth::id(), Auth::id());
     }
 
     foreach (dbFetchRows($sql, $param) as $data) {
@@ -210,11 +208,11 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<select name='port_descr_type' id='port_descr_type' class='form-control input-sm'>";
     $output .= "<option value=''>All Port Types</option>";
 
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         $sql = "SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
     } else {
         $sql = "SELECT `port_descr_type` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
-        $param[] = array(LegacyAuth::id(), LegacyAuth::id());
+        $param[] = array(Auth::id(), Auth::id());
     }
     $ports = dbFetchRows($sql, $param);
 

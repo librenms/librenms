@@ -23,9 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     ?>
 
     <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
@@ -40,6 +38,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                 </div>
                 <div class="modal-footer">
                     <form role="form" class="remove_token_form">
+                        <?php echo csrf_field() ?>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger danger" id="poller-removal"
                                 data-target="poller-removal">Delete

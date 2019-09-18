@@ -1,0 +1,3236 @@
+--  Version  svn rev 8658
+--  History
+--      09 Mar 2015 Initial draft
+--      04 Aug 2015 Add config objects
+--      15 Sep 2015 Revise config objects
+--      25 Nov 2015 Add Capacity objects
+-- ========================================================================
+
+NBS-COHERENT-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32
+        FROM SNMPv2-SMI
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB
+    ;
+
+nbsCoherentMib  MODULE-IDENTITY
+    LAST-UPDATED  "201509150000Z"
+    ORGANIZATION  "MRV"
+    CONTACT-INFO
+       "For technical support, please contact your service channel"
+    DESCRIPTION
+       "Coherent CFP information."
+    ::= { nbs 242 }
+
+nbsCoherentCfgGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Configurable coherent features"
+    ::= { nbsCoherentMib 10 }
+
+nbsCohpmThresholdsGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Maximum considered safe by user"
+    ::= { nbsCoherentMib 21 }
+
+nbsCohpmCurrentGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Subtotals and statistics for sample now underway"
+    ::= { nbsCoherentMib 22 }
+
+nbsCohpmHistoricGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Totals and final statistics for a previous sample"
+    ::= { nbsCoherentMib 23 }
+
+nbsCohpmRunningGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Totals and statistics since (boot-up) protocol configuration"
+    ::= { nbsCoherentMib 24 }
+
+nbsCoherentStatsGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Coherent operating information and statistics"
+    ::= { nbsCoherentMib 90 }
+
+nbsCohpmEventsGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Threshold crossing events"
+    ::= { nbsCoherentMib 100 }
+
+
+-- *******************************************************************
+--
+-- the nbsCoherentCfgGrp
+--
+-- *******************************************************************
+
+nbsCoherentCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsCoherentCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Configurable coherent parameters."
+    ::= { nbsCoherentCfgGrp 2 }
+
+nbsCoherentCfgEntry OBJECT-TYPE
+    SYNTAX          NbsCoherentCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "User-controlled Coherent operating information and statistics for a
+        specific port/interface."
+    INDEX {
+        nbsCoherentCfgIfIndex
+    }
+    ::= { nbsCoherentCfgTable 1 }
+
+NbsCoherentCfgEntry ::= SEQUENCE {
+    nbsCoherentCfgIfIndex           InterfaceIndex,
+    nbsCoherentCfgCDmodeCaps        OCTET STRING,
+    nbsCoherentCfgCDmodeAdmin       INTEGER,
+    nbsCoherentCfgCDmodeOper        INTEGER,
+    nbsCoherentCfgCDautolAdmin      Integer32,
+    nbsCoherentCfgCDautolOper       Integer32,
+    nbsCoherentCfgCDautohAdmin      Integer32,
+    nbsCoherentCfgCDautohOper       Integer32,
+    nbsCoherentCfgCDfixedAdmin      Integer32,
+    nbsCoherentCfgCDfixedOper       Integer32,
+    nbsCoherentCfgSOPmodeAdmin      INTEGER,
+    nbsCoherentCfgSOPmodeOper       INTEGER
+}
+
+nbsCoherentCfgIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The MIB2 ifIndex"
+    ::= { nbsCoherentCfgEntry 1 }
+
+nbsCoherentCfgCDmodeCaps OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This bitmask indicates which configurable codes this port supports for
+        nbsCoherentCfgCDmodeAdmin.
+
+        Bit 0, 1 are reserved.
+
+        Subsequent bits refer to the CD modes enumerated list; bits are
+        numbered per enumeration value.  Bit 2 corresponds to disable(2), Bit 3
+        to auto(3), etc.  A bit is set (1) if that CD
+        mode is appropriate for this module, cleared (0) if unavailable.
+
+        OCTET STRING bitmasks count the leftmost bit (MSB) as 0."
+    ::= { nbsCoherentCfgEntry 3 }
+
+nbsCoherentCfgCDmodeAdmin OBJECT-TYPE
+    SYNTAX          INTEGER {
+        notSupported   (1),
+        disable        (2),
+        auto           (3),
+        fixed          (4)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Desired administrative chromatic dispersion (CD) mode setting:
+
+        disable(2) --
+
+        auto(3) -- apply the objects nbsCoherentCfgCDautolAdmin and
+            nbsCoherentCfgCDautohAdmin
+
+        fixed(4) -- apply the object nbsCoherentCfgCDfixedAdmin"
+    ::= { nbsCoherentCfgEntry 12 }
+
+nbsCoherentCfgCDmodeOper OBJECT-TYPE
+    SYNTAX          INTEGER {
+        notSupported   (1),
+        disable        (2),
+        auto           (3),
+        fixed          (4)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Current operational chromatic dispersion (CD) mode setting:
+
+        notSupported(1) --
+
+        disable(2) --
+
+        auto(3) -- the objects nbsCoherentCfgCDautolAdmin and
+            nbsCoherentCfgCDautohAdmin apply
+
+        fixed(4) -- the object nbsCoherentCfgCDfixedAdmin applies"
+    ::= { nbsCoherentCfgEntry 13 }
+
+nbsCoherentCfgCDautolAdmin OBJECT-TYPE
+    SYNTAX          Integer32 (-100000..100000)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Desired administrative setting for the low search value for an automatic
+        find of the chromatic dispersion (CD); applies only for auto(3).
+        Unit measurement: 1 ps/nm"
+    ::= { nbsCoherentCfgEntry 14 }
+
+nbsCoherentCfgCDautolOper OBJECT-TYPE
+    SYNTAX          Integer32 (-100000..100000)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Current operational setting for the low search value for an automatic
+        find of the chromatic dispersion (CD); applies only for auto(3).
+        Unit measurement: 1 ps/nm"
+    ::= { nbsCoherentCfgEntry 15 }
+
+nbsCoherentCfgCDautohAdmin OBJECT-TYPE
+    SYNTAX          Integer32 (-100000..100000)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Desired administrative setting for the high search value for an automatic
+        find of the chromatic dispersion (CD); applies only for auto(3).
+        Unit measurement: 1 ps/nm"
+    ::= { nbsCoherentCfgEntry 16 }
+
+nbsCoherentCfgCDautohOper OBJECT-TYPE
+    SYNTAX          Integer32 (-100000..100000)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Current operational setting for the high search value for an automatic
+        find of the chromatic dispersion (CD); applies only for auto(3).
+        Unit measurement: 1 ps/nm"
+    ::= { nbsCoherentCfgEntry 17 }
+
+nbsCoherentCfgCDfixedAdmin OBJECT-TYPE
+    SYNTAX          Integer32 (-100000..100000)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Desired administrative setting for a fixed chromatic dispersion (CD);
+        applies only for fixed(4).
+        Unit measurement: 1 ps/nm"
+    ::= { nbsCoherentCfgEntry 18 }
+
+nbsCoherentCfgCDfixedOper OBJECT-TYPE
+    SYNTAX          Integer32 (-100000..100000)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Current operational setting for a fixed chromatic dispersion (CD);
+        applies only for fixed(4).
+        Unit measurement: 1 ps/nm"
+    ::= { nbsCoherentCfgEntry 19 }
+
+nbsCoherentCfgSOPmodeAdmin  OBJECT-TYPE
+    SYNTAX          INTEGER {
+        notSupported  (1),
+        standard      (2),
+        enhanced      (3)
+    } 
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Desired administrative setting for state of polarization (SOP) mode"
+    ::= { nbsCoherentCfgEntry 22 }
+
+nbsCoherentCfgSOPmodeOper  OBJECT-TYPE
+    SYNTAX          INTEGER {
+        notSupported  (1),
+        standard      (2),
+        enhanced      (3)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Operational setting for state of polarization (SOP) mode"
+    ::= { nbsCoherentCfgEntry 23 }
+
+
+-- *******************************************************************
+--
+-- the nbsCohpmThresholdsGrp
+--
+-- *******************************************************************
+
+nbsCohpmThresholdsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsCohpmThresholdsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Coherent Performance Monitoring thresholds"
+    ::= { nbsCohpmThresholdsGrp 1 }
+
+nbsCohpmThresholdsEntry OBJECT-TYPE
+    SYNTAX          NbsCohpmThresholdsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Performance monitoring thresholds for a particular interface"
+    INDEX {
+        nbsCohpmThresholdsIfIndex,
+        nbsCohpmThresholdsInterval
+    }
+    ::= { nbsCohpmThresholdsTable 1 }
+
+NbsCohpmThresholdsEntry ::= SEQUENCE {
+    nbsCohpmThresholdsIfIndex       InterfaceIndex,
+    nbsCohpmThresholdsInterval      INTEGER,
+
+    nbsCohpmThresholdsAveNetBERsig  INTEGER,
+    nbsCohpmThresholdsAveNetBERexp  Integer32,
+    nbsCohpmThresholdsMinNetBERsig  INTEGER,
+    nbsCohpmThresholdsMinNetBERexp  Integer32,
+    nbsCohpmThresholdsMaxNetBERsig  INTEGER,
+    nbsCohpmThresholdsMaxNetBERexp  Integer32,
+
+    nbsCohpmThresholdsAveCD         Integer32,
+    nbsCohpmThresholdsMinCD         Integer32,
+    nbsCohpmThresholdsMaxCD         Integer32,
+
+    nbsCohpmThresholdsAveDGD        Unsigned32,
+    nbsCohpmThresholdsMinDGD        Unsigned32,
+    nbsCohpmThresholdsMaxDGD        Unsigned32,
+
+    nbsCohpmThresholdsAveQ          Unsigned32,
+    nbsCohpmThresholdsMinQ          Unsigned32,
+    nbsCohpmThresholdsMaxQ          Unsigned32,
+
+    nbsCohpmThresholdsAveCFO        Integer32,
+    nbsCohpmThresholdsMinCFO        Integer32,
+    nbsCohpmThresholdsMaxCFO        Integer32,
+
+    nbsCohpmThresholdsAveOSNR       Unsigned32,
+    nbsCohpmThresholdsMinOSNR       Unsigned32,
+    nbsCohpmThresholdsMaxOSNR       Unsigned32,
+
+    nbsCohpmThresholdsAveSNRx       Unsigned32,
+    nbsCohpmThresholdsMinSNRx       Unsigned32,
+    nbsCohpmThresholdsMaxSNRx       Unsigned32,
+
+    nbsCohpmThresholdsAveSNRy       Unsigned32,
+    nbsCohpmThresholdsMinSNRy       Unsigned32,
+    nbsCohpmThresholdsMaxSNRy       Unsigned32,
+
+    nbsCohpmThresholdsAvePDL        Unsigned32,
+    nbsCohpmThresholdsMinPDL        Unsigned32,
+    nbsCohpmThresholdsMaxPDL        Unsigned32,
+
+    nbsCohpmThresholdsAveSOP        Unsigned32,
+    nbsCohpmThresholdsMinSOP        Unsigned32,
+    nbsCohpmThresholdsMaxSOP        Unsigned32
+}
+
+nbsCohpmThresholdsIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The MIB2 ifIndex"
+    ::= { nbsCohpmThresholdsEntry 1 }
+
+nbsCohpmThresholdsInterval OBJECT-TYPE
+    SYNTAX          INTEGER {
+        quarterHour    (1),
+        twentyfourHour (2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Indicates the interval monitored to which these thresholds apply"
+    ::= { nbsCohpmThresholdsEntry 3 }
+
+nbsCohpmThresholdsAveNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The significand of the average network Bit Error Rate (BER)
+        threshold, which is calculated by:
+           nbsCohpmThresholdsAveNetBERsig x 10^nbsCohpmThresholdsAveNetBERexp
+
+        The first time the average BER meets/exceeds this threshold during
+        a current interval triggers the nbsCohpmTrapsAveBER notification.
+
+        The reserved value 0 disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 11 }
+
+nbsCohpmThresholdsAveNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The exponent of the average network Bit Error Rate (BER)
+        threshold, see nbsCohpmThresholdsAveNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 12 }
+
+nbsCohpmThresholdsMinNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The significand of the minimum network Bit Error Rate (BER)
+        threshold, which is calculated by:
+           nbsCohpmThresholdsMinNetBERsig x 10^nbsCohpmThresholdsMinNetBERexp
+
+        The first time the minimum BER meets/is below this threshold during
+        a current interval triggers the nbsCohpmTrapsMinBER notification.
+
+        The reserved value 0 disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 14 }
+
+nbsCohpmThresholdsMinNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The exponent of the minimum network Bit Error Rate (BER)
+        threshold, see nbsCohpmThresholdsMinNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 15 }
+
+nbsCohpmThresholdsMaxNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The significand of the maximum network Bit Error Rate (BER)
+        threshold, which is calculated by:
+           nbsCohpmThresholdsMaxNetBERsig x 10^nbsCohpmThresholdsMaxNetBERexp
+
+        The first time the maximum BER meets/exceeds this threshold during
+        a current interval triggers the nbsCohpmTrapsMaxBER notification.
+
+        The reserved value 0 disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 17 }
+
+nbsCohpmThresholdsMaxNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The exponent of the maximum network Bit Error Rate (BER)
+        threshold, see nbsCohpmThresholdsMaxNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 18 }
+
+nbsCohpmThresholdsAveCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The average chromatic dispersion (CD) threshold.
+        Unit measurement: 1 ps/nm
+
+        The first time nbsCohpmCurrentAveCD meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsAveCD.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 20 }
+
+nbsCohpmThresholdsMinCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The minimum chromatic dispersion (CD) threshold.
+        Unit measurement: 1 ps/nm
+
+        The first time nbsCohpmCurrentMinCD meets/is below this threshold
+        during a given current interval triggers nbsCohpmTrapsMinCD.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 23 }
+
+nbsCohpmThresholdsMaxCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The maximum chromatic dispersion (CD) threshold.
+        Unit measurement: 1 ps/nm
+
+        The first time nbsCohpmCurrentMaxCD meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsMaxCD.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 26 }
+
+nbsCohpmThresholdsAveDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The average differential group delay (DGD) threshold.
+        Unit measurement: 1 ps
+
+        The first time nbsCohpmCurrentAveDGD meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsAveDGD.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 30 }
+
+nbsCohpmThresholdsMinDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The minimum differential group delay (DGD) threshold.
+        Unit measurement: 1 ps
+
+        The first time nbsCohpmCurrentMinDGD meets/is below this threshold
+        during a given current interval triggers nbsCohpmTrapsMinDGD.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 33 }
+
+nbsCohpmThresholdsMaxDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The maximum differential group delay (DGD) threshold.
+        Unit measurement: 1 ps
+
+        The first time nbsCohpmCurrentMaxDGD meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsMaxDGD.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 36 }
+
+nbsCohpmThresholdsAveQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The average Q threshold.
+        Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentAveQ meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsAveQ.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 40 }
+
+nbsCohpmThresholdsMinQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The minimum Q threshold.
+        Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMinQ meets/is below this threshold
+        during a given current interval triggers nbsCohpmTrapsMinQ.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 43 }
+
+nbsCohpmThresholdsMaxQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The maximum Q threshold.
+        Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMaxQ meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsMaxQ.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 46 }
+
+nbsCohpmThresholdsAveCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The average carrier frequency offset (CFO) threshold.
+        Unit measurement: 1 MHz
+
+        The first time nbsCohpmCurrentAveCFO meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsAveCFO.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 50 }
+
+nbsCohpmThresholdsMinCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The minimum carrier frequency offset (CFO) threshold.
+        Unit measurement: 1 MHz
+
+        The first time nbsCohpmCurrentMinCFO meets/is below this threshold
+        during a given current interval triggers nbsCohpmTrapsMinCFO.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 53 }
+
+nbsCohpmThresholdsMaxCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The maximum carrier frequency offset (CFO) threshold.
+        Unit measurement: 1 MHz
+
+        The first time nbsCohpmCurrentMaxCFO meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsMaxCFO.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 56 }
+
+nbsCohpmThresholdsAveOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The average optical signal-to-noise ratio (OSNR) threshold.
+        Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentAveOSNR meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsAveOSNR.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 60 }
+
+nbsCohpmThresholdsMinOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The minimum optical signal-to-noise ratio (OSNR) threshold.
+        Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMinOSNR meets/is below this threshold
+        during a given current interval triggers nbsCohpmTrapsMinOSNR.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 63 }
+
+nbsCohpmThresholdsMaxOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The maximum optical signal-to-noise ratio (OSNR) threshold.
+        Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMaxOSNR meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsMaxOSNR.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 66 }
+
+nbsCohpmThresholdsAveSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The average signal-to-noise ratio of X Polarization (SNRx)
+        threshold. Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentAveSNRx meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsAveSNRx.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 70 }
+
+nbsCohpmThresholdsMinSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The minimum signal-to-noise ratio of X Polarization (SNRx)
+        threshold. Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMinSNRx meets/is below this threshold
+        during a given current interval triggers nbsCohpmTrapsMinSNRx.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 73 }
+
+nbsCohpmThresholdsMaxSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The maximum signal-to-noise ratio of X Polarization (SNRx)
+        threshold. Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMaxSNRx meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsMaxSNRx.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 76 }
+
+nbsCohpmThresholdsAveSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The average signal-to-noise ratio of Y Polarization (SNRy)
+        threshold. Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentAveSNRy meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsAveSNRy.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 80 }
+
+nbsCohpmThresholdsMinSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The minimum signal-to-noise ratio of Y Polarization (SNRy)
+        threshold. Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMinSNRy meets/is below this threshold
+        during a given current interval triggers nbsCohpmTrapsMinSNRy.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 83 }
+
+nbsCohpmThresholdsMaxSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The maximum signal-to-noise ratio of Y Polarization (SNRy)
+        threshold. Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMaxSNRy meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsMaxSNRy.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 86 }
+
+nbsCohpmThresholdsAvePDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The average polarization dependent loss (PDL) threshold.
+        Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentAvePDL meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsAvePDL.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 90 }
+
+nbsCohpmThresholdsMinPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The minimum polarization dependent loss (PDL) threshold.
+        Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMinPDL meets/is below this threshold
+        during a given current interval triggers nbsCohpmTrapsMinPDL.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 93 }
+
+nbsCohpmThresholdsMaxPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The maximum polarization dependent loss (PDL) threshold.
+        Unit measurement: 0.1 dB
+
+        The first time nbsCohpmCurrentMaxPDL meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsMaxPDL.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 96 }
+
+nbsCohpmThresholdsAveSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The average state of polarization (SOP) threshold.
+        Unit measurement: 1 rad/s
+
+        The first time nbsCohpmCurrentAveSOP meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsAveSOP.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 100 }
+
+nbsCohpmThresholdsMinSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The minimum state of polarization (SOP) threshold.
+        Unit measurement: 1 rad/s
+
+        The first time nbsCohpmCurrentMinSOP meets/is below this threshold
+        during a given current interval triggers nbsCohpmTrapsMinSOP.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 103 }
+
+nbsCohpmThresholdsMaxSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent. The maximum state of polarization (SOP) threshold.
+        Unit measurement: 1 rad/s
+
+        The first time nbsCohpmCurrentMaxSOP meets/exceeds this threshold
+        during a given current interval triggers nbsCohpmTrapsMaxSOP.
+
+        The reserved value 0xFFFFFFFF disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsCohpmThresholdsEntry 106 }
+
+
+-- *******************************************************************
+--
+-- the nbsCohpmCurrentGroup
+--
+-- *******************************************************************
+
+nbsCohpmCurrentTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsCohpmCurrentEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "All Coherent Performance Monitoring statistics for the
+        nbsCohpmCurrentInterval now underway."
+    ::= { nbsCohpmCurrentGrp 3 }
+
+nbsCohpmCurrentEntry OBJECT-TYPE
+    SYNTAX          NbsCohpmCurrentEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Coherent Performance Monitoring statistics for a specific port/
+        interface and nbsCohpmCurrentInterval."
+    INDEX {
+        nbsCohpmCurrentIfIndex,
+        nbsCohpmCurrentInterval
+    }
+    ::= { nbsCohpmCurrentTable 1 }
+
+NbsCohpmCurrentEntry ::= SEQUENCE {
+    nbsCohpmCurrentIfIndex          InterfaceIndex,
+    nbsCohpmCurrentInterval         INTEGER,
+    nbsCohpmCurrentDate             INTEGER,
+    nbsCohpmCurrentTime             INTEGER,
+
+    nbsCohpmCurrentAveNetBERsig     INTEGER,
+    nbsCohpmCurrentAveNetBERexp     Integer32,
+    nbsCohpmCurrentMinNetBERsig     INTEGER,
+    nbsCohpmCurrentMinNetBERexp     Integer32,
+    nbsCohpmCurrentMaxNetBERsig     INTEGER,
+    nbsCohpmCurrentMaxNetBERexp     Integer32,
+
+    nbsCohpmCurrentAveCD            Integer32,
+    nbsCohpmCurrentMinCD            Integer32,
+    nbsCohpmCurrentMaxCD            Integer32,
+
+    nbsCohpmCurrentAveDGD           Unsigned32,
+    nbsCohpmCurrentMinDGD           Unsigned32,
+    nbsCohpmCurrentMaxDGD           Unsigned32,
+
+    nbsCohpmCurrentAveQ             Unsigned32,
+    nbsCohpmCurrentMinQ             Unsigned32,
+    nbsCohpmCurrentMaxQ             Unsigned32,
+
+    nbsCohpmCurrentAveCFO           Integer32,
+    nbsCohpmCurrentMinCFO           Integer32,
+    nbsCohpmCurrentMaxCFO           Integer32,
+
+    nbsCohpmCurrentAveOSNR          Unsigned32,
+    nbsCohpmCurrentMinOSNR          Unsigned32,
+    nbsCohpmCurrentMaxOSNR          Unsigned32,
+
+    nbsCohpmCurrentAveSNRx          Unsigned32,
+    nbsCohpmCurrentMinSNRx          Unsigned32,
+    nbsCohpmCurrentMaxSNRx          Unsigned32,
+
+    nbsCohpmCurrentAveSNRy          Unsigned32,
+    nbsCohpmCurrentMinSNRy          Unsigned32,
+    nbsCohpmCurrentMaxSNRy          Unsigned32,
+
+    nbsCohpmCurrentAvePDL           Unsigned32,
+    nbsCohpmCurrentMinPDL           Unsigned32,
+    nbsCohpmCurrentMaxPDL           Unsigned32,
+
+    nbsCohpmCurrentAveSOP           Unsigned32,
+    nbsCohpmCurrentMinSOP           Unsigned32,
+    nbsCohpmCurrentMaxSOP           Unsigned32
+}
+
+nbsCohpmCurrentIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The MIB2 ifIndex"
+    ::= { nbsCohpmCurrentEntry 1 }
+
+nbsCohpmCurrentInterval OBJECT-TYPE
+    SYNTAX          INTEGER {
+        quarterHour    (1),
+        twentyfourHour (2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Indicates the interval monitored"
+    ::= { nbsCohpmCurrentEntry 3 }
+
+nbsCohpmCurrentDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) interval began, represented by an eight
+        digit decimal number: yyyymmdd"
+    ::= { nbsCohpmCurrentEntry 5 }
+
+nbsCohpmCurrentTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) interval began, represented by a six
+        digit decimal number: hhmmss"
+    ::= { nbsCohpmCurrentEntry 6 }
+
+nbsCohpmCurrentAveNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the average network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCohpmCurrentAveNetBERsig x 10^nbsCohpmCurrentAveNetBERexp"
+    DEFVAL { 0 } -- FIXME: keep?
+    ::= { nbsCohpmCurrentEntry 11 }
+
+nbsCohpmCurrentAveNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the average network Bit Error Rate (BER),
+        see nbsCohpmCurrentAveNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 12 }
+
+nbsCohpmCurrentMinNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the minimum network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCohpmCurrentMinNetBERsig x 10^nbsCohpmCurrentMinNetBERexp"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 14 }
+
+nbsCohpmCurrentMinNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the minimum network Bit Error Rate (BER),
+        see nbsCohpmCurrentMinNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 15 }
+
+nbsCohpmCurrentMaxNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the maximum network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCohpmCurrentMaxNetBERsig x 10^nbsCohpmCurrentMaxNetBERexp"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 17 }
+
+nbsCohpmCurrentMaxNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the maximum network Bit Error Rate (BER),
+        see nbsCohpmCurrentMaxNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 18 }
+
+nbsCohpmCurrentAveCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average chromatic dispersion (CD) seen in the current interval.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 20 }
+
+nbsCohpmCurrentMinCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum chromatic dispersion (CD) seen in the current interval.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 23 }
+
+nbsCohpmCurrentMaxCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum chromatic dispersion (CD) seen in the current interval.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 26 }
+
+nbsCohpmCurrentAveDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average differential group delay (DGD) seen in the current interval.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 30 }
+
+nbsCohpmCurrentMinDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum differential group delay (DGD) seen in the current interval.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 33 }
+
+nbsCohpmCurrentMaxDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum differential group delay (DGD) seen in the current interval.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 36 }
+
+nbsCohpmCurrentAveQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average Q seen in the current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 40 }
+
+nbsCohpmCurrentMinQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum Q seen in the current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 43 }
+
+nbsCohpmCurrentMaxQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum Q seen in the current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 46 }
+
+nbsCohpmCurrentAveCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average carrier frequency offset (CFO) seen in the current interval.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 50 }
+
+nbsCohpmCurrentMinCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum carrier frequency offset (CFO) seen in the current interval.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 53 }
+
+nbsCohpmCurrentMaxCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum carrier frequency offset (CFO) seen in the current interval.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 56 }
+
+nbsCohpmCurrentAveOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average optical signal-to-noise ratio (OSNR) seen in the current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 60 }
+
+nbsCohpmCurrentMinOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum optical signal-to-noise ratio (OSNR) seen in the current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 63 }
+
+nbsCohpmCurrentMaxOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum optical signal-to-noise ratio (OSNR) seen in the current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 66 }
+
+nbsCohpmCurrentAveSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average signal-to-noise ratio of X Polarization (SNRx) seen in the
+        current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 70 }
+
+nbsCohpmCurrentMinSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum signal-to-noise ratio of X Polarization (SNRx) seen in the
+        current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 73 }
+
+nbsCohpmCurrentMaxSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum signal-to-noise ratio of X Polarization (SNRx) seen in the
+        current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 76 }
+
+nbsCohpmCurrentAveSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average signal-to-noise ratio of Y Polarization (SNRy) seen in the
+        current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 80 }
+
+nbsCohpmCurrentMinSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum signal-to-noise ratio of Y Polarization (SNRy) seen in the
+        current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 83 }
+
+nbsCohpmCurrentMaxSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum signal-to-noise ratio of Y Polarization (SNRy) seen in the
+        current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 86 }
+
+nbsCohpmCurrentAvePDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average polarization dependent loss (PDL) seen in the current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 90 }
+
+nbsCohpmCurrentMinPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum polarization dependent loss (PDL) seen in the current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 93 }
+
+nbsCohpmCurrentMaxPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum polarization dependent loss (PDL) seen in the current interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 96 }
+
+nbsCohpmCurrentAveSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average state of polarization (SOP) seen in the current interval.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 100 }
+
+nbsCohpmCurrentMinSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum state of polarization (SOP) seen in the current interval.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 103 }
+
+nbsCohpmCurrentMaxSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum state of polarization (SOP) seen in the current interval.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmCurrentEntry 106 }
+
+
+-- *******************************************************************
+--
+-- the nbsCohpmHistoricGrp
+--
+-- *******************************************************************
+
+nbsCohpmHistoricTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsCohpmHistoricEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "All Coherent Performance Monitoring statistics for past
+        nbsCohpmHistoricInterval periods."
+    ::= { nbsCohpmHistoricGrp 3 }
+
+nbsCohpmHistoricEntry OBJECT-TYPE
+    SYNTAX          NbsCohpmHistoricEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Coherent Performance Monitoring statistics for a specific port/
+        interface and nbsCohpmHistoricInterval."
+    INDEX {
+        nbsCohpmHistoricIfIndex,
+        nbsCohpmHistoricInterval,
+        nbsCohpmHistoricSample
+    }
+    ::= { nbsCohpmHistoricTable 1 }
+
+NbsCohpmHistoricEntry ::= SEQUENCE {
+    nbsCohpmHistoricIfIndex         InterfaceIndex,
+    nbsCohpmHistoricInterval        INTEGER,
+    nbsCohpmHistoricSample          INTEGER,
+    nbsCohpmHistoricDate            INTEGER,
+    nbsCohpmHistoricTime            INTEGER,
+
+    nbsCohpmHistoricAveNetBERsig    INTEGER,
+    nbsCohpmHistoricAveNetBERexp    Integer32,
+    nbsCohpmHistoricMinNetBERsig    INTEGER,
+    nbsCohpmHistoricMinNetBERexp    Integer32,
+    nbsCohpmHistoricMaxNetBERsig    INTEGER,
+    nbsCohpmHistoricMaxNetBERexp    Integer32,
+
+    nbsCohpmHistoricAveCD           Integer32,
+    nbsCohpmHistoricMinCD           Integer32,
+    nbsCohpmHistoricMaxCD           Integer32,
+
+    nbsCohpmHistoricAveDGD          Unsigned32,
+    nbsCohpmHistoricMinDGD          Unsigned32,
+    nbsCohpmHistoricMaxDGD          Unsigned32,
+
+    nbsCohpmHistoricAveQ            Unsigned32,
+    nbsCohpmHistoricMinQ            Unsigned32,
+    nbsCohpmHistoricMaxQ            Unsigned32,
+
+    nbsCohpmHistoricAveCFO          Integer32,
+    nbsCohpmHistoricMinCFO          Integer32,
+    nbsCohpmHistoricMaxCFO          Integer32,
+
+    nbsCohpmHistoricAveOSNR         Unsigned32,
+    nbsCohpmHistoricMinOSNR         Unsigned32,
+    nbsCohpmHistoricMaxOSNR         Unsigned32,
+
+    nbsCohpmHistoricAveSNRx         Unsigned32,
+    nbsCohpmHistoricMinSNRx         Unsigned32,
+    nbsCohpmHistoricMaxSNRx         Unsigned32,
+
+    nbsCohpmHistoricAveSNRy         Unsigned32,
+    nbsCohpmHistoricMinSNRy         Unsigned32,
+    nbsCohpmHistoricMaxSNRy         Unsigned32,
+
+    nbsCohpmHistoricAvePDL          Unsigned32,
+    nbsCohpmHistoricMinPDL          Unsigned32,
+    nbsCohpmHistoricMaxPDL          Unsigned32,
+
+    nbsCohpmHistoricAveSOP          Unsigned32,
+    nbsCohpmHistoricMinSOP          Unsigned32,
+    nbsCohpmHistoricMaxSOP          Unsigned32
+}
+
+nbsCohpmHistoricIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The MIB2 ifIndex"
+    ::= { nbsCohpmHistoricEntry 1 }
+
+nbsCohpmHistoricInterval OBJECT-TYPE
+    SYNTAX          INTEGER {
+        quarterHour    (1),
+        twentyfourHour (2)
+    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Indicates the interval monitored"
+    ::= { nbsCohpmHistoricEntry 3 }
+
+nbsCohpmHistoricSample OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Indicates the sample number of this statistic.  The most
+        recent sample is numbered 1, the next previous 2, and so on
+        until the oldest sample."
+    ::= { nbsCohpmHistoricEntry 4 }
+
+nbsCohpmHistoricDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) interval began, represented by an eight
+        digit decimal number: yyyymmdd"
+    ::= { nbsCohpmHistoricEntry 5 }
+
+nbsCohpmHistoricTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) interval began, represented by a six
+        digit decimal number: hhmmss"
+    ::= { nbsCohpmHistoricEntry 6 }
+
+nbsCohpmHistoricAveNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the average network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCohpmHistoricAveNetBERsig x 10^nbsCohpmHistoricAveNetBERexp"
+    DEFVAL { 0 } -- FIXME: keep?
+    ::= { nbsCohpmHistoricEntry 11 }
+
+nbsCohpmHistoricAveNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the average network Bit Error Rate (BER),
+        see nbsCohpmHistoricAveNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 12 }
+
+nbsCohpmHistoricMinNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the minimum network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCohpmHistoricMinNetBERsig x 10^nbsCohpmHistoricMinNetBERexp"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 14 }
+
+nbsCohpmHistoricMinNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the minimum network Bit Error Rate (BER),
+        see nbsCohpmHistoricMinNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 15 }
+
+nbsCohpmHistoricMaxNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the maximum network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCohpmHistoricMaxNetBERsig x 10^nbsCohpmHistoricMaxNetBERexp"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 17 }
+
+nbsCohpmHistoricMaxNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the maximum network Bit Error Rate (BER),
+        see nbsCohpmHistoricMaxNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 18 }
+
+nbsCohpmHistoricAveCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average chromatic dispersion (CD) for the historic interval.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 20 }
+
+nbsCohpmHistoricMinCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum chromatic dispersion (CD) for the historic interval.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 23 }
+
+nbsCohpmHistoricMaxCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum chromatic dispersion (CD) for the historic interval.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 26 }
+
+nbsCohpmHistoricAveDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average differential group delay (DGD) for the historic interval.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 30 }
+
+nbsCohpmHistoricMinDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum differential group delay (DGD) for the historic interval.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 33 }
+
+nbsCohpmHistoricMaxDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum differential group delay (DGD) for the historic interval.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 36 }
+
+nbsCohpmHistoricAveQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average Q for the historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 40 }
+
+nbsCohpmHistoricMinQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum Q for the historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 43 }
+
+nbsCohpmHistoricMaxQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum Q for the historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 46 }
+
+nbsCohpmHistoricAveCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average carrier frequency offset (CFO) for the historic interval.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 50 }
+
+nbsCohpmHistoricMinCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum carrier frequency offset (CFO) for the historic interval.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 53 }
+
+nbsCohpmHistoricMaxCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum carrier frequency offset (CFO) for the historic interval.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 56 }
+
+nbsCohpmHistoricAveOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average optical signal-to-noise ratio (OSNR) for the historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 60 }
+
+nbsCohpmHistoricMinOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum optical signal-to-noise ratio (OSNR) for the historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 63 }
+
+nbsCohpmHistoricMaxOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum optical signal-to-noise ratio (OSNR) for the historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 66 }
+
+nbsCohpmHistoricAveSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average signal-to-noise ratio of X Polarization (SNRx) for the
+        historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 70 }
+
+nbsCohpmHistoricMinSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum signal-to-noise ratio of X Polarization (SNRx) for the
+        historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 73 }
+
+nbsCohpmHistoricMaxSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum signal-to-noise ratio of X Polarization (SNRx) for the
+        historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 76 }
+
+nbsCohpmHistoricAveSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average signal-to-noise ratio of Y Polarization (SNRy) for the
+        historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 80 }
+
+nbsCohpmHistoricMinSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum signal-to-noise ratio of Y Polarization (SNRy) for the
+        historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 83 }
+
+nbsCohpmHistoricMaxSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum signal-to-noise ratio of Y Polarization (SNRy) for the
+        historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 86 }
+
+nbsCohpmHistoricAvePDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average Polarization Dependent Loss (PDL) for the historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 90 }
+
+nbsCohpmHistoricMinPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum polarization dependent loss (PDL) for the historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 93 }
+
+nbsCohpmHistoricMaxPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum polarization dependent loss (PDL) for the historic interval.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 96 }
+
+nbsCohpmHistoricAveSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average state of polarization (SOP) for the historic interval.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 100 }
+
+nbsCohpmHistoricMinSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum state of polarization (SOP) for the historic interval.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 103 }
+
+nbsCohpmHistoricMaxSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum state of polarization (SOP) for the historic interval.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmHistoricEntry 106 }
+
+
+-- *******************************************************************
+--
+-- the nbsCohpmRunningGroup
+--
+-- *******************************************************************
+
+nbsCohpmRunningTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsCohpmRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "All Coherent Performance Monitoring running statistics since port
+        configuration, i.e. boot-up or protocol/FEC/preference change."
+    ::= { nbsCohpmRunningGrp 3 }
+
+nbsCohpmRunningEntry OBJECT-TYPE
+    SYNTAX          NbsCohpmRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Coherent Performance Monitoring running statistics for a specific
+        port/interface."
+    INDEX {
+        nbsCohpmRunningIfIndex
+    }
+    ::= { nbsCohpmRunningTable 1 }
+
+NbsCohpmRunningEntry ::= SEQUENCE {
+    nbsCohpmRunningIfIndex          InterfaceIndex,
+    nbsCohpmRunningDate             INTEGER,
+    nbsCohpmRunningTime             INTEGER,
+
+    nbsCohpmRunningAveNetBERsig     INTEGER,
+    nbsCohpmRunningAveNetBERexp     Integer32,
+    nbsCohpmRunningMinNetBERsig     INTEGER,
+    nbsCohpmRunningMinNetBERexp     Integer32,
+    nbsCohpmRunningMaxNetBERsig     INTEGER,
+    nbsCohpmRunningMaxNetBERexp     Integer32,
+
+    nbsCohpmRunningAveCD            Integer32,
+    nbsCohpmRunningMinCD            Integer32,
+    nbsCohpmRunningMaxCD            Integer32,
+
+    nbsCohpmRunningAveDGD           Unsigned32,
+    nbsCohpmRunningMinDGD           Unsigned32,
+    nbsCohpmRunningMaxDGD           Unsigned32,
+
+    nbsCohpmRunningAveQ             Unsigned32,
+    nbsCohpmRunningMinQ             Unsigned32,
+    nbsCohpmRunningMaxQ             Unsigned32,
+
+    nbsCohpmRunningAveCFO           Integer32,
+    nbsCohpmRunningMinCFO           Integer32,
+    nbsCohpmRunningMaxCFO           Integer32,
+
+    nbsCohpmRunningAveOSNR          Unsigned32,
+    nbsCohpmRunningMinOSNR          Unsigned32,
+    nbsCohpmRunningMaxOSNR          Unsigned32,
+
+    nbsCohpmRunningAveSNRx          Unsigned32,
+    nbsCohpmRunningMinSNRx          Unsigned32,
+    nbsCohpmRunningMaxSNRx          Unsigned32,
+
+    nbsCohpmRunningAveSNRy          Unsigned32,
+    nbsCohpmRunningMinSNRy          Unsigned32,
+    nbsCohpmRunningMaxSNRy          Unsigned32,
+
+    nbsCohpmRunningAvePDL           Unsigned32,
+    nbsCohpmRunningMinPDL           Unsigned32,
+    nbsCohpmRunningMaxPDL           Unsigned32,
+
+    nbsCohpmRunningAveSOP           Unsigned32,
+    nbsCohpmRunningMinSOP           Unsigned32,
+    nbsCohpmRunningMaxSOP           Unsigned32
+}
+
+nbsCohpmRunningIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The MIB2 ifIndex"
+    ::= { nbsCohpmRunningEntry 1 }
+
+nbsCohpmRunningDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) of port configuration, represented by an
+        eight digit decimal number: yyyymmdd"
+    ::= { nbsCohpmRunningEntry 5 }
+
+nbsCohpmRunningTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) of port configuration, represented by a
+        six digit decimal number: hhmmss"
+    ::= { nbsCohpmRunningEntry 6 }
+
+nbsCohpmRunningAveNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the average network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCohpmRunningAveNetBERsig x 10^nbsCohpmRunningAveNetBERexp"
+    DEFVAL { 0 } -- FIXME: keep?
+    ::= { nbsCohpmRunningEntry 11 }
+
+nbsCohpmRunningAveNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the average network Bit Error Rate (BER),
+        see nbsCohpmRunningAveNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 12 }
+
+nbsCohpmRunningMinNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the minimum network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCohpmRunningMinNetBERsig x 10^nbsCohpmRunningMinNetBERexp"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 14 }
+
+nbsCohpmRunningMinNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the minimum network Bit Error Rate (BER),
+        see nbsCohpmRunningMinNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 15 }
+
+nbsCohpmRunningMaxNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the maximum network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCohpmRunningMaxNetBERsig x 10^nbsCohpmRunningMaxNetBERexp"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 17 }
+
+nbsCohpmRunningMaxNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the maximum network Bit Error Rate (BER),
+        see nbsCohpmRunningMaxNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 18 }
+
+nbsCohpmRunningAveCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average chromatic dispersion (CD) since port configuration.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 20 }
+
+nbsCohpmRunningMinCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum chromatic dispersion (CD) since port configuration.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 23 }
+
+nbsCohpmRunningMaxCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum chromatic dispersion (CD) since port configuration.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 26 }
+
+nbsCohpmRunningAveDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average differential group delay (DGD) since port configuration.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 30 }
+
+nbsCohpmRunningMinDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum differential group delay (DGD) since port configuration.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 33 }
+
+nbsCohpmRunningMaxDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum differential group delay (DGD) since port configuration.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 36 }
+
+nbsCohpmRunningAveQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average Q since port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 40 }
+
+nbsCohpmRunningMinQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum Q since port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 43 }
+
+nbsCohpmRunningMaxQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum Q since port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 46 }
+
+nbsCohpmRunningAveCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average carrier frequency offset (CFO) since port configuration.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 50 }
+
+nbsCohpmRunningMinCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum carrier frequency offset (CFO) since port configuration.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 53 }
+
+nbsCohpmRunningMaxCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum carrier frequency offset (CFO) since port configuration.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 56 }
+
+nbsCohpmRunningAveOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average optical signal-to-noise ratio (OSNR) since port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 60 }
+
+nbsCohpmRunningMinOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum optical signal-to-noise ratio (OSNR) since port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 63 }
+
+nbsCohpmRunningMaxOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum optical signal-to-noise ratio (OSNR) since port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 66 }
+
+nbsCohpmRunningAveSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average signal-to-noise ratio of X Polarization (SNRx) since
+        port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 70 }
+
+nbsCohpmRunningMinSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum signal-to-noise ratio of X Polarization (SNRx) since
+        port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 73 }
+
+nbsCohpmRunningMaxSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum signal-to-noise ratio of X Polarization (SNRx) since
+        port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 76 }
+
+nbsCohpmRunningAveSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average signal-to-noise ratio of Y Polarization (SNRy) since
+        port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 80 }
+
+nbsCohpmRunningMinSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum signal-to-noise ratio of Y Polarization (SNRy) since
+        port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 83 }
+
+nbsCohpmRunningMaxSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum signal-to-noise ratio of Y Polarization (SNRy) since
+        port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 86 }
+
+nbsCohpmRunningAvePDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average polarization dependent loss (PDL) since port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 90 }
+
+nbsCohpmRunningMinPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum polarization dependent loss (PDL) since port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 93 }
+
+nbsCohpmRunningMaxPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum polarization dependent loss (PDL) since port configuration.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 96 }
+
+nbsCohpmRunningAveSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average state of polarization (SOP) since port configuration.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 100 }
+
+nbsCohpmRunningMinSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum state of polarization (SOP) since port configuration.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 103 }
+
+nbsCohpmRunningMaxSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum state of polarization (SOP) since port configuration.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCohpmRunningEntry 106 }
+
+
+-- *******************************************************************
+--
+-- the nbsCoherentStatsGrp
+--
+-- *******************************************************************
+
+nbsCoherentStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsCoherentStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Coherent operating information and statistics managed per user
+        discretion. This monitoring may be started, stopped, and cleared as
+        desired without affecting the normal performance monitoring activity."
+    ::= { nbsCoherentStatsGrp 2 }
+
+nbsCoherentStatsEntry OBJECT-TYPE
+    SYNTAX          NbsCoherentStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "User-controlled Coherent operating information and statistics for a
+        specific port/interface."
+    INDEX {
+        nbsCoherentStatsIfIndex
+    }
+    ::= { nbsCoherentStatsTable 1 }
+
+NbsCoherentStatsEntry ::= SEQUENCE {
+    nbsCoherentStatsIfIndex         InterfaceIndex,
+    nbsCoherentStatsDate            INTEGER,
+    nbsCoherentStatsTime            INTEGER,
+    nbsCoherentStatsSpan            INTEGER,
+    nbsCoherentStatsState           INTEGER,
+
+    nbsCoherentStatsAveNetBERsig    INTEGER,
+    nbsCoherentStatsAveNetBERexp    Integer32,
+    nbsCoherentStatsMinNetBERsig    INTEGER,
+    nbsCoherentStatsMinNetBERexp    Integer32,
+    nbsCoherentStatsMaxNetBERsig    INTEGER,
+    nbsCoherentStatsMaxNetBERexp    Integer32,
+
+    nbsCoherentStatsAveCD           Integer32,
+    nbsCoherentStatsMinCD           Integer32,
+    nbsCoherentStatsMaxCD           Integer32,
+
+    nbsCoherentStatsAveDGD          Unsigned32,
+    nbsCoherentStatsMinDGD          Unsigned32,
+    nbsCoherentStatsMaxDGD          Unsigned32,
+
+    nbsCoherentStatsAveQ            Unsigned32,
+    nbsCoherentStatsMinQ            Unsigned32,
+    nbsCoherentStatsMaxQ            Unsigned32,
+
+    nbsCoherentStatsAveCFO          Integer32,
+    nbsCoherentStatsMinCFO          Integer32,
+    nbsCoherentStatsMaxCFO          Integer32,
+
+    nbsCoherentStatsAveOSNR         Unsigned32,
+    nbsCoherentStatsMinOSNR         Unsigned32,
+    nbsCoherentStatsMaxOSNR         Unsigned32,
+
+    nbsCoherentStatsAveSNRx         Unsigned32,
+    nbsCoherentStatsMinSNRx         Unsigned32,
+    nbsCoherentStatsMaxSNRx         Unsigned32,
+
+    nbsCoherentStatsAveSNRy         Unsigned32,
+    nbsCoherentStatsMinSNRy         Unsigned32,
+    nbsCoherentStatsMaxSNRy         Unsigned32,
+
+    nbsCoherentStatsAvePDL          Unsigned32,
+    nbsCoherentStatsMinPDL          Unsigned32,
+    nbsCoherentStatsMaxPDL          Unsigned32,
+
+    nbsCoherentStatsAveSOP          Unsigned32,
+    nbsCoherentStatsMinSOP          Unsigned32,
+    nbsCoherentStatsMaxSOP          Unsigned32
+}
+
+nbsCoherentStatsIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The MIB2 ifIndex"
+    ::= { nbsCoherentStatsEntry 1 }
+
+nbsCoherentStatsDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) Coherent statistics collection began (was cleared),
+        represented by an eight digit decimal number: yyyymmdd"
+    ::= { nbsCoherentStatsEntry 5 }
+
+nbsCoherentStatsTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) Coherent statistics collection began (was cleared),
+        represented by a six digit decimal number: hhmmss"
+    ::= { nbsCoherentStatsEntry 6 }
+
+nbsCoherentStatsSpan OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The amount of time Coherent statistics collection has been underway
+        since nbsCoherentStatsDate and nbsCoherentStatsTime, or if stopped,
+        the duration of the prior collection.
+        Unit measurement: 0.1 s"
+    ::= { nbsCoherentStatsEntry 7 }
+
+nbsCoherentStatsState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        counting     (2),
+        clearing     (3),
+        stopped      (4),
+        resumed      (5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Writing 'stopped' to this object stops (pauses) Coherent statistics
+        collection. Removing the Coherent optic from this port automatically
+        sets this object to 'stopped'.
+
+        Writing 'counting' to this object starts (resumes) Coherent statistics
+        collection if a Coherent optic is inserted in this port.
+
+        Writing 'clearing' to this object clears all statistical counters."
+    ::= { nbsCoherentStatsEntry 8 }
+
+nbsCoherentStatsAveNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the average network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCoherentStatsAveNetBERsig x 10^nbsCoherentStatsAveNetBERexp"
+    DEFVAL { 0 } -- FIXME: keep?
+    ::= { nbsCoherentStatsEntry 11 }
+
+nbsCoherentStatsAveNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the average network Bit Error Rate (BER),
+        see nbsCoherentStatsAveNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 12 }
+
+nbsCoherentStatsMinNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the minimum network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCoherentStatsMinNetBERsig x 10^nbsCoherentStatsMinNetBERexp"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 14 }
+
+nbsCoherentStatsMinNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the minimum network Bit Error Rate (BER),
+        see nbsCoherentStatsMinNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 15 }
+
+nbsCoherentStatsMaxNetBERsig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the maximum network Bit Error Rate (BER),
+        which is calculated by:
+           nbsCoherentStatsMaxNetBERsig x 10^nbsCoherentStatsMaxNetBERexp"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 17 }
+
+nbsCoherentStatsMaxNetBERexp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the maximum network Bit Error Rate (BER),
+        see nbsCoherentStatsMaxNetBERsig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 18 }
+
+nbsCoherentStatsAveCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average chromatic dispersion (CD) observed.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 20 }
+
+nbsCoherentStatsMinCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum chromatic dispersion (CD) observed.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 23 }
+
+nbsCoherentStatsMaxCD OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum chromatic dispersion (CD) observed.
+        Unit measurement: 1 ps/nm
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 26 }
+
+nbsCoherentStatsAveDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average differential group delay (DGD) observed.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 30 }
+
+nbsCoherentStatsMinDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum differential group delay (DGD) observed.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 33 }
+
+nbsCoherentStatsMaxDGD OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum differential group delay (DGD) observed.
+        Unit measurement: 1 ps
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 36 }
+
+nbsCoherentStatsAveQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average Q observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 40 }
+
+nbsCoherentStatsMinQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum Q observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 43 }
+
+nbsCoherentStatsMaxQ OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum Q observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 46 }
+
+nbsCoherentStatsAveCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average carrier frequency offset (CFO) observed.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 50 }
+
+nbsCoherentStatsMinCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum carrier frequency offset (CFO) observed.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 53 }
+
+nbsCoherentStatsMaxCFO OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum carrier frequency offset (CFO) observed.
+        Unit measurement: 1 MHz
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 56 }
+
+nbsCoherentStatsAveOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average optical signal-to-noise ratio (OSNR) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 60 }
+
+nbsCoherentStatsMinOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum optical signal-to-noise ratio (OSNR) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 63 }
+
+nbsCoherentStatsMaxOSNR OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum optical signal-to-noise ratio (OSNR) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 66 }
+
+nbsCoherentStatsAveSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average signal-to-noise ratio of X Polarization (SNRx) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 70 }
+
+nbsCoherentStatsMinSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum signal-to-noise ratio of X Polarization (SNRx) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 73 }
+
+nbsCoherentStatsMaxSNRx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum signal-to-noise ratio of X Polarization (SNRx) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 76 }
+
+nbsCoherentStatsAveSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average signal-to-noise ratio of Y Polarization (SNRy) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 80 }
+
+nbsCoherentStatsMinSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum signal-to-noise ratio of Y Polarization (SNRy) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 83 }
+
+nbsCoherentStatsMaxSNRy OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum signal-to-noise ratio of Y Polarization (SNRy) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 86 }
+
+nbsCoherentStatsAvePDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average polarization dependent loss (PDL) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 90 }
+
+nbsCoherentStatsMinPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum polarization dependent loss (PDL) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 93 }
+
+nbsCoherentStatsMaxPDL OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum polarization dependent loss (PDL) observed.
+        Unit measurement: 0.1 dB
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 96 }
+
+nbsCoherentStatsAveSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Average state of polarization (SOP) observed.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 100 }
+
+nbsCoherentStatsMinSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Minimum state of polarization (SOP) observed.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 103 }
+
+nbsCoherentStatsMaxSOP OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Maximum state of polarization (SOP) observed.
+        Unit measurement: 1 rad/s
+
+        Not supported value: 0xFFFFFFFF"
+    DEFVAL { 0 }
+    ::= { nbsCoherentStatsEntry 106 }
+
+
+-- *******************************************************************
+--
+-- the nbsCohpmEventsGrp
+--
+-- *******************************************************************
+
+nbsCohpmTraps  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Threshold crossing Traps or Notifications"
+    ::= { nbsCohpmEventsGrp 0 }
+
+nbsCohpmTrapsAveBER  NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAveNetBERsig, nbsCohpmCurrentAveNetBERexp }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        bit error rate (BER) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsAveNetBERsig, nbsCohpmCurrentAveNetBERexp)."
+    ::= { nbsCohpmTraps 11 }
+
+nbsCohpmTrapsMinBER  NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinNetBERsig, nbsCohpmCurrentMinNetBERexp }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        bit error rate (BER) meets/is below its defined threshold
+        (nbsCohpmThresholdsMinNetBERsig, nbsCohpmCurrentMinNetBERexp)."
+    ::= { nbsCohpmTraps 14 }
+
+nbsCohpmTrapsMaxBER  NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxNetBERsig, nbsCohpmCurrentMaxNetBERexp }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        bit error rate (BER) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsMaxNetBERsig, nbsCohpmCurrentMaxNetBERexp)."
+    ::= { nbsCohpmTraps 17 }
+
+nbsCohpmTrapsAveCD NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAveCD }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        chromatic dispersion (CD) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsAveCD)."
+    ::= { nbsCohpmTraps 20 }
+
+nbsCohpmTrapsMinCD NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinCD }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        chromatic dispersion (CD) meets/is below its defined threshold
+        (nbsCohpmThresholdsMinCD)."
+    ::= { nbsCohpmTraps 23 }
+
+nbsCohpmTrapsMaxCD NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxCD }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        chromatic dispersion (CD) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsMaxCD)."
+    ::= { nbsCohpmTraps 26 }
+
+nbsCohpmTrapsAveDGD NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAveDGD }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        differential group delay (DGD) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsAveDGD)."
+    ::= { nbsCohpmTraps 30 }
+
+nbsCohpmTrapsMinDGD NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinDGD }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        differential group delay (DGD) meets/is below its defined threshold
+        (nbsCohpmThresholdsMinDGD)."
+    ::= { nbsCohpmTraps 33 }
+
+nbsCohpmTrapsMaxDGD NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxDGD }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        differential group delay (DGD) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsMaxDGD)."
+    ::= { nbsCohpmTraps 36 }
+
+nbsCohpmTrapsAveQ NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAveQ }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        Q meets/exceeds its defined threshold (nbsCohpmThresholdsAveQ)."
+    ::= { nbsCohpmTraps 40 }
+
+nbsCohpmTrapsMinQ NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinQ }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        Q meets/is below its defined threshold (nbsCohpmThresholdsMinQ)."
+    ::= { nbsCohpmTraps 43 }
+
+nbsCohpmTrapsMaxQ NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxQ }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        Q meets/exceeds its defined threshold (nbsCohpmThresholdsMaxQ)."
+    ::= { nbsCohpmTraps 46 }
+
+nbsCohpmTrapsAveCFO NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAveCFO }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        carrier frequency offset (CFO) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsAveCFO)."
+    ::= { nbsCohpmTraps 50 }
+
+nbsCohpmTrapsMinCFO NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinCFO }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        carrier frequency offset (CFO) meets/is below its defined threshold
+        (nbsCohpmThresholdsMinCFO)."
+    ::= { nbsCohpmTraps 53 }
+
+nbsCohpmTrapsMaxCFO NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxCFO }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        carrier frequency offset (CFO) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsMaxCFO)."
+    ::= { nbsCohpmTraps 56 }
+
+nbsCohpmTrapsAveOSNR NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAveOSNR }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        optical signal-to-noise ratio (OSNR) meets/exceeds its defined
+        threshold (nbsCohpmThresholdsAveOSNR)."
+    ::= { nbsCohpmTraps 60 }
+
+nbsCohpmTrapsMinOSNR NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinOSNR }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        optical signal-to-noise ratio (OSNR) meets/is below its defined
+        threshold (nbsCohpmThresholdsMinOSNR)."
+    ::= { nbsCohpmTraps 63 }
+
+nbsCohpmTrapsMaxOSNR NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxOSNR }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        optical signal-to-noise ratio (OSNR) meets/exceeds its defined
+        threshold (nbsCohpmThresholdsMaxOSNR)."
+    ::= { nbsCohpmTraps 66 }
+
+nbsCohpmTrapsAveSNRx NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAveSNRx }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        signal-to-noise ratio of X Polarization (SNRx) meets/exceeds its
+        defined threshold (nbsCohpmThresholdsAveSNRx)."
+    ::= { nbsCohpmTraps 70 }
+
+nbsCohpmTrapsMinSNRx NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinSNRx }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        signal-to-noise ratio of X Polarization (SNRx) meets/is below its
+        defined threshold (nbsCohpmThresholdsMinSNRx)."
+    ::= { nbsCohpmTraps 73 }
+
+nbsCohpmTrapsMaxSNRx NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxSNRx }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        signal-to-noise ratio of X Polarization (SNRx) meets/exceeds its
+        defined threshold (nbsCohpmThresholdsMaxSNRx)."
+    ::= { nbsCohpmTraps 76 }
+
+nbsCohpmTrapsAveSNRy NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAveSNRy }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        signal-to-noise ratio of Y Polarization (SNRy) meets/exceeds its
+        defined threshold (nbsCohpmThresholdsAveSNRy)."
+    ::= { nbsCohpmTraps 80 }
+
+nbsCohpmTrapsMinSNRy NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinSNRy }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        signal-to-noise ratio of Y Polarization (SNRy) meets/is below its
+        defined threshold (nbsCohpmThresholdsMinSNRy)."
+    ::= { nbsCohpmTraps 83 }
+
+nbsCohpmTrapsMaxSNRy NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxSNRy }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        signal-to-noise ratio of Y Polarization (SNRy) meets/exceeds its
+        defined threshold (nbsCohpmThresholdsMaxSNRy)."
+    ::= { nbsCohpmTraps 86 }
+
+nbsCohpmTrapsAvePDL NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAvePDL }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        polarization dependent loss (PDL) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsAvePDL)."
+    ::= { nbsCohpmTraps 90 }
+
+nbsCohpmTrapsMinPDL NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinPDL }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        polarization dependent loss (PDL) meets/is below its defined threshold
+        (nbsCohpmThresholdsMinPDL)."
+    ::= { nbsCohpmTraps 93 }
+
+nbsCohpmTrapsMaxPDL NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxPDL }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        polarization dependent loss (PDL) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsMaxPDL)."
+    ::= { nbsCohpmTraps 96 }
+
+nbsCohpmTrapsAveSOP NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentAveSOP }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the average
+        state of polarization (SOP) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsAveSOP)."
+    ::= { nbsCohpmTraps 100 }
+
+nbsCohpmTrapsMinSOP NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMinSOP }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the minimum
+        state of polarization (SOP) meets/is below its defined threshold
+        (nbsCohpmThresholdsMinSOP)."
+    ::= { nbsCohpmTraps 103 }
+
+nbsCohpmTrapsMaxSOP NOTIFICATION-TYPE
+    OBJECTS   { nbsCohpmCurrentIfIndex, nbsCohpmCurrentInterval,
+                nbsCohpmCurrentMaxSOP }
+    STATUS      current
+    DESCRIPTION
+       "Sent on the first occurrence in a current interval when the maximum
+        state of polarization (SOP) meets/exceeds its defined threshold
+        (nbsCohpmThresholdsMaxSOP)."
+    ::= { nbsCohpmTraps 106 }
+
+END

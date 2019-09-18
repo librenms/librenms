@@ -12,7 +12,6 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 if (isset($settings['mode_select']) && $settings['mode_select'] !== '') {
@@ -38,6 +37,7 @@ $show_disabled_ignored = $settings['show_disabled_and_ignored'];
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
     <form class="form" onsubmit="widget_settings(this); return false;">
+        ' . csrf_field() . '
         <div class="form-group">
             <div class="col-sm-4">
                 <label for="title" class="control-label availability-map-widget-header">Widget title</label>
@@ -174,9 +174,9 @@ if (defined('SHOW_SETTINGS')) {
 
         $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`ignore`, `D`.`disabled` FROM `devices` AS `D`';
 
-        if (!LegacyAuth::user()->hasGlobalRead()) {
+        if (!Auth::user()->hasGlobalRead()) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
-            $param = [LegacyAuth::id()];
+            $param = [Auth::id()];
         } else {
             $sql .= ' WHERE ';
             $param = [];
@@ -254,12 +254,12 @@ if (defined('SHOW_SETTINGS')) {
     }
 
     if (($mode == 1 || $mode == 2) && (Config::get('show_services') != 0)) {
-        if (LegacyAuth::user()->hasGlobalRead()) {
+        if (Auth::user()->hasGlobalRead()) {
             $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id` ORDER BY '.$serviceOrderBy.';';
             $service_par = array();
         } else {
             $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D, devices_perms P where `S`.`device_id` = `D`.`device_id` AND D.device_id = P.device_id AND P.user_id = ? ORDER BY '.$serviceOrderBy.';';
-            $service_par = array(LegacyAuth::id());
+            $service_par = array(Auth::id());
         }
         $services = dbFetchRows($service_query, $service_par);
         if (count($services) > 0) {

@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 $graph_type = mres($vars['graph_type']);
@@ -24,16 +23,16 @@ $class      = mres($vars['class']);
 
 $sql = " FROM `$table` AS S, `devices` AS D";
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql .= ', devices_perms as P';
 }
 
 $sql .= " WHERE S.sensor_class=? AND S.device_id = D.device_id ";
 $param[] = mres($vars['class']);
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql .= " AND D.device_id = P.device_id AND P.user_id = ?";
-    $param[] = LegacyAuth::id();
+    $param[] = Auth::id();
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {

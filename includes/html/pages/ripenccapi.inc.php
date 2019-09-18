@@ -16,6 +16,7 @@ $no_refresh = true;
 <h3> RIPE NCC API Tools </h3>
 <hr>
 <form class="form-horizontal" action="" method="post">
+    <?php echo csrf_field() ?>
     <div class="radio">
         <label><input type="radio" name="data_radio" value="abuse-contact-finder">Abuse Contact Finder</label>
     </div>

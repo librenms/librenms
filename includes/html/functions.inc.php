@@ -12,7 +12,6 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 /**
@@ -288,11 +287,11 @@ function print_graph_popup($graph_array)
 
 function bill_permitted($bill_id)
 {
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         return true;
     }
 
-    return \Permissions::canAccessBill($bill_id, LegacyAuth::id());
+    return \Permissions::canAccessBill($bill_id, Auth::id());
 }
 
 function port_permitted($port_id, $device_id = null)
@@ -305,7 +304,7 @@ function port_permitted($port_id, $device_id = null)
         return true;
     }
 
-    return \Permissions::canAccessPort($port_id, LegacyAuth::id());
+    return \Permissions::canAccessPort($port_id, Auth::id());
 }
 
 function application_permitted($app_id, $device_id = null)
@@ -323,10 +322,10 @@ function application_permitted($app_id, $device_id = null)
 
 function device_permitted($device_id)
 {
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user() && Auth::user()->hasGlobalRead()) {
         return true;
     }
-    return \Permissions::canAccessDevice($device_id, LegacyAuth::id());
+    return \Permissions::canAccessDevice($device_id, Auth::id());
 }
 
 function print_graph_tag($args)
@@ -456,6 +455,18 @@ function generate_entity_link($type, $entity, $text = null, $graph_type = null)
     return ($link);
 }//end generate_entity_link()
 
+/**
+ * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
+ * @param string $type
+ * @return array [type, subtype]
+ */
+function extract_graph_type($type): array
+{
+    preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $type, $graphtype);
+    $type = basename($graphtype['type']);
+    $subtype = basename($graphtype['subtype']);
+    return [$type, $subtype];
+}
 
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
@@ -572,7 +583,7 @@ function generate_sensor_url($sensor, $vars = array())
     return generate_url(array('page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => Config::get('time.day')), $vars);
 }//end generate_sensor_url()
 
- 
+
 function generate_port_url($port, $vars = array())
 {
     return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
@@ -686,11 +697,11 @@ function devclass($device)
 
 function getlocations()
 {
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         return dbFetchRows('SELECT id, location FROM locations ORDER BY location');
     }
 
-    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [LegacyAuth::id()]);
+    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [Auth::id()]);
 }
 
 
@@ -1516,6 +1527,34 @@ function generate_stacked_graphs($transparency = '88')
 }
 
 /**
+ * Parse AT time spec, does not handle the entire spec.
+ * @param string $time
+ * @return int
+ */
+function parse_at_time($time)
+{
+    if (is_numeric($time)) {
+        return $time < 0 ? time() + $time : intval($time);
+    }
+
+    if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
+        $units = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+            'y' => 31557600,
+        ];
+        $value = substr($time, 1, -1);
+        $unit = substr($time, -1);
+
+        $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
+        return time() + $offset;
+    }
+
+    return (int)strtotime($time);
+}
+
+/**
  * Get the ZFS pools for a device... just requires the device ID
  * an empty return means ZFS is not in use or there are currently no pools
  * @param $device_id
@@ -1639,5 +1678,111 @@ function get_sensor_label_color($sensor, $type = 'sensors')
         $label_style = "label-danger";
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");
+    if ($sensor['sensor_class'] == 'runtime') {
+        $sensor['sensor_current'] = formatUptime($sensor['sensor_current'] * 60, 'short');
+        return "<span class='label $label_style'>".trim($sensor['sensor_current'])."</span>";
+    }
     return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
+}
+
+/**
+ * @params int unix time
+ * @params int seconds
+ * @return int
+ *
+ * Rounds down to the nearest interval.
+ *
+ * The first argument is required and it is the unix time being
+ * rounded down.
+ *
+ * The second value is the time interval. If not specified, it
+ * defaults to 300, or 5 minutes.
+ */
+function lowest_time($time, $seconds = 300)
+{
+    return $time - ($time % $seconds);
+}
+
+/**
+ * @params int
+ * @return string
+ *
+ * This returns the subpath for working with nfdump.
+ *
+ * 1 value is taken and that is a unix time stamp. It will be then be rounded
+ * off to the lowest five minutes earlier.
+ *
+ * The return string will be a path partial you can use with nfdump to tell it what
+ * file or range of files to use.
+ *
+ * Below ie a explanation of the layouts as taken from the NfSen config file.
+ *  0             no hierachy levels - flat layout - compatible with pre NfSen version
+ *  1 %Y/%m/%d    year/month/day
+ *  2 %Y/%m/%d/%H year/month/day/hour
+ *  3 %Y/%W/%u    year/week_of_year/day_of_week
+ *  4 %Y/%W/%u/%H year/week_of_year/day_of_week/hour
+ *  5 %Y/%j       year/day-of-year
+ *  6 %Y/%j/%H    year/day-of-year/hour
+ *  7 %Y-%m-%d    year-month-day
+ *  8 %Y-%m-%d/%H year-month-day/hour
+ */
+function time_to_nfsen_subpath($time)
+{
+    $time=lowest_time($time);
+    $layout=Config::get('nfsen_subdirlayout');
+
+    if ($layout == 0) {
+        return 'nfcapd.'.date('YmdHi', $time);
+    } elseif ($layout == 1) {
+        return date('Y\/m\/d\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 2) {
+        return date('Y\/m\/d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 3) {
+        return date('Y\/W\/w\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 4) {
+        return date('Y\/W\/w\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 5) {
+        return date('Y\/z\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 6) {
+        return date('Y\/z\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 7) {
+        return date('Y\-m\-d\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 8) {
+        return date('Y\-m\-d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    }
+}
+
+/**
+ * @params string hostname
+ * @return string
+ *
+ * Takes a hostname and transforms it to the name
+ * used by nfsen.
+*/
+function nfsen_hostname($hostname)
+{
+    $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
+
+    if (!is_null(Config::get('nfsen_suffix'))) {
+        $nfsen_hostname=str_replace(Config::get('nfsen_suffix'), '', $nfsen_hostname);
+    }
+    return $nfsen_hostname;
+}
+
+/**
+ * @params string hostname
+ * @return string
+ *
+ * Takes a hostname and returns the path to the nfsen
+ * live dir.
+*/
+function nfsen_live_dir($hostname)
+{
+    $hostname=nfsen_hostname($hostname);
+
+    foreach (Config::get('nfsen_base') as $base_dir) {
+        if (file_exists($base_dir) && is_dir($base_dir)) {
+            return $base_dir.'/profiles-data/live/'.$hostname;
+        }
+    }
 }

@@ -11,10 +11,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     require 'includes/html/javascript-interfacepicker.inc.php';
 
     $port_device_id = -1;
@@ -36,6 +35,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
         </div>
         <div class="modal-body">
             <form method="post" role="form" action="bills/" class="form-horizontal alerts-form">
+                <?php echo csrf_field() ?>
                 <input type="hidden" name="addbill" value="yes" />
 
                 <div class="form-group">

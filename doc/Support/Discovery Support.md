@@ -1,10 +1,13 @@
 source: Support/Discovery Support.md
 path: blob/master/doc/
-### discovery.php
 
-This document will explain how to use discovery.php to debug issues or manually running to process data.
+# discovery.php
 
-#### Command options
+This document will explain how to use discovery.php to debug issues or
+manually running to process data.
+
+## Command options
+
 ```bash
 -h <device id> | <device hostname wildcard>  Poll single device
 -h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)
@@ -20,27 +23,33 @@ Debugging and testing options:
 -d                                           Enable debugging output
 -v                                           Enable verbose debugging output
 -m                                           Specify module(s) to be run. Comma separate modules, submodules may be added with /
-
-
 ```
 
-`-h` Use this to specify a device via either id or hostname (including wildcard using *). You can also specify odd and
-even. all will run discovery against all devices whilst
-new will poll only those devices that have recently been added or have been selected for rediscovery.
+`-h` Use this to specify a device via either id or hostname (including
+wildcard using *). You can also specify odd and even. all will run
+discovery against all devices whilst new will poll only those devices
+that have recently been added or have been selected for rediscovery.
 
 `-i` This can be used to stagger the discovery process.
 
-`-d` Enables debugging output (verbose output but with most sensitive data masked) so that you can see what is happening during a discovery run. This includes things like rrd updates, SQL queries and response from snmp.
+`-d` Enables debugging output (verbose output but with most sensitive
+data masked) so that you can see what is happening during a discovery
+run. This includes things like rrd updates, SQL queries and response
+from snmp.
 
 `-v` Enables verbose debugging output with all data in tact.
 
 `-m` This enables you to specify the module you want to run for discovery.
 
-#### Discovery wrapper
+# Discovery wrapper
 
-We have a `discovery-wrapper.py` script which is based on `poller-wrapper.py` by [Job Snijders](https://github.com/job). This script is currently the default.
+We have a `discovery-wrapper.py` script which is based on
+`poller-wrapper.py` by [Job Snijders](https://github.com/job). This
+script is currently the default.
 
-If you need to debug the output of discovery-wrapper.py then you can add `-d` to the end of the command - it is NOT recommended to do this in cron.
+If you need to debug the output of discovery-wrapper.py then you can
+add `-d` to the end of the command - it is NOT recommended to do this
+in cron.
 
 If you want to switch back to discovery.php then you can replace:
 
@@ -50,10 +59,12 @@ With:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery.php -h all >> /dev/null 2>&1`
 
-#### Discovery config
+# Discovery config
 
-These are the default discovery config items. You can globally disable a module by setting it to 0. If you just want to
-disable it for one device then you can do this within the WebUI -> Device -> Settings -> Modules.
+These are the default discovery config items. You can globally disable
+a module by setting it to 0. If you just want to disable it for one
+device then you can do this within the WebUI -> Device -> Settings ->
+Modules.
 
 ```php
 $config['discovery_modules']['os']                   = true;
@@ -97,12 +108,14 @@ $config['discovery_modules']['wireless']             = true;
 $config['discovery_modules']['fdb-table']            = true;
 ```
 
-#### OS based Discovery config
+## OS based Discovery config
 
-You can enable or disable modules for a specific OS by add corresponding line in `config.php`
-OS based settings have preference over global. Device based settings have preference over all others
+You can enable or disable modules for a specific OS by add
+corresponding line in `config.php` OS based settings have preference
+over global. Device based settings have preference over all others
 
-Discover performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
+Discover performance improvement can be achieved by deactivating all
+modules that are not supported by specific OS.
 
 E.g. to deactivate spanning tree but activate discovery-arp module for linux OS
 
@@ -111,11 +124,12 @@ $config['os']['linux']['discovery_modules']['stp'] = false;
 $config['os']['linux']['discovery_modules']['discovery-arp'] = true;
 ```
 
-#### Discovery modules
+## Discovery modules
 
 `os`: Os detection. This module will pick up the OS of the device.
 
-`ports`: This module will detect all ports on a device excluding ones configured to be ignored by config options.
+`ports`: This module will detect all ports on a device excluding ones
+configured to be ignored by config options.
 
 `ports-stack`: Same as ports except for stacks.
 
@@ -143,7 +157,8 @@ $config['os']['linux']['discovery_modules']['discovery-arp'] = true;
 
 `arp-table`: Detection of the ARP table for the device.
 
-`fdb-table`: Detection of the Forwarding DataBase table for the device, with history data.
+`fdb-table`: Detection of the Forwarding DataBase table for the
+device, with history data.
 
 `discovery-arp`: Auto discovery via ARP.
 
@@ -175,36 +190,44 @@ $config['os']['linux']['discovery_modules']['discovery-arp'] = true;
 
 `charge`: APC Charge detection and support.
 
-#### Running
+# Running
 
 Here are some examples of running discovery from within your install directory.
+
 ```bash
 ./discovery.php -h localhost
 
 ./discovery.php -h localhost -m ports
 ```
 
-#### Debugging
+# Debugging
 
-To provide debugging output you will need to run the discovery process with the `-d` flag. You can do this either against
-all modules, single or multiple modules:
+To provide debugging output you will need to run the discovery process
+with the `-d` flag. You can do this either against all modules, single
+or multiple modules:
 
 All Modules
+
 ```bash
 ./discovery.php -h localhost -d
 ```
 
 Single Module
+
 ```bash
 ./discovery.php -h localhost -m ports -d
 ```
 
 Multiple Modules
+
 ```bash
 ./discovery.php -h localhost -m ports,entity-physical -d
 ```
 
-Using `-d` shouldn't output much sensitive information, `-v` will so it is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details amongst other items including port descriptions.
+Using `-d` shouldn't output much sensitive information, `-v` will so
+it is then advisable to sanitise the output before pasting it
+somewhere as the debug output will contain snmp details amongst other
+items including port descriptions.
 
 The output will contain:
 

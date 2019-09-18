@@ -25,7 +25,7 @@ cache:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y snmp fping python3-pip
+  - sudo apt-get install -y snmp fping python3-pip python3-setuptools
   - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
   - cp tests/config/config.test.php config.php
 

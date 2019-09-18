@@ -146,6 +146,8 @@ class ComposerHelper
             }
         }
 
+        $content = self::fixComments($content);
+
         // only write if the content has changed
         if ($content !== $original_content) {
             file_put_contents($file, $content);
@@ -171,5 +173,23 @@ class ComposerHelper
     {
         $cmd = "set -v\n" . implode(PHP_EOL, (array)$cmds);
         passthru($cmd);
+    }
+
+    /**
+     * Fix .env with # in them without a space before it
+     */
+    private static function fixComments($dotenv)
+    {
+        return implode(PHP_EOL, array_map(function ($line) {
+            $parts = explode('=', $line, 2);
+            if (isset($parts[1])
+                && preg_match('/(?<!\s)#/', $parts[1]) // number symbol without a space before it
+                && !preg_match('/^(".*"|\'.*\')$/', $parts[1]) // not already quoted
+            ) {
+                return trim($parts[0]) . '="' . trim($parts[1]) . '"';
+            }
+
+            return $line;
+        }, explode(PHP_EOL, $dotenv)));
     }
 }

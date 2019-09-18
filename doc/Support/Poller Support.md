@@ -1,10 +1,13 @@
 source: Support/Poller Support.md
 path: blob/master/doc/
-### poller.php
 
-This document will explain how to use poller.php to debug issues or manually running to process data.
+# poller.php
 
-#### Command options
+This document will explain how to use poller.php to debug issues or
+manually running to process data.
+
+## Command options
+
 ```bash
 	LibreNMS 2014.master Poller
 
@@ -24,29 +27,39 @@ Debugging and testing options:
 -m                                           Specify module(s) to be run. Comma separate modules, submodules may be added with /
 ```
 
-`-h` Use this to specify a device via either id or hostname (including wildcard using *). You can also specify odd and
-even. all will run poller against all devices.
+`-h` Use this to specify a device via either id or hostname (including
+wildcard using *). You can also specify odd and even. all will run
+poller against all devices.
 
 `-i` This can be used to stagger the poller process.
 
 `-r` This option will suppress the creation or update of RRD files.
 
-`-d` Enables debugging output (verbose output but with most sensitive data masked) so that you can see what is happening during a poller run. This includes things like rrd updates, SQL queries and response from snmp.
+`-d` Enables debugging output (verbose output but with most sensitive
+data masked) so that you can see what is happening during a poller
+run. This includes things like rrd updates, SQL queries and response
+from snmp.
 
 `-v` Enables verbose debugging output with all data in tact.
 
 `-m` This enables you to specify the module you want to run for poller.
 
-#### Poller Wrapper
+# Poller Wrapper
 
-We have a `poller-wrapper.py` script by [Job Snijders](https://github.com/job). This script is currently the default.
+We have a `poller-wrapper.py` script by [Job
+Snijders](https://github.com/job). This script is currently the
+default.
 
-If you need to debug the output of poller-wrapper.py then you can add `-d` to the end of the command - it is NOT recommended to do this in cron.
+If you need to debug the output of poller-wrapper.py then you can add
+`-d` to the end of the command - it is NOT recommended to do this in
+cron.
 
-#### Poller config
+# Poller config
 
-These are the default poller config items. You can globally disable a module by setting it to 0. If you just want to
-disable it for one device then you can do this within the WebUI Device -> Edit -> Modules.
+These are the default poller config items. You can globally disable a
+module by setting it to 0. If you just want to
+disable it for one device then you can do this within the WebUI Device
+-> Edit -> Modules.
 
 ```php
 $config['poller_modules']['unix-agent']                  = false;
@@ -94,12 +107,14 @@ $config['poller_modules']['loadbalancers']               = false;
 $config['poller_modules']['mef']                         = false;
 ```
 
-#### OS based Poller config
+## OS based Poller config
 
-You can enable or disable modules for a specific OS by add corresponding line in `config.php`
-OS based settings have preference over global. Device based settings have preference over all others
+You can enable or disable modules for a specific OS by add
+corresponding line in `config.php` OS based settings have preference
+over global. Device based settings have preference over all others
 
-Poller performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
+Poller performance improvement can be achieved by deactivating all
+modules that are not supported by specific OS.
 
 E.g. to deactivate spanning tree but activate unix-agent module for linux OS
 
@@ -108,7 +123,7 @@ $config['os']['linux']['poller_modules']['stp']  = false;
 $config['os']['linux']['poller_modules']['unix-agent'] = true;
 ```
 
-#### Poller modules
+## Poller modules
 
 `unix-agent`: Enable the check_mk agent for external support for applications.
 
@@ -134,7 +149,8 @@ $config['os']['linux']['poller_modules']['unix-agent'] = true;
 
 `ipSystemStats`: IP statistics for device.
 
-`ports`: This module will detect all ports on a device excluding ones configured to be ignored by config options.
+`ports`: This module will detect all ports on a device excluding ones
+configured to be ignored by config options.
 
 `nac`: Network Access Control (NAC) or 802.1X support.
 
@@ -178,36 +194,44 @@ $config['os']['linux']['poller_modules']['unix-agent'] = true;
 
 `mib`: Support for generic MIB parsing.
 
-#### Running
+# Running
 
 Here are some examples of running poller from within your install directory.
+
 ```bash
 ./poller.php -h localhost
 
 ./poller.php -h localhost -m ports
 ```
 
-#### Debugging
+# Debugging
 
-To provide debugging output you will need to run the poller process with the `-d` flag. You can do this either against
+To provide debugging output you will need to run the poller process
+with the `-d` flag. You can do this either against
 all modules, single or multiple modules:
 
 All Modules
+
 ```bash
 ./poller.php -h localhost -d
 ```
 
 Single Module
+
 ```bash
 ./poller.php -h localhost -m ports -d
 ```
 
 Multiple Modules
+
 ```bash
 ./poller.php -h localhost -m ports,entity-physical -d
 ```
 
-Using `-d` shouldn't output much sensitive information, `-v` will so it is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details amongst other items including port descriptions.
+Using `-d` shouldn't output much sensitive information, `-v` will so
+it is then advisable to sanitise the output before pasting it
+somewhere as the debug output will contain snmp details amongst other
+items including port descriptions.
 
 The output will contain:
 

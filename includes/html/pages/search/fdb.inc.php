@@ -28,21 +28,20 @@ var grid = $("#fdb-search").bootgrid({
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
                 "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
+                "<?php echo addslashes(csrf_field()) ?>"+
                 "<div class=\"form-group\">"+
                 "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 // Select the devices only with FDB tables
 $sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
 
 $param = array();
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = LegacyAuth::id();
+    $param[] = Auth::id();
 }
 
 $sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";

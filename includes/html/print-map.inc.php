@@ -13,7 +13,6 @@
  */
 
 use LibreNMS\Config;
-use LibreNMS\Authentication\LegacyAuth;
 
 //Don't know where this should come from, but it is used later, so I just define it here.
 $row_colour="#ffffff";
@@ -28,10 +27,10 @@ if (!empty($device['hostname'])) {
     $sql = ' ';
 }
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $join_sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D1`.`device_id` = `DP`.`device_id`';
     $sql  .= ' AND `DP`.`user_id`=?';
-    $sql_array[] = LegacyAuth::id();
+    $sql_array[] = Auth::id();
 }
 
 $devices_by_id = array();

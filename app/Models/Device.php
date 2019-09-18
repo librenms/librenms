@@ -429,6 +429,15 @@ class Device extends BaseModel
         return $this->hasDeviceAccess($query, $user);
     }
 
+    public function scopeInDeviceGroup($query, $deviceGroup)
+    {
+        return $query->whereIn($query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+            $query->select('device_id')
+                ->from('device_group_device')
+                ->where('device_group_id', $deviceGroup);
+        });
+    }
+
     // ---- Define Relationships ----
 
     public function alerts()
@@ -474,6 +483,16 @@ class Device extends BaseModel
     public function groups()
     {
         return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
+    }
+
+    public function ipv4()
+    {
+        return $this->hasManyThrough('App\Models\Ipv4Address', 'App\Models\Port', 'device_id', 'port_id', 'device_id', 'port_id');
+    }
+
+    public function ipv6()
+    {
+        return $this->hasManyThrough('App\Models\Ipv6Address', 'App\Models\Port', 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
     public function location()
@@ -554,6 +573,26 @@ class Device extends BaseModel
     public function mplsLspPaths()
     {
         return $this->hasMany('App\Models\MplsLspPath', 'device_id');
+    }
+
+    public function mplsSdps()
+    {
+        return $this->hasMany('App\Models\MplsSdp', 'device_id');
+    }
+
+    public function mplsServices()
+    {
+        return $this->hasMany('App\Models\MplsService', 'device_id');
+    }
+
+    public function mplsSaps()
+    {
+        return $this->hasMany('App\Models\MplsSap', 'device_id');
+    }
+
+    public function mplsSdpBinds()
+    {
+        return $this->hasMany('App\Models\MplsSdpBind', 'device_id');
     }
 
     public function syslogs()

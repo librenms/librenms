@@ -7,9 +7,7 @@ foreach ($_GET as $name => $value) {
     $vars[$name] = $value;
 }
 
-preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
-$type    = basename($graphtype['type']);
-$subtype = basename($graphtype['subtype']);
+list($type, $subtype) = extract_graph_type($vars['type']);
 
 if (is_numeric($vars['device'])) {
     $device = device_by_id_cache($vars['device']);
@@ -24,13 +22,9 @@ $title    = $vars['title'];
 $vertical = $vars['vertical'];
 $legend   = $vars['legend'];
 $output   = (!empty($vars['output']) ? $vars['output'] : 'default');
-$from = (isset($vars['from']) ? $vars['from'] : time() - 60 * 60 * 24);
-$to   = (isset($vars['to']) ? $vars['to'] : time());
+$from = parse_at_time($_GET['from']) ?: Config::get('time.day');
+$to   = parse_at_time($_GET['to']) ?: Config::get('time.now');
 $graph_type = (isset($vars['graph_type']) ? $vars['graph_type'] : Config::get('webui.graph_type'));
-
-if ($from < 0) {
-    $from = ($to + $from);
-}
 
 $period = ($to - $from);
 $base64_output = '';
@@ -168,12 +162,7 @@ if ($error_msg) {
                         }
                     } else {
                         if ($output === 'base64') {
-                            $fd = fopen($graphfile, 'r');
-                            ob_start();
-                                fpassthru($fd);
-                                $imagedata = ob_get_contents();
-                                fclose($fd);
-                            ob_end_clean();
+                            $imagedata = file_get_contents($graphfile);
                             $base64_output =  base64_encode($imagedata);
                         } else {
                             $fd = fopen($graphfile, 'r');

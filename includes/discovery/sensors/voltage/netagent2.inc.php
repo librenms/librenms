@@ -44,7 +44,7 @@
     $bat_1phase_warnlimit     = 28;
     $bat_1phase_lowlimit      = 10;
     $bat_1phase_lowwarnlimit  = 18;
-    $bat_1phase_divisor       = 1;
+    $bat_1phase_divisor       = 10;
 
     # UPS 3 phase battery system values
     $bat_3phase_limit         = 270; // Remember to check correct values
@@ -389,8 +389,8 @@ if ($out_phaseNum == '3') {
 // BATTERY Voltage
 # Set divisor and limit ranges 1 phase UPS systems
 if ($in_phaseNum == '1') {
-    $battery_voltage_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
-    $battery_voltage1 = snmp_get($device, $battery_voltage_oid, '-Oqv');
+    $battery_voltage1_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
+    $battery_voltage1 = snmp_get($device, $battery_voltage1_oid, '-Oqv');
     $limit = $bat_1phase_limit;
     $warnlimit = $bat_1phase_warnlimit;
     $lowlimit = $bat_1phase_lowlimit;

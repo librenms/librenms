@@ -1,0 +1,616 @@
+-- MIB created 5/06/99 21:06:02, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBMIROCRLAN-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmrlan.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Counter32, TimeTicks, IpAddress
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    TRAP-TYPE
+            FROM RFC-1215
+    DisplayString, TruthValue
+            FROM SNMPv2-TC-v1
+    enterprises
+            FROM RFC1155-SMI
+    ifIndex
+            FROM IF-MIB;
+
+ibmIROCroutingRlan OBJECT IDENTIFIER ::= { ibmIROCrouting 5 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9808050900Z
+--  OrgName
+--    IBM
+--  ContactInfo
+--    David D. Chen
+--     Sam Henderson
+--     IBM Corporation
+--     800 Park, Highway 54
+--     Research Triangle Park, NC 27709-9990
+--     Tel:    1 919 254 6182
+--     E-mail: ddchen@us.ibm.com
+--  Descr
+--    RLAN
+--  RevDate
+--    9808050900Z
+--  RevDescr
+--    Added the virtual connection configuration parameters,
+--     and define Enabled textual convention.
+--  RevDate
+--    9712150900Z
+--  RevDescr
+--    The initial version of this MIB module.
+
+ibm             OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd         OBJECT IDENTIFIER ::= { ibm 6 }
+ibm2210         OBJECT IDENTIFIER ::= { ibmProd 72 }
+ibmIROC         OBJECT IDENTIFIER ::= { ibmProd 119 }
+ibmIROCrouting  OBJECT IDENTIFIER ::= { ibmIROC 4 }
+ibmRlanTraps    OBJECT IDENTIFIER ::= { ibmIROCroutingRlan 0 }
+ibmRlanMIB      OBJECT IDENTIFIER ::= { ibmIROCroutingRlan 1 }
+ibmRlanDomains  OBJECT IDENTIFIER ::= { ibmIROCroutingRlan 2 }
+ibmRlanConformance OBJECT IDENTIFIER ::= { ibmIROCroutingRlan 3 }
+ibmRlanGeneral  OBJECT IDENTIFIER ::= { ibmRlanMIB 1 }
+rlanCompliances OBJECT IDENTIFIER ::= { ibmRlanConformance 1 }
+rlanGroups      OBJECT IDENTIFIER ::= { ibmRlanConformance 2 }
+
+NBNames ::= OCTET STRING(SIZE(0..512))
+-- TEXTUAL-CONVENTION
+--  DspHint
+--    1x:
+--  Status
+--    mandatory
+--  Descr
+--    Represents a list of NetBIOS names, each is 16 octets concatenated
+--     together.
+
+IpxNetworkNumber ::= OCTET STRING(SIZE(4))
+-- TEXTUAL-CONVENTION
+--  DspHint
+--    1x:
+--  Status
+--    mandatory
+
+IpxNodeNumber ::= OCTET STRING(SIZE(6))
+-- TEXTUAL-CONVENTION
+--  DspHint
+--    1x:
+--  Status
+--    mandatory
+
+MacAddress ::= OCTET STRING(SIZE(0..6))
+-- TEXTUAL-CONVENTION
+--  DspHint
+--    1x:
+--  Status
+--    mandatory
+--  Descr
+--    Represents an 802 MAC address represented in
+--     canonical format.  That is, the least significant
+--     bit will be transmitted first.  If this information
+--     is not available, the value is a zero length string.
+
+CircuitState ::= INTEGER {
+        unknown(0),
+        closed(1),
+        listen(2),
+        reqSent(3),
+        ackRcvd(4),
+        ackSent(5),
+        open(6),
+        termSent(7),
+        dhcpWait(8)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    The status of the circuit.
+
+ZeroOrigCounter32 ::= Counter32
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    This TC describes an object which counts events with the
+--    following semantics: objects of this type will be set to
+--    zero(0) on creation and will thereafter count appropriate
+--    events, wrapping back to zero(0) when the value 2^32 is
+--    reached.
+--    
+--    Provided that an application discovers the new object within
+--    the minimum time to wrap it can use the initial value as a
+--    delta since it last polled the table of which this object is
+--    part.  It is important for a management station to be aware of
+--    this minimum time and the actual time between polls, and to
+--    discard data if the actual time is too long or there is no
+--    defined minimum time.
+--    
+--    Typically this TC is used in tables where the INDEX space is
+--    constantly changing and/or the TimeFilter mechanism is in use.
+
+rlanActiveUserTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlanActiveUserEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    ::= { ibmRlanMIB 2 }
+
+rlanActiveUserEntry OBJECT-TYPE
+    SYNTAX RlanActiveUserEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    INDEX { ifIndex }
+    ::= { rlanActiveUserTable 1 }
+
+RlanActiveUserEntry ::= SEQUENCE {
+    rlanActiveUserName DisplayString,
+    rlanActiveUserConnected TimeTicks,
+    rlanActiveUserTimeRemaining INTEGER,
+    rlanActiveUserInPkts ZeroOrigCounter32,
+    rlanActiveUserOutPkts ZeroOrigCounter32,
+    rlanActiveUserInOctets ZeroOrigCounter32,
+    rlanActiveUserOutOctets ZeroOrigCounter32,
+    rlanActiveUserActiveVC TruthValue
+    }
+
+rlanActiveUserName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..253))
+--    Rsyntax OCTET STRING(SIZE(0..253))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "could be null."
+    ::= { rlanActiveUserEntry 1 }
+
+rlanActiveUserConnected OBJECT-TYPE
+    SYNTAX TimeTicks
+--  Units
+--    hundredths of a second
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The elapsed time since the connection opened."
+    ::= { rlanActiveUserEntry 2 }
+
+rlanActiveUserTimeRemaining OBJECT-TYPE
+    SYNTAX INTEGER(0..2147483647)
+--  Units
+--    seconds
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The amount of time the connection allowed.
+         Zero means no limits."
+    ::= { rlanActiveUserEntry 3 }
+
+rlanActiveUserInPkts OBJECT-TYPE
+    SYNTAX ZeroOrigCounter32
+--    Rsyntax Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Packets for this user, starting with zero."
+    ::= { rlanActiveUserEntry 4 }
+
+rlanActiveUserOutPkts OBJECT-TYPE
+    SYNTAX ZeroOrigCounter32
+--    Rsyntax Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Packets for this user, starting with zero."
+    ::= { rlanActiveUserEntry 5 }
+
+rlanActiveUserInOctets OBJECT-TYPE
+    SYNTAX ZeroOrigCounter32
+--    Rsyntax Counter32
+--  Units
+--    octets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Octets for this user, starting with zero."
+    ::= { rlanActiveUserEntry 6 }
+
+rlanActiveUserOutOctets OBJECT-TYPE
+    SYNTAX ZeroOrigCounter32
+--    Rsyntax Counter32
+--  Units
+--    octets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Octets for this user, starting with zero."
+    ::= { rlanActiveUserEntry 7 }
+
+rlanActiveUserActiveVC OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The connection is an active virtual connection."
+    ::= { rlanActiveUserEntry 8 }
+
+rlanActiveIpUserTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlanActiveIpUserEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    ::= { ibmRlanMIB 3 }
+
+rlanActiveIpUserEntry OBJECT-TYPE
+    SYNTAX RlanActiveIpUserEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    INDEX { ifIndex }
+    ::= { rlanActiveIpUserTable 1 }
+
+RlanActiveIpUserEntry ::= SEQUENCE {
+    rlanActiveIpUserState CircuitState,
+    rlanActiveIpUserPrevState CircuitState,
+    rlanActiveIpUserLocalAddr IpAddress,
+    rlanActiveIpUserRemoteAddr IpAddress,
+    rlanActiveIpUserRemoteMask IpAddress,
+    rlanActiveIpUserRemoteName DisplayString
+    }
+
+rlanActiveIpUserState OBJECT-TYPE
+    SYNTAX CircuitState
+--    Rsyntax INTEGER {
+--        unknown(0),
+--        closed(1),
+--        listen(2),
+--        reqSent(3),
+--        ackRcvd(4),
+--        ackSent(5),
+--        open(6),
+--        termSent(7),
+--        dhcpWait(8)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveIpUserEntry 1 }
+
+rlanActiveIpUserPrevState OBJECT-TYPE
+    SYNTAX CircuitState
+--    Rsyntax INTEGER {
+--        unknown(0),
+--        closed(1),
+--        listen(2),
+--        reqSent(3),
+--        ackRcvd(4),
+--        ackSent(5),
+--        open(6),
+--        termSent(7),
+--        dhcpWait(8)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveIpUserEntry 2 }
+
+rlanActiveIpUserLocalAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Ip address at this end of the interface."
+    ::= { rlanActiveIpUserEntry 3 }
+
+rlanActiveIpUserRemoteAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Ip address of the remote end of this interface."
+    ::= { rlanActiveIpUserEntry 4 }
+
+rlanActiveIpUserRemoteMask OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Ip address mask of the remote end of this interface."
+    ::= { rlanActiveIpUserEntry 5 }
+
+rlanActiveIpUserRemoteName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The host name used be the remote box for Domain
+         Name Server function."
+    ::= { rlanActiveIpUserEntry 6 }
+
+rlanActiveNBUserTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlanActiveNBUserEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    ::= { ibmRlanMIB 4 }
+
+rlanActiveNBUserEntry OBJECT-TYPE
+    SYNTAX RlanActiveNBUserEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    INDEX { ifIndex }
+    ::= { rlanActiveNBUserTable 1 }
+
+RlanActiveNBUserEntry ::= SEQUENCE {
+    rlanActiveNBUserState CircuitState,
+    rlanActiveNBUserPrevState CircuitState,
+    rlanActiveNBProtType INTEGER,
+    rlanActiveNBUserLocalMac MacAddress,
+    rlanActiveNBUserRemoteMac MacAddress,
+    rlanActiveNBUserRemoteNames NBNames,
+    rlanActiveNBUserRemoteClass INTEGER,
+    rlanActiveNBUserRemoteVerMaj INTEGER,
+    rlanActiveNBUserRemoteVerMin INTEGER
+    }
+
+rlanActiveNBUserState OBJECT-TYPE
+    SYNTAX CircuitState
+--    Rsyntax INTEGER {
+--        unknown(0),
+--        closed(1),
+--        listen(2),
+--        reqSent(3),
+--        ackRcvd(4),
+--        ackSent(5),
+--        open(6),
+--        termSent(7),
+--        dhcpWait(8)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The state information may not be reliable, if
+         the protocol type is notApplicable or negotiating."
+    ::= { rlanActiveNBUserEntry 1 }
+
+rlanActiveNBUserPrevState OBJECT-TYPE
+    SYNTAX CircuitState
+--    Rsyntax INTEGER {
+--        unknown(0),
+--        closed(1),
+--        listen(2),
+--        reqSent(3),
+--        ackRcvd(4),
+--        ackSent(5),
+--        open(6),
+--        termSent(7),
+--        dhcpWait(8)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The state information may not be reliable, if
+         the protocol type is notApplicable or negotiating."
+    ::= { rlanActiveNBUserEntry 2 }
+
+rlanActiveNBProtType OBJECT-TYPE
+    SYNTAX INTEGER {
+        notApplicable(1),
+        negotiating(2),
+        nbContlProt(3),
+        nbFrameCntlProt(4),
+        bridgeProt(5)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveNBUserEntry 3 }
+
+rlanActiveNBUserLocalMac OBJECT-TYPE
+    SYNTAX MacAddress
+--    Rsyntax OCTET STRING(SIZE(0..6))
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveNBUserEntry 4 }
+
+rlanActiveNBUserRemoteMac OBJECT-TYPE
+    SYNTAX MacAddress
+--    Rsyntax OCTET STRING(SIZE(0..6))
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveNBUserEntry 5 }
+
+rlanActiveNBUserRemoteNames OBJECT-TYPE
+    SYNTAX NBNames
+--    Rsyntax OCTET STRING(SIZE(0..512))
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveNBUserEntry 6 }
+
+rlanActiveNBUserRemoteClass OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveNBUserEntry 7 }
+
+rlanActiveNBUserRemoteVerMaj OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveNBUserEntry 8 }
+
+rlanActiveNBUserRemoteVerMin OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveNBUserEntry 9 }
+
+rlanActiveIpxUserTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlanActiveIpxUserEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    ::= { ibmRlanMIB 5 }
+
+rlanActiveIpxUserEntry OBJECT-TYPE
+    SYNTAX RlanActiveIpxUserEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    INDEX { ifIndex }
+    ::= { rlanActiveIpxUserTable 1 }
+
+RlanActiveIpxUserEntry ::= SEQUENCE {
+    rlanActiveIpxUserState CircuitState,
+    rlanActiveIpxUserPrevState CircuitState,
+    rlanActiveIpxUserNetworkNum IpxNetworkNumber,
+    rlanActiveIpxUserLocalNodeNum IpxNodeNumber,
+    rlanActiveIpxUserRemoteNodeNum IpxNodeNumber
+    }
+
+rlanActiveIpxUserState OBJECT-TYPE
+    SYNTAX CircuitState
+--    Rsyntax INTEGER {
+--        unknown(0),
+--        closed(1),
+--        listen(2),
+--        reqSent(3),
+--        ackRcvd(4),
+--        ackSent(5),
+--        open(6),
+--        termSent(7),
+--        dhcpWait(8)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveIpxUserEntry 1 }
+
+rlanActiveIpxUserPrevState OBJECT-TYPE
+    SYNTAX CircuitState
+--    Rsyntax INTEGER {
+--        unknown(0),
+--        closed(1),
+--        listen(2),
+--        reqSent(3),
+--        ackRcvd(4),
+--        ackSent(5),
+--        open(6),
+--        termSent(7),
+--        dhcpWait(8)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveIpxUserEntry 2 }
+
+rlanActiveIpxUserNetworkNum OBJECT-TYPE
+    SYNTAX IpxNetworkNumber
+--    Rsyntax OCTET STRING(SIZE(4))
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveIpxUserEntry 3 }
+
+rlanActiveIpxUserLocalNodeNum OBJECT-TYPE
+    SYNTAX IpxNodeNumber
+--    Rsyntax OCTET STRING(SIZE(6))
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveIpxUserEntry 4 }
+
+rlanActiveIpxUserRemoteNodeNum OBJECT-TYPE
+    SYNTAX IpxNodeNumber
+--    Rsyntax OCTET STRING(SIZE(6))
+    ACCESS read-only
+    STATUS mandatory
+    ::= { rlanActiveIpxUserEntry 5 }
+
+rlanActiveUserGroup OBJECT IDENTIFIER ::= { rlanGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    Conformance group for RLAN general information.
+--  objects
+--    rlanActiveUserName, rlanActiveUserConnected, 
+--    rlanActiveUserTimeRemaining, rlanActiveUserInPkts, 
+--    rlanActiveUserOutPkts, rlanActiveUserInOctets, 
+--    rlanActiveUserOutOctets
+
+rlanActiveIpUserGroup OBJECT IDENTIFIER ::= { rlanGroups 2 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    Conformance group for RLAN which supports IP Connection.
+--  objects
+--    rlanActiveIpUserState, rlanActiveIpUserPrevState, 
+--    rlanActiveIpUserLocalAddr, rlanActiveIpUserRemoteAddr, 
+--    rlanActiveIpUserRemoteMask, rlanActiveIpUserRemoteName
+
+rlanActiveNBUserGroup OBJECT IDENTIFIER ::= { rlanGroups 3 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    Conformance group for RLAN which supports Netbios Connection.
+--  objects
+--    rlanActiveNBUserState, rlanActiveNBUserPrevState, 
+--    rlanActiveNBProtType, rlanActiveNBUserLocalMac, 
+--    rlanActiveNBUserRemoteMac, rlanActiveNBUserRemoteNames, 
+--    rlanActiveNBUserRemoteClass, rlanActiveNBUserRemoteVerMaj, 
+--    rlanActiveNBUserRemoteVerMin
+
+rlanActiveIpxUserGroup OBJECT IDENTIFIER ::= { rlanGroups 4 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    Conformance group for RLAN which supports IPX Connection.
+--  objects
+--    rlanActiveIpxUserState, rlanActiveIpxUserPrevState, 
+--    rlanActiveIpxUserNetworkNum, rlanActiveIpxUserLocalNodeNum, 
+--    rlanActiveIpxUserRemoteNodeNum
+
+rlanCoreCompliance OBJECT IDENTIFIER ::= { rlanCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The core compliance statement for all RLAN nodes.
+--  Module
+--    >>current<<
+--   MandGroup
+--    rlanActiveUserGroup
+
+rlanIpCompliance OBJECT IDENTIFIER ::= { rlanCompliances 2 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Module
+--    >>current<<
+--   MandGroup
+--    rlanActiveIpUserGroup
+
+rlanNBCompliance OBJECT IDENTIFIER ::= { rlanCompliances 3 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Module
+--    >>current<<
+--   MandGroup
+--    rlanActiveNBUserGroup
+
+rlanIpxCompliance OBJECT IDENTIFIER ::= { rlanCompliances 4 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Module
+--    >>current<<
+--   MandGroup
+--    rlanActiveIpxUserGroup
+
+
+END
+

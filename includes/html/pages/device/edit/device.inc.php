@@ -2,12 +2,11 @@
 
 use App\Models\Device;
 use App\Models\Location;
-use LibreNMS\Authentication\LegacyAuth;
 
 $device_model = Device::find($device['device_id']);
 
 if ($_POST['editing']) {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         if (isset($_POST['parent_id'])) {
             $parents = array_diff((array)$_POST['parent_id'], ['0']);
             // TODO avoid loops!
@@ -48,7 +47,7 @@ if ($_POST['editing']) {
         }
 
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
-            if (LegacyAuth::user()->hasGlobalAdmin()) {
+            if (Auth::user()->hasGlobalAdmin()) {
                 $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
                 if ($result == "") {
                     Toastr::success("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
@@ -75,6 +74,7 @@ if ($_POST['editing']) {
 <div class="row">
     <div class="col-md-1 col-md-offset-2">
         <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
+            <?php echo csrf_field() ?>
             <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
             <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button>
         </form>
@@ -91,6 +91,7 @@ if ($_POST['editing']) {
 </div>
 <br>
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
+<?php echo csrf_field() ?>
 <input type=hidden name="editing" value="yes">
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
         <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
@@ -148,7 +149,7 @@ if ($_POST['editing']) {
                 if (!$device_model->override_sysLocation) {
                     echo(' disabled="1"');
                 }
-                ?> value="<?php echo display($device_model->location->location); ?>" />
+                ?> value="<?php echo display($device_model->location); ?>" />
         </div>
     </div>
     <div class="form-group">

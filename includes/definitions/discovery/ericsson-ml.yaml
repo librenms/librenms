@@ -1,0 +1,48 @@
+mib: PT-RADIOLINK-MIB
+modules:
+  sensors:
+    state:
+      data:
+        -
+          oid: actualTxAcmTC
+          num_oid: '.1.3.6.1.4.1.193.223.2.7.1.1.58.{{ $index }}'
+          index: actualTxAcmTC
+          descr: Tx Modulation Rate
+          state_name: actualTxAcmTC
+          states:
+            - { value: 1, generic: 1, graph: 1, descr: 'HalfBpsk' }
+            - { value: 2, generic: 0, graph: 1, descr: 'HalfBpskLight' }
+            - { value: 3, generic: 0, graph: 1, descr: 'HalfBpskStrong' }
+            - { value: 4, generic: 0, graph: 1, descr: 'Bpsk' }
+            - { value: 5, generic: 0, graph: 1, descr: 'BpskLight' }
+            - { value: 6, generic: 0, graph: 1, descr: 'BpskStrong' }
+            - { value: 7, generic: 0, graph: 1, descr: '4Qam' }
+            - { value: 8, generic: 0, graph: 1, descr: '4QamLight' }
+            - { value: 9, generic: 0, graph: 1, descr: '4QamStrong' }
+            - { value: 10, generic: 0, graph: 1, descr: '16Qam' }
+            - { value: 11, generic: 0, graph: 1, descr: '16QamLight' }
+            - { value: 12, generic: 1, graph: 1, descr: '16QamStrong' }
+            - { value: 13, generic: 0, graph: 1, descr: '32Qam' }
+            - { value: 14, generic: 0, graph: 1, descr: '32QamLight' }
+            - { value: 15, generic: 0, graph: 1, descr: '32QamStrong' }
+            - { value: 16, generic: 0, graph: 1, descr: '64Qam' }
+            - { value: 17, generic: 0, graph: 1, descr: '64QamLight' }
+            - { value: 18, generic: 0, graph: 1, descr: '64QamStrong' }
+            - { value: 19, generic: 0, graph: 1, descr: '128Qam' }
+            - { value: 20, generic: 0, graph: 1, descr: '128QamLight' }
+            - { value: 21, generic: 0, graph: 1, descr: '128QamStrong' }
+            - { value: 22, generic: 0, graph: 1, descr: '256Qam' }
+            - { value: 23, generic: 1, graph: 1, descr: '256QamLight' }
+            - { value: 24, generic: 0, graph: 1, descr: '256QamStrong' }
+            - { value: 25, generic: 0, graph: 1, descr: '512Qam' }
+            - { value: 26, generic: 0, graph: 1, descr: '512QamLight' }
+            - { value: 27, generic: 0, graph: 1, descr: '512QamStrong' }
+            - { value: 28, generic: 0, graph: 1, descr: '1024Qam' }
+            - { value: 29, generic: 0, graph: 1, descr: '1024QamLight' }
+            - { value: 30, generic: 0, graph: 1, descr: '1024QamStrong' }
+            - { value: 31, generic: 0, graph: 1, descr: '2048Qam' }
+            - { value: 32, generic: 0, graph: 1, descr: '2048QamLight' }
+            - { value: 33, generic: 0, graph: 1, descr: '2048QamStrong' }
+            - { value: 34, generic: 0, graph: 1, descr: '4096Qam' }
+            - { value: 35, generic: 0, graph: 1, descr: '4096QamLight' }
+            - { value: 36, generic: 0, graph: 1, descr: '4096QamStrong' }

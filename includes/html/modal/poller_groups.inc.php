@@ -11,9 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     echo ('ERROR: You need to be admin');
 } else {
 ?>
@@ -30,6 +28,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
             </div>
             <div class="modal-footer">
                 <form role="form" class="remove_group_form">
+                    <?php echo csrf_field() ?>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger danger" id="group-removal" data-target="group-removal">Delete</button>
                     <input type="hidden" name="group_id" id="group_id" value="">
@@ -49,6 +48,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
             </div>
             <div class="modal-body">
                 <form method="post" role="form" id="poller_groups" class="form-horizontal poller-groups-form">
+                <?php echo csrf_field() ?>
                 <input type="hidden" name="group_id" id="group_id" value="">
                 <div class="row">
                     <div class="col-md-12">

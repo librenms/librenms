@@ -1,7 +1,5 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $no_refresh = true;
 
 ?>
@@ -29,7 +27,7 @@ require_once 'includes/html/modal/edit_transport_group.inc.php';
     </tr>
     <td colspan="6">
 <?php
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-alert-transport'><i class='fa fa-plus'></i> Create alert transport</button>";
 }
 

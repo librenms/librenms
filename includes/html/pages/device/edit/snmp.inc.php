@@ -1,10 +1,9 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 if ($_POST['editing']) {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
         if ($snmp_enabled) {
@@ -117,6 +116,7 @@ $max_oid = get_dev_attrib($device, 'snmp_max_oid');
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
+    " . csrf_field() . "
     <div class='form-group'>
     <label for='hardware' class='col-sm-2 control-label'>SNMP</label>
     <div class='col-sm-4'>

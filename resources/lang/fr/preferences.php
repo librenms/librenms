@@ -12,6 +12,6 @@ return [
     |
     */
 
-    'lang' => 'français',
+    'lang' => 'Français',
 
 ];

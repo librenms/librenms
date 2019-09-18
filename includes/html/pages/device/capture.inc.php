@@ -23,13 +23,11 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $no_refresh = true;
 $pagetitle[] = "Capture";
 
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     print_error("Insufficient Privileges");
 } else {
     ?>

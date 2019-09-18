@@ -1,0 +1,118 @@
+NBS-VLAN-TAGS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    InterfaceIndex
+        FROM IF-MIB
+    nbs
+        FROM NBS-MIB;
+
+nbsVlanTagsMib  MODULE-IDENTITY
+    LAST-UPDATED "201604291200Z"
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "MIB for setting VLAN tags for tagging and stacking"
+
+    ::= { nbs 219 }
+
+-- *******************************************************************
+-- NBS-VLAN-TAGS-MIB local defines
+-- *******************************************************************
+
+nbsVlanTagsPortGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "VLAN Tags information"
+    ::= { nbsVlanTagsMib 1 }
+
+-- *******************************************************************
+--
+-- the nbsVlanTagsPortTable
+--
+-- *******************************************************************
+
+nbsVlanTagsPortTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsVlanTagsPortTable."
+
+        ::= { nbsVlanTagsPortGrp 1 }
+
+nbsVlanTagsPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsVlanTagsPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          ""
+        ::= { nbsVlanTagsPortGrp 2 }
+
+NbsVlanTagsPortEntry ::= SEQUENCE {
+        nbsVlanTagsPortIfIndex      InterfaceIndex,
+
+-- Stacking, stripping stuff
+        nbsVlanTagsPortAction   INTEGER,
+        nbsVlanTagsPortVid      INTEGER,
+        nbsVlanTagsPortPriority INTEGER
+}
+
+nbsVlanTagsPortEntry      OBJECT-TYPE
+        SYNTAX      NbsVlanTagsPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          ""
+        INDEX { nbsVlanTagsPortIfIndex }
+        ::= { nbsVlanTagsPortTable 1 }
+
+nbsVlanTagsPortIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the VLAN tag port"
+        ::= { nbsVlanTagsPortEntry 1 }
+
+
+nbsVlanTagsPortAction OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                add          (2),
+                strip        (3),
+                ignore       (4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "add(2) need two more arguments s-vlanId and s-vlan-priority
+           strip(3)and ignore(4) does not need any argument"
+        DEFVAL { ignore }
+        ::= { nbsVlanTagsPortEntry 2 }
+
+nbsVlanTagsPortVid OBJECT-TYPE
+        SYNTAX      INTEGER  (1..4095)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "need to be specified when VlanTagAction is add(2)"
+        DEFVAL { 1 }
+        ::= { nbsVlanTagsPortEntry 3 }
+
+nbsVlanTagsPortPriority OBJECT-TYPE
+        SYNTAX      INTEGER (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "need to be specified when VlanTagAction is add(2)"
+        DEFVAL { 0 }
+        ::= { nbsVlanTagsPortEntry 4 }
+
+
+
+END
