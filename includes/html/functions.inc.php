@@ -1423,30 +1423,35 @@ function get_postgres_databases($device_id)
 }
 
 /**
- * Get all mdadm arrays from the collected
+ * Get all application data from the collected
  * rrd files.
  *
  * @param array $device device for which we get the rrd's
  * @param int   $app_id application id on the device
- * @return array list of disks
+ * @param string  $category which category of seafile graphs are searched
+ * @return array list of entry data
  */
-function get_arrays_with_mdadm($device, $app_id)
+function get_arrays_with_application($device, $app_id, $app_name, $category = null)
 {
-    $arrays = array();
+    $entries = array();
 
-    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'mdadm', $app_id);
+    if ($category) {
+        $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id, $category);
+    } else {
+        $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id);
+    }
 
     foreach (glob($pattern) as $rrd) {
         $filename = basename($rrd, '.rrd');
 
-        list(,,, $array_name) = explode("-", $filename, 4);
+        list(,,, $entry) = explode("-", $filename, 4);
 
-        if ($array_name) {
-            array_push($arrays, $array_name);
+        if ($entry) {
+            array_push($entries, $entry);
         }
     }
 
-    return $arrays;
+    return $entries;
 }
 
 /**
@@ -1455,26 +1460,27 @@ function get_arrays_with_mdadm($device, $app_id)
  *
  * @param array $device device for which we get the rrd's
  * @param int   $app_id application id on the device
- * @param string  $category which category of seafile graphs are searched
+ * @param string $category which category of seafile graphs are searched
  * @return array list of seafile data
  */
 function get_arrays_with_seafile($device, $app_id, $category)
 {
-    $arrays = array();
+    $app_name = 'seafile';
+    return get_arrays_with_application($device, $app_id, $app_name, $category);
+}
 
-    $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'seafile', $app_id, $category);
-
-    foreach (glob($pattern) as $rrd) {
-        $filename = basename($rrd, '.rrd');
-
-        list(,,, $account_name) = explode("-", $filename, 4);
-
-        if ($account_name) {
-            array_push($arrays, $account_name);
-        }
-    }
-
-    return $arrays;
+/**
+ * Get all mdadm arrays from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @return array list of raid-arrays
+ */
+function get_arrays_with_mdadm($device, $app_id)
+{
+    $app_name = 'mdadm';
+    return get_arrays_with_application($device, $app_id, $app_name);
 }
 
 /**
@@ -1487,21 +1493,8 @@ function get_arrays_with_seafile($device, $app_id, $category)
  */
 function get_disks_with_smart($device, $app_id)
 {
-    $disks = array();
-
-    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'smart', $app_id);
-
-    foreach (glob($pattern) as $rrd) {
-        $filename = basename($rrd, '.rrd');
-
-        list(,,, $disk) = explode("-", $filename, 4);
-
-        if ($disk) {
-            array_push($disks, $disk);
-        }
-    }
-
-    return $disks;
+    $app_name = 'smart';
+    return get_arrays_with_application($device, $app_id, $app_name);
 }
 
 /**
