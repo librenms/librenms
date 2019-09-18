@@ -348,8 +348,7 @@ __webpack_require__.r(__webpack_exports__);
         toastr.error(error.response.data.message);
       });
     }, 500),
-    changeValue: function changeValue(event) {
-      var value = event.target ? event.target.value : event;
+    changeValue: function changeValue(value) {
       this.persistValue(value);
       this.value = value;
     },

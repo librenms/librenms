@@ -77,8 +77,7 @@
                         toastr.error(error.response.data.message);
                     })
             }, 500),
-            changeValue(event) {
-                const value = event.target ? event.target.value : event;
+            changeValue(value) {
                 this.persistValue(value);
                 this.value = value
             },
