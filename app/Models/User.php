@@ -158,9 +158,9 @@ class User extends Authenticatable
         $this->attributes['can_modify_passwd'] = $modify ? 1 : 0;
     }
 
-    public function setEnabledAttribute($modify)
+    public function setEnabledAttribute($enable)
     {
-        $this->attributes['enabled'] = $modify ? 1 : 0;
+        $this->attributes['enabled'] = $enable ? 1 : 0;
     }
 
     // ---- Define Relationships ----
