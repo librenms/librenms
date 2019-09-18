@@ -33,6 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessNoiseFloorPolling;
 use LibreNMS\OS;
 
 class HiveosWireless extends OS implements
@@ -40,6 +41,7 @@ class HiveosWireless extends OS implements
     WirelessFrequencyDiscovery,
     WirelessFrequencyPolling,
     WirelessNoiseFloorDiscovery,
+    WirelessNoiseFloorPolling,
     WirelessPowerDiscovery,
     ProcessorDiscovery
 {
@@ -134,9 +136,9 @@ class HiveosWireless extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
-        $ahRxNoise = snmpwalk_group($this->getDevice(), 'ahRadioNoiseFloor', 'AH-INTERFACE-MIB');
+        $ahRadioNoiseFloor = snmpwalk_group($this->getDevice(), 'ahRadioNoiseFloor', 'AH-INTERFACE-MIB');
         $sensors = array();
-        foreach ($ahRxNoise as $index => $entry) {
+        foreach ($ahRadioNoiseFloor as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'noise-floor',
                 $this->getDeviceId(),
@@ -144,9 +146,26 @@ class HiveosWireless extends OS implements
                 'hiveos-wireless',
                 $index,
                 'Noise floor ' . $ahRadioName[$index],
-                $entry['ahRxNoise']
+                $entry['ahRadioNoiseFloor'] - 256
             );
         }
         return $sensors;
+    }
+
+    /**
+     * Poll wireless noise floor
+     * The returned array should be sensor_id => value pairs
+     *
+     * @param array $sensors Array of sensors needed to be polled
+     * @return array of polled data
+     */
+    public function pollWirelessNoiseFloor(array $sensors)
+    {
+        $data = [];
+        $ahRadioNoiseFloor = snmpwalk_group($this->getDevice(), 'ahRadioNoiseFloor', 'AH-INTERFACE-MIB');
+        foreach ($sensors as $sensor) {
+            $data[$sensor['sensor_id']] = $ahRadioNoiseFloor[$sensor['sensor_index']]['ahRadioNoiseFloor'] - 256;
+        }
+        return $data;
     }
 }
