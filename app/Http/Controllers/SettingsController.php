@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Util\DynamicConfig;
@@ -111,13 +112,23 @@ class SettingsController extends Controller
             return $this->jsonResponse($id, ":id is not a valid setting", null, 400);
         }
 
-        if (\App\Models\Config::destroy($id)) {
-            return $this->jsonResponse($id, ":id reset to default", $config->get($id)->default);
+        try {
+            $dbConfig = \App\Models\Config::where('config_name', $id)->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            return $this->jsonResponse($id, ":id is not set", $config->get($id)->default, 400);
         }
 
-        return $this->jsonResponse($id, ":id is not set", null, 400);
+        $dbConfig->delete();
+
+        return $this->jsonResponse($id, ":id reset to default", $config->get($id)->default);
     }
 
+    /**
+     * List all settings (excluding hidden ones and ones that don't have metadata)
+     *
+     * @param DynamicConfig $config
+     * @return JsonResponse
+     */
     public function listAll(DynamicConfig $config)
     {
         return response()->json($config->all()->filter->isValid());

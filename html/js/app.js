@@ -312,6 +312,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LibrenmsSetting",
   props: {
@@ -370,7 +371,21 @@ __webpack_require__.r(__webpack_exports__);
       return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale);
     },
     resetToDefault: function resetToDefault() {
-      this.changeValue(this.setting["default"]);
+      var _this2 = this;
+
+      axios["delete"](route('settings.destroy', this.setting.name)).then(function (response) {
+        _this2.value = response.data.value;
+        _this2.feedback = 'has-success';
+        setTimeout(function () {
+          return _this2.feedback = '';
+        }, 3000);
+      })["catch"](function (error) {
+        _this2.feedback = 'has-error';
+        setTimeout(function () {
+          return _this2.feedback = '';
+        }, 3000);
+        toastr.error(error.response.data.message);
+      });
     },
     resetToInitial: function resetToInitial() {
       this.changeValue(this.setting.value);

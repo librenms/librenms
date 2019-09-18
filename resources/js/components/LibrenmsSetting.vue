@@ -43,7 +43,8 @@
         </div>
         <div class="col-sm-2">
             <button v-show="showUndo()" @click="resetToInitial" class="btn btn-primary" type="button" v-tooltip="$t('Undo')"><i class="fa fa-undo"></i></button>
-            <button v-show="showResetToDefault()" @click="resetToDefault" class="btn btn-default" type="button" v-tooltip="$t('Reset to default')"><i class="fa fa-refresh"></i></button>
+            <button v-show="showResetToDefault()" @click="resetToDefault" class="btn btn-default" type="button" v-tooltip="$t('Reset to default')"><i class="fa fa-refresh"></i>
+            </button>
             <div v-if="hasHelp()" v-tooltip="{content: getHelp(), trigger: 'hover click'}" class="fa fa-fw fa-lg fa-question-circle"></div>
         </div>
     </div>
@@ -98,7 +99,17 @@
                 return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale)
             },
             resetToDefault() {
-                this.changeValue(this.setting.default)
+                axios.delete(route('settings.destroy', this.setting.name))
+                    .then((response) => {
+                        this.value = response.data.value;
+                        this.feedback = 'has-success';
+                        setTimeout(() => this.feedback = '', 3000);
+                    })
+                    .catch((error) => {
+                        this.feedback = 'has-error';
+                        setTimeout(() => this.feedback = '', 3000);
+                        toastr.error(error.response.data.message);
+                    })
             },
             resetToInitial() {
                 this.changeValue(this.setting.value)
