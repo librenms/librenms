@@ -26,11 +26,12 @@ class DeviceGroupController extends Controller
     {
         $this->authorize('manage', DeviceGroup::class);
 
-        $device_groups = DeviceGroup::orderBy('name')->with('devices:devices.device_id')->withCount('devices')->get();
-        $ungrouped_devices = Device::orderBy('hostname')->whereNotIn('device_id', function ($q) { $q->select('device_id')->from('device_group_device'); })->get();
+        $ungrouped_devices = Device::orderBy('hostname')->whereNotIn('device_id', function ($query) {
+            $query->select('device_id')->from('device_group_device');
+        })->get();
 
         return view('device-group.index', [
-            'device_groups' => $device_groups,
+            'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
             'ungrouped_devices' => $ungrouped_devices,
         ]);
     }
