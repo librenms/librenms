@@ -85,29 +85,43 @@ class Mpls implements Module
     public function poll(OS $os)
     {
         if ($os instanceof MplsPolling) {
-            echo "\nMPLS LSPs: ";
-            ModuleModelObserver::observe('\App\Models\MplsLsp');
-            $lsps = $this->syncModels($os->getDeviceModel(), 'mplsLsps', $os->pollMplsLsps());
+            $device = $os->getDeviceModel();
 
-            echo "\nMPLS LSP Paths: ";
-            ModuleModelObserver::observe('\App\Models\MplsLspPath');
-            $this->syncModels($os->getDeviceModel(), 'mplsLspPaths', $os->pollMplsPaths($lsps));
+            if ($device->mplsLsps()->exists()) {
+                echo "\nMPLS LSPs: ";
+                ModuleModelObserver::observe('\App\Models\MplsLsp');
+                $lsps = $this->syncModels($device, 'mplsLsps', $os->pollMplsLsps());
+            }
 
-            echo "\nMPLS SDPs: ";
-            ModuleModelObserver::observe('\App\Models\MplsSdp');
-            $sdps = $this->syncModels($os->getDeviceModel(), 'mplsSdps', $os->pollMplsSdps());
+            if ($device->mplsLspPaths()->exists()) {
+                echo "\nMPLS LSP Paths: ";
+                ModuleModelObserver::observe('\App\Models\MplsLspPath');
+                $this->syncModels($device, 'mplsLspPaths', $os->pollMplsPaths($lsps));
+            }
 
-            echo "\nMPLS Services: ";
-            ModuleModelObserver::observe('\App\Models\MplsService');
-            $svcs = $this->syncModels($os->getDeviceModel(), 'mplsServices', $os->pollMplsServices());
+            if ($device->mplsSdps()->exists()) {
+                echo "\nMPLS SDPs: ";
+                ModuleModelObserver::observe('\App\Models\MplsSdp');
+                $sdps = $this->syncModels($device, 'mplsSdps', $os->pollMplsSdps());
+            }
 
-            echo "\nMPLS SAPs: ";
-            ModuleModelObserver::observe('\App\Models\MplsSap');
-            $this->syncModels($os->getDeviceModel(), 'mplsSaps', $os->pollMplsSaps($svcs));
+            if ($device->mplsServices()->exists()) {
+                echo "\nMPLS Services: ";
+                ModuleModelObserver::observe('\App\Models\MplsService');
+                $svcs = $this->syncModels($device, 'mplsServices', $os->pollMplsServices());
+            }
 
-            echo "\nMPLS SDP Bindings: ";
-            ModuleModelObserver::observe('\App\Models\MplsSdpBind');
-            $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->pollMplsSdpBinds($sdps, $svcs));
+            if ($device->mplsSaps()->exists()) {
+                echo "\nMPLS SAPs: ";
+                ModuleModelObserver::observe('\App\Models\MplsSap');
+                $this->syncModels($device, 'mplsSaps', $os->pollMplsSaps($svcs));
+            }
+
+            if ($device->mplsSdpBinds()->exists()) {
+                echo "\nMPLS SDP Bindings: ";
+                ModuleModelObserver::observe('\App\Models\MplsSdpBind');
+                $this->syncModels($device, 'mplsSdpBinds', $os->pollMplsSdpBinds($sdps, $svcs));
+            }
 
             echo PHP_EOL;
         }
