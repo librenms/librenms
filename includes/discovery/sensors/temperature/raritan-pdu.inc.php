@@ -65,3 +65,23 @@ if (is_array($raritan_data) && !empty($raritan_data)) {
         }
     }
 }
+
+//Check for PDU MIB external Sensors
+$oids = snmpwalk_cache_multi_oid($device, "externalSensorTable", array(), "PDU-MIB");
+$offset=0;
+foreach ($oids as $index => $sensor) {
+    if ($sensor['externalSensorType'] == 'temperature') {
+        $oid = ".1.3.6.1.4.1.13742.4.3.3.1.41.$index";
+        $descr = $sensor['externalSensorName'];
+        $temp_current = $sensor['externalSensorValue'];
+        $temp_current = $temp_current/$divisor;
+        $limit_high = $sensor['externalSensorUpperWarningThreshold'] / $divisor;
+        $limit_low = $sensor['externalSensorLowerWarningThreshold'] / $divisor;
+        $limit_high_warn = $sensor['externalSensorUpperCriticalThreshold'] / $divisor;
+        $limit_low_warn = $sensor['externalSensorLowerCriticalThreshold'] / $divisor;
+        $offset++;
+        if (is_numeric($temp_current) && $temp_current >= 0) {
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $offset, 'raritan', $descr, $divisor, 1, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $temp_current);
+        }
+    }
+}
