@@ -374,5 +374,5 @@ modules:
                     value: batteryTimeLeftValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.8.5.{{ $index }}'
                     descr: batteryTimeLeftDescription
-                    warn_limit: batteryTimeLeftMinorAlarmLevel
-                    high_limit: batteryTimeLeftMajorAlarmLevel
+                    low_warn_limit: batteryTimeLeftMinorAlarmLevel
+                    low_limit: batteryTimeLeftMajorAlarmLevel
