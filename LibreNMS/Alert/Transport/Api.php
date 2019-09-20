@@ -74,7 +74,7 @@ class Api extends Transport
         if (isset($auth) && !empty($auth[0])) {
             $request_opts['auth'] = $auth;
 	}
-	if (is_array($request_heads)) {
+	if (count($request_heads) > 0) {
 		$request_opts['headers'] = $request_heads;
 	}
 	if (strlen($body))
