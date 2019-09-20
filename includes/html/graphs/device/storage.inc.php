@@ -6,7 +6,7 @@ $scale_max = '100';
 require 'includes/html/graphs/common.inc.php';
 
 $iter         = '1';
-$rrd_options .= " COMMENT:'                        Size      Used    Ratio\\l'";
+$rrd_options .= " COMMENT:'                        Size      Used    % Used\\l'";
 
 foreach (dbFetchRows('SELECT * FROM storage where device_id = ?', array($device['device_id'])) as $storage) {
     // FIXME generic colour function
