@@ -81,8 +81,8 @@
                                         "type": "string"
                                     },
                                     "warn_percent": {
-￼                                        "type": "string"
-￼                                    },
+                                        "type": "string"
+                                    },
                                     "snmp_flags": {
                                         "type": [
                                             "string",
