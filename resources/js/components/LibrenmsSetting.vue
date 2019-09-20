@@ -123,7 +123,10 @@
                 return !_.isEqual(this.setting.value, this.value);
             },
             getComponent() {
-                const component = 'Setting' + this.setting.type.charAt(0).toUpperCase() + this.setting.type.toString().slice(1);
+                // snake to studly
+                const component = 'Setting' +  this.setting.type.toString()
+                    .replace(/(-[a-z]|^[a-z])/g, (group) => group.toUpperCase().replace('-', ''));
+
                 return typeof Vue.options.components[component] !== 'undefined' ? component : 'SettingNull';
             }
         }

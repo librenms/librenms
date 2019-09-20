@@ -23,7 +23,7 @@
   -->
 
 <template>
-        <input type="text" class="form-control validation"
+        <input type="text" class="form-control"
                :name="name"
                :value="value"
                @input="$emit('input', $event.target.value)"

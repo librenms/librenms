@@ -23,7 +23,7 @@
   -->
 
 <template>
-    <input type="email" class="form-control validation"
+    <input type="email" class="form-control"
            :name="name"
            :value="value"
            @input="$emit('input', $event.target.value)"

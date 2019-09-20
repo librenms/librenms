@@ -23,9 +23,7 @@
   -->
 
 <template>
-    <ul
-        v-tooltip="disabled ? $t('settings.readonly') : false"
-    >
+    <div v-tooltip="disabled ? $t('settings.readonly') : false">
         <draggable v-model="localList" @end="dragged()" :disabled="disabled">
             <div v-for="(item, index) in localList" class="input-group">
                 <span :class="['input-group-addon', disabled ? 'disabled' : '']">{{ index+1 }}.</span>
@@ -49,7 +47,7 @@
                 </span>
             </div>
         </div>
-    </ul>
+    </div>
 </template>
 
 <script>
