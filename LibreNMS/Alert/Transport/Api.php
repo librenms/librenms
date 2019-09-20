@@ -80,7 +80,6 @@ class Api extends Transport
 	if (strlen($body))
 		$request_opts['body'] = $body;
 
-        $request_opts['query'] = $query;
         if ($method == "get") {
             $request_opts['query'] = $query;
             $res = $client->request('GET', $host, $request_opts);
