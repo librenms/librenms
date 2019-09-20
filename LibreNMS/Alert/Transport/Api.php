@@ -65,7 +65,7 @@ class Api extends Transport
             foreach ($obj as $p_key => $p_val) {
                 $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
             }
-            
+
             //store the parameter in the array for HTTP query
             $query[$u_key] = $u_val;
         }
@@ -73,23 +73,26 @@ class Api extends Transport
         $client = new \GuzzleHttp\Client();
         if (isset($auth) && !empty($auth[0])) {
             $request_opts['auth'] = $auth;
-	}
-	if (count($request_heads) > 0) {
-		$request_opts['headers'] = $request_heads;
-	}
-	if (strlen($body))
-		$request_opts['body'] = $body;
+        }
+        if (count($request_heads) > 0) {
+            $request_opts['headers'] = $request_heads;
+        }
+        if (strlen($body)) {
+            $request_opts['body'] = $body;
+        }
 
         if ($method == "get") {
             $request_opts['query'] = $query;
             $res = $client->request('GET', $host, $request_opts);
-        } else if ($method == "put") {
+        } elseif ($method == "put") {
             $request_opts['query'] = $query;
             $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
             $request_opts['form_params'] = $query;
             $res = $client->request('POST', $host, $request_opts);
         }
+
+
 
         $code = $res->getStatusCode();
         if ($code != 200) {
