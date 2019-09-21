@@ -9,7 +9,7 @@ $rrd_options .= ' -b 1024';
 
 $iter = '1';
 
-$rrd_options .= " COMMENT:'                    Size      Free   % Used\\n'";
+$rrd_options .= " COMMENT:'                        Size      Free   % Used\\n'";
 
 $hostname = gethostbyid($storage['device_id']);
 
