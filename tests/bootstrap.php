@@ -50,7 +50,7 @@ ini_set('display_errors', 1);
 
 update_os_cache(true); // Force update of OS Cache
 
-$snmpsim = new Snmpsim('127.1.6.2', 1162, null);
+$snmpsim = new Snmpsim('127.1.6.2', 1162);
 if (getenv('SNMPSIM')) {
     $snmpsim->fork();
 
@@ -78,9 +78,6 @@ if (getenv('DBTEST')) {
 
     $cmd = Config::get('install_dir') . '/build-base.php';
     exec($cmd, $schema);
-
-    Config::load(); // reload the config including database config
-    load_all_os();
 
     register_shutdown_function(function () use ($empty_db, $sql_mode) {
         Eloquent::boot();
@@ -111,3 +108,7 @@ if (getenv('DBTEST')) {
         }
     });
 }
+
+// reload the config including database config
+Config::load();
+load_all_os();

@@ -30,9 +30,9 @@ use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
-class BgpTrapTest extends LaravelTestCase
+class BgpTrapTest extends TestCase
 {
     use DatabaseTransactions;
 

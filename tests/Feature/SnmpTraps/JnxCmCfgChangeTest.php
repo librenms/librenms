@@ -32,7 +32,7 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class JnxCmCfgChangeTest extends LaravelTestCase
+class JnxCmCfgChangeTest extends TestCase
 {
 
     public function testConfigChangeTrap()

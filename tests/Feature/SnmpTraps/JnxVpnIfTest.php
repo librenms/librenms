@@ -34,7 +34,7 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class JnxVpnIfTest extends LaravelTestCase
+class JnxVpnIfTest extends TestCase
 {
 
     public function testVpnIfDown()

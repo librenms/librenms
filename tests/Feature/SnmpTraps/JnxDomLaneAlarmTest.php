@@ -33,7 +33,7 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class JnxDomLaneAlarmTest extends LaravelTestCase
+class JnxDomLaneAlarmTest extends TestCase
 {
 
     public function testJnxDomLaneAlarmSetTrap()

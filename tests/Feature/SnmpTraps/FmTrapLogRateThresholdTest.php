@@ -28,9 +28,9 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
-class FgTrapLogRateThresholdTest extends LaravelTestCase
+class FgTrapLogRateThresholdTest extends TestCase
 {
 
     public function testAvOversize()

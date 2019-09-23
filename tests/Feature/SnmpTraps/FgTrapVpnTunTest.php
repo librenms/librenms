@@ -29,9 +29,9 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
-class FgTrapVpnTunTest extends LaravelTestCase
+class FgTrapVpnTunTest extends TestCase
 {
     public function testVpnTunDown()
     {

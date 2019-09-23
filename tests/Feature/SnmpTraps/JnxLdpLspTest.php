@@ -33,7 +33,7 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class JnxLdpLspTest extends LaravelTestCase
+class JnxLdpLspTest extends TestCase
 {
 
     public function testLdpLspDownTrap()

@@ -27,9 +27,9 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
-class NetgearFailedUserLoginTest extends LaravelTestCase
+class NetgearFailedUserLoginTest extends TestCase
 {
     public function testManagedSeries()
     {

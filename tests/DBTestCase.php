@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-abstract class DBTestCase extends LaravelTestCase
+abstract class DBTestCase extends TestCase
 {
     public function setUp(): void
     {

@@ -31,11 +31,11 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\DBTestCase;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 use Log;
 use Mockery\Mock;
 
-class PortsTrapTest extends LaravelTestCase
+class PortsTrapTest extends TestCase
 {
     use DatabaseTransactions;
 

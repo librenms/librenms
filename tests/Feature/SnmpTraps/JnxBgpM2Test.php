@@ -33,7 +33,7 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class JnxBgpM2Test extends LaravelTestCase
+class JnxBgpM2Test extends TestCase
 {
 
     public function testBgpPeerUnknown()

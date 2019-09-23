@@ -29,9 +29,9 @@ use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
-class AdvaSysAlmTrapTest extends LaravelTestCase
+class AdvaSysAlmTrapTest extends TestCase
 {
     use DatabaseTransactions;
 
