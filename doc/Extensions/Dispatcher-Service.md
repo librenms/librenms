@@ -196,7 +196,7 @@ replacement scl.
 
 #### Debian 9 (stretch)
 
-install python3 and python-mysqldb. python-dotenv is not yes
+install python3 and python-mysqldb. python-dotenv is not yet
 available, but the testing package is working fine, you can grab it on
 <https://packages.debian.org/fr/buster/all/python3-dotenv/download> (the
 package may be updated and have a new version number).
