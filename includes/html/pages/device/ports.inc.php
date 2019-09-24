@@ -105,7 +105,7 @@ if ($vars['view'] == 'minigraphs') {
     foreach (dbFetchRows('select * from ports WHERE device_id = ? AND `disabled` = 0 ORDER BY ifIndex', array($device['device_id'])) as $port) {
         $port = cleanPort($port, $device);
         echo "<div class='minigraph-div'><div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>
-            <a href=\"'.generate_port_url($port).'\" onmouseover=\"return overlib('<div class=\'overlib-content\'>\
+            <a href=\"" . generate_port_url($port) . "\" onmouseover=\"return overlib('<div class=\'overlib-content\'>\
       	    <div class=\'overlib-text\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
             <span class=\'overlib-title\'>".$port['ifAlias']."</span>\
             <img src=\'graph.php?type=".$graph_type.'&amp;id='.$port['port_id'].'&amp;from='.$from.'&amp;to='.\LibreNMS\Config::get('time.now')."&amp;width=450&amp;height=150\'>\
