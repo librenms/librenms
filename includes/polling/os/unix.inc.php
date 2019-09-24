@@ -164,7 +164,7 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
     # AIX standard snmp deamon
     if ($aix_descr[1]) {
         $serial = explode("Processor id: ", $aix_descr[1])[1];
-        $aix_long_version = explode("AIX version: ", $aix_descr[2])[1];
+        $aix_long_version = explode(" version: ", $aix_descr[2])[1];
         list($version,$aix_version_min) = array_map('intval', explode(".", $aix_long_version));
     # AIX net-snmp
     } else {
