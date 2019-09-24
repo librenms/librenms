@@ -137,7 +137,7 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
             }
 
             if (empty($qfp_descr)) {
-                $descr = "QFP $index";
+                $descr = "QFP $entQfpPhysicalIndex";
             }
 
             $processors[] = Processor::discover(
