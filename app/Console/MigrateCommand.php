@@ -55,7 +55,8 @@ class MigrateCommand extends BaseMigrateCommand
         ) {
             $this->output->write('Importing DB snapshot... ');
             try {
-                $res = $this->laravel['db']->getPdo()->exec(file_get_contents(\config('snipe.snapshot-location')));
+                $res = $this->laravel['db']->connection($database)
+                    ->getPdo()->exec(file_get_contents(\config('snipe.snapshot-location')));
 
                 if ($res !== 0) { // is 0 the right value?
                     $this->output->write('failed');
