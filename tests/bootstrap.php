@@ -71,7 +71,8 @@ if (getenv('DBTEST')) {
         echo "done\n";
     } else {
         echo "Info: Refusing to reset main database: {$db_config['database']}.  Running migrations.\n";
-        Artisan::call('migrate', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
+        $migrate_result = Artisan::call('migrate', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
+        $migrate_output = Artisan::output();
     }
     unset($db_config);
 }
