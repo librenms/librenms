@@ -36,7 +36,7 @@ abstract class LnmsCommand extends Command
 
     public function isHidden()
     {
-        return $this->hidden || ($this->developer && $this->getLaravel()->environment() !== 'production');
+        return $this->hidden || ($this->developer && \config('app.env') === 'production');
     }
 
     /**

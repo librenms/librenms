@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Console\MigrateCommand;
 use App\Console\MigrateInstallCommand;
 use Illuminate\Foundation\Providers\ArtisanServiceProvider;
 
@@ -28,6 +29,13 @@ class CliServiceProvider extends ArtisanServiceProvider
         // override with our own implementation to put models in the correct namespace
         $this->app->singleton('command.model.make', function ($app) {
             return new \App\Console\ModelMakeCommand($app['files']);
+        });
+    }
+
+    protected function registerMigrateCommand()
+    {
+        $this->app->singleton('command.migrate', function ($app) {
+            return new MigrateCommand($app['migrator']);
         });
     }
 

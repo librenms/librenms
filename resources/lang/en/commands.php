@@ -17,4 +17,10 @@ return [
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
     ],
+    'migrate:snapshot' => [
+        'description' => 'Create new snapshot of the database, requires mysqldump',
+        'options' => [
+            'database' => 'The database connection to use',
+        ]
+    ]
 ];

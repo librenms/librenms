@@ -140,6 +140,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Snapshot location
+    |--------------------------------------------------------------------------
+    |
+    | This file stores an sql dump of the database to improve migration speeds
+    | You can generate it with migrate:snapshot
+    |
+    */
+
+    'snapshot_location' => 'misc/snapshot.sql',
+
+    /*
+    |--------------------------------------------------------------------------
     | Redis Databases
     |--------------------------------------------------------------------------
     |
