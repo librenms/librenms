@@ -36,12 +36,6 @@ if (!getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
 }
 
-if (getenv('DBTEST')) {
-    if (!is_file($install_dir . '/config.php')) {
-        exec("cp $install_dir/tests/config/config.test.php $install_dir/config.php");
-    }
-}
-
 require $install_dir . '/includes/init.php';
 chdir($install_dir);
 
@@ -60,6 +54,7 @@ if (getenv('SNMPSIM')) {
     }, $snmpsim);
 }
 
+$db_name = 'librenms';
 if (getenv('DBTEST')) {
     global $schema, $sql_mode;
 
@@ -75,40 +70,17 @@ if (getenv('DBTEST')) {
     Eloquent::setStrictMode();
 
     $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", [$db_name]) == 0);
-
-    $cmd = Config::get('install_dir') . '/build-base.php';
-    exec($cmd, $schema);
-
-    register_shutdown_function(function () use ($empty_db, $sql_mode) {
-        Eloquent::boot();
-
-        echo "Cleaning database...\n";
-
-        $db_name = dbFetchCell('SELECT DATABASE()');
-        if ($empty_db) {
-            dbQuery("DROP DATABASE $db_name");
-        } elseif (Config::get('test_db_name') == $db_name) {
-            // truncate tables
-            $tables = dbFetchColumn('SHOW TABLES');
-
-            $excluded = array(
-                'alert_templates',
-                'config', // not sure about this one
-                'dbSchema',
-                'migrations',
-                'widgets',
-            );
-            $truncate = array_diff($tables, $excluded);
-
-            dbQuery("SET FOREIGN_KEY_CHECKS = 0");
-            foreach ($truncate as $table) {
-                dbQuery("TRUNCATE TABLE $table");
-            }
-            dbQuery("SET FOREIGN_KEY_CHECKS = 1");
-        }
-    });
 }
 
 // reload the config including database config
 Config::load();
 load_all_os();
+
+if (getenv('DBTEST')) {
+    // try to avoid erasing people's primary databases
+    if ($db_name !== \config('database.connections.mysql.database', 'librenms')) {
+        Artisan::call('migrate:fresh', ['--seed', '--env=testing', '--database=testing']);
+    }
+}
+
+
