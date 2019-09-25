@@ -53,6 +53,9 @@
         "icon": {
             "type": "string"
         },
+        "config_highlighting": {
+            "type": "string"
+        },
         "poller_modules": {
             "type": "object",
             "properties": {
