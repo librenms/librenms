@@ -173,7 +173,7 @@ class Schema
             if (is_writable($cache_file)) {
                 file_put_contents($cache_file, serialize($cache));
             } else {
-                \Log::error("Could not write cache file ($cache_file)!");
+                d_echo("Could not write cache file ($cache_file)!");
             }
         }
 
