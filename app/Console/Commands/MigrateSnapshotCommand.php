@@ -46,7 +46,8 @@ class MigrateSnapshotCommand extends LnmsCommand
         $this->addOption('database', null, InputOption::VALUE_REQUIRED);
     }
 
-    public function handle() {
+    public function handle()
+    {
         $database = $this->option('database') ?: \config('database.default');
         $this->dropAllTables($database);
         $this->call('migrate', [
@@ -62,7 +63,8 @@ class MigrateSnapshotCommand extends LnmsCommand
         exec("mysqldump -h {$db_config['host']} -u {$db_config['username']} --password={$db_config['password']} {$db_config['database']} > {$storageLocation} 2>/dev/null");
     }
 
-    protected function dropAllTables($database) {
+    protected function dropAllTables($database)
+    {
         $this->laravel['db']->connection($database)
             ->getSchemaBuilder()
             ->dropAllTables();
