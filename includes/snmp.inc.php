@@ -1385,6 +1385,8 @@ function get_device_max_repeaters($device)
 
     if (isset($max_repeaters) && $max_repeaters > 0) {
         return $max_repeaters;
+    } elseif (Config::getOsSetting($device['os'], 'snmp.max_repeaters', 0) > 0) {
+        return Config::getOsSetting($device['os'], 'snmp.max_repeaters');
     } elseif (Config::get('snmp.max_repeaters') > 0) {
         return Config::get('snmp.max_repeaters');
     } else {
