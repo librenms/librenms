@@ -1,8 +1,8 @@
 <?php
 /*
- * LibreNMS module to capture statistics from the CISCO-NTP-MIB
+ * Polling module to get statistics from Cisco QFP forwarding processor
  *
- * Copyright (c) 2016 Aaron Daniels <aaron@daniels.id.au>
+ * Copyright (c) 2019 Pavle Obradovic <pobradovic08@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
