@@ -118,7 +118,7 @@ class ConfigTest extends TestCase
         $this->assertTrue(Config::getCombined('nullos', 'osset', false), 'Did not return OS value when global value is not set');
         $this->assertTrue(Config::getCombined('nullos', 'gset', false), 'Did not return global value when OS value is not set');
 
-        $combined =  Config::getCombined('nullos', 'num');
+        $combined = Config::getCombined('nullos', 'num');
         sort($combined);
         $this->assertEquals(array('one', 'three', 'two'), $combined);
 
@@ -176,7 +176,6 @@ class ConfigTest extends TestCase
     }
 
 
-
     public function testGetSubtree()
     {
         Config::set('words.top', 'August');
@@ -195,7 +194,8 @@ class ConfigTest extends TestCase
      * Pass an anonymous function which will be passed the config variable to modify before it is set
      * @param callable $function
      */
-    private function setConfig($function) {
+    private function setConfig($function)
+    {
         $config = $this->config->getValue();
         $function($config);
         $this->config->setValue($config);
