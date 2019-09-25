@@ -45,7 +45,6 @@ class Config
             return self::$config;
         }
 
-
         self::loadFiles();
 
         // Make sure the database is connected
@@ -99,7 +98,7 @@ class Config
 
         // import standard settings
         $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
-        self::set('alert.macros.rule', $macros);
+        $config['alert']['macros']['rule'] = $macros;
 
         // Load user config
         @include $install_dir . '/config.php';
