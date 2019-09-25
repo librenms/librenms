@@ -25,12 +25,15 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Ipv4Address;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\DBTestCase;
 
-class ApcPduOutletTest extends TestCase
+class ApcPduOutletTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     public function testOutletOff()
     {
         $device = factory(Device::class)->create();

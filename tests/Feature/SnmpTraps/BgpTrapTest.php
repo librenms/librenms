@@ -30,9 +30,9 @@ use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\DBTestCase;
 
-class BgpTrapTest extends TestCase
+class BgpTrapTest extends DBTestCase
 {
     use DatabaseTransactions;
 

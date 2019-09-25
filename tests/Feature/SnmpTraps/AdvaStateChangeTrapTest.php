@@ -26,15 +26,11 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Tests\TestCase;
+use LibreNMS\Snmptrap\Trap;
 
-class AdvaStateChangeTrapTest extends TestCase
+class AdvaStateChangeTrapTest extends SnmpTrapTestCase
 {
-    use DatabaseTransactions;
-
     public function testAccessPortChg()
     {
         $device = factory(Device::class)->create();

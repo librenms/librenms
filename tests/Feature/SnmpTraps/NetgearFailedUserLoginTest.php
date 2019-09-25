@@ -24,12 +24,10 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-use App\Models\Ipv4Address;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\TestCase;
 
-class NetgearFailedUserLoginTest extends TestCase
+class NetgearFailedUserLoginTest extends SnmpTrapTestCase
 {
     public function testManagedSeries()
     {

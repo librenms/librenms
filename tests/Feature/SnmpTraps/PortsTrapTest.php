@@ -27,18 +27,12 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\DBTestCase;
-use LibreNMS\Tests\TestCase;
 use Log;
-use Mockery\Mock;
 
-class PortsTrapTest extends TestCase
+class PortsTrapTest extends SnmpTrapTestCase
 {
-    use DatabaseTransactions;
-
     public function testLinkDown()
     {
         // make a device and associate a port with it

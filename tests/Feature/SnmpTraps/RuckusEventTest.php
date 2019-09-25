@@ -30,9 +30,8 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\TestCase;
 
-class RuckusEventTrap extends TestCase
+class RuckusEventTrap extends SnmpTrapTestCase
 {
     public function testRuckusAssocTrap()
     {
