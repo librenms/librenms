@@ -54,33 +54,27 @@ if (getenv('SNMPSIM')) {
     }, $snmpsim);
 }
 
-$db_name = 'librenms';
 if (getenv('DBTEST')) {
-    global $schema, $sql_mode;
+    global $migrate_result, $migrate_output;
 
     // create testing table if needed
-    $db_config = Config::getDatabaseSettings();
-    $db_name = $db_config['db_name'];
-
-    $connection = new PDO("mysql:host={$db_config['db_host']}", $db_config['db_user'], $db_config['db_pass']);
-    $connection->query("CREATE DATABASE IF NOT EXISTS $db_name CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+    $db_config = \config("database.connections.testing");
+    $connection = new PDO("mysql:host={$db_config['host']}", $db_config['username'], $db_config['password']);
+    $connection->query("CREATE DATABASE IF NOT EXISTS {$db_config['database']} CHARACTER SET utf8 COLLATE utf8_unicode_ci");
     unset($connection); // close connection
 
-    Eloquent::boot();
-    Eloquent::setStrictMode();
-
-    $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", [$db_name]) == 0);
+    // try to avoid erasing people's primary databases
+    if ($db_config['database'] !== \config('database.connections.mysql.database', 'librenms')) {
+        echo "Refreshing database...";
+        $migrate_result = Artisan::call('migrate:fresh', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
+        $migrate_output = Artisan::output();
+        echo "done\n";
+    } else {
+        echo "Info: Refusing to reset main database: {$db_config['database']} \n";
+    }
+    unset($db_config);
 }
 
 // reload the config including database config
-Config::load();
+Config::reload();
 load_all_os();
-
-if (getenv('DBTEST')) {
-    // try to avoid erasing people's primary databases
-    if ($db_name !== \config('database.connections.mysql.database', 'librenms')) {
-        Artisan::call('migrate:fresh', ['--seed', '--env=testing', '--database=testing']);
-    }
-}
-
-
