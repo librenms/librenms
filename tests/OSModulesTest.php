@@ -83,14 +83,12 @@ class OSModulesTest extends DBTestCase
         $this->requireSnmpsim();  // require snmpsim for tests
 
         try {
+            set_debug(false); // avoid all undefined index errors in the legacy code
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 
             $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
-            if (count(\LibreNMS\Config::get('os')) < 5) {
-                dd(count(\LibreNMS\Config::get('os')));
-            }
             $results = $helper->generateTestData($this->getSnmpsim(), true);
         } catch (FileNotFoundException $e) {
             $this->fail($e->getMessage());
