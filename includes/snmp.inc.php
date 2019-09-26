@@ -1381,17 +1381,8 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
  */
 function get_device_max_repeaters($device)
 {
-    $max_repeaters = $device['snmp_max_repeaters'];
-
-    if (isset($max_repeaters) && $max_repeaters > 0) {
-        return $max_repeaters;
-    } elseif (Config::getOsSetting($device['os'], 'snmp.max_repeaters', 0) > 0) {
-        return Config::getOsSetting($device['os'], 'snmp.max_repeaters');
-    } elseif (Config::get('snmp.max_repeaters') > 0) {
-        return Config::get('snmp.max_repeaters');
-    } else {
-        return false;
-    }
+    return $device['snmp_max_repeaters'] ?: 
+        Config::getOsSetting($device['os'], 'snmp.max_repeaters', false);
 }
 
 /**
