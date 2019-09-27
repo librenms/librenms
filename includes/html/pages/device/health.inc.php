@@ -4,8 +4,11 @@ $storage   = dbFetchCell('select count(*) from storage WHERE device_id = ?', arr
 $diskio    = get_disks($device['device_id']);
 $mempools  = dbFetchCell('select count(*) from mempools WHERE device_id = ?', array($device['device_id'])) + count_mib_mempools($device);
 $processor = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id'])) + count_mib_processors($device);
-$qfp = 0;
 
+/*
+ * QFP count for cisco devices
+ */
+$qfp = 0;
 if ($device['os_group'] == 'cisco') {
     $component = new LibreNMS\Component();
     $components = $component->getComponents($device['device_id'], array('type'=> 'cisco-qfp'));
@@ -239,7 +242,6 @@ if (is_file("includes/html/pages/device/health/$metric.inc.php")) {
         if ($type != 'overview') {
             $graph_title         = $type_text[$type];
             $graph_array['type'] = 'device_'.$type;
-
             include 'includes/html/print-device-graph.php';
         }
     }

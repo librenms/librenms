@@ -22,18 +22,30 @@ if ($device['os_group'] == 'cisco') {
 
     if ($qfp_general_data) {
 
-        // Loop through SNMP data and add or update components
+        /*
+         * Loop through SNMP data and add or update components
+         */
         foreach ($qfp_general_data as $qfp_index => $data) {
 
-            $qfp_name_oid = '.1.3.6.1.2.1.47.1.1.1.1.7.' . $qfp_index;      
+            /*
+             * Get entPhysicalName for QFP
+             */
+            $qfp_name_oid = '.1.3.6.1.2.1.47.1.1.1.1.7.' . $qfp_index;
             $qfp_name_data = snmp_get_multi_oid($device, [$qfp_name_oid]);
             $qfp_name = $qfp_name_data[$qfp_name_oid];
 
-            // Component data
+            /*
+             * Component data array for `component_prefs`
+             */
             $component_data = array(
                 'label' => 'qfp_' . $qfp_index,
                 'entPhysicalIndex' => $qfp_index,
-                'name' => $qfp_name
+                'name' => $qfp_name,
+                'utilization' => '',
+                'traffic_direction' => '',
+                'system_state' => '',
+                'system_loads' => '',
+                'system_last_load' => ''
             );
 
             // Find existing component ID if QFP already exists
@@ -70,7 +82,7 @@ if ($device['os_group'] == 'cisco') {
             }
         }
     }
-    
+
     $component->setComponentPrefs($device['device_id'], $components);
     echo "\n";
 }
