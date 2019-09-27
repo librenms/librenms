@@ -10,6 +10,7 @@ $colour_area   = 'FFBBBB';
 $colour_minmax = 'c5c5c5';
 
 $graph_max = 1;
-$unit_text = 'Usage';
+$unit_text = 'Utilization';
+$line_text = $components['name'];
 
 require 'includes/html/graphs/generic_simplex.inc.php';

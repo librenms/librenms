@@ -44,7 +44,7 @@ foreach ($components as $component_id => $component) {
      */
     $graph_array = $default_graph_array;
     $graph_array['type'] = 'qfp_relativeutil';
-    $text_descr = 'QFP Relative utilizatoin per pps';
+    $text_descr = 'QFP Relative utilizatoin per kpps';
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>$text_descr</h3>
@@ -58,7 +58,7 @@ foreach ($components as $component_id => $component) {
      */
     $graph_array = $default_graph_array;
     $graph_array['type'] = 'qfp_packets';
-    $text_descr = 'QFP Throughput and packets';
+    $text_descr = 'QFP packets';
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>$text_descr</h3>
@@ -73,7 +73,7 @@ foreach ($components as $component_id => $component) {
      */
     $graph_array = $default_graph_array;
     $graph_array['type'] = 'qfp_throughput';
-    $text_descr = 'QFP Throughput and packets';
+    $text_descr = 'QFP Throughput';
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>$text_descr</h3>

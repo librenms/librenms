@@ -57,8 +57,8 @@ if ($width > '500') {
     $rrd_options .= " GPRINT:qfp_perc:MIN:'%5.2lf%% '";
     $rrd_options .= " GPRINT:qfp_perc:MAX:'%5.2lf%% '";
     $rrd_options .= " GPRINT:qfp_perc:AVERAGE:%5.2lf%%\\n";
-    $rrd_options .= " LINE2:qfp_perc_wmark#ffaaaa:'Low Watermark'";
-    $rrd_options .= " GPRINT:qfp_low_watermark:MIN:%5.2lf%sB\\n";
+    $rrd_options .= " LINE2:qfp_perc_wmark#ffaaaa:'Most used'";
+    $rrd_options .= " COMMENT:'\l'";
     $rrd_options .= " LINE1:qfp_warn_th#aa0000:'Threshold':dashes";
 
 } else {
@@ -71,8 +71,8 @@ if ($width > '500') {
     $rrd_options .= " GPRINT:qfp_perc:LAST:'%5.2lf%%  '";
     $rrd_options .= " GPRINT:qfp_percx:LAST:'%5.2lf%% '";
     $rrd_options .= " COMMENT:'\l'";
-    $rrd_options .= " LINE2:qfp_perc_wmark#ffaaaa:'Low Watermark'";
-    $rrd_options .= " GPRINT:qfp_low_watermark:MIN:%5.2lf%sB\\n";
+    $rrd_options .= " LINE2:qfp_perc_wmark#ffaaaa:'Most used'";
+    $rrd_options .= " COMMENT:'\l'";
     $rrd_options .= " LINE1:qfp_warn_th#aa0000:'Threshold':dashes";
 }//end if
 

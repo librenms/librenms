@@ -15,8 +15,8 @@ $rrd_list[$i]['descr']           = $components['name'];
 $rrd_list[$i]['ds_in']           = 'InNonPriorityBps';
 $rrd_list[$i]['ds_out']          = 'OutNonPriorityBps';
 $rrd_list[$i]['descr']           = 'NonPriority';
-$rrd_list[$i]['colour_area_in']  = '085F63';
-$rrd_list[$i]['colour_area_out'] = '49BEB7';
+$rrd_list[$i]['colour_area_in']  = '608720';
+$rrd_list[$i]['colour_area_out'] = '606090';
 
 
 
