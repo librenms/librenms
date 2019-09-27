@@ -69,27 +69,41 @@ if (!empty($components) && is_array($components)) {
 
         $mem_oid_suffix = $qfp_index . '.1';
         $memory_oids = array(
-            '.1.3.6.1.4.1.9.9.715.1.1.7.1.6.' . $mem_oid_suffix,    //RisingThreshold
-            '.1.3.6.1.4.1.9.9.715.1.1.7.1.7.' . $mem_oid_suffix,    //FallingThreshold
-            '.1.3.6.1.4.1.9.9.715.1.1.7.1.15.' . $mem_oid_suffix,   //LowFreeWatermark
-            '.1.3.6.1.4.1.9.9.715.1.1.7.1.9.' . $mem_oid_suffix,    //Total
-            '.1.3.6.1.4.1.9.9.715.1.1.7.1.11.' . $mem_oid_suffix,   //InUse
-            '.1.3.6.1.4.1.9.9.715.1.1.7.1.13.' . $mem_oid_suffix    //Free
+            'RisingThreshold' => '.1.3.6.1.4.1.9.9.715.1.1.7.1.6.' . $mem_oid_suffix,
+            'FallingThreshold' => '.1.3.6.1.4.1.9.9.715.1.1.7.1.7.' . $mem_oid_suffix,
+            'LowFreeWatermark' => '.1.3.6.1.4.1.9.9.715.1.1.7.1.15.' . $mem_oid_suffix,
+            'Total' => '.1.3.6.1.4.1.9.9.715.1.1.7.1.9.' . $mem_oid_suffix,
+            'InUse' => '.1.3.6.1.4.1.9.9.715.1.1.7.1.11.' . $mem_oid_suffix,
+            'Free' => '.1.3.6.1.4.1.9.9.715.1.1.7.1.13.' . $mem_oid_suffix
         );
 
         $utilization_data = snmp_get_multi_oid($device, array_values($utilization_oids));
-        $memory_data = snmp_get_multi_oid($device, $memory_oids);
+        $memory_data = snmp_get_multi_oid($device, array_values($memory_oids));
 
         //TODO: Update components with general data
 
         /*
-         * Create RRDs
+         * Create Utilization RRDs
          */
         $rrd_name = array($module, 'util', $qfp_index);
         $rrd_def = RrdDefinition::make();
         foreach ($utilization_oids as $name => $oid) {
             $rrd_def->addDataset($name, 'GAUGE', 0);
             $rrd[$name] = $utilization_data[$utilization_oids[$name]];
+        }
+        $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
+        data_update($device, $module, $tags, $rrd);
+        unset($filename, $rrd_filename, $rrd_name, $rrd_def, $rrd);
+
+
+	    /*
+         * Create Utilization RRDs
+         */
+        $rrd_name = array($module, 'memory', $qfp_index);
+        $rrd_def = RrdDefinition::make();
+        foreach ($memory_oids as $name => $oid) {
+            $rrd_def->addDataset($name, 'GAUGE', 0);
+            $rrd[$name] = $memory_data[$memory_oids[$name]];
         }
         $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
         data_update($device, $module, $tags, $rrd);
