@@ -20,8 +20,9 @@ class MysqlAuthorizer extends AuthorizerBase
         $username = $credentials['username'] ?? null;
         $password = $credentials['password'] ?? null;
 
-        $hash = User::thisAuth()->where(['username' => $username])->value('password');
-        $enabled = User::thisAuth()->where(['username' => $username])->value('enabled');
+        $user_data = User::thisAuth()->where(['username' => $username])->value('password', 'enabled');
+        $hash = $user_data->password;
+        $enabled = $user_data->enabled;
 
         if (! $enabled) {
             throw new AuthenticationException($message = 'login denied');
