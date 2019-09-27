@@ -4,6 +4,15 @@ $storage   = dbFetchCell('select count(*) from storage WHERE device_id = ?', arr
 $diskio    = get_disks($device['device_id']);
 $mempools  = dbFetchCell('select count(*) from mempools WHERE device_id = ?', array($device['device_id'])) + count_mib_mempools($device);
 $processor = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id'])) + count_mib_processors($device);
+$qfp = 0;
+
+if ($device['os_group'] == 'cisco') {
+    $component = new LibreNMS\Component();
+    $components = $component->getComponents($device['device_id'], array('type'=> 'cisco-qfp'));
+    $components = $components[$device['device_id']];
+    $qfp = count($components);
+}
+
 
 $count                 = dbFetchCell("select count(*) from sensors WHERE sensor_class='count' AND device_id = ?", array($device['device_id']));
 $temperatures          = dbFetchCell("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = ?", array($device['device_id']));
@@ -36,6 +45,10 @@ unset($datas);
 $datas[] = 'overview';
 if ($processor) {
     $datas[] = 'processor';
+}
+
+if ($qfp) {
+    $datas[] = 'qfp';
 }
 
 if ($mempools) {
@@ -185,6 +198,7 @@ $type_text['chromatic_dispersion'] = 'Chromatic Dispersion';
 $type_text['ber']                  = 'Bit Error Rate';
 $type_text['eer']                  = 'Energy Efficiency Ratio';
 $type_text['waterflow']            = 'Water Flow Rate';
+$type_text['qfp']                  = 'QFP';
 
 $link_array = array(
     'page'   => 'device',
