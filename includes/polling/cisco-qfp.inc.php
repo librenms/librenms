@@ -1,14 +1,18 @@
 <?php
-/*
- * Polling module to get statistics from Cisco QFP forwarding processor
- *
- * Copyright (c) 2019 Pavle Obradovic <pobradovic08@gmail.com>
- *
+/**
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
+ *
+ * LibreNMS module to capture Cisco QFP Statistics
+ *
+ * @package    LibreNMS
+ * @subpackage polling
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
 
 use LibreNMS\RRD\RrdDefinition;
@@ -18,7 +22,6 @@ $module = 'cisco-qfp';
 /*
  * Fetch device components and filter ignored or disabled ones
  */
-
 $options = array(
     'filter' => array(
         'type' => array('=', $module),
@@ -47,8 +50,15 @@ $ti = $time_interval_array['5min'];
 
 
 if (!empty($components) && is_array($components)) {
-    foreach ($components as $component_id => $component_tmp) {
-        $qfp_index = $component_tmp['entPhysicalIndex'];
+    foreach ($components as $component_id => $tmp_component) {
+        /*
+         * Build OIDs and use snmpget to fetch multiple OIDs at once instead of snmpwalk
+         */
+        $qfp_index = $tmp_component['entPhysicalIndex'];
+
+        /*
+         * ceqfpUtilizationEntry table has `entPhysicalIndex` and `ceqfpUtilTimeInterval` indexes
+         */
         $util_oid_suffix = $qfp_index . '.' . $ti;
         $util_oids = array(
             'InPriorityPps' => '.1.3.6.1.4.1.9.9.715.1.1.6.1.2.' . $util_oid_suffix,
@@ -66,6 +76,10 @@ if (!empty($components) && is_array($components)) {
             'ProcessingLoad' => '.1.3.6.1.4.1.9.9.715.1.1.6.1.14.' . $util_oid_suffix
         );
 
+        /*
+         * ceqfpMemoryResourceEntry table has `entPhysicalIndex` and `ceqfpMemoryResType` indexes
+         * ceqfpMemoryResType has the only one valid value (1: dram)
+         */
         $mem_oid_suffix = $qfp_index . '.1';
         $memory_oids = array(
             'RisingThreshold' => '.1.3.6.1.4.1.9.9.715.1.1.7.1.6.' . $mem_oid_suffix,
@@ -76,6 +90,9 @@ if (!empty($components) && is_array($components)) {
             'Free' => '.1.3.6.1.4.1.9.9.715.1.1.7.1.13.' . $mem_oid_suffix
         );
 
+        /*
+         * Get SNMP data
+         */
         $util_data = snmp_get_multi_oid($device, array_values($util_oids));
         $memory_data = snmp_get_multi_oid($device, array_values($memory_oids));
 
@@ -131,6 +148,9 @@ if (!empty($components) && is_array($components)) {
         }
     }
 
+    /*
+     * Update DB Components
+     */
     $component->setComponentPrefs($device['device_id'], $components);
 }
 

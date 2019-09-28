@@ -1,37 +1,57 @@
 <?php
+/**
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage Authentication
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     Pavle Obradovic <pobradovic08@gmail.com>
+ */
 
-use LibreNMS\Component;
+/*
+ * Get a single module component with specified ID
+ */
+if (isset($vars['id'])) {
+    $component = new LibreNMS\Component();
+    $components = $component->getComponents(null, array('type' => 'cisco-qfp', 'id' => $vars['id']));
+    /*
+     * Fist (and only) key is the device ID
+     */
+    $device_id = key($components);
 
-$component = new Component();
-// Include ID filter so we get only one component
-$components = $component->getComponents(null, array('type' => 'cisco-qfp', 'id' => $vars['id']));
-// Get first key of the components array that is device ID
-$device_id = key($components);
+    /*
+     * Check if component exists and we're authenticated
+     */
+    if ($components && isset($components[$device_id][$vars['id']]) && ($auth || device_permitted($device_id))) {
+        $components = $components[$device_id][$vars['id']];
+        $device = device_by_id_cache($device_id);
 
-if ($components && isset($components[$device_id][$vars['id']]) && ($auth || device_permitted($device_id))) {
-    $components = $components[$device_id][$vars['id']];
-    $device = device_by_id_cache($device_id);
-    switch ($subtype) {
-        case 'memory':
+        /*
+         * Data is split into just two RRD files, memory resources and utilization
+         */
+        if ($subtype == 'memory') {
             $rrd_filename = rrd_name($device['hostname'], array('cisco-qfp', 'memory', $components['entPhysicalIndex']));
-            break;
-        case 'packets':
-        case 'throughput':
-        case 'util':
-        case 'avgpktsize':
-        default:
+        } else {
             $rrd_filename = rrd_name($device['hostname'], array('cisco-qfp', 'util', $components['entPhysicalIndex']));
-            break;
+        }
+
+        /*
+         * Build title with breadcrumbs for module's main subpage
+         */
+        $link_array = array(
+            'page' => 'device',
+            'device' => $device['device_id'],
+            'tab' => 'health',
+        );
+        $title = generate_device_link($device);
+        $title .= ' :: ' . generate_link("QFP", $link_array, array('metric' => 'qfp'));
+        $title .= ' :: ' . $components['name'];
+
+        $auth = true;
     }
-
-    $link_array = array(
-        'page'   => 'device',
-        'device' => $device['device_id'],
-        'tab'    => 'health',
-    );
-
-    $title = generate_device_link($device);
-    $title .= ' :: ' . generate_link("QFP", $link_array, array('metric' => 'qfp'));
-    $title .= ' :: ' . $components['name'];
-    $auth = true;
 }

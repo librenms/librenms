@@ -1,10 +1,26 @@
 <?php
+/**
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     Pavle Obradovic <pobradovic08@gmail.com>
+ */
 
-$component = new \LibreNMS\Component();
+/*
+ * Get module's components for a device
+ */
+$component = new LibreNMS\Component();
 $components = $component->getComponents($device['device_id'], array('type' => 'cisco-qfp'));
 $components = $components[$device['device_id']];
 
-foreach ($components as $component_id => $component) {
+foreach ($components as $component_id => $tmp_component) {
     $default_graph_array = array(
         'from' => \LibreNMS\Config::get('time.day'),
         'to' => \LibreNMS\Config::get('time.now'),
@@ -13,9 +29,10 @@ foreach ($components as $component_id => $component) {
     );
 
     /*
-     * Main container for QFP
+     * Main container for QFP component
+     * Header with system data
      */
-    switch ($component['system_state']) {
+    switch ($tmp_component['system_state']) {
         case 'active':
         case 'activeSolo':
         case 'standby':
@@ -32,7 +49,7 @@ foreach ($components as $component_id => $component) {
             $state_label = 'label-default';
     }
 
-    switch ($component['traffic_direction']) {
+    switch ($tmp_component['traffic_direction']) {
         case 'none':
             $direction_label = 'label-danger';
             break;
@@ -47,7 +64,7 @@ foreach ($components as $component_id => $component) {
             $direction_label = 'label-default';
     }
 
-    $text_descr = $component['name'];
+    $text_descr = $tmp_component['name'];
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <div class='pull-left'>
@@ -55,13 +72,13 @@ foreach ($components as $component_id => $component) {
                 </div>
                 <h2 class='panel-title'><b>$text_descr</b>
                     <div class='pull-right'>
-                        <span class='label {$state_label}'>State: {$component['system_state']}</span>
+                        <span class='label {$state_label}'>State: {$tmp_component['system_state']}</span>
                         <span class='label {$direction_label}'>
-                            Traffic direction: {$component['traffic_direction']}
+                            Traffic direction: {$tmp_component['traffic_direction']}
                         </span>
                     </div>
                 </h2>
-                Last system load at <b>{$component['system_last_load']}</b>
+                Last system load at <b>{$tmp_component['system_last_load']}</b>
             </div>";
     echo "<div class='panel-body'>";
 
@@ -71,9 +88,9 @@ foreach ($components as $component_id => $component) {
      * QFP Utilization (Load)
      */
 
-    if ($component['utilization'] < 50) {
+    if ($tmp_component['utilization'] < 50) {
         $util_label = 'label-success';
-    }elseif ($component['utilization'] < 75) {
+    } elseif ($tmp_component['utilization'] < 75) {
         $util_label = 'label-warning';
     } else {
         $util_label = 'label-danger';
@@ -86,7 +103,7 @@ foreach ($components as $component_id => $component) {
             <div class='panel-heading'>
                 <h3 class='panel-title'>
                     $text_descr
-                    <div class='pull-right'><span class='label {$util_label}'>{$component['utilization']} %</span></div>
+                    <div class='pull-right'><span class='label {$util_label}'>{$tmp_component['utilization']} %</span></div>
                 </h3>
             </div>";
     echo "<div class='panel-body'>";
@@ -119,7 +136,7 @@ foreach ($components as $component_id => $component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$packets_label}'>" . format_bi($component['packets']) . "pps</span>
+                        <span class='label {$packets_label}'>" . format_bi($tmp_component['packets']) . "pps</span>
                     </div>
                 </h3>
             </div>";
@@ -140,7 +157,7 @@ foreach ($components as $component_id => $component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$throughput_label}'>" . format_bi($component['throughput']) . "bps</span>
+                        <span class='label {$throughput_label}'>" . format_bi($tmp_component['throughput']) . "bps</span>
                     </div>
                 </h3>
             </div>";
@@ -160,7 +177,7 @@ foreach ($components as $component_id => $component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$psize_label}'>" . ceil($component['average_packet']) . " Bytes</span>
+                        <span class='label {$psize_label}'>" . ceil($tmp_component['average_packet']) . " Bytes</span>
                     </div>
                 </h3>
             </div>";
@@ -171,18 +188,18 @@ foreach ($components as $component_id => $component) {
     /*
      * QFP Memory resources
      */
-    $mem_prec = $component['memory_used']*100/$component['memory_total'];
+    $mem_prec = $tmp_component['memory_used']*100/$tmp_component['memory_total'];
     if ($mem_prec < 75) {
         $mem_label = 'label-success';
-    }elseif ($mem_prec < 90) {
+    } elseif ($mem_prec < 90) {
         $mem_label = 'label-warning';
-    }else {
+    } else {
         $mem_label = 'label-danger';
     }
     $graph_array = $default_graph_array;
     $graph_array['type'] = 'qfp_memory';
     $text_descr = 'QFP Memory';
-    $label_text = sprintf("%sB / %sB", format_bi($component['memory_used']),format_bi($component['memory_total']));
+    $label_text = sprintf("%sB / %sB", format_bi($tmp_component['memory_used']), format_bi($tmp_component['memory_total']));
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>

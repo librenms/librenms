@@ -1,19 +1,26 @@
 <?php
-/*
- * LibreNMS module to capture Cisco QFP Statistics
- *
- * Copyright (c) 2019 Pavle Obradovic <pobradovic08@gmail.com>
- *
+/**
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
+ *
+ * LibreNMS module to capture Cisco QFP Statistics
+ *
+ * @package    LibreNMS
+ * @subpackage discovery
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
 
 if ($device['os_group'] == 'cisco') {
     $module = 'cisco-qfp';
 
+    /*
+     * CISCO-ENTITY-QFP-MIB::ceqfpSystemState values
+     */
     $system_states = array(
         1 => 'unknown',
         2 => 'reset',
@@ -24,6 +31,9 @@ if ($device['os_group'] == 'cisco') {
         7 => 'hotStandby'
     );
 
+    /*
+     * CISCO-ENTITY-QFP-MIB::ceqfpSystemTrafficDirection values
+     */
     $system_traffic_direction = array (
         1 => 'none',
         2 => 'ingress',
@@ -31,12 +41,15 @@ if ($device['os_group'] == 'cisco') {
         4 => 'both'
     );
 
+    /*
+     * Get module's components for a device
+     */
     $component = new LibreNMS\Component();
     $components = $component->getComponents($device['device_id'], array('type'=>$module));
     $components = $components[$device['device_id']];
 
     /*
-     * Walk through ceqfpSystemTable
+     * Walk through CISCO-ENTITY-QFP-MIB::ceqfpSystemTable
      */
     $qfp_general_data = snmpwalk_group($device, 'ceqfpSystemTable', 'CISCO-ENTITY-QFP-MIB');
     if ($qfp_general_data) {
