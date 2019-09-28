@@ -62,6 +62,9 @@
                 "cisco-cbqos": {
                     "type": "boolean"
                 },
+                "cisco-qfp": {
+                    "type": "boolean"
+                },
                 "cisco-cef": {
                     "type": "boolean"
                 },
@@ -203,6 +206,9 @@
         "discovery_modules": {
             "type": "object",
             "properties": {
+                "cisco-qfp": {
+                    "type": "boolean"
+                },
                 "cisco-cef": {
                     "type": "boolean"
                 },

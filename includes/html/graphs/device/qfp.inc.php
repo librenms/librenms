@@ -5,7 +5,6 @@ $components = $component->getComponents($device['device_id'], array('type' => 'c
 $components = $components[$device['device_id']];
 
 foreach ($components as $component_id => $component_tmp) {
-
     $rrd_filename = rrd_name($device['hostname'], array('cisco-qfp', 'util', $component_tmp['entPhysicalIndex']));
 
     if (rrdtool_check_rrd_exists($rrd_filename)) {

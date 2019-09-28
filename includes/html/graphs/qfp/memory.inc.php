@@ -60,7 +60,6 @@ if ($width > '500') {
     $rrd_options .= " LINE2:qfp_perc_wmark#ffaaaa:'Most used'";
     $rrd_options .= " COMMENT:'\l'";
     $rrd_options .= " LINE1:qfp_warn_th#aa0000:'Threshold':dashes";
-
 } else {
     $rrd_options .= " LINE1.25:qfp_perc#".$background['left'].":'$descr'";
     $rrd_options .= " GPRINT:qfp_size:LAST:%6.2lf%sB";
@@ -75,4 +74,3 @@ if ($width > '500') {
     $rrd_options .= " COMMENT:'\l'";
     $rrd_options .= " LINE1:qfp_warn_th#aa0000:'Threshold':dashes";
 }//end if
-

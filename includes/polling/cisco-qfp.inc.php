@@ -15,11 +15,9 @@ use LibreNMS\RRD\RrdDefinition;
 
 $module = 'cisco-qfp';
 
-
 /*
  * Fetch device components and filter ignored or disabled ones
  */
-$component = new LibreNMS\Component();
 
 $options = array(
     'filter' => array(
@@ -29,6 +27,7 @@ $options = array(
     )
 );
 
+$component = new LibreNMS\Component();
 $components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];
 
@@ -48,10 +47,10 @@ $ti = $time_interval_array['5min'];
 
 
 if (!empty($components) && is_array($components)) {
-    foreach ($components as $component_id => $component) {
-        $qfp_index = $component['entPhysicalIndex'];
+    foreach ($components as $component_id => $component_tmp) {
+        $qfp_index = $component_tmp['entPhysicalIndex'];
         $util_oid_suffix = $qfp_index . '.' . $ti;
-        $utilization_oids = array(
+        $util_oids = array(
             'InPriorityPps' => '.1.3.6.1.4.1.9.9.715.1.1.6.1.2.' . $util_oid_suffix,
             'InPriorityBps' => '.1.3.6.1.4.1.9.9.715.1.1.6.1.3.' . $util_oid_suffix,
             'InNonPriorityPps' => '.1.3.6.1.4.1.9.9.715.1.1.6.1.4.' . $util_oid_suffix,
@@ -77,40 +76,62 @@ if (!empty($components) && is_array($components)) {
             'Free' => '.1.3.6.1.4.1.9.9.715.1.1.7.1.13.' . $mem_oid_suffix
         );
 
-        $utilization_data = snmp_get_multi_oid($device, array_values($utilization_oids));
+        $util_data = snmp_get_multi_oid($device, array_values($util_oids));
         $memory_data = snmp_get_multi_oid($device, array_values($memory_oids));
 
-        //TODO: Update components with general data
-
         /*
-         * Create Utilization RRDs
+         * Check if the oids exist
+         * Possible FP linecard OIR between discovery and polling calls
          */
-        $rrd_name = array($module, 'util', $qfp_index);
-        $rrd_def = RrdDefinition::make();
-        foreach ($utilization_oids as $name => $oid) {
-            $rrd_def->addDataset($name, 'GAUGE', 0);
-            $rrd[$name] = $utilization_data[$utilization_oids[$name]];
-        }
-        $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
-        data_update($device, $module, $tags, $rrd);
-        unset($filename, $rrd_filename, $rrd_name, $rrd_def, $rrd);
+        if (!empty($util_data) && !empty($memory_data)) {
+            $total_packets = $util_data[$util_oids['InTotalPps']] + $util_data[$util_oids['OutTotalPps']];
+            $throughput = $util_data[$util_oids['InTotalBps']] + $util_data[$util_oids['OutTotalBps']];
+            $average_packet = $throughput / 8 / $total_packets;
+            /*
+             * Create component data array for `component_prefs`
+             * and update components
+             */
+            $component_data = array(
+                'utilization' => $util_data[$util_oids['ProcessingLoad']],
+                'packets' => $total_packets,
+                'throughput' => $throughput,
+                'average_packet' => $average_packet,
+                'memory_total' => $memory_data[$memory_oids['Total']],
+                'memory_used' => $memory_data[$memory_oids['InUse']],
+                'memory_free' => $memory_data[$memory_oids['Free']]
+            );
+            $components[$component_id] = array_merge($components[$component_id], $component_data);
+
+            /*
+             * Create Utilization RRDs
+             */
+            $rrd_name = array($module, 'util', $qfp_index);
+            $rrd_def = RrdDefinition::make();
+            foreach ($util_oids as $name => $oid) {
+                $rrd_def->addDataset($name, 'GAUGE', 0);
+                $rrd[$name] = $util_data[$util_oids[$name]];
+            }
+            $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
+            data_update($device, $module, $tags, $rrd);
+            unset($filename, $rrd_filename, $rrd_name, $rrd_def, $rrd);
 
 
-	    /*
-         * Create Utilization RRDs
-         */
-        $rrd_name = array($module, 'memory', $qfp_index);
-        $rrd_def = RrdDefinition::make();
-        foreach ($memory_oids as $name => $oid) {
-            $rrd_def->addDataset($name, 'GAUGE', 0);
-            $rrd[$name] = $memory_data[$memory_oids[$name]];
+            /*
+             * Create Utilization RRDs
+             */
+            $rrd_name = array($module, 'memory', $qfp_index);
+            $rrd_def = RrdDefinition::make();
+            foreach ($memory_oids as $name => $oid) {
+                $rrd_def->addDataset($name, 'GAUGE', 0);
+                $rrd[$name] = $memory_data[$memory_oids[$name]];
+            }
+            $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
+            data_update($device, $module, $tags, $rrd);
+            unset($filename, $rrd_filename, $rrd_name, $rrd_def, $rrd);
         }
-        $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
-        data_update($device, $module, $tags, $rrd);
-        unset($filename, $rrd_filename, $rrd_name, $rrd_def, $rrd);
     }
+
+    $component->setComponentPrefs($device['device_id'], $components);
 }
 
-
 unset($module, $component, $components);
-

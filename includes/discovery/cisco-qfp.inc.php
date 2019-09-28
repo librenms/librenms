@@ -14,19 +14,36 @@
 if ($device['os_group'] == 'cisco') {
     $module = 'cisco-qfp';
 
+    $system_states = array(
+        1 => 'unknown',
+        2 => 'reset',
+        3 => 'init',
+        4 => 'active',
+        5 => 'activeSolo',
+        6 => 'standby',
+        7 => 'hotStandby'
+    );
+
+    $system_traffic_direction = array (
+        1 => 'none',
+        2 => 'ingress',
+        3 => 'egress',
+        4 => 'both'
+    );
+
     $component = new LibreNMS\Component();
     $components = $component->getComponents($device['device_id'], array('type'=>$module));
     $components = $components[$device['device_id']];
 
+    /*
+     * Walk through ceqfpSystemTable
+     */
     $qfp_general_data = snmpwalk_group($device, 'ceqfpSystemTable', 'CISCO-ENTITY-QFP-MIB');
-
     if ($qfp_general_data) {
-
         /*
          * Loop through SNMP data and add or update components
          */
         foreach ($qfp_general_data as $qfp_index => $data) {
-
             /*
              * Get entPhysicalName for QFP
              */
@@ -41,14 +58,15 @@ if ($device['os_group'] == 'cisco') {
                 'label' => 'qfp_' . $qfp_index,
                 'entPhysicalIndex' => $qfp_index,
                 'name' => $qfp_name,
-                'utilization' => '',
-                'traffic_direction' => '',
-                'system_state' => '',
-                'system_loads' => '',
-                'system_last_load' => ''
+                'traffic_direction' => $system_traffic_direction[$data['ceqfpSystemTrafficDirection']],
+                'system_state' => $system_states[$data['ceqfpSystemState']],
+                'system_loads' => $data['ceqfpNumberSystemLoads'],
+                'system_last_load' => $data['ceqfpSystemLastLoadTime']
             );
 
-            // Find existing component ID if QFP already exists
+            /*
+             * Find existing component ID if QFP is already known
+             */
             $component_id = false;
             foreach ($components as $tmp_component_id => $tmp_component) {
                 if ($tmp_component['entPhysicalIndex'] == $qfp_index) {
@@ -70,19 +88,23 @@ if ($device['os_group'] == 'cisco') {
                 echo '.';
             }
         }
+    }
 
-        /*
-         * Loop trough components, check against SNMP QFP indexes and delete if needed
-         */
-        foreach ($components as $tmp_component_id => $tmp_component) {
-            $found = in_array($tmp_component['entPhysicalIndex'], array_keys($qfp_general_data));
-            if (!$found) {
-                $component->deleteComponent($tmp_component_id);
-                echo '-';
-            }
+    /*
+     * Loop trough components, check against SNMP QFP indexes and delete if needed
+     */
+    foreach ($components as $tmp_component_id => $tmp_component) {
+        $found = in_array($tmp_component['entPhysicalIndex'], array_keys($qfp_general_data));
+        if (!$found) {
+            $component->deleteComponent($tmp_component_id);
+            echo '-';
         }
     }
 
+    /*
+     * Save components
+     */
     $component->setComponentPrefs($device['device_id'], $components);
+
     echo "\n";
 }
