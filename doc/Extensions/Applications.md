@@ -202,9 +202,12 @@ A small shell script that reports various Asterisk call status.
 
 ## SNMP Extend
 
-1: Copy the [asterisk
+1: Download the [asterisk
 script](https://github.com/librenms/librenms-agent/blob/master/snmp/asterisk)
 to `/etc/snmp/` on your asterisk server.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/asterisk -O /etc/snmp/asterisk
+```
 
 2: Run `chmod +x /etc/snmp/asterisk`
 
