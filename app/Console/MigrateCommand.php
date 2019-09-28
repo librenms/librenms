@@ -51,12 +51,12 @@ class MigrateCommand extends BaseMigrateCommand
         // import snapshot if this is a new DB and it is available
         if (!$this->option('no-snapshot')
             && !$this->migrator->repositoryExists()
-            && is_file(\config('snipe.snapshot-location'))
+            && is_file(\config('database.snapshot_location'))
         ) {
             $this->output->write('Importing DB snapshot... ');
             try {
                 $res = $this->laravel['db']->connection($database)
-                    ->getPdo()->exec(file_get_contents(\config('snipe.snapshot-location')));
+                    ->getPdo()->exec(file_get_contents(\config('database.snapshot_location')));
 
                 if ($res !== 0) { // is 0 the right value?
                     $this->output->write('failed');
