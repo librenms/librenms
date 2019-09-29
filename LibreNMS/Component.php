@@ -112,11 +112,11 @@ class Component
                 // Only add valid fields to the query
                 if (in_array($field, $validFields)) {
                     if ($array[0] == 'LIKE') {
-                        $SQL .= "`".$field."` LIKE ? AND ";
+                        $SQL .= "`C`.`".$field."` LIKE ? AND ";
                         $array[1] = "%".$array[1]."%";
                     } else {
                         // Equals operator is the default
-                        $SQL .= "`".$field."` = ? AND ";
+                        $SQL .= "`C`.`".$field."` = ? AND ";
                     }
                     array_push($PARAM, $array[1]);
                 }
