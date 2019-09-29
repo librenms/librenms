@@ -98,7 +98,7 @@ foreach ($components as $component_id => $tmp_component) {
 
     $graph_array = $default_graph_array;
     $graph_array['type'] = 'qfp_util';
-    $text_descr = 'QFP Utilizatoin';
+    $text_descr = 'QFP Utilization';
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>
@@ -115,7 +115,7 @@ foreach ($components as $component_id => $tmp_component) {
      */
     $graph_array = $default_graph_array;
     $graph_array['type'] = 'qfp_relativeutil';
-    $text_descr = 'QFP Relative utilizatoin per kpps';
+    $text_descr = 'QFP Relative utilization per kpps';
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>$text_descr</h3>
