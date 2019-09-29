@@ -11,6 +11,7 @@ if (is_array($storage_array)) {
         $used   = ($storage['hrStorageUsed'] * $storage['hrStorageAllocationUnits']);
         $units  = $storage['hrStorageAllocationUnits'];
         $deny   = 1;
+        $perc_warn = 90;
 
         switch ($fstype) {
             case 'hrStorageVirtualMemory':
