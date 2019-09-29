@@ -154,4 +154,4 @@ if (!empty($components) && is_array($components)) {
     $component->setComponentPrefs($device['device_id'], $components);
 }
 
-unset($module, $component, $components);
+unset($component, $components);
