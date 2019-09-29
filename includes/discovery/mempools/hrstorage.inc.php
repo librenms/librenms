@@ -30,6 +30,7 @@ if (is_array($storage_array)) {
         }
 
         if ($device['os'] == 'vmware' && $descr == 'Real Memory') {
+            $perc_warn = 99;
             $deny = 0;
         }
 
@@ -44,11 +45,23 @@ if (is_array($storage_array)) {
             $deny = 1;
         } //end if
 
-        if (!$deny && is_numeric($index)) {
-            discover_mempool($valid_mempool, $device, $index, 'hrstorage', $descr, $units, null, null);
+        if ($device['os'] == 'linux' && $descr == 'Physical memory') {
+            $perc_warn = 99;
         }
 
-        unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd);
+        if ($device['os'] == 'linux' && $descr == 'Virtual memory') {
+            $perc_warn = 95;
+        }
+
+        if ($device['os'] == 'linux' && $descr == 'Swap memory') {
+            $perc_warn = 10;
+        }
+
+        if (!$deny && is_numeric($index)) {
+            discover_mempool($valid_mempool, $device, $index, 'hrstorage', $descr, $units, null, null, $perc_warn);
+        }
+
+        unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $perc_warn);
     }//end foreach
 
     unset($storage_array);

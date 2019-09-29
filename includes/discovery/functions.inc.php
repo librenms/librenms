@@ -657,7 +657,7 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 
 //end discover_processor()
 
-function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = '1', $entPhysicalIndex = null, $hrDeviceIndex = null, $perc_warn = '75')
+function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = '1', $entPhysicalIndex = null, $hrDeviceIndex = null, $perc_warn = '90')
 {
 
     $descr = substr($descr, 0, 64);
