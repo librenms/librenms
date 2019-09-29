@@ -30,11 +30,6 @@ if (is_array($storage_array)) {
                 break;
         }
 
-        if ($device['os'] == 'vmware' && $descr == 'Real Memory') {
-            $perc_warn = 99;
-            $deny = 0;
-        }
-
         if ($device['os'] == 'routeros' && $descr == 'main memory') {
             $deny = 0;
         }
@@ -46,16 +41,15 @@ if (is_array($storage_array)) {
             $deny = 1;
         } //end if
 
-        if ($device['os'] == 'linux' && $descr == 'Physical memory') {
-            $perc_warn = 99;
-        }
-
-        if ($device['os'] == 'linux' && $descr == 'Virtual memory') {
-            $perc_warn = 95;
-        }
-
-        if ($device['os'] == 'linux' && $descr == 'Swap memory') {
-            $perc_warn = 10;
+        if ($device['os'] == 'linux' || $device['os'] == 'vmware') {
+            if ($descr == 'Physical memory' || $descr == 'Real Memory') {
+                $perc_warn = 99;
+                $deny = 0;
+            } elseif ($descr == 'Virtual memory') {
+                $perc_warn = 95;
+            } elseif ($descr == 'Swap space') {
+                $perc_warn = 10;
+            }
         }
 
         if (!$deny && is_numeric($index)) {
