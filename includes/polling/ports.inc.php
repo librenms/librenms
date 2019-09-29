@@ -933,7 +933,6 @@ foreach ($ports as $port) {
             if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
                 include 'ports/cisco-if-extension.inc.php';
             }
-
         }
 
         foreach ($port['update'] as $key => $val_check) {

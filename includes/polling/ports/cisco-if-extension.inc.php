@@ -17,7 +17,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 /*
  * Check if port has one of the counters ('cieIfInRuntsErrs') from CISCO-IF-EXTENSION MIB
- * Not all ports do, only physical ones.
  */
 if (isset($this_port['cieIfInRuntsErrs'])) {
     /*
@@ -49,6 +48,6 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
      * Generate/update RRD
      */
     $ifName = $port['ifName'];
-    $tags = compact('ifName','rrd_name', 'rrd_def');
+    $tags = compact('ifName', 'rrd_name', 'rrd_def');
     rrdtool_data_update($device, 'drops', $tags, $rrd_data);
 }
