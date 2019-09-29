@@ -223,7 +223,7 @@ If you use the HTTP interface:
 1. Access the legacy web admin page and log in
 1. Go to System > Advanced Configuration
 1. Go to the sub-tab "SNMP" > "Community"
-1. Click "Ad Community Group"
+1. Click "Add Community Group"
 1. Enter your SNMP community, ip address and click submit
 1. Go to System > Summary
 1. Go to the sub-tab "Description"
