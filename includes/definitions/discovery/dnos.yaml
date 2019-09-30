@@ -133,6 +133,8 @@ modules:
                     index: 'dellNetIfTransReceivePowerLane4.{{ $index }}'
                     group: Lane 4
         temperature:
+            options:
+                skip_values: 0
             data:
                 -
                     oid: dellNetIfTransceiverDataTable
