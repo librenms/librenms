@@ -180,4 +180,12 @@
         "SELECT * FROM locations,devices WHERE (devices.device_id = ? AND locations.id = devices.location_id) AND locations.location REGEXP \"somewhere\"",
         ["select * from `devices` left join `locations` on `locations`.`id` = `devices`.`location_id` where (`locations`.`location` REGEXP ?)", ["somewhere"]]
     ]
+,
+    [
+        "%device_groups.id = 1",
+        {"condition":"AND","rules":[{"id":"device_groups.id","field":"device_groups.id","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true},
+        "device_groups.id = 1",
+        "SELECT * FROM devices,device_group_device,device_groups WHERE (devices.device_id = ? AND devices.device_id = device_group_device.device_id AND device_group_device.device_group_id = device_groups.id) AND device_groups.id = 1",
+        ["select * from `devices` left join `device_group_device` on `devices`.`device_id` = `device_group_device`.`device_id` left join `device_groups` on `device_group_device`.`device_group_id` = `device_groups`.`id` where (`device_groups`.`id` = ?)", ["1"]]
+    ]
 ]
