@@ -30742,7 +30742,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "2",
@@ -30758,7 +30758,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "20",
@@ -30774,7 +30774,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 }
             ]
         },
@@ -30794,7 +30794,7 @@
                     "mempool_largestfree": 368135712,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "2",
@@ -30810,7 +30810,7 @@
                     "mempool_largestfree": 4151048,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "20",
@@ -30826,7 +30826,7 @@
                     "mempool_largestfree": 299768,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 }
             ]
         }
@@ -30845,7 +30845,7 @@
                     "group": null,
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.0061000000000000004,
+                    "sensor_current": 0.0061,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -30869,7 +30869,7 @@
                     "group": null,
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.0057000000000000002,
+                    "sensor_current": 0.0057,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -30917,7 +30917,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": -4.7000000000000002,
+                    "sensor_current": -4.7,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -30965,7 +30965,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": -7.2999999999999998,
+                    "sensor_current": -7.3,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -31589,7 +31589,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34.600000000000001,
+                    "sensor_current": 34.6,
                     "sensor_limit": 90,
                     "sensor_limit_warn": 85,
                     "sensor_limit_low": -10,
@@ -31637,10 +31637,10 @@
                     "group": null,
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.3199999999999998,
-                    "sensor_limit": 3.8180000000000001,
+                    "sensor_current": 3.32,
+                    "sensor_limit": 3.818,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.8220000000000001,
+                    "sensor_limit_low": 2.822,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -31661,10 +31661,10 @@
                     "group": null,
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.3199999999999998,
-                    "sensor_limit": 3.8180000000000001,
+                    "sensor_current": 3.32,
+                    "sensor_limit": 3.818,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.8220000000000001,
+                    "sensor_limit_low": 2.822,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -31978,7 +31978,7 @@
                     "group": null,
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.0061000000000000004,
+                    "sensor_current": 0.0061,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -32002,7 +32002,7 @@
                     "group": null,
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.0057000000000000002,
+                    "sensor_current": 0.0057,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -32050,7 +32050,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": -4.7000000000000002,
+                    "sensor_current": -4.7,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -32098,7 +32098,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": -7.2999999999999998,
+                    "sensor_current": -7.3,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -32722,7 +32722,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34.600000000000001,
+                    "sensor_current": 34.6,
                     "sensor_limit": 90,
                     "sensor_limit_warn": 85,
                     "sensor_limit_low": -10,
@@ -32770,10 +32770,10 @@
                     "group": null,
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.3199999999999998,
-                    "sensor_limit": 3.8180000000000001,
+                    "sensor_current": 3.32,
+                    "sensor_limit": 3.818,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.8220000000000001,
+                    "sensor_limit_low": 2.822,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -32794,10 +32794,10 @@
                     "group": null,
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.3199999999999998,
-                    "sensor_limit": 3.8180000000000001,
+                    "sensor_current": 3.32,
+                    "sensor_limit": 3.818,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.8220000000000001,
+                    "sensor_limit_low": 2.822,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
