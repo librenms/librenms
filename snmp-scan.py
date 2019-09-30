@@ -121,6 +121,18 @@ def scan_host(ip):
         except (herror, gaierror):
             pass
 
+        # If there is no hostname and the configuration option to add by IP is
+        # not set, we should not add this to LibreNMS
+        if hostname is None and not CONFIG.get('discovery_by_ip'):
+            try:
+                arguments = ['/usr/sbin/fping', ip]
+                check_output(arguments)
+            except CalledProcessError as err:
+                output = err.output.decode().rstrip()
+                return Result(ip, hostname, Outcome.UNPINGABLE, output)
+
+            return Result(ip, hostname, Outcome.FAILED, 'no dns entry found and discovery_by_ip is not set in config.php!')
+
         try:
             arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or ip]
             if args.ping:
