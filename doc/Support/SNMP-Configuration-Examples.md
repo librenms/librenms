@@ -21,6 +21,8 @@ Table of Content:
     - [RouterOS 6.x](#routeros-6x)
   - [Palo Alto](#palo-alto)
     - [PANOS 6.x/7.x](#panos-6x7x)
+  - [Ubiquiti](#ubiquiti)
+    - [EdgeOs](#edgeos)
   - [VMware](#vmware)
     - [ESX/ESXi 5.x/6.x](#esxesxi-5x6x)
     - [VCenter 6.x](#vcenter-6x)
@@ -211,6 +213,33 @@ username@devicename# set deviceconfig system snmp-setting snmp-system location "
 username@devicename# set deviceconfig system snmp-setting snmp-system contact noc@your.org
 username@devicename# commit
 username@devicename# exit
+```
+
+### Ubiquiti
+
+#### EdgeOs
+
+If you use the HTTP interface:
+1. Access the legacy web admin page and log in
+1. Go to System > Advanced Configuration
+1. Go to the sub-tab "SNMP" > "Community"
+1. Click "Add Community Group"
+1. Enter your SNMP community, ip address and click submit
+1. Go to System > Summary
+1. Go to the sub-tab "Description"
+1. Enter your System Name, System Location and System Contact.
+1. Click submit
+1. Click "Save Configuration"
+
+If you use CLI:
+```
+username@devicename> enable
+username@devicename# configure
+username@devicename (Config)# snmp-server community "public" ro
+username@devicename (Config)# snmp-server sysname "devicename"
+username@devicename (Config)# snmp-server contact "noc@example.com"
+username@devicename (Config)# exit
+username@devicename# write memory
 ```
 
 ### VMware
