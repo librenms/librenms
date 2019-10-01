@@ -82,9 +82,13 @@ Once you have your Redis database set up, configure it in the .env file on each 
 
 ```dotenv
 REDIS_HOST=127.0.0.1
-#REDIS_DB=0
+REDIS_PORT=6379
+# OR
+REDIS_SENTINEL=192.0.2.1:26379
+REDIS_SENTINEL_SERVICE=myservice
+
+REDIS_DB=0
 #REDIS_PASSWORD=
-#REDIS_PORT=6379
 ```
 
 ## Basic Configuration
