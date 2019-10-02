@@ -20,7 +20,7 @@
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Jozef Rebjak
- * @author     Jozef Rebjak <jozefrebjaky@icloud.com>
+ * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
 
 namespace LibreNMS\OS;
