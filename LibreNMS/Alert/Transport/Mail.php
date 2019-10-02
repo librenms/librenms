@@ -35,12 +35,10 @@ class Mail extends Transport
 
     public function contactMail($obj)
     {
-        if (empty($this->config['email'])) {
-            $email = $obj['contacts'];
-        } else {
-            $email = $this->config['email'];
-        }
-        return send_mail($email, $obj['title'], $obj['msg'], (Config::get('email_html') == 'true') ? true : false);
+        $email = $this->config['email'] ?? $obj['contacts'];
+        $msg = preg_replace("/(?<!\r)\n/", "\r\n", $obj['msg']); // fix line returns for windows mail clients
+
+        return send_mail($email, $obj['title'], $msg, (Config::get('email_html') == 'true') ? true : false);
     }
 
     public static function configTemplate()
