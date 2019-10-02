@@ -30,11 +30,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\OS;
 
-class Rutos2xx extends OS implements
-
-    WirelessSnrDiscovery,
+class Rutos2xx extends OS implement WirelessSnrDiscovery,
     WirelessRssiDiscovery
-
 {
     public function discoverWirelessSnr()
     {
