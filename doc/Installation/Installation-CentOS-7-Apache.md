@@ -56,7 +56,7 @@ yum install rh-php72 rh-php72-php-cli rh-php72-php-common rh-php72-php-curl rh-p
 ```
 
 ```
-scl enable rh-php72 bash
+ln -s /opt/rh/rh-php72/root/usr/bin/php /usr/bin/php
 ln -s /opt/rh/httpd24/root/etc/httpd/conf.d/rh-php72-php.conf /etc/httpd/conf.d/
 ln -s /opt/rh/httpd24/root/etc/httpd/conf.modules.d/15-rh-php72-php.conf /etc/httpd/conf.modules.d/
 ln -s /opt/rh/httpd24/root/etc/httpd/modules/librh-php72-php7.so /etc/httpd/modules/
