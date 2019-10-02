@@ -31,7 +31,7 @@ yum localinstall http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 ```
 
 ```
-yum install composer php73-php-fpm php73-php-cli php73-php-common php73-php-curl php73-php-gd php73-php-mbstring php73-php-process php73-php-snmp php73-php-xml php73-php-zip php73-php-memcached php73-php-mysqlnd
+yum install php73-mod_php php73-php-cli php73-php-common php73-php-curl php73-php-gd php73-php-mbstring php73-php-process php73-php-snmp php73-php-xml php73-php-zip php73-php-memcached php73-php-mysqlnd
 ```
 
 #### Running with Webtatic PHP
@@ -41,7 +41,7 @@ rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 ```
 
 ```
-yum install composer php73w php73w-cli php73w-common php73w-curl php73w-gd php73w-mbstring php73w-mysqlnd php73w-process php73w-snmp php73w-xml php73w-zip
+yum install php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip
 ```
 
 
@@ -52,11 +52,14 @@ yum install centos-release-scl
 ```
 
 ```
-yum install rh-php72-php-fpm rh-php72-php-cli rh-php72-php-common rh-php72-php-curl rh-php72-php-gd rh-php72-php-mbstring rh-php72-php-process rh-php72-php-snmp rh-php72-php-xml rh-php72-php-zip rh-php72-php-memcached rh-php72-php-mysqlnd
+yum install rh-php72 rh-php72-php-cli rh-php72-php-common rh-php72-php-curl rh-php72-php-gd rh-php72-php-mbstring rh-php72-php-process rh-php72-php-snmp rh-php72-php-xml rh-php72-php-zip rh-php72-php-memcached rh-php72-php-mysqlnd
 ```
 
 ```
 ln -s /opt/rh/rh-php72/root/usr/bin/php /usr/bin/php
+ln -s /opt/rh/httpd24/root/etc/httpd/conf.d/rh-php72-php.conf /etc/httpd/conf.d/
+ln -s /opt/rh/httpd24/root/etc/httpd/conf.modules.d/15-rh-php72-php.conf /etc/httpd/conf.modules.d/
+ln -s /opt/rh/httpd24/root/etc/httpd/modules/librh-php72-php7.so /etc/httpd/modules/
 ```
 
 # Add librenms user
