@@ -695,7 +695,6 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
             echo '.';
             $update_data = array(
                 'mempool_descr' => $descr,
-                'mempool_perc_warn' => $perc_warn,
             );
 
             if (is_numeric($entPhysicalIndex)) {
