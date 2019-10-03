@@ -6,6 +6,8 @@ ifXmcbc: true
 ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_temperature, text: 'Temperature' }
 icon: alcatellucent
 discovery:
     - sysObjectID:
