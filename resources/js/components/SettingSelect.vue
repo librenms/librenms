@@ -30,7 +30,7 @@
             :required="required"
             :disabled="disabled"
     >
-        <option v-for="(text, option) in options" :value="option" :selected="value === option" v-text="text"></option>
+        <option v-for="(text, option) in options" :value="Array.isArray(options) ? text : option" :selected="value === option" v-text="text"></option>
     </select>
 </template>
 

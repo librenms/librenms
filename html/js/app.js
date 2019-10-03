@@ -2923,7 +2923,7 @@ var render = function() {
     _vm._l(_vm.options, function(text, option) {
       return _c("option", {
         domProps: {
-          value: option,
+          value: Array.isArray(_vm.options) ? text : option,
           selected: _vm.value === option,
           textContent: _vm._s(text)
         }
