@@ -3671,14 +3671,20 @@
             "authpass": "",
             "cryptoalgo": "AES",
             "cryptopass": ""
-        }]
+        }],
+        "validate": {
+            "value.*.authalgo": "in:MD5,AES"
+        }
     },
     "snmp.version": {
         "group": "poller",
         "section": "snmp",
         "order": 1,
         "type": "array",
-        "default": ["v2c", "v3", "v1"]
+        "default": ["v2c", "v3", "v1"],
+        "validate": {
+            "value.*": "in:v1,v2c,v3"
+        }
     },
     "snmpbulkwalk": {
         "default": "/usr/bin/snmpbulkwalk",
@@ -4170,7 +4176,9 @@
         "section": "dashboard",
         "order": 0,
         "type": "dashboard-select",
-        "validate": "zero_or_exists:dashboards,dashboard_id"
+        "validate": {
+            "value": "zero_or_exists:dashboards,dashboard_id"
+        }
     },
     "webui.dynamic_graphs": {
         "default": false,

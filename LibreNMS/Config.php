@@ -253,10 +253,14 @@ class Config
     {
         if ($persist) {
             try {
-                \App\Models\Config::updateOrCreate(['config_name' => $key], [
-                    'config_name' => $key,
-                    'config_value' => $value,
-                ]);
+                // flatten an array if sent one as value
+                $values = is_array($value) ? Arr::dot($value, "$key.") : [$key => $value];
+                foreach ($values as $key => $value) {
+                    \App\Models\Config::updateOrCreate(['config_name' => $key], [
+                        'config_name' => $key,
+                        'config_value' => $value,
+                    ]);
+                }
             } catch (QueryException $e) {
                 if (class_exists(\Log::class)) {
                     \Log::error($e);

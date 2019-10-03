@@ -112,13 +112,12 @@ class SettingsController extends Controller
             return $this->jsonResponse($id, ":id is not a valid setting", null, 400);
         }
 
-        try {
-            $dbConfig = \App\Models\Config::where('config_name', $id)->firstOrFail();
-        } catch (ModelNotFoundException $e) {
+        $dbConfig = \App\Models\Config::where('config_name', 'like', "$id%")->get();
+        if ($dbConfig->isEmpty()) {
             return $this->jsonResponse($id, ":id is not set", $config->get($id)->default, 400);
         }
 
-        $dbConfig->delete();
+        $dbConfig->each->delete();
 
         return $this->jsonResponse($id, ":id reset to default", $config->get($id)->default);
     }

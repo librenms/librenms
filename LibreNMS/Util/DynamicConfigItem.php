@@ -185,7 +185,7 @@ class DynamicConfigItem implements \ArrayAccess
     {
         return $this->validate
             ? implode(" \n", $this->buildValidator($value)->messages()->get('value'))
-            : __('settings.validate.' . $this->type, ['id' => $this->name, 'value' => $value]);
+            : __('settings.validate.' . $this->type, ['id' => $this->name, 'value' => is_array($value) ? json_encode($value) : $value]);
     }
 
     // ArrayAccess functions
@@ -230,6 +230,6 @@ class DynamicConfigItem implements \ArrayAccess
     }
 
     private function buildValidator($value) {
-        return Validator::make(['value' => $value], ['value' => $this->validate]);
+        return Validator::make(['value' => $value], $this->validate);
     }
 }
