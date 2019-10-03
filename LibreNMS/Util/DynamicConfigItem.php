@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use App\Models\Dashboard;
 use LibreNMS\Config;
+use Validator;
 
 class DynamicConfigItem implements \ArrayAccess
 {
@@ -43,6 +44,7 @@ class DynamicConfigItem implements \ArrayAccess
     public $options = [];
     public $class;
     public $pattern;
+    public $validate;
     public $units;
 
     public function __construct($name, $settings = [])
@@ -63,7 +65,9 @@ class DynamicConfigItem implements \ArrayAccess
      */
     public function checkValue($value)
     {
-        if ($this->type == 'boolean') {
+        if ($this->validate) {
+            return $this->buildValidator($value)->passes();
+        } elseif ($this->type == 'boolean') {
             return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
         } elseif ($this->type == 'integer') {
             return filter_var($value, FILTER_VALIDATE_INT) || $value === "0" || $value === 0;
@@ -73,8 +77,6 @@ class DynamicConfigItem implements \ArrayAccess
             return filter_var($value, FILTER_VALIDATE_EMAIL);
         } elseif (in_array($this->type, ['text', 'password'])) {
             return true;
-        } elseif ($this->type == 'dashboard-select') {
-            return $value === 0 || Dashboard::query()->where('dashboard_id', $value)->exists();
         }
 
         return false;
@@ -175,6 +177,17 @@ class DynamicConfigItem implements \ArrayAccess
         return ($this->group == "" || $this->type) && !$this->hidden && !$this->disabled;
     }
 
+    /**
+     * @param mixed $value The value that was validated
+     * @return string
+     */
+    public function getValidationMessage($value)
+    {
+        return $this->validate
+            ? implode(" \n", $this->buildValidator($value)->messages()->get('value'))
+            : __('settings.validate.' . $this->type, ['id' => $this->name, 'value' => $value]);
+    }
+
     // ArrayAccess functions
     public function offsetExists($offset)
     {
@@ -214,5 +227,9 @@ class DynamicConfigItem implements \ArrayAccess
     private function optionTranslationKey($option)
     {
         return "settings.settings.$this->name.options.$option";
+    }
+
+    private function buildValidator($value) {
+        return Validator::make(['value' => $value], ['value' => $this->validate]);
     }
 }

@@ -89,7 +89,7 @@ class SettingsController extends Controller
         $config_item = $config->get($id);
 
         if (!$config_item->checkValue($value)) {
-            return $this->jsonResponse($id, __('settings.validate.' . $config_item->getType(), ['id' => $id, 'value' => $value]), $current, 400);
+            return $this->jsonResponse($id, $config_item->getValidationMessage($value), $current, 400);
         }
 
         if (\LibreNMS\Config::set($id, $value, true)) {
