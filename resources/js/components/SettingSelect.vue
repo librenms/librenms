@@ -30,7 +30,11 @@
             :required="required"
             :disabled="disabled"
     >
-        <option v-for="(text, option) in options" :value="Array.isArray(options) ? text : option" :selected="value === option" v-text="text"></option>
+        <option v-for="(text, option) in options"
+                :value="Array.isArray(options) ? text : option"
+                :selected="value === option"
+                v-text="getText(name, text)"
+        ></option>
     </select>
 </template>
 
@@ -39,7 +43,13 @@
 
     export default {
         name: "SettingSelect",
-        mixins: [BaseSetting]
+        mixins: [BaseSetting],
+        methods: {
+            getText(name, text) {
+                const key = `settings.settings.${name}.options.${text}`;
+                return this.$te(key) ? this.$t(key) : text;
+            }
+        }
     }
 </script>
 
