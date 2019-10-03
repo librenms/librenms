@@ -503,6 +503,43 @@ return [
                 'mono' => 'Mono',
             ]
         ],
+        'snmp' => [
+            'transports' => [
+                'description' => 'Transport (priority)',
+                'help' => 'Select enabled transports and order them as you want them to be tried.'
+            ],
+            'version' => [
+                'description' => 'Version (priority)',
+                'help' => 'Select enabled versions and order them as you want them to be tried.'
+            ],
+            'community' => [
+                'description' => 'Communities (priority)',
+                'help' => 'Enter community strings for v1 and v2c and order them as you want them to be tried'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'Set the tcp/udp port to be used for SNMP'
+            ],
+            'v3' => [
+                'description' => 'SNMP v3 Authentication (priority)',
+                'help' => 'Set up v3 authentication variables and order them as you want them to be tried',
+                'auth' => 'Auth',
+                'crypto' => 'Crypto',
+                'fields' => [
+                    'authalgo' => 'Algorithm',
+                    'authlevel' => 'Level',
+                    'authname' => 'Username',
+                    'authpass' => 'Password',
+                    'cryptoalgo' => 'Algorithm',
+                    'cryptopass' => 'Password'
+                ],
+                'level' => [
+                    'noAuthNoPriv' => 'No Authentication, No Privacy',
+                    'authNoPriv' => 'Authentication, No Privacy',
+                    'authPriv' => 'Authentication and Privacy'
+                ]
+            ]
+        ],
         'snmpbulkwalk' => [
             'description' => 'Path to snmpbulkwalk'
         ],

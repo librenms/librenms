@@ -1192,10 +1192,163 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingSelect",
-  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]]
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]],
+  methods: {
+    getText: function getText(name, text) {
+      var key = "settings.settings.".concat(name, ".options.").concat(text);
+      return this.$te(key) ? this.$t(key) : text;
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSnmp3auth.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingSnmp3auth.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "SettingSnmp3auth",
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]],
+  data: function data() {
+    return {
+      localList: this.value
+    };
+  },
+  methods: {
+    addItem: function addItem() {
+      this.localList.push({
+        authlevel: 'noAuthNoPriv',
+        authalgo: 'MD5',
+        authname: '',
+        authpass: '',
+        cryptoalgo: 'AES',
+        cryptopass: ''
+      });
+    },
+    removeItem: function removeItem(index) {
+      this.localList.splice(index, 1);
+    },
+    dragged: function dragged() {
+      this.$emit('input', this.localList);
+    }
+  }
 });
 
 /***/ }),
@@ -1589,6 +1742,25 @@ exports.push([module.i, "\ndiv[data-v-37a8c75c] {\n    color: red;\n}\n", ""]);
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css&":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css& ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.authlevel[data-v-4a841d50] {\n    font-size: 18px;\n    text-align: left;\n}\n.fa-minus-circle[data-v-4a841d50] {\n    cursor: pointer;\n}\n.snmp3-add-button[data-v-4a841d50] {\n    margin-top: 5px;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Tabs.vue?vue&type=style&index=0&id=6e9bbb69&scoped=true&lang=css&":
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Tabs.vue?vue&type=style&index=0&id=6e9bbb69&scoped=true&lang=css& ***!
@@ -1756,6 +1928,36 @@ if(false) {}
 
 
 var content = __webpack_require__(/*! !../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./SettingNull.vue?vue&type=style&index=0&id=37a8c75c&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingNull.vue?vue&type=style&index=0&id=37a8c75c&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css&":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css& ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css&");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -2925,11 +3127,428 @@ var render = function() {
         domProps: {
           value: Array.isArray(_vm.options) ? text : option,
           selected: _vm.value === option,
-          textContent: _vm._s(text)
+          textContent: _vm._s(_vm.getText(_vm.name, text))
         }
       })
     }),
     0
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSnmp3auth.vue?vue&type=template&id=4a841d50&scoped=true&":
+/*!*******************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingSnmp3auth.vue?vue&type=template&id=4a841d50&scoped=true& ***!
+  \*******************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c(
+        "draggable",
+        {
+          attrs: { disabled: _vm.disabled },
+          on: {
+            end: function($event) {
+              return _vm.dragged()
+            }
+          },
+          model: {
+            value: _vm.localList,
+            callback: function($$v) {
+              _vm.localList = $$v
+            },
+            expression: "localList"
+          }
+        },
+        _vm._l(_vm.localList, function(item, id) {
+          return _c("div", [
+            _c("div", { staticClass: "panel panel-default" }, [
+              _c("div", { staticClass: "panel-heading" }, [
+                _c("h3", { staticClass: "panel-title" }, [
+                  _vm._v(_vm._s(id + 1) + ". "),
+                  _c(
+                    "span",
+                    {
+                      staticClass: "pull-right text-danger",
+                      on: {
+                        click: function($event) {
+                          return _vm.removeItem(id)
+                        }
+                      }
+                    },
+                    [_c("i", { staticClass: "fa fa-minus-circle" })]
+                  )
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "panel-body" }, [
+                _c(
+                  "form",
+                  {
+                    attrs: { disabled: _vm.disabled },
+                    on: {
+                      onsubmit: function($event) {
+                        $event.preventDefault()
+                      }
+                    }
+                  },
+                  [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("div", { staticClass: "col-sm-12" }, [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: item.authlevel,
+                                expression: "item.authlevel"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { id: "authlevel", disabled: _vm.disabled },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  item,
+                                  "authlevel",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c("option", {
+                              attrs: { value: "noAuthNoPriv" },
+                              domProps: {
+                                textContent: _vm._s(
+                                  _vm.$t(
+                                    "settings.settings.snmp.v3.level.noAuthNoPriv"
+                                  )
+                                )
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("option", {
+                              attrs: { value: "authNoPriv" },
+                              domProps: {
+                                textContent: _vm._s(
+                                  _vm.$t(
+                                    "settings.settings.snmp.v3.level.authNoPriv"
+                                  )
+                                )
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("option", {
+                              attrs: { value: "authPriv" },
+                              domProps: {
+                                textContent: _vm._s(
+                                  _vm.$t(
+                                    "settings.settings.snmp.v3.level.authNoPriv"
+                                  )
+                                )
+                              }
+                            })
+                          ]
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "fieldset",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value:
+                              item.authlevel.toString().substring(0, 4) ===
+                              "auth",
+                            expression:
+                              "item.authlevel.toString().substring(0, 4) === 'auth'"
+                          }
+                        ],
+                        attrs: { name: "algo", disabled: _vm.disabled }
+                      },
+                      [
+                        _c("legend", {
+                          staticClass: "h4",
+                          domProps: {
+                            textContent: _vm._s(
+                              _vm.$t("settings.settings.snmp.v3.auth")
+                            )
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", {
+                            staticClass: "col-sm-3 control-label",
+                            attrs: { for: "authalgo" },
+                            domProps: {
+                              textContent: _vm._s(
+                                _vm.$t(
+                                  "settings.settings.snmp.v3.fields.authalgo"
+                                )
+                              )
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-sm-9" }, [
+                            _c(
+                              "select",
+                              {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: item.authalgo,
+                                    expression: "item.authalgo"
+                                  }
+                                ],
+                                staticClass: "form-control",
+                                attrs: { id: "authalgo", name: "authalgo" },
+                                on: {
+                                  change: function($event) {
+                                    var $$selectedVal = Array.prototype.filter
+                                      .call($event.target.options, function(o) {
+                                        return o.selected
+                                      })
+                                      .map(function(o) {
+                                        var val =
+                                          "_value" in o ? o._value : o.value
+                                        return val
+                                      })
+                                    _vm.$set(
+                                      item,
+                                      "authalgo",
+                                      $event.target.multiple
+                                        ? $$selectedVal
+                                        : $$selectedVal[0]
+                                    )
+                                  }
+                                }
+                              },
+                              [
+                                _c("option", { attrs: { value: "MD5" } }, [
+                                  _vm._v("MD5")
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "AES" } }, [
+                                  _vm._v("AES")
+                                ])
+                              ]
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", {
+                            staticClass: "col-sm-3 control-label",
+                            attrs: { for: "authname" },
+                            domProps: {
+                              textContent: _vm._s(
+                                _vm.$t(
+                                  "settings.settings.snmp.v3.fields.authname"
+                                )
+                              )
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-sm-9" }, [
+                            _c("input", {
+                              staticClass: "form-control",
+                              attrs: { type: "text", id: "authname" },
+                              domProps: { value: item.authname }
+                            })
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", {
+                            staticClass: "col-sm-3 control-label",
+                            attrs: { for: "authpass" },
+                            domProps: {
+                              textContent: _vm._s(
+                                _vm.$t(
+                                  "settings.settings.snmp.v3.fields.authpass"
+                                )
+                              )
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-sm-9" }, [
+                            _c("input", {
+                              staticClass: "form-control",
+                              attrs: { type: "text", id: "authpass" },
+                              domProps: { value: item.authpass }
+                            })
+                          ])
+                        ])
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "fieldset",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: item.authlevel === "authPriv",
+                            expression: "item.authlevel === 'authPriv'"
+                          }
+                        ],
+                        attrs: { name: "crypt", disabled: _vm.disabled }
+                      },
+                      [
+                        _c("legend", {
+                          staticClass: "h4",
+                          domProps: {
+                            textContent: _vm._s(
+                              _vm.$t("settings.settings.snmp.v3.crypto")
+                            )
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c(
+                            "label",
+                            {
+                              staticClass: "col-sm-3 control-label",
+                              attrs: { for: "cryptoalgo" }
+                            },
+                            [_vm._v("Cryptoalgo")]
+                          ),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-sm-9" }, [
+                            _c(
+                              "select",
+                              {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: item.cryptoalgo,
+                                    expression: "item.cryptoalgo"
+                                  }
+                                ],
+                                staticClass: "form-control",
+                                attrs: { id: "cryptoalgo" },
+                                on: {
+                                  change: function($event) {
+                                    var $$selectedVal = Array.prototype.filter
+                                      .call($event.target.options, function(o) {
+                                        return o.selected
+                                      })
+                                      .map(function(o) {
+                                        var val =
+                                          "_value" in o ? o._value : o.value
+                                        return val
+                                      })
+                                    _vm.$set(
+                                      item,
+                                      "cryptoalgo",
+                                      $event.target.multiple
+                                        ? $$selectedVal
+                                        : $$selectedVal[0]
+                                    )
+                                  }
+                                }
+                              },
+                              [
+                                _c("option", { attrs: { value: "AES" } }, [
+                                  _vm._v("AES")
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "DES" } }, [
+                                  _vm._v("DES")
+                                ])
+                              ]
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", {
+                            staticClass: "col-sm-3 control-label",
+                            attrs: { for: "cryptopass" },
+                            domProps: {
+                              textContent: _vm._s(
+                                _vm.$t(
+                                  "settings.settings.snmp.v3.fields.authpass"
+                                )
+                              )
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-sm-9" }, [
+                            _c("input", {
+                              staticClass: "form-control",
+                              attrs: { type: "text", id: "cryptopass" },
+                              domProps: { value: item.cryptopass }
+                            })
+                          ])
+                        ])
+                      ]
+                    )
+                  ]
+                )
+              ])
+            ])
+          ])
+        }),
+        0
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "row snmp3-add-button" }, [
+        _c("div", { staticClass: "col-sm-12" }, [
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary",
+              on: {
+                click: function($event) {
+                  return _vm.addItem()
+                }
+              }
+            },
+            [
+              _c("i", { staticClass: "fa fa-plus-circle" }),
+              _vm._v(" " + _vm._s(_vm.$t("New")))
+            ]
+          )
+        ])
+      ])
+    ],
+    1
   )
 }
 var staticRenderFns = []
@@ -3156,6 +3775,7 @@ var map = {
 	"./components/SettingNull.vue": "./resources/js/components/SettingNull.vue",
 	"./components/SettingPassword.vue": "./resources/js/components/SettingPassword.vue",
 	"./components/SettingSelect.vue": "./resources/js/components/SettingSelect.vue",
+	"./components/SettingSnmp3auth.vue": "./resources/js/components/SettingSnmp3auth.vue",
 	"./components/SettingText.vue": "./resources/js/components/SettingText.vue",
 	"./components/Tab.vue": "./resources/js/components/Tab.vue",
 	"./components/Tabs.vue": "./resources/js/components/Tabs.vue",
@@ -4413,6 +5033,93 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/SettingSnmp3auth.vue":
+/*!******************************************************!*\
+  !*** ./resources/js/components/SettingSnmp3auth.vue ***!
+  \******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _SettingSnmp3auth_vue_vue_type_template_id_4a841d50_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SettingSnmp3auth.vue?vue&type=template&id=4a841d50&scoped=true& */ "./resources/js/components/SettingSnmp3auth.vue?vue&type=template&id=4a841d50&scoped=true&");
+/* harmony import */ var _SettingSnmp3auth_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SettingSnmp3auth.vue?vue&type=script&lang=js& */ "./resources/js/components/SettingSnmp3auth.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _SettingSnmp3auth_vue_vue_type_style_index_0_id_4a841d50_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css& */ "./resources/js/components/SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _SettingSnmp3auth_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _SettingSnmp3auth_vue_vue_type_template_id_4a841d50_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _SettingSnmp3auth_vue_vue_type_template_id_4a841d50_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "4a841d50",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/SettingSnmp3auth.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/SettingSnmp3auth.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************!*\
+  !*** ./resources/js/components/SettingSnmp3auth.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./SettingSnmp3auth.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSnmp3auth.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css&":
+/*!***************************************************************************************************************!*\
+  !*** ./resources/js/components/SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css& ***!
+  \***************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_style_index_0_id_4a841d50_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSnmp3auth.vue?vue&type=style&index=0&id=4a841d50&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_style_index_0_id_4a841d50_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_style_index_0_id_4a841d50_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_style_index_0_id_4a841d50_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_style_index_0_id_4a841d50_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_style_index_0_id_4a841d50_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./resources/js/components/SettingSnmp3auth.vue?vue&type=template&id=4a841d50&scoped=true&":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/components/SettingSnmp3auth.vue?vue&type=template&id=4a841d50&scoped=true& ***!
+  \*************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_template_id_4a841d50_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./SettingSnmp3auth.vue?vue&type=template&id=4a841d50&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingSnmp3auth.vue?vue&type=template&id=4a841d50&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_template_id_4a841d50_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingSnmp3auth_vue_vue_type_template_id_4a841d50_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/SettingText.vue":
 /*!*************************************************!*\
   !*** ./resources/js/components/SettingText.vue ***!
@@ -5330,6 +6037,43 @@ __webpack_require__.r(__webpack_exports__);
             "dark": "Dark",
             "light": "Light",
             "mono": "Mono"
+          }
+        },
+        "snmp": {
+          "transports": {
+            "description": "Transport (priority)",
+            "help": "Select enabled transports and order them as you want them to be tried."
+          },
+          "version": {
+            "description": "Version (priority)",
+            "help": "Select enabled versions and order them as you want them to be tried."
+          },
+          "community": {
+            "description": "Communities (priority)",
+            "help": "Enter community strings for v1 and v2c and order them as you want them to be tried"
+          },
+          "port": {
+            "description": "Port",
+            "help": "Set the tcp/udp port to be used for SNMP"
+          },
+          "v3": {
+            "description": "SNMP v3 Authentication (priority)",
+            "help": "Set up v3 authentication variables and order them as you want them to be tried",
+            "auth": "Auth",
+            "crypto": "Crypto",
+            "fields": {
+              "authalgo": "Algorithm",
+              "authlevel": "Level",
+              "authname": "Username",
+              "authpass": "Password",
+              "cryptoalgo": "Algorithm",
+              "cryptopass": "Password"
+            },
+            "level": {
+              "noAuthNoPriv": "No Authentication or Privacy",
+              "authNoPriv": "Authentication, No Privacy",
+              "authPriv": "Authentication and Privacy"
+            }
           }
         },
         "snmpbulkwalk": {
