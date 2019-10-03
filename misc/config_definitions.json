@@ -4165,11 +4165,11 @@
         "type": "boolean"
     },
     "webui.default_dashboard_id": {
-        "default": false,
+        "default": 0,
         "group": "webui",
         "section": "dashboard",
         "order": 0,
-        "type": "select"
+        "type": "dashboard-select"
     },
     "webui.dynamic_graphs": {
         "default": false,

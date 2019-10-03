@@ -23,8 +23,12 @@ files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(
 
 import ToggleButton from 'vue-js-toggle-button'
 Vue.use(ToggleButton);
+
 import VTooltip from 'v-tooltip'
 Vue.use(VTooltip);
+
+import vSelect from 'vue-select'
+Vue.component('v-select', vSelect);
 
 Vue.mixin({
     methods: {

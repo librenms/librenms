@@ -78,6 +78,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
             Route::get('application', 'ApplicationController');
             Route::get('bill', 'BillController');
+            Route::get('dashboard', 'DashboardController')->name('ajax.select.dashboard');
             Route::get('device', 'DeviceController');
             Route::get('device-field', 'DeviceFieldController');
             Route::get('device-group', 'DeviceGroupController');

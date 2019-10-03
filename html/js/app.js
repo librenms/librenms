@@ -361,7 +361,7 @@ __webpack_require__.r(__webpack_exports__);
       var help = this.$t('settings.settings.' + this.setting.name + '.help');
 
       if (this.setting.overridden) {
-        help += "\n" + this.$t('settings.readonly');
+        help += "</p><p>" + this.$t('settings.readonly');
       }
 
       return help;
@@ -732,6 +732,91 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingBoolean",
   mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]]
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingDashboardSelect.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingDashboardSelect.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BaseSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BaseSetting */ "./resources/js/components/BaseSetting.vue");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "SettingDashboardSelect",
+  mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]],
+  data: function data() {
+    return {
+      ajaxData: {
+        results: []
+      },
+      "default": {
+        id: 0,
+        text: this.$t('No Default Dashboard')
+      }
+    };
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    axios.get(route('ajax.select.dashboard')).then(function (response) {
+      return _this.ajaxData = response.data;
+    });
+  },
+  computed: {
+    localOptions: function localOptions() {
+      return [this["default"]].concat(this.ajaxData.results);
+    },
+    selected: function selected() {
+      var _this2 = this;
+
+      return this.value === 0 ? this["default"] : this.ajaxData.results.find(function (dash) {
+        return dash.id === _this2.value;
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -2091,39 +2176,50 @@ var render = function() {
           key: "header",
           fn: function() {
             return [
-              _c("form", { staticClass: "form-inline" }, [
-                _c("div", { staticClass: "input-group" }, [
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model.trim",
-                        value: _vm.search_phrase,
-                        expression: "search_phrase",
-                        modifiers: { trim: true }
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: {
-                      id: "settings-search",
-                      type: "search",
-                      placeholder: "Filter Settings"
-                    },
-                    domProps: { value: _vm.search_phrase },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.search_phrase = $event.target.value.trim()
-                      },
-                      blur: function($event) {
-                        return _vm.$forceUpdate()
-                      }
+              _c(
+                "form",
+                {
+                  staticClass: "form-inline",
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
                     }
-                  })
-                ])
-              ])
+                  }
+                },
+                [
+                  _c("div", { staticClass: "input-group" }, [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model.trim",
+                          value: _vm.search_phrase,
+                          expression: "search_phrase",
+                          modifiers: { trim: true }
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        id: "settings-search",
+                        type: "search",
+                        placeholder: "Filter Settings"
+                      },
+                      domProps: { value: _vm.search_phrase },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.search_phrase = $event.target.value.trim()
+                        },
+                        blur: function($event) {
+                          return _vm.$forceUpdate()
+                        }
+                      }
+                    })
+                  ])
+                ]
+              )
             ]
           },
           proxy: true
@@ -2178,7 +2274,14 @@ var render = function() {
                   [
                     _c(
                       "form",
-                      { staticClass: "form-horizontal" },
+                      {
+                        staticClass: "form-horizontal",
+                        on: {
+                          submit: function($event) {
+                            $event.preventDefault()
+                          }
+                        }
+                      },
                       _vm._l(items, function(setting) {
                         return _c("librenms-setting", {
                           key: setting,
@@ -2387,6 +2490,44 @@ var render = function() {
     on: {
       change: function($event) {
         return _vm.$emit("change", $event.value)
+      }
+    }
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingDashboardSelect.vue?vue&type=template&id=27b9146b&scoped=true&":
+/*!*************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/SettingDashboardSelect.vue?vue&type=template&id=27b9146b&scoped=true& ***!
+  \*************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("v-select", {
+    attrs: {
+      options: _vm.localOptions,
+      label: "text",
+      clearable: false,
+      value: _vm.selected,
+      required: _vm.required,
+      disabled: _vm.disabled
+    },
+    on: {
+      input: function($event) {
+        return _vm.$emit("input", $event.id)
       }
     }
   })
@@ -2770,7 +2911,7 @@ var render = function() {
   return _c(
     "select",
     {
-      staticClass: "form-control bootselect",
+      staticClass: "form-control",
       attrs: { name: _vm.name, required: _vm.required, disabled: _vm.disabled },
       domProps: { value: _vm.value },
       on: {
@@ -3008,6 +3149,7 @@ var map = {
 	"./components/LibrenmsSettings.vue": "./resources/js/components/LibrenmsSettings.vue",
 	"./components/SettingArray.vue": "./resources/js/components/SettingArray.vue",
 	"./components/SettingBoolean.vue": "./resources/js/components/SettingBoolean.vue",
+	"./components/SettingDashboardSelect.vue": "./resources/js/components/SettingDashboardSelect.vue",
 	"./components/SettingEmail.vue": "./resources/js/components/SettingEmail.vue",
 	"./components/SettingInteger.vue": "./resources/js/components/SettingInteger.vue",
 	"./components/SettingLdapGroups.vue": "./resources/js/components/SettingLdapGroups.vue",
@@ -3055,6 +3197,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_js_toggle_button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-js-toggle-button */ "./node_modules/vue-js-toggle-button/dist/index.js");
 /* harmony import */ var vue_js_toggle_button__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue_js_toggle_button__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var v_tooltip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! v-tooltip */ "./node_modules/v-tooltip/dist/v-tooltip.esm.js");
+/* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-select */ "./node_modules/vue-select/dist/vue-select.js");
+/* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(vue_select__WEBPACK_IMPORTED_MODULE_3__);
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -3082,6 +3226,8 @@ files.keys().map(function (key) {
 Vue.use(vue_js_toggle_button__WEBPACK_IMPORTED_MODULE_1___default.a);
 
 Vue.use(v_tooltip__WEBPACK_IMPORTED_MODULE_2__["default"]);
+
+Vue.component('v-select', vue_select__WEBPACK_IMPORTED_MODULE_3___default.a);
 Vue.mixin({
   methods: {
     route: route
@@ -3743,6 +3889,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingBoolean_vue_vue_type_template_id_637b0ae3_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingBoolean_vue_vue_type_template_id_637b0ae3_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/SettingDashboardSelect.vue":
+/*!************************************************************!*\
+  !*** ./resources/js/components/SettingDashboardSelect.vue ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _SettingDashboardSelect_vue_vue_type_template_id_27b9146b_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SettingDashboardSelect.vue?vue&type=template&id=27b9146b&scoped=true& */ "./resources/js/components/SettingDashboardSelect.vue?vue&type=template&id=27b9146b&scoped=true&");
+/* harmony import */ var _SettingDashboardSelect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SettingDashboardSelect.vue?vue&type=script&lang=js& */ "./resources/js/components/SettingDashboardSelect.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _SettingDashboardSelect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _SettingDashboardSelect_vue_vue_type_template_id_27b9146b_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _SettingDashboardSelect_vue_vue_type_template_id_27b9146b_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "27b9146b",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/SettingDashboardSelect.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/SettingDashboardSelect.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/SettingDashboardSelect.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingDashboardSelect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./SettingDashboardSelect.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingDashboardSelect.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingDashboardSelect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/SettingDashboardSelect.vue?vue&type=template&id=27b9146b&scoped=true&":
+/*!*******************************************************************************************************!*\
+  !*** ./resources/js/components/SettingDashboardSelect.vue?vue&type=template&id=27b9146b&scoped=true& ***!
+  \*******************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingDashboardSelect_vue_vue_type_template_id_27b9146b_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./SettingDashboardSelect.vue?vue&type=template&id=27b9146b&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/SettingDashboardSelect.vue?vue&type=template&id=27b9146b&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingDashboardSelect_vue_vue_type_template_id_27b9146b_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SettingDashboardSelect_vue_vue_type_template_id_27b9146b_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -4609,6 +4824,7 @@ __webpack_require__.r(__webpack_exports__);
     "Admin": "Admin",
     "Global Read": "Global Read",
     "Normal": "Normal",
+    "No Default Dashboard": "No Default Dashboard",
     "syslog": {
       "severity": ["Emergency", "Alert", "Critical", "Error", "Warning", "Notice", "Informational", "Debug"],
       "facility": ["kernel messages", "user-level messages", "mail-system", "system daemons", "security/authorization messages", "messages generated internally by syslogd", "line printer subsystem", "network news subsystem", "UUCP subsystem", "clock daemon", "security/authorization messages", "FTP daemon", "NTP subsystem", "log audit", "log alert", "clock daemon (note 2)", "local use 0  (local0)", "local use 1  (local1)", "local use 2  (local2)", "local use 3  (local3)", "local use 4  (local4)", "local use 5  (local5)", "local use 6  (local6)", "local use 7  (local7)"]
@@ -5187,7 +5403,8 @@ __webpack_require__.r(__webpack_exports__);
             "help": "Enable usage of device groups filter"
           },
           "default_dashboard_id": {
-            "description": "Global default dashboard_id for all users who do not have their own default set"
+            "description": "Default dashboard",
+            "help": "Global default dashboard_id for all users who do not have their own default set"
           },
           "dynamic_graphs": {
             "description": "Enable dynamic graphs",

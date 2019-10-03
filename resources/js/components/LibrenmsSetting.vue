@@ -89,7 +89,7 @@
             getHelp() {
                 let help = this.$t('settings.settings.' + this.setting.name + '.help');
                 if (this.setting.overridden) {
-                    help += "\n" + this.$t('settings.readonly')
+                    help += "</p><p>" + this.$t('settings.readonly')
                 }
 
                 return help

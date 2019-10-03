@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use App\Models\Dashboard;
 use LibreNMS\Config;
 
 class DynamicConfigItem implements \ArrayAccess
@@ -72,6 +73,8 @@ class DynamicConfigItem implements \ArrayAccess
             return filter_var($value, FILTER_VALIDATE_EMAIL);
         } elseif (in_array($this->type, ['text', 'password'])) {
             return true;
+        } elseif ($this->type == 'dashboard-select') {
+            return $value === 0 || Dashboard::query()->where('dashboard_id', $value)->exists();
         }
 
         return false;

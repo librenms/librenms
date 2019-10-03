@@ -1,5 +1,5 @@
 <!--
-  - SettingSelect.vue
+  - SettingDashboardSelect.vue
   -
   - Description-
   -
@@ -23,23 +23,42 @@
   -->
 
 <template>
-    <select class="form-control"
-            :name="name"
-            :value="value"
-            @input="$emit('input', $event.target.value)"
+    <v-select
+            :options="localOptions"
+            label="text"
+            :clearable="false"
+            :value="selected"
+            @input="$emit('input', $event.id)"
             :required="required"
             :disabled="disabled"
     >
-        <option v-for="(text, option) in options" :value="option" :selected="value === option" v-text="text"></option>
-    </select>
+    </v-select>
 </template>
 
 <script>
+
     import BaseSetting from "./BaseSetting";
 
     export default {
-        name: "SettingSelect",
-        mixins: [BaseSetting]
+        name: "SettingDashboardSelect",
+        mixins: [BaseSetting],
+        data() {
+            return {
+                ajaxData: {results: []},
+                default: {id: 0, text: this.$t('No Default Dashboard')}
+            }
+        },
+        mounted() {
+            axios.get(route('ajax.select.dashboard')).then((response) => this.ajaxData = response.data);
+        },
+        computed: {
+            localOptions() {
+                return [this.default].concat(this.ajaxData.results)
+            },
+            selected() {
+                return this.value === 0 ? this.default : this.ajaxData.results.find(dash => dash.id === this.value);
+            }
+        }
     }
 </script>
 

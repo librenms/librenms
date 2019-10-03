@@ -25,7 +25,7 @@
 <template>
     <tabs @tab-selected="tabChanged" :selected="this.tab">
         <template v-slot:header>
-            <form class="form-inline">
+            <form class="form-inline" @submit.prevent>
                 <div class="input-group">
                     <input id="settings-search" type="search" class="form-control" placeholder="Filter Settings" v-model.trim="search_phrase">
                 </div>
@@ -35,7 +35,7 @@
         <tab v-for="(sections, group) in groups" :key="group" :name="group" :selected="group === tab" :text="$t('settings.groups.' + group)">
             <accordion @expanded="sectionExpanded" @collapsed="sectionCollapsed">
                 <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :text="$t('settings.sections.' + group + '.' + item)" :active="item === section">
-                    <form class="form-horizontal">
+                    <form class="form-horizontal" @submit.prevent>
                         <librenms-setting v-for="setting in items" :key="setting" :setting="settings[setting]"></librenms-setting>
                     </form>
                 </accordion-item>

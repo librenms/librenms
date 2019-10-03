@@ -574,7 +574,8 @@ return [
                 'help' => 'Enable usage of device groups filter'
             ],
             'default_dashboard_id' => [
-                'description' => 'Global default dashboard_id for all users who do not have their own default set'
+                'description' => 'Default dashboard',
+                'help' => 'Global default dashboard_id for all users who do not have their own default set'
             ],
             'dynamic_graphs' => [
                 'description' => 'Enable dynamic graphs',
