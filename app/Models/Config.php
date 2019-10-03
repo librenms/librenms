@@ -54,6 +54,11 @@ class Config extends BaseModel
      */
     public function getConfigValueAttribute($value)
     {
+        $result = @unserialize($value);
+        if ($value === 'b:0;' || $result !== false) {
+            return $result;
+        }
+
         if (filter_var($value, FILTER_VALIDATE_INT)) {
             return (int)$value;
         } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
@@ -67,10 +72,6 @@ class Config extends BaseModel
 
     public function setConfigValueAttribute($value)
     {
-        if (is_bool($value)) {
-            $this->attributes['config_value'] = $value ? 'true' : 'false';
-        } else {
-            $this->attributes['config_value'] = $value;
-        }
+        $this->attributes['config_value'] = serialize($value);
     }
 }

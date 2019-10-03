@@ -44,7 +44,7 @@ class Config
         self::loadFiles();
 
         // Make sure the database is connected
-        if (Eloquent::isConnected() || (function_exists('dbIsConnected') && dbIsConnected())) {
+        if (Eloquent::isConnected()) {
             // pull in the database config settings
             self::mergeDb();
 
@@ -244,7 +244,6 @@ class Config
         global $config;
 
         if ($persist) {
-            if (Eloquent::isConnected()) {
                 try {
                     $config_array = collect([
                         'config_name' => $key,
@@ -259,26 +258,14 @@ class Config
 
                     \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
                 } catch (QueryException $e) {
-                    // possibly table config doesn't exist yet
+                    if (class_exists(\Log::class)) {
+                        \Log::error($e);
+                    }
                     global $debug;
                     if ($debug) {
                         echo $e;
                     }
                 }
-            } else {
-                $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
-                if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
-                    $insert = array(
-                        'config_name' => $key,
-                        'config_value' => $value,
-                        'config_default' => $default,
-                        'config_descr' => $descr,
-                        'config_group' => $group,
-                        'config_sub_group' => $sub_group,
-                    );
-                    dbInsert($insert, 'config');
-                }
-            }
         }
 
         $keys = explode('.', $key);
@@ -356,20 +343,13 @@ class Config
 
         $db_config = [];
 
-        if (Eloquent::isConnected()) {
-            try {
-                \App\Models\Config::get(['config_name', 'config_value'])
-                    ->each(function ($item) use (&$db_config) {
-                        array_set($db_config, $item->config_name, $item->config_value);
-                    });
-            } catch (QueryException $e) {
-                // possibly table config doesn't exist yet
-            }
-
-        } else {
-            foreach (dbFetchRows('SELECT `config_name`,`config_value` FROM `config`') as $obj) {
-                self::assignArrayByPath($db_config, $obj['config_name'], $obj['config_value']);
-            }
+        try {
+            \App\Models\Config::get(['config_name', 'config_value'])
+                ->each(function ($item) use (&$db_config) {
+                    Arr::set($db_config, $item->config_name, $item->config_value);
+                });
+        } catch (QueryException $e) {
+            // possibly table config doesn't exist yet
         }
 
         $config = array_replace_recursive($db_config, $config);
@@ -409,15 +389,11 @@ class Config
     {
         global $config;
 
-        if (Eloquent::isConnected()) {
-            try {
-                $graph_types = GraphType::all()->toArray();
-            } catch (QueryException $e) {
-                // possibly table config doesn't exist yet
-                $graph_types = [];
-            }
-        } else {
-            $graph_types = dbFetchRows('SELECT * FROM graph_types');
+        try {
+            $graph_types = GraphType::all()->toArray();
+        } catch (QueryException $e) {
+            // possibly table config doesn't exist yet
+            $graph_types = [];
         }
 
         // load graph types from the database
