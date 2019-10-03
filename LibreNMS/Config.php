@@ -244,28 +244,28 @@ class Config
         global $config;
 
         if ($persist) {
-                try {
-                    $config_array = collect([
-                        'config_name' => $key,
-                        'config_value' => $value,
-                        'config_default' => $default,
-                        'config_descr' => $descr,
-                        'config_group' => $group,
-                        'config_sub_group' => $sub_group,
-                    ])->filter(function ($value) {
-                        return !is_null($value);
-                    })->toArray();
+            try {
+                $config_array = collect([
+                    'config_name' => $key,
+                    'config_value' => $value,
+                    'config_default' => $default,
+                    'config_descr' => $descr,
+                    'config_group' => $group,
+                    'config_sub_group' => $sub_group,
+                ])->filter(function ($value) {
+                    return !is_null($value);
+                })->toArray();
 
-                    \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
-                } catch (QueryException $e) {
-                    if (class_exists(\Log::class)) {
-                        \Log::error($e);
-                    }
-                    global $debug;
-                    if ($debug) {
-                        echo $e;
-                    }
+                \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
+            } catch (QueryException $e) {
+                if (class_exists(\Log::class)) {
+                    \Log::error($e);
                 }
+                global $debug;
+                if ($debug) {
+                    echo $e;
+                }
+            }
         }
 
         $keys = explode('.', $key);
@@ -353,36 +353,6 @@ class Config
         }
 
         $config = array_replace_recursive($db_config, $config);
-    }
-
-    /**
-     * Assign a value into the passed array by a path
-     * 'snmp.version' = 'v1' becomes $arr['snmp']['version'] = 'v1'
-     *
-     * @param array $arr the array to insert the value into, will be modified in place
-     * @param string $path the path to insert the value at
-     * @param mixed $value the value to insert, will be type cast
-     * @param string $separator path separator
-     */
-    private static function assignArrayByPath(&$arr, $path, $value, $separator = '.')
-    {
-        // type cast value. Is this needed here?
-        if (filter_var($value, FILTER_VALIDATE_INT)) {
-            $value = (int)$value;
-        } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
-            $value = (float)$value;
-        } elseif (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
-            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-        }
-
-        $keys = explode($separator, $path);
-
-        // walk the array creating keys if they don't exist
-        foreach ($keys as $key) {
-            $arr = &$arr[$key];
-        }
-        // assign the variable
-        $arr = $value;
     }
 
     private static function loadGraphsFromDb()
