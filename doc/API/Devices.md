@@ -1174,3 +1174,39 @@ Output:
     }
 ]
 ```
+
+
+### `search_oxidized`
+
+search all oxidized device configs for a string.
+
+Route: `api/v0/oxidized/configsearch/:searchstring`
+
+  - searchstring is the specific string you would like to search for.
+  
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/configsearch/vlan10"
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "nodes": [
+        {
+            "node": "asr9k.librenms.org",
+            "full_name": "cisco\/ASR9K.Librenms.org"
+        },
+        {
+            "node": "ios.Librenms.org",
+            "full_name": "cisco\/ios.Librenms.org"
+        }
+    ],
+    "count": 2
+}
+```
