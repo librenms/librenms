@@ -45,33 +45,7 @@ class Config extends BaseModel
         'config_group' => '',
         'config_sub_group' => '',
     ];
-
-    /**
-     * Get the config_value (type cast)
-     *
-     * @param string $value
-     * @return mixed
-     */
-    public function getConfigValueAttribute($value)
-    {
-        $result = @unserialize($value);
-        if ($value === 'b:0;' || $result !== false) {
-            return $result;
-        }
-
-        if (filter_var($value, FILTER_VALIDATE_INT)) {
-            return (int)$value;
-        } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
-            return (float)$value;
-        } elseif (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
-            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
-        }
-
-        return $value;
-    }
-
-    public function setConfigValueAttribute($value)
-    {
-        $this->attributes['config_value'] = serialize($value);
-    }
+    protected $casts = [
+        'config_value' => 'array'
+    ];
 }

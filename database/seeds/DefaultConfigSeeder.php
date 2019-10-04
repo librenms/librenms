@@ -677,8 +677,8 @@ class DefaultConfigSeeder extends Seeder
         $existing = DB::table('config')->pluck('config_name');
 
         \DB::table('config')->insert(array_map(function ($entry) {
-            $entry['config_value'] = serialize($entry['config_value']);
-            $entry['config_default'] = serialize($entry['config_default']);
+            $entry['config_value'] = json_encode($entry['config_value']);
+            $entry['config_default'] = json_encode($entry['config_default']);
             return $entry;
         }, array_filter($config_values, function ($entry) use ($existing) {
             return !$existing->contains($entry['config_name']);
