@@ -92,7 +92,7 @@ if (!is_numeric($config_id)) {
         $state = filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
-    $update = dbUpdate(['config_value' => json_encode($state)], 'config', '`config_id`=?', array($config_id));
+    $update = dbUpdate(['config_value' => json_encode($state, JSON_UNESCAPED_SLASHES)], 'config', '`config_id`=?', array($config_id));
     if (!empty($update) || $update == '0') {
         $message = 'Alert rule has been updated.';
         $status  = 'ok';
