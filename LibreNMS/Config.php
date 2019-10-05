@@ -252,9 +252,7 @@ class Config
                     'config_descr' => $descr,
                     'config_group' => $group,
                     'config_sub_group' => $sub_group,
-                ])->filter(function ($value) {
-                    return !is_null($value);
-                })->toArray();
+                ])->toArray();
 
                 \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
             } catch (QueryException $e) {

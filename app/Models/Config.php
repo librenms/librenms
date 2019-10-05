@@ -46,6 +46,16 @@ class Config extends BaseModel
         'config_sub_group' => '',
     ];
     protected $casts = [
-        'config_value' => 'array'
+        'config_default' => 'array'
     ];
+
+    public function getConfigValueAttribute($value)
+    {
+        return json_decode($value);
+    }
+
+    public function setConfigValueAttribute($value)
+    {
+        $this->attributes['config_value'] = json_encode($value, JSON_UNESCAPED_SLASHES);
+    }
 }
