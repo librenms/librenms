@@ -245,16 +245,15 @@ class Config
 
         if ($persist) {
             try {
-                $config_array = collect([
+                \App\Models\Config::updateOrCreate(['config_name' => $key], collect([
                     'config_name' => $key,
-                    'config_value' => $value,
                     'config_default' => $default,
                     'config_descr' => $descr,
                     'config_group' => $group,
                     'config_sub_group' => $sub_group,
-                ])->toArray();
-
-                \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
+                ])->filter(function ($value, $field) {
+                    return !is_null($value);
+                })->put('config_value', $value)->toArray());
             } catch (QueryException $e) {
                 if (class_exists(\Log::class)) {
                     \Log::error($e);
