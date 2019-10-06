@@ -44,7 +44,7 @@ class Config
         self::loadFiles();
 
         // Make sure the database is connected
-        if (Eloquent::isConnected() || (function_exists('dbIsConnected') && dbIsConnected())) {
+        if (Eloquent::isConnected()) {
             // pull in the database config settings
             self::mergeDb();
 
@@ -244,39 +244,23 @@ class Config
         global $config;
 
         if ($persist) {
-            if (Eloquent::isConnected()) {
-                try {
-                    $config_array = collect([
-                        'config_name' => $key,
-                        'config_value' => $value,
-                        'config_default' => $default,
-                        'config_descr' => $descr,
-                        'config_group' => $group,
-                        'config_sub_group' => $sub_group,
-                    ])->filter(function ($value) {
-                        return !is_null($value);
-                    })->toArray();
-
-                    \App\Models\Config::updateOrCreate(['config_name' => $key], $config_array);
-                } catch (QueryException $e) {
-                    // possibly table config doesn't exist yet
-                    global $debug;
-                    if ($debug) {
-                        echo $e;
-                    }
+            try {
+                \App\Models\Config::updateOrCreate(['config_name' => $key], collect([
+                    'config_name' => $key,
+                    'config_default' => $default,
+                    'config_descr' => $descr,
+                    'config_group' => $group,
+                    'config_sub_group' => $sub_group,
+                ])->filter(function ($value, $field) {
+                    return !is_null($value);
+                })->put('config_value', $value)->toArray());
+            } catch (QueryException $e) {
+                if (class_exists(\Log::class)) {
+                    \Log::error($e);
                 }
-            } else {
-                $res = dbUpdate(array('config_value' => $value), 'config', '`config_name`=?', array($key));
-                if (!$res && !dbFetchCell('SELECT 1 FROM `config` WHERE `config_name`=?', array($key))) {
-                    $insert = array(
-                        'config_name' => $key,
-                        'config_value' => $value,
-                        'config_default' => $default,
-                        'config_descr' => $descr,
-                        'config_group' => $group,
-                        'config_sub_group' => $sub_group,
-                    );
-                    dbInsert($insert, 'config');
+                global $debug;
+                if ($debug) {
+                    echo $e;
                 }
             }
         }
@@ -356,68 +340,27 @@ class Config
 
         $db_config = [];
 
-        if (Eloquent::isConnected()) {
-            try {
-                \App\Models\Config::get(['config_name', 'config_value'])
-                    ->each(function ($item) use (&$db_config) {
-                        array_set($db_config, $item->config_name, $item->config_value);
-                    });
-            } catch (QueryException $e) {
-                // possibly table config doesn't exist yet
-            }
-
-        } else {
-            foreach (dbFetchRows('SELECT `config_name`,`config_value` FROM `config`') as $obj) {
-                self::assignArrayByPath($db_config, $obj['config_name'], $obj['config_value']);
-            }
+        try {
+            \App\Models\Config::get(['config_name', 'config_value'])
+                ->each(function ($item) use (&$db_config) {
+                    Arr::set($db_config, $item->config_name, $item->config_value);
+                });
+        } catch (QueryException $e) {
+            // possibly table config doesn't exist yet
         }
 
         $config = array_replace_recursive($db_config, $config);
-    }
-
-    /**
-     * Assign a value into the passed array by a path
-     * 'snmp.version' = 'v1' becomes $arr['snmp']['version'] = 'v1'
-     *
-     * @param array $arr the array to insert the value into, will be modified in place
-     * @param string $path the path to insert the value at
-     * @param mixed $value the value to insert, will be type cast
-     * @param string $separator path separator
-     */
-    private static function assignArrayByPath(&$arr, $path, $value, $separator = '.')
-    {
-        // type cast value. Is this needed here?
-        if (filter_var($value, FILTER_VALIDATE_INT)) {
-            $value = (int)$value;
-        } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
-            $value = (float)$value;
-        } elseif (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
-            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-        }
-
-        $keys = explode($separator, $path);
-
-        // walk the array creating keys if they don't exist
-        foreach ($keys as $key) {
-            $arr = &$arr[$key];
-        }
-        // assign the variable
-        $arr = $value;
     }
 
     private static function loadGraphsFromDb()
     {
         global $config;
 
-        if (Eloquent::isConnected()) {
-            try {
-                $graph_types = GraphType::all()->toArray();
-            } catch (QueryException $e) {
-                // possibly table config doesn't exist yet
-                $graph_types = [];
-            }
-        } else {
-            $graph_types = dbFetchRows('SELECT * FROM graph_types');
+        try {
+            $graph_types = GraphType::all()->toArray();
+        } catch (QueryException $e) {
+            // possibly table config doesn't exist yet
+            $graph_types = [];
         }
 
         // load graph types from the database

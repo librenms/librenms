@@ -126,7 +126,7 @@ class ConfigTest extends LaravelTestCase
 
         $key = 'testing.persist';
 
-        $query = Eloquent::DB()->table('config')->where('config_name', $key);
+        $query = \App\Models\Config::query()->where('config_name', $key);
 
         $query->delete();
         $this->assertFalse($query->exists(), "$key should not be set, clean database");
