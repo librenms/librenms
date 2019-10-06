@@ -917,51 +917,14 @@ function clean_bootgrid($string)
 
 function get_config_by_group($group)
 {
-    $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = ?", array($group)) as $config_item) {
-        $val = $config_item['config_value'];
-        if (filter_var($val, FILTER_VALIDATE_INT)) {
-            $val = (int)$val;
-        } elseif (filter_var($val, FILTER_VALIDATE_FLOAT)) {
-            $val = (float)$val;
-        } elseif (filter_var($val, FILTER_VALIDATE_BOOLEAN)) {
-            $val = (boolean)$val;
+    return \App\Models\Config::query()->where('config_group', $group)->get()->map(function ($config_item) {
+        if ($config_item['config_value'] === true) {
+            $config_item['config_checked']  = 'checked';
         }
 
-        if ($val === true) {
-            $config_item += array('config_checked' => 'checked');
-        }
-
-        $items[$config_item['config_name']] = $config_item;
-    }
-
-    return $items;
+        return $config_item;
+    })->keyBy('config_name')->toArray();
 }//end get_config_by_group()
-
-
-function get_config_like_name($name)
-{
-    $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE ?", array("%$name%")) as $config_item) {
-        $items[$config_item['config_id']] = $config_item;
-    }
-
-    return $items;
-}//end get_config_like_name()
-
-
-function get_config_by_name($name)
-{
-    $config_item = dbFetchRow('SELECT * FROM `config` WHERE `config_name` = ?', array($name));
-    return $config_item;
-}//end get_config_by_name()
-
-
-function set_config_name($name, $config_value)
-{
-    return dbUpdate(array('config_value' => $config_value), 'config', '`config_name`=?', array($name));
-}//end set_config_name()
-
 
 function get_url()
 {
