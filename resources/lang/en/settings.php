@@ -460,6 +460,10 @@ return [
         'ping' => [
             'description' => 'Path to ping'
         ],
+        'ports_fdb_purge' => [
+            'description' => 'Port FDB entries older than',
+            'help' => 'Cleanup done by daily.sh'
+        ],
         'public_status' => [
             'description' => 'Show status publicly',
             'help' => 'Shows the status of some devices on the logon page without authentication.'

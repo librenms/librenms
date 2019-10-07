@@ -118,7 +118,7 @@
         "units": "days",
         "group": "system",
         "section": "cleanup",
-        "order": 4,
+        "order": 3,
         "type": "integer"
     },
     "alerts.bgp.whitelist": {
@@ -661,7 +661,7 @@
         "default": 7,
         "group": "system",
         "section": "cleanup",
-        "order": 4,
+        "order": 7,
         "type": "integer"
     },
     "device_traffic_descr": {
@@ -758,78 +758,6 @@
     "discovery_by_ip": {
         "default": false
     },
-    "discovery_modules.applications": {
-        "default": false
-    },
-    "discovery_modules.arp-table": {
-        "default": true
-    },
-    "discovery_modules.bgp-peers": {
-        "default": true
-    },
-    "discovery_modules.cisco-cbqos": {
-        "default": false
-    },
-    "discovery_modules.cisco-cef": {
-        "default": false
-    },
-    "discovery_modules.cisco-mac-accounting": {
-        "default": false
-    },
-    "discovery_modules.cisco-otv": {
-        "default": false
-    },
-    "discovery_modules.cisco-pw": {
-        "default": false
-    },
-    "discovery_modules.cisco-sla": {
-        "default": false
-    },
-    "discovery_modules.cisco-vrf-lite": {
-        "default": true
-    },
-    "discovery_modules.discovery-arp": {
-        "default": false
-    },
-    "discovery_modules.discovery-protocols": {
-        "default": true
-    },
-    "discovery_modules.entity-physical": {
-        "default": true
-    },
-    "discovery_modules.entity-state": {
-        "default": false
-    },
-    "discovery_modules.fdb-table": {
-        "default": true
-    },
-    "discovery_modules.hr-device": {
-        "default": true
-    },
-    "discovery_modules.ipv4-addresses": {
-        "default": true
-    },
-    "discovery_modules.ipv6-addresses": {
-        "default": true
-    },
-    "discovery_modules.junose-atm-vp": {
-        "default": false
-    },
-    "discovery_modules.libvirt-vminfo": {
-        "default": false
-    },
-    "discovery_modules.loadbalancers": {
-        "default": false
-    },
-    "discovery_modules.mef": {
-        "default": false
-    },
-    "discovery_modules.mempools": {
-        "default": true
-    },
-    "discovery_modules.ntp": {
-        "default": true
-    },
     "discovery_modules.os": {
         "default": true
     },
@@ -839,7 +767,49 @@
     "discovery_modules.ports-stack": {
         "default": true
     },
+    "discovery_modules.entity-physical": {
+        "default": true
+    },
+    "discovery_modules.entity-state": {
+        "default": false
+    },
     "discovery_modules.processors": {
+        "default": true
+    },
+    "discovery_modules.mempools": {
+        "default": true
+    },
+    "discovery_modules.cisco-vrf-lite": {
+        "default": true
+    },
+    "discovery_modules.cisco-mac-accounting": {
+        "default": false
+    },
+    "discovery_modules.cisco-pw": {
+        "default": false
+    },
+    "discovery_modules.vrf": {
+        "default": false
+    },
+    "discovery_modules.cisco-cef": {
+        "default": false
+    },
+    "discovery_modules.cisco-sla": {
+        "default": false
+    },
+    "discovery_modules.cisco-cbqos": {
+        "default": false
+    },
+    "discovery_modules.cisco-otv": {
+        "default": false
+    },
+    "discovery_modules.cisco-qfp": {
+        "default": false
+    },
+    "discovery_modules.ipv4-addresses": {
+        "default": true
+    },
+    "discovery_modules.ipv6-addresses": {
         "default": true
     },
     "discovery_modules.route": {
@@ -848,19 +818,25 @@
     "discovery_modules.sensors": {
         "default": true
     },
-    "discovery_modules.services": {
-        "default": true
-    },
     "discovery_modules.storage": {
         "default": true
     },
-    "discovery_modules.stp": {
+    "discovery_modules.hr-device": {
         "default": true
     },
-    "discovery_modules.toner": {
+    "discovery_modules.discovery-protocols": {
+        "default": true
+    },
+    "discovery_modules.arp-table": {
+        "default": true
+    },
+    "discovery_modules.discovery-arp": {
         "default": false
     },
-    "discovery_modules.ucd-diskio": {
+    "discovery_modules.junose-atm-vp": {
+        "default": false
+    },
+    "discovery_modules.bgp-peers": {
         "default": true
     },
     "discovery_modules.vlans": {
@@ -869,10 +845,40 @@
     "discovery_modules.vmware-vminfo": {
         "default": false
     },
-    "discovery_modules.vrf": {
+    "discovery_modules.libvirt-vminfo": {
+        "default": false
+    },
+    "discovery_modules.toner": {
+        "default": false
+    },
+    "discovery_modules.ucd-diskio": {
+        "default": true
+    },
+    "discovery_modules.applications": {
+        "default": false
+    },
+    "discovery_modules.services": {
+        "default": true
+    },
+    "discovery_modules.stp": {
+        "default": true
+    },
+    "discovery_modules.ntp": {
+        "default": true
+    },
+    "discovery_modules.loadbalancers": {
+        "default": false
+    },
+    "discovery_modules.mef": {
         "default": false
     },
     "discovery_modules.wireless": {
+        "default": true
+    },
+    "discovery_modules.fdb-table": {
+        "default": true
+    },
+    "discovery_modules.mpls": {
         "default": true
     },
     "distributed_poller": {
@@ -1053,7 +1059,7 @@
         "default": 1
     },
     "enable_footer": {
-        "default": 1
+        "default": false
     },
     "enable_inventory": {
         "default": 1
@@ -1098,7 +1104,7 @@
         "default": 30,
         "group": "system",
         "section": "cleanup",
-        "order": 4,
+        "order": 0,
         "type": "integer"
     },
     "favicon": {
@@ -3361,7 +3367,7 @@
         "default": 30,
         "group": "system",
         "section": "cleanup",
-        "order": 4,
+        "order": 6,
         "type": "integer"
     },
     "ping": {
@@ -3373,14 +3379,77 @@
     },
     "plugin_dir": {
     },
-    "poller_modules.applications": {
+    "poller_modules.unix-agent": {
+        "default": false
+    },
+    "poller_modules.os": {
         "default": true
     },
-    "poller_modules.aruba-controller": {
-        "default": false
+    "poller_modules.ipmi": {
+        "default": true
+    },
+    "poller_modules.sensors": {
+        "default": true
+    },
+    "poller_modules.processors": {
+        "default": true
+    },
+    "poller_modules.mempools": {
+        "default": true
+    },
+    "poller_modules.storage": {
+        "default": true
+    },
+    "poller_modules.netstats": {
+        "default": true
+    },
+    "poller_modules.hr-mib": {
+        "default": true
+    },
+    "poller_modules.ucd-mib": {
+        "default": true
+    },
+    "poller_modules.ipSystemStats": {
+        "default": true
+    },
+    "poller_modules.ports": {
+        "default": true
     },
     "poller_modules.bgp-peers": {
         "default": true
+    },
+    "poller_modules.junose-atm-vp": {
+        "default": false
+    },
+    "poller_modules.toner": {
+        "default": false
+    },
+    "poller_modules.ucd-diskio": {
+        "default": true
+    },
+    "poller_modules.wifi": {
+        "default": false
+    },
+    "poller_modules.wireless": {
+        "default": true
+    },
+    "poller_modules.ospf": {
+        "default": true
+    },
+    "poller_modules.cisco-ipsec-flow-monitor": {
+        "default": false
+    },
+    "poller_modules.cisco-remote-access-monitor": {
+        "default": false
+    },
+    "poller_modules.cisco-cef": {
+        "default": false
+    },
+    "poller_modules.cisco-sla": {
+        "default": false
+    },
+    "poller_modules.cisco-mac-accounting": {
+        "default": false
     },
     "poller_modules.cipsec-tunnels": {
         "default": false
@@ -3394,16 +3463,10 @@
     "poller_modules.cisco-asa-firewall": {
         "default": false
     },
+    "poller_modules.cisco-voice": {
+        "default": false
+    },
     "poller_modules.cisco-cbqos": {
-        "default": false
-    },
-    "poller_modules.cisco-cef": {
-        "default": false
-    },
-    "poller_modules.cisco-ipsec-flow-monitor": {
-        "default": false
-    },
-    "poller_modules.cisco-mac-accounting": {
         "default": false
     },
     "poller_modules.cisco-otv": {
@@ -3412,46 +3475,7 @@
     "poller_modules.cisco-qfp": {
         "default": false
     },
-    "poller_modules.cisco-remote-access-monitor": {
-        "default": false
-    },
-    "poller_modules.cisco-sla": {
-        "default": false
-    },
-    "poller_modules.cisco-voice": {
-        "default": false
-    },
     "poller_modules.cisco-vpdn": {
-        "default": false
-    },
-    "poller_modules.entity-physical": {
-        "default": true
-    },
-    "poller_modules.entity-state": {
-        "default": false
-    },
-    "poller_modules.hr-mib": {
-        "default": true
-    },
-    "poller_modules.ipSystemStats": {
-        "default": true
-    },
-    "poller_modules.ipmi": {
-        "default": true
-    },
-    "poller_modules.junose-atm-vp": {
-        "default": false
-    },
-    "poller_modules.loadbalancers": {
-        "default": false
-    },
-    "poller_modules.mef": {
-        "default": false
-    },
-    "poller_modules.mempools": {
-        "default": true
-    },
-    "poller_modules.mib": {
         "default": false
     },
     "poller_modules.nac": {
@@ -3460,53 +3484,46 @@
     "poller_modules.netscaler-vsvr": {
         "default": false
     },
-    "poller_modules.netstats": {
+    "poller_modules.aruba-controller": {
+        "default": false
+    },
+    "poller_modules.entity-physical": {
+        "default": true
+    },
+    "poller_modules.entity-state": {
+        "default": false
+    },
+    "poller_modules.applications": {
+        "default": true
+    },
+    "poller_modules.mib": {
+        "default": false
+    },
+    "poller_modules.stp": {
         "default": true
     },
     "poller_modules.ntp": {
         "default": true
     },
-    "poller_modules.os": {
-        "default": true
-    },
-    "poller_modules.ospf": {
-        "default": true
-    },
-    "poller_modules.ports": {
-        "default": true
-    },
-    "poller_modules.processors": {
-        "default": true
-    },
-    "poller_modules.sensors": {
-        "default": true
-    },
-    "poller_modules.storage": {
-        "default": true
-    },
-    "poller_modules.stp": {
-        "default": true
-    },
-    "poller_modules.toner": {
+    "poller_modules.loadbalancers": {
         "default": false
     },
-    "poller_modules.ucd-diskio": {
-        "default": true
-    },
-    "poller_modules.ucd-mib": {
-        "default": true
-    },
-    "poller_modules.unix-agent": {
+    "poller_modules.mef": {
         "default": false
     },
-    "poller_modules.wifi": {
-        "default": false
-    },
-    "poller_modules.wireless": {
+    "poller_modules.mpls": {
         "default": true
     },
     "port_descr_parser": {
         "default": "includes/port-descr-parser.inc.php"
+    },
+    "ports_fdb_purge": {
+        "default": 10,
+        "units": "days",
+        "group": "system",
+        "section": "cleanup",
+        "order": 5,
+        "type": "integer"
     },
     "ports_page_default": {
         "default": "details"
@@ -3803,7 +3820,7 @@
         "default": 30,
         "group": "system",
         "section": "cleanup",
-        "order": 4,
+        "order": 2,
         "type": "integer"
     },
     "temp_dir": {
