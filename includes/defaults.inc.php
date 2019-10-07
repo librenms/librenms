@@ -469,9 +469,6 @@ $config['bad_if_regexp'][] = '/^sl[0-9]/';
 // Rewrite Interfaces
 $config['rewrite_if_regexp']['/^cpu interface/'] = 'Mgmt';
 
-// Storage default warning percentage
-$config['storage_perc_warn'] = 60;
-
 $config['ignore_mount_removable'] = 1;
 // Ignore removable disk storage
 $config['ignore_mount_network'] = 1;
@@ -606,10 +603,6 @@ $config['libvirt_protocols'] = array(
     'qemu+ssh',
     'xen+ssh',
 );
-// Mechanisms used, add or remove if not using this on any of your machines.
-// Hardcoded ASN descriptions
-$config['astext'][65332] = 'Cymru FullBogon Feed';
-$config['astext'][65333] = 'Cymru Bogon Feed';
 
 // Nicer labels for the SLA types
 $config['sla_type_labels']['echo']              = 'ICMP ping';
@@ -843,9 +836,6 @@ $config['gui']['network-map']['style']                  = 'new';//old is also va
 
 // Show errored ports in the summary table on the dashboard
 $config['summary_errors']                               = 0;
-
-// Default width of the availability map's tiles
-$config['availability-map-width']                       = 25;
 
 // Default notifications Feed
 $config['notifications']['LibreNMS']                    = 'http://www.librenms.org/notifications.rss';

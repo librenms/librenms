@@ -225,7 +225,11 @@
         "type": "integer"
     },
     "astext": {
-        "description": "Key to hold cache of autonomous systems descriptions"
+        "default": {
+            "65332":"Cymru FullBogon Feed",
+            "65333":"Cymru Bogon Feed"
+        },
+        "type": "object"
     },
     "auth_ad_base_dn": {
         "group": "auth",
@@ -410,7 +414,7 @@
         "type": "text"
     },
     "auth_ldap_starttls": {
-        "default": "ldap.example.com",
+        "default": "disabled",
         "group": "auth",
         "section": "ldap",
         "order": 0,
@@ -2867,7 +2871,7 @@
         "required": true
     },
     "nfsen_subdirlayout": {
-        "default": "1",
+        "default": 1,
         "group": "external",
         "section": "nfsen",
         "order": 2,
@@ -3342,6 +3346,9 @@
     },
     "secure_cookies": {
     },
+    "sensors.guess_limits": {
+        "default": true
+    },
     "sfdp": {
         "default": "/usr/bin/sfdp",
         "group": "external",
@@ -3542,6 +3549,9 @@
     "sso.user_attr": {
         "default": "REMOTE_USER"
     },
+    "storage_perc_warn": {
+        "default": 60
+    },
     "stylesheet": {
         "default": "css/styles.css"
     },
@@ -3644,300 +3654,6 @@
         "section": "binaries",
         "order": 15,
         "type": "text"
-    },
-    "vmware_guestid.asianux3Guest": {
-        "default": "Asianux Server 3"
-    },
-    "vmware_guestid.asianux3_64Guest": {
-        "default": "Asianux Server 3 (64 bit)"
-    },
-    "vmware_guestid.asianux4Guest": {
-        "default": "Asianux Server 4"
-    },
-    "vmware_guestid.asianux4_64Guest": {
-        "default": "Asianux Server 4 (64 bit)"
-    },
-    "vmware_guestid.centos64Guest": {
-        "default": "CentOS 4/5 (64-bit)"
-    },
-    "vmware_guestid.centosGuest": {
-        "default": "CentOS 4/5"
-    },
-    "vmware_guestid.darwin64Guest": {
-        "default": "Mac OS 10.5 (64 bit)"
-    },
-    "vmware_guestid.darwinGuest": {
-        "default": "Mac OS 10.5"
-    },
-    "vmware_guestid.debian4Guest": {
-        "default": "Debian GNU/Linux 4"
-    },
-    "vmware_guestid.debian4_64Guest": {
-        "default": "Debian GNU/Linux 4 (64 bit)"
-    },
-    "vmware_guestid.debian5Guest": {
-        "default": "Debian GNU/Linux 5"
-    },
-    "vmware_guestid.debian5_64Guest": {
-        "default": "Debian GNU/Linux 5 (64 bit)"
-    },
-    "vmware_guestid.debian6Guest": {
-        "default": "Debian GNU/Linux 6"
-    },
-    "vmware_guestid.debian6_64Guest": {
-        "default": "Debian GNU/Linux 6 (64 bit)"
-    },
-    "vmware_guestid.debian7Guest": {
-        "default": "Debian GNU/Linux 7"
-    },
-    "vmware_guestid.debian7_64Guest": {
-        "default": "Debian GNU/Linux 7 (64 bit)"
-    },
-    "vmware_guestid.debian8Guest": {
-        "default": "Debian GNU/Linux 8"
-    },
-    "vmware_guestid.debian8_64Guest": {
-        "default": "Debian GNU/Linux 8 (64 bit)"
-    },
-    "vmware_guestid.dosGuest": {
-        "default": "MS-DOS."
-    },
-    "vmware_guestid.eComStationGuest": {
-        "default": "eComStation"
-    },
-    "vmware_guestid.freebsd64Guest": {
-        "default": "FreeBSD x64"
-    },
-    "vmware_guestid.freebsdGuest": {
-        "default": "FreeBSD"
-    },
-    "vmware_guestid.mandriva64Guest": {
-        "default": "Mandriva Linux (64 bit)"
-    },
-    "vmware_guestid.mandrivaGuest": {
-        "default": "Mandriva Linux"
-    },
-    "vmware_guestid.netware4Guest": {
-        "default": "Novell NetWare 4"
-    },
-    "vmware_guestid.netware5Guest": {
-        "default": "Novell NetWare 5.1"
-    },
-    "vmware_guestid.netware6Guest": {
-        "default": "Novell NetWare 6.x"
-    },
-    "vmware_guestid.nld9Guest": {
-        "default": "Novell Linux Desktop 9"
-    },
-    "vmware_guestid.oesGuest": {
-        "default": "Open Enterprise Server"
-    },
-    "vmware_guestid.openServer5Guest": {
-        "default": "SCO OpenServer 5"
-    },
-    "vmware_guestid.openServer6Guest": {
-        "default": "SCO OpenServer 6"
-    },
-    "vmware_guestid.oracleLinux64Guest": {
-        "default": "Oracle Linux 4/5 (64-bit)"
-    },
-    "vmware_guestid.oracleLinuxGuest": {
-        "default": "Oracle Linux 4/5"
-    },
-    "vmware_guestid.os2Guest": {
-        "default": "OS/2"
-    },
-    "vmware_guestid.other24xLinux64Guest": {
-        "default": "Linux 2.4x Kernel (64 bit) (experimental)"
-    },
-    "vmware_guestid.other24xLinuxGuest": {
-        "default": "Linux 2.4x Kernel"
-    },
-    "vmware_guestid.other26xLinux64Guest": {
-        "default": "Linux 2.6x Kernel (64 bit) (experimental)"
-    },
-    "vmware_guestid.other26xLinuxGuest": {
-        "default": "Linux 2.6x Kernel"
-    },
-    "vmware_guestid.otherGuest": {
-        "default": "Other Operating System"
-    },
-    "vmware_guestid.otherGuest64": {
-        "default": "Other Operating System (64 bit) (experimental)"
-    },
-    "vmware_guestid.otherLinux64Guest": {
-        "default": "Linux (64 bit) (experimental)"
-    },
-    "vmware_guestid.otherLinuxGuest": {
-        "default": "Other Linux"
-    },
-    "vmware_guestid.redhatGuest": {
-        "default": "Red Hat Linux 2.1"
-    },
-    "vmware_guestid.rhel2Guest": {
-        "default": "Red Hat Enterprise Linux 2"
-    },
-    "vmware_guestid.rhel3Guest": {
-        "default": "Red Hat Enterprise Linux 3"
-    },
-    "vmware_guestid.rhel3_64Guest": {
-        "default": "Red Hat Enterprise Linux 3 (64 bit)"
-    },
-    "vmware_guestid.rhel4Guest": {
-        "default": "Red Hat Enterprise Linux 4"
-    },
-    "vmware_guestid.rhel4_64Guest": {
-        "default": "Red Hat Enterprise Linux 4 (64 bit)"
-    },
-    "vmware_guestid.rhel5Guest": {
-        "default": "Red Hat Enterprise Linux 5"
-    },
-    "vmware_guestid.rhel5_64Guest": {
-        "default": "Red Hat Enterprise Linux 5 (64 bit) (experimental)"
-    },
-    "vmware_guestid.rhel6Guest": {
-        "default": "Red Hat Enterprise Linux 6"
-    },
-    "vmware_guestid.rhel6_64Guest": {
-        "default": "Red Hat Enterprise Linux 6 (64 bit)"
-    },
-    "vmware_guestid.sjdsGuest": {
-        "default": "Sun Java Desktop System"
-    },
-    "vmware_guestid.sles10Guest": {
-        "default": "Suse linux Enterprise Server 10"
-    },
-    "vmware_guestid.sles10_64Guest": {
-        "default": "Suse Linux Enterprise Server 10 (64 bit) (experimental)"
-    },
-    "vmware_guestid.sles11Guest": {
-        "default": "Suse linux Enterprise Server 11"
-    },
-    "vmware_guestid.sles11_64Guest": {
-        "default": "Suse Linux Enterprise Server 11 (64 bit)"
-    },
-    "vmware_guestid.sles64Guest": {
-        "default": "Suse Linux Enterprise Server 9 (64 bit)"
-    },
-    "vmware_guestid.slesGuest": {
-        "default": "Suse Linux Enterprise Server 9"
-    },
-    "vmware_guestid.solaris10Guest": {
-        "default": "Solaris 10 (32 bit) (experimental)"
-    },
-    "vmware_guestid.solaris10_64Guest": {
-        "default": "Solaris 10 (64 bit) (experimental)"
-    },
-    "vmware_guestid.solaris6Guest": {
-        "default": "Solaris 6"
-    },
-    "vmware_guestid.solaris7Guest": {
-        "default": "Solaris 7"
-    },
-    "vmware_guestid.solaris8Guest": {
-        "default": "Solaris 8"
-    },
-    "vmware_guestid.solaris9Guest": {
-        "default": "Solaris 9"
-    },
-    "vmware_guestid.suse64Guest": {
-        "default": "Suse Linux (64 bit)"
-    },
-    "vmware_guestid.suseGuest": {
-        "default": "Suse Linux"
-    },
-    "vmware_guestid.turboLinux64Guest": {
-        "default": "Turbolinux (64 bit)"
-    },
-    "vmware_guestid.turboLinuxGuest": {
-        "default": "Turbolinux"
-    },
-    "vmware_guestid.ubuntu64Guest": {
-        "default": "Ubuntu Linux (64 bit)"
-    },
-    "vmware_guestid.ubuntuGuest": {
-        "default": "Ubuntu Linux"
-    },
-    "vmware_guestid.unixWare7Guest": {
-        "default": "SCO UnixWare 7"
-    },
-    "vmware_guestid.win2000AdvServGuest": {
-        "default": "Windows 2000 Advanced Server"
-    },
-    "vmware_guestid.win2000ProGuest": {
-        "default": "Windows 2000 Professional"
-    },
-    "vmware_guestid.win2000ServGuest": {
-        "default": "Windows 2000 Server"
-    },
-    "vmware_guestid.win31Guest": {
-        "default": "Windows 3.1"
-    },
-    "vmware_guestid.win95Guest": {
-        "default": "Windows 95"
-    },
-    "vmware_guestid.win98Guest": {
-        "default": "Windows 98"
-    },
-    "vmware_guestid.winLonghorn64Guest": {
-        "default": "Windows Longhorn (64 bit) (experimental)"
-    },
-    "vmware_guestid.winLonghornGuest": {
-        "default": "Windows Longhorn (experimental)"
-    },
-    "vmware_guestid.winMeGuest": {
-        "default": "Windows Millenium Edition"
-    },
-    "vmware_guestid.winNTGuest": {
-        "default": "Windows NT 4"
-    },
-    "vmware_guestid.winNetBusinessGuest": {
-        "default": "Windows Small Business Server 2003"
-    },
-    "vmware_guestid.winNetDatacenter64Guest": {
-        "default": "Windows Server 2003, Datacenter Edition (64 bit) (experimental)"
-    },
-    "vmware_guestid.winNetDatacenterGuest": {
-        "default": "Windows Server 2003, Datacenter Edition"
-    },
-    "vmware_guestid.winNetEnterprise64Guest": {
-        "default": "Windows Server 2003, Enterprise Edition (64 bit)"
-    },
-    "vmware_guestid.winNetEnterpriseGuest": {
-        "default": "Windows Server 2003, Enterprise Edition"
-    },
-    "vmware_guestid.winNetStandard64Guest": {
-        "default": "Windows Server 2003, Standard Edition (64 bit)"
-    },
-    "vmware_guestid.winNetStandardGuest": {
-        "default": "Windows Server 2003, Standard Edition"
-    },
-    "vmware_guestid.winNetWebGuest": {
-        "default": "Windows Server 2003, Web Edition"
-    },
-    "vmware_guestid.winVista64Guest": {
-        "default": "Windows Vista (64 bit)"
-    },
-    "vmware_guestid.winVistaGuest": {
-        "default": "Windows Vista"
-    },
-    "vmware_guestid.winXPHomeGuest": {
-        "default": "Windows XP Home Edition"
-    },
-    "vmware_guestid.winXPPro64Guest": {
-        "default": "Windows XP Professional Edition (64 bit)"
-    },
-    "vmware_guestid.winXPProGuest": {
-        "default": "Windows XP Professional"
-    },
-    "vmware_guestid.windows7Guest": {
-        "default": "Windows 7"
-    },
-    "vmware_guestid.windows7Server64Guest": {
-        "default": "Windows Server 2008 R2 (64 bit)"
-    },
-    "vmware_guestid.windows7_64Guest": {
-        "default": "Windows 7 (64 bit)"
     },
     "warn.ifdown": {
         "default": true
