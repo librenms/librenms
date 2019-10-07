@@ -32,12 +32,11 @@ modules:
         count:
             data:
                 -
-                    oid: panSession
-                    value: panSessionActive
-                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.{{ $index }}'
+                    oid: panSessionActive
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.3.{{ $index }}'
                     group: Sessions
                     descr: Active Sessions
-                    high_limit: panSessionMax
+                    high_limit: '.1.3.6.1.4.1.25461.2.1.2.3.2.{{ $index }}'
         load:
             data:
                 -
