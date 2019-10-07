@@ -262,9 +262,25 @@ class Config
     public static function persist($key, $value)
     {
         try {
-            // flatten an array if sent one as value
-            $values = is_array($value) ? Arr::dot($value, "$key.") : [$key => $value];
-            foreach ($values as $key => $value) {
+            if (is_array($value)) {
+                // get all children
+                $children = \App\Models\Config::query()->where('config_name', 'like', "$key.%")->pluck('config_value', 'config_name');
+
+                // flatten an array and set each
+                foreach (Arr::dot($value, "$key.") as $key => $value) {
+                    if ($children->get($key) !== $value) {
+                        \App\Models\Config::updateOrCreate(['config_name' => $key], [
+                            'config_name' => $key,
+                            'config_value' => $value,
+                        ]);
+                    }
+                    Arr::set(self::$config, $key, $value);
+                    $children->forget($key);
+                }
+
+                // delete any non-existent children
+                \App\Models\Config::query()->whereIn('config_name', $children)->delete();
+            } else {
                 \App\Models\Config::updateOrCreate(['config_name' => $key], [
                     'config_name' => $key,
                     'config_value' => $value,

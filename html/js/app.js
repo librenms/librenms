@@ -1341,12 +1341,23 @@ __webpack_require__.r(__webpack_exports__);
         cryptoalgo: 'AES',
         cryptopass: ''
       });
+      this.$emit('input', this.localList);
     },
     removeItem: function removeItem(index) {
       this.localList.splice(index, 1);
+      this.$emit('input', this.localList);
+    },
+    updateItem: function updateItem(index, key, value) {
+      this.localList[index][key] = value;
+      this.$emit('input', this.localList);
     },
     dragged: function dragged() {
       this.$emit('input', this.localList);
+    }
+  },
+  watch: {
+    value: function value($value) {
+      this.localList = $value;
     }
   }
 });
@@ -3225,23 +3236,33 @@ var render = function() {
                             staticClass: "form-control",
                             attrs: { id: "authlevel", disabled: _vm.disabled },
                             on: {
-                              change: function($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function(o) {
-                                    return o.selected
-                                  })
-                                  .map(function(o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.$set(
-                                  item,
-                                  "authlevel",
-                                  $event.target.multiple
-                                    ? $$selectedVal
-                                    : $$selectedVal[0]
-                                )
-                              }
+                              change: [
+                                function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.$set(
+                                    item,
+                                    "authlevel",
+                                    $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  )
+                                },
+                                function($event) {
+                                  return _vm.updateItem(
+                                    id,
+                                    $event.target.id,
+                                    $event.target.value
+                                  )
+                                }
+                              ]
                             }
                           },
                           [
@@ -3272,7 +3293,7 @@ var render = function() {
                               domProps: {
                                 textContent: _vm._s(
                                   _vm.$t(
-                                    "settings.settings.snmp.v3.level.authNoPriv"
+                                    "settings.settings.snmp.v3.level.authPriv"
                                   )
                                 )
                               }
@@ -3336,24 +3357,35 @@ var render = function() {
                                 staticClass: "form-control",
                                 attrs: { id: "authalgo", name: "authalgo" },
                                 on: {
-                                  change: function($event) {
-                                    var $$selectedVal = Array.prototype.filter
-                                      .call($event.target.options, function(o) {
-                                        return o.selected
-                                      })
-                                      .map(function(o) {
-                                        var val =
-                                          "_value" in o ? o._value : o.value
-                                        return val
-                                      })
-                                    _vm.$set(
-                                      item,
-                                      "authalgo",
-                                      $event.target.multiple
-                                        ? $$selectedVal
-                                        : $$selectedVal[0]
-                                    )
-                                  }
+                                  change: [
+                                    function($event) {
+                                      var $$selectedVal = Array.prototype.filter
+                                        .call($event.target.options, function(
+                                          o
+                                        ) {
+                                          return o.selected
+                                        })
+                                        .map(function(o) {
+                                          var val =
+                                            "_value" in o ? o._value : o.value
+                                          return val
+                                        })
+                                      _vm.$set(
+                                        item,
+                                        "authalgo",
+                                        $event.target.multiple
+                                          ? $$selectedVal
+                                          : $$selectedVal[0]
+                                      )
+                                    },
+                                    function($event) {
+                                      return _vm.updateItem(
+                                        id,
+                                        $event.target.id,
+                                        $event.target.value
+                                      )
+                                    }
+                                  ]
                                 }
                               },
                               [
@@ -3386,7 +3418,16 @@ var render = function() {
                             _c("input", {
                               staticClass: "form-control",
                               attrs: { type: "text", id: "authname" },
-                              domProps: { value: item.authname }
+                              domProps: { value: item.authname },
+                              on: {
+                                input: function($event) {
+                                  return _vm.updateItem(
+                                    id,
+                                    $event.target.id,
+                                    $event.target.value
+                                  )
+                                }
+                              }
                             })
                           ])
                         ]),
@@ -3408,7 +3449,16 @@ var render = function() {
                             _c("input", {
                               staticClass: "form-control",
                               attrs: { type: "text", id: "authpass" },
-                              domProps: { value: item.authpass }
+                              domProps: { value: item.authpass },
+                              on: {
+                                input: function($event) {
+                                  return _vm.updateItem(
+                                    id,
+                                    $event.target.id,
+                                    $event.target.value
+                                  )
+                                }
+                              }
                             })
                           ])
                         ])
@@ -3463,24 +3513,35 @@ var render = function() {
                                 staticClass: "form-control",
                                 attrs: { id: "cryptoalgo" },
                                 on: {
-                                  change: function($event) {
-                                    var $$selectedVal = Array.prototype.filter
-                                      .call($event.target.options, function(o) {
-                                        return o.selected
-                                      })
-                                      .map(function(o) {
-                                        var val =
-                                          "_value" in o ? o._value : o.value
-                                        return val
-                                      })
-                                    _vm.$set(
-                                      item,
-                                      "cryptoalgo",
-                                      $event.target.multiple
-                                        ? $$selectedVal
-                                        : $$selectedVal[0]
-                                    )
-                                  }
+                                  change: [
+                                    function($event) {
+                                      var $$selectedVal = Array.prototype.filter
+                                        .call($event.target.options, function(
+                                          o
+                                        ) {
+                                          return o.selected
+                                        })
+                                        .map(function(o) {
+                                          var val =
+                                            "_value" in o ? o._value : o.value
+                                          return val
+                                        })
+                                      _vm.$set(
+                                        item,
+                                        "cryptoalgo",
+                                        $event.target.multiple
+                                          ? $$selectedVal
+                                          : $$selectedVal[0]
+                                      )
+                                    },
+                                    function($event) {
+                                      return _vm.updateItem(
+                                        id,
+                                        $event.target.id,
+                                        $event.target.value
+                                      )
+                                    }
+                                  ]
                                 }
                               },
                               [
@@ -3513,7 +3574,16 @@ var render = function() {
                             _c("input", {
                               staticClass: "form-control",
                               attrs: { type: "text", id: "cryptopass" },
-                              domProps: { value: item.cryptopass }
+                              domProps: { value: item.cryptopass },
+                              on: {
+                                input: function($event) {
+                                  return _vm.updateItem(
+                                    id,
+                                    $event.target.id,
+                                    $event.target.value
+                                  )
+                                }
+                              }
                             })
                           ])
                         ])
@@ -5525,7 +5595,779 @@ export function loadLanguageAsync(lang) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
+  "de": {
+    "Docs": "Dokumentation",
+    "Close": "Schließen",
+    "LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system": "LibreNMS ist ein selbstdetektierendes PHP/MySQL basierendes Netzwerkmonitoring System",
+    "Packages": "Pakete",
+    "Disabled": "gesperrt",
+    "Version": "Version",
+    "Database Schema": "Datenbank Schema",
+    "Web Server": "Webserver",
+    "LibreNMS is a community-based project": "LibreNMS ist ein Open Source Projekt",
+    "Please feel free to join us and contribute code, documentation, and bug reports:": "Sie sind herzlich dazu eingeladen Quellcode, Dokumentation und Fehlerreports hinzuzufügen",
+    "Web site": "Webseite",
+    "Bug tracker": "Bugtracker",
+    "Community Forum": "Community Forum",
+    "Changelog": "Changelog",
+    "Local git log": "lokales Git Log",
+    "Contributors": "Mitwirkende",
+    "Acknowledgements": "Anerkennungen",
+    "Opt in to send anonymous usage statistics to LibreNMS?": "Senden von anonymen Statistiken zu LibreNMS",
+    "Online stats:": "Online Statistiken",
+    "Clear remote stats": "lösche entfernte Statistiken",
+    "IPv4 Addresses": "IPv4 Adressen",
+    "IPv4 Networks": "IPv4 Netzwerke",
+    "IPv6 Addresses": "IPv6 Adressen",
+    "IPv6 Networks": "IPv6 Netzwerke",
+    "Processors": "Prozessoren",
+    "Applications": "Anwendungen",
+    "Disk I/O": "Festplatten I/O",
+    "Syslog Entries": "Syslog Einträge",
+    "Eventlog Entries": "Eventlog Einträge",
+    "Sensors": "Sensoren",
+    "Wireless Sensors": "WLAN Sensoren",
+    "Toner": "Toner",
+    "License": "Lizenz",
+    "Shutdown": "abschalten",
+    "Select Devices": "ausgewählte Geräte",
+    "Dynamic": "dynamisch",
+    "Static": "statisch",
+    "Define Rules": "definiere Regeln",
+    "Create Device Group": "erstelle Gerätegruppen",
+    "Edit Device Group": "bearbeite Gerätegruppen",
+    "New Device Group": "neue Gerätegruppen",
+    "Pattern": "Pattern",
+    "Type": "Typ",
+    "Name": "Name",
+    "User Preferences": "Benutzereinstellungen",
+    "Global Administrative Access": "administrativer Zugang",
+    "Device Permissions": "Geräterechte",
+    "Preferences": "Einstellungen",
+    "Language": "Sprache",
+    "Change Password": "ändere Passwort",
+    "Verify New Password": "bestätige neues Passwort",
+    "Peering + Transit": "Peering und Transit",
+    "FDB Tables": "FDB Tabellen",
+    "ARP Tables": "ARP Tabellen",
+    "MAC Address": "MAC Adresse",
+    "IPv6 Address": "IPv6 Adresse",
+    "IPv4 Address": "IPv4 Adresse",
+    "Package": "Package",
+    "Virtual Machines": "virtuelle Maschine",
+    "Device Groups": "Gerätegruppe",
+    "Register": "Registrierung",
+    "Overview": "Übersicht",
+    "Maps": "Karten",
+    "Availability": "Verfügbarkeit",
+    "Device Groups Maps": "Gerätegruppenkarte",
+    "Geographical": "geographisch",
+    "Plugins": "Plugins",
+    "Plugin Admin": "Plugin Administrator",
+    "Tools": "Werkzeuge",
+    "Eventlog": "Ereignisanzeige",
+    "Inventory": "Inhaltsverzeichnis",
+    "MIB definitions": "MIB Definitionen",
+    "No devices": "keine Geräte",
+    "MIB associations": "MIB Zuordnungen",
+    "Manage Groups": "verwalte Gruppen",
+    "Device Dependencies": "Geräteabhängigkeiten",
+    "Add Device": "Gerät hinzufügen",
+    "Delete Device": "Geräte entfernen",
+    "All Services": "Alle Dienste",
+    "Add Service": "Dienst hinzufügen",
+    "Traffic Bills": "Traffic Rechnungen",
+    "Pseudowires": "Pseudokabel",
+    "Customers": "Kunden",
+    "Transit": "Transit",
+    "Core": "Kern",
+    "Alerts": "Alarme",
+    "Deleted": "gelöscht",
+    "Health": "Gesundheit",
+    "Memory": "Arbeitsspeicher",
+    "Processor": "Prozessoren",
+    "Storage": "Speicher",
+    "Wireless": "WLAN",
+    "Apps": "Software",
+    "Routing": "Routing",
+    "Alerted": "alarmiert",
+    "Notifications": "Benachrichtigungen",
+    "Alert History": "Alarm Geschichte",
+    "Statistics": "Statistiken",
+    "Alert Rules": "Alarm Regeln",
+    "Scheduled Maintenance": "geplante Wartung",
+    "Alert Templates": "Alarm Vorlagen",
+    "Alert Transports": "Alarm Übertragungswege",
+    "My Settings": "Meine Einstellungen",
+    "Settings": "Einstellungen",
+    "Global Settings": "globale Einstellungen",
+    "Validate Config": "überprüfe Konfiguration",
+    "Auth History": "Authentifizierungsgeschichte",
+    "Peering": "Peering",
+    "API Settings": "API Einstellungen",
+    "API Docs": "API Dokumentation",
+    "The {attribute} must a valid IP address/network or hostname.": "{attribute} muss eine gültige IP Adresse/Netzwerk oder Hostname sein",
+    "Never polled": "nie geprüft",
+    "This indicates the most likely endpoint switchport": "Dies indiziert den höchstwahrscheinlichsen Endpunkt des Switchports",
+    "Two-Factor unlocked.": "Zweifaktor entsperrt",
+    "Failed to unlock Two-Factor.": "Entsperrung von Zweifaktor schlug fehl",
+    "Two-Factor removed.": "Zweifaktor wurde entfernt",
+    "Failed to remove Two-Factor.": "Das Entfernen von Zweifaktor schlug fehl",
+    "TwoFactor auth removed.": "Zweifaktor Authentifizierung entfernt",
+    "Too many two-factor failures, please contact administrator.": "Zu viele Zweifaktor Fehler, bitte kontaktieren Sie den Administrator",
+    "Too many two-factor failures, please wait {time} seconds": "Zu viele Zweifaktor Fehler, bitte warten Sie {time} Sekunden",
+    "No Two-Factor Token entered.": "Keine Zweifaktor Token verbucht",
+    "No Two-Factor settings, how did you get here?": "Keine Zweifaktor Einstellungen, wie sind sie hierher gekommen",
+    "Wrong Two-Factor Token.": "falsche Zweifaktor Token",
+    "TwoFactor auth added.": "Zweifaktor Authentifizierung hinzugefügt",
+    "User {username} created": "Benutzer {username} erstellt",
+    "Failed to create user": "Erstellung des Benutzers schlug fehl",
+    "Updated dashboard for {username}": "Dashboard für {username} upgedated",
+    "User {username} updated": "Benutzer {username} upgedated",
+    "Failed to update user {username}": "Update von Benutzer {username} fehlgeschlagen",
+    "User {username} deleted.": "Benutzer {username} gelöscht",
+    "Device does not exist": "Gerät existiert nicht",
+    "Port does not exist": "Port existiert nicht",
+    "App does not exist": "Anwendung existiert nicht",
+    "Bill does not exist": "Rechnung existiert nicht",
+    "Munin plugin does not exist": "Munin Erweiterung existiert nicht",
+    "Ok": "OK",
+    "Warning": "Warnung",
+    "Critical": "kritisch",
+    "Existing password did not match": "existierendes Passwort stimmt nicht überein",
+    "The {attribute} field is required.": "{attribute} ist benötigt",
+    "Edit User": "bearbeite Benutzer",
+    "Unlock": "entsperrend",
+    "User exceeded failures": "Benutzer überschreitet die Fehler",
+    "Disable TwoFactor": "sperre Zweifaktor",
+    "No TwoFactor key generated for this user, Nothing to do.": "keine Zweifaktor Schlüssel erstellt für Benutzer, nichts zu tun.",
+    "Save": "Speichern",
+    "Cancel": "Abbrechen",
+    "Unlocked Two Factor.": "entsperre Zweifaktor",
+    "Failed to unlock Two Factor": "entsperren von Zweifaktor schlug fehl",
+    "Removed Two Factor.": "entferne Zweifaktor",
+    "Failed to remove Two Factor": "entfernen von Zweifaktor schlug fehl",
+    "Real Name": "Realname",
+    "Email": "E-Mail",
+    "Description": "Beschreibung",
+    "Level": "Level",
+    "Normal": "Normal",
+    "Global Read": "globales Lesen",
+    "Admin": "Admin",
+    "Demo": "Demo",
+    "Dashboard": "Dashboard",
+    "Password": "Password",
+    "Current Password": "momentanes Passwort",
+    "New Password": "neues Passwort",
+    "Confirm Password": "bestätige Passwort",
+    "Can Modify Password": "darf Passwort ändern",
+    "Create User": "erstelle Benutzer",
+    "Username": "Benutzername",
+    "Manage Users": "verwalte Benutzer",
+    "ID": "ID",
+    "Access": "Zugriff",
+    "Auth": "Authentifizierung",
+    "Actions": "Aktionen",
+    "Edit": "Bearbeitung",
+    "Delete": "Löschen",
+    "Manage Access": "verwalte Zugriff",
+    "Add User": "Benutzer hinzufügen",
+    "Are you sure you want to delete ": "Sind sie sicher zu löschen",
+    "The user could not be deleted": "Der Benutzer kann nicht gelöscht werden",
+    "Whoops, the web server could not write required files to the filesystem.": "Ooops, der Webserver konnte die benötigten Dateien nicht auf das Dateisystem schreiben",
+    "Running the following commands will fix the issue most of the time:": "Ausführen der folgenden Befehle löst meistens die Probleme:",
+    "Whoops, looks like something went wrong. Check your librenms.log.": "Ooops, sieht so aus als wäre etwas schief gegangen. Bitte prüfen Sie die librenms.log",
+    "Public Devices": "öffentliche Geräte",
+    "System Status": "System Status",
+    "Logon": "Anmeldung",
+    "Device": "Geräte",
+    "Platform": "Plattform",
+    "Uptime": "Laufzeit",
+    "Location": "Standort",
+    "Status": "Status",
+    "Remember Me": "merken",
+    "Login": "Anmeldung",
+    "Please enter auth token": "Bitte geben Sie das Authentifizierungstoken ein",
+    "Submit": "Bestätigen",
+    "Logout": "Abmelden",
+    "Locations": "Standorte",
+    "Coordinates": "Koordinaten",
+    "Devices": "Geräte",
+    "Network": "Netzwerk",
+    "Servers": "Server",
+    "Firewalls": "Firewalls",
+    "Down": "aus",
+    "Save changes": "Änderungen speichern",
+    "N/A": "k.a.",
+    "Location must have devices to show graphs": "Der Standort muss Geräte haben um Graphen anzuzeigen",
+    "Traffic": "Datendurchsatz",
+    "Cannot delete locations used by devices": "Kann keinen Standort löschen, welcher von Geräten genutzt wird",
+    "Location deleted": "Standort gelöscht",
+    "Failed to delete location": "Löschen des Standorts schlug fehl",
+    "Timestamp": "Zeitstempel",
+    "Source": "Quelle",
+    "Message": "Nachricht",
+    "Facility": "Standort",
+    "Total hosts": "Gesamtzahl Geräte",
+    "ignored": "ignoriert",
+    "disabled": "gesperrt",
+    "up": "erreichbar",
+    "warn": "Warnung",
+    "down": "unerreichbar",
+    "Total services": "Gesamtzahl Anwendungen",
+    "Widget title": "Widget Titel",
+    "Default Title": "Standardtitel",
+    "Columns": "Spalten",
+    "Markers": "Markierungen",
+    "Ports": "Ports",
+    "Resolution": "Auflösung",
+    "Countries": "Länder",
+    "Provinces": "Gebiete",
+    "Metros": "Metros",
+    "Region": "Region",
+    "Help": "Hilfe",
+    "Stream": "Stream",
+    "All Messages": "alle Meldungen",
+    "All Devices": "alle Geräte",
+    "Page Size": "Seitegröße",
+    "Time Range": "Zeitbereich",
+    "Search all time": "kein Zeitlimit",
+    "Search last 5 minutes": "letzten 5 Minuten",
+    "Search last 15 minutes": "letzten 15 Minuten",
+    "Search last 30 minutes": "letzten 30 Minuten",
+    "Search last 1 hour": "letzte 1 Stunde",
+    "Search last 2 hours": "letzten 2 Stunden",
+    "Search last 8 hours": "letzten 8 Stunden",
+    "Search last 1 day": "letzten 1 Tag",
+    "Search last 2 days": "letzten 2 Tage",
+    "Search last 5 days": "letzten 5 Tage",
+    "Search last 7 days": "letzten 7 Tage",
+    "Search last 14 days": "letzten 14 Tage",
+    "Search last 30 days": "letzten 30 Tage",
+    "Custom title": "individueller Titel",
+    "Initial Latitude": "initialer Latitude",
+    "ie. 51.4800 for Greenwich": "z.B. 51.4800 für Greenwich",
+    "Initial Longitude": "initialer Longitude",
+    "ie. 0 for Greenwich": "z.B. 0 für Greenwich",
+    "Initial Zoom": "initialer Zoom",
+    "Grouping radius": "Guppierungsradius",
+    "default 80": "Standard 80",
+    "Show devices": "Zeige Geräte",
+    "Up + Down": "erreichbar und nicht erreichbar",
+    "Up": "erreichbar",
+    "Show Services": "zeige Anwendungen",
+    "no": "nein",
+    "yes": "ja",
+    "Show Port Errors": "zeige Portfehler",
+    "Notes": "Notizen",
+    "Custom title for widget": "angepassert Titel für Widget",
+    "Display type": "Anzeigetyp",
+    "boxes": "Box",
+    "compact": "Kompakt",
+    "Uniform Tiles": "gleichmässige Kacheln",
+    "Tile size": "Kachelgröße",
+    "Disabled/ignored": "gesperrt/ignoriert",
+    "Show": "Anzeigen",
+    "Hide": "Verbergen",
+    "Mode select": "Modus Auswahl",
+    "only devices": "Nur Geräte",
+    "only services": "Nur Anwendungen",
+    "devices and services": "Geräte und Anwendungen",
+    "Order By": "sortieren nach",
+    "Hostname": "Hostname",
+    "Device group": "Gerätegruppe",
+    "Automatic Title": "automatischer Titel",
+    "Graph type": "Graphentyp",
+    "Select a graph": "wähle einen Graph",
+    "Show legend": "zeige Legende an",
+    "Date range": "Datumsbereich",
+    "One Hour": "eine Stunde",
+    "Four Hours": "vier Stunden",
+    "Six Hours": "sechs Stunden",
+    "Twelve Hours": "zwölf Stunden",
+    "One Day": "ein Tag",
+    "One Week": "eine Woche",
+    "Two Weeks": "zwei Wochen",
+    "One Month": "ein Monat",
+    "Two Months": "zwei Monate",
+    "Three Months": "drei Monate",
+    "One Year": "ein Jahr",
+    "Two Years": "zwei Jahre",
+    "Select a device": "wähle ein Gerät",
+    "Port": "Port",
+    "Select a port": "wählen einen Port",
+    "Application": "Anwendung",
+    "Select an application": "wähle einen Port",
+    "Munin plugin": "Munin 外掛程式",
+    "Select a Munin plugin": "wähle ein Munin Plugin",
+    "Bill": "Rechnung",
+    "Select a bill": "wähle eine Rechnung",
+    "Custom Aggregator(s)": "angepasster Aggregator(s)",
+    "Select or add one or more": "wähle oder hinzufüge einen oder mehrere",
+    "Select one or more": "wähle einen oder mehrere",
+    "Top query": "Top Auswahl",
+    "Response time": "Antwortzeit",
+    "Poller duration": "Poller Laufzeit",
+    "Processor load": "Prozessorlast",
+    "Memory usage": "Speichernutzung",
+    "Disk usage": "Festplattennutzung",
+    "Sort order": "Sortierreihenfolge",
+    "Ascending": "aufsteigend",
+    "Descending": "absteigend",
+    "Number of Devices": "Anzahl an Geräten",
+    "Last Polled (minutes)": "zuletzt geprüft (Minuten)",
+    "Image URL": "Bild URL",
+    "Target URL": "Ziel URL",
+    "Show acknowledged": "zeige bestätigte",
+    "not filtered": "nicht gefiltert",
+    "show only acknowledged": "zeige nur bestätigte",
+    "hide acknowledged": "verstecke bestätigte",
+    "Show only fired": "zeige nur abgeschossene",
+    "show only fired alerts": "zeige nur abgeschossene Alarme",
+    "Displayed severity": "zeige Dringlichkeit",
+    "any severity": "jede Dringlichkeit",
+    "or higher": "oder höher",
+    "State": "Status",
+    "any state": "jeder Status",
+    "All alerts": "alle Alarme",
+    "Show Procedure field": "zeige Prozedurfeld",
+    "show": "zeige",
+    "hide": "verstecke",
+    "Sort alerts by": "sortiere Alarme nach",
+    "timestamp, descending": "Zeitstempel, absteigend",
+    "severity, descending": "Dringlichkeit, absteigend",
+    "All devices": "Alle Geräte",
+    "Event type": "Ereignistyp",
+    "All types": "Alle Typen",
+    "Number of interfaces": "Anzahl an Schnittstellen",
+    "Last polled (minutes)": "zuletzt geprüft (Minuten)",
+    "Interface type": "Schnittstellentyp",
+    "All Ports": "Alle Ports",
+    "Total": "Alle",
+    "Ignored": "ignoriert",
+    "Errored": "fehlerhalt",
+    "Services": "Anwendungen",
+    "No devices found within interval.": "Keine Geräte gefunden innerhalb dieses Intervals",
+    "Summary": "Zusammenfassung",
+    "Interface": "Schnittstelle",
+    "Total traffic": "Gesamtdurchsatz",
+    "Check your log for more details.": "Prüfen Sie das Logfile für Details",
+    "If you need additional help, you can find how to get help at": "Wenn Sie zusätzliche Hilfe benötigen finde Sie diese bei",
+    "Geo Locations": "geographischer Standort",
+    "All Locations": "alle Standorte",
+    "Pollers": "Poller",
+    "Groups": "Gruppen",
+    "Performance": "Performance",
+    "History": "Geschichte",
+    "syslog": {
+      "severity": ["Notfall", "Alarm", "Kritisch", "Fehler", "Warnung", "Notiz", "Information", "Debug"],
+      "facility": ["kernel Meldung", "user-level Meldung", "mail-system", "system daemons", "security/authorization Meldung", "messages generated internally by syslogd", "line printer subsystem", "network news subsystem", "UUCP subsystem", "clock daemon", "security/authorization Meldung", "FTP daemon", "NTP subsystem", "log audit", "log alert", "clock daemon (note 2)", "local use 0  (local0)", "local use 1  (local1)", "local use 2  (local2)", "local use 3  (local3)", "local use 4  (local4)", "local use 5  (local5)", "local use 6  (local6)", "local use 7  (local7)"]
+    },
+    "passwords": {
+      "password": "Das Passwort muss aus mindestens acht Zeichen bestehen",
+      "reset": "Ihr Passwort wurde zurückgesetzt!",
+      "sent": "Sie haben via E-Mail einen Link bekommen um das Passwort zurückzusetzen!",
+      "token": "Das Passwort Token zum zurücksetzen ist fehlerhaft.",
+      "user": "Es konnte kein Benutzer mit der angegebenen E-Mailadresse gefunden werden"
+    },
+    "sensors": {
+      "airflow": {
+        "short": "Luftfluß",
+        "long": "Luftfluß",
+        "unit": "cfm",
+        "unit_long": "Kubikfuß pro Minute"
+      },
+      "ber": {
+        "short": "BER",
+        "long": "Bitfehlerrate",
+        "unit": "",
+        "unit_long": ""
+      },
+      "charge": {
+        "short": "Ladung",
+        "long": "Ladung Prozent",
+        "unit": "%",
+        "unit_long": "Prozent"
+      },
+      "chromatic_dispersion": {
+        "short": "Chromatische Dispersion",
+        "long": "Chromatische Dispersion",
+        "unit": "ps/nm/km",
+        "unit_long": "Picosekunden pro Nanometer per Kilometer"
+      },
+      "cooling": {
+        "short": "Kühlung",
+        "long": "",
+        "unit": "W",
+        "unit_long": "Watt"
+      },
+      "count": {
+        "short": "Zähler",
+        "long": "Zähler",
+        "unit": "",
+        "unit_long": ""
+      },
+      "current": {
+        "short": "Strom",
+        "long": "Strom",
+        "unit": "A",
+        "unit_long": "Ampere"
+      },
+      "dbm": {
+        "short": "dBm",
+        "long": "dBm",
+        "unit": "dBm",
+        "unit_long": "Decibel-Milliwatt"
+      },
+      "delay": {
+        "short": "Verzögerung",
+        "long": "Verzögerung",
+        "unit": "s",
+        "unit_long": "Sekunden"
+      },
+      "eer": {
+        "short": "EER",
+        "long": "Energy Effizienz Rate",
+        "unit": "",
+        "unit_long": ""
+      },
+      "fanspeed": {
+        "short": "Lüfterdrehzahl",
+        "long": "Lüfterdrehzahl",
+        "unit": "RPM",
+        "unit_long": "Umdrehungen pro Minute"
+      },
+      "frequency": {
+        "short": "Frequenz",
+        "long": "Frequenz",
+        "unit": "Hz",
+        "unit_long": "Hertz"
+      },
+      "humidity": {
+        "short": "Luftfeuchtigkeit",
+        "long": "Luftfeuchtigkeit Prozent",
+        "unit": "%",
+        "unit_long": "Prozent"
+      },
+      "load": {
+        "short": "Last",
+        "long": "Last Prozent",
+        "unit": "%",
+        "unit_long": "Prozent"
+      },
+      "power": {
+        "short": "Leistung",
+        "long": "Leistung",
+        "unit": "W",
+        "unit_long": "Watt"
+      },
+      "power_consumed": {
+        "short": "Verbrauchsleistung",
+        "long": "Verbrauchsleistung",
+        "unit": "kWh",
+        "unit_long": "Killowatt-Stunden"
+      },
+      "power_factor": {
+        "short": "Leistungsfaktor",
+        "long": "Leistungsfaktor",
+        "unit": "",
+        "unit_long": ""
+      },
+      "pressure": {
+        "short": "Luftdruck",
+        "long": "Luftdruck",
+        "unit": "kPa",
+        "unit_long": "Kilopascal"
+      },
+      "quality_factor": {
+        "short": "Qualitätsfaktor",
+        "long": "Qualitätsfaktor",
+        "unit": "",
+        "unit_long": ""
+      },
+      "runtime": {
+        "short": "Laufzeit",
+        "long": "Leufzeit",
+        "unit": "Min",
+        "unit_long": "Minuten"
+      },
+      "signal": {
+        "short": "Signalstärke",
+        "long": "Signalstärke",
+        "unit": "dBm",
+        "unit_long": "Decibel-Milliwatt"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "Signal zu Rausch Verhältnis",
+        "unit": "dB",
+        "unit_long": "Decibel"
+      },
+      "state": {
+        "short": "Status",
+        "long": "Status",
+        "unit": ""
+      },
+      "temperature": {
+        "short": "Temperatur",
+        "long": "Temperatur",
+        "unit": "°C",
+        "unit_long": "° Celsius"
+      },
+      "voltage": {
+        "short": "Spannung",
+        "long": "Spannung",
+        "unit": "V",
+        "unit_long": "Volt"
+      },
+      "waterflow": {
+        "short": "Wasserdurchfluß",
+        "long": "Wasserdurchfluß",
+        "unit": "l/m",
+        "unit_long": "Liter pro Minute"
+      }
+    },
+    "wireless": {
+      "ap-count": {
+        "short": "APs",
+        "long": "AP Anzahl",
+        "unit": ""
+      },
+      "clients": {
+        "short": "Clienten",
+        "long": "Client Anzahl",
+        "unit": ""
+      },
+      "capacity": {
+        "short": "Kapazität",
+        "long": "Kapazität",
+        "unit": "%"
+      },
+      "ccq": {
+        "short": "CCQ",
+        "long": "Client Verbindungsqualität",
+        "unit": "%"
+      },
+      "errors": {
+        "short": "Fehler",
+        "long": "Fehleranzahl",
+        "unit": ""
+      },
+      "error-ratio": {
+        "short": "Fehlerrate",
+        "long": "Bit/Packet Fehlerrate",
+        "unit": "%"
+      },
+      "error-rate": {
+        "short": "BER",
+        "long": "Bitfehlerrate",
+        "unit": "bps"
+      },
+      "frequency": {
+        "short": "Frequenz",
+        "long": "Frequenz",
+        "unit": "MHz"
+      },
+      "distance": {
+        "short": "Distanz",
+        "long": "Distanz",
+        "unit": "km"
+      },
+      "mse": {
+        "short": "MSE",
+        "long": "mittlere quadratische Abweichung",
+        "unit": "dB"
+      },
+      "noise-floor": {
+        "short": "Grundrauschen",
+        "long": "Grundrauschen",
+        "unit": "dBm/Hz"
+      },
+      "power": {
+        "short": "Signalstärke",
+        "long": "TX/RX Signalstärke",
+        "unit": "dBm"
+      },
+      "quality": {
+        "short": "Qualität",
+        "long": "Qualität",
+        "unit": "%"
+      },
+      "rate": {
+        "short": "Rate",
+        "long": "TX/RX Rate",
+        "unit": "bps"
+      },
+      "rssi": {
+        "short": "RSSI",
+        "long": "Empfangsfeldstärke",
+        "unit": "dBm"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "Signal-zu-Rausch Verhältnis",
+        "unit": "dB"
+      },
+      "ssr": {
+        "short": "SSR",
+        "long": "Signalstärke Rate",
+        "unit": "dB"
+      },
+      "utilization": {
+        "short": "Nutzrate",
+        "long": "Nutzungsrate",
+        "unit": "%"
+      },
+      "xpi": {
+        "short": "XPI",
+        "long": "Kreuzpolarisation Interferenz",
+        "unit": "dB"
+      }
+    },
+    "auth": {
+      "failed": "Login fehlgeschlagen.",
+      "throttle": "Zuviele Loginversuche. Versuchen Sie es in {seconds} Sekunden noch einmal."
+    },
+    "pagination": {
+      "previous": "&laquo; zurück",
+      "next": "weiter &raquo;"
+    },
+    "validation": {
+      "accepted": "{attribute} muss akzeptiert werden.",
+      "active_url": "{attribute} ist keine gültige URL.",
+      "after": "{attribute} muss später als {date} sein.",
+      "after_or_equal": "{attribute} muss dem {date} oder später entsprechen.",
+      "alpha": "{attribute} darf nur Buchstaben enthalten.",
+      "alpha_dash": "{attribute} darf nur Buchstaben, Ziffern, Striche und Unterlinien enthalten.",
+      "alpha_num": "{attribute} darf nur Buchstaben und Ziffern enthalten.",
+      "alpha_space": "{attribute} darf nur Buchstaben, Ziffern Unterlinien und Leerzeichen enthalten.",
+      "array": "{attribute} muss ein Array sein.",
+      "before": "Th{attribute} muss ein Datum vor dem {date} sein.",
+      "before_or_equal": "{attribute} muss ein Datum vor oder gleich dem {date} sein.",
+      "between": {
+        "numeric": "{attribute} muss zwischen {min} und {max} sein.",
+        "file": "{attribute} muss zwischen {min} und {max} kilobytes sein.",
+        "string": "{attribute} muss zwischen {min} und {max} Zeichen haben.",
+        "array": "{attribute} muss mindestens {min} und maximal {max} Elemente haben."
+      },
+      "boolean": "das {attribute} Feld darf nur true oder false sein.",
+      "confirmed": "Die Prüfung von {attribute} schlug fehl.",
+      "date": "{attribute} enthält kein gültiges Datum.",
+      "date_equals": "{attribute} muss ein gültiges Datum gleich dem {date} sein.",
+      "date_format": "{attribute} entpricht nicht dem Format {format}.",
+      "different": "{attribute} und {other} müssen sich unterscheiden.",
+      "digits": "{attribute} muss aus aus {digits} Ziffern bestehen.",
+      "digits_between": "{attribute} muss mindestens {min} und maximal {max} Ziffern enthalten.",
+      "dimensions": "{attribute} hat ungültige Bild Abmessungen.",
+      "distinct": "{attribute} enthält doppelte Werte.",
+      "email": "{attribute} muss eine gültige E-Mailadresse enthalten.",
+      "ends_with": "{attribute} muss mit einem der folgenden Werte enden: {values}",
+      "exists": "Die Auswahl {attribute} ist ungültig.",
+      "file": "{attribute} muss eine Datei sein.",
+      "filled": "{attribute} darf nicht leer sein.",
+      "gt": {
+        "numeric": "{attribute} muss zwischen {min} und {max} sein.",
+        "file": "{attribute} muss zwischen {min} und {max} kilobytes sein.",
+        "string": "{attribute} muss zwischen {min} und {max} Zeichen haben.",
+        "array": "{attribute} muss mindestens {min} und maximal {max} Elemente haben."
+      },
+      "gte": {
+        "numeric": "{attribute} muss zwischen {min} und {max} sein.",
+        "file": "{attribute} muss zwischen {min} und {max} kilobytes sein.",
+        "string": "{attribute} muss zwischen {min} und {max} Zeichen haben.",
+        "array": "{attribute} muss mindestens {min} und maximal {max} Elemente haben."
+      },
+      "image": "{attribute} muss ein Bild sein.",
+      "in": "{attribute} ist ungültig.",
+      "in_array": "{attribute} existiert nicht in {other}.",
+      "integer": "{attribute} muss ein Integer sein.",
+      "ip": "{attribute} muss eine gültige IP address enthalten.",
+      "ipv4": "{attribute} muss eine gültige IPv4 Addresse enthalten.",
+      "ipv6": "{attribute} muss eine gültige IPv6 Addresse enthalten.",
+      "json": "{attribute} muss einen gültigen JSON String enthalten.",
+      "lt": {
+        "numeric": "{attribute} muss kleiner als {value} sein.",
+        "file": "{attribute} muss kleiner als {value} kilobytes sein.",
+        "string": "{attribute} muss weniger als {value} Zeichen enthalten.",
+        "array": "{attribute} muss weniger als {value} Elemente haben."
+      },
+      "lte": {
+        "numeric": "{attribute} muss kleiner oder gleich {value} sein.",
+        "file": "{attribute} muss kleiner oder gleich {value} kilobytes sein.",
+        "string": "{attribute} muss weniger oder gleich {value} Zeichen enthalten.",
+        "array": "{attribute} muss weniger oder gleich {value} Elemente haben."
+      },
+      "max": {
+        "numeric": "{attribute} darf nicht größer als {max} sein.",
+        "file": "{attribute} darf nicht größer als {max} kilobytes sein.",
+        "string": "{attribute} darf nicht mehr als {max} Zeichen haben.",
+        "array": "{attribute} darf nicht mehr als {max} Elemente haben."
+      },
+      "mimes": "{attribute} muss eine Datei des Types {values} sein.",
+      "mimetypes": "{attribute} muss eine Datei des Types {values} sein.",
+      "min": {
+        "numeric": "{attribute} muss mindestens {min} sein.",
+        "file": "{attribute} muss mindestens {min} kilobytes groß sein.",
+        "string": "{attribute} muss mindestens {min} Zeichen lang sein.",
+        "array": "{attribute} muss mindestens {min} Elemente enthalten."
+      },
+      "not_in": "Die Auswahl von {attribute} ist ungültig.",
+      "not_regex": "Das Format von {attribute} ist ungültig.",
+      "numeric": "{attribute} muss eine Ziffer sein.",
+      "present": "{attribute} darf nicht leer sein.",
+      "regex": "Das Format von {attribute} ist ungültig.",
+      "required": "{attribute} wird benötigt.",
+      "required_if": "{attribute} wird benötigt wenn {other} den Wert {value} enthält.",
+      "required_unless": "{attribute} wird benötigt außer {other} enthält{values}.",
+      "required_with": "{attribute} wird benötigt wenn {values} existiert.",
+      "required_with_all": "{attribute} wird benötigt wenn {values} existieren.",
+      "required_without": "{attribute} wird benötigt wenn {values} nicht existieren.",
+      "required_without_all": "{attribute} wird benötigt wenn keines von {values} existieren.",
+      "same": "{attribute} und {other} müssen passen.",
+      "size": {
+        "numeric": "{attribute} muss {size} groß sein.",
+        "file": "{attribute} muss {size} kilobyte groß sein.",
+        "string": "{attribute} muss {size} Zeichen groß sein.",
+        "array": "{attribute} muss {size} Elemente enthalten."
+      },
+      "starts_with": "{attribute} muss mit einem von diesen beginnen: {values}",
+      "string": "{attribute} muss einen Zeichenkette sein.",
+      "timezone": "{attribute} muss eine gültige Zeitzone sein.",
+      "unique": "{attribute} wird schon verwendet.",
+      "uploaded": "Der Upload von {attribute} schlug fehl.",
+      "url": "Das Format von {attribute} ist ungültig.",
+      "uuid": "{attribute} muss eine gültige UUID sein.",
+      "custom": {
+        "attribute-name": {
+          "rule-name": "custom-message"
+        }
+      },
+      "attributes": []
+    },
+    "preferences": {
+      "lang": "Deutsch"
+    },
+    "commands": {
+      "user{add}": {
+        "description": "Füge einen lokalen Benutzer hinzu. Sie können sich nur einloggen wenn die Authentifizierung auf MySQL gesetzt ist",
+        "arguments": {
+          "username": "Die Authentifizierung mit der sich der Benutzer einloggt"
+        },
+        "options": {
+          "descr": "Beschreibung",
+          "email": "E-Mail",
+          "password": "Passwort des Benutzers. Wenn nicht angegeben werden Sie danach gefragt",
+          "full-name": "Voller Name des Benutzers",
+          "role": "Deklariere dem Benutzer die Rolle {roles}"
+        },
+        "password-request": "Definieren Sie ein Benutzerpasswort",
+        "success": "Benutzer {username} erfolgreich hinzugefügt",
+        "wrong-auth": "Achtung! Sie können sich nicht mit diesem Benutzernamen einloggen wenn die Authentifizierung nicht auf MySQL gesetzt ist"
+      }
+    }
+  },
   "en": {
+    "New": "New",
     "Undo": "Undo",
     "Reset to default": "Reset to default",
     "Admin": "Admin",
@@ -6070,7 +6912,7 @@ __webpack_require__.r(__webpack_exports__);
               "cryptopass": "Password"
             },
             "level": {
-              "noAuthNoPriv": "No Authentication or Privacy",
+              "noAuthNoPriv": "No Authentication, No Privacy",
               "authNoPriv": "Authentication, No Privacy",
               "authPriv": "Authentication and Privacy"
             }
@@ -6190,7 +7032,8 @@ __webpack_require__.r(__webpack_exports__);
         "integer": "{value} is not an integer",
         "password": "The password is incorrect",
         "select": "{value} is not an allowed value",
-        "text": "{value} is not allowed"
+        "text": "{value} is not allowed",
+        "array": "Invalid format"
       }
     },
     "passwords": {
@@ -6597,14 +7440,137 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   "fr": {
-    "Shutdown": "Shutdown",
+    "Authlog": "Journal d'authentification",
+    "User": "Utilisateur",
+    "IP Address": "Adresse IP",
+    "Result": "Résultat",
+    "Translation not fully supported": "La traduction n'est pas entièrement prise en charge",
+    "Warning {service_count}": "Attention {service_count}",
+    "Critical {service_count}": "Critique {service_count}",
+    "Disabled {port_count}": "Désactivé {port_count}",
+    "Errored {port_count}": "Erreurs {port_count}",
+    "Ignored {port_count}": "Ignoré {port_count}",
+    "Down {port_count}": "Down {port_count}",
+    "Deleted {port_count}": "Supprimé {port_count}",
+    "About {project_name}": "À propos {project_name}",
+    "See the <a href=\"{url}\">list of contributors</a> on GitHub.": "Consultez la <a href=\"{url}\"> liste des contributeurs </a> sur GitHub.",
+    "Docs": "Documentations",
+    "Close": "Fermer",
+    "LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system": "LibreNMS est un système de surveillance réseau basé sur PHP / MySQL à découverte automatique.",
+    "Packages": "Paquets",
+    "Disabled": "Désactiver",
+    "Version": "Version",
+    "Database Schema": "Schéma de base de données",
+    "Web Server": "Serveur Web",
+    "LibreNMS is a community-based project": "LibreNMS est un projet basé sur la communauté",
+    "Please feel free to join us and contribute code, documentation, and bug reports:": "N'hésitez pas à nous rejoindre et à contribuer au code, à la documentation et aux rapports de bug:",
+    "Web site": "Site Web",
+    "Bug tracker": "Traqueur de bug",
+    "Community Forum": "Forum de la communauté",
+    "Changelog": "Journal des changements",
+    "Local git log": "Local git log",
+    "Contributors": "Contributeurs",
+    "Acknowledgements": "Remerciements",
+    "Opt in to send anonymous usage statistics to LibreNMS?": "Activer pour envoyer des statistiques d'utilisation anonymes à LibreNMS?",
+    "Online stats:": "Statistiques en ligne",
+    "Clear remote stats": "Effacer les statistiques à distance",
+    "IPv4 Addresses": "Adresses IPv4",
+    "IPv4 Networks": "Réseaux IPv4",
+    "IPv6 Addresses": "Adresses IPv6",
+    "IPv6 Networks": "Réseaux IPv6",
+    "Processors": "Processeurs",
+    "Applications": "Applications",
+    "Disk I/O": "E/S Disque",
+    "Syslog Entries": "Entrées Syslog",
+    "Eventlog Entries": "Entrées du journal des événements",
+    "Sensors": "Capteurs",
+    "Wireless Sensors": "Capteurs sans fil",
+    "Toner": "Toner",
+    "License": "License",
+    "Select Devices": "Sélectionner les périphériques",
+    "Dynamic": "Dynamique",
+    "Static": "Statique",
+    "Define Rules": "Définir les règles",
+    "Create Device Group": "Créer un groupe de périphériques",
+    "Edit Device Group": "Modifier le groupe de périphériques",
+    "New Device Group": "Nouveau groupe de périphérique",
+    "Pattern": "Modèle",
+    "Type": "Type",
+    "Name": "Prénom",
+    "User Preferences": "Préférences de l'utilisateur",
+    "Global Administrative Access": "Accès administratif global",
+    "Device Permissions": "Autorisations de périphérique",
+    "Preferences": "Préférences",
+    "Language": "Langue",
+    "Change Password": "Changer le mot de passe",
+    "Verify New Password": "Vérifier le nouveau mot de passe",
+    "Peering + Transit": "Peering + Transit",
+    "FDB Tables": "Tables FDB",
+    "ARP Tables": "Tables ARP",
+    "MAC Address": "Adresse MAC",
+    "IPv6 Address": "Adresse IPv6",
+    "IPv4 Address": "Adresse IPv4",
+    "Package": "Paquet",
+    "Virtual Machines": "Machines virtuelles",
+    "Device Groups": "Groupes de périphériques",
+    "Register": "S'enregistrer",
+    "Overview": "Vue d'ensemble",
+    "Maps": "Cartes",
+    "Availability": "Disponibilité",
+    "Device Groups Maps": "Cartes de groupes de périphériques",
+    "Geographical": "Géographique",
+    "Plugins": "Plugins",
+    "Plugin Admin": "Plugin Admin",
+    "Tools": "Outils",
+    "Eventlog": "Journal des événements",
+    "Inventory": "Inventaire",
+    "MIB definitions": "Définitions MIB",
+    "No devices": "Aucun périphérique ",
+    "MIB associations": "Associations MIB",
+    "Manage Groups": "Gérer les groupes",
+    "Device Dependencies": "Dépendances du périphérique",
+    "Add Device": "Ajouter un périphérique",
+    "Delete Device": "Supprimer le périphérique",
+    "All Services": "Tous les services",
+    "Add Service": "Ajouter un service",
+    "Traffic Bills": "Factures de traffic",
+    "Pseudowires": "Pseudowires",
+    "Customers": "Clients",
+    "Transit": "Transit",
+    "Core": "Coeur",
+    "Alerts": "Alertes",
+    "Deleted": "Supprimé",
+    "Health": "Santé",
+    "Memory": "Mémoire",
+    "Processor": "Processeur",
+    "Storage": "Stockage",
+    "Wireless": "Sans-fil",
+    "Apps": "Applications",
+    "Routing": "Routage",
+    "Alerted": "Alerte",
+    "Notifications": "Notifications",
+    "Alert History": "Historique d'alerte",
+    "Statistics": "Statistiques",
+    "Alert Rules": "Règles d'alerte",
+    "Scheduled Maintenance": "Maintenance prévue",
+    "Alert Templates": "Modèles d'alerte",
+    "Alert Transports": "Alert Transports",
+    "My Settings": "Mes Paramètres",
+    "Settings": "Paramètres",
+    "Global Settings": "Paramètres globaux",
+    "Validate Config": "Valider la configuration",
+    "Auth History": "Historique d'authentification",
+    "Peering": "Peering",
+    "API Settings": "Paramètres de l'API",
+    "API Docs": "Documentation API",
+    "Shutdown": "Arrêt",
     "The {attribute} must a valid IP address/network or hostname.": "{attribute} doit avoir une adresse IP valide ou un nom d'hôte valide.",
     "Never polled": "Jamais sondé",
     "This indicates the most likely endpoint switchport": "Ceci indique le port de commutation le plus probable",
-    "Two-Factor unlocked.": "Double-facteurs déverrouillé.",
-    "Failed to unlock Two-Factor.": "Échec de déverrouilliage double-facteurs .",
-    "Two-Factor removed.": "Double-facteurs supprimé.",
-    "Failed to remove Two-Factor.": "Échec d'enlevent  .",
+    "Two-Factor unlocked.": "Double facteur déverrouillé.",
+    "Failed to unlock Two-Factor.": "Échec de déverrouilliage double facteur.",
+    "Two-Factor removed.": "Double facteur supprimé.",
+    "Failed to remove Two-Factor.": "Échec de la suppression du double facteur  .",
     "TwoFactor auth removed.": "Authentification à deux facteurs supprimée.",
     "Too many two-factor failures, please contact administrator.": "Trop d'échecs à deux facteurs, veuillez contacter l'administrateur.",
     "Too many two-factor failures, please wait {time} seconds": "Trop d'échecs à deux facteurs, veuillez patienter {time} secondes",
@@ -6632,11 +7598,11 @@ __webpack_require__.r(__webpack_exports__);
     "Unlock": "Déverrouiller",
     "User exceeded failures": "L'utilisateur à dépassé le nombre de tentative",
     "Disable TwoFactor": "Désactiver le double facteur",
-    "No TwoFactor key generated for this user, Nothing to do.": "Pas de clé à deux facteurs générée pour cet utilisateur, Rien à faire.",
+    "No TwoFactor key generated for this user, Nothing to do.": "Pas de clé à deux facteurs générée pour cet utilisateur, rien à faire.",
     "Save": "Enregistrer",
     "Cancel": "Annuler",
-    "Unlocked Two Factor.": "Déverrouillé le double-facteurs.",
-    "Failed to unlock Two Factor": "N'a pas réussi à déverrouiller le double-facteurs",
+    "Unlocked Two Factor.": "Déverrouillé le double facteur.",
+    "Failed to unlock Two Factor": "N'a pas réussi à déverrouiller le double facteur",
     "Removed Two Factor.": "Supprimé le double-facteurs.",
     "Failed to remove Two Factor": "N'a pas réussi à supprimer le double facteur",
     "Real Name": "Nom réel",
@@ -6653,211 +7619,463 @@ __webpack_require__.r(__webpack_exports__);
     "New Password": "Nouveau mot de passe",
     "Confirm Password": "Mot de passe confirmer",
     "Can Modify Password": "Peut modifier le mot de passe",
-    "Create User": "créer un utilisateur",
-    "Username": "nom d'utilisateur",
+    "Create User": "Créer un utilisateur",
+    "Username": "Nom d'utilisateur",
     "Manage Users": "Gestion des utilisateurs",
     "ID": "ID",
     "Access": "Accès",
     "Auth": "Auth",
     "Actions": "Actions",
-    "Edit": "Edit",
+    "Edit": "Modifier",
     "Delete": "Supprimer",
     "Manage Access": "Gérer les accès",
-    "Add User": "Add User",
-    "Are you sure you want to delete ": "Are you sure you want to delete ",
-    "The user could not be deleted": "The user could not be deleted",
-    "Whoops, the web server could not write required files to the filesystem.": "Whoops, the web server could not write required files to the filesystem.",
-    "Running the following commands will fix the issue most of the time:": "Running the following commands will fix the issue most of the time:",
-    "Whoops, looks like something went wrong. Check your librenms.log.": "Whoops, looks like something went wrong. Check your librenms.log.",
-    "Public Devices": "Public Devices",
-    "System Status": "System Status",
-    "Logon": "Logon",
-    "Device": "Device",
-    "Platform": "Platform",
-    "Uptime": "Uptime",
-    "Location": "Location",
+    "Add User": "Ajouter un utilisateur",
+    "Are you sure you want to delete ": "Êtes-vous sûr de vouloir supprimer ",
+    "The user could not be deleted": "L’utilisateur ne peut être supprimé",
+    "Whoops, the web server could not write required files to the filesystem.": "Oups, le serveur web ne peut pas écrire les fichiers nécessaires au système de fichiers.",
+    "Running the following commands will fix the issue most of the time:": "Exécuter les commandes suivantes corrigera le problème la plupart du temps:",
+    "Whoops, looks like something went wrong. Check your librenms.log.": "Oups, on dirait que quelque chose a mal tourné. Vérifiez le fichier librenms.log.",
+    "Public Devices": "Appareils publics",
+    "System Status": "Status du système",
+    "Logon": "Connexion",
+    "Device": "Appareils",
+    "Platform": "Plateforme",
+    "Uptime": "Temps de fonctionnement",
+    "Location": "Emplacement",
     "Status": "Status",
-    "Remember Me": "Remember Me",
+    "Remember Me": "Se souvenir de moi",
     "Login": "Connexion",
-    "Please enter auth token": "Please enter auth token",
+    "Please enter auth token": "Veuillez entrer le jeton d’autorisation",
     "Submit": "Submit",
-    "Logout": "Logout",
-    "Locations": "Locations",
-    "Coordinates": "Coordinates",
+    "Logout": "Déconnexion",
+    "Locations": "Emplacements",
+    "Coordinates": "Coordonnées",
     "Devices": "Appareils",
     "Network": "Réseau",
-    "Servers": "Servers",
-    "Firewalls": "Firewalls",
-    "Down": "inaccessible",
-    "Save changes": "Save changes",
+    "Servers": "Serveurs",
+    "Firewalls": "Pare-feux",
+    "Down": "Down",
+    "Save changes": "Sauvegarder les changements",
     "N/A": "N/A",
-    "Location must have devices to show graphs": "Location must have devices to show graphs",
+    "Location must have devices to show graphs": "L’emplacement doit avoir des appareils pour montrer des graphiques",
     "Traffic": "Traffic",
-    "Cannot delete locations used by devices": "Cannot delete locations used by devices",
-    "Location deleted": "Location deleted",
-    "Failed to delete location": "Failed to delete location",
-    "Timestamp": "Timestamp",
+    "Cannot delete locations used by devices": "Impossible de supprimer les emplacements utilisés par les appareils",
+    "Location deleted": "Emplacement supprimé",
+    "Failed to delete location": "Echec de suppression de l'emplacement",
+    "Timestamp": "Horodatage",
     "Source": "Source",
     "Message": "Message",
-    "Facility": "Facility",
-    "Total hosts": "Total hosts",
-    "ignored": "ignored",
-    "disabled": "disabled",
+    "Facility": "Etablissement",
+    "Total hosts": "Nombre total d’hôtes",
+    "ignored": "ignoré",
+    "disabled": "desactiver",
     "up": "up",
     "warn": "warn",
     "down": "down",
     "Total services": "Total services",
-    "Widget title": "Widget title",
-    "Default Title": "Default Title",
-    "Columns": "Columns",
+    "Widget title": "Titre du widget",
+    "Default Title": "Titre par défaut",
+    "Columns": "Colonnes",
     "Markers": "Markers",
     "Ports": "Ports",
-    "Resolution": "Resolution",
-    "Countries": "Countries",
+    "Resolution": "Résolution",
+    "Countries": "Pays",
     "Provinces": "Provinces",
     "Metros": "Metros",
-    "Region": "Region",
-    "Help": "Help",
+    "Region": "Région",
+    "Help": "Aide",
     "Stream": "Stream",
-    "All Messages": "All Messages",
+    "All Messages": "Tous les Messages",
     "All Devices": "Tous les appareils",
-    "Page Size": "Page Size",
-    "Time Range": "Time Range",
-    "Search all time": "Search all time",
-    "Search last 5 minutes": "Search last 5 minutes",
-    "Search last 15 minutes": "Search last 15 minutes",
-    "Search last 30 minutes": "Search last 30 minutes",
-    "Search last 1 hour": "Search last 1 hour",
-    "Search last 2 hours": "Search last 2 hours",
-    "Search last 8 hours": "Search last 8 hours",
-    "Search last 1 day": "Search last 1 day",
-    "Search last 2 days": "Search last 2 days",
-    "Search last 5 days": "Search last 5 days",
-    "Search last 7 days": "Search last 7 days",
-    "Search last 14 days": "Search last 14 days",
-    "Search last 30 days": "Search last 30 days",
-    "Custom title": "Custom title",
-    "Initial Latitude": "Initial Latitude",
-    "ie. 51.4800 for Greenwich": "ie. 51.4800 for Greenwich",
-    "Initial Longitude": "Initial Longitude",
-    "ie. 0 for Greenwich": "ie. 0 for Greenwich",
-    "Initial Zoom": "Initial Zoom",
-    "Grouping radius": "Grouping radius",
-    "default 80": "default 80",
-    "Show devices": "Show devices",
+    "Page Size": "Taille de la page",
+    "Time Range": "Plage de temps",
+    "Search all time": "Rechercher tout le temps",
+    "Search last 5 minutes": "Rechercher les 5 dernières minutes",
+    "Search last 15 minutes": "Rechercher les 15 dernières minutes",
+    "Search last 30 minutes": "Rechercherles 30 dernières minutess",
+    "Search last 1 hour": "Rechercher la dernière heure",
+    "Search last 2 hours": "Rechercher les deux dernières heures",
+    "Search last 8 hours": "Rechercher les huit dernières heures",
+    "Search last 1 day": "Rechercher le dernier jour",
+    "Search last 2 days": "Rechercher les deux derniers jours",
+    "Search last 5 days": "Rechercher les cinq derniers jours",
+    "Search last 7 days": "Rechercher la dernière semaine",
+    "Search last 14 days": "Rechercher les deux dernières semaines",
+    "Search last 30 days": "Rechercher le mois dernier",
+    "Custom title": "Titre personnalisé",
+    "Initial Latitude": "Latitude initiale",
+    "ie. 51.4800 for Greenwich": "ie. 51.4800 pour Greenwich",
+    "Initial Longitude": "Longitude initiale",
+    "ie. 0 for Greenwich": "ie. 0 pour Greenwich",
+    "Initial Zoom": "Zoom initial",
+    "Grouping radius": "Rayon de regroupement",
+    "default 80": "defaut 80",
+    "Show devices": "Afficher les appareils",
     "Up + Down": "Up + Down",
     "Up": "Up",
-    "Show Services": "Show Services",
-    "no": "no",
-    "yes": "yes",
-    "Show Port Errors": "Show Port Errors",
+    "Show Services": "Afficher les Services",
+    "no": "non",
+    "yes": "oui",
+    "Show Port Errors": "Afficher les erreurs de port",
     "Notes": "Notes",
-    "Custom title for widget": "Custom title for widget",
-    "Display type": "Display type",
-    "boxes": "boxes",
+    "Custom title for widget": "Titre personnalisé pour widget",
+    "Display type": "Type d'affichage",
+    "boxes": "boîtes",
     "compact": "compact",
-    "Uniform Tiles": "Uniform Tiles",
-    "Tile size": "Tile size",
-    "Disabled/ignored": "Disabled/ignored",
-    "Show": "Show",
-    "Hide": "Hide",
-    "Mode select": "Mode select",
-    "only devices": "only devices",
-    "only services": "only services",
-    "devices and services": "devices and services",
-    "Order By": "Order By",
-    "Hostname": "Hostname",
-    "Device group": "Groupe d'appareil",
-    "Automatic Title": "Automatic Title",
-    "Graph type": "Graph type",
-    "Select a graph": "Select a graph",
-    "Show legend": "Show legend",
-    "Date range": "Date range",
-    "One Hour": "One Hour",
-    "Four Hours": "Four Hours",
-    "Six Hours": "Six Hours",
-    "Twelve Hours": "Twelve Hours",
-    "One Day": "One Day",
-    "One Week": "One Week",
-    "Two Weeks": "Two Weeks",
-    "One Month": "One Month",
-    "Two Months": "Two Months",
-    "Three Months": "Three Months",
-    "One Year": "One Year",
-    "Two Years": "Two Years",
-    "Select a device": "Select a device",
+    "Uniform Tiles": "Tuiles uniformes",
+    "Tile size": "Taille des carreaux",
+    "Disabled/ignored": "Désactivé/Ignoré",
+    "Show": "Afficher",
+    "Hide": "Cacher",
+    "Mode select": "Sélection du mode",
+    "only devices": "uniquement les appareils",
+    "only services": "uniquement les services",
+    "devices and services": "appareils et services",
+    "Order By": "Classé par",
+    "Hostname": "Nom d'hôte",
+    "Device group": "Groupe d'appareils",
+    "Automatic Title": "Titre automatique",
+    "Graph type": "Type de graphique",
+    "Select a graph": "Selectionner un graphique",
+    "Show legend": "Afficher la légende",
+    "Date range": "Plage de date",
+    "One Hour": "Une Heure",
+    "Four Hours": "Quatre Heures",
+    "Six Hours": "Six Heures",
+    "Twelve Hours": "Douze Heures",
+    "One Day": "Un jour",
+    "One Week": "Une Semaine",
+    "Two Weeks": "Deux Semaines",
+    "One Month": "Un Mois",
+    "Two Months": "Deux Mois",
+    "Three Months": "Trois Mois",
+    "One Year": "Un An",
+    "Two Years": "Deux Ans",
+    "Select a device": "Selectionner un appareil",
     "Port": "Port",
-    "Select a port": "Select a port",
+    "Select a port": "Selectionner un port",
     "Application": "Application",
-    "Select an application": "Select an application",
-    "Munin plugin": "Munin plugin",
-    "Select a Munin plugin": "Select a Munin plugin",
-    "Bill": "Bill",
-    "Select a bill": "Select a bill",
-    "Custom Aggregator(s)": "Custom Aggregator(s)",
-    "Select or add one or more": "Select or add one or more",
-    "Select one or more": "Select one or more",
-    "Top query": "Top query",
-    "Response time": "Response time",
+    "Select an application": "Selectionner une application",
+    "Munin plugin": "Plugin Munin",
+    "Select a Munin plugin": "Selectionner un plugin Munin",
+    "Bill": "Facture",
+    "Select a bill": "Selectionner une facture",
+    "Custom Aggregator(s)": "Agrégateur personnalisé(s)",
+    "Select or add one or more": "Selectionner ou ajouter un ou plus",
+    "Select one or more": "Selectionner un ou plus",
+    "Top query": "Top requête",
+    "Response time": "Temps de réponse",
     "Poller duration": "Poller duration",
-    "Processor load": "Processor load",
-    "Memory usage": "Memory usage",
-    "Disk usage": "Disk usage",
-    "Sort order": "Sort order",
-    "Ascending": "Ascending",
-    "Descending": "Descending",
-    "Number of Devices": "Number of Devices",
-    "Last Polled (minutes)": "Last Polled (minutes)",
+    "Processor load": "Charge du processeur",
+    "Memory usage": "Utilisation de la mémoire",
+    "Disk usage": "Utilisation du disque",
+    "Sort order": "Ordre de tri",
+    "Ascending": "Croissant",
+    "Descending": "Décroissant",
+    "Number of Devices": "Nombre d'appareils",
+    "Last Polled (minutes)": "Dernier sondage (minutes)",
     "Image URL": "Image URL",
-    "Target URL": "Target URL",
-    "Show acknowledged": "Show acknowledged",
-    "not filtered": "not filtered",
-    "show only acknowledged": "show only acknowledged",
-    "hide acknowledged": "hide acknowledged",
+    "Target URL": "URL cible",
+    "Show acknowledged": "Afficher les acquittées",
+    "not filtered": "non filtré",
+    "show only acknowledged": "voir seulement les acquittées",
+    "hide acknowledged": "cacher les acquittées",
     "Show only fired": "Show only fired",
     "show only fired alerts": "show only fired alerts",
-    "Displayed severity": "Displayed severity",
-    "any severity": "any severity",
-    "or higher": "or higher",
-    "State": "State",
-    "any state": "any state",
-    "All alerts": "All alerts",
-    "Show Procedure field": "Show Procedure field",
-    "show": "show",
-    "hide": "hide",
-    "Sort alerts by": "Sort alerts by",
-    "timestamp, descending": "timestamp, descending",
-    "severity, descending": "severity, descending",
-    "All devices": "All devices",
-    "Event type": "Event type",
-    "All types": "All types",
-    "Number of interfaces": "Number of interfaces",
-    "Last polled (minutes)": "Last polled (minutes)",
-    "Interface type": "Interface type",
+    "Displayed severity": "Afficher la sévérité",
+    "any severity": "toutes les sévérités",
+    "or higher": "ou plus",
+    "State": "Status",
+    "any state": "tous les status",
+    "All alerts": "Toutes les alertes",
+    "Show Procedure field": "Afficher les procédures",
+    "show": "afficher",
+    "hide": "cacher",
+    "Sort alerts by": "Trier les alertes par",
+    "timestamp, descending": "horodatage, décroissant",
+    "severity, descending": "sévérité, décroissant",
+    "All devices": "Tous les appareils",
+    "Event type": "Type d'évenement",
+    "All types": "Tous types",
+    "Number of interfaces": "Nombre d'interfaces",
+    "Interface type": "Type d'interface",
     "All Ports": "Tous les ports",
     "Total": "Total",
-    "Ignored": "Ignored",
-    "Disabled": "Désactiver",
-    "Errored": "Errored",
+    "Ignored": "Ignoré",
+    "Errored": "Erreurs",
     "Services": "Services",
-    "No devices found within interval.": "No devices found within interval.",
-    "Summary": "Summary",
+    "No devices found within interval.": "Aucun appareil découvert dans l’intervalle.",
+    "Summary": "Sommaire",
     "Interface": "Interface",
-    "Total traffic": "Total traffic",
+    "Total traffic": "Trafic total",
     "Check your log for more details.": "Regarder vos log pour plus de détails",
     "If you need additional help, you can find how to get help at": "si vous avez besoin d’aide supplémentaire, vous pouvez trouver comment l'obtenir sur:",
-    "Geo Locations": "Emplacements Géographique",
+    "Geo Locations": "Emplacements Géographiques",
     "All Locations": "Tous les Emplacements",
-    "Pollers": "Gestionnaires",
-    "Groups": "Groups",
+    "Pollers": "Sondeurs",
+    "Groups": "Groupes",
     "Performance": "Performance",
-    "History": "History",
+    "History": "Historique",
     "passwords": {
       "password": "Le mot de passe doit comporter au moins six caractères et doit être le même que la confirmation.",
       "reset": "Votre mot de passe a été réinitialisé !",
       "sent": "Nous vous avons envoyé un lien pour mettre à jour votre mot de passe",
       "token": "Le jeton de mise à jour du mot de passe est valide.",
       "user": "Nous ne trouvons pas d'utilisateur avec cette adresse e-mail."
+    },
+    "sensors": {
+      "airflow": {
+        "short": "Flux d'air",
+        "long": "Flux d'air",
+        "unit": "cfm",
+        "unit_long": "mètre cube par minute"
+      },
+      "ber": {
+        "short": "BER",
+        "long": "Taux d'erreurs",
+        "unit": "",
+        "unit_long": ""
+      },
+      "charge": {
+        "short": "Charge",
+        "long": "Pourcentage de charge",
+        "unit": "%",
+        "unit_long": "Pourcent"
+      },
+      "chromatic_dispersion": {
+        "short": "Dispersion chromatique",
+        "long": "Dispersion chromatique",
+        "unit": "ps/nm/km",
+        "unit_long": "Picosecondes par nanomètre par kilomètre"
+      },
+      "cooling": {
+        "short": "Refroidissement",
+        "long": "",
+        "unit": "W",
+        "unit_long": "Watts"
+      },
+      "count": {
+        "short": "Count",
+        "long": "Count",
+        "unit": "",
+        "unit_long": ""
+      },
+      "current": {
+        "short": "Courant",
+        "long": "Courant",
+        "unit": "A",
+        "unit_long": "Ampères"
+      },
+      "dbm": {
+        "short": "dBm",
+        "long": "dBm",
+        "unit": "dBm",
+        "unit_long": "Décibel-Milliwatts"
+      },
+      "delay": {
+        "short": "Delay",
+        "long": "Delay",
+        "unit": "s",
+        "unit_long": "Seconds"
+      },
+      "eer": {
+        "short": "EER",
+        "long": "Ratio d'efficacité énergétique",
+        "unit": "",
+        "unit_long": ""
+      },
+      "fanspeed": {
+        "short": "Vitesse du ventilateur",
+        "long": "Vitesse du ventilateur",
+        "unit": "RPM",
+        "unit_long": "Rotations par Minute"
+      },
+      "frequency": {
+        "short": "Fréquence",
+        "long": "Fréquence",
+        "unit": "Hz",
+        "unit_long": "Hertz"
+      },
+      "humidity": {
+        "short": "Humidité",
+        "long": "Pourcentage d'humidité",
+        "unit": "%",
+        "unit_long": "Pourcent"
+      },
+      "load": {
+        "short": "Charge",
+        "long": "Pourcentage de charge",
+        "unit": "%",
+        "unit_long": "Pourcent"
+      },
+      "power": {
+        "short": "Puissance",
+        "long": "Puissance",
+        "unit": "W",
+        "unit_long": "Watts"
+      },
+      "power_consumed": {
+        "short": "Puissance consommée",
+        "long": "Puissance consommée",
+        "unit": "kWh",
+        "unit_long": "Kilowatt-heure"
+      },
+      "power_factor": {
+        "short": "Facteur de puissance",
+        "long": "Facteur de puissance",
+        "unit": "",
+        "unit_long": ""
+      },
+      "pressure": {
+        "short": "Pression",
+        "long": "Pression",
+        "unit": "kPa",
+        "unit_long": "Kilopascal"
+      },
+      "quality_factor": {
+        "short": "Facteur de qualité",
+        "long": "Facteur de qualité",
+        "unit": "",
+        "unit_long": ""
+      },
+      "runtime": {
+        "short": "Temps d'éxécution",
+        "long": "Temps d'éxécution",
+        "unit": "Min",
+        "unit_long": "Minutes"
+      },
+      "signal": {
+        "short": "Signal",
+        "long": "Signal",
+        "unit": "dBm",
+        "unit_long": "Decibel-milliwatt"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "Rapport signal sur bruit",
+        "unit": "dB",
+        "unit_long": "Decibel"
+      },
+      "state": {
+        "short": "Etat",
+        "long": "Etat",
+        "unit": ""
+      },
+      "temperature": {
+        "short": "Température",
+        "long": "Température",
+        "unit": "°C",
+        "unit_long": "° Celsius"
+      },
+      "voltage": {
+        "short": "Voltage",
+        "long": "voltage",
+        "unit": "V",
+        "unit_long": "Volts"
+      },
+      "waterflow": {
+        "short": "Ecoulement de l'eau",
+        "long": "Ecoulement de l'eau",
+        "unit": "l/m",
+        "unit_long": "Litres par minute"
+      }
+    },
+    "wireless": {
+      "ap-count": {
+        "short": "APs",
+        "long": "Nombre de points d'accès",
+        "unit": ""
+      },
+      "clients": {
+        "short": "Clients",
+        "long": "Nombre de clients",
+        "unit": ""
+      },
+      "capacity": {
+        "short": "Capacité",
+        "long": "Capacité",
+        "unit": "%"
+      },
+      "ccq": {
+        "short": "CCQ",
+        "long": "Qualité de la connexion client",
+        "unit": "%"
+      },
+      "errors": {
+        "short": "Erreurs",
+        "long": "Nombre d'erreurs",
+        "unit": ""
+      },
+      "error-ratio": {
+        "short": "Ratio d'erreur",
+        "long": "Bit/Paquets ratio d'erreur",
+        "unit": "%"
+      },
+      "error-rate": {
+        "short": "BER",
+        "long": "Taux d'erreur",
+        "unit": "bps"
+      },
+      "frequency": {
+        "short": "Fréquence",
+        "long": "Fréquence",
+        "unit": "MHz"
+      },
+      "distance": {
+        "short": "Distance",
+        "long": "Distance",
+        "unit": "km"
+      },
+      "mse": {
+        "short": "MSE",
+        "long": "Erreur quadratique moyenne",
+        "unit": "dB"
+      },
+      "noise-floor": {
+        "short": "Bruit de fond",
+        "long": "Bruit de fond",
+        "unit": "dBm/Hz"
+      },
+      "power": {
+        "short": "Puissance/Signal",
+        "long": "TX/RX Puissance ou Signal",
+        "unit": "dBm"
+      },
+      "quality": {
+        "short": "Qualité",
+        "long": "Qualité",
+        "unit": "%"
+      },
+      "rate": {
+        "short": "Taux",
+        "long": "TX/RX Taux",
+        "unit": "bps"
+      },
+      "rssi": {
+        "short": "RSSI",
+        "long": "Indicateur d'intensité du signal reçu",
+        "unit": "dBm"
+      },
+      "snr": {
+        "short": "SNR",
+        "long": "Rapport signal sur bruit",
+        "unit": "dB"
+      },
+      "ssr": {
+        "short": "SSR",
+        "long": "Rapport de force du signal",
+        "unit": "dB"
+      },
+      "utilization": {
+        "short": "Utilisation",
+        "long": "utilisation",
+        "unit": "%"
+      },
+      "xpi": {
+        "short": "XPI",
+        "long": "Interférence polaire croisée",
+        "unit": "dB"
+      }
     },
     "auth": {
       "failed": "Échec d'authentification",
@@ -6867,8 +8085,120 @@ __webpack_require__.r(__webpack_exports__);
       "previous": "&laquo; Précédent",
       "next": "Suivant &raquo;"
     },
+    "validation": {
+      "accepted": "{attribute} doit être accepté.",
+      "active_url": "{attribute} n'est pas une URL valide.",
+      "after": "{attribute} doit être une date après {date}.",
+      "after_or_equal": "{attribute} doit être une date après ou égale à {date}.",
+      "alpha": "{attribute} ne peut contenir que des lettres.",
+      "alpha_dash": "{attribute} ne peut contenir que des lettres, des chiffres, des tirets et des underscores.",
+      "alpha_num": "{attribute} ne peut contenir que des lettres et des chiffres.",
+      "alpha_space": "{attribute} ne peut contenir que des lettres, des chiffres, des underscores et des espaces.",
+      "array": "{attribute} doit être un tableau.",
+      "before": "{attribute} doit être une date avant {date}.",
+      "before_or_equal": "{attribute} doit être une date antérieure ou égale à {date}.",
+      "between": {
+        "numeric": "{attribute} doit être entre {min} et {max}.",
+        "file": "{attribute} doit être entre {min} et {max} kilobytes.",
+        "string": "{attribute} doit être entre {min} et {max} caractères.",
+        "array": "{attribute} doit être entre {min} et {max} objets."
+      },
+      "boolean": "{attribute} le champ doit être vrai ou faux.",
+      "confirmed": "{attribute} la confirmation ne correspond pas.",
+      "date": "{attribute} n'est pas une date valide.",
+      "date_equals": "{attribute} doit être une date égale à {date}.",
+      "date_format": "{attribute} ne correspond pas au format {format}.",
+      "different": "{attribute} et {other} doit être différent.",
+      "digits": "{attribute} doit être {digits} chiffres.",
+      "digits_between": "{attribute} doit être entre {min} et {max} chiffres.",
+      "dimensions": "{attribute} a des dimensions d'image non valides.",
+      "distinct": "{attribute} le champ a une valeur en double.",
+      "email": "{attribute} doit être une adresse e-mail valide.",
+      "ends_with": "{attribute} doit se terminer par l’un des éléments suivants: {values}",
+      "exists": "La sélection {attribute} est invalide.",
+      "file": "{attribute} doit être un fichier.",
+      "filled": "Le champ {attribute} doit avoir une valeur.",
+      "gt": {
+        "numeric": "{attribute} doit être supérieur à {value}.",
+        "file": "{attribute} doit être supérieur à {value} kilobytes.",
+        "string": "{attribute} doit être supérieur à {value} characters.",
+        "array": "{attribute} doit avoir plus de {value} objets."
+      },
+      "gte": {
+        "numeric": "{attribute} doit être supérieur ou égal {value}.",
+        "file": "{attribute} doit être supérieur ou égal {value} kilobytes.",
+        "string": "{attribute} doit être supérieur ou égal {value} caractères.",
+        "array": "{attribute} doit avoir {value} objets ou plus."
+      },
+      "image": "{attribute} doit être une image.",
+      "in": "La sélection {attribute} est invalide.",
+      "in_array": "Le champ {attribute} n'existe pas dans {other}.",
+      "integer": "{attribute} doit être un entier.",
+      "ip": "{attribute} doit être une adresse IP valide.",
+      "ipv4": "{attribute} doit être une adresse IPv4 valide.",
+      "ipv6": "{attribute} doit être une adresse IPv6 valide.",
+      "json": "{attribute} doit être une chaîne JSON valide.",
+      "lt": {
+        "numeric": "{attribute} doit être inférieur à {value}.",
+        "file": "{attribute} doit être inférieur à {value} kilobytes.",
+        "string": "{attribute} doit être inférieur à {value} caractères.",
+        "array": "{attribute} doit avoir moins de {value} objets."
+      },
+      "lte": {
+        "numeric": "{attribute} doit être inférieur ou égal {value}.",
+        "file": "{attribute} doit être inférieur ou égal {value} kilobytes.",
+        "string": "{attribute} doit être inférieur ou égal {value} caractères.",
+        "array": "{attribute} ne doit pas avoir plus de {value} objets."
+      },
+      "max": {
+        "numeric": "{attribute} ne peut pas être supérieur à {max}.",
+        "file": "{attribute} ne peut pas être supérieur à {max} kilobytes.",
+        "string": "{attribute} ne peut pas être supérieur à {max} caractères.",
+        "array": "{attribute} peut ne pas avoir plus de {max} objets."
+      },
+      "mimes": "{attribute} doit être un fichier de type: {values}.",
+      "mimetypes": "{attribute} doit être un fichier de type: {values}.",
+      "min": {
+        "numeric": "{attribute} doit être au moins {min}.",
+        "file": "{attribute} doit être au moins {min} kilobytes.",
+        "string": "{attribute} doit être au moins {min} caractères.",
+        "array": "{attribute} doit avoir au moins {min} objets."
+      },
+      "not_in": "La sélection {attribute} est invalide.",
+      "not_regex": "Le format {attribute} est invalide.",
+      "numeric": "{attribute} must be a number.",
+      "present": "Le champ {attribute} doit être présent.",
+      "regex": "Le format {attribute} est invalide.",
+      "required": "Le champ {attribute} est requis.",
+      "required_if": "Le champ {attribute} est requis quand {other} est {value}.",
+      "required_unless": "Le champ {attribute} est requis sauf {other} est dans {values}.",
+      "required_with": "Le champ {attribute} est requis lorsque {values} est présent.",
+      "required_with_all": "Le champ {attribute} est requis quand {values} est présent.",
+      "required_without": "Le champ {attribute} est requis quand {values} n'est pas present.",
+      "required_without_all": "Le champ {attribute} est requis quand aucun des {values} est présent.",
+      "same": "{attribute} et {other} doit correspondre.",
+      "size": {
+        "numeric": "{attribute} doit être {size}.",
+        "file": "{attribute} doit être {size} kilobytes.",
+        "string": "{attribute} doit être {size} caractères.",
+        "array": "{attribute} doit contenir {size} objets."
+      },
+      "starts_with": "{attribute} doit commencer par l’un des éléments suivants: {values}",
+      "string": "{attribute} doit être une chaîne.",
+      "timezone": "{attribute} doit être une zone valide.",
+      "unique": "{attribute} a déjà été pris.",
+      "uploaded": "{attribute} échec du téléchargement.",
+      "url": "Le format {attribute} est invalide.",
+      "uuid": "{attribute} doit être un UUID valide.",
+      "custom": {
+        "attribute-name": {
+          "rule-name": "custom-message"
+        }
+      },
+      "attributes": []
+    },
     "preferences": {
-      "lang": "français"
+      "lang": "Français"
     },
     "commands": {
       "user{add}": {
@@ -7999,6 +9329,55 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   "zh-TW": {
+    "Priority": "重要性",
+    "Program": "程式",
+    "Authlog": "驗證歷程",
+    "User": "使用者",
+    "IP Address": "IP 位址",
+    "Result": "結果",
+    "Translation not fully supported": "多國語系功能尚未完備",
+    "Warning {service_count}": "警告 {service_count}",
+    "Critical {service_count}": "嚴重 {service_count}",
+    "Disabled {port_count}": "已停用 {port_count}",
+    "Errored {port_count}": "發生錯誤 {port_count}",
+    "Ignored {port_count}": "已忽略 {port_count}",
+    "Down {port_count}": "已關閉 {port_count}",
+    "Deleted {port_count}": "已刪除 {port_count}",
+    "About {project_name}": "關於 {project_name}",
+    "See the <a href=\"{url}\">list of contributors</a> on GitHub.": "至 GitHub 觀看<a href=\"{url}\">貢獻者名單</a>。",
+    "Docs": "文件",
+    "Close": "關閉",
+    "LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system": "LibreNMS 是個以 PHP/MySQL 為基底的自動探索網路監控系統",
+    "Packages": "軟體包",
+    "Disabled": "已停用",
+    "Version": "版本",
+    "Database Schema": "資料庫綱要",
+    "Web Server": "Web 伺服器",
+    "LibreNMS is a community-based project": "LibreNMS 是建基於社群開發的專案",
+    "Please feel free to join us and contribute code, documentation, and bug reports:": "您隨時都可以加入社群貢獻您的程式碼、文件以及問題回報：",
+    "Web site": "官方網站",
+    "Bug tracker": "問題追蹤",
+    "Community Forum": "社群論壇",
+    "Changelog": "變更記錄",
+    "Local git log": "本機 Git 記錄",
+    "Contributors": "貢獻者",
+    "Acknowledgements": "特別感謝",
+    "Opt in to send anonymous usage statistics to LibreNMS?": "您要選擇以匿名方式提供使用統計資料給 LibreNMS 嗎？",
+    "Online stats:": "線上統計資料",
+    "Clear remote stats": "清除遠端統計資料",
+    "IPv4 Addresses": "IPv4 位址",
+    "IPv4 Networks": "IPv4 網路",
+    "IPv6 Addresses": "IPv6 位址",
+    "IPv6 Networks": "IPv6 網路",
+    "Processors": "處理器",
+    "Applications": "應用",
+    "Disk I/O": "磁碟 I/O",
+    "Syslog Entries": "Syslog 項目",
+    "Eventlog Entries": "事件記錄項目",
+    "Sensors": "感測器",
+    "Wireless Sensors": "無線感測器",
+    "Toner": "碳粉",
+    "License": "授權",
     "Shutdown": "關機",
     "Select Devices": "選擇裝置",
     "Dynamic": "動態",
@@ -8017,7 +9396,7 @@ __webpack_require__.r(__webpack_exports__);
     "Language": "語言",
     "Change Password": "變更密碼",
     "Verify New Password": "確認新密碼",
-    "Peering + Transit": "對等互連 + 轉送",
+    "Peering + Transit": "互連 + 轉送",
     "FDB Tables": "FDB 對照表",
     "ARP Tables": "ARP 對照表",
     "MAC Address": "MAC 位址",
@@ -8073,7 +9452,7 @@ __webpack_require__.r(__webpack_exports__);
     "Global Settings": "全域設定",
     "Validate Config": "組態驗證",
     "Auth History": "驗證歷程",
-    "Peering": "對等互連",
+    "Peering": "互連",
     "API Settings": "API 設定",
     "API Docs": "API 文件",
     "The {attribute} must a valid IP address/network or hostname.": "這個 {attribute} 必需為有效的 IP 位址/網路或主機名稱。",
@@ -8122,7 +9501,7 @@ __webpack_require__.r(__webpack_exports__);
     "Description": "描述",
     "Level": "等級",
     "Normal": "正常",
-    "Global Read": "全部已讀",
+    "Global Read": "全域讀取",
     "Admin": "Admin",
     "Demo": "Demo",
     "Dashboard": "資訊看版",
@@ -8315,7 +9694,6 @@ __webpack_require__.r(__webpack_exports__);
     "All Ports": "所有連接埠",
     "Total": "總計",
     "Ignored": "已忽略",
-    "Disabled": "已取消",
     "Errored": "已錯誤",
     "Services": "服務",
     "No devices found within interval.": "在最近一次輪詢間隔內尚未找到裝置。",
@@ -8330,6 +9708,10 @@ __webpack_require__.r(__webpack_exports__);
     "Groups": "群組",
     "Performance": "效能",
     "History": "歷程",
+    "syslog": {
+      "severity": ["緊急", "警報", "重大", "錯誤", "警告", "通知", "資訊", "除錯"],
+      "facility": ["kernel messages", "user-level messages", "mail-system", "system daemons", "security/authorization messages", "messages generated internally by syslogd", "line printer subsystem", "network news subsystem", "UUCP subsystem", "clock daemon", "security/authorization messages", "FTP daemon", "NTP subsystem", "log audit", "log alert", "clock daemon (note 2)", "local use 0  (local0)", "local use 1  (local1)", "local use 2  (local2)", "local use 3  (local3)", "local use 4  (local4)", "local use 5  (local5)", "local use 6  (local6)", "local use 7  (local7)"]
+    },
     "passwords": {
       "password": "密碼至少需要六個字元，並且要確認兩者相符。",
       "reset": "您的密碼已重置。",

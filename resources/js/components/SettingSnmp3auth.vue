@@ -34,10 +34,10 @@
             <form @onsubmit.prevent :disabled="disabled">
                 <div class="form-group">
                     <div class="col-sm-12">
-                        <select class="form-control" id="authlevel" v-model="item.authlevel" :disabled="disabled">
+                        <select class="form-control" id="authlevel" v-model="item.authlevel" :disabled="disabled" @change="updateItem(id, $event.target.id, $event.target.value)">
                             <option value="noAuthNoPriv" v-text="$t('settings.settings.snmp.v3.level.noAuthNoPriv')"></option>
                             <option value="authNoPriv" v-text="$t('settings.settings.snmp.v3.level.authNoPriv')"></option>
-                            <option value="authPriv" v-text="$t('settings.settings.snmp.v3.level.authNoPriv')"></option>
+                            <option value="authPriv" v-text="$t('settings.settings.snmp.v3.level.authPriv')"></option>
                         </select>
 
                     </div>
@@ -48,7 +48,7 @@
                     <div class="form-group">
                         <label for="authalgo" class="col-sm-3 control-label" v-text="$t('settings.settings.snmp.v3.fields.authalgo')"></label>
                         <div class="col-sm-9">
-                        <select class="form-control" id="authalgo" name="authalgo" v-model="item.authalgo">
+                        <select class="form-control" id="authalgo" name="authalgo" v-model="item.authalgo" @change="updateItem(id, $event.target.id, $event.target.value)">
                             <option value="MD5">MD5</option>
                             <option value="AES">AES</option>
                         </select>
@@ -57,13 +57,13 @@
                     <div class="form-group">
                         <label for="authname" class="col-sm-3 control-label" v-text="$t('settings.settings.snmp.v3.fields.authname')"></label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="authname" :value="item.authname">
+                            <input type="text" class="form-control" id="authname" :value="item.authname" @input="updateItem(id, $event.target.id, $event.target.value)">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="authpass" class="col-sm-3 control-label" v-text="$t('settings.settings.snmp.v3.fields.authpass')"></label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="authpass" :value="item.authpass">
+                            <input type="text" class="form-control" id="authpass" :value="item.authpass" @input="updateItem(id, $event.target.id, $event.target.value)">
                         </div>
                     </div>
                 </fieldset>
@@ -73,7 +73,7 @@
                     <div class="form-group">
                         <label for="cryptoalgo" class="col-sm-3 control-label">Cryptoalgo</label>
                         <div class="col-sm-9">
-                        <select class="form-control" id="cryptoalgo" v-model="item.cryptoalgo">
+                        <select class="form-control" id="cryptoalgo" v-model="item.cryptoalgo" @change="updateItem(id, $event.target.id, $event.target.value)">
                             <option value="AES">AES</option>
                             <option value="DES">DES</option>
                         </select>
@@ -83,7 +83,7 @@
                     <div class="form-group">
                         <label for="cryptopass" class="col-sm-3 control-label" v-text="$t('settings.settings.snmp.v3.fields.authpass')"></label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="cryptopass" :value="item.cryptopass">
+                            <input type="text" class="form-control" id="cryptopass" :value="item.cryptopass"  @input="updateItem(id, $event.target.id, $event.target.value)">
                         </div>
                     </div>
                 </fieldset>
@@ -120,13 +120,24 @@
                     authpass: '',
                     cryptoalgo: 'AES',
                     cryptopass: ''
-                })
+                });
+                this.$emit('input', this.localList);
             },
             removeItem(index) {
                 this.localList.splice(index, 1);
+                this.$emit('input', this.localList);
+            },
+            updateItem(index, key, value) {
+                this.localList[index][key] = value;
+                this.$emit('input', this.localList);
             },
             dragged() {
                 this.$emit('input', this.localList);
+            }
+        },
+        watch: {
+            value($value) {
+                this.localList = $value;
             }
         }
     }
