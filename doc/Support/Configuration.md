@@ -725,26 +725,25 @@ $config['sensors']['guess_limits'] = false;
 
 It is possible to filter some sensors from the configuration:
 
-- Ignore all temperature sensors
+* Ignore all temperature sensors
 
 ```php
 $config['disabled_sensors']['current'] = true;
 ```
 
-- Filter all sensors matching regexp ``` '/PEM Iout/' ```.
+* Filter all sensors matching regexp ```'/PEM Iout/'```.
 
 ```php
 $config['disabled_sensors_regex'][] = '/PEM Iout/';
 ```
 
-- Filter all 'current' sensors for Operating System 'vrp'.
+* Filter all 'current' sensors for Operating System 'vrp'.
 
 ```php
 $config['os']['vrp']['disabled_sensors']['current'] = true;
 ```
 
-- Filter all sensors matching regexp ``` '/PEM Iout/' ``` for
-Operating System iosxe.
+* Filter all sensors matching regexp ```'/PEM Iout/'``` for Operating System iosxe.
 
 ```php
 $config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';

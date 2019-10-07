@@ -11,10 +11,8 @@ The template-parser understands `if` and `foreach` controls and replaces certain
 
 Controls:
 
-- if-else (Else can be omitted):
-`{if %placeholder == value}Some Text{else}Other Text{/if}`
-- foreach-loop:
-`{foreach %faults}Key: %key<br/>Value: %value{/foreach}`
+- if-else (Else can be omitted): `{if %placeholder == value}Some Text{else}Other Text{/if}`
+- foreach-loop: `{foreach %faults}Key: %key<br/>Value: %value{/foreach}`
 
 Placeholders:
 
@@ -73,6 +71,7 @@ The Default Template is a 'one-size-fit-all'. We highly recommend defining your 
 ## Examples
 
 Default Template:
+
 ```text
 %title
 Severity: %severity
@@ -84,7 +83,9 @@ Rule: {if %name}%name{else}%rule{/if}
 {foreach %faults}  #%key: %value.string{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
+
 Ports Utilization Template:
+
 ```text
 %title
 Device Name: %hostname
@@ -102,6 +103,7 @@ Outbound Utilization: {calc ((%value.ifOutOctets_rate*8)/%value.ifSpeed)*100}%
 ```
 
 Storage:
+
 ```text
 
 %title
@@ -121,6 +123,7 @@ Server: %sysName {foreach %faults}Mount Point: %value.storage_descr Percent Util
 ```
 
 Temperature Sensors:
+
 ```text
 
 %title
@@ -148,6 +151,7 @@ High Temperature Limit: %value.sensor_limit°C
 ```
 
 Value Sensors:
+
 ```text
 
 %title
@@ -175,6 +179,7 @@ Limit: %value.sensor_limit
 ```
 
 Memory Alert:
+
 ```text
 %title
 
@@ -192,8 +197,8 @@ Memory Description: %value.mempool_descr
 Percent Utilized: %value.mempool_perc{/foreach}
 ```
 
-
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
+
 ```text
 {if %transport == mail}<a href="https://my.librenms.install/device/device=%hostname/">%hostname</a>
 {else}
@@ -208,12 +213,14 @@ Note the use of double-quotes.  Single quotes (`'`) in templates will be escaped
 Note: To use HTML emails you must set HTML email to Yes in the WebUI under Global Settings > Alerting Settings > Email transport > Use HTML emails
 
 Note: To include Graphs you must enable unauthorized graphs in config.php. Allow_unauth_graphs_cidr is optional, but more secure.
+
 ```
 $config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 
 Service Alert:
+
 ```
 <div style="font-family:Helvetica;">
 <h2>{if %state == 1}<span style="color:red;">%severity{/if}
@@ -235,6 +242,7 @@ Service Alert:
 ```
 
 Processor Alert with Graph:
+
 ```
 %title <br>
 Severity: %severity  <br>
@@ -262,6 +270,6 @@ assign the BGP template to this rule to provide more information.
 
 The included templates apart from the default template are:
 
-  - BGP Sessions
-  - Ports
-  - Temperature
+- BGP Sessions
+- Ports
+- Temperature

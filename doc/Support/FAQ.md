@@ -350,7 +350,7 @@ Or
 
 Restart snmpd and LibreNMS should populate the additional disk after a fresh discovery.
 
-#### <a name="faq27"> Why are my disks reporting an incorrect size?</a>
+### <a name="faq27"> Why are my disks reporting an incorrect size?</a>
 
 There is a known issue for net-snmp, which causes it to report
 incorrect disk size and disk usage when the size of the disk (or raid)
@@ -581,6 +581,7 @@ As of [Ver. 1.55](https://community.librenms.org/t/v1-55-release-changelog-augus
 > It doesn't work on non-port graphs or consolidated graphs at the time this FAQ entry was written.
 
 To view a prediction:
+
 - Click on any `port` graph of any network device
 - Select a `From` date to your liking (not earlier than the device was actually added to LNMS), and then select a future date in the `To` field.
 - Click update

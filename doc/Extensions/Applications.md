@@ -231,7 +231,7 @@ Extend` heading top of page.
 
 1: Create stats file with appropriate permissions:
 
-```shell
+```bash
 ~$ touch /var/run/named/stats
 ~$ chown bind:bind /var/run/named/stats
 ```
@@ -1563,14 +1563,14 @@ adjust this path if necessary.
 1: Replace your _log_'s `run` file, typically located in
    `/service/dns/log/run` with:
 
-```shell
+```bash
 #!/bin/sh
 exec setuidgid dnslog tinystats ./main/tinystats/ multilog t n3 s250000 ./main/
 ```
 
 2: Create tinystats directory and chown:
 
-```shell
+```bash
 mkdir /service/dns/log/main/tinystats
 chown dnslog:nofiles /service/dns/log/main/tinystats
 ```

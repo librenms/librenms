@@ -97,7 +97,6 @@ discovery_modules:
      cisco-mac-accounting: false
 ```
 
-
 ##### Discovery Logic
 
 YAML is converted to an array in PHP.  Consider the following YAML:
@@ -128,11 +127,11 @@ This is how the discovery array would look in PHP:
 ]
 ```
 
-
 The logic for the discovery is as follows:
+
 1. One of the first level items must match
-2. ALL of the second level items must match (sysObjectID, sysDescr)
-3. One of the third level items (foo, [snafu,exodar], bar) must match
+1. ALL of the second level items must match (sysObjectID, sysDescr)
+1. One of the third level items (foo, [snafu,exodar], bar) must match
 
 So, considering the example:
 
@@ -154,11 +153,8 @@ Within the discovery code base if you are using php then the following helpers a
 OS polling is done within `includes/polling/os/$os.inc.php` and is where we detect certain values.
 
 ```php
-<?php
-
 $version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
 $hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
-
 ```
 
 `$version`: The version of the OS running on the device.
