@@ -61,28 +61,6 @@ $config['snmp']['transports'] = array(
     'tcp6',
 );
 
-$config['snmp']['version'] = ['v2c', 'v3', 'v1'];
-// Default version to use
-// SNMPv1/2c default settings
-$config['snmp']['community'][0] = 'public';
-// Communities to try during adding hosts and discovery
-$config['snmp']['port'] = 161;
-// Port Client SNMP is running on
-// SNMPv3 default settings
-// The array can be expanded to give another set of parameters
-// NOTE: If you change these, also change the equivalents in includes/defaults.inc.php - not sure why they are separate
-$config['snmp']['v3'][0]['authlevel'] = 'noAuthNoPriv';
-// noAuthNoPriv | authNoPriv | authPriv
-$config['snmp']['v3'][0]['authname'] = 'root';
-// User Name (required even for noAuthNoPriv)
-$config['snmp']['v3'][0]['authpass'] = '';
-// Auth Passphrase
-$config['snmp']['v3'][0]['authalgo'] = 'MD5';
-// MD5 | SHA
-$config['snmp']['v3'][0]['cryptopass'] = '';
-// Privacy (Encryption) Passphrase
-$config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
-// AES | DES
 
 // Devices must respond to icmp by default
 $config['icmp_check'] = true;

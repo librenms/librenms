@@ -3404,6 +3404,9 @@
     "poller_modules.cisco-otv": {
         "default": false
     },
+    "poller_modules.cisco-qfp": {
+        "default": false
+    },
     "poller_modules.cisco-remote-access-monitor": {
         "default": false
     },
