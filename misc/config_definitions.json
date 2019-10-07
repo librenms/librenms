@@ -902,7 +902,7 @@
             "true": "Yes",
             "false": "No"
         },
-        "class": "smtp-form"
+        "when": {"email_backend": "smtp"}
     },
     "email_backend": {
         "default": "mail",
@@ -936,7 +936,7 @@
         "section": "email",
         "order": 5,
         "type": "text",
-        "class": "sendmail-form"
+        "when": {"email_backend": "sendmail"}
     },
     "email_smtp_auth": {
         "default": false,
@@ -944,7 +944,7 @@
         "section": "email",
         "order": 11,
         "type": "boolean",
-        "class": "smtp-form"
+        "when": {"email_backend": "smtp"}
     },
     "email_smtp_host": {
         "default": "localhost",
@@ -953,7 +953,7 @@
         "order": 6,
         "type": "text",
         "pattern": "[a-zA-Z0-9_\\-.]+",
-        "class": "smtp-form"
+        "when": {"email_backend": "smtp"}
     },
     "email_smtp_password": {
         "default": "NULL",
@@ -961,7 +961,7 @@
         "section": "email",
         "order": 13,
         "type": "password",
-        "class": "smtp-form"
+        "when": {"email_backend": "smtp"}
     },
     "email_smtp_port": {
         "default": 25,
@@ -969,7 +969,7 @@
         "section": "email",
         "order": 7,
         "type": "integer",
-        "class": "smtp-form"
+        "when": {"email_backend": "smtp"}
     },
     "email_smtp_secure": {
         "default": false,
@@ -982,7 +982,7 @@
             "tls": "TLS",
             "ssl": "SSL"
         },
-        "class": "smtp-form"
+        "when": {"email_backend": "smtp"}
     },
     "email_smtp_timeout": {
         "default": 10,
@@ -990,7 +990,7 @@
         "section": "email",
         "order": 8,
         "type": "integer",
-        "class": "smtp-form"
+        "when": {"email_backend": "smtp"}
     },
     "email_smtp_username": {
         "default": "NULL",
@@ -998,7 +998,7 @@
         "section": "email",
         "order": 12,
         "type": "text",
-        "class": "smtp-form"
+        "when": {"email_backend": "smtp"}
     },
     "email_user": {
         "default": "LibreNMS",
@@ -1133,7 +1133,6 @@
         "section": "location",
         "order": 1,
         "type": "text",
-        "class": "geoloc_api_key",
         "required": true
     },
     "geoloc.engine": {

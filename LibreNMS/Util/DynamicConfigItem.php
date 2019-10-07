@@ -42,7 +42,7 @@ class DynamicConfigItem implements \ArrayAccess
     public $required = false;
     public $disabled = false;
     public $options = [];
-    public $class;
+    public $when;
     public $pattern;
     public $validate;
     public $units;
@@ -72,7 +72,7 @@ class DynamicConfigItem implements \ArrayAccess
         } elseif ($this->type == 'integer') {
             return filter_var($value, FILTER_VALIDATE_INT) || $value === "0" || $value === 0;
         } elseif ($this->type == 'select') {
-            return in_array($value, $this->options);
+            return in_array($value, array_keys($this->options));
         } elseif ($this->type == 'email') {
             return filter_var($value, FILTER_VALIDATE_EMAIL);
         } elseif (in_array($this->type, ['text', 'password'])) {

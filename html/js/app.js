@@ -324,33 +324,53 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       value: this.setting.value,
-      inhibit: false,
       feedback: ''
     };
   },
   methods: {
-    persistValue: _.debounce(function (value) {
+    persistValue: function persistValue(value) {
       var _this = this;
 
       axios.put(route('settings.update', this.setting.name), {
         value: value
       }).then(function (response) {
         _this.value = response.data.value;
+
+        _this.$emit('setting-updated', {
+          name: _this.setting.name,
+          value: _this.value
+        });
+
         _this.feedback = 'has-success';
         setTimeout(function () {
           return _this.feedback = '';
         }, 3000);
       })["catch"](function (error) {
         _this.value = error.response.data.value;
+
+        _this.$emit('setting-updated', {
+          name: _this.setting.name,
+          value: _this.value
+        });
+
         _this.feedback = 'has-error';
         setTimeout(function () {
           return _this.feedback = '';
         }, 3000);
         toastr.error(error.response.data.message);
       });
+    },
+    debouncePersistValue: _.debounce(function (value) {
+      this.persistValue(value);
     }, 500),
     changeValue: function changeValue(value) {
-      this.persistValue(value);
+      if (['select', 'boolean'].includes(this.setting.type)) {
+        // no need to debounce
+        this.persistValue(value);
+      } else {
+        this.debouncePersistValue(value);
+      }
+
       this.value = value;
     },
     getDescription: function getDescription() {
@@ -471,6 +491,12 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LibrenmsSettings",
   props: {
@@ -527,6 +553,24 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     },
     loadData: function loadData(response) {
       this.settings = response.data;
+    },
+    updateSetting: function updateSetting(name, value) {
+      this.$set(this.settings[name], 'value', value);
+    },
+    settingShown: function settingShown(setting_name) {
+      var setting = this.settings[setting_name];
+
+      if (setting.when !== null) {
+        for (var _i2 = 0, _Object$entries = Object.entries(setting.when); _i2 < _Object$entries.length; _i2++) {
+          var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
+              key = _Object$entries$_i[0],
+              value = _Object$entries$_i[1];
+
+          return this.settings[key].value === value;
+        }
+      }
+
+      return true;
     }
   },
   mounted: function mounted() {
@@ -543,8 +587,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       // populate layout data
       var groups = {};
 
-      for (var _i2 = 0, _Object$keys = Object.keys(this.settings); _i2 < _Object$keys.length; _i2++) {
-        var key = _Object$keys[_i2];
+      for (var _i3 = 0, _Object$keys = Object.keys(this.settings); _i3 < _Object$keys.length; _i3++) {
+        var key = _Object$keys[_i3];
         var setting = this.settings[key]; // filter
 
         if (!setting.name.includes(this.search_phrase)) {
@@ -2497,8 +2541,24 @@ var render = function() {
                       },
                       _vm._l(items, function(setting) {
                         return _c("librenms-setting", {
+                          directives: [
+                            {
+                              name: "show",
+                              rawName: "v-show",
+                              value: _vm.settingShown(setting),
+                              expression: "settingShown(setting)"
+                            }
+                          ],
                           key: setting,
-                          attrs: { setting: _vm.settings[setting] }
+                          attrs: { setting: _vm.settings[setting] },
+                          on: {
+                            "setting-updated": function($event) {
+                              return _vm.updateSetting(
+                                $event.name,
+                                $event.value
+                              )
+                            }
+                          }
                         })
                       }),
                       1

@@ -59,27 +59,36 @@
         data() {
             return {
                 value: this.setting.value,
-                inhibit: false,
                 feedback: ''
             }
         },
         methods: {
-            persistValue: _.debounce(function (value) {
+            persistValue(value) {
                 axios.put(route('settings.update', this.setting.name), {value: value})
                     .then((response) => {
                         this.value = response.data.value;
+                        this.$emit('setting-updated', {name: this.setting.name, value: this.value});
                         this.feedback = 'has-success';
                         setTimeout(() => this.feedback = '', 3000);
                     })
                     .catch((error) => {
                         this.value = error.response.data.value;
+                        this.$emit('setting-updated', {name: this.setting.name, value: this.value});
                         this.feedback = 'has-error';
                         setTimeout(() => this.feedback = '', 3000);
                         toastr.error(error.response.data.message);
                     })
+            },
+            debouncePersistValue: _.debounce(function (value) {
+                this.persistValue(value)
             }, 500),
             changeValue(value) {
-                this.persistValue(value);
+                if (['select', 'boolean'].includes(this.setting.type)) {
+                    // no need to debounce
+                    this.persistValue(value);
+                } else {
+                    this.debouncePersistValue(value);
+                }
                 this.value = value
             },
             getDescription() {

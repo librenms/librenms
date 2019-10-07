@@ -36,7 +36,13 @@
             <accordion @expanded="sectionExpanded" @collapsed="sectionCollapsed">
                 <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :text="$t('settings.sections.' + group + '.' + item)" :active="item === section">
                     <form class="form-horizontal" @submit.prevent>
-                        <librenms-setting v-for="setting in items" :key="setting" :setting="settings[setting]"></librenms-setting>
+                        <librenms-setting
+                            v-for="setting in items"
+                            :key="setting"
+                            :setting="settings[setting]"
+                            v-show="settingShown(setting)"
+                            @setting-updated="updateSetting($event.name, $event.value)"
+                        ></librenms-setting>
                     </form>
                 </accordion-item>
             </accordion>
@@ -91,6 +97,19 @@
             },
             loadData(response) {
                 this.settings = response.data;
+            },
+            updateSetting(name, value) {
+                this.$set(this.settings[name], 'value', value)
+            },
+            settingShown(setting_name) {
+                let setting = this.settings[setting_name];
+                if (setting.when !== null) {
+                    for (let [key, value] of Object.entries(setting.when)) {
+                        return this.settings[key].value === value;
+                    }
+                }
+
+                return true;
             }
         },
         mounted() {
