@@ -1283,7 +1283,8 @@
             "73880A",
             "D01F3C",
             "36393D",
-            "FF0084"
+            "FF0084",
+            "91B13C"
         ],
         "type": "array"
     },
@@ -2851,7 +2852,114 @@
         "type": "text"
     },
     "nfsen_enable": {
-        "default": false
+        "default": false,
+        "group": "external",
+        "section": "nfsen",
+        "order": 0,
+        "type": "boolean"
+    },
+    "nfsen_rrds": {
+        "default": ["/var/nfsen/profiles-stat/live"],
+        "group": "external",
+        "section": "nfsen",
+        "order": 1,
+        "type": "array",
+        "required": true
+    },
+    "nfsen_subdirlayout": {
+        "default": "1",
+        "group": "external",
+        "section": "nfsen",
+        "order": 2,
+        "type": "select",
+        "options": {
+            "0": "0. flat layout",
+            "1": "1. year/month/day",
+            "2": "2. year/month/day/hour",
+            "3": "3. year/week_of_year/day_of_week",
+            "4": "4. year/week_of_year/day_of_week/hour",
+            "5": "5. year/day-of-year",
+            "6": "6. year/day-of-year/hour",
+            "7": "7. year-month-day",
+            "8": "8. year-month-day/hour"
+        }
+    },
+    "nfsen_last_max": {
+        "default": 153600,
+        "group": "external",
+        "section": "nfsen",
+        "order": 3,
+        "type": "integer",
+        "units": "seconds"
+    },
+    "nfsen_top_max": {
+        "default": 500,
+        "group": "external",
+        "section": "nfsen",
+        "order": 4,
+        "type": "integer"
+    },
+    "nfsen_top_N": {
+        "default": [10, 20, 50, 100, 200, 500],
+        "group": "external",
+        "section": "nfsen",
+        "order": 5,
+        "type": "array"
+    },
+    "nfsen_top_default": {
+        "default": 20,
+        "group": "external",
+        "section": "nfsen",
+        "order": 6,
+        "type": "integer"
+    },
+    "nfsen_stat_default": {
+        "default": "srcip",
+        "group": "external",
+        "section": "nfsen",
+        "order": 7,
+        "type": "text"
+    },
+    "nfsen_order_default": {
+        "default": "packets",
+        "group": "external",
+        "section": "nfsen",
+        "order": 8,
+        "type": "text"
+    },
+    "nfsen_last_default": {
+        "default": 900,
+        "group": "external",
+        "section": "nfsen",
+        "order": 9,
+        "type": "integer",
+        "units": "seconds"
+    },
+    "nfsen_lasts": {
+        "default": {
+            "300": "5 minutes",
+            "600": "10 minutes",
+            "900": "15 minutes",
+            "1800": "30 minutes",
+            "3600": "1 hour",
+            "9600": "3 hours",
+            "38400": "12 hours",
+            "76800": "24 hours",
+            "115200": "36 hours",
+            "153600": "48 hours"
+        }
+    },
+    "nfsen_split_char": {
+        "group": "external",
+        "section": "nfsen",
+        "order": 11,
+        "type": "text"
+    },
+    "nfsen_suffix": {
+        "group": "external",
+        "section": "nfsen",
+        "order": 12,
+        "type": "text"
     },
     "nmap": {
         "default": "/usr/bin/nmap",
@@ -3210,7 +3318,10 @@
         "type": "text"
     },
     "rrdgraph_def_text": {
-        "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal"
+        "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal"
+    },
+    "rrdgraph_def_text_color": {
+        "default": "000000"
     },
     "rrdgraph_real_percentile": {
         "default": false
@@ -3256,7 +3367,12 @@
         "section": "style",
         "order": 1,
         "type": "select",
-        "options": ["blue", "dark", "light", "mono"]
+        "options": {
+            "blue": "blue",
+            "dark": "dark",
+            "light": "light",
+            "mono": "mono"
+        }
     },
     "sla_type_labels.dhcp": {
         "default": "DHCP"

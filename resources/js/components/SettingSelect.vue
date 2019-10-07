@@ -31,7 +31,7 @@
             :disabled="disabled"
     >
         <option v-for="(text, option) in options"
-                :value="Array.isArray(options) ? text : option"
+                :value="option"
                 :selected="value === option"
                 v-text="getText(name, text)"
         ></option>

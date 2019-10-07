@@ -23,10 +23,11 @@ return [
             'ldap' => 'LDAP Settings'
         ],
         'external' => [
+            'binaries' => 'Binary Locations',
             'location' => 'Location Settings',
             'oxidized' => 'Oxidized Integration',
-            'binaries' => 'Binary Locations',
             'peeringdb' => 'PeeringDB Integration',
+            'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
         ],
         'poller' => [
@@ -415,6 +416,51 @@ return [
         ],
         'mtr' => [
             'description' => 'Path to mtr'
+        ],
+        'nfsen_enable' => [
+            'description' => 'Enable NfSen',
+            'help' => 'Enable Integration with NfSen',
+        ],
+        'nfsen_rrds' => [
+            'description' => 'NfSen RRD Directories',
+            'help' => 'This value specifies where your NFSen RRD files are located.'
+        ],
+        'nfsen_subdirlayout' => [
+            'description' => 'Set NfSen subdir layout',
+            'help' => 'This must match the subdir layout you have set in NfSen. 1 is the default.',
+        ],
+        'nfsen_last_max' => [
+            'description' => 'Last Max'
+        ],
+        'nfsen_top_max' => [
+            'description' => 'Top Max',
+            'help' => 'Max topN value for stats',
+        ],
+        'nfsen_top_N' => [
+            'description' => 'Top N'
+        ],
+        'nfsen_top_default' => [
+            'description' => 'Default Top N'
+        ],
+        'nfsen_stat_default' => [
+            'description' => 'Default Stat'
+        ],
+        'nfsen_order_default' => [
+            'description' => 'Default Order'
+        ],
+        'nfsen_last_default' => [
+            'description' => 'Default Last'
+        ],
+        'nfsen_lasts' => [
+            'description' => 'Default Last Options'
+        ],
+        'nfsen_split_char' => [
+            'description' => 'Split Char',
+            'help' => 'This value tells us what to replace the full stops `.` in the devices hostname with. Usually: `_`'
+        ],
+        'nfsen_suffix' => [
+            'description' => 'File name suffix',
+            'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.'
         ],
         'nmap' => [
             'description' => 'Path to nmap'
