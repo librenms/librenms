@@ -38,3 +38,10 @@ modules:
                     group: Sessions
                     descr: Active Sessions
                     high_limit: panSessionMax
+        load:
+            data:
+                -
+                    oid: panSessionSslProxyUtilization
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.8.{{ $index }}'
+                    descr: SSL Proxy Utilization
+                    group: Sessions
