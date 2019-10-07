@@ -55,6 +55,7 @@ class Config
 
         // final cleanups and validations
         self::processConfig();
+        self::populateTime();
 
         // set to global for legacy/external things
         global $config;
@@ -89,7 +90,7 @@ class Config
         $definitions = self::getDefinitions();
 
         foreach ($definitions as $path => $def) {
-            if (isset($def['default'])) {
+            if (array_key_exists('default', $def)) {
                 Arr::set($def_config, $path, $def['default']);
             }
         }
@@ -569,5 +570,26 @@ class Config
             }
         }
         return $binary;
+    }
+
+    private static function populateTime()
+    {
+        $now = time();
+        $now -= $now % 300;
+        self::set('time.now', $now);
+        self::set('time.onehour', $now - 3600); // time() - (1 * 60 * 60);
+        self::set('time.fourhour', $now - 14400); // time() - (4 * 60 * 60);
+        self::set('time.sixhour', $now - 21600); // time() - (6 * 60 * 60);
+        self::set('time.twelvehour', $now - 43200); // time() - (12 * 60 * 60);
+        self::set('time.day', $now - 86400); // time() - (24 * 60 * 60);
+        self::set('time.twoday', $now - 172800); // time() - (2 * 24 * 60 * 60);
+        self::set('time.week', $now - 604800); // time() - (7 * 24 * 60 * 60);
+        self::set('time.twoweek', $now - 1209600); // time() - (2 * 7 * 24 * 60 * 60);
+        self::set('time.month', $now - 2678400); // time() - (31 * 24 * 60 * 60);
+        self::set('time.twomonth', $now - 5356800); // time() - (2 * 31 * 24 * 60 * 60);
+        self::set('time.threemonth', $now - 8035200); // time() - (3 * 31 * 24 * 60 * 60);
+        self::set('time.sixmonth', $now - 16070400); // time() - (6 * 31 * 24 * 60 * 60);
+        self::set('time.year', $now - 31536000); // time() - (365 * 24 * 60 * 60);
+        self::set('time.twoyear', $now - 63072000); // time() - (2 * 365 * 24 * 60 * 60);
     }
 }

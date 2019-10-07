@@ -6955,6 +6955,10 @@ __webpack_require__.r(__webpack_exports__);
             "description": "Communities (priority)",
             "help": "Enter community strings for v1 and v2c and order them as you want them to be tried"
           },
+          "max_repeaters": {
+            "description": "Max Repeaters",
+            "help": "Set repeaters to use for SNMP bulk requests"
+          },
           "port": {
             "description": "Port",
             "help": "Set the tcp/udp port to be used for SNMP"

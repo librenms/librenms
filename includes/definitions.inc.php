@@ -621,7 +621,6 @@ $config['device_types'][$i]['icon'] = 'workstation.png';
 //
 // No changes below this line #
 //
-$config['project_name_version'] = $config['project_name'];
 
 // IPMI sensor type mappings
 $config['ipmi_unit']['Volts']     = 'voltage';

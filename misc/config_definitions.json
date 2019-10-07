@@ -700,16 +700,6 @@
                 "type": "network"
             },
             {
-                "icon": "collaboration.png",
-                "text": "Collaboration",
-                "type": "collaboration"
-            },
-            {
-                "icon": "workstation.png",
-                "text": "Workstation",
-                "type": "workstation"
-            },
-            {
                 "icon": "wireless.png",
                 "text": "Wireless",
                 "type": "wireless"
@@ -748,6 +738,16 @@
                 "icon": "appliance.png",
                 "text": "Appliance",
                 "type": "appliance"
+            },
+            {
+                "icon": "collaboration.png",
+                "text": "Collaboration",
+                "type": "collaboration"
+            },
+            {
+                "icon": "workstation.png",
+                "text": "Workstation",
+                "type": "workstation"
             }
         ],
         "type": "array"
@@ -1365,1529 +1365,1146 @@
     "graph_descr.device_smokeping_in_all": {
         "default": "This is an aggregate graph of the incoming smokeping tests to this host. The line corresponds to the average RTT. The shaded area around each line denotes the standard deviation."
     },
-    "graph_types.device.agent.descr": {
-        "default": "Agent Execution Time"
-    },
-    "graph_types.device.agent.order": {
-        "default": 0
-    },
-    "graph_types.device.agent.section": {
-        "default": "poller"
-    },
-    "graph_types.device.arbos_flows.descr": {
-        "default": "Accumulative flow count per SP device"
-    },
-    "graph_types.device.arbos_flows.order": {
-        "default": 0
-    },
-    "graph_types.device.arbos_flows.section": {
-        "default": "graphs"
-    },
-    "graph_types.device.arbos_flows.subtype": {
-        "default": "arbos_flows"
-    },
-    "graph_types.device.arbos_flows.type": {
-        "default": "device"
-    },
-    "graph_types.device.asa_conns.descr": {
-        "default": "Current connections"
-    },
-    "graph_types.device.asa_conns.order": {
-        "default": 0
-    },
-    "graph_types.device.asa_conns.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.asa_conns.subtype": {
-        "default": "asa_conns"
-    },
-    "graph_types.device.asa_conns.type": {
-        "default": "device"
-    },
-    "graph_types.device.asyncos_conns.descr": {
-        "default": "Current Connections"
-    },
-    "graph_types.device.asyncos_conns.order": {
-        "default": 0
-    },
-    "graph_types.device.asyncos_conns.section": {
-        "default": "proxy"
-    },
-    "graph_types.device.asyncos_conns.subtype": {
-        "default": "asyncos_conns"
-    },
-    "graph_types.device.asyncos_conns.type": {
-        "default": "device"
-    },
-    "graph_types.device.bigip_apm_sessions.descr": {
-        "default": "Active Sessions"
-    },
-    "graph_types.device.bigip_apm_sessions.order": {
-        "default": 0
-    },
-    "graph_types.device.bigip_apm_sessions.section": {
-        "default": "apm"
-    },
-    "graph_types.device.bigip_apm_sessions.subtype": {
-        "default": "bigip_apm_sessions"
-    },
-    "graph_types.device.bigip_apm_sessions.type": {
-        "default": "device"
-    },
-    "graph_types.device.bits.descr": {
-        "default": "Total Traffic"
-    },
-    "graph_types.device.bits.order": {
-        "default": 0
-    },
-    "graph_types.device.bits.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.bluecoat_http_client_connections.descr": {
-        "default": "HTTP Client Connections"
-    },
-    "graph_types.device.bluecoat_http_client_connections.order": {
-        "default": 0
-    },
-    "graph_types.device.bluecoat_http_client_connections.section": {
-        "default": "network"
-    },
-    "graph_types.device.bluecoat_http_client_connections_active.descr": {
-        "default": "HTTP Client Connections Active"
-    },
-    "graph_types.device.bluecoat_http_client_connections_active.order": {
-        "default": 0
-    },
-    "graph_types.device.bluecoat_http_client_connections_active.section": {
-        "default": "network"
-    },
-    "graph_types.device.bluecoat_http_client_connections_idle.descr": {
-        "default": "HTTP Client Connections Idle"
-    },
-    "graph_types.device.bluecoat_http_client_connections_idle.order": {
-        "default": 0
-    },
-    "graph_types.device.bluecoat_http_client_connections_idle.section": {
-        "default": "network"
-    },
-    "graph_types.device.bluecoat_http_server_connections.descr": {
-        "default": "HTTP Server Connections"
-    },
-    "graph_types.device.bluecoat_http_server_connections.order": {
-        "default": 0
-    },
-    "graph_types.device.bluecoat_http_server_connections.section": {
-        "default": "network"
-    },
-    "graph_types.device.bluecoat_http_server_connections_active.descr": {
-        "default": "HTTP Server Connections Active"
-    },
-    "graph_types.device.bluecoat_http_server_connections_active.order": {
-        "default": 0
-    },
-    "graph_types.device.bluecoat_http_server_connections_active.section": {
-        "default": "network"
-    },
-    "graph_types.device.bluecoat_http_server_connections_idle.descr": {
-        "default": "HTTP Server Connections Idle"
-    },
-    "graph_types.device.bluecoat_http_server_connections_idle.order": {
-        "default": 0
-    },
-    "graph_types.device.bluecoat_http_server_connections_idle.section": {
-        "default": "network"
-    },
-    "graph_types.device.cambium-epmp-frameUtilization.descr": {
-        "default": "Frame Utilization"
-    },
-    "graph_types.device.cambium-epmp-frameUtilization.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.cambium_epmp_RFStatus.descr": {
-        "default": "RF Status"
-    },
-    "graph_types.device.cambium_epmp_RFStatus.order": {
-        "default": 0
-    },
-    "graph_types.device.cambium_epmp_RFStatus.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.cambium_epmp_access.descr": {
-        "default": "Access Info"
-    },
-    "graph_types.device.cambium_epmp_access.order": {
-        "default": 4
-    },
-    "graph_types.device.cambium_epmp_access.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.cambium_epmp_freq.descr": {
-        "default": "Frequency"
-    },
-    "graph_types.device.cambium_epmp_freq.order": {
-        "default": 6
-    },
-    "graph_types.device.cambium_epmp_freq.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.cambium_epmp_gpsSync.descr": {
-        "default": "GPS Sync Status"
-    },
-    "graph_types.device.cambium_epmp_gpsSync.order": {
-        "default": 5
-    },
-    "graph_types.device.cambium_epmp_gpsSync.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.cambium_epmp_modulation.descr": {
-        "default": "ePMP Modulation"
-    },
-    "graph_types.device.cambium_epmp_modulation.order": {
-        "default": 2
-    },
-    "graph_types.device.cambium_epmp_modulation.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.cambium_epmp_registeredSM.descr": {
-        "default": "ePMP Registered SM"
-    },
-    "graph_types.device.cambium_epmp_registeredSM.order": {
-        "default": 3
-    },
-    "graph_types.device.cambium_epmp_registeredSM.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_450_linkRadioDbm.descr": {
-        "default": "Radio Link H/V"
-    },
-    "graph_types.device.canopy_generic_450_linkRadioDbm.order": {
-        "default": 5
-    },
-    "graph_types.device.canopy_generic_450_linkRadioDbm.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_450_powerlevel.descr": {
-        "default": "Power Level of Registered SM"
-    },
-    "graph_types.device.canopy_generic_450_powerlevel.order": {
-        "default": 4
-    },
-    "graph_types.device.canopy_generic_450_powerlevel.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_450_ptpSNR.descr": {
-        "default": "Master SNR"
-    },
-    "graph_types.device.canopy_generic_450_ptpSNR.order": {
-        "default": 6
-    },
-    "graph_types.device.canopy_generic_450_ptpSNR.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_450_slaveHV.descr": {
-        "default": "Dbm H/V"
-    },
-    "graph_types.device.canopy_generic_450_slaveHV.order": {
-        "default": 7
-    },
-    "graph_types.device.canopy_generic_450_slaveHV.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_crcErrors.descr": {
-        "default": "CRC Errors (Migrated to Wireless Sensor)"
-    },
-    "graph_types.device.canopy_generic_crcErrors.order": {
-        "default": 15
-    },
-    "graph_types.device.canopy_generic_crcErrors.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_errorCount.descr": {
-        "default": "Error Count (Migrated to Wireless Sensor)"
-    },
-    "graph_types.device.canopy_generic_errorCount.order": {
-        "default": 14
-    },
-    "graph_types.device.canopy_generic_errorCount.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_gpsStats.descr": {
-        "default": "GPS Stats"
-    },
-    "graph_types.device.canopy_generic_gpsStats.order": {
-        "default": 0
-    },
-    "graph_types.device.canopy_generic_gpsStats.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_jitter.descr": {
-        "default": "Jitter"
-    },
-    "graph_types.device.canopy_generic_jitter.order": {
-        "default": 2
-    },
-    "graph_types.device.canopy_generic_jitter.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_radioDbm.descr": {
-        "default": "Radio Dbm"
-    },
-    "graph_types.device.canopy_generic_radioDbm.order": {
-        "default": 13
-    },
-    "graph_types.device.canopy_generic_radioDbm.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_regCount.descr": {
-        "default": "Registered SM"
-    },
-    "graph_types.device.canopy_generic_regCount.order": {
-        "default": 11
-    },
-    "graph_types.device.canopy_generic_regCount.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.canopy_generic_signalHV.descr": {
-        "default": "Signal"
-    },
-    "graph_types.device.canopy_generic_signalHV.order": {
-        "default": 3
-    },
-    "graph_types.device.canopy_generic_signalHV.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ccambium-epmp-frameUtilization.order": {
-        "default": 7
-    },
-    "graph_types.device.ceraos_DefectedBlocks.descr": {
-        "default": "DefectedBlocks"
-    },
-    "graph_types.device.ceraos_DefectedBlocks.order": {
-        "default": 4
-    },
-    "graph_types.device.ceraos_DefectedBlocks.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ceraos_MSE.descr": {
-        "default": "Radial MSE"
-    },
-    "graph_types.device.ceraos_MSE.order": {
-        "default": 2
-    },
-    "graph_types.device.ceraos_MSE.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ceraos_RxBitrate.descr": {
-        "default": "RxBitrate"
-    },
-    "graph_types.device.ceraos_RxBitrate.order": {
-        "default": 6
-    },
-    "graph_types.device.ceraos_RxBitrate.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ceraos_RxLevel.descr": {
-        "default": "RX Level"
-    },
-    "graph_types.device.ceraos_RxLevel.order": {
-        "default": 0
-    },
-    "graph_types.device.ceraos_RxLevel.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ceraos_TxBitrate.descr": {
-        "default": "TxBitrate"
-    },
-    "graph_types.device.ceraos_TxBitrate.order": {
-        "default": 5
-    },
-    "graph_types.device.ceraos_TxBitrate.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ceraos_TxPower.descr": {
-        "default": "TX Power"
-    },
-    "graph_types.device.ceraos_TxPower.order": {
-        "default": 1
-    },
-    "graph_types.device.ceraos_TxPower.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ceraos_XPI.descr": {
-        "default": "Cross Polarisation Interference"
-    },
-    "graph_types.device.ceraos_XPI.order": {
-        "default": 3
-    },
-    "graph_types.device.ceraos_XPI.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.charge.descr": {
-        "default": "Battery Charge"
-    },
-    "graph_types.device.charge.order": {
-        "default": 0
-    },
-    "graph_types.device.charge.section": {
-        "default": "system"
-    },
-    "graph_types.device.cipsec_flow_bits.descr": {
-        "default": "IPSec Tunnel Traffic Volume"
-    },
-    "graph_types.device.cipsec_flow_bits.order": {
-        "default": 0
-    },
-    "graph_types.device.cipsec_flow_bits.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.cipsec_flow_pkts.descr": {
-        "default": "IPSec Tunnel Traffic Packets"
-    },
-    "graph_types.device.cipsec_flow_pkts.order": {
-        "default": 0
-    },
-    "graph_types.device.cipsec_flow_pkts.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.cipsec_flow_stats.descr": {
-        "default": "IPSec Tunnel Statistics"
-    },
-    "graph_types.device.cipsec_flow_stats.order": {
-        "default": 0
-    },
-    "graph_types.device.cipsec_flow_stats.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.cipsec_flow_tunnels.descr": {
-        "default": "IPSec Active Tunnels"
-    },
-    "graph_types.device.cipsec_flow_tunnels.order": {
-        "default": 0
-    },
-    "graph_types.device.cipsec_flow_tunnels.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.cisco-iosdsp.descr": {
-        "default": "DSP Utilisation"
-    },
-    "graph_types.device.cisco-iosdsp.order": {
-        "default": 0
-    },
-    "graph_types.device.cisco-iosdsp.section": {
-        "default": "voice"
-    },
-    "graph_types.device.cisco-iosmtp.descr": {
-        "default": "Hardware MTP Utilisation"
-    },
-    "graph_types.device.cisco-iosmtp.order": {
-        "default": 0
-    },
-    "graph_types.device.cisco-iosmtp.section": {
-        "default": "voice"
-    },
-    "graph_types.device.cisco-iospri.descr": {
-        "default": "PRI Utilisation"
-    },
-    "graph_types.device.cisco-iospri.order": {
-        "default": 0
-    },
-    "graph_types.device.cisco-iospri.section": {
-        "default": "voice"
-    },
-    "graph_types.device.cisco-iosxcode.descr": {
-        "default": "Transcoder Utilisation"
-    },
-    "graph_types.device.cisco-iosxcode.order": {
-        "default": 0
-    },
-    "graph_types.device.cisco-iosxcode.section": {
-        "default": "voice"
-    },
-    "graph_types.device.cisco_wwan_mnc.descr": {
-        "default": "MNC"
-    },
-    "graph_types.device.cisco_wwan_mnc.order": {
-        "default": 1
-    },
-    "graph_types.device.cisco_wwan_mnc.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.cisco_wwan_rssi.descr": {
-        "default": "Signal Rssi"
-    },
-    "graph_types.device.cisco_wwan_rssi.order": {
-        "default": 0
-    },
-    "graph_types.device.cisco_wwan_rssi.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.cras_sessions.descr": {
-        "default": "Remote Access Sessions"
-    },
-    "graph_types.device.cras_sessions.order": {
-        "default": 0
-    },
-    "graph_types.device.cras_sessions.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.fdb_count.descr": {
-        "default": "MAC Addresses Learnt"
-    },
-    "graph_types.device.fdb_count.order": {
-        "default": 0
-    },
-    "graph_types.device.fdb_count.section": {
-        "default": "system"
-    },
-    "graph_types.device.fortigate_cpu.descr": {
-        "default": "CPU"
-    },
-    "graph_types.device.fortigate_cpu.order": {
-        "default": 0
-    },
-    "graph_types.device.fortigate_cpu.section": {
-        "default": "system"
-    },
-    "graph_types.device.fortigate_sessions.descr": {
-        "default": "Active Sessions"
-    },
-    "graph_types.device.fortigate_sessions.order": {
-        "default": 0
-    },
-    "graph_types.device.fortigate_sessions.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.fortios_lograte.descr": {
-        "default": "Log Rate"
-    },
-    "graph_types.device.fortios_lograte.order": {
-        "default": 0
-    },
-    "graph_types.device.fortios_lograte.section": {
-        "default": "analyzer"
-    },
-    "graph_types.device.fortios_lograte.subtype": {
-        "default": "fortios_lograte"
-    },
-    "graph_types.device.fortios_lograte.type": {
-        "default": "device"
-    },
-    "graph_types.device.hr_processes.descr": {
-        "default": "Running Processes"
-    },
-    "graph_types.device.hr_processes.order": {
-        "default": 0
-    },
-    "graph_types.device.hr_processes.section": {
-        "default": "system"
-    },
-    "graph_types.device.hr_users.descr": {
-        "default": "Users Logged In"
-    },
-    "graph_types.device.hr_users.order": {
-        "default": 0
-    },
-    "graph_types.device.hr_users.section": {
-        "default": "system"
-    },
-    "graph_types.device.ib_dhcp_messages.descr": {
-        "default": "DHCP messages"
-    },
-    "graph_types.device.ib_dhcp_messages.order": {
-        "default": 0
-    },
-    "graph_types.device.ib_dhcp_messages.section": {
-        "default": "dhcp"
-    },
-    "graph_types.device.ib_dns_dyn_updates.descr": {
-        "default": "DNS dynamic updates"
-    },
-    "graph_types.device.ib_dns_dyn_updates.order": {
-        "default": 0
-    },
-    "graph_types.device.ib_dns_dyn_updates.section": {
-        "default": "dns"
-    },
-    "graph_types.device.ib_dns_performance.descr": {
-        "default": "DNS performance"
-    },
-    "graph_types.device.ib_dns_performance.order": {
-        "default": 0
-    },
-    "graph_types.device.ib_dns_performance.section": {
-        "default": "dns"
-    },
-    "graph_types.device.ib_dns_request_return_codes.descr": {
-        "default": "DNS request return codes"
-    },
-    "graph_types.device.ib_dns_request_return_codes.order": {
-        "default": 0
-    },
-    "graph_types.device.ib_dns_request_return_codes.section": {
-        "default": "dns"
-    },
-    "graph_types.device.ipsystemstats_ipv4.descr": {
-        "default": "IPv4 Packet Statistics"
-    },
-    "graph_types.device.ipsystemstats_ipv4.order": {
-        "default": 0
-    },
-    "graph_types.device.ipsystemstats_ipv4.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.ipsystemstats_ipv4_frag.descr": {
-        "default": "IPv4 Fragmentation Statistics"
-    },
-    "graph_types.device.ipsystemstats_ipv4_frag.order": {
-        "default": 0
-    },
-    "graph_types.device.ipsystemstats_ipv4_frag.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.ipsystemstats_ipv6.descr": {
-        "default": "IPv6 Packet Statistics"
-    },
-    "graph_types.device.ipsystemstats_ipv6.order": {
-        "default": 0
-    },
-    "graph_types.device.ipsystemstats_ipv6.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.ipsystemstats_ipv6_frag.descr": {
-        "default": "IPv6 Fragmentation Statistics"
-    },
-    "graph_types.device.ipsystemstats_ipv6_frag.order": {
-        "default": 0
-    },
-    "graph_types.device.ipsystemstats_ipv6_frag.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.junos_jsrx_spu_flows.descr": {
-        "default": "SPU Flows"
-    },
-    "graph_types.device.junos_jsrx_spu_flows.order": {
-        "default": 0
-    },
-    "graph_types.device.junos_jsrx_spu_flows.section": {
-        "default": "network"
-    },
-    "graph_types.device.junos_jsrx_spu_flows.subtype": {
-        "default": "junos_jsrx_spu_flows"
-    },
-    "graph_types.device.junos_jsrx_spu_flows.type": {
-        "default": "device"
-    },
-    "graph_types.device.junos_jsrx_spu_sessions.descr": {
-        "default": "Flow Sessions"
-    },
-    "graph_types.device.junos_jsrx_spu_sessions.order": {
-        "default": 1
-    },
-    "graph_types.device.junos_jsrx_spu_sessions.section": {
-        "default": "network"
-    },
-    "graph_types.device.mempool.descr": {
-        "default": "Memory Pool Usage"
-    },
-    "graph_types.device.mempool.order": {
-        "default": 0
-    },
-    "graph_types.device.mempool.section": {
-        "default": "system"
-    },
-    "graph_types.device.netscaler_tcp_bits.descr": {
-        "default": "TCP Traffic"
-    },
-    "graph_types.device.netscaler_tcp_bits.order": {
-        "default": 0
-    },
-    "graph_types.device.netscaler_tcp_bits.section": {
-        "default": "load balancer"
-    },
-    "graph_types.device.netscaler_tcp_conn.descr": {
-        "default": "TCP Connections"
-    },
-    "graph_types.device.netscaler_tcp_conn.order": {
-        "default": 0
-    },
-    "graph_types.device.netscaler_tcp_conn.section": {
-        "default": "load balancer"
-    },
-    "graph_types.device.netscaler_tcp_pkts.descr": {
-        "default": "TCP Packets"
-    },
-    "graph_types.device.netscaler_tcp_pkts.order": {
-        "default": 0
-    },
-    "graph_types.device.netscaler_tcp_pkts.section": {
-        "default": "load balancer"
-    },
-    "graph_types.device.netstat_icmp.descr": {
-        "default": "ICMP Statistics"
-    },
-    "graph_types.device.netstat_icmp.order": {
-        "default": 0
-    },
-    "graph_types.device.netstat_icmp.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.netstat_icmp_info.descr": {
-        "default": "ICMP Informational Statistics"
-    },
-    "graph_types.device.netstat_icmp_info.order": {
-        "default": 0
-    },
-    "graph_types.device.netstat_icmp_info.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.netstat_ip.descr": {
-        "default": "IP Statistics"
-    },
-    "graph_types.device.netstat_ip.order": {
-        "default": 0
-    },
-    "graph_types.device.netstat_ip.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.netstat_ip_forward.descr": {
-        "default": "IP Forwarding Statistics"
-    },
-    "graph_types.device.netstat_ip_forward.order": {
-        "default": 0
-    },
-    "graph_types.device.netstat_ip_forward.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.netstat_ip_frag.descr": {
-        "default": "IP Fragmentation Statistics"
-    },
-    "graph_types.device.netstat_ip_frag.order": {
-        "default": 0
-    },
-    "graph_types.device.netstat_ip_frag.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.netstat_snmp.descr": {
-        "default": "SNMP Statistics"
-    },
-    "graph_types.device.netstat_snmp.order": {
-        "default": 0
-    },
-    "graph_types.device.netstat_snmp.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.netstat_snmp_pkt.descr": {
-        "default": "SNMP Packet Type Statistics"
-    },
-    "graph_types.device.netstat_snmp_pkt.order": {
-        "default": 0
-    },
-    "graph_types.device.netstat_snmp_pkt.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.netstat_tcp.descr": {
-        "default": "TCP Statistics"
-    },
-    "graph_types.device.netstat_tcp.order": {
-        "default": 0
-    },
-    "graph_types.device.netstat_tcp.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.netstat_udp.descr": {
-        "default": "UDP Statistics"
-    },
-    "graph_types.device.netstat_udp.order": {
-        "default": 0
-    },
-    "graph_types.device.netstat_udp.section": {
-        "default": "netstats"
-    },
-    "graph_types.device.panos_activetunnels.descr": {
-        "default": "Active GlobalProtect Tunnels"
-    },
-    "graph_types.device.panos_activetunnels.order": {
-        "default": 0
-    },
-    "graph_types.device.panos_activetunnels.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.panos_activetunnels.subtype": {
-        "default": "panos_activetunnels"
-    },
-    "graph_types.device.panos_activetunnels.type": {
-        "default": "device"
-    },
-    "graph_types.device.panos_sessions.descr": {
-        "default": "Active Sessions"
-    },
-    "graph_types.device.panos_sessions.order": {
-        "default": 0
-    },
-    "graph_types.device.panos_sessions.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.panos_sessions_icmp.descr": {
-        "default": "Active ICMP Sessions"
-    },
-    "graph_types.device.panos_sessions_icmp.order": {
-        "default": 0
-    },
-    "graph_types.device.panos_sessions_icmp.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.panos_sessions_ssl.descr": {
-        "default": "Active SSL Proxy Sessions"
-    },
-    "graph_types.device.panos_sessions_ssl.order": {
-        "default": 0
-    },
-    "graph_types.device.panos_sessions_ssl.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.panos_sessions_sslutil.descr": {
-        "default": "Active SSL Proxy Utilization"
-    },
-    "graph_types.device.panos_sessions_sslutil.order": {
-        "default": 0
-    },
-    "graph_types.device.panos_sessions_sslutil.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.panos_sessions_tcp.descr": {
-        "default": "Active TCP Sessions"
-    },
-    "graph_types.device.panos_sessions_tcp.order": {
-        "default": 0
-    },
-    "graph_types.device.panos_sessions_tcp.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.panos_sessions_udp.descr": {
-        "default": "Active UDP Sessions"
-    },
-    "graph_types.device.panos_sessions_udp.order": {
-        "default": 0
-    },
-    "graph_types.device.panos_sessions_udp.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_badoffset.descr": {
-        "default": "BadOffset"
-    },
-    "graph_types.device.pf_badoffset.order": {
-        "default": 6
-    },
-    "graph_types.device.pf_badoffset.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_fragmented.descr": {
-        "default": "Fragmented"
-    },
-    "graph_types.device.pf_fragmented.order": {
-        "default": 7
-    },
-    "graph_types.device.pf_fragmented.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_inserts.descr": {
-        "default": "Inserts"
-    },
-    "graph_types.device.pf_inserts.order": {
-        "default": 3
-    },
-    "graph_types.device.pf_inserts.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_matches.descr": {
-        "default": "Matches"
-    },
-    "graph_types.device.pf_matches.order": {
-        "default": 5
-    },
-    "graph_types.device.pf_matches.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_memdropped.descr": {
-        "default": "MemDropped"
-    },
-    "graph_types.device.pf_memdropped.order": {
-        "default": 10
-    },
-    "graph_types.device.pf_memdropped.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_normalized.descr": {
-        "default": "Normalized"
-    },
-    "graph_types.device.pf_normalized.order": {
-        "default": 9
-    },
-    "graph_types.device.pf_normalized.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_removals.descr": {
-        "default": "Removals"
-    },
-    "graph_types.device.pf_removals.order": {
-        "default": 4
-    },
-    "graph_types.device.pf_removals.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_searches.descr": {
-        "default": "Searches"
-    },
-    "graph_types.device.pf_searches.order": {
-        "default": 2
-    },
-    "graph_types.device.pf_searches.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_short.descr": {
-        "default": "Short"
-    },
-    "graph_types.device.pf_short.order": {
-        "default": 8
-    },
-    "graph_types.device.pf_short.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pf_states.descr": {
-        "default": "States"
-    },
-    "graph_types.device.pf_states.order": {
-        "default": 1
-    },
-    "graph_types.device.pf_states.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.ping_perf.descr": {
-        "default": "Ping Response"
-    },
-    "graph_types.device.ping_perf.order": {
-        "default": 0
-    },
-    "graph_types.device.ping_perf.section": {
-        "default": "poller"
-    },
-    "graph_types.device.poller_modules_perf.descr": {
-        "default": "Poller Modules Performance"
-    },
-    "graph_types.device.poller_modules_perf.order": {
-        "default": 0
-    },
-    "graph_types.device.poller_modules_perf.section": {
-        "default": "poller"
-    },
-    "graph_types.device.poller_perf.descr": {
-        "default": "Poller Time"
-    },
-    "graph_types.device.poller_perf.order": {
-        "default": 0
-    },
-    "graph_types.device.poller_perf.section": {
-        "default": "poller"
-    },
-    "graph_types.device.processor.descr": {
-        "default": "Processor Usage"
-    },
-    "graph_types.device.processor.order": {
-        "default": 0
-    },
-    "graph_types.device.processor.section": {
-        "default": "system"
-    },
-    "graph_types.device.pulse_sessions.descr": {
-        "default": "Active Sessions"
-    },
-    "graph_types.device.pulse_sessions.order": {
-        "default": 0
-    },
-    "graph_types.device.pulse_sessions.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pulse_sessions.subtype": {
-        "default": "pulse_sessions"
-    },
-    "graph_types.device.pulse_sessions.type": {
-        "default": "device"
-    },
-    "graph_types.device.pulse_users.descr": {
-        "default": "Active Users"
-    },
-    "graph_types.device.pulse_users.order": {
-        "default": 0
-    },
-    "graph_types.device.pulse_users.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.pulse_users.subtype": {
-        "default": "pulse_users"
-    },
-    "graph_types.device.pulse_users.type": {
-        "default": "device"
-    },
-    "graph_types.device.riverbed_connections.descr": {
-        "default": "Connections"
-    },
-    "graph_types.device.riverbed_connections.order": {
-        "default": 0
-    },
-    "graph_types.device.riverbed_connections.section": {
-        "default": "network"
-    },
-    "graph_types.device.riverbed_connections.subtype": {
-        "default": "riverbed_connections"
-    },
-    "graph_types.device.riverbed_connections.type": {
-        "default": "device"
-    },
-    "graph_types.device.riverbed_datastore.descr": {
-        "default": "Datastore productivity"
-    },
-    "graph_types.device.riverbed_datastore.order": {
-        "default": 0
-    },
-    "graph_types.device.riverbed_datastore.section": {
-        "default": "network"
-    },
-    "graph_types.device.riverbed_datastore.subtype": {
-        "default": "riverbed_datastore"
-    },
-    "graph_types.device.riverbed_datastore.type": {
-        "default": "device"
-    },
-    "graph_types.device.riverbed_optimization.descr": {
-        "default": "Optimization"
-    },
-    "graph_types.device.riverbed_optimization.order": {
-        "default": 0
-    },
-    "graph_types.device.riverbed_optimization.section": {
-        "default": "network"
-    },
-    "graph_types.device.riverbed_optimization.subtype": {
-        "default": "riverbed_optimization"
-    },
-    "graph_types.device.riverbed_optimization.type": {
-        "default": "device"
-    },
-    "graph_types.device.riverbed_passthrough.descr": {
-        "default": "Bandwidth passthrough"
-    },
-    "graph_types.device.riverbed_passthrough.order": {
-        "default": 0
-    },
-    "graph_types.device.riverbed_passthrough.section": {
-        "default": "network"
-    },
-    "graph_types.device.riverbed_passthrough.subtype": {
-        "default": "riverbed_passthrough"
-    },
-    "graph_types.device.riverbed_passthrough.type": {
-        "default": "device"
-    },
-    "graph_types.device.routeros_leases.descr": {
-        "default": "DHCP Lease Count"
-    },
-    "graph_types.device.routeros_leases.order": {
-        "default": 0
-    },
-    "graph_types.device.routeros_leases.section": {
-        "default": "network"
-    },
-    "graph_types.device.screenos_sessions.descr": {
-        "default": "Active Sessions"
-    },
-    "graph_types.device.screenos_sessions.order": {
-        "default": 0
-    },
-    "graph_types.device.screenos_sessions.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.secureplatform_sessions.descr": {
-        "default": "Active connections"
-    },
-    "graph_types.device.secureplatform_sessions.order": {
-        "default": 0
-    },
-    "graph_types.device.secureplatform_sessions.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.sgos_average_requests.descr": {
-        "default": "Average HTTP Requests"
-    },
-    "graph_types.device.sgos_average_requests.order": {
-        "default": 0
-    },
-    "graph_types.device.sgos_average_requests.section": {
-        "default": "network"
-    },
-    "graph_types.device.sgos_average_requests.subtype": {
-        "default": "sgos_average_requests"
-    },
-    "graph_types.device.sgos_average_requests.type": {
-        "default": "device"
-    },
-    "graph_types.device.sgos_client_connections.descr": {
-        "default": "HTTP Client Connections"
-    },
-    "graph_types.device.sgos_client_connections.order": {
-        "default": 0
-    },
-    "graph_types.device.sgos_client_connections.section": {
-        "default": "network"
-    },
-    "graph_types.device.sgos_client_connections.subtype": {
-        "default": "sgos_client_connections"
-    },
-    "graph_types.device.sgos_client_connections.type": {
-        "default": "device"
-    },
-    "graph_types.device.sgos_client_connections_active.descr": {
-        "default": "HTTP Client Connections Active"
-    },
-    "graph_types.device.sgos_client_connections_active.order": {
-        "default": 0
-    },
-    "graph_types.device.sgos_client_connections_active.section": {
-        "default": "network"
-    },
-    "graph_types.device.sgos_client_connections_active.subtype": {
-        "default": "sgos_client_connections_active"
-    },
-    "graph_types.device.sgos_client_connections_active.type": {
-        "default": "device"
-    },
-    "graph_types.device.sgos_client_connections_idle.descr": {
-        "default": "HTTP Client Connections Idle"
-    },
-    "graph_types.device.sgos_client_connections_idle.order": {
-        "default": 0
-    },
-    "graph_types.device.sgos_client_connections_idle.section": {
-        "default": "network"
-    },
-    "graph_types.device.sgos_client_connections_idle.subtype": {
-        "default": "sgos_client_connections_idle"
-    },
-    "graph_types.device.sgos_client_connections_idle.type": {
-        "default": "device"
-    },
-    "graph_types.device.sgos_server_connections.descr": {
-        "default": "HTTP Server Connections"
-    },
-    "graph_types.device.sgos_server_connections.order": {
-        "default": 0
-    },
-    "graph_types.device.sgos_server_connections.section": {
-        "default": "network"
-    },
-    "graph_types.device.sgos_server_connections.subtype": {
-        "default": "sgos_server_connections"
-    },
-    "graph_types.device.sgos_server_connections.type": {
-        "default": "device"
-    },
-    "graph_types.device.sgos_server_connections_active.descr": {
-        "default": "HTTP Server Connections Active"
-    },
-    "graph_types.device.sgos_server_connections_active.order": {
-        "default": 0
-    },
-    "graph_types.device.sgos_server_connections_active.section": {
-        "default": "network"
-    },
-    "graph_types.device.sgos_server_connections_active.subtype": {
-        "default": "sgos_server_connections_active"
-    },
-    "graph_types.device.sgos_server_connections_active.type": {
-        "default": "device"
-    },
-    "graph_types.device.sgos_server_connections_idle.descr": {
-        "default": "HTTP Server Connections Idle"
-    },
-    "graph_types.device.sgos_server_connections_idle.order": {
-        "default": 0
-    },
-    "graph_types.device.sgos_server_connections_idle.section": {
-        "default": "network"
-    },
-    "graph_types.device.sgos_server_connections_idle.subtype": {
-        "default": "sgos_server_connections_idle"
-    },
-    "graph_types.device.sgos_server_connections_idle.type": {
-        "default": "device"
-    },
-    "graph_types.device.siklu_rfinterfaceOctets.descr": {
-        "default": "Traffic"
-    },
-    "graph_types.device.siklu_rfinterfaceOctets.order": {
-        "default": 5
-    },
-    "graph_types.device.siklu_rfinterfaceOctets.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.siklu_rfinterfaceOtherOctets.descr": {
-        "default": "Other Octets"
-    },
-    "graph_types.device.siklu_rfinterfaceOtherOctets.order": {
-        "default": 6
-    },
-    "graph_types.device.siklu_rfinterfaceOtherOctets.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.siklu_rfinterfaceOtherPkts.descr": {
-        "default": "Other Packets"
-    },
-    "graph_types.device.siklu_rfinterfaceOtherPkts.order": {
-        "default": 4
-    },
-    "graph_types.device.siklu_rfinterfaceOtherPkts.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.siklu_rfinterfacePkts.descr": {
-        "default": "Packets"
-    },
-    "graph_types.device.siklu_rfinterfacePkts.order": {
-        "default": 3
-    },
-    "graph_types.device.siklu_rfinterfacePkts.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.sonicwall_sessions.descr": {
-        "default": "Active Sessions"
-    },
-    "graph_types.device.sonicwall_sessions.order": {
-        "default": 0
-    },
-    "graph_types.device.sonicwall_sessions.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.sonicwall_sessions.subtype": {
-        "default": "sonicwall_sessions"
-    },
-    "graph_types.device.sonicwall_sessions.type": {
-        "default": "device"
-    },
-    "graph_types.device.storage.descr": {
-        "default": "Filesystem Usage"
-    },
-    "graph_types.device.storage.order": {
-        "default": 0
-    },
-    "graph_types.device.storage.section": {
-        "default": "system"
-    },
-    "graph_types.device.sub10_sub10RadioLclAFER.descr": {
-        "default": "Radio Air Frame Error Rate"
-    },
-    "graph_types.device.sub10_sub10RadioLclAFER.order": {
-        "default": 4
-    },
-    "graph_types.device.sub10_sub10RadioLclAFER.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.sub10_sub10RadioLclDataRate.descr": {
-        "default": "Data Rate on the Airside interface"
-    },
-    "graph_types.device.sub10_sub10RadioLclDataRate.order": {
-        "default": 4
-    },
-    "graph_types.device.sub10_sub10RadioLclDataRate.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.sub10_sub10RadioLclLnkLoss.descr": {
-        "default": "Radio Link Loss"
-    },
-    "graph_types.device.sub10_sub10RadioLclLnkLoss.order": {
-        "default": 3
-    },
-    "graph_types.device.sub10_sub10RadioLclLnkLoss.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.sub10_sub10RadioLclRxPower.descr": {
-        "default": "Radio Receive Power"
-    },
-    "graph_types.device.sub10_sub10RadioLclRxPower.order": {
-        "default": 1
-    },
-    "graph_types.device.sub10_sub10RadioLclRxPower.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.sub10_sub10RadioLclTxPower.descr": {
-        "default": "Radio Transmit Power"
-    },
-    "graph_types.device.sub10_sub10RadioLclTxPower.order": {
-        "default": 0
-    },
-    "graph_types.device.sub10_sub10RadioLclTxPower.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.sub10_sub10RadioLclVectErr.descr": {
-        "default": "Radio Vector Error"
-    },
-    "graph_types.device.sub10_sub10RadioLclVectErr.order": {
-        "default": 3
-    },
-    "graph_types.device.sub10_sub10RadioLclVectErr.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.temperature.descr": {
-        "default": "temperature"
-    },
-    "graph_types.device.temperature.order": {
-        "default": 0
-    },
-    "graph_types.device.temperature.section": {
-        "default": "system"
-    },
-    "graph_types.device.topvision_cmoffline.descr": {
-        "default": "Cable Modem Offline"
-    },
-    "graph_types.device.topvision_cmoffline.order": {
-        "default": 2
-    },
-    "graph_types.device.topvision_cmoffline.section": {
-        "default": "cmts"
-    },
-    "graph_types.device.topvision_cmreg.descr": {
-        "default": "Cable Modem Registered"
-    },
-    "graph_types.device.topvision_cmreg.order": {
-        "default": 1
-    },
-    "graph_types.device.topvision_cmreg.section": {
-        "default": "cmts"
-    },
-    "graph_types.device.topvision_cmtotal.descr": {
-        "default": "Cable Modem Total"
-    },
-    "graph_types.device.topvision_cmtotal.order": {
-        "default": 0
-    },
-    "graph_types.device.topvision_cmtotal.section": {
-        "default": "cmts"
-    },
-    "graph_types.device.ubnt_airfiber_Capacity.descr": {
-        "default": "Link Capacity"
-    },
-    "graph_types.device.ubnt_airfiber_Capacity.order": {
-        "default": 2
-    },
-    "graph_types.device.ubnt_airfiber_Capacity.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ubnt_airfiber_LinkDist.descr": {
-        "default": "Link Distance"
-    },
-    "graph_types.device.ubnt_airfiber_LinkDist.order": {
-        "default": 1
-    },
-    "graph_types.device.ubnt_airfiber_LinkDist.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ubnt_airfiber_RFTotOctetsRx.descr": {
-        "default": "RF Total Octets Rx"
-    },
-    "graph_types.device.ubnt_airfiber_RFTotOctetsRx.order": {
-        "default": 6
-    },
-    "graph_types.device.ubnt_airfiber_RFTotOctetsRx.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ubnt_airfiber_RFTotOctetsTx.descr": {
-        "default": "RF Total Octets Tx"
-    },
-    "graph_types.device.ubnt_airfiber_RFTotOctetsTx.order": {
-        "default": 4
-    },
-    "graph_types.device.ubnt_airfiber_RFTotOctetsTx.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ubnt_airfiber_RFTotPktsRx.descr": {
-        "default": "RF Total Packets Rx"
-    },
-    "graph_types.device.ubnt_airfiber_RFTotPktsRx.order": {
-        "default": 7
-    },
-    "graph_types.device.ubnt_airfiber_RFTotPktsRx.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ubnt_airfiber_RFTotPktsTx.descr": {
-        "default": "RF Total Packets Tx"
-    },
-    "graph_types.device.ubnt_airfiber_RFTotPktsTx.order": {
-        "default": 5
-    },
-    "graph_types.device.ubnt_airfiber_RFTotPktsTx.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ubnt_airfiber_RadioFreqs.descr": {
-        "default": "Radio Frequencies"
-    },
-    "graph_types.device.ubnt_airfiber_RadioFreqs.order": {
-        "default": 0
-    },
-    "graph_types.device.ubnt_airfiber_RadioFreqs.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ubnt_airfiber_RadioTemp.descr": {
-        "default": "Radio Temperatures"
-    },
-    "graph_types.device.ubnt_airfiber_RadioTemp.order": {
-        "default": 3
-    },
-    "graph_types.device.ubnt_airfiber_RadioTemp.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ubnt_airfiber_RxPower.descr": {
-        "default": "Radio Rx Power"
-    },
-    "graph_types.device.ubnt_airfiber_RxPower.order": {
-        "default": 8
-    },
-    "graph_types.device.ubnt_airfiber_RxPower.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ubnt_airfiber_TxPower.descr": {
-        "default": "Radio Tx Power"
-    },
-    "graph_types.device.ubnt_airfiber_TxPower.order": {
-        "default": 0
-    },
-    "graph_types.device.ubnt_airfiber_TxPower.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.ucd_contexts.descr": {
-        "default": "Context Switches"
-    },
-    "graph_types.device.ucd_contexts.order": {
-        "default": 0
-    },
-    "graph_types.device.ucd_contexts.section": {
-        "default": "system"
-    },
-    "graph_types.device.ucd_cpu.descr": {
-        "default": "Detailed Processor Usage"
-    },
-    "graph_types.device.ucd_cpu.order": {
-        "default": 0
-    },
-    "graph_types.device.ucd_cpu.section": {
-        "default": "system"
-    },
-    "graph_types.device.ucd_interrupts.descr": {
-        "default": "Interrupts"
-    },
-    "graph_types.device.ucd_interrupts.order": {
-        "default": 0
-    },
-    "graph_types.device.ucd_interrupts.section": {
-        "default": "system"
-    },
-    "graph_types.device.ucd_io.descr": {
-        "default": "System I/O Activity"
-    },
-    "graph_types.device.ucd_io.order": {
-        "default": 0
-    },
-    "graph_types.device.ucd_io.section": {
-        "default": "system"
-    },
-    "graph_types.device.ucd_load.descr": {
-        "default": "Load Averages"
-    },
-    "graph_types.device.ucd_load.order": {
-        "default": 0
-    },
-    "graph_types.device.ucd_load.section": {
-        "default": "system"
-    },
-    "graph_types.device.ucd_memory.descr": {
-        "default": "Detailed Memory Usage"
-    },
-    "graph_types.device.ucd_memory.order": {
-        "default": 0
-    },
-    "graph_types.device.ucd_memory.section": {
-        "default": "system"
-    },
-    "graph_types.device.ucd_swap_io.descr": {
-        "default": "Swap I/O Activity"
-    },
-    "graph_types.device.ucd_swap_io.order": {
-        "default": 0
-    },
-    "graph_types.device.ucd_swap_io.section": {
-        "default": "system"
-    },
-    "graph_types.device.uptime.descr": {
-        "default": "System Uptime"
-    },
-    "graph_types.device.uptime.order": {
-        "default": 0
-    },
-    "graph_types.device.uptime.section": {
-        "default": "system"
-    },
-    "graph_types.device.vpdn_sessions_l2tp.descr": {
-        "default": "VPDN L2TP Sessions"
-    },
-    "graph_types.device.vpdn_sessions_l2tp.order": {
-        "default": 0
-    },
-    "graph_types.device.vpdn_sessions_l2tp.section": {
-        "default": "vpdn"
-    },
-    "graph_types.device.vpdn_tunnels_l2tp.descr": {
-        "default": "VPDN L2TP Tunnels"
-    },
-    "graph_types.device.vpdn_tunnels_l2tp.order": {
-        "default": 0
-    },
-    "graph_types.device.vpdn_tunnels_l2tp.section": {
-        "default": "vpdn"
-    },
-    "graph_types.device.waas_cwotfostatsactiveoptconn.descr": {
-        "default": "Optimized TCP Connections"
-    },
-    "graph_types.device.waas_cwotfostatsactiveoptconn.order": {
-        "default": 0
-    },
-    "graph_types.device.waas_cwotfostatsactiveoptconn.section": {
-        "default": "graphs"
-    },
-    "graph_types.device.waas_cwotfostatsactiveoptconn.subtype": {
-        "default": "waas_cwotfostatsactiveoptconn"
-    },
-    "graph_types.device.waas_cwotfostatsactiveoptconn.type": {
-        "default": "device"
-    },
-    "graph_types.device.xirrus_stations.descr": {
-        "default": "Associated Stations"
-    },
-    "graph_types.device.xirrus_stations.order": {
-        "default": 0
-    },
-    "graph_types.device.xirrus_stations.section": {
-        "default": "wireless"
-    },
-    "graph_types.device.zywall_sessions.descr": {
-        "default": "Sessions"
-    },
-    "graph_types.device.zywall_sessions.order": {
-        "default": 0
-    },
-    "graph_types.device.zywall_sessions.section": {
-        "default": "firewall"
-    },
-    "graph_types.device.zywall_sessions.subtype": {
-        "default": "zywall_sessions"
-    },
-    "graph_types.device.zywall_sessions.type": {
-        "default": "device"
+    "graph_types.device.agent": {
+        "default": {
+            "section": "poller",
+            "order": 0,
+            "descr": "Agent Execution Time"
+        }
+    },
+    "graph_types.device.arbos_flows": {
+        "default": {
+           "section": "graphs",
+            "order": 0,
+            "descr": "Accumulative flow count per SP device"
+        }
+    },
+    "graph_types.device.asa_conns": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Current connections"
+        }
+    },
+    "graph_types.device.asyncos_conns": {
+        "default": {
+           "section": "proxy",
+            "order": 0,
+            "descr": "Current connections"
+        }
+    },
+    "graph_types.device.barracuda_firewall_sessions": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active Sessions"
+        }
+    },
+    "graph_types.device.bigip_apm_sessions": {
+        "default": {
+           "section": "apm",
+            "order": 0,
+            "descr": "Active Sessions"
+        }
+    },
+    "graph_types.device.bigip_system_client_concurrent_connections": {
+        "default": {
+           "section": "ltm",
+            "order": 2,
+            "descr": "Global Client Concurrent Connections"
+        }
+    },
+    "graph_types.device.bigip_system_client_connection_rate": {
+        "default": {
+           "section": "ltm",
+            "order": 4,
+            "descr": "Global Client Connection Rate"
+        }
+    },
+    "graph_types.device.bigip_system_server_concurrent_connections": {
+        "default": {
+           "section": "ltm",
+            "order": 1,
+            "descr": "Global Server Concurrent Connections"
+        }
+    },
+    "graph_types.device.bigip_system_server_connection_rate": {
+        "default": {
+           "section": "ltm",
+            "order": 3,
+            "descr": "Global Server Connection Rate"
+        }
+    },
+    "graph_types.device.bigip_system_tps": {
+        "default": {
+           "section": "ltm",
+            "order": 0,
+            "descr": "SSL Transactions"
+        }
+    },
+    "graph_types.device.bits": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "Total Traffic"
+        }
+    },
+    "graph_types.device.bluecoat_http_client_connections": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "HTTP Client Connections"
+        }
+    },
+    "graph_types.device.bluecoat_http_client_connections_active": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "HTTP Client Connections Active"
+        }
+    },
+    "graph_types.device.bluecoat_http_client_connections_idle": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "HTTP Client Connections Idle"
+        }
+    },
+    "graph_types.device.bluecoat_http_server_connections": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "HTTP Server Connections"
+        }
+    },
+    "graph_types.device.bluecoat_http_server_connections_active": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "HTTP Server Connections Active"
+        }
+    },
+    "graph_types.device.bluecoat_http_server_connections_idle": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "HTTP Server Connections Idle"
+        }
+    },
+    "graph_types.device.cambium-epmp-frameUtilization": {
+        "default": {
+            "section": "wireless",
+            "order": 7,
+            "descr": "Frame Utilization"
+        }
+    },
+    "graph_types.device.cambium_epmp_RFStatus": {
+        "default": {
+           "section": "wireless",
+            "order": 0,
+            "descr": "RF Status"
+        }
+    },
+    "graph_types.device.cambium_epmp_access": {
+        "default": {
+           "section": "wireless",
+            "order": 4,
+            "descr": "Access Info"
+        }
+    },
+    "graph_types.device.cambium_epmp_freq": {
+        "default": {
+           "section": "wireless",
+            "order": 6,
+            "descr": "Frequency"
+        }
+    },
+    "graph_types.device.cambium_epmp_gpsSync": {
+        "default": {
+           "section": "wireless",
+            "order": 5,
+            "descr": "GPS Sync Status"
+        }
+    },
+    "graph_types.device.cambium_epmp_modulation": {
+        "default": {
+           "section": "wireless",
+            "order": 2,
+            "descr": "ePMP Modulation"
+        }
+    },
+    "graph_types.device.cambium_epmp_registeredSM": {
+        "default": {
+           "section": "wireless",
+            "order": 3,
+            "descr": "ePMP Registered SM"
+        }
+    },
+    "graph_types.device.canopy_generic_450_linkRadioDbm": {
+        "default": {
+           "section": "wireless",
+            "order": 5,
+            "descr": "Radio Link H/V"
+        }
+    },
+    "graph_types.device.canopy_generic_450_powerlevel": {
+        "default": {
+           "section": "wireless",
+            "order": 4,
+            "descr": "Power Level of Registered SM"
+        }
+    },
+    "graph_types.device.canopy_generic_450_ptpSNR": {
+        "default": {
+           "section": "wireless",
+            "order": 6,
+            "descr": "Master SNR"
+        }
+    },
+    "graph_types.device.canopy_generic_450_slaveHV": {
+        "default": {
+           "section": "wireless",
+            "order": 7,
+            "descr": "Dbm H/V"
+        }
+    },
+    "graph_types.device.canopy_generic_crcErrors": {
+        "default": {
+           "section": "wireless",
+            "order": 15,
+            "descr": "CRC Errors (Migrated to Wireless Sensor)"
+        }
+    },
+    "graph_types.device.canopy_generic_errorCount": {
+        "default": {
+           "section": "wireless",
+            "order": 14,
+            "descr": "Error Count (Migrated to Wireless Sensor)"
+        }
+    },
+    "graph_types.device.canopy_generic_gpsStats": {
+        "default": {
+           "section": "wireless",
+            "order": 0,
+            "descr": "GPS Stats"
+        }
+    },
+    "graph_types.device.canopy_generic_jitter": {
+        "default": {
+           "section": "wireless",
+            "order": 2,
+            "descr": "Jitter"
+        }
+    },
+    "graph_types.device.canopy_generic_radioDbm": {
+        "default": {
+           "section": "wireless",
+            "order": 13,
+            "descr": "Radio Dbm"
+        }
+    },
+    "graph_types.device.canopy_generic_regCount": {
+        "default": {
+           "section": "wireless",
+            "order": 11,
+            "descr": "Registered SM"
+        }
+    },
+    "graph_types.device.canopy_generic_signalHV": {
+        "default": {
+           "section": "wireless",
+            "order": 3,
+            "descr": "Signal"
+        }
+    },
+    "graph_types.device.ceraos_DefectedBlocks": {
+        "default": {
+           "section": "wireless",
+            "order": 4,
+            "descr": "DefectedBlocks"
+        }
+    },
+    "graph_types.device.ceraos_MSE": {
+        "default": {
+           "section": "wireless",
+            "order": 2,
+            "descr": "Radial MSE"
+        }
+    },
+    "graph_types.device.ceraos_RxBitrate": {
+        "default": {
+           "section": "wireless",
+            "order": 6,
+            "descr": "RxBitrate"
+        }
+    },
+    "graph_types.device.ceraos_RxLevel": {
+        "default": {
+           "section": "wireless",
+            "order": 0,
+            "descr": "RX Level"
+        }
+    },
+    "graph_types.device.ceraos_TxBitrate": {
+        "default": {
+           "section": "wireless",
+            "order": 5,
+            "descr": "TxBitrate"
+        }
+    },
+    "graph_types.device.ceraos_TxPower": {
+        "default": {
+           "section": "wireless",
+            "order": 1,
+            "descr": "TX Power"
+        }
+    },
+    "graph_types.device.ceraos_XPI": {
+        "default": {
+           "section": "wireless",
+            "order": 3,
+            "descr": "Cross Polarisation Interference"
+        }
+    },
+    "graph_types.device.charge": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Battery Charge"
+        }
+    },
+    "graph_types.device.cipsec_flow_bits": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "IPSec Tunnel Traffic Volume"
+        }
+    },
+    "graph_types.device.cipsec_flow_pkts": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "IPSec Tunnel Traffic Packets"
+        }
+    },
+    "graph_types.device.cipsec_flow_stats": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "IPSec Tunnel Statistics"
+        }
+    },
+    "graph_types.device.cipsec_flow_tunnels": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "IPSec Active Tunnels"
+        }
+    },
+    "graph_types.device.cisco-iosdsp": {
+        "default": {
+           "section": "voice",
+            "order": 0,
+            "descr": "DSP Utilisation"
+        }
+    },
+    "graph_types.device.cisco-iosmtp": {
+        "default": {
+           "section": "voice",
+            "order": 0,
+            "descr": "Hardware MTP Utilisation"
+        }
+    },
+    "graph_types.device.cisco-iospri": {
+        "default": {
+           "section": "voice",
+            "order": 0,
+            "descr": "PRI Utilisation"
+        }
+    },
+    "graph_types.device.cisco-iosxcode": {
+        "default": {
+           "section": "voice",
+            "order": 0,
+            "descr": "Transcoder Utilisation"
+        }
+    },
+    "graph_types.device.cisco-voice-ip": {
+        "default": {
+           "section": "voice",
+            "order": 0,
+            "descr": "IP Real Time Calls"
+        }
+    },
+    "graph_types.device.cisco_wwan_mnc": {
+        "default": {
+           "section": "wireless",
+            "order": 1,
+            "descr": "MNC"
+        }
+    },
+    "graph_types.device.cisco_wwan_rssi": {
+        "default": {
+           "section": "wireless",
+            "order": 0,
+            "descr": "Signal Rssi"
+        }
+    },
+    "graph_types.device.cras_sessions": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Remote Access Sessions"
+        }
+    },
+    "graph_types.device.fdb_count": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "MAC Addresses Learnt"
+        }
+    },
+    "graph_types.device.fortigate_cpu": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "CPU"
+        }
+    },
+    "graph_types.device.fortigate_sessions": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active Sessions"
+        }
+    },
+    "graph_types.device.fortios_lograte": {
+        "default": {
+           "section": "analyzer",
+            "order": 0,
+            "descr": "Log Rate"
+        }
+    },
+    "graph_types.device.hr_processes": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Running Processes"
+        }
+    },
+    "graph_types.device.hr_users": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Users Logged In"
+        }
+    },
+    "graph_types.device.ib_dhcp_messages": {
+        "default": {
+           "section": "dhcp",
+            "order": 0,
+            "descr": "DHCP messages"
+        }
+    },
+    "graph_types.device.ib_dns_dyn_updates": {
+        "default": {
+           "section": "dns",
+            "order": 0,
+            "descr": "DNS dynamic updates"
+        }
+    },
+    "graph_types.device.ib_dns_performance": {
+        "default": {
+           "section": "dns",
+            "order": 0,
+            "descr": "DNS performance"
+        }
+    },
+    "graph_types.device.ib_dns_request_return_codes": {
+        "default": {
+           "section": "dns",
+            "order": 0,
+            "descr": "DNS request return codes"
+        }
+    },
+    "graph_types.device.ipsystemstats_ipv4": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "IPv4 Packet Statistics"
+        }
+    },
+    "graph_types.device.ipsystemstats_ipv4_frag": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "IPv4 Fragmentation Statistics"
+        }
+    },
+    "graph_types.device.ipsystemstats_ipv6": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "IPv6 Packet Statistics"
+        }
+    },
+    "graph_types.device.ipsystemstats_ipv6_frag": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "IPv6 Fragmentation Statistics"
+        }
+    },
+    "graph_types.device.junos_jsrx_spu_flows": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "SPU Flows"
+        }
+    },
+    "graph_types.device.junos_jsrx_spu_sessions": {
+        "default": {
+           "section": "network",
+            "order": 1,
+            "descr": "Flow Sessions"
+        }
+    },
+    "graph_types.device.mempool": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Memory Pool Usage"
+        }
+    },
+    "graph_types.device.netscaler_tcp_bits": {
+        "default": {
+            "section": "load balancer",
+            "order": 0,
+            "descr": "TCP Traffic"
+        }
+    },
+    "graph_types.device.netscaler_tcp_conn": {
+        "default": {
+            "section": "load balancer",
+            "order": 0,
+            "descr": "TCP Connections"
+        }
+    },
+    "graph_types.device.netscaler_tcp_pkts": {
+        "default": {
+            "section": "load balancer",
+            "order": 0,
+            "descr": "TCP Packets"
+        }
+    },
+    "graph_types.device.netstat_icmp": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "ICMP Statistics"
+        }
+    },
+    "graph_types.device.netstat_icmp_info": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "ICMP Informational Statistics"
+        }
+    },
+    "graph_types.device.netstat_ip": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "IP Statistics"
+        }
+    },
+    "graph_types.device.netstat_ip_forward": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "IP Forwarding Statistics"
+        }
+    },
+    "graph_types.device.netstat_ip_frag": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "IP Fragmentation Statistics"
+        }
+    },
+    "graph_types.device.netstat_snmp": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "SNMP Statistics"
+        }
+    },
+    "graph_types.device.netstat_snmp_pkt": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "SNMP Packet Type Statistics"
+        }
+    },
+    "graph_types.device.netstat_tcp": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "TCP Statistics"
+        }
+    },
+    "graph_types.device.netstat_udp": {
+        "default": {
+           "section": "netstats",
+            "order": 0,
+            "descr": "UDP Statistics"
+        }
+    },
+    "graph_types.device.panos_activetunnels": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active GlobalProtect Tunnels"
+        }
+    },
+    "graph_types.device.panos_sessions": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active Sessions"
+        }
+    },
+    "graph_types.device.panos_sessions_icmp": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active ICMP Sessions"
+        }
+    },
+    "graph_types.device.panos_sessions_ssl": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active SSL Proxy Sessions"
+        }
+    },
+    "graph_types.device.panos_sessions_sslutil": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active SSL Proxy Utilization"
+        }
+    },
+    "graph_types.device.panos_sessions_tcp": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active TCP Sessions"
+        }
+    },
+    "graph_types.device.panos_sessions_udp": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active UDP Sessions"
+        }
+    },
+    "graph_types.device.pf_badoffset": {
+        "default": {
+           "section": "firewall",
+            "order": 6,
+            "descr": "BadOffset"
+        }
+    },
+    "graph_types.device.pf_fragmented": {
+        "default": {
+           "section": "firewall",
+            "order": 7,
+            "descr": "Fragmented"
+        }
+    },
+    "graph_types.device.pf_inserts": {
+        "default": {
+           "section": "firewall",
+            "order": 3,
+            "descr": "Inserts"
+        }
+    },
+    "graph_types.device.pf_matches": {
+        "default": {
+           "section": "firewall",
+            "order": 5,
+            "descr": "Matches"
+        }
+    },
+    "graph_types.device.pf_memdropped": {
+        "default": {
+           "section": "firewall",
+            "order": 10,
+            "descr": "MemDropped"
+        }
+    },
+    "graph_types.device.pf_normalized": {
+        "default": {
+           "section": "firewall",
+            "order": 9,
+            "descr": "Normalized"
+        }
+    },
+    "graph_types.device.pf_removals": {
+        "default": {
+           "section": "firewall",
+            "order": 4,
+            "descr": "Removals"
+        }
+    },
+    "graph_types.device.pf_searches": {
+        "default": {
+           "section": "firewall",
+            "order": 2,
+            "descr": "Searches"
+        }
+    },
+    "graph_types.device.pf_short": {
+        "default": {
+           "section": "firewall",
+            "order": 8,
+            "descr": "Short"
+        }
+    },
+    "graph_types.device.pf_states": {
+        "default": {
+           "section": "firewall",
+            "order": 1,
+            "descr": "States"
+        }
+    },
+    "graph_types.device.ping_perf": {
+        "default": {
+           "section": "poller",
+            "order": 0,
+            "descr": "Ping Response"
+        }
+    },
+    "graph_types.device.poller_modules_perf": {
+        "default": {
+           "section": "poller",
+            "order": 0,
+            "descr": "Poller Modules Performance"
+        }
+    },
+    "graph_types.device.poller_perf": {
+        "default": {
+           "section": "poller",
+            "order": 0,
+            "descr": "Poller Time"
+        }
+    },
+    "graph_types.device.processor": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Processor Usage"
+        }
+    },
+    "graph_types.device.pulse_sessions": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active Sessions"
+        }
+    },
+    "graph_types.device.pulse_users": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active Users"
+        }
+    },
+    "graph_types.device.riverbed_connections": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "Connections"
+        }
+    },
+    "graph_types.device.riverbed_datastore": {
+        "default": {
+           "section": "network",
+            "order": 2,
+            "descr": "Datastore productivity"
+        }
+    },
+    "graph_types.device.riverbed_optimization": {
+        "default": {
+           "section": "network",
+            "order": 1,
+            "descr": "Optimization"
+        }
+    },
+    "graph_types.device.riverbed_passthrough": {
+        "default": {
+           "section": "network",
+            "order": 3,
+            "descr": "Bandwidth passthrough"
+        }
+    },
+    "graph_types.device.routeros_leases": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "DHCP Lease Count"
+        }
+    },
+    "graph_types.device.routeros_pppoe_sessions": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "PPPoE Session Count"
+        }
+    },
+    "graph_types.device.rutos_2xx_mobileDataUsage": {
+        "default": {
+            "section": "network",
+            "order": 0,
+            "descr": "Mobile Data Usage"
+        }
+    },
+    "graph_types.device.screenos_sessions": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active Sessions"
+        }
+    },
+    "graph_types.device.secureplatform_sessions": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active connections"
+        }
+    },
+    "graph_types.device.sgos_average_requests": {
+        "default": {
+           "section": "network",
+            "order": 0,
+            "descr": "Average HTTP Requests"
+        }
+    },
+    "graph_types.device.sgos_client_connections": {
+        "default": {
+           "section": "network",
+            "order": 1,
+            "descr": "HTTP Client Connections"
+        }
+    },
+    "graph_types.device.sgos_client_connections_active": {
+        "default": {
+           "section": "network",
+            "order": 2,
+            "descr": "HTTP Client Connections Active"
+        }
+    },
+    "graph_types.device.sgos_client_connections_idle": {
+        "default": {
+           "section": "network",
+            "order": 3,
+            "descr": "HTTP Client Connections Idle"
+        }
+    },
+    "graph_types.device.sgos_server_connections": {
+        "default": {
+           "section": "network",
+            "order": 4,
+            "descr": "HTTP Server Connections"
+        }
+    },
+    "graph_types.device.sgos_server_connections_active": {
+        "default": {
+           "section": "network",
+            "order": 5,
+            "descr": "HTTP Server Connections Active"
+        }
+    },
+    "graph_types.device.sgos_server_connections_idle": {
+        "default": {
+           "section": "network",
+            "order": 6,
+            "descr": "HTTP Server Connections Idle"
+        }
+    },
+    "graph_types.device.siklu_rfinterfaceOctets": {
+        "default": {
+           "section": "wireless",
+            "order": 5,
+            "descr": "Traffic"
+        }
+    },
+    "graph_types.device.siklu_rfinterfaceOtherOctets": {
+        "default": {
+           "section": "wireless",
+            "order": 6,
+            "descr": "Other Octets"
+        }
+    },
+    "graph_types.device.siklu_rfinterfaceOtherPkts": {
+        "default": {
+           "section": "wireless",
+            "order": 4,
+            "descr": "Other Packets"
+        }
+    },
+    "graph_types.device.siklu_rfinterfacePkts": {
+        "default": {
+           "section": "wireless",
+            "order": 3,
+            "descr": "Packets"
+        }
+    },
+    "graph_types.device.sonicwall_sessions": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Active Sessions"
+        }
+    },
+    "graph_types.device.storage": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Filesystem Usage"
+        }
+    },
+    "graph_types.device.sub10_sub10RadioLclAFER": {
+        "default": {
+           "section": "wireless",
+            "order": 4,
+            "descr": "Radio Air Frame Error Rate"
+        }
+    },
+    "graph_types.device.sub10_sub10RadioLclDataRate": {
+        "default": {
+           "section": "wireless",
+            "order": 4,
+            "descr": "Data Rate on the Airside interface"
+        }
+    },
+    "graph_types.device.sub10_sub10RadioLclLnkLoss": {
+        "default": {
+           "section": "wireless",
+            "order": 3,
+            "descr": "Radio Link Loss"
+        }
+    },
+    "graph_types.device.sub10_sub10RadioLclRxPower": {
+        "default": {
+           "section": "wireless",
+            "order": 1,
+            "descr": "Radio Receive Power"
+        }
+    },
+    "graph_types.device.sub10_sub10RadioLclTxPower": {
+        "default": {
+           "section": "wireless",
+            "order": 0,
+            "descr": "Radio Transmit Power"
+        }
+    },
+    "graph_types.device.sub10_sub10RadioLclVectErr": {
+        "default": {
+           "section": "wireless",
+            "order": 3,
+            "descr": "Radio Vector Error"
+        }
+    },
+    "graph_types.device.temperature": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "temperature"
+        }
+    },
+    "graph_types.device.topvision_cmoffline": {
+        "default": {
+           "section": "cmts",
+            "order": 2,
+            "descr": "Cable Modem Offline"
+        }
+    },
+    "graph_types.device.topvision_cmreg": {
+        "default": {
+           "section": "cmts",
+            "order": 1,
+            "descr": "Cable Modem Registered"
+        }
+    },
+    "graph_types.device.topvision_cmtotal": {
+        "default": {
+           "section": "cmts",
+            "order": 0,
+            "descr": "Cable Modem Total"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_Capacity": {
+        "default": {
+            "section": "wireless",
+            "order": 2,
+            "descr": "Link Capacity"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_LinkDist": {
+        "default": {
+            "section": "wireless",
+            "order": 1,
+            "descr": "Link Distance"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_RFTotOctetsRx": {
+        "default": {
+            "section": "wireless",
+            "order": 6,
+            "descr": "RF Total Octets Rx"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_RFTotOctetsTx": {
+        "default": {
+            "section": "wireless",
+            "order": 4,
+            "descr": "RF Total Octets Tx"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_RFTotPktsRx": {
+        "default": {
+            "section": "wireless",
+            "order": 7,
+            "descr": "RF Total Packets Rx"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_RFTotPktsTx": {
+        "default": {
+            "section": "wireless",
+            "order": 5,
+            "descr": "RF Total Packets Tx"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_RadioFreqs": {
+        "default": {
+            "section": "wireless",
+            "order": 0,
+            "descr": "Radio Frequencies"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_RadioTemp": {
+        "default": {
+            "section": "wireless",
+            "order": 3,
+            "descr": "Radio Temperatures"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_RxPower": {
+        "default": {
+            "section": "wireless",
+            "order": 8,
+            "descr": "Radio Rx Power"
+        }
+    },
+    "graph_types.device.ubnt_airfiber_TxPower": {
+        "default": {
+            "section": "wireless",
+            "order": 0,
+            "descr": "Radio Tx Power"
+        }
+    },
+    "graph_types.device.ucd_contexts": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Context Switches"
+        }
+    },
+    "graph_types.device.ucd_cpu": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Detailed Processor Usage"
+        }
+    },
+    "graph_types.device.ucd_interrupts": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Interrupts"
+        }
+    },
+    "graph_types.device.ucd_io": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "System I/O Activity"
+        }
+    },
+    "graph_types.device.ucd_load": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Load Averages"
+        }
+    },
+    "graph_types.device.ucd_memory": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Detailed Memory Usage"
+        }
+    },
+    "graph_types.device.ucd_swap_io": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "Swap I/O Activity"
+        }
+    },
+    "graph_types.device.uptime": {
+        "default": {
+           "section": "system",
+            "order": 0,
+            "descr": "System Uptime"
+        }
+    },
+    "graph_types.device.vpdn_sessions_l2tp": {
+        "default": {
+           "section": "vpdn",
+            "order": 0,
+            "descr": "VPDN L2TP Sessions"
+        }
+    },
+    "graph_types.device.vpdn_tunnels_l2tp": {
+        "default": {
+           "section": "vpdn",
+            "order": 0,
+            "descr": "VPDN L2TP Tunnels"
+        }
+    },
+    "graph_types.device.waas_cwotfostatsactiveoptconn": {
+        "default": {
+           "section": "graphs",
+            "order": 0,
+            "descr": "Optimized TCP Connections"
+        }
+    },
+    "graph_types.device.xirrus_stations": {
+        "default": {
+           "section": "wireless",
+            "order": 0,
+            "descr": "Associated Stations"
+        }
+    },
+    "graph_types.device.zywall_sessions": {
+        "default": {
+           "section": "firewall",
+            "order": 0,
+            "descr": "Sessions"
+        }
     },
     "graphite.port": {
         "default": 2003
