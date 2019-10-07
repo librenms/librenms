@@ -1,0 +1,3359 @@
+ALCATEL-IND1-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+         OBJECT-TYPE,
+         OBJECT-IDENTITY,
+         MODULE-IDENTITY,
+         NOTIFICATION-TYPE,
+         Unsigned32, Integer32, IpAddress,
+         Counter32              FROM SNMPv2-SMI
+         PhysicalIndex,
+         entPhysicalIndex       FROM ENTITY-MIB
+         hardentIND1Physical,
+         hardentIND1Chassis     FROM ALCATEL-IND1-BASE
+         SnmpAdminString        FROM SNMP-FRAMEWORK-MIB
+         MacAddress,
+         TruthValue,
+         DisplayString,
+         TEXTUAL-CONVENTION     FROM SNMPv2-TC
+         MODULE-COMPLIANCE,
+         OBJECT-GROUP,
+         NOTIFICATION-GROUP     FROM SNMPv2-CONF;
+
+
+alcatelIND1ChassisMIB MODULE-IDENTITY
+    LAST-UPDATED "201103230000Z"
+    ORGANIZATION "Alcatel-Lucent, Enterprise Solutions Division"
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
+
+                 Alcatel-Lucent, Enterprise Solutions Division
+                (Formerly Alcatel Internetworking, Incorporated)
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
+
+     Telephone:               North America  +1 800 995 2696
+                              Latin America  +1 877 919 9526
+                              Europe         +31 23 556 0100
+                              Asia           +65 394 7933
+                              All Other      +1 818 878 4507
+
+     Electronic Mail:         support@ind.alcatel.com
+     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+        etwork Management Protocol (SNMP) Management Information Base (MIB):
+
+        For the Birds Of Prey Product Line, this is the Chassis Supervision
+        Chassis MIB
+        for managing physical chassis objects not covered in the IETF
+        Entity MIB (rfc 2737).
+
+        The right to make changes in specification and other information
+        contained in this document without prior notice is reserved.
+
+        No liability shall be assumed for any incidental, indirect, special, or
+        consequential damages whatsoever arising from or related to this
+        document or the information contained herein.
+
+        Vendors, end-users, and other interested parties are granted
+        non-exclusive license to use this specification in connection with
+        management of the products for which it is intended to be used.
+
+                   Copyright (C) 1995-2007 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201110310000Z"
+        DESCRIPTION
+            "Added changes for virtual chassis."
+
+        REVISION      "201110140000Z"
+        DESCRIPTION
+            "Added chasEntPhysPowerUsed object."
+
+        REVISION      "201108050000Z"
+        DESCRIPTION
+            "Added chasEntTemperatureTable."
+
+        REVISION      "201103230000Z"
+        DESCRIPTION
+            "Added image file MD5 checksum changed alert, airflow, and temperature alerts"
+
+
+        REVISION      "201005130000Z"
+        DESCRIPTION
+            "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
+
+        REVISION      "200706180000Z"
+
+        DESCRIPTION
+            "Addressing discrepancies with Alcatel Standard."
+     ::= { hardentIND1Chassis 1 }
+
+
+    alcatelIND1ChassisMIBNotifications OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis MIB Subsystem Notifications."
+        ::= { alcatelIND1ChassisMIB 0 }
+
+    alcatelIND1ChassisMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Chassis MIB
+            Subsystem Managed Objects."
+        ::= { alcatelIND1ChassisMIB 1 }
+
+    alcatelIND1ChassisMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Chassis MIB
+            Subsystem Conformance Information."
+        ::= { alcatelIND1ChassisMIB 2 }
+
+    alcatelIND1ChassisMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Chassis MIB
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1ChassisMIBConformance 1 }
+
+
+    alcatelIND1ChassisMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Chassis MIB
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1ChassisMIBConformance 2 }
+
+
+    alcatelIND1ChassisPhysMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Chassis Physical MIB
+            Subsystem Managed Objects."
+        ::= { hardentIND1Physical 1 }
+
+
+    alcatelIND1ChassisPhysMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Chassis Physical MIB
+            Subsystem Conformance Information."
+        ::= { hardentIND1Physical 2 }
+
+
+    alcatelIND1ChassisPhysMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Chassis Physical MIB
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1ChassisPhysMIBConformance 1 }
+
+
+    alcatelIND1ChassisPhysMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Chassis Physical MIB
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1ChassisPhysMIBConformance 2 }
+
+-- Textual Conventions 
+
+        AlaChasBpsShelfId ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+        "BPS shelf Id ."
+        SYNTAX          Integer32 (1..3)
+
+        ChasTrapsBPSPowerSupply ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+        "Textual convention for type of bps power supply."
+        SYNTAX    INTEGER 
+                    {
+                          bpsSysPower1          (1),
+                          bpsSysPower2          (2),
+                          bpsPoePower1          (3),
+                          bpsPoePower2          (4),
+                          bpsPoePower3          (5),
+                          notApplicable         (6)
+                    }
+
+        ChasTrapsBPSFetState ::= TEXTUAL-CONVENTION
+        STATUS   current
+        DESCRIPTION
+        "Textual convention for BPS FET state"
+        SYNTAX  INTEGER 
+                {
+                    on                    (1),
+                    off                   (2),
+                    notApplicable         (3)
+                }
+
+        ChasTrapsBPSEventAlert ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+        "Textual convention for BPS event alert"
+        SYNTAX   INTEGER 
+                {
+                    bpsPsPlugged                 (1),
+                    bpsPsUnPlugged               (2),
+                    notApplicable                (3)
+               }
+
+
+-- CONTROL MODULE TABLE
+
+chasControlModuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChasControlModuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "This table contains one row for the primary control module."
+::= { alcatelIND1ChassisMIBObjects 1 }
+
+
+chasControlModuleEntry OBJECT-TYPE
+        SYNTAX ChasControlModuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Information about the primary control module. This table is an extension
+        of the entity physical table but this class is instanciated only for a
+        the primary control module that has a particular Index. When operatiing
+        in virtual chassis mode only the master primary control module is
+        instanciated"
+        INDEX { entPhysicalIndex }
+::= { chasControlModuleTable 1 }
+
+
+ChasControlModuleEntry ::= SEQUENCE
+        {
+                chasControlActivateTimeout            Integer32,
+                chasControlVersionMngt                INTEGER,
+                chasControlDelayedActivateTimer       Unsigned32,
+                chasControlCertifyStatus              INTEGER,
+                chasControlSynchronizationStatus      INTEGER,
+                chasControlAcrossCmmWorkingSynchroStatus     INTEGER,
+                chasControlAcrossCmmCertifiedSynchroStatus   INTEGER,
+                chasControlNextRunningVersion         SnmpAdminString,
+                chasControlCurrentRunningVersion      SnmpAdminString,
+                chasControlWorkingVersion             SnmpAdminString,
+                chasControlRedundancyTime             Integer32,
+                chasControlEmpIpAddress               IpAddress,
+                chasControlEmpIpMask                  IpAddress,
+                chasControlChassisId                  Integer32
+
+
+        }
+
+chasControlActivateTimeout OBJECT-TYPE
+        SYNTAX Integer32 (0..900)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "This value is in seconds. It represents how much time before the
+        switch automatically falls back to the certified version. This value
+        is set via the Activate(reload working) cli command.
+        An Activate reboot must be initiated via the primary CMM and that
+        the timeout value can be accessed via user interface to the primary CMM
+        only. After the Activate reboot has been initiated, a timeout will occur
+        (i.e., an Activate Timeout) at the timeout value specified by the user.
+        If a reboot cancel has not been received prior to the timeout expiration,
+        the primary CMM will automatically reboot (i.e., re-reboot) using the
+        certified configuration. This ensures that an automatic backup reboot is
+        available using the certified configuration in the event that the user
+        is unable to interface with primary CMM as a result of the attempted
+        Activate reboot. If the Activate reboot is successful, the user cancels
+        the backup reboot via the normal reboot cancellation process (i.e., a
+        zero value is written for the object chasControlDelayedRebootTimer)."
+::= { chasControlModuleEntry 1 }
+
+
+chasControlVersionMngt OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        notSignificant(1),
+        certifySynchro(2),
+        certifyNoSynchro(3),
+        flashSynchro(4),
+        restore(5),
+        activate(6),
+        issu(7),
+        shutdown(8),
+        vcConvert(9)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "For the primary this means:
+                notSignificant   - No command applied.
+                certifySynchro   - Copy the file from the working to the certified
+                                   directory and from the primary to the secondary
+                                   (reboot of the secondary).
+                certifyNoSynchro - Copy the file from the working to the certified
+                                   directory.
+                flashSynchro -     Copy the file from the primary to the secondary
+                                   (reboot of the secondary).
+                restore -          Copy the file from the certified directory to the
+                                   working directory.
+                activate -         Reload from the working directory. Activate can be
+                                   scheduled.
+                issu -             In Service Software Upgrade (ISSU).
+                shutdown -         Shutdown chassis specified by chasControlChassisId.
+                                   Halts and powers off NIs, halts primary and
+                                   secondary CMMs.
+                vcConvert -        Copy the image files from the running directory
+                                   to the working directory."
+
+::= { chasControlModuleEntry 2 }
+
+
+chasControlDelayedActivateTimer OBJECT-TYPE
+        SYNTAX Unsigned32 (0..31622400)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Timer value in seconds used to initiate a delayed activate of the primary
+        CMM. Writing this object to a non-zero value results in CMM reboot of the
+        working  directory following expiration of the specified activate timer delay.
+        Writing this object to zero results in an immediately activate process.
+                It is now adjusted to wait a maximum of 366 days."
+::= { chasControlModuleEntry 3 }
+
+
+
+chasControlCertifyStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                unknown(1),
+                needCertify(2),
+                certified(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Returned value indicates if the control module has been certified
+     (that is the working directory matches the certified directory)"
+::= { chasControlModuleEntry 4 }
+
+
+chasControlSynchronizationStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                unknown(1),
+                monoControlModule(2),
+                notSynchronized(3),
+                synchronized(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Returned value indicates if the control module has been synchronized
+     (that is the working directory matches the working directory
+     on the other control module(s) if present).  Returned value is
+     monoControlModule when no other control module is present."
+::= { chasControlModuleEntry 5 }
+
+
+chasControlAcrossCmmWorkingSynchroStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                unknown(1),
+                monoCMM(2),
+                no(3),
+                yes(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Returned value indicates if the /working has been synchronized
+     across the CMMs (that is the working directory matches the working directory
+     on all CMMs if present)"
+::= { chasControlModuleEntry 6 }
+
+chasControlAcrossCmmCertifiedSynchroStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                unknown(1),
+                monoCMM(2),
+                no(3),
+                yes(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Returned value indicates if the /certified has been synchronized
+        across the CMMs if present)"
+::= { chasControlModuleEntry 7 }
+
+chasControlNextRunningVersion OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The pathname for the image directory that will be
+        used on the next reload. Value may be /flash/certified
+        or /flash/<working directory name>."
+::= { chasControlModuleEntry 8 }
+
+chasControlCurrentRunningVersion OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The pathname of the image directory to the version
+        that is currently executing. Value may be /flash/certified
+        or /flash/<working directory name>."
+::= { chasControlModuleEntry 9 }
+
+chasControlWorkingVersion OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The path to the currently specified working image directory.
+         Value may be /flash/certified or /flash/<working directory name>."
+::= { chasControlModuleEntry 10 }
+
+chasControlRedundancyTime OBJECT-TYPE
+        SYNTAX Integer32 (0..900)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Time in minutes that the running image must stay up without error
+         before a subsequent error reset will restart the board from the
+         running image. If a CMM in dual-CMM switch fails after a reload
+         and before chasControlRedundancyTime expires, both CMMs will be
+         rebooted from the certified version."
+::= { chasControlModuleEntry 11 }
+
+chasControlEmpIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+        "This object is deprecated. Instead use alaInterfaceTable(ALCATEL-IND1-IP-MIB)
+         when configuring EMP interfaces.
+
+         The IP Address for the primary control module EMP interface.
+         This address is used for managing the chassis and will
+         continue as the EMP interface address after a takeover."
+::= { chasControlModuleEntry 12 }
+
+chasControlEmpIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+        "This object is deprecated. Instead use alaInterfaceTable(ALCATEL-IND1-IP-MIB)
+         when configuring EMP interfaces.
+
+         The IP Address Mask for the primary control module EMP interface.
+         This address mask is used for managing the chassis and will
+         continue as the EMP interface mask after a takeover."
+::= { chasControlModuleEntry 13 }
+
+chasControlChassisId OBJECT-TYPE
+        SYNTAX Integer32 (0..16)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The virtual chassis id for the action specified by
+         chasControlVersionMngt when operating in virtual
+         chassis mode. A value of 0 indicates the local
+         chassis."
+::= { chasControlModuleEntry 14 }
+
+
+-- CONTROL REDUNDANT TABLE
+
+
+chasControlRedundantTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChasControlRedundantEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "This table contains one row per control module. There is always at least
+        one control module in the system."
+::= { alcatelIND1ChassisMIBObjects 2 }
+
+
+chasControlRedundantEntry OBJECT-TYPE
+        SYNTAX ChasControlRedundantEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Information about a particular control module this table is an extension
+        of the entity physical table but this class is instanciated only for a
+        particular type of physical entity: the control module that has a
+        particular Index. When running in virtual chassis mode, entries are
+        instantiated for the Master and all the slave CMMs"
+        INDEX { entPhysicalIndex }
+::= { chasControlRedundantTable 1 }
+
+
+ChasControlRedundantEntry ::= SEQUENCE
+        {
+                chasControlNumberOfTakeover           Counter32,
+                chasControlDelayedRebootTimer         Unsigned32,
+                chasControlDelayedResetAll            Integer32
+        }
+
+
+chasControlNumberOfTakeover OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object is a count of the number of times the control module has
+        changed from primary to secondary mode as a result of a Takeover. Note
+        that this object can be accessed via user interface to either the
+        primary or secondary CMM. The value returned is the number of times
+        that the interfacing control module (either primary or secondary CMM)
+        has changed from primary to secondary mode. This value does not reflect
+        the total number of CMM Takeovers for the switch. To get the total
+        number of Takeovers for the switch, it is necessary to read this value
+        via user interface to each control module independently."
+::= { chasControlRedundantEntry 1 }
+
+
+chasControlDelayedRebootTimer OBJECT-TYPE
+        SYNTAX Unsigned32 (0.. 31622400)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Timer value (in seconds) used to initiate a delayed reboot of the primary
+        or secondary CMM using the certified configuration.  Writing this object to
+        a non-zero value results in a CMM reboot following expiration of the
+        specified reset timer delay.  Writing this object to zero results in
+        cancellation of a pending CMM delayed reboot.
+        It is now adjusted to wait a maximum of 366 days."
+::= { chasControlRedundantEntry 2 }
+
+chasControlDelayedResetAll OBJECT-TYPE
+        SYNTAX Integer32 (-1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "This object is used to schedule a delayed reset all action for a chassis
+        when running in virtual chassis mode. If set to -1 - cancel the timer,
+        0 - reset all immediately, any other value will start counting down the
+        time until reset."
+    DEFVAL { -1 }
+::= { chasControlRedundantEntry 3 }
+
+
+ -- CHASSIS TABLE
+
+chasChassisTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChasChassisEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "This table contains one row per chassis. There is always at least one
+        chassis or many when running in virtual chassis mode."
+::= { alcatelIND1ChassisMIBObjects 3 }
+
+
+chasChassisEntry OBJECT-TYPE
+        SYNTAX ChasChassisEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+    "Information about a particular control module this table is an extension
+         of the entity physical table but this class is instanciated only for a
+         particular type of physical entity: the control module that has a
+         particular Index."
+        INDEX { entPhysicalIndex }
+::= { chasChassisTable 1 }
+
+
+ChasChassisEntry ::= SEQUENCE
+    {
+        chasFreeSlots               Unsigned32,
+        chasPowerLeft               Integer32,
+        chasNumberOfResets          Counter32,
+        chasTempRange               INTEGER,
+        chasTempThreshold           Integer32,
+        chasDangerTempThreshold     Integer32,
+        chasPrimaryPhysicalIndex    Integer32,
+        chasCPMAHardwareBoardTemp   Integer32,
+        chasCFMAHardwareBoardTemp   Integer32,
+        chasCPMBHardwareBoardTemp   Integer32,
+        chasCFMBHardwareBoardTemp   Integer32,
+        chasCFMCHardwareBoardTemp   Integer32,
+        chasCFMDHardwareBoardTemp   Integer32,
+        chasFTAHardwareBoardTemp    Integer32,
+        chasFTBHardwareBoardTemp    Integer32,
+        chasNI1HardwareBoardTemp    Integer32,
+        chasNI2HardwareBoardTemp    Integer32,
+        chasNI3HardwareBoardTemp    Integer32,
+        chasNI4HardwareBoardTemp    Integer32,
+        chasNI5HardwareBoardTemp    Integer32,
+        chasNI6HardwareBoardTemp    Integer32,
+        chasNI7HardwareBoardTemp    Integer32,
+        chasNI8HardwareBoardTemp    Integer32,
+        chasPowerSupplyRedundancy   INTEGER
+    }
+
+
+chasFreeSlots OBJECT-TYPE
+        SYNTAX Unsigned32       (0..18)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The number of free NI front panel slots."
+::= { chasChassisEntry 1 }
+
+
+chasPowerLeft OBJECT-TYPE
+        SYNTAX Integer32 (-100000..100000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The power still available on the chassis in Watts."
+::= { chasChassisEntry 2 }
+
+
+chasNumberOfResets OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object is a count of the number of times this station has been reset
+         since a cold-start."
+::= { chasChassisEntry 3 }
+
+chasTempRange OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                unknown(1),
+                notPresent(2),
+                underThreshold(3),
+                overFirstThreshold(4),
+                overDangerThreshold(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Temp Range is the value of the temperature sensor for the chassis. The
+         Temp Range value reflects the temperature of the chassis relative to the
+         Temp Threshold value (i.e., over vs. under the threshold)."
+::= { chasChassisEntry 4 }
+
+
+chasTempThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..150)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+       "This object is the threshold temperature in degrees Celsius for the
+        chassis. Temp Threshold is the chassis temperature point at which,
+        when reached due to an ascending or descending temperature transition,
+        a temperature notification is provided to the user. When this threshold
+        is exceeded, we start sending traps and other operator notification."
+::= { chasChassisEntry 5 }
+
+chasDangerTempThreshold OBJECT-TYPE
+        SYNTAX Integer32 (30..150)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This Threshold is a second one which is hardcoded. When the
+         Chassis Exceeds this value it starts shutting down NIs.
+         This value will be set by the factory and not changeable."
+::= { chasChassisEntry 6 }
+
+
+chasPrimaryPhysicalIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This value holds the Entity Table Physical Index for the Control
+         Module that is currently primary. This is to allow snmp managers
+         to determine which Control Module is currently primary so it knows
+         what entry in the chasControlModuleTable to access for setting the
+         chasControlVersionMngt values for controling the switch. When running
+         in virtual chassis mode, it will contain the Physical Index of the
+         master primary Control Module."
+::= { chasChassisEntry 7 }
+
+chasCPMAHardwareBoardTemp       OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         CPMA control module board. This temperature is what is used for
+         comparing to the threshold and determining whether the value
+         is in range."
+::= { chasChassisEntry 8 }
+
+chasCFMAHardwareBoardTemp       OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         CFMA fabric board. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 9 }
+
+chasCPMBHardwareBoardTemp       OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         CPMB control module board. This temperature is what is used for
+         comparing to the threshold and determining whether the value
+         is in range."
+::= { chasChassisEntry 10 }
+
+chasCFMBHardwareBoardTemp       OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         CFMB fabric board. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 11 }
+
+chasCFMCHardwareBoardTemp       OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         CFMC fabric board. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 12 }
+
+chasCFMDHardwareBoardTemp       OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         CFMD fabric board. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 13 }
+
+chasFTAHardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for
+         Fantray 1. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 14 }
+
+chasFTBHardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for
+         Fantry 2. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 15 }
+
+chasNI1HardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         NI board in slot 1. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 16 }
+
+chasNI2HardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         NI board in slot 2. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 17 }
+
+chasNI3HardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         NI board in slot 3. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 18 }
+
+chasNI4HardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         NI board in slot 4. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 19 }
+
+chasNI5HardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         NI board in slot 5. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 20 }
+
+chasNI6HardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         NI board in slot 6. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 21 }
+
+chasNI7HardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         NI board in slot 7. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 22 }
+
+chasNI8HardwareBoardTemp        OBJECT-TYPE
+    SYNTAX              Integer32 (0..200)
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+        "This object indicates the current output of the Board Temperature
+         Sensor provided by the LM75 part (degrees Centigrade) for the
+         NI board in slot 8. This temperature is what is used for comparing
+         to the threshold and determining whether the value is in range."
+::= { chasChassisEntry 23 }
+
+chasPowerSupplyRedundancy       OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+       on(1),
+       off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the state of power supply redundancy mode.
+         When on(1), N+1 mode redundancy is enabled(default mode). In
+         this mode the system controls the power supplies to maintain
+         efficient use of the power supplies, with 1 extra power supply
+         in case of a power supply failure. Unneeded power supplies are
+         powered off. It can be set to off(2) to disable redundancy mode.
+         In this mode all power supplies are powered on."
+    DEFVAL   { on }
+::= { chasChassisEntry 24 }
+
+-- Extension of the Entity physical table
+
+chasEntPhysicalTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChasEntPhysicalEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "This table contains one row per physical entity. It is an extension for
+        the entity physical table (rfc 2737) that is instantiated for every physical entity
+        object. The fields are not always significant for every object."
+::= { alcatelIND1ChassisPhysMIBObjects 1 }
+
+
+chasEntPhysicalEntry OBJECT-TYPE
+        SYNTAX ChasEntPhysicalEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Information about a particular physical entity."
+        INDEX { entPhysicalIndex }
+::= { chasEntPhysicalTable 1 }
+
+
+ChasEntPhysLed ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Textual convention for physical LEDs.  Note: Due to European regulation, the LEDs
+         will never be illuminated in red, but will be either green or amber."
+    SYNTAX    INTEGER {
+        notApplicable         (0),
+        off                   (1),
+        greenOn               (2),
+        greenBlink            (3),
+        amberOn               (4),
+        amberBlink            (5)
+    }
+
+ChasEntPhysicalEntry ::= SEQUENCE
+    {
+        chasEntPhysAdminStatus                INTEGER,
+        chasEntPhysOperStatus                 INTEGER,
+        chasEntPhysPower                      Integer32,
+        chasEntPhysModuleType                 SnmpAdminString,
+        chasEntPhysPartNumber                 SnmpAdminString,
+        chasEntPhysLedStatusOk1               ChasEntPhysLed,
+        chasEntPhysLedStatusOk2               ChasEntPhysLed,
+        chasEntPhysLedStatusPrimaryCMM        ChasEntPhysLed,
+        chasEntPhysLedStatusSecondaryCMM      ChasEntPhysLed,
+        chasEntPhysLedStatusTemperature       ChasEntPhysLed,
+        chasEntPhysLedStatusFan               ChasEntPhysLed,
+        chasEntPhysLedStatusBackupPS          ChasEntPhysLed,
+        chasEntPhysLedStatusInternalPS        ChasEntPhysLed,
+        chasEntPhysLedStatusControl           ChasEntPhysLed,
+        chasEntPhysLedStatusFabric            ChasEntPhysLed,
+        chasEntPhysLedStatusPS                ChasEntPhysLed,
+        chasEntPhysAsic1Rev                    SnmpAdminString,
+        chasEntPhysAsic2Rev                    SnmpAdminString,
+        chasEntPhysAsic3Rev                    SnmpAdminString,
+        chasEntPhysAsic4Rev                    SnmpAdminString,
+        chasEntPhysAsic5Rev                    SnmpAdminString,
+        chasEntPhysAsic6Rev                    SnmpAdminString,
+        chasEntPhysCpldRev                    SnmpAdminString,
+        chasEntPhysDaughterFpga1Rev           SnmpAdminString,
+        chasEntPhysDaughterFpga2Rev           SnmpAdminString,
+        chasEntPhysNiNum                      Integer32,
+        chasEntPhysGbicNum                    Integer32,
+        chasEntPhysWaveLen                    Integer32,
+        chasEntPhysUbootRev                   SnmpAdminString,
+        chasEntPhysUbootMinibootRev           SnmpAdminString,
+        chasEntPhysMacAddress                 MacAddress,
+        chasEntPhysCpuModel                   SnmpAdminString,
+        chasEntPhysAirflow                    INTEGER,
+        chasEntPhysPowerUsed                  Integer32
+    }
+
+
+chasEntPhysAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                unknown(1),
+                powerOff(2),
+                powerOn(3),
+                reset(4),
+                takeover(5),
+                resetAll(6),
+                standby(7),
+                resetWithFabric(8),
+                takeoverWithFabrc(9),
+                vcTakeover(10),
+                resetVcAll(11)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "All modules (even empty slots) are in unknown state when the chassis
+             first powers up.
+
+        Chassis status possible value:
+                powerOn <=> powered up
+
+        Control Module possible value:
+                powerOn <=> CM up and running
+                reset <=> CM reset
+                takeover <=> Secondary CM takes over
+                resetAll <=> resets the whole switch
+                vcTakeover <=> Reloads master chassis from the current working directory,
+                               which initiates a VC takeover.
+                vcResetAll <=> resets entire VC.
+        NI status possible value:
+                powerOn <=> NI is either powered (up or down) or waiting to be powered
+                        whenever more power is available. This admin status has not full meaning
+                        without chasEntPhysOperStatus
+                powerOff <=> NI down and unpowered and NI will not be powered until user
+                        requests it, a failover happens or a reboot happens
+                reset <=> NI reset
+
+        FABRIC status possible value:
+                powerOn     <=> FABRIC is powered
+                powerOff    <=> FABRIC is unpowered
+                standby     <=> FABRIC is powered and requested to be redundant (inactive)
+
+        Daughter board status possible value:
+                powerOn <=> DB up and running
+                reset <=> DB reset (TO BE CONFIRMED)
+
+        Power supply status possible value:
+                powerOn <=> PS up"
+::= { chasEntPhysicalEntry 1 }
+
+
+chasEntPhysOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                up(1),
+                down(2),
+                testing(3),
+                unknown(4),
+                secondary(5),
+                notPresent(6),
+                unpowered(7),
+                master(8),
+                idle(9),
+                pwrsave(10)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "All modules (even empty slots) are in unknown state when the chassis
+        first powers up.
+
+        Chassis status possible value :
+                up <=> powered up
+
+        Control Module possible value :
+                notPresent <=> CM not present
+                up <=> CM up and running
+                down <=> CM down and powered
+                secondary <=> CM in secondary mode and running
+
+        NI status possible value :
+                notPresent <=> NI not present
+                up <=> NI up and running
+                down <=> NI down and powered
+                unpowered <=> NI unpowered because there is not enough power in the system
+                              (chasEntPhysAdminStatus = powerOn) or because the NI has to be OFF
+                              (chasEntPhysAdminStatus = powerOff). This operational status has
+                  not full meaning without chasEntPhysAdminStatus
+
+        Fabric status possible value :
+                master <=> up and acting as master
+                up <=> up and acting as slave
+                secondary <=> secondary mode for redundancy
+
+        Daughter board status possible value :
+                notPresent <=> DB not present
+                up <=> DB up and running
+                down <=> DB down and powered
+
+        Power supply status possible value :
+                up <=> PS up
+                down <=> PS administratively down
+                unpowered <=> PS not plugged in
+                pwrsave <=> chassis in powersave mode, supply turned off
+
+        Fan Tray status possible value :
+                up <=> powered up
+                down <=> powered down
+                fault <=> fault detected"
+::= { chasEntPhysicalEntry 2 }
+
+
+chasEntPhysPower OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "This value is only applicable to the NI, PS and Control Modules.  It
+         corresponds to a a static value for the power consumption of an NI
+         module or Control Module. This value is in Watts."
+        ::= { chasEntPhysicalEntry 3 }
+
+chasEntPhysModuleType OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is the unique Module Type or ID from the entities eeprom.
+             This value is guarrantteed to be unique to each type of Module.
+             This value is only intended for Alcatel internal use."
+        ::= { chasEntPhysicalEntry 4 }
+
+chasEntPhysPartNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the Alcatel Part Number for the entity.
+             This value is used to identify what is
+             needed when placing orders with Alcatel."
+        ::= { chasEntPhysicalEntry 5 }
+
+chasEntPhysLedStatusOk1               OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Chassis Management Module (CMM) front panel LED OK1 status indication"
+        ::= { chasEntPhysicalEntry 6 }
+
+chasEntPhysLedStatusOk2               OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Chassis Management Module (CMM) front panel LED OK2 status indication"
+        ::= { chasEntPhysicalEntry 7 }
+
+chasEntPhysLedStatusPrimaryCMM        OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Chassis Management Module (CMM) front panel LED Primary chassis indication"
+        ::= { chasEntPhysicalEntry 8 }
+
+chasEntPhysLedStatusSecondaryCMM      OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Chassis Management Module (CMM) front panel LED Secondary chassis indication"
+        ::= { chasEntPhysicalEntry 9 }
+
+chasEntPhysLedStatusTemperature       OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Chassis Management Module (CMM) front panel LED temperature status indication"
+        ::= { chasEntPhysicalEntry 10 }
+
+chasEntPhysLedStatusFan               OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "For Hawk stacks used as a fan group status LED.  For eagle CMM's user instead:
+             Fan 1 (top left), Fan 2 (top right), Fan 3 (rear)"
+        ::= { chasEntPhysicalEntry 11 }
+
+chasEntPhysLedStatusBackupPS          OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Chassis backup power supply status indication"
+        ::= { chasEntPhysicalEntry 12 }
+
+chasEntPhysLedStatusInternalPS        OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Chassis internal power supply status indication"
+        ::= { chasEntPhysicalEntry 13 }
+
+chasEntPhysLedStatusControl           OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Chassis control status"
+        ::= { chasEntPhysicalEntry 14 }
+
+chasEntPhysLedStatusFabric            OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Chassis Management Module (CMM) Fabric status indication"
+        ::= { chasEntPhysicalEntry 15 }
+
+chasEntPhysLedStatusPS               OBJECT-TYPE
+        SYNTAX                  ChasEntPhysLed
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Chassis Power Supply Unit status indication"
+        ::= { chasEntPhysicalEntry 16 }
+
+chasEntPhysAsic1Rev               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the ASIC revision Number of the ni entity"
+        ::= { chasEntPhysicalEntry 17 }
+
+chasEntPhysAsic2Rev               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the ASIC revision Number of the ni entity"
+        ::= { chasEntPhysicalEntry 18 }
+
+chasEntPhysAsic3Rev               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the ASIC revision Number of the ni entity"
+        ::= { chasEntPhysicalEntry 19 }
+
+chasEntPhysAsic4Rev               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the ASIC revision Number of the ni entity"
+        ::= { chasEntPhysicalEntry 20 }
+
+chasEntPhysAsic5Rev               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the ASIC revision Number of the ni entity"
+        ::= { chasEntPhysicalEntry 21 }
+
+chasEntPhysAsic6Rev               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the ASIC revision Number of the ni entity"
+        ::= { chasEntPhysicalEntry 22 }
+
+chasEntPhysCpldRev               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the CPLD revision Number of the ni entity"
+        ::= { chasEntPhysicalEntry 23 }
+
+chasEntPhysDaughterFpga1Rev               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the daughter fpga revision Number of the ni entity"
+        ::= { chasEntPhysicalEntry 24 }
+
+chasEntPhysDaughterFpga2Rev               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the daughter fpga revision Number of the ni entity"
+        ::= { chasEntPhysicalEntry 25 }
+
+
+chasEntPhysNiNum                OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value is only applicable to the NI.  It indicates an NI associated with this physicalEntry"
+        ::= { chasEntPhysicalEntry 26 }
+
+chasEntPhysGbicNum              OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value is only applicable to the NI.  It indicates a gbic associated with this ni"
+        ::= { chasEntPhysicalEntry 27 }
+
+chasEntPhysWaveLen              OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the wave length of a SFP device"
+        ::= { chasEntPhysicalEntry 28 }
+
+chasEntPhysUbootRev             OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the uboot version Number of the ni entity"
+        ::= { chasEntPhysicalEntry 29 }
+
+chasEntPhysUbootMinibootRev             OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the uboot miniboot version Number of the ni entity"
+        ::= { chasEntPhysicalEntry 30 }
+
+chasEntPhysMacAddress             OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the MAC address of the ni entity"
+        ::= { chasEntPhysicalEntry 31 }
+
+chasEntPhysCpuModel               OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the model description of the cmm/ni cpu"
+        ::= { chasEntPhysicalEntry 32 }
+
+chasEntPhysAirflow              OBJECT-TYPE
+    SYNTAX      INTEGER {
+        frontToRear(0),
+        rearToFront(1),
+        notApplicable(2)
+    }
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Chassis PS fan airflow direction"
+        ::= { chasEntPhysicalEntry 33 }
+
+chasEntPhysPowerUsed            OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value is only applicable to the PS.  It is the current
+         reading for the power usage of the PS. This value is in Watts."
+        ::= { chasEntPhysicalEntry 34 }
+
+
+-- Extension of the Entity physical table
+
+chasEntTemperatureTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChasEntTemperatureEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "This table contains one row per temperature sensor located on an entity
+         represented by the associated row in the entPhysicalTable."
+::= { alcatelIND1ChassisPhysMIBObjects 2 }
+
+
+chasEntTemperatureEntry OBJECT-TYPE
+        SYNTAX ChasEntTemperatureEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Information about a particular physical temperature sensor."
+        INDEX { entPhysicalIndex }
+::= { chasEntTemperatureTable 1 }
+
+
+ChasEntTemperatureEntry ::= SEQUENCE
+    {
+        chasEntTempCurrent                       Integer32,
+        chasEntTempThreshold                     Integer32,
+        chasEntTempDangerThreshold               Integer32,
+        chasEntTempStatus                        INTEGER
+    }
+
+chasEntTempCurrent OBJECT-TYPE
+        SYNTAX Integer32 (0..200)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object indicates the current output of the temperature
+         sensor in degrees Celsius."
+::= { chasEntTemperatureEntry 1 }
+
+chasEntTempThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..150)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+       "This object is the threshold temperature in degrees Celsius for the
+        sensor. When the value of chasEntTempCurrent exceeds this value,
+        a temperature notification is provided to the user."
+::= { chasEntTemperatureEntry 2 }
+
+chasEntTempDangerThreshold OBJECT-TYPE
+        SYNTAX Integer32 (30..150)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object is the danger threshold temperature in degrees Celsius for
+         the sensor. When the value of chasEntTempCurrent exceeds this value, the
+         associated physical entity is powered down."
+::= { chasEntTemperatureEntry 3 }
+
+chasEntTempStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                unknown(1),
+                notPresent(2),
+                underThreshold(3),
+                overFirstThreshold(4),
+                overDangerThreshold(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object is the status value of the temperature sensor.
+         It reflects the temperature relative to the chasEntTempThreshold
+         and chasEntTempDangerThreshold values."
+::= { chasEntTemperatureEntry 4 }
+
+-- CHASSIS SUPERVISION RFS TABLES
+
+chasSupervisionRfsLsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChasSupervisionRfsLsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        "This table contains a list of file on the remote chassis per directory."
+        ::= { alcatelIND1ChassisMIBObjects 4 }
+
+chasSupervisionRfsLsEntry OBJECT-TYPE
+        SYNTAX          ChasSupervisionRfsLsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        "Information about a remote file.
+         A row in this table contains a file per directory per chassis"
+    INDEX { chasSupervisionRfsLsFileIndex }
+        ::= { chasSupervisionRfsLsTable 1 }
+
+ChasSupervisionRfsLsEntry ::= SEQUENCE
+        {
+                chasSupervisionRfsLsFileIndex     Integer32,
+                chasSupervisionRfsLsSlot          Unsigned32,
+                chasSupervisionRfsLsDirName       SnmpAdminString,
+                chasSupervisionRfsLsFileName      SnmpAdminString,
+                chasSupervisionRfsLsFileType      INTEGER,
+                chasSupervisionRfsLsFileSize      Unsigned32,
+                chasSupervisionRfsLsFileAttr      INTEGER,
+                chasSupervisionRfsLsFileDateTime  SnmpAdminString
+        }
+
+chasSupervisionRfsLsFileIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..100)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "This value holds file Index for the RFS LS table."
+        ::= { chasSupervisionRfsLsEntry 1}
+
+chasSupervisionRfsLsSlot OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "CMM Slot where remote file is located."
+        ::= { chasSupervisionRfsLsEntry 2}
+
+chasSupervisionRfsLsDirName OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "The remote directory name where remote file is located in"
+        DEFVAL { "/flash" }
+        ::= { chasSupervisionRfsLsEntry 3 }
+
+chasSupervisionRfsLsFileName OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..33))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The file name of remote file"
+        DEFVAL { "" }
+        ::= { chasSupervisionRfsLsEntry 4 }
+
+chasSupervisionRfsLsFileType OBJECT-TYPE
+        SYNTAX          INTEGER {
+                        file(1),
+                        directory(2),
+                        undefined(3),
+                        tarArchive(4)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The Type of a remote file"
+        DEFVAL          { undefined }
+        ::= { chasSupervisionRfsLsEntry 5 }
+
+chasSupervisionRfsLsFileSize OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "size of this remote file"
+        DEFVAL          { 0 }
+        ::= { chasSupervisionRfsLsEntry 6 }
+
+chasSupervisionRfsLsFileAttr OBJECT-TYPE
+        SYNTAX          INTEGER {
+                        undefined(1),
+                        readOnly(2),
+                        readWrite(3),
+                        writeOnly(4)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "attributes of this remote file"
+        DEFVAL          { undefined }
+        ::= { chasSupervisionRfsLsEntry 7 }
+
+chasSupervisionRfsLsFileDateTime OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..16))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "the modification date and time of a remote file"
+        DEFVAL          { "" }
+        ::= { chasSupervisionRfsLsEntry 8 }
+
+
+chasSupervisionRfsDfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChasSupervisionRfsDfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table contains information about file system size and use."
+        ::= { alcatelIND1ChassisMIBObjects 8 }
+
+chasSupervisionRfsDfEntry OBJECT-TYPE
+        SYNTAX          ChasSupervisionRfsDfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This entry contains information about file system size and use."
+    INDEX { chasSupervisionRfsDfSlot }
+        ::= { chasSupervisionRfsDfTable 1 }
+
+ChasSupervisionRfsDfEntry ::= SEQUENCE
+        {
+                chasSupervisionRfsDfSlot          Integer32,
+                chasSupervisionRfsDfFlashFree     Unsigned32,
+                chasSupervisionRfsDfFlashSize     Unsigned32,
+                chasSupervisionRfsDfUsbFree       Unsigned32,
+                chasSupervisionRfsDfUsbSize       Unsigned32
+        }
+
+chasSupervisionRfsDfSlot OBJECT-TYPE
+        SYNTAX          Integer32 (1..16)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        "CMM Slot where flash space is evaluated."
+        ::= { chasSupervisionRfsDfEntry 1}
+
+chasSupervisionRfsDfFlashFree OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Number bytes free on the file system."
+        ::= { chasSupervisionRfsDfEntry 2}
+
+chasSupervisionRfsDfFlashSize OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Number of total bytes on the file system."
+        ::= { chasSupervisionRfsDfEntry 3}
+
+chasSupervisionRfsDfUsbFree OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "kb"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "The amount of free space on the USB file system."
+        ::= { chasSupervisionRfsDfEntry 4}
+
+chasSupervisionRfsDfUsbSize OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "kb"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "The total amount of space on the USB file system."
+        ::= { chasSupervisionRfsDfEntry 5}
+
+chasSupervisionFlashMemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ChasSupervisionFlashMemEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains the systems flash memory information."
+        ::= { alcatelIND1ChassisMIBObjects 9 }
+
+chasSupervisionFlashMemEntry OBJECT-TYPE
+    SYNTAX          ChasSupervisionFlashMemEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This contains one entry for the flash memory table."
+    INDEX { chasSupervisionSlot }
+        ::= { chasSupervisionFlashMemTable 1 }
+
+ChasSupervisionFlashMemEntry ::= SEQUENCE
+        {
+                chasSupervisionSlot          Integer32,
+                chasSupervisionFlashSize     Unsigned32,
+                chasSupervisionFlashFree     Unsigned32,
+                chasSupervisionFlashUsed     Integer32
+        }
+
+chasSupervisionSlot OBJECT-TYPE
+    SYNTAX          Integer32 (1..16)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "CMM Slot where flash space is evaluated."
+        ::= { chasSupervisionFlashMemEntry 1}
+
+chasSupervisionFlashSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Flash memory size."
+        ::= { chasSupervisionFlashMemEntry 2}
+
+chasSupervisionFlashFree OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number bytes free on file system."
+        ::= { chasSupervisionFlashMemEntry 3}
+
+chasSupervisionFlashUsed OBJECT-TYPE
+    SYNTAX          Integer32 (0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A rounded up percentage of Flash Memory used."
+        ::= { chasSupervisionFlashMemEntry 4}
+
+
+chasSupervisionCmmCertifiedTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ChasSupervisionCmmCertifiedEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains certification status"
+        ::= { alcatelIND1ChassisMIBObjects 10 }
+
+chasSupervisionCmmCertifiedEntry OBJECT-TYPE
+    SYNTAX          ChasSupervisionCmmCertifiedEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+         "Information about control module certification status.  This class is
+         instanciated only when running in virtual chassis mode."
+        INDEX { chasSupervisionCmmNum }
+        ::= { chasSupervisionCmmCertifiedTable 1 }
+
+ChasSupervisionCmmCertifiedEntry ::= SEQUENCE
+        {
+                chasSupervisionCmmNum Integer32,
+                chasSupervisionCmmCertifiedStatus INTEGER
+        }
+
+chasSupervisionCmmNum OBJECT-TYPE
+    SYNTAX          Integer32 (1..16)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "CMM Slot where /certified directory is evaluated."
+        ::= { chasSupervisionCmmCertifiedEntry 1}
+
+chasSupervisionCmmCertifiedStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                notPresent(0),
+                yes(1),
+                no(2)
+        }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        " The status of the CMM certified directory - certified or not."
+        ::= { chasSupervisionCmmCertifiedEntry 2}
+
+
+-- CHASSIS SUPERVISION FAN STATUS TABLE
+
+alaChasEntPhysFanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaChasEntPhysFanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains one row per physical fan entity."
+        ::= { alcatelIND1ChassisMIBObjects 11 }
+
+alaChasEntPhysFanEntry OBJECT-TYPE
+        SYNTAX      AlaChasEntPhysFanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Information about a particular fan in a chassis physical entity."
+        INDEX { entPhysicalIndex, alaChasEntPhysFanLocalIndex }
+        ::= { alaChasEntPhysFanTable 1 }
+
+AlaChasEntPhysFanEntry ::= SEQUENCE
+        {
+            alaChasEntPhysFanLocalIndex    Integer32,
+            alaChasEntPhysFanStatus        INTEGER,
+            alaChasEntPhysFanAirflow       INTEGER
+        }
+
+alaChasEntPhysFanLocalIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index to a chassis fan entity"
+        ::={ alaChasEntPhysFanEntry 1 }
+
+alaChasEntPhysFanStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        noStatus(0),
+                        notRunning(1),
+                        running(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Chassis fan operational status"
+        ::={alaChasEntPhysFanEntry 2}
+
+alaChasEntPhysFanAirflow OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        frontToRear(0),
+                        rearToFront(1),
+                        notApplicable(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Chassis fan airflow direction"
+        ::={alaChasEntPhysFanEntry 3}
+
+
+-- CHASSIS SUPERVISION RFS COMMANDS
+
+
+alcatelIND1ChassisSupervisionRfsCommands OBJECT-IDENTITY
+        STATUS current
+    DESCRIPTION
+        "Branch For Chassis Supervision RFS commands.
+         For rrm command the Slot, Command and SrcFileName are mandatory.
+         For rcp command the Slot, Command, SrcFileName and DestFileName
+         are mandatory.  For rdf command the Slot and Command are mandatory"
+        ::= { alcatelIND1ChassisMIBObjects 5 }
+
+chasSupervisionRfsCommandsSlot OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "CMM Slot where RFS command should be executed."
+        ::= { alcatelIND1ChassisSupervisionRfsCommands 1}
+
+chasSupervisionRfsCommandsCommand OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                notSignificant(0),
+                                rrm(1),
+                                rcp(2),
+                                rls(3),
+                                rdf(4),
+                                rget(5),
+                                rput(6),
+                                reserved(7)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+        "This object identifies which of the above Actions is to be
+         performed.  The commands are as follows:
+                  - rrm   Remote file remove
+                  - rcp   Remote file copy (DEPRECATED please use rget or rput instead)
+                  - rls   Remote directory listing
+                  - rdf   Remote flash disk space free
+                  - rget  Remote file get
+                  - rput  Remote file put"
+
+        ::= { alcatelIND1ChassisSupervisionRfsCommands 2 }
+
+
+chasSupervisionRfsCommandsSrcFileName OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+        "The remote file for where the RFS action is executed.
+         This includes also the path so directory name and file name.
+         This object is used when command set to rrm or rget or rput."
+        ::= { alcatelIND1ChassisSupervisionRfsCommands 3 }
+
+chasSupervisionRfsCommandsDestFileName OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The destination file for where the RFS action is executed.
+                 This includes also the path so directory name and file name.
+                 This object is used when command set to rget or rput."
+        ::= { alcatelIND1ChassisSupervisionRfsCommands 4 }
+
+chasSupervisionRfsCommandsRlsDirName OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+               "The remote directory name where remote file is located in.
+                This is used when command set to rls."
+        DEFVAL { "/flash" }
+        ::= { alcatelIND1ChassisSupervisionRfsCommands 5 }
+
+chasSupervisionRfsCommandsRlsFileName OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+               "The remote file name where remote file is located in.
+                This is used when command set to rls."
+        ::= { alcatelIND1ChassisSupervisionRfsCommands 6 }
+
+chasSupervisionRfsCommandsProcessingState OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    inProgress(1),
+                                    ready(2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "command executing state for the previous set operation."
+        ::= { alcatelIND1ChassisSupervisionRfsCommands 7 }
+
+chasSupervisionRfsCommandsStatusCode OBJECT-TYPE
+        SYNTAX          INTEGER {
+                        success(1),
+                        slotIsPrimary(2),
+                        slotNotExist(3),
+                        directoryNotExist(4),
+                        fileNotExist(5),
+                        maximumFilesExceed(6),
+                        noDiskSpace(7),
+                        systemBusy(8),
+                        systemError(9),
+                        directoryNotAllowToRemove(10),
+                        permissionDenied(11)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "command completetion status error code."
+        ::= { alcatelIND1ChassisSupervisionRfsCommands 8 }
+
+
+-- CHASSIS CONTROL RELOAD STATUS
+
+
+chasControlReloadStatusTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF ChasControlReloadEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table containing reload status of each network interface
+                         slot or stack module"
+::= { alcatelIND1ChassisMIBObjects 6 }
+
+chasControlReloadEntry OBJECT-TYPE
+        SYNTAX          ChasControlReloadEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Entry of a network interface reload status"
+        INDEX { chasControlReloadIndex }
+::={ chasControlReloadStatusTable 1 }
+
+ChasControlReloadEntry ::= SEQUENCE {
+        chasControlReloadIndex          Integer32,
+        chasControlReloadStatus         INTEGER
+}
+
+chasControlReloadIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..64)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The index (entPhsycialIndex) value of the network interface."
+        ::= { chasControlReloadEntry 1 }
+
+chasControlReloadStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                reloadEnabled(1),
+                reloadDisabled(2),
+                noInterface(3),
+                unknown(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Returned value indicates if the network interface module is
+         enabled or disabled for reload."
+        DEFVAL { reloadDisabled }
+::= { chasControlReloadEntry 2 }
+
+
+-- CHASSIS GLOBAL CONTROL OBJECTS
+
+
+    chasGlobalControl   OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 7 }
+
+chasGlobalControlDelayedResetAll OBJECT-TYPE
+        SYNTAX Integer32 (-1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "This object is used to schedule a delayed reset all action for
+        a standalone chassis or for the entire virtual chassis when running
+        is virtual chassis mode. To schedule a delayed reset on a specific
+        chassis when running is virtual chassis mode, use the
+        chasControlDelayedResetAll object for the desired chassis.
+        If set to -1 - cancel the timer, 0 - reset all immediately,
+        any other value will start counting down the time until reset."
+
+    DEFVAL { -1 }
+::= { chasGlobalControl 1 }
+
+chasGlobalControlLongCommand OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                none(1),
+                certifySynchro(2),
+                certifyNoSynchro(3),
+                flashSynchro(4),
+                restore(5),
+                reload(6),
+                rfs(7),
+                issu(8),
+                shutdown(9),
+                vcConvert(10),
+                macRelease(11)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object is used to indicate whether a long-term action
+        is in progress, and if so, what the action is."
+    DEFVAL { none }
+::= { chasGlobalControl 2 }
+
+chasGlobalControlLongCommandStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                none(1),
+                inProgress(2),
+                completeSuccess(3),
+                completeFailure(4),
+                confirmationRequired(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object indicates the final disposition of the
+        most recent long-term action. When  running in virtual
+        chassis mode, the value confirmationRequired(5),
+        indicates that the command identified in
+        chasGlobalControlLongCommand may disrupt the virtual
+        chassis. The command is suspended and requires that
+        chasClobalControlConfirmOperation be set to true, after
+        reviewing the details and accepting the consequences
+        identified by chasGlobalControlConfirmMessage."
+    DEFVAL { none }
+::= { chasGlobalControl 3 }
+
+chasGlobalControlUpdateFirmware OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                none(1),
+                ubootCmm(2),
+                ubootNi(3),
+                ubootNiAll(4),
+                ubootCmmAll(5),
+                fpgaCmm(6),
+                fpgaNi(7),
+                fpgaNiDaughterBoard1(8),
+                fpgaNiDaughterBoard2(9),
+		fpgaCmmAll(10)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "This object initiates a firmware update. The chasGlobalControlUpdateSlot
+         and chasGlobalControlUpdateFilename objects must be set prior to setting
+         this object to start the update. The progress of the update can be
+         monitored by reading chasGlobalControlUpdateStatus."
+    DEFVAL { none }
+::= { chasGlobalControl 4 }
+
+chasGlobalControlUpdateSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "This object identifies the slot to be updated. The Slot value is
+        the entPhysicalIndex of the NI or CMM entry in the entPhyscialTable.
+        A value of 0 may be specified to update all NIs or CMMs. The value
+        of 0 is supported only for uboot updates."
+::= { chasGlobalControl 5 }
+
+chasGlobalControlUpdateFilename OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "This object identifies the filename containing the uboot
+         firmware image."
+        DEFVAL { "" }
+::= { chasGlobalControl 6 }
+
+chasGlobalControlUpdateStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                noUpdate(1),
+                updateInProgress(2),
+                updateSuccess(3),
+                updateFailed(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object reports the status of the firmware update.
+         The status for the the update identified by
+         chasGlobalControlUpdateFirmware and chasGlobalControlUpdateSlot
+         is returned. When ubootNiAll(4) ubootCmmAll(5) or fpgaCmmAll(10) update is
+         executed, the status of individual NIs or CMMs may be monitored
+         by changing the value of chasGlobalControlUpdateSlot to the
+         desired NI or CMM slot value prior to reading the status.
+         noUpdate(1) - No firmware update has been initiated.
+         updateInProgress(2) - Update is in progress.
+         updateSuccess(3) - The last firmware update was successful.
+         updateFailed(4) - The last firmware update failed."
+    DEFVAL { noUpdate }
+::= { chasGlobalControl 7 }
+
+chasGlobalControlConfirmOperation OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "When operating in virtual chassis mode, this object can
+        be set to true(1) to confirm that the operation identified
+        by chasGlobalControlLongCommand can proceed.  Set to false(2)
+        to cancel the operation. This should only be used when
+        chasGlobalControlLongCommandStatus is set to
+        confirmationRequired(5), and the value of
+        chasGlobalControlConfirmMessage has been reviewed."
+::= { chasGlobalControl 8 }
+
+chasGlobalControlConfirmMessage OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "When operating in virtual chassis mode, this object may be read
+         when chasGlobalControlLongCommandStatus is set to
+         confirmationRequired(5). This will happen when an operation such a
+         reload may disrupt the virtual chassis. This object contains information
+         about the consequences of executing the command identified by
+         chasGlobalControlLongCommand. The command has been suspended. To
+         accept the consequences and proceed with the operation, set
+         chasGlobalControlConfirmOperation to true."
+::= { chasGlobalControl 9 }
+
+alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
+
+
+  alaChasBpsFwTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaChasBpsFwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table contains one row per shelf bps firrmware "
+    ::= { alaChasBpsObjects 1 }
+
+  alaChasBpsFwEntry OBJECT-TYPE
+    SYNTAX     AlaChasBpsFwEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Information about a bps firrmare" 
+    INDEX { alaChasBpsShelfId } 
+    ::= { alaChasBpsFwTable 1 }
+
+    AlaChasBpsFwEntry ::= SEQUENCE
+    {
+            alaChasBpsShelfId           AlaChasBpsShelfId,
+            alaChasBpsUpdateFirmware    INTEGER, 
+            alaChasBpsCpldRev           SnmpAdminString,
+            alaChasBpsMmcuRev           SnmpAdminString,
+            alaChasBpsCmcuRev           SnmpAdminString
+    }
+
+  alaChasBpsShelfId OBJECT-TYPE
+    SYNTAX       AlaChasBpsShelfId 
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "Bps shelf ID "
+    ::= { alaChasBpsFwEntry 1 }
+
+  alaChasBpsUpdateFirmware OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            disabled(1),
+            enabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "This object is used to start BPS firmware update."
+        DEFVAL { disabled }
+       ::= { alaChasBpsFwEntry 2 }
+
+    alaChasBpsCpldRev               OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE(0..14))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "This object contains the CPLD revision Number of the  BPS"
+        ::= { alaChasBpsFwEntry 3 }
+
+    alaChasBpsMmcuRev OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE(0..14))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "This object contains the MMCU revision Number of the  BPS"
+        ::= { alaChasBpsFwEntry 4 }
+
+    alaChasBpsCmcuRev OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE(0..14))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "This object contains the CMCU revision Number of the  BPS"
+        ::= { alaChasBpsFwEntry 5 }
+
+--
+-- Connector Priority Table 
+---
+
+  alaChasBpsConnectorPriorityTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaChasBpsConnectorPriorityEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "This table contains BPS connector priority for each slot"
+    ::= { alaChasBpsObjects 2 }
+
+  alaChasBpsConnectorPriorityEntry OBJECT-TYPE
+    SYNTAX          AlaChasBpsConnectorPriorityEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "Information about bps connector priority for each slot"
+    INDEX { alaChasBpsChassisId }
+    ::= {alaChasBpsConnectorPriorityTable 1 }
+
+    AlaChasBpsConnectorPriorityEntry ::= SEQUENCE
+    {
+        alaChasBpsChassisId           Integer32,
+        alaChasBpsConnectorShelfId    AlaChasBpsShelfId,
+        alaChasBpsConnectorPriority   Integer32,
+        alaChasBpsConnectorNum        SnmpAdminString, 
+        alaChasBpsSerialNum           SnmpAdminString
+    }
+  alaChasBpsChassisId OBJECT-TYPE
+    SYNTAX          Integer32(1..8)
+    MAX-ACCESS      not-accessible 
+    STATUS          current
+    DESCRIPTION "Numbers allocated for the stack NIs as follows:
+    - 1..8:       valid and assigned slot numbers corresponding to values from the entPhysicalTable"
+    ::= { alaChasBpsConnectorPriorityEntry 1 }
+
+
+  alaChasBpsConnectorShelfId OBJECT-TYPE
+    SYNTAX          AlaChasBpsShelfId 
+    MAX-ACCESS      read-only 
+    STATUS          current
+    DESCRIPTION
+    "Bps shelf ID "
+    ::= { alaChasBpsConnectorPriorityEntry 2  }
+
+
+  alaChasBpsConnectorPriority OBJECT-TYPE
+    SYNTAX          Integer32(0..8)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION "This object specifies the bps connector priority."
+    DEFVAL { 0 }
+    ::= { alaChasBpsConnectorPriorityEntry 3 }
+
+  alaChasBpsConnectorNum OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(1..8)) 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION "This object specifies the bps connector num."
+    ::= { alaChasBpsConnectorPriorityEntry 4 }
+
+  alaChasBpsSerialNum OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(0..14)) 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION "This object specifies the bps serial num."
+    ::= { alaChasBpsConnectorPriorityEntry 5 }
+
+    --
+    -- Bps Mode Table 
+    --
+  alaChasBpsModeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaChasBpsModeEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "This table contains one row for bps config parameters."
+    ::= { alaChasBpsObjects 3 }
+
+  alaChasBpsModeEntry OBJECT-TYPE
+    SYNTAX          AlaChasBpsModeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    " Information about bps mode"
+    INDEX  { alaChasBpsShelfId }
+    ::= { alaChasBpsModeTable 1 }
+
+    AlaChasBpsModeEntry ::= SEQUENCE
+    {
+         alaChasBpsMode       INTEGER
+    }
+
+  alaChasBpsMode OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+            single(1),
+            full(2),
+            notApplicable(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "This object is only applicable to BPS .Value is
+    used to specify current Mode of switch."
+    DEFVAL { single }
+    ::= { alaChasBpsModeEntry 1 }
+
+
+--
+--  BPS Power supplies  Table
+--
+
+  alaChasBpsPowerSupplyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaChasBpsPowerSupplyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "This table contains   BPS power supplies details"
+     ::= {alaChasBpsObjects 4}
+
+  alaChasBpsPowerSupplyEntry OBJECT-TYPE
+    SYNTAX          AlaChasBpsPowerSupplyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "Information about a particular  BPS power supply"
+    INDEX { alaChasBpsPowerSupplyShelfId, alaChasBpsPowerSupplyIndex }
+    ::= { alaChasBpsPowerSupplyTable 1 }
+
+    AlaChasBpsPowerSupplyEntry ::= SEQUENCE
+    {
+        alaChasBpsPowerSupplyShelfId     AlaChasBpsShelfId,
+        alaChasBpsPowerSupplyIndex       Integer32,
+        alaChasBpsPowerSupplyName        SnmpAdminString,
+        alaChasBpsPowerSupplyDescr       SnmpAdminString,
+        alaChasBpsPowerSupplyModuleType  SnmpAdminString,
+        alaChasBpsPowerSupplyPartNumber  SnmpAdminString,
+        alaChasBpsPowerSupplyHardwareRev SnmpAdminString,
+        alaChasBpsPowerSupplySerialNum   SnmpAdminString,
+        alaChasBpsPowerSupplyMfgDate     SnmpAdminString,
+        alaChasBpsPowerSupplyOperStatus  INTEGER,
+        alaChasBpsPowerSupplyPowerProv   Integer32
+    }
+
+  alaChasBpsPowerSupplyShelfId    OBJECT-TYPE
+    SYNTAX          AlaChasBpsShelfId 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "BPS shelf ID"
+    ::= { alaChasBpsPowerSupplyEntry 1 }
+
+
+  alaChasBpsPowerSupplyIndex OBJECT-TYPE
+    SYNTAX          Integer32(1..5)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "This value hold BPS power power supply Index"
+    ::= { alaChasBpsPowerSupplyEntry 2 }
+
+  alaChasBpsPowerSupplyName  OBJECT-TYPE
+    SYNTAX          SnmpAdminString(SIZE(0..63))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+     "This object hold name of BPS power supply"
+            ::= { alaChasBpsPowerSupplyEntry 3 }
+
+  alaChasBpsPowerSupplyDescr OBJECT-TYPE
+    SYNTAX          SnmpAdminString(SIZE(0..63))
+    MAX-ACCESS      read-only
+    STATUS           current
+    DESCRIPTION
+    "This object hold description of BPS power supply"
+    ::= { alaChasBpsPowerSupplyEntry 4 }
+
+  alaChasBpsPowerSupplyModuleType OBJECT-TYPE
+    SYNTAX          SnmpAdminString(SIZE(0..31))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This object is unique module Type or ID from BPS entities eeprom"
+    ::= { alaChasBpsPowerSupplyEntry 5 }
+
+  alaChasBpsPowerSupplyPartNumber OBJECT-TYPE
+    SYNTAX          SnmpAdminString(SIZE(0..16))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This object contains the BPS power supply  Part Number "
+    ::= {   alaChasBpsPowerSupplyEntry 6 }
+
+  alaChasBpsPowerSupplyHardwareRev OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The vendor-specific hardware revision string for the
+    BPS  power supplies
+    Note that if revision information is stored internally in a
+    non-printable (e.g., binary) format, then the agent must
+    convert such information to a printable format, in an
+    implementation-specific manner.
+
+    If no specific hardware revision string is associated with
+    the physical component, or this information is unknown to
+    the agent, then this object will contain a zero-length
+    string."
+    ::= { alaChasBpsPowerSupplyEntry 7 }
+
+  alaChasBpsPowerSupplySerialNum OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The vendor-specific serial number string for the
+    BPS power supplies"
+    ::= { alaChasBpsPowerSupplyEntry 8 }
+
+  alaChasBpsPowerSupplyMfgDate OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..11))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "This object contains the manufacturing date of the BPS power supplies .
+    Its format is mmm dd yyyy : NOV 27 2012."
+    ::= { alaChasBpsPowerSupplyEntry 9 }
+
+    alaChasBpsPowerSupplyOperStatus OBJECT-TYPE
+    SYNTAX    INTEGER
+    {
+        up(1),
+        down(2),
+        unknown(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Oper status of  BPS power supply"
+    ::= { alaChasBpsPowerSupplyEntry 10 }
+
+  alaChasBpsPowerSupplyPowerProv OBJECT-TYPE
+    SYNTAX      Integer32(0..2000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    " It corresponds to  max power  of  BPS power supply.
+    This value is in Watts."
+    ::= { alaChasBpsPowerSupplyEntry 11 }
+
+--
+--BPS Total Power allocation Table
+--
+
+  alaChasBpsTotalPowerAllocTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AlaChasBpsTotalPowerAllocEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "This table contains one row for parameters which reflect total allocation by BPS ."
+    ::= { alaChasBpsObjects 5 }
+
+  alaChasBpsTotalPowerAllocEntry  OBJECT-TYPE
+    SYNTAX  AlaChasBpsTotalPowerAllocEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    " Information about various bps config parameters"
+    INDEX  { alaChasBpsShelfId }
+    ::= { alaChasBpsTotalPowerAllocTable 1 }
+
+    AlaChasBpsTotalPowerAllocEntry ::= SEQUENCE
+    {
+        alaChasBpsSysTotalAvailablePower   Integer32,
+        alaChasBpsSysTotalAllocation       Integer32,
+        alaChasBpsPoeTotalAvailablePower   Integer32,
+        alaChasBpsPoeTotalAllocation       Integer32
+    }
+
+  alaChasBpsSysTotalAvailablePower OBJECT-TYPE
+    SYNTAX          Integer32(0..900)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This value is only applicable to the BPS Module.  It
+    corresponds to system total power available on BPS
+    This value is in Watts."
+    ::= {  alaChasBpsTotalPowerAllocEntry 1 }
+
+  alaChasBpsSysTotalAllocation OBJECT-TYPE
+    SYNTAX          Integer32(0..900)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This value is only applicable to the BPS Modules.  It
+    corresponds to  total system  power allocated by  BPS
+    This value is in Watts."
+    ::= {  alaChasBpsTotalPowerAllocEntry 2 }
+
+  alaChasBpsPoeTotalAvailablePower OBJECT-TYPE
+    SYNTAX          Integer32(0..6000)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This value is only applicable to the  BPS Modules.  It
+    corresponds to system total power available on BPS
+    This value is in Watts."
+    ::= {  alaChasBpsTotalPowerAllocEntry 3 }
+
+  alaChasBpsPoeTotalAllocation OBJECT-TYPE
+    SYNTAX          Integer32(0..6000)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This value is only applicable to the Bps Modules.  It
+    corresponds to  total POE  power allocated by  BPS
+    This value is in Watts."
+    ::= {  alaChasBpsTotalPowerAllocEntry 4 }
+
+
+--
+--Chassis traps mib : chassisTraps
+--
+
+--Chassis traps Object definition
+
+chassisTrapsObj  OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 13 }
+
+--
+--textual conventions
+--
+
+ChassisTrapsStrLevel ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "enumerated value which provide the
+        urgency level of the STR."
+    SYNTAX        INTEGER {
+                          strNotFatal           (1), --recorverable
+                          strApplicationFatal   (2), --not recorverable for the application
+                          strFatal              (3)  --not recorverable for the board
+                  }
+
+
+ChassisTrapsStrAppID  ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Application Identification number"
+    SYNTAX        Integer32 (0..255)
+
+
+ChassisTrapsStrSnapID  ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Subapplication Identification number.
+        we can have multiple snapIDs per
+        Subapplication (task) but only one is
+        to be used to send STRs."
+    SYNTAX        Integer32 (0..255)
+
+
+ChassisTrapsStrfileLineNb ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Line number in the source file where the
+        fault was detected. This is given by the C
+        ANSI macro __LINE__."
+    SYNTAX        Integer32 (1..65535)
+
+
+ChassisTrapsStrErrorNb ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Fault identifier. The error number
+        identifies the kind the detected fault and
+        allows a mapping of the data contained in
+        chassisTrapsdataInfo."
+    SYNTAX        Integer32 (0..65535)
+
+
+ChassisTrapsStrdataInfo ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Additional data provided to help to find out
+        the origine of the fault. The contain and the
+        significant portion are varying in accordance
+        with chassisTrapsStrErrorNb. The lenght of this
+        field is expressed in bytes."
+    SYNTAX  OCTET STRING (SIZE (0..63))
+
+ChassisTrapsObjectType ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "An enumerated value which provides the object type
+        involved in the alert trap."
+    SYNTAX        INTEGER {
+        chassis           (1),
+        ni                (2),
+        powerSuply        (3),
+        fan               (4),
+        cmm               (5),
+        fabric            (6),
+        gbic              (7)
+    }
+
+
+ChassisTrapsObjectNumber ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "A number defining the order of the object in the
+        set. EX: The number of the considered fan or power
+        supply. This intend to clarify as much as possible
+        the location of the failure or alert. An instance
+        of the appearance of the trap could be:
+        failure on a module. Power supply 3.  "
+    SYNTAX        Integer32 (0..255)
+
+ChassisTrapsAlertNumber ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "this number identify the alert among all the
+        possible chassis alert causes."
+    SYNTAX        INTEGER {
+        runningWorking                  (1),   -- The working version is used
+        runningCertified                    (2),   -- The certified version is used
+
+        certifyStarted                  (3),   -- CERTIFY process started
+        certifyFlashSyncStarted         (4),   -- CERTIFY w/FLASH SYNCHRO process started
+        certifyCompleted                (5),   -- CERTIFY process completed successfully
+        certifyFailed                   (6),   -- CERTIFY process failed
+        synchroStarted                  (7),   -- Flash Synchronization process started
+        synchroCompleted                    (8),   -- Flash Synchronization completed successfully
+        synchroFailed                   (9),   -- Flash Synchronization failed
+
+        restoreStarted                  (10),   -- RESTORE process started
+        restoreCompleted                    (11),   -- RESTORE process completed successfully
+        restoreFailed                   (12),   -- RESTORE process failed
+
+        takeoverStarted                 (13),   -- CMM take-over being processed
+        takeoverDeferred                    (14),   -- CMM take-over deferred
+        takeoverCompleted                   (15),   -- CMM take-over completed
+
+        macAllocFailed                  (16),   -- CMS MAC allocation failed
+        macRangeFailed                  (17),   -- CMS MAC range addition failed
+
+        fanFailed                           (18),   -- One or more of the fans is inoperable
+        fanOk                               (19),   -- Fan is operable
+        fansOk                              (20),   -- All fans are operable
+
+        tempOverThreshold                   (21),   -- CMM temperature over the threshold
+        tempUnderThreshold                  (22),   -- CMM temperature under the threshold
+        tempOverDangerThreshold         (23),   -- CMM temperature over danger threshold
+
+        powerMissing                    (24),   -- Not enough power available
+        psNotOperational                    (25),   -- Power Supply is not operational
+        psOperational                   (26),   -- Power supply is operational
+        psAllOperational                    (27),   -- All power supplies are operational
+
+        redundancyNotSupported          (28),   -- Hello protocol disabled, Redundancy not supported
+        redundancyDisabledCertifyNeeded (29),   -- Hello protocol disabled, Certify needed
+        cmmStartingAsPrimary            (30),   -- CMM started as primary
+        cmmStartingAsSecondary          (31),   -- CMM started as secondary
+        cmmStartupCompleted                 (32),   -- end of CMM start up
+
+        cmmAPlugged                         (33),   -- cmm a plugged
+        cmmBPlugged                         (34),   -- cmm b plugged
+        cmmAUnPlugged                   (35),   -- cmm a unplugged
+        cmmBUnPlugged                   (36),   -- cmm b unplugged
+
+        lowNvramBattery                 (37),   -- NV RAM battery is low
+        notEnoughFabricsOperational     (38),   -- Not enough Fabric boards operational
+        simplexNoSynchro                    (39),   -- Only simplex CMM no flash synchro done
+
+        secAutoActivate                 (40),   -- secondary CMM autoactivating
+        secAutoCertifyStarted           (41),   -- secondary CMM autocertifying
+        secAutoCertifyCompleted         (42),   -- secondary CMM autocertify end
+        secInactiveReset                (43),   -- cmm b unplugged
+
+        activateScheduled               (44),   -- ACTIVATE process scheduled
+        activateStarted                 (45),   -- secondary CMM reset because of inactivity
+
+        getAfileCompleted               (46),   -- Get A file process completed
+        getAfileFailed                  (47),   -- Failed to get a file from other CMM/Stack
+
+        sysUpdateStart                  (48),   -- sysUpdate starts
+        sysUpdateInProgress             (49),   -- sysUpdate in progress
+        sysUpdateError                  (50),   -- sysUpdate error
+        sysUpdateEnd                    (51),   -- sysUpdate ends
+        reloadInProgress                (52),   -- the system is already in reload workign process
+        c20UpgradeOk                    (53),   -- the c20 license upgrade ok
+        c20UpgradeFailed                (54),   -- the c20 license upgrade failed
+        c20RestoreOk                    (55),   -- the c20 license restore ok
+        c20RestoreFailed                (56),   -- the c20 license restore failed
+        c20NiFailed                     (57),   -- the c20 ni board reports failure
+        airflowReverse                  (58),   -- ps and fan have opposit air flow direction
+        tempSWHigh                      (59),   -- the cmm/ni temperature is over SW high level
+        tempHWHigh                      (60),   -- the cmm/ni temperature is over HW high level
+        tempDanger                      (61),   -- the cmm/ni temperature is over HW danger set level
+        imageFileChecksumChanged        (62)    -- the image file MD5 checksum has changed
+    }
+
+--
+--object i.e. trap description
+--
+
+chassisTrapsStr NOTIFICATION-TYPE
+    OBJECTS {
+        chassisTrapsStrLevel            ,
+        chassisTrapsStrAppID            ,
+        chassisTrapsStrSnapID           ,
+        chassisTrapsStrfileName         ,
+        chassisTrapsStrfileLineNb       ,
+        chassisTrapsStrErrorNb          ,
+        chassisTrapsStrcomments         ,
+        chassisTrapsStrdataInfo
+    }
+    STATUS        current
+    DESCRIPTION
+       "A Software Trouble report is sent by whatever application
+        encountering a problem during its execution and would
+        want to aware the user of for maintenance purpose.      "
+::= { alcatelIND1ChassisMIBNotifications 1 }
+
+chassisTrapsAlert NOTIFICATION-TYPE
+    OBJECTS {
+        physicalIndex                   ,
+        chassisTrapsObjectType          ,
+        chassisTrapsObjectNumber        ,
+        chassisTrapsAlertNumber         ,
+        chassisTrapsAlertDescr
+    }
+    STATUS        current
+    DESCRIPTION
+       "generic trap notifying something changed in the chassis
+        whatever it's a failure or not                          "
+::= { alcatelIND1ChassisMIBNotifications 2 }
+
+
+chassisTrapsStateChange NOTIFICATION-TYPE
+    OBJECTS {
+        physicalIndex                   ,
+        chassisTrapsObjectType          ,
+        chassisTrapsObjectNumber        ,
+        chasEntPhysOperStatus
+    }
+    STATUS        current
+    DESCRIPTION
+       "A status change was detected"
+::= { alcatelIND1ChassisMIBNotifications 3 }
+
+-- BPS related traps 
+--
+-- Ni specific
+
+  chasTrapsBPSLessAllocSysPwr NOTIFICATION-TYPE
+    OBJECTS 
+    {
+         physicalIndex,
+         chasTrapsNiRqstdBpsSysPower,
+         chasTrapsNiGrantdBpsSysPower
+    }
+    STATUS        current
+    DESCRIPTION
+    "Insufficient system power given by BPS"
+    ::= { alcatelIND1ChassisMIBNotifications 4 }
+
+-- Complete shelf specific
+  chasTrapsBPSStateChange NOTIFICATION-TYPE
+    OBJECTS 
+    {
+            chasTrapBPSShelfId, 
+            chasTrapsBPSPowerSupply,
+            chasTrapsBPSEventAlert
+    }
+    STATUS        current
+    DESCRIPTION
+    "BPS power supplies insertion/removal  trap"
+    ::= { alcatelIND1ChassisMIBNotifications 5 }
+
+
+-- specific to connector
+  chasTrapsNiBPSFETStateChange NOTIFICATION-TYPE
+    OBJECTS 
+    {
+            physicalIndex,
+            chasTrapsBPSSystemFETChange,
+            chasTrapsBPSPoeFETChange
+    }
+    STATUS        current
+    DESCRIPTION
+    "BPS power supplies FET state change  trap"
+    ::= { alcatelIND1ChassisMIBNotifications 6 }
+
+
+-- BPS related traps  end
+
+-- objects used in the traps.
+--
+chassisTrapsStrLevel    OBJECT-TYPE
+        SYNTAX                  ChassisTrapsStrLevel
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "An enumerated value which provides the
+        urgency level of the STR."
+        ::= {chassisTrapsObj 1}
+
+chassisTrapsStrAppID    OBJECT-TYPE
+        SYNTAX                  ChassisTrapsStrAppID
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Application Identification number"
+        ::= {chassisTrapsObj 2}
+
+chassisTrapsStrSnapID   OBJECT-TYPE
+        SYNTAX                  ChassisTrapsStrSnapID
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Subapplication Identification number.
+        we can have multiple snapIDs per
+        Subapplication (task) but only one is
+        to be used to send STRs."
+        ::= {chassisTrapsObj 3}
+
+chassisTrapsStrfileName    OBJECT-TYPE
+        SYNTAX                  SnmpAdminString(SIZE(0..19))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Name of the source file where the fault
+        was detected. This is given by the C ANSI
+        macro __FILE__. The path shouldn't appear."
+        ::= {chassisTrapsObj 4}
+
+chassisTrapsStrfileLineNb    OBJECT-TYPE
+        SYNTAX                  ChassisTrapsStrfileLineNb
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Line number in the source file where the
+        fault was detected. This is given by the C
+        ANSI macro __LINE__."
+        ::= {chassisTrapsObj 5}
+
+chassisTrapsStrErrorNb    OBJECT-TYPE
+        SYNTAX                  ChassisTrapsStrErrorNb
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Fault identificator. The error number
+        identify the kind the detected fault and
+        allow a mapping of the data contained in
+        chassisTrapsdataInfo."
+        ::= {chassisTrapsObj 6}
+
+chassisTrapsStrcomments    OBJECT-TYPE
+        SYNTAX                  SnmpAdminString(SIZE(0..63))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "comment text explaning the fault."
+        ::= {chassisTrapsObj 7}
+
+chassisTrapsStrdataInfo    OBJECT-TYPE
+        SYNTAX                  ChassisTrapsStrdataInfo
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "Additional data provided to help to find out
+        the origine of the fault. The contain and the
+        significant portion are varying in accordance
+        with chassisTrapsStrErrorNb. The lenght of this
+        field is expressed in bytes."
+        ::= {chassisTrapsObj 8}
+
+chassisTrapsObjectType    OBJECT-TYPE
+        SYNTAX                  ChassisTrapsObjectType
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "enumerated value which provide the object type
+        involved in the alert trap."
+        ::= {chassisTrapsObj 9}
+
+chassisTrapsObjectNumber    OBJECT-TYPE
+        SYNTAX                  ChassisTrapsObjectNumber
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "number defining the order of the object in the
+        set. EX: number of the considered fan or power
+        supply. This intend to clarify as much as possible
+        the location of the failure or alert. A instance
+        of the appearance of the trap could be:
+        failure on a module. Power supply 3.  "
+        ::= {chassisTrapsObj 10}
+
+chassisTrapsAlertNumber    OBJECT-TYPE
+        SYNTAX                  ChassisTrapsAlertNumber
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "this number identify the alert among all the
+        possible chassis alert causes."
+        ::= {chassisTrapsObj 11}
+
+chassisTrapsAlertDescr    OBJECT-TYPE
+        SYNTAX                  SnmpAdminString(SIZE(0..127))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+        "description of the alert matching chassisTrapsAlertNumber"
+        ::= {chassisTrapsObj 12}
+
+physicalIndex             OBJECT-TYPE
+    SYNTAX                      PhysicalIndex
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+    "The Physical index of the involved object."
+    ::= { chassisTrapsObj 13 }
+
+--BPS Traps objects
+  chasTrapsNiRqstdBpsSysPower OBJECT-TYPE
+    SYNTAX          Integer32(0..126)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "Requested system power from os-bps"
+    ::= { chassisTrapsObj 14 }
+
+  chasTrapsNiGrantdBpsSysPower OBJECT-TYPE
+    SYNTAX          Integer32(0..126)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "Granted system power from os-bps"
+    ::= { chassisTrapsObj 15 }
+
+  chasTrapBPSShelfId OBJECT-TYPE
+    SYNTAX          Integer32(1..3) 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "Granted system power from os-bps"
+    ::= { chassisTrapsObj 16 }
+
+  chasTrapsBPSPowerSupply OBJECT-TYPE
+    SYNTAX          ChasTrapsBPSPowerSupply
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "value which provide bps power supply involved in the
+    State change trap"
+    ::= { chassisTrapsObj 17 }
+
+  chasTrapsBPSEventAlert OBJECT-TYPE
+    SYNTAX          ChasTrapsBPSEventAlert
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "enumerated value identifying alert"
+    ::= { chassisTrapsObj 18 }
+
+  chasTrapsBPSSystemFETChange OBJECT-TYPE
+    SYNTAX          ChasTrapsBPSFetState
+    MAX-ACCESS      read-only
+    STATUS           current
+    DESCRIPTION
+    "enumerated value which indicate Fet state"
+    ::= { chassisTrapsObj 19 }
+
+  chasTrapsBPSPoeFETChange OBJECT-TYPE
+    SYNTAX          ChasTrapsBPSFetState
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+    "enumerated value which indicate Fet state"
+    ::= { chassisTrapsObj 20 }
+
+--BPS Traps objects End
+
+-- END Trap Objects
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1ChassisMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Chassis Supervision."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                chasControlModuleGroup               ,
+                chasControlRedundantGroup            ,
+                chasChassisGroup                     ,
+                chasControlReloadStatusGroup         ,
+                chasGlobalControlGroup               ,
+                chassisNotificationGroup             ,
+                alaChasEntPhysFanGroup               ,
+                alaChasNotificationObjectGroup       ,
+                chassisSupervisionRfsCommandsGroup   ,
+                chasSupervisionCmmCertifiedEntryGroup,
+                chasSupervisionFlashMemEntryGroup    ,
+                chasSupervisionRfsDfEntryGroup       ,
+                chasSupervisionRfsLsEntryGroup,
+                alaChasBpsFwGroup,
+                alaChasBpsConnectorPriorityGroup,
+                alaChasBpsModeGroup,
+                alaChasBpsPowerSupplyGroup,
+                alaChasBpsTotalPowerAllocGroup
+            }
+
+        ::= { alcatelIND1ChassisMIBCompliances 1 }
+
+    alcatelIND1ChassisPhysMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Chassis Supervision Physical."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                chasEntPhysicalGroup                 ,
+                chassisPhysNotificationGroup
+            }
+
+        ::= { alcatelIND1ChassisPhysMIBCompliances 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    chasControlModuleGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chasControlActivateTimeout,
+            chasControlVersionMngt,
+            chasControlDelayedActivateTimer,
+            chasControlCertifyStatus,
+            chasControlSynchronizationStatus,
+            chasControlAcrossCmmWorkingSynchroStatus,
+            chasControlAcrossCmmCertifiedSynchroStatus,
+            chasControlNextRunningVersion,
+            chasControlCurrentRunningVersion,
+            chasControlWorkingVersion,
+            chasControlRedundancyTime,
+            chasControlEmpIpAddress,
+            chasControlEmpIpMask,
+            chasControlChassisId
+
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Control Modules Group."
+        ::= { alcatelIND1ChassisMIBGroups 1 }
+
+    chasControlRedundantGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chasControlNumberOfTakeover      ,
+            chasControlDelayedRebootTimer    ,
+            chasControlDelayedResetAll
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Redundant Control Modules Group."
+        ::= { alcatelIND1ChassisMIBGroups 2 }
+
+    chasChassisGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chasFreeSlots           ,
+            chasPowerLeft           ,
+            chasNumberOfResets      ,
+            chasTempRange           ,
+            chasTempThreshold       ,
+            chasDangerTempThreshold ,
+            chasPrimaryPhysicalIndex,
+            chasCPMAHardwareBoardTemp,
+            chasCFMAHardwareBoardTemp,
+            chasCPMBHardwareBoardTemp,
+            chasCFMBHardwareBoardTemp,
+            chasCFMCHardwareBoardTemp,
+            chasCFMDHardwareBoardTemp,
+            chasFTAHardwareBoardTemp,
+            chasFTBHardwareBoardTemp,
+            chasNI1HardwareBoardTemp,
+            chasNI2HardwareBoardTemp,
+            chasNI3HardwareBoardTemp,
+            chasNI4HardwareBoardTemp,
+            chasNI5HardwareBoardTemp,
+            chasNI6HardwareBoardTemp,
+            chasNI7HardwareBoardTemp,
+            chasNI8HardwareBoardTemp,
+            chasPowerSupplyRedundancy
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Chassis Group."
+        ::= { alcatelIND1ChassisMIBGroups 3 }
+
+    chasControlReloadStatusGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chasControlReloadStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision NI Reload Status Control Modules Group."
+        ::= { alcatelIND1ChassisMIBGroups 4 }
+
+    chasGlobalControlGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chasGlobalControlDelayedResetAll,
+            chasGlobalControlLongCommand,
+            chasGlobalControlLongCommandStatus,
+            chasGlobalControlUpdateFirmware,
+            chasGlobalControlUpdateSlot,
+            chasGlobalControlUpdateFilename,
+            chasGlobalControlUpdateStatus,
+            chasGlobalControlConfirmOperation,
+            chasGlobalControlConfirmMessage
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Global Control Modules Group."
+        ::= { alcatelIND1ChassisMIBGroups 5 }
+
+    chassisNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+            chassisTrapsStr                  ,
+            chassisTrapsAlert,
+            chasTrapsBPSLessAllocSysPwr,
+            chasTrapsBPSStateChange, 
+            chasTrapsNiBPSFETStateChange 
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Notification Group."
+        ::= { alcatelIND1ChassisMIBGroups 6 }
+
+    alaChasEntPhysFanGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaChasEntPhysFanStatus,
+            alaChasEntPhysFanAirflow
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Physical Fan Group."
+        ::= { alcatelIND1ChassisMIBGroups 7 }
+
+    alaChasNotificationObjectGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chassisTrapsStrLevel,
+            chassisTrapsStrAppID,
+            chassisTrapsStrSnapID,
+            chassisTrapsStrfileName,
+            chassisTrapsStrfileLineNb,
+            chassisTrapsStrErrorNb,
+            chassisTrapsStrcomments,
+            chassisTrapsStrdataInfo,
+            chassisTrapsObjectType,
+            chassisTrapsObjectNumber,
+            chassisTrapsAlertNumber,
+            chassisTrapsAlertDescr,
+            physicalIndex,
+            chasTrapsNiRqstdBpsSysPower,
+            chasTrapsNiGrantdBpsSysPower,
+            chasTrapBPSShelfId, 
+            chasTrapsBPSPowerSupply,
+            chasTrapsBPSEventAlert,
+            chasTrapsBPSSystemFETChange,
+            chasTrapsBPSPoeFETChange
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Notification Object Group."
+        ::= { alcatelIND1ChassisMIBGroups 9 }
+
+        chassisSupervisionRfsCommandsGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chasSupervisionRfsCommandsSlot,
+            chasSupervisionRfsCommandsCommand,
+            chasSupervisionRfsCommandsSrcFileName,
+            chasSupervisionRfsCommandsDestFileName,
+            chasSupervisionRfsCommandsRlsDirName,
+            chasSupervisionRfsCommandsRlsFileName,
+            chasSupervisionRfsCommandsProcessingState,
+            chasSupervisionRfsCommandsStatusCode
+        }
+        STATUS  current
+        DESCRIPTION
+	        "Chassis Supervision RFS Command Group."
+        ::= { alcatelIND1ChassisMIBGroups 10 }
+
+        chasSupervisionCmmCertifiedEntryGroup OBJECT-GROUP
+        OBJECTS
+        {
+             chasSupervisionCmmCertifiedStatus
+        }
+        STATUS  current
+        DESCRIPTION
+	        "Information about Cmm Certified Group."
+        ::= { alcatelIND1ChassisMIBGroups 11 }
+
+        chasSupervisionFlashMemEntryGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	chasSupervisionFlashSize,
+        	chasSupervisionFlashFree,
+        	chasSupervisionFlashUsed
+        }
+        STATUS  current
+        DESCRIPTION
+	        "The systems flash memory information group."
+        ::= { alcatelIND1ChassisMIBGroups 12 }
+
+
+       chasSupervisionRfsDfEntryGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	chasSupervisionRfsDfFlashFree,
+        	chasSupervisionRfsDfFlashSize,
+        	chasSupervisionRfsDfUsbFree,
+        	chasSupervisionRfsDfUsbSize
+        }
+        STATUS  current
+        DESCRIPTION
+	        "Information about RfsDf file system group."
+        ::= { alcatelIND1ChassisMIBGroups 13 }
+
+
+        chasSupervisionRfsLsEntryGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chasSupervisionRfsLsFileIndex,
+            chasSupervisionRfsLsSlot,
+            chasSupervisionRfsLsDirName,
+            chasSupervisionRfsLsFileName,
+            chasSupervisionRfsLsFileType,
+            chasSupervisionRfsLsFileSize,
+            chasSupervisionRfsLsFileAttr,
+            chasSupervisionRfsLsFileDateTime
+        }
+        STATUS  current
+        DESCRIPTION
+	        "Information about a RfsLs file group."
+        ::= { alcatelIND1ChassisMIBGroups 14 }
+
+     alaChasBpsFwGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaChasBpsUpdateFirmware,
+            alaChasBpsCpldRev, 
+            alaChasBpsMmcuRev,
+            alaChasBpsCmcuRev
+        }
+        STATUS  current
+        DESCRIPTION
+        "Information about BPS FW group."
+        ::= { alcatelIND1ChassisMIBGroups 15 }
+
+        alaChasBpsConnectorPriorityGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaChasBpsConnectorShelfId,        
+            alaChasBpsConnectorPriority,   
+            alaChasBpsConnectorNum,    
+            alaChasBpsSerialNum 
+        }
+        STATUS  current
+        DESCRIPTION
+        "Information about BPS Connector Priority group."
+        ::= { alcatelIND1ChassisMIBGroups 16 }
+
+    alaChasBpsModeGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaChasBpsMode
+        }
+        STATUS  current
+        DESCRIPTION
+        "Information about BPS Mode group."
+        ::= { alcatelIND1ChassisMIBGroups 17 }
+
+    alaChasBpsPowerSupplyGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaChasBpsPowerSupplyName,
+                alaChasBpsPowerSupplyDescr,
+                alaChasBpsPowerSupplyModuleType,
+                alaChasBpsPowerSupplyPartNumber,
+                alaChasBpsPowerSupplyHardwareRev,
+                alaChasBpsPowerSupplySerialNum,
+                alaChasBpsPowerSupplyMfgDate,
+                alaChasBpsPowerSupplyOperStatus,
+                alaChasBpsPowerSupplyPowerProv
+        }
+        STATUS  current
+        DESCRIPTION
+        " BPS Power Supply  group."
+        ::= { alcatelIND1ChassisMIBGroups 18 }
+
+    alaChasBpsTotalPowerAllocGroup  OBJECT-GROUP
+        OBJECTS
+        {
+            alaChasBpsSysTotalAvailablePower,   
+            alaChasBpsSysTotalAllocation,      
+            alaChasBpsPoeTotalAvailablePower, 
+            alaChasBpsPoeTotalAllocation    
+        }
+        STATUS  current
+        DESCRIPTION
+        " BPS Total Power Alloc group."
+        ::= { alcatelIND1ChassisMIBGroups 19 }
+
+    chasEntPhysicalGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chasEntPhysAdminStatus                ,
+            chasEntPhysOperStatus                 ,
+            chasEntPhysPower                      ,
+            chasEntPhysModuleType                 ,
+            chasEntPhysPartNumber                 ,
+            chasEntPhysLedStatusOk1               ,
+            chasEntPhysLedStatusOk2               ,
+            chasEntPhysLedStatusPrimaryCMM        ,
+            chasEntPhysLedStatusSecondaryCMM      ,
+            chasEntPhysLedStatusTemperature       ,
+            chasEntPhysLedStatusFan               ,
+            chasEntPhysLedStatusBackupPS          ,
+            chasEntPhysLedStatusInternalPS        ,
+            chasEntPhysLedStatusControl           ,
+            chasEntPhysLedStatusFabric            ,
+            chasEntPhysLedStatusPS                ,
+            chasEntPhysAsic1Rev                   ,
+            chasEntPhysAsic2Rev                   ,
+            chasEntPhysAsic3Rev                   ,
+            chasEntPhysAsic4Rev                   ,
+            chasEntPhysAsic5Rev                   ,
+            chasEntPhysAsic6Rev                   ,
+            chasEntPhysCpldRev                    ,
+            chasEntPhysDaughterFpga1Rev           ,
+            chasEntPhysDaughterFpga2Rev           ,
+            chasEntPhysNiNum                      ,
+            chasEntPhysGbicNum                    ,
+            chasEntPhysWaveLen                    ,
+            chasEntPhysUbootRev                   ,
+            chasEntPhysUbootMinibootRev           ,
+            chasEntPhysMacAddress                 ,
+            chasEntPhysCpuModel                   ,
+            chasEntPhysAirflow                    ,
+            chasEntPhysPowerUsed
+
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis (inclosure) Entity Physical Group."
+        ::= { alcatelIND1ChassisPhysMIBGroups 1 }
+
+    chassisPhysNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+            chassisTrapsStr                  ,
+            chassisTrapsAlert                ,
+            chassisTrapsStateChange
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Physical Notification Group."
+        ::= { alcatelIND1ChassisPhysMIBGroups 2 }
+
+    chassisTemperatureGroup OBJECT-GROUP
+        OBJECTS
+        {
+            chasEntTempCurrent,
+            chasEntTempDangerThreshold,
+            chasEntTempStatus,
+            chasEntTempThreshold
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Temprature Group."
+        ::= { alcatelIND1ChassisPhysMIBGroups 3 }
+
+END

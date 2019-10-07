@@ -1,0 +1,2366 @@
+ALCATEL-IND1-VIRTUAL-FLOW-CONTROL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        Unsigned32,
+        Counter64,
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        OBJECT-IDENTITY,
+        NOTIFICATION-TYPE               FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        DateAndTime,
+        RowStatus                       FROM SNMPv2-TC
+        OBJECT-GROUP,
+        MODULE-COMPLIANCE               FROM SNMPv2-CONF
+        SnmpAdminString                 FROM SNMP-FRAMEWORK-MIB
+        InterfaceIndex                  FROM IF-MIB
+        softentIND1Vfc                  FROM ALCATEL-IND1-BASE;
+
+
+        alcatelIND1VfcMIB MODULE-IDENTITY
+                LAST-UPDATED "201003150000Z"
+                ORGANIZATION "Alcatel-Lucent"
+                CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                        "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 System Capability Manager, to allow for system control and limitation setting, of
+                 different, features through out the system.
+                 Capability manager is a centralized process which provides hardware information and
+                 capability to other processes. To optimize the system performance , certain features
+                 may be configured to a lower than the hardware limit through capability manager.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2009 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+                REVISION      "201003150000Z"
+        DESCRIPTION
+            "Capability Manager is used to set system wide limitation."
+                ::= { softentIND1Vfc 1}
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        alcatelIND1VfcMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Virtual Flow Control Subsystem Managed Objects."
+            ::= { alcatelIND1VfcMIB 1 }
+
+
+        alcatelIND1VfcMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VFC Subsystem Conformance Information."
+        ::= { alcatelIND1VfcMIB 2 }
+
+
+        alcatelIND1VfcMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VFC Subsystem Units Of Conformance."
+        ::= { alcatelIND1VfcMIBConformance 1 }
+
+
+        alcatelIND1VfcMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VFC Subsystem Compliance Statements."
+        ::= { alcatelIND1VfcMIBConformance 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        alaVfcConfig  OBJECT IDENTIFIER ::= { alcatelIND1VfcMIBObjects 1 }
+        alaVfcConformance  OBJECT IDENTIFIER ::= { alcatelIND1VfcMIBObjects 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+VfcEnableState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Administrative state of a VFC entity."
+    SYNTAX  INTEGER {
+                disabled (0),
+                enabled (1)
+            }
+
+VfcBwLimitType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Units of traffic shaping lower and upper limit.  If a percentage is specified
+         the granularity of the limit value is 1Mb."
+    SYNTAX INTEGER {
+               mbits (1),
+               percentage(2)
+               }
+VfcProfileType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Type of profile."
+    SYNTAX INTEGER {
+               wredProfile (1),
+               qsetProfile (2),
+               qProfile    (3)
+               }
+
+VfcQueueType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "QoS characteristics of queue. SApecified in RFC 3289 as Differentiated Services Code Point values."
+    SYNTAX INTEGER
+
+VfcQsetAction ::= TEXTUAL-CONVENTION
+    STATUS deprecated
+    DESCRIPTION
+        "Action on Qset.
+
+        TC deprecated; actions on Qset are done by modifying the QSI table."
+    SYNTAX INTEGER {
+               default  (0),
+               override (1),
+               detach   (2),
+               revert   (3)
+               }
+
+VfcQsapList ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Each group of four octets in this string specify
+                     a 32-bit Qsap Id.  The Qsap Ids are stored in network
+                     byte order; i.e. octet N corresponds to the most
+                     significant 8 bits of the Qsap ID, and octet N+3 correspond
+                     to the least significant 8 bits. Four octets with a value of 0xFF
+                     indicate that all Qsaps have been retrieved.  The list is
+                     large enough to hold up to 32 Qsap Ids."
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+VfcQsapType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Type of Qsap."
+    SYNTAX INTEGER {
+               all       (1),
+               slot      (2),  -- physical
+               slotport  (3),  -- physical
+               lag       (4),  -- logical
+               ipif      (5),  -- virtual
+               lsp       (6),  -- virtual
+               sbind     (7),  -- virtual
+               sap       (8)   -- virtual
+               }
+
+VfcSchedulingMethod ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Algorithm used by scheduler for related object."
+    SYNTAX INTEGER {
+               strictPriority (1),
+               queueSpecified(2)
+               }
+
+VfcWfqMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "WFQ Mode."
+    SYNTAX INTEGER {
+            werr (1),
+            wrr (2)
+            }
+
+VfcProfileMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Configured mode of the object."
+    SYNTAX INTEGER {
+        nonDcb (1),
+        dcb (2)
+        }
+
+-- xxxxxxxxxxxxxxxxxxx
+-- WRED Profile Table
+-- xxxxxxxxxxxxxxxxxxx
+
+alaVfcWREDProfileTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaVfcWREDProfileEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table of WRED profiles."
+            ::= { alaVfcConfig 1 }
+
+alaVfcWREDProfileEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcWREDProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A WRED profile entry."
+        INDEX { alaVfcWRPId }
+            ::= { alaVfcWREDProfileTable 1 }
+
+AlaVfcWREDProfileEntry ::= SEQUENCE {
+        alaVfcWRPId
+                Unsigned32,
+        alaVfcWRPAdminState
+                VfcEnableState,     -- deprecated
+        alaVfcWRPName
+                SnmpAdminString,
+        alaVfcWRPGreenMinThreshold
+                Unsigned32,
+        alaVfcWRPGreenMaxThreshold
+                Unsigned32,
+        alaVfcWRPGreenMaxDropProbability
+                Unsigned32,
+        alaVfcWRPGreenGain
+                Unsigned32,
+        alaVfcWRPYellowMinThreshold
+                Unsigned32,
+        alaVfcWRPYellowMaxThreshold
+                Unsigned32,
+        alaVfcWRPYellowMaxDropProbability
+                Unsigned32,
+        alaVfcWRPYellowGain
+                Unsigned32,
+        alaVfcWRPRedMinThreshold
+                Unsigned32,
+        alaVfcWRPRedMaxThreshold
+                Unsigned32,
+        alaVfcWRPRedMaxDropProbability
+                Unsigned32,
+        alaVfcWRPRedGain
+                Unsigned32,
+        alaVfcWRPStatsAdmin
+                VfcEnableState,     -- deprecated
+        alaVfcWRPAttachmentCount
+                Unsigned32,
+        alaVfcWRPMTU
+                Unsigned32,
+        alaVfcWRPLastChange
+                DateAndTime,
+        alaVfcWRPRowStatus
+                RowStatus
+        }
+
+alaVfcWRPId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..16)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of WRED profile."
+
+        ::= { alaVfcWREDProfileEntry 1 }
+
+alaVfcWRPAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-create
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of WRED profile.  Setting this variable to
+                 disabled disables all Qsets and queues which use it.
+
+                Object deprecated in effort to simplify VFC."
+        DEFVAL {disabled}
+        ::= { alaVfcWREDProfileEntry 2 }
+
+alaVfcWRPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Name of WRED profile."
+
+        ::= { alaVfcWREDProfileEntry 3 }
+
+alaVfcWRPGreenMinThreshold  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Minimum threshold (percentage of queue size)."
+
+        DEFVAL {90}
+        ::= { alaVfcWREDProfileEntry 4 }
+
+alaVfcWRPGreenMaxThreshold  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Maximum threshold (percentage of queue size)."
+
+        DEFVAL {90}
+        ::= { alaVfcWREDProfileEntry 5 }
+
+alaVfcWRPGreenMaxDropProbability  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Maximum probability of a packet being dropped (percent)."
+
+        DEFVAL {10}
+        ::= { alaVfcWREDProfileEntry 6 }
+
+alaVfcWRPGreenGain  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..15)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Burst smoothing factor used for EWMA calculations."
+
+        DEFVAL {7}
+        ::= { alaVfcWREDProfileEntry 7 }
+
+alaVfcWRPYellowMinThreshold  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Minimum threshold (percentage of queue size)."
+
+        DEFVAL {90}
+        ::= { alaVfcWREDProfileEntry 8 }
+
+alaVfcWRPYellowMaxThreshold  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Maximum threshold (percentage of queue size)."
+
+        DEFVAL {90}
+        ::= { alaVfcWREDProfileEntry 9 }
+
+alaVfcWRPYellowMaxDropProbability  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Maximum probability of a packet being dropped (percent)."
+
+        DEFVAL {10}
+        ::= { alaVfcWREDProfileEntry 10 }
+
+alaVfcWRPYellowGain  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..15)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Burst smoothing factor used for EWMA calculations."
+
+        DEFVAL {7}
+        ::= { alaVfcWREDProfileEntry 11 }
+
+alaVfcWRPRedMinThreshold  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Minimum threshold (percentage of queue size)."
+
+        DEFVAL {90}
+        ::= { alaVfcWREDProfileEntry 12 }
+
+alaVfcWRPRedMaxThreshold  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Maximum threshold (percentage of queue size)."
+
+        DEFVAL {90}
+        ::= { alaVfcWREDProfileEntry 13 }
+
+alaVfcWRPRedMaxDropProbability  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Maximum probability of a packet being dropped (percent)."
+
+        DEFVAL {10}
+        ::= { alaVfcWREDProfileEntry 14 }
+
+alaVfcWRPRedGain  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..15)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Burst smoothing factor used for EWMA calculations."
+
+        DEFVAL {7}
+        ::= { alaVfcWREDProfileEntry 15 }
+
+alaVfcWRPStatsAdmin  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Statistics collection state.
+
+                Object deprecated in effort to simplify VFC."
+        DEFVAL {disabled}
+        ::= { alaVfcWREDProfileEntry 16 }
+
+alaVfcWRPAttachmentCount  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..16384)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Number of queues and/or qsets using this profile."
+        ::= { alaVfcWREDProfileEntry 17 }
+
+alaVfcWRPMTU  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..16384)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "MTU for this profile."
+        ::= { alaVfcWREDProfileEntry 18 }
+
+alaVfcWRPLastChange  OBJECT-TYPE
+        SYNTAX  DateAndTime
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Time of most recent change to this entry."
+        ::= { alaVfcWREDProfileEntry 19 }
+
+alaVfcWRPRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "alaVfcWRPRowStatus controls the creation and deletion of
+                 rows in the alaVfcWREDProfileTable."
+        ::= { alaVfcWREDProfileEntry 20 }
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- Qset Profile Table
+-- xxxxxxxxxxxxxxxxxxx
+
+alaVfcQsetProfileTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaVfcQsetProfileEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table of Qset profiles."
+            ::= { alaVfcConfig 2 }
+
+alaVfcQsetProfileEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcQsetProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A Qset profile entry."
+        INDEX { alaVfcQSPId }
+            ::= { alaVfcQsetProfileTable 1 }
+
+AlaVfcQsetProfileEntry ::= SEQUENCE {
+        alaVfcQSPId
+                Unsigned32,
+        alaVfcQSPAdminState
+                VfcEnableState,     -- deprecated
+        alaVfcQSPName
+                SnmpAdminString,
+	    alaVfcQSPType
+        	INTEGER,
+	    alaVfcQSPTemplateId
+        	Unsigned32,
+        alaVfcQSPTemplateName
+                SnmpAdminString,
+        alaVfcQSPBandwidthLimitType
+                VfcBwLimitType,
+        alaVfcQSPBandwidthLimitValue
+                Unsigned32,
+        alaVfcQSPQueueCount
+                Unsigned32,
+        alaVfcQSPWRPId
+                Unsigned32,
+        alaVfcQSPWRPName
+                SnmpAdminString,
+        alaVfcQSPWRPAdminState
+                VfcEnableState,     -- deprecated
+        alaVfcQSPSchedulingMethod
+                VfcSchedulingMethod,
+        alaVfcQSPStatsAdmin
+                VfcEnableState,     -- deprecated
+        alaVfcQSPAttachmentCount
+                Unsigned32,
+        alaVfcQSPLastChange
+                DateAndTime,
+        alaVfcQSPRowStatus
+                RowStatus
+        }
+
+alaVfcQSPId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..8)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of Qset profile."
+
+        ::= { alaVfcQsetProfileEntry 1 }
+
+alaVfcQSPAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of Qset profile.
+
+                Object deprecated in effort to simplify VFC."
+        DEFVAL {enabled}
+        ::= { alaVfcQsetProfileEntry 2 }
+
+alaVfcQSPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Name of Qset profile."
+
+        ::= { alaVfcQsetProfileEntry 3 }
+
+alaVfcQSPType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+		    static(1),
+		    dynamic(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of Qset profile."
+
+        ::= { alaVfcQsetProfileEntry 4 }
+
+alaVfcQSPTemplateId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..8)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Identifier of Qset profile used as a template for this Qset profile."
+
+        ::= { alaVfcQsetProfileEntry 5 }
+
+alaVfcQSPTemplateName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Name of Qset profile used as a template for this Qset profile."
+
+        ::= { alaVfcQsetProfileEntry 6 }
+
+alaVfcQSPBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Specifies the units used for input bandwidth limit, alaVfcQSPBandwidthLimitValue."
+
+        DEFVAL {percentage}
+        ::= { alaVfcQsetProfileEntry 7 }
+
+alaVfcQSPBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Limit to be enforced on input traffic.  Units are specified by alaVfcQSPBandwidthLimitType."
+        ::= { alaVfcQsetProfileEntry 8 }
+
+alaVfcQSPQueueCount  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Number of queues for this Qset.  Legal values are 1,4, or 8."
+        DEFVAL {8}
+        ::= { alaVfcQsetProfileEntry 9 }
+
+alaVfcQSPWRPId  OBJECT-TYPE
+        SYNTAX  Unsigned32  (1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Identifier of WRED profile to be used for this Qset."
+        ::= { alaVfcQsetProfileEntry 10 }
+
+alaVfcQSPWRPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Name of WRED profile to be used for this Qset."
+
+        ::= { alaVfcQsetProfileEntry 11 }
+
+alaVfcQSPWRPAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-create
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of Qset Profile WRED profile.  Setting this variable to
+                 disabled disables it for all objects using this QSP.
+
+                Object deprecated in effort to simplify VFC."
+        DEFVAL {disabled}
+        ::= { alaVfcQsetProfileEntry 12 }
+
+alaVfcQSPSchedulingMethod  OBJECT-TYPE
+        SYNTAX  VfcSchedulingMethod
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Input scheduling method used by this Qset."
+        DEFVAL {strictPriority}
+        ::= { alaVfcQsetProfileEntry 13 }
+
+alaVfcQSPStatsAdmin OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-create
+        STATUS  deprecated
+        DESCRIPTION
+                "If set to enable, collect statistics for queues in this Qset.
+
+                Object deprecated in effort to simplify VFC."
+        DEFVAL {disabled}
+        ::= { alaVfcQsetProfileEntry 14 }
+
+alaVfcQSPAttachmentCount OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Number of Qsaps attached to this profile."
+        DEFVAL {0}
+        ::= { alaVfcQsetProfileEntry 15 }
+
+alaVfcQSPLastChange  OBJECT-TYPE
+        SYNTAX  DateAndTime
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Time of most recent change to this entry."
+        ::= { alaVfcQsetProfileEntry 16 }
+
+alaVfcQSPRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "alaVfcQSPRowStatus controls the creation and deletion of
+                 rows in the alaVfcQsetProfileTable."
+        ::= { alaVfcQsetProfileEntry 17 }
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- Qset Instance Table
+-- xxxxxxxxxxxxxxxxxxx
+
+alaVfcQsetInstanceTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaVfcQsetInstanceEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table of Qset instances."
+            ::= { alaVfcConfig 3 }
+
+alaVfcQsetInstanceEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcQsetInstanceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A Qset entry."
+        INDEX { alaVfcQsetId }
+            ::= { alaVfcQsetInstanceTable 1 }
+
+AlaVfcQsetInstanceEntry ::= SEQUENCE {
+        alaVfcQsetId
+                Unsigned32,
+        alaVfcQsetQsapId
+                Unsigned32,
+        alaVfcQsetAdminState
+                VfcEnableState,         -- deprecated
+        alaVfcQsetOperState
+                VfcEnableState,         -- deprecated
+        alaVfcQsetQSPId
+                Unsigned32,
+        alaVfcQsetQSPName
+                SnmpAdminString,
+        alaVfcQsetOperBandwidthLimitType
+                VfcBwLimitType,
+        alaVfcQsetOperBandwidthLimitValue
+                Unsigned32,
+        alaVfcQsetBandwidthLimitType
+                VfcBwLimitType,         -- deprecated
+        alaVfcQsetBandwidthLimitValue
+                Unsigned32,             -- deprecated
+        alaVfcQsetQueueCount
+                Unsigned32,             -- deprecated
+        alaVfcQsetWRPId
+                Unsigned32,             -- deprecated
+        alaVfcQsetWRPName
+                SnmpAdminString,        -- deprecated
+        alaVfcQsetWRPAdminState
+                VfcEnableState,
+        alaVfcQsetWRPOperState
+                VfcEnableState,
+        alaVfcQsetSchedulingMethod
+                VfcSchedulingMethod,    -- deprecated
+        alaVfcQsetStatsAdmin
+                VfcEnableState,
+        alaVfcQsetStatsOper
+                VfcEnableState,
+        alaVfcQsetLastChange
+                DateAndTime,
+        alaVfcQsetStatsClear
+                VfcEnableState,
+        alaVfcQsetStatsInterval
+                Unsigned32,
+        alaVfcQsetMisconfigured
+                VfcEnableState,
+        alaVfcQsetMode
+                VfcProfileMode
+        }
+
+
+alaVfcQsetId  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of this Qset instance."
+
+        ::= { alaVfcQsetInstanceEntry 1 }
+
+alaVfcQsetQsapId  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Identifier of default Qset Instance attached to this Qset."
+
+        ::= { alaVfcQsetInstanceEntry 2 }
+
+alaVfcQsetAdminState OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of Qset.  Setting this variable to
+                 disabled disables all queues using this Qset.
+
+                 Object deprecated since it does not affect VFC traffic behavior.
+                 Use interfaces commands to disable traffic flow."
+        DEFVAL {enabled}
+        ::= { alaVfcQsetInstanceEntry 3 }
+
+alaVfcQsetOperState OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Operational state of Qset instance.
+
+                 Object deprecated as a result of deprecating alaVfcQsetAdminState"
+        DEFVAL {enabled}
+        ::= { alaVfcQsetInstanceEntry 4 }
+
+alaVfcQsetQSPId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..128)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Identifier of Qset profile used by this Qset.
+                 Can only be set to (1..8). Setting this will change the
+                 port mode to NDCB. When reading can return value (1..128)
+                 when port mode is DCB."
+
+        ::= { alaVfcQsetInstanceEntry 5 }
+
+alaVfcQsetQSPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Name of Qset profile used by this Qset.
+                 Setting this will change the port mode to NDCB."
+
+        ::= { alaVfcQsetInstanceEntry 6 }
+
+alaVfcQsetOperBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Specifies the units of bandwidth limit currently in use."
+
+        DEFVAL {percentage}
+        ::= { alaVfcQsetInstanceEntry 7 }
+
+alaVfcQsetOperBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Current limit enforced on input traffic.  Units are specified by alaVfcQsetOperBandwidthLimitType."
+        ::= { alaVfcQsetInstanceEntry 8 }
+
+alaVfcQsetBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Specifies the units used for input bandwidth limit, alaVfcQsetBandwidthLimitValue.
+
+                Object deprecated because it is a duplicate. Use alaVfcQSPBandwidthLimitType instead."
+
+        DEFVAL {percentage}
+        ::= { alaVfcQsetInstanceEntry 9 }
+
+alaVfcQsetBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Limit to be enforced on input traffic.  Units are specified by alaVfcQsetBandwidthLimitType.
+
+                Object deprecated because it is a duplicate. Use alaVfcQSPBandwidthLimitValue instead."
+        ::= { alaVfcQsetInstanceEntry 10 }
+
+alaVfcQsetQueueCount  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Number of queues for this Qset.  Legal values are 1,4, or 8.
+
+                Object deprecated because it is a duplicate. Use alaVfcQSPQueueCount instead."
+        DEFVAL {8}
+        ::= { alaVfcQsetInstanceEntry 11 }
+
+alaVfcQsetWRPId  OBJECT-TYPE
+        SYNTAX  Unsigned32  (1..16)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Identifier of WRED profile to be used for this Qset.
+
+                Object deprecated because it is a duplicate. Use alaVfcQSPWRPId instead."
+        ::= { alaVfcQsetInstanceEntry 12 }
+
+alaVfcQsetWRPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Name of WRED profile to be used for this Qset.
+
+                Object deprecated because it is a duplicate. Use alaVfcQSPWRPName instead."
+        ::= { alaVfcQsetInstanceEntry 13 }
+
+alaVfcQsetWRPAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Administrative state of Qset WRED profile.  Setting this variable to
+                 disabled disables the WRED profile for all objects using this Qset."
+        DEFVAL {disabled}
+        ::= { alaVfcQsetInstanceEntry 14 }
+
+alaVfcQsetWRPOperState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Operational state of Qset WRED profile.  Setting this variable to
+                 disabled disables the WRED profile for all objects using this Qset."
+        DEFVAL {disabled}
+        ::= { alaVfcQsetInstanceEntry 15 }
+
+alaVfcQsetSchedulingMethod  OBJECT-TYPE
+        SYNTAX  VfcSchedulingMethod
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Input scheduling method used by this Qset.
+
+                Object deprecated because it is a duplicate. Use alaVfcQSPSchedulingMethod instead."
+        DEFVAL {strictPriority}
+        ::= { alaVfcQsetInstanceEntry 16 }
+
+alaVfcQsetStatsAdmin OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "If set to enable, collect statistics for queues in this Qset."
+        DEFVAL {disabled}
+        ::= { alaVfcQsetInstanceEntry 17 }
+
+alaVfcQsetStatsOper OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "If set to enable, collecting statistics for queues in this Qset."
+        DEFVAL {disabled}
+        ::= { alaVfcQsetInstanceEntry 18 }
+
+alaVfcQsetLastChange  OBJECT-TYPE
+        SYNTAX  DateAndTime
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Time of most recent change to this entry."
+        ::= { alaVfcQsetInstanceEntry 19 }
+
+alaVfcQsetStatsClear OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "If set to enable, reset statistics for queues in this Qset."
+        DEFVAL {disabled}
+        ::= { alaVfcQsetInstanceEntry 20 }
+
+alaVfcQsetStatsInterval OBJECT-TYPE
+        SYNTAX  Unsigned32 (10..300)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "The stats gathering time interval."
+        ::= { alaVfcQsetInstanceEntry 21 }
+
+alaVfcQsetMisconfigured OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "If set to enable, DCB configuration could not be applied.
+                 Default VFC behavior has been configured instead."
+        DEFVAL {disabled}
+        ::= { alaVfcQsetInstanceEntry 22 }
+
+alaVfcQsetMode OBJECT-TYPE
+        SYNTAX  VfcProfileMode
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Specifies the operating mode on the qsi.
+                 QSI mode can be non-dcb or dcb."
+        ::= { alaVfcQsetInstanceEntry 23 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- Queue Profile Table
+-- xxxxxxxxxxxxxxxxxxx
+
+alaVfcQProfileTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaVfcQProfileEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table of Queue profiles."
+            ::= { alaVfcConfig 4 }
+
+alaVfcQProfileEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcQProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A QProfile entry."
+        INDEX { alaVfcQPQSPId, alaVfcQPQId }
+            ::= { alaVfcQProfileTable 1 }
+
+AlaVfcQProfileEntry ::= SEQUENCE {
+        alaVfcQPQSPId
+                Unsigned32,
+        alaVfcQPQId
+                Unsigned32,
+        alaVfcQPAdminState
+                VfcEnableState,     -- deprecated
+        alaVfcQPWRPId
+                Unsigned32,
+        alaVfcQPWRPName
+                SnmpAdminString,
+        alaVfcQPWRPAdminState
+                VfcEnableState,     -- deprecated
+        alaVfcQPQSPName
+                SnmpAdminString,
+        alaVfcQPTrafficClass
+                Unsigned32,
+        alaVfcQPQType
+                VfcQueueType,
+        alaVfcQPCIRBandwidthLimitType
+                VfcBwLimitType,
+        alaVfcQPCIRBandwidthLimitValue
+                Unsigned32,
+        alaVfcQPPIRBandwidthLimitType
+                VfcBwLimitType,
+        alaVfcQPPIRBandwidthLimitValue
+                Unsigned32,
+        alaVfcQPStatsAdmin
+                VfcEnableState,     -- deprecated
+        alaVfcQPCbs
+                Unsigned32,
+        alaVfcQPMbs
+                Unsigned32,
+        alaVfcQPLastChange
+                DateAndTime,
+        alaVfcQPWfqWeight
+                Unsigned32,
+        alaVfcQPWfqMode
+                VfcWfqMode
+        }
+
+
+alaVfcQPQSPId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..8)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of Qset associated with this Queue Profile."
+
+        ::= { alaVfcQProfileEntry 1 }
+
+alaVfcQPQId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..8)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of queue associated with this Queue Profile."
+
+        ::= { alaVfcQProfileEntry 2 }
+
+alaVfcQPAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of Queue profile.  Setting this variable to
+                 disabled disables the queue profile for all objects using this Queue profile.
+
+                Object deprecated in effort to simplify VFC."
+        DEFVAL {disabled}
+        ::= { alaVfcQProfileEntry 3 }
+
+alaVfcQPWRPId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..16)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Identifier of associated WRED profile."
+        ::= { alaVfcQProfileEntry 4 }
+
+alaVfcQPWRPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Name of associated WRED profile."
+
+        ::= { alaVfcQProfileEntry 5 }
+
+alaVfcQPWRPAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of Qset WRED profile.  Setting this variable to
+                 disabled disables the WRED profile for all objects using this Queue profile.
+
+                Object deprecated in effort to simplify VFC."
+        DEFVAL {disabled}
+        ::= { alaVfcQProfileEntry 6 }
+
+alaVfcQPQSPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Name of Qset instance."
+
+        ::= { alaVfcQProfileEntry 7 }
+
+alaVfcQPTrafficClass  OBJECT-TYPE
+        SYNTAX  Unsigned32  (0..7)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Traffic class of the queue."
+        ::= { alaVfcQProfileEntry 8 }
+
+alaVfcQPQType  OBJECT-TYPE
+        SYNTAX  VfcQueueType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of the queue."
+        ::= { alaVfcQProfileEntry 9 }
+
+alaVfcQPCIRBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of CIR bandwidth Limit to be applied to queue traffic."
+        ::= { alaVfcQProfileEntry 10 }
+
+alaVfcQPCIRBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "CIR limit to be applied to queue traffic."
+        ::= { alaVfcQProfileEntry 11 }
+
+alaVfcQPPIRBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of PIR bandwidth Limit to be applied to queue traffic."
+        ::= { alaVfcQProfileEntry 12 }
+
+alaVfcQPPIRBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "PIR limit to be applied to queue traffic."
+        ::= { alaVfcQProfileEntry 13 }
+
+alaVfcQPStatsAdmin OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "If set to enable, collect statistics for queues in this QP.
+
+                Object deprecated in effort to simplify VFC."
+        DEFVAL {disabled}
+        ::= { alaVfcQProfileEntry 14 }
+
+alaVfcQPCbs  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Cbs value."
+        ::= { alaVfcQProfileEntry 15 }
+
+alaVfcQPMbs  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Mbs value."
+        ::= { alaVfcQProfileEntry 16 }
+
+alaVfcQPLastChange  OBJECT-TYPE
+        SYNTAX  DateAndTime
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Time of most recent change to this entry."
+        ::= { alaVfcQProfileEntry 17 }
+
+alaVfcQPWfqWeight  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WFQ Weight."
+        ::= { alaVfcQProfileEntry 18 }
+
+alaVfcQPWfqMode  OBJECT-TYPE
+        SYNTAX  VfcWfqMode
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WFQ Mode."
+        ::= { alaVfcQProfileEntry 19 }
+
+-- xxxxxxxxxxxxxxxxxxxxx
+-- Queue Instance Table
+-- xxxxxxxxxxxxxxxxxxxxx
+
+alaVfcQInstanceTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaVfcQInstanceEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table of Queue instances."
+            ::= { alaVfcConfig 5 }
+
+alaVfcQInstanceEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcQInstanceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A QInstance entry."
+        INDEX { alaVfcQInstanceQsiId, alaVfcQInstanceQId }
+            ::= { alaVfcQInstanceTable 1 }
+
+AlaVfcQInstanceEntry ::= SEQUENCE {
+        alaVfcQInstanceQsiId
+                Unsigned32,
+        alaVfcQInstanceQId
+                Unsigned32,
+        alaVfcQInstanceQsapId
+                Unsigned32,         -- deprecated
+        alaVfcQInstanceQSPId
+                Unsigned32,         -- deprecated
+        alaVfcQInstanceQSPName
+                SnmpAdminString,    -- deprecated
+        alaVfcQInstanceAdminState
+                VfcEnableState,     -- deprecated
+        alaVfcQInstanceOperState
+                VfcEnableState,     -- deprecated
+        alaVfcQInstanceWRPAdminState
+                VfcEnableState,
+        alaVfcQInstanceWRPOperState
+                VfcEnableState,
+        alaVfcQInstanceWRPId
+                Unsigned32,         -- deprecated
+        alaVfcQInstanceWRPName
+                SnmpAdminString,    -- deprecated
+        alaVfcQInstanceCIRBandwidthLimitType
+                VfcBwLimitType,     -- deprecated
+        alaVfcQInstanceCIRBandwidthLimitValue
+                Unsigned32,         -- deprecated
+        alaVfcQInstancePIRBandwidthLimitType
+                VfcBwLimitType,     -- deprecated
+        alaVfcQInstancePIRBandwidthLimitValue
+                Unsigned32,         -- deprecated
+        alaVfcQInstanceCIROperationalBandwidthLimitType
+                VfcBwLimitType,
+        alaVfcQInstanceCIROperationalBandwidthLimitValue
+                Unsigned32,
+        alaVfcQInstancePIROperationalBandwidthLimitType
+                VfcBwLimitType,
+        alaVfcQInstancePIROperationalBandwidthLimitValue
+                Unsigned32,
+        alaVfcQInstanceStatsAdmin   -- deprecated
+                VfcEnableState,
+        alaVfcQInstanceStatsOper    -- deprecated
+                VfcEnableState,
+        alaVfcQInstancePacketsEnqueued
+                Counter64,
+        alaVfcQInstanceBytesEnqueued
+                Counter64,
+        alaVfcQInstancePacketsDequeued
+                Counter64,          -- deprecated
+        alaVfcQInstanceBytesDequeued
+                Counter64,          -- deprecated
+        alaVfcQInstancePacketsDropped
+                Counter64,
+        alaVfcQInstanceBytesDropped
+                Counter64,
+        alaVfcQInstanceGreenPacketsAccepted
+                Counter64,
+        alaVfcQInstanceGreenBytesAccepted
+                Counter64,
+        alaVfcQInstanceGreenPacketsDropped
+                Counter64,
+        alaVfcQInstanceGreenBytesDropped
+                Counter64,
+        alaVfcQInstanceYellowPacketsAccepted
+                Counter64,
+        alaVfcQInstanceYellowBytesAccepted
+                Counter64,
+        alaVfcQInstanceYellowPacketsDropped
+                Counter64,
+        alaVfcQInstanceYellowBytesDropped
+                Counter64,
+        alaVfcQInstanceRedPacketsAccepted
+                Counter64,
+        alaVfcQInstanceRedBytesAccepted
+                Counter64,
+        alaVfcQInstanceRedPacketsDropped
+                Counter64,
+        alaVfcQInstanceRedBytesDropped
+                Counter64,
+        alaVfcQInstanceLastChange
+                DateAndTime,
+        alaVfcQInstanceStatsClear   -- deprecated
+                VfcEnableState
+        }
+
+
+alaVfcQInstanceQsiId  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of Qset associated with this QInstance."
+
+        ::= { alaVfcQInstanceEntry 1 }
+
+alaVfcQInstanceQId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..8)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of queue associated with this QInstance."
+
+        ::= { alaVfcQInstanceEntry 2 }
+
+alaVfcQInstanceQsapId  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Identifier of Qsap associated with this QInstance.
+
+                Object deprecated because it is a duplicate. Use alaVfcQsetQsapId instead."
+
+        ::= { alaVfcQInstanceEntry 3 }
+
+alaVfcQInstanceQSPId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..8)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Identifier of Qset associated with this QInstance.
+
+                Object deprecated because it is a duplicate. Use alaVfcQsetQSPId instead."
+
+        ::= { alaVfcQInstanceEntry 4 }
+
+alaVfcQInstanceQSPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Name of Qset profile associated with with QInstance.
+
+                Object deprecated because it is a duplicate. Use alaVfcQsetQSPName instead."
+
+        ::= { alaVfcQInstanceEntry 5 }
+
+alaVfcQInstanceAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of this QInstance.  Setting this variable to
+                 disabled disables this queue.
+
+                 Object deprecated as a result of deprecating alaVfcQsetAdminState."
+        DEFVAL {enabled}
+        ::= { alaVfcQInstanceEntry 6 }
+
+alaVfcQInstanceOperState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Operational state of this QInstance.
+
+                 Object deprecated as a result of deprecating alaVfcQsetAdminState."
+        DEFVAL {enabled}
+        ::= { alaVfcQInstanceEntry 7 }
+
+alaVfcQInstanceWRPAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Administrative state of Qset WRED profile.  Setting this variable to
+                 disabled disables the WRED profile for this Queue."
+        DEFVAL {disabled}
+        ::= { alaVfcQInstanceEntry 8 }
+
+alaVfcQInstanceWRPOperState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Operational state of Qset WRED profile."
+        DEFVAL {disabled}
+        ::= { alaVfcQInstanceEntry 9 }
+
+alaVfcQInstanceWRPId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..16)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Associated WRED Profile.
+
+                Object deprecated because it is a duplicate. Use alaVfcQPWRPId instead."
+        ::= { alaVfcQInstanceEntry 10 }
+
+alaVfcQInstanceWRPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Name of Associated WRED Profile.
+
+                Object deprecated because it is a duplicate. Use alaVfcQPWRPName instead."
+
+        ::= { alaVfcQInstanceEntry 11 }
+
+alaVfcQInstanceCIRBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Type of CIR bandwidth Limit currently applied to queue traffic.
+
+                Object deprecated because it is a duplicate. Use alaVfcQPCIRBandwidthLimitType instead."
+        ::= { alaVfcQInstanceEntry 12 }
+
+alaVfcQInstanceCIRBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "CIR limit currently applied to queue traffic.
+
+                Object deprecated because it is a duplicate. Use alaVfcQPCIRBandwidthLimitValue instead."
+        ::= { alaVfcQInstanceEntry 13 }
+
+alaVfcQInstancePIRBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Type of PIR bandwidth Limit currently applied to queue traffic.
+
+                Object deprecated because it is a duplicate. Use alaVfcQPPIRBandwidthLimitType instead."
+        ::= { alaVfcQInstanceEntry 14 }
+
+alaVfcQInstancePIRBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "PIR limit currently applied to queue traffic.
+
+                Object deprecated because it is a duplicate. Use alaVfcQPPIRBandwidthLimitValue instead."
+        ::= { alaVfcQInstanceEntry 15 }
+
+alaVfcQInstanceCIROperationalBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of CIR bandwidth Limit currently applied to queue traffic."
+        ::= { alaVfcQInstanceEntry 16 }
+
+alaVfcQInstanceCIROperationalBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "CIR limit currently applied to queue traffic."
+        ::= { alaVfcQInstanceEntry 17 }
+
+alaVfcQInstancePIROperationalBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of PIR bandwidth Limit currently applied to queue traffic."
+        ::= { alaVfcQInstanceEntry 18 }
+
+alaVfcQInstancePIROperationalBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "PIR limit currently applied to queue traffic."
+        ::= { alaVfcQInstanceEntry 19 }
+
+alaVfcQInstanceStatsAdmin  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of statistics.
+                 Deprecated - queue stats changes not allowed."
+        DEFVAL {disabled}
+        ::= { alaVfcQInstanceEntry 20 }
+
+alaVfcQInstanceStatsOper  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Operational state of statistics.
+                 Deprecated - queue stats changes not allowed."
+        DEFVAL {disabled}
+        ::= { alaVfcQInstanceEntry 21 }
+
+alaVfcQInstancePacketsEnqueued  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Scheduler packet enqueued count."
+        ::= { alaVfcQInstanceEntry 22 }
+
+alaVfcQInstanceBytesEnqueued  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Scheduler byte enqueued count."
+        ::= { alaVfcQInstanceEntry 23 }
+
+alaVfcQInstancePacketsDequeued  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Scheduler packet dequeued count.
+
+                Deprecated for lack of HW support."
+        ::= { alaVfcQInstanceEntry 24 }
+
+alaVfcQInstanceBytesDequeued  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Scheduler byte dequeued count.
+
+                Deprecated for lack of HW support."
+        ::= { alaVfcQInstanceEntry 25 }
+
+alaVfcQInstancePacketsDropped  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Non-WRED dropped packet count."
+        ::= { alaVfcQInstanceEntry 26 }
+
+alaVfcQInstanceBytesDropped  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Non-WRED dropped byte count."
+        ::= { alaVfcQInstanceEntry 27 }
+
+alaVfcQInstanceGreenPacketsAccepted  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED green accepted packet count."
+        ::= { alaVfcQInstanceEntry 28 }
+
+alaVfcQInstanceGreenBytesAccepted  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED green accepted byte count."
+        ::= { alaVfcQInstanceEntry 29 }
+
+alaVfcQInstanceGreenPacketsDropped  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED green dropped packet count."
+        ::= { alaVfcQInstanceEntry 30 }
+
+alaVfcQInstanceGreenBytesDropped  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED green dropped byte count."
+        ::= { alaVfcQInstanceEntry 31 }
+
+alaVfcQInstanceYellowPacketsAccepted  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED yellow accepted packet count."
+        ::= { alaVfcQInstanceEntry 32 }
+
+alaVfcQInstanceYellowBytesAccepted  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED yellow accepted byte count."
+        ::= { alaVfcQInstanceEntry 33 }
+
+alaVfcQInstanceYellowPacketsDropped  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED yellow dropped packet count."
+        ::= { alaVfcQInstanceEntry 34 }
+
+alaVfcQInstanceYellowBytesDropped  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED yellow dropped byte count."
+        ::= { alaVfcQInstanceEntry 35 }
+
+alaVfcQInstanceRedPacketsAccepted  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED red accepted packet count."
+        ::= { alaVfcQInstanceEntry 36 }
+
+alaVfcQInstanceRedBytesAccepted  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED red accepted byte count."
+        ::= { alaVfcQInstanceEntry 37 }
+
+alaVfcQInstanceRedPacketsDropped  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED red dropped packet count."
+        ::= { alaVfcQInstanceEntry 38 }
+
+alaVfcQInstanceRedBytesDropped  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "WRED red dropped byte count."
+        ::= { alaVfcQInstanceEntry 39 }
+
+alaVfcQInstanceLastChange  OBJECT-TYPE
+        SYNTAX  DateAndTime
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Time of most recent change to this entry."
+        ::= { alaVfcQInstanceEntry 40 }
+
+alaVfcQInstanceStatsClear  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Operational state of statistics.
+                 Deprecated - queue stats changes not allowed."
+        DEFVAL {disabled}
+        ::= { alaVfcQInstanceEntry 41 }
+
+-- xxxxxxxxxxxxxxxxxxxxx
+-- Qsap Table
+-- xxxxxxxxxxxxxxxxxxxxx
+
+alaVfcQsapTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaVfcQsapEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table of Qsaps."
+            ::= { alaVfcConfig 6 }
+
+alaVfcQsapEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcQsapEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A Qsap entry."
+        INDEX { alaVfcQsapId }
+            ::= { alaVfcQsapTable 1 }
+
+AlaVfcQsapEntry ::= SEQUENCE {
+        alaVfcQsapId
+                Unsigned32,
+        alaVfcQsapAdminState
+                VfcEnableState,     -- deprecated
+        alaVfcQsapType
+                VfcQsapType,
+        alaVfcQsapValue
+                Unsigned32,
+        alaVfcQsapQSPId
+                Unsigned32,         -- deprecated
+        alaVfcQsapQSPName
+                SnmpAdminString,    -- deprecated
+        alaVfcQsapWRPAdminState
+                VfcEnableState,     -- deprecated
+        alaVfcQsapStatsAdmin
+                VfcEnableState,     -- deprecated
+        alaVfcQsapBandwidthLimitType
+                VfcBwLimitType,
+        alaVfcQsapBandwidthLimitValue
+                Unsigned32,
+        alaVfcQsapClearStats
+                INTEGER,            -- deprecated
+        alaVfcQsapQpId
+                Unsigned32,         -- deprecated
+        alaVfcQsapAction
+                VfcQsetAction,      -- deprecated
+        alaVfcQsapLastChange
+                DateAndTime,
+        alaVfcQsapParent
+                Unsigned32
+        }
+
+alaVfcQsapId  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of this Qsap."
+
+        ::= { alaVfcQsapEntry 1 }
+
+alaVfcQsapAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of this Qsap.
+
+                 Object deprecated as a result of deprecating alaVfcQsetAdminState."
+        DEFVAL {enabled}
+        ::= { alaVfcQsapEntry 2 }
+
+alaVfcQsapType  OBJECT-TYPE
+        SYNTAX  VfcQsapType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of this Qsap."
+        ::= { alaVfcQsapEntry 3 }
+
+alaVfcQsapValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Value of this Qsap.  The meaning of this object depends on the value of object alaVfcQsapType."
+
+        ::= { alaVfcQsapEntry 4 }
+
+
+
+alaVfcQsapQSPId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..8)
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Identifier of Qset associated with this Qsap.
+
+                Deprecated since value can be accessed through the QSI. Use alaVfcQsetQSPId instead."
+
+        ::= { alaVfcQsapEntry 5 }
+
+alaVfcQsapQSPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Name of Qset associated with this Qsap.
+
+                Deprecated since value can be accessed through the QSI. Use alaVfcQsetQSPName instead."
+        ::= { alaVfcQsapEntry 6 }
+
+alaVfcQsapWRPAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of WRED.
+
+                Deprecated since value can be accessed through the QSI. Use alaVfcQsetWRPAdminState instead."
+        DEFVAL {disabled}
+        ::= { alaVfcQsapEntry 7 }
+
+alaVfcQsapStatsAdmin  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Administrative state of statistics.
+
+                Deprecated since value can be accessed through the QSI. Use alaVfcQsetStatsAdmin instead."
+        DEFVAL {disabled}
+        ::= { alaVfcQsapEntry 8 }
+
+alaVfcQsapBandwidthLimitType  OBJECT-TYPE
+        SYNTAX  VfcBwLimitType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Specifies the units used for input bandwidth limit, alaVfcQSPBandwidthLimitValue."
+
+        DEFVAL {percentage}
+        ::= { alaVfcQsapEntry 9 }
+
+alaVfcQsapBandwidthLimitValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Limit to be enforced on input traffic.  Units are specified by alaVfcQSPBandwidthLimitType."
+        ::= { alaVfcQsapEntry 10 }
+
+alaVfcQsapClearStats OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                default(0),
+                reset(1)
+        }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+                "Used to Clear all Statistics counters.
+                By default, this object contains zero value.
+
+                Deprecated since value can be accessed through the QSI. Use alaVfcQsetStatsClear instead."
+        ::= { alaVfcQsapEntry 11 }
+
+alaVfcQsapQpId OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+                "Used to Clear Queue Statistics counters.
+                By default, this object contains zero value.
+
+                Value used to identify the QI modify. Deprecated since QI
+                can be modified using the QI table."
+        ::= { alaVfcQsapEntry 12 }
+
+alaVfcQsapAction  OBJECT-TYPE
+        SYNTAX  VfcQsetAction
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+                "Action to be performed on the Qsap.
+
+                TC deprecated; actions on Qset are done by modifying the QSI table."
+        ::= { alaVfcQsapEntry 13 }
+
+alaVfcQsapLastChange  OBJECT-TYPE
+        SYNTAX  DateAndTime
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Time of most recent change to this entry."
+        ::= { alaVfcQsapEntry 14 }
+
+alaVfcQsapParent  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Parent ID."
+        ::= { alaVfcQsapEntry 15 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Profile Index Lookup Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaVfcProfileIndexLookupTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaVfcProfileIndexLookupEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "This table provides the index of a profile entry given it's name."
+            ::= { alaVfcConfig 7 }
+
+alaVfcProfileIndexLookupEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcProfileIndexLookupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A  profile entry."
+        INDEX { alaVfcProfileType, IMPLIED alaVfcProfileName }
+            ::= { alaVfcProfileIndexLookupTable 1 }
+
+AlaVfcProfileIndexLookupEntry ::= SEQUENCE {
+        alaVfcProfileType
+                VfcProfileType,
+        alaVfcProfileName
+                SnmpAdminString,
+        alaVfcProfileId
+                Unsigned32
+        }
+
+alaVfcProfileType  OBJECT-TYPE
+        SYNTAX  VfcProfileType
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Type of  profile."
+        ::= { alaVfcProfileIndexLookupEntry 1 }
+
+alaVfcProfileName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (1..32))
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Name of  profile."
+        ::= { alaVfcProfileIndexLookupEntry 2 }
+
+alaVfcProfileId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..64)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Identifier of  profile."
+        ::= { alaVfcProfileIndexLookupEntry 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Profile Qsap Lookup Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaVfcProfileQsapLookupTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaVfcProfileQsapLookupEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "Repeated Get Next requests on this table return lists of
+                 Qsaps used by a profile."
+            ::= { alaVfcConfig 8 }
+
+alaVfcProfileQsapLookupEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcProfileQsapLookupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A  profile qsap lookup entry."
+        INDEX { alaVfcProfileQsapLookupType, alaVfcProfileQsapLookupId, alaVfcProfileQsapLookupValue }
+            ::= { alaVfcProfileQsapLookupTable 1 }
+
+AlaVfcProfileQsapLookupEntry ::= SEQUENCE {
+        alaVfcProfileQsapLookupType
+                VfcProfileType,
+        alaVfcProfileQsapLookupId
+                Unsigned32,
+        alaVfcProfileQsapLookupValue
+                Unsigned32,
+        alaVfcProfileQsapLookupList
+                VfcQsapList
+        }
+
+alaVfcProfileQsapLookupType  OBJECT-TYPE
+        SYNTAX  VfcProfileType
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Type of  profile."
+        ::= { alaVfcProfileQsapLookupEntry 1 }
+
+alaVfcProfileQsapLookupId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..64)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of  profile."
+        ::= { alaVfcProfileQsapLookupEntry 2 }
+
+alaVfcProfileQsapLookupValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of last Qsap returned."
+        ::= { alaVfcProfileQsapLookupEntry 3 }
+
+alaVfcProfileQsapLookupList  OBJECT-TYPE
+        SYNTAX  VfcQsapList
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "A list of Qsaps using this profile."
+        ::= { alaVfcProfileQsapLookupEntry 4 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Qset Instance Qsap Lookup Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaVfcQSIQsapLookupTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaVfcQSIQsapLookupEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "Repeated Get Next requests on this table return lists of
+                 Qsaps used by a Qset Instance."
+            ::= { alaVfcConfig 9 }
+
+alaVfcQSIQsapLookupEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcQSIQsapLookupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A Qset instance lookup entry."
+        INDEX { alaVfcQSIQsapLookupQsetId, alaVfcQSIQsapLookupValue }
+            ::= { alaVfcQSIQsapLookupTable 1 }
+
+AlaVfcQSIQsapLookupEntry ::= SEQUENCE {
+        alaVfcQSIQsapLookupQsetId
+                Unsigned32,
+        alaVfcQSIQsapLookupValue
+                Unsigned32,
+        alaVfcQSIQsapLookupList
+                VfcQsapList
+        }
+
+
+alaVfcQSIQsapLookupQsetId  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of Qset profile used by this Qset."
+        ::= { alaVfcQSIQsapLookupEntry 1 }
+
+alaVfcQSIQsapLookupValue  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of last Qsap returned."
+        ::= { alaVfcQSIQsapLookupEntry 2 }
+
+alaVfcQSIQsapLookupList  OBJECT-TYPE
+        SYNTAX  VfcQsapList
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "A list of Qsaps using this Qset instance."
+        ::= { alaVfcQSIQsapLookupEntry 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Statistics Collection Controls
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaVfcStatisticsCollectionInterval OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object specifies the frequency of statistics collection.
+                 Units are minutes.
+
+                Deprecated since value can be modified per port using the QSI table.
+                Use alaVfcQsetStatsInterval instead."
+        ::= { alaVfcConfig 10 }
+
+alaVfcStatisticsCollectionDuration OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This object specifies the duration of statistics collection.
+                 Each time the value of this object is changed, statistics are
+                 collected for the time specified for each entity which has statistics
+                 collection enabled.  Setting this object to zero stops all statistics
+                 collection.  Units are minutes.
+
+                Deprecated due to lack of HW support."
+        ::= { alaVfcConfig 11 }
+
+-- -------------------------------------------------------------
+-- Compliance Statements
+-- -------------------------------------------------------------
+
+    alcatelIND1VfcMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for VFC Subsystem."
+        MODULE  -- this module
+            MANDATORY-GROUPS
+            {
+                alaVfcWREDProfileGroup,
+                alaVfcQsetProfileGroup,
+                alaVfcQsetInstanceGroup,
+                alaVfcQProfileGroup,
+                alaVfcQInstanceGroup,
+                alaVfcQsapGroup,
+                alaVfcProfileIndexLookupGroup,
+                alaVfcProfileQsapLookupGroup,
+                alaVfcQSIQsapLookupGroup,
+                alaVfcStatsGroup
+            }
+        ::= { alcatelIND1VfcMIBCompliances 1 }
+
+
+-- -------------------------------------------------------------
+-- Units Of Conformance
+-- -------------------------------------------------------------
+    alaVfcWREDProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaVfcWRPAdminState,
+            alaVfcWRPName,
+            alaVfcWRPGreenMinThreshold,
+            alaVfcWRPGreenMaxThreshold,
+            alaVfcWRPGreenMaxDropProbability,
+            alaVfcWRPGreenGain,
+            alaVfcWRPYellowMinThreshold,
+            alaVfcWRPYellowMaxThreshold,
+            alaVfcWRPYellowMaxDropProbability,
+            alaVfcWRPYellowGain,
+            alaVfcWRPRedMinThreshold,
+            alaVfcWRPRedMaxThreshold,
+            alaVfcWRPRedMaxDropProbability,
+            alaVfcWRPRedGain,
+            alaVfcWRPStatsAdmin,
+            alaVfcWRPAttachmentCount,
+            alaVfcWRPMTU,
+            alaVfcWRPLastChange,
+            alaVfcWRPRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of WRED Profile for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 1 }
+
+    alaVfcQsetProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcQSPAdminState,
+                alaVfcQSPName,
+                alaVfcQSPType,
+                alaVfcQSPTemplateId,
+                alaVfcQSPTemplateName,
+                alaVfcQSPBandwidthLimitType,
+                alaVfcQSPBandwidthLimitValue,
+                alaVfcQSPQueueCount,
+                alaVfcQSPWRPId,
+                alaVfcQSPWRPName,
+                alaVfcQSPWRPAdminState,
+                alaVfcQSPSchedulingMethod,
+                alaVfcQSPStatsAdmin,
+                alaVfcQSPAttachmentCount,
+                alaVfcQSPLastChange,
+                alaVfcQSPRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Qset Profile for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 2 }
+
+
+    alaVfcQsetInstanceGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcQsetQsapId,
+                alaVfcQsetAdminState,
+                alaVfcQsetOperState,
+                alaVfcQsetQSPId,
+                alaVfcQsetQSPName,
+                alaVfcQsetBandwidthLimitType,
+                alaVfcQsetBandwidthLimitValue,
+                alaVfcQsetOperBandwidthLimitType,
+                alaVfcQsetOperBandwidthLimitValue,
+                alaVfcQsetQueueCount,
+                alaVfcQsetWRPId,
+                alaVfcQsetWRPName,
+                alaVfcQsetWRPAdminState,
+                alaVfcQsetWRPOperState,
+                alaVfcQsetSchedulingMethod,
+                alaVfcQsetStatsAdmin,
+                alaVfcQsetStatsOper,
+                alaVfcQsetLastChange,
+                alaVfcQsetStatsClear,
+                alaVfcQsetStatsInterval,
+                alaVfcQsetMisconfigured,
+                alaVfcQsetMode
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Qset Instance for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 3 }
+
+    alaVfcQProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcQPAdminState,
+                alaVfcQPWRPId,
+                alaVfcQPWRPName,
+                alaVfcQPWRPAdminState,
+                alaVfcQPQSPName,
+                alaVfcQPTrafficClass,
+                alaVfcQPQType,
+                alaVfcQPCIRBandwidthLimitType,
+                alaVfcQPCIRBandwidthLimitValue,
+                alaVfcQPPIRBandwidthLimitType,
+                alaVfcQPPIRBandwidthLimitValue,
+                alaVfcQPStatsAdmin,
+                alaVfcQPCbs,
+                alaVfcQPMbs,
+                alaVfcQPLastChange,
+                alaVfcQPWfqWeight,
+                alaVfcQPWfqMode
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Q Profile for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 4 }
+
+    alaVfcQInstanceGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcQInstanceQsapId,
+                alaVfcQInstanceQSPId,
+                alaVfcQInstanceQSPName,
+                alaVfcQInstanceAdminState,
+                alaVfcQInstanceOperState,
+                alaVfcQInstanceWRPAdminState,
+                alaVfcQInstanceWRPOperState,
+                alaVfcQInstanceWRPId,
+                alaVfcQInstanceWRPName,
+                alaVfcQInstanceCIRBandwidthLimitType,
+                alaVfcQInstanceCIRBandwidthLimitValue,
+                alaVfcQInstancePIRBandwidthLimitType,
+                alaVfcQInstancePIRBandwidthLimitValue,
+                alaVfcQInstanceCIROperationalBandwidthLimitType,
+                alaVfcQInstanceCIROperationalBandwidthLimitValue,
+                alaVfcQInstancePIROperationalBandwidthLimitType,
+                alaVfcQInstancePIROperationalBandwidthLimitValue,
+                alaVfcQInstanceStatsAdmin,
+                alaVfcQInstanceStatsOper,
+                alaVfcQInstancePacketsEnqueued,
+                alaVfcQInstanceBytesEnqueued,
+                alaVfcQInstancePacketsDequeued,
+                alaVfcQInstanceBytesDequeued,
+                alaVfcQInstancePacketsDropped,
+                alaVfcQInstanceBytesDropped,
+                alaVfcQInstanceGreenPacketsAccepted,
+                alaVfcQInstanceGreenBytesAccepted,
+                alaVfcQInstanceGreenPacketsDropped,
+                alaVfcQInstanceGreenBytesDropped,
+                alaVfcQInstanceYellowPacketsAccepted,
+                alaVfcQInstanceYellowBytesAccepted,
+                alaVfcQInstanceYellowPacketsDropped,
+                alaVfcQInstanceYellowBytesDropped,
+                alaVfcQInstanceRedPacketsAccepted,
+                alaVfcQInstanceRedBytesAccepted,
+                alaVfcQInstanceRedPacketsDropped,
+                alaVfcQInstanceRedBytesDropped,
+                alaVfcQInstanceLastChange,
+                alaVfcQInstanceStatsClear
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Q Instance for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 5 }
+
+    alaVfcQsapGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcQsapAdminState,
+                alaVfcQsapType,
+                alaVfcQsapValue,
+                alaVfcQsapQSPId,
+                alaVfcQsapQSPName,
+                alaVfcQsapWRPAdminState,
+                alaVfcQsapStatsAdmin,
+                alaVfcQsapBandwidthLimitType,
+                alaVfcQsapBandwidthLimitValue,
+                alaVfcQsapClearStats,
+                alaVfcQsapQpId,
+                alaVfcQsapAction,
+                alaVfcQsapLastChange,
+                alaVfcQsapParent
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Q SAP Profile for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 6 }
+
+
+    alaVfcProfileIndexLookupGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcProfileId
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Profile Index Lookup Profile for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 7 }
+
+    alaVfcProfileQsapLookupGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcProfileQsapLookupList
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Profile Qsap Lookup for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 8 }
+
+
+    alaVfcQSIQsapLookupGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcQSIQsapLookupList
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of QSI Qsap Lookup for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 9 }
+
+    alaVfcStatsGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcStatisticsCollectionInterval,
+                alaVfcStatisticsCollectionDuration
+        }
+        STATUS  deprecated
+        DESCRIPTION
+            "Collection of Statistics Configuration Objects for management of VFC.
+
+            Deprecated since all objects in this group have been deprecated."
+        ::= { alcatelIND1VfcMIBGroups 10 }
+
+
+END

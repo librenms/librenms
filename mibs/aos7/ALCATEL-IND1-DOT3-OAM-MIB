@@ -1,0 +1,866 @@
+ALCATEL-IND1-DOT3-OAM-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY,
+                Integer32, Counter32, NOTIFICATION-TYPE
+                                                FROM SNMPv2-SMI
+                OBJECT-GROUP,MODULE-COMPLIANCE, NOTIFICATION-GROUP
+                                                FROM SNMPv2-CONF
+                DisplayString, RowStatus        FROM SNMPv2-TC
+                ifIndex                         FROM IF-MIB
+                dot3OamEntry, dot3OamLoopbackEntry, dot3OamEventLogTimestamp,
+                dot3OamEventLogOui, dot3OamEventLogType, dot3OamEventLogLocation,
+                dot3OamEventLogWindowHi, dot3OamEventLogWindowLo, dot3OamEventLogThresholdHi,
+                dot3OamEventLogThresholdLo, dot3OamEventLogValue, dot3OamEventLogRunningTotal,
+                dot3OamEventLogEventTotal, dot3OamStatsEntry
+                                                FROM DOT3-OAM-MIB
+                softentIND1Dot3Oam              FROM ALCATEL-IND1-BASE;
+
+
+        alcatelIND1Dot3OamMIB MODULE-IDENTITY
+		LAST-UPDATED "200902250000Z"     -- 02/25/2009 00:00GMT
+                ORGANIZATION "Alcatel - Architects Of An Internet World"
+                CONTACT-INFO
+                "Please consult with Customer Service to insure the most appropriate
+                 version of this document is used with the products in question:
+
+                        Alcatel Internetworking, Incorporated
+                       (Division 1, Formerly XYLAN Corporation)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+                Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+                Electronic Mail:         support@ind.alcatel.com
+                World Wide Web:          http://www.ind.alcatel.com
+                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                "This module describes an authoritative enterprise-
+                specific Simple Network Management Protocol (SNMP) Management
+                Information Base (MIB):
+
+                For the Birds Of Prey Product Line
+                Ethernet in First Mile OAM.
+
+
+                The right to make changes in specification and other information
+                contained in this document without prior notice is reserved.
+
+                No liability shall be assumed for any incidental, indirect,
+                special, or consequential damages whatsoever arising from or
+                related to this document or the information contained herein.
+
+                Vendors, end-users, and other interested parties are granted
+                non-exclusive license to use this specification in connection with
+                management of the products for which it is intended to be used.
+
+                Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200902250000Z"
+
+                DESCRIPTION
+                "Ethernet in First Mile (EFM) module for managing IEEE 802.3ah.
+                This 802.3ah (EFM) OAM MIB extends standard 802.3ah.
+
+                The set of objects defined in this MIB, do not duplicate,
+                nor conflict with any MIB object definitions defined in
+                the RFC 4878 MIB (dot3-oam-mib.mib)."
+                ::= { softentIND1Dot3Oam 1}
+
+-- --------------------------------------------------------------
+--
+-- Extension to - Dot3-OAM-MIB
+-- Sections of the Ethernet OAM MIB
+--
+      alcatelIND1Dot3OamNotifications OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for 802.3ah OAM Notifications."
+        ::= { alcatelIND1Dot3OamMIB 0 }
+
+      alcatelIND1Dot3OamMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "Branch For 802.3ah OAM Objects."
+        ::= { alcatelIND1Dot3OamMIB 1 }
+
+      alcatelIND1Dot3OamMIBConformance OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for 802.3ah Module MIB Subsystem Conformance Information."
+        ::= { alcatelIND1Dot3OamMIB 2 }
+
+        alcatelIND1Dot3OamMIBGroups OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for 802.3ah Module MIB Subsystem Units of Conformance."
+        ::= { alcatelIND1Dot3OamMIBConformance 1 }
+
+        alcatelIND1Dot3OamMIBCompliances OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for 802.3ah Module MIB Subsystem Compliance Statements."
+        ::= { alcatelIND1Dot3OamMIBConformance 2 }
+
+--------------------------------------------------------------
+
+      alaDot3OamStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "The administrative status requested by management for
+        802.3ah.  The value enabled(1) indicates that 802.3ah should
+        be enabled on this device, on all ports for which it has
+        not been specifically disabled.  When disabled(2), 802.3ah
+        is disabled on all ports and all 802.3ah packets will be
+        dropped.  A transition from disabled(2) to enabled(1) will
+        cause a reset of all 802.3ah state machines on all ports."
+        DEFVAL      { disabled }
+        ::= { alcatelIND1Dot3OamMIBObjects 1 }
+
+      alaDot3OamGlobalClearStats        OBJECT-TYPE
+        SYNTAX          INTEGER {
+                        default(0),
+                        reset(1)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+        "Defines the global clear statistics control for Dot3OAM.
+        The value reset (1) indicates that clear all statistic counters
+        related to all ports in the system. By default, this object
+        contains a zero value."
+        DEFVAL  { default }
+        ::= { alcatelIND1Dot3OamMIBObjects 2 }
+
+        alaDot3OamGlobalClearEventLogs  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                        default(0),
+                        reset(1)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+        "Defines the global clear event logs control for Dot3OAM.
+        The value reset (1) indicates that clear all event logs
+        related to all ports in the system. By default, this object
+        contains a zero value."
+        DEFVAL  { default }
+        ::= { alcatelIND1Dot3OamMIBObjects 3 }
+
+        alaDot3OamGlobalClearVariableTransactions       OBJECT-TYPE
+        SYNTAX          INTEGER {
+                        default(0),
+                        reset(1)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+        "Defines the global clear variable transactions control for
+        Dot3OAM. The value reset (1) indicates that clear all
+        transactions related to all ports in the system. By default,
+        this object contains a zero value."
+        DEFVAL  { default }
+        ::= { alcatelIND1Dot3OamMIBObjects 4 }
+
+      alaDot3OamMultiplePduCount OBJECT-TYPE
+        SYNTAX      INTEGER (1..10)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object is used to set the number of PDUs that will be
+          sent, when OAM needs to send multiple event notification PDUs.
+          "
+        DEFVAL { 3 }
+        ::= { alcatelIND1Dot3OamMIBObjects 5 }
+
+      -- ***************************************************************
+
+--      DESCRIPTION:
+--                      "Port configuration information
+--                       data for the 802.3ah Module.
+--                       Implementation of this group is mandantory"
+
+
+      alaDot3OamPortConfig  OBJECT IDENTIFIER ::= { alcatelIND1Dot3OamMIBObjects 8 }
+
+      alaDot3OamTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDot3OamEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "This table contains the primary controls and status for the
+          OAM capabilities of an Ethernet like interface.  There will be
+          one row in this table for each Ethernet like interface in the
+          system that supports the OAM functions defined in [802.3ah].
+          "
+        ::= { alaDot3OamPortConfig 1 }
+
+      alaDot3OamEntry OBJECT-TYPE
+        SYNTAX     AlaDot3OamEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+          "An entry in the table, containing information on the Ethernet
+          OAM function for a single Ethernet like interface. Entries in
+          the table are created automatically for each interface
+          supporting Ethernet OAM. The status of the row entry can be
+          determined from dot3OamOperStatus.
+
+          A alaDot3OamEntry is indexed in the alaDot3OamTable by the
+          ifIndex object of the Interfaces MIB.
+          "
+        AUGMENTS { dot3OamEntry }
+        ::= { alaDot3OamTable 1 }
+
+      AlaDot3OamEntry ::=
+        SEQUENCE {
+          alaDot3OamKeepAliveInterval        Integer32,
+          alaDot3OamHelloInterval            Integer32,
+          alaDot3OamNextTransactionId        Integer32
+        }
+
+      alaDot3OamKeepAliveInterval OBJECT-TYPE
+        SYNTAX      Integer32 (5..120)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object is used to set the timer in seconds to restart the
+          discovery process if no PDUs are received in this time frame.
+          "
+        DEFVAL { 5 }
+        ::= { alaDot3OamEntry 1 }
+
+      alaDot3OamHelloInterval OBJECT-TYPE
+        SYNTAX      Integer32 (1..60)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object is used to set the interval between two OAMPDUs
+          "
+        DEFVAL { 1 }
+        ::= { alaDot3OamEntry 2 }
+
+      alaDot3OamNextTransactionId OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object is used to fetch the next available transaction id
+          required for MIB variable retrieval requests on this interface.
+          To read the remote entity's MIB variables, a unique transaction
+          id is generated for each request. The administrator first needs
+          to get the next available transaction id for the interface, and
+          provide this as index to the alaDot3OamRetrieveRequestTable.
+          "
+        ::= { alaDot3OamEntry 3 }
+
+      -- ***************************************************************
+
+--      DESCRIPTION:
+--                      "Port loopback information
+--                       for the 802.3ah Module.
+--                       Implementation of this group is mandantory"
+
+
+      alaDot3OamPortLoopbackControl  OBJECT IDENTIFIER ::= { alcatelIND1Dot3OamMIBObjects 9 }
+
+      alaDot3OamLoopbackTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDot3OamLoopbackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "This table contains controls for the loopback state of the
+          local link as well as indicating the status of the loopback
+          function.  There is one entry in this table for each entry in
+          dot3OamTable that supports loopback functionality (where
+          dot3OamFunctionsSupported includes the loopbackSupport bit
+          set).
+          "
+        ::= { alaDot3OamPortLoopbackControl 1 }
+
+      alaDot3OamLoopbackEntry OBJECT-TYPE
+        SYNTAX      AlaDot3OamLoopbackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An entry in the table, containing information on the L1 ping.
+           One record/entry shall be maintained per interface. This record
+           shall be automatically created when L1 ping is initiated for the
+           first time on the interface. Subsequent ping operations shall
+           replace the record. Loopback capabilities of the interface can
+           be determined from the dot3OamLoopbackStatus object.
+          "
+        AUGMENTS { dot3OamLoopbackEntry }
+        ::= { alaDot3OamLoopbackTable 1 }
+
+      AlaDot3OamLoopbackEntry ::=
+        SEQUENCE {
+                  alaDot3OamPortL1PingFramesConf                Integer32,
+                  alaDot3OamPortL1PingFramesDelay               Integer32,
+                  alaDot3OamPortL1PingStatus                    INTEGER,
+                  alaDot3OamPortL1PingFramesSent                Counter32,
+                  alaDot3OamPortL1PingFramesReceived            Counter32,
+                  alaDot3OamPortL1PingAverageRoundTripDelay     Integer32
+                 }
+
+      alaDot3OamPortL1PingFramesConf OBJECT-TYPE
+        SYNTAX      Integer32 (1..20)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object is used to set the number of frames to be transmitted
+           from the interface during L1 ping.
+          "
+        DEFVAL { 5 }
+        ::= { alaDot3OamLoopbackEntry 1 }
+
+      alaDot3OamPortL1PingFramesDelay OBJECT-TYPE
+        SYNTAX      Integer32 (100..1000)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object is used to set the delay between two
+           frames transmitted during L1 ping.
+          "
+        DEFVAL { 1000 }
+        ::= { alaDot3OamLoopbackEntry 2 }
+
+      alaDot3OamPortL1PingStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        default(0),
+                        start(1),
+                        running(2),
+                        operationSuccessful(3),
+                        operationUnsuccessful(4)
+                       }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object is used to start the L1 ping operation. Operator
+           can set only start(1) value and setting of start(1) value is not valid
+           if object value is start(1) or running(2).
+           Whenever efm gets enabled on any port, this object has default(0) value.
+           Default(0) value implies that loopback session has not been started even
+           for a single time. Running(2) is corresponding to the state, when L1 ping
+           is going on, operationSuccessful(3) is corresponding to the state, when L1
+           ping operation is done successfully. operationUnsuccessful(4) is corresponding
+           to state when operation gets failed due to some reason.
+          "
+        ::= { alaDot3OamLoopbackEntry 3 }
+
+      alaDot3OamPortL1PingFramesSent OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object is used to keep the actual frames sent during
+           last L1 ping operation.
+          "
+        ::= { alaDot3OamLoopbackEntry 4 }
+
+      alaDot3OamPortL1PingFramesReceived OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object is used to keep the number of frames received
+           during last L1 ping operation.
+          "
+        ::= { alaDot3OamLoopbackEntry 5 }
+
+      alaDot3OamPortL1PingAverageRoundTripDelay OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object is used to keep the average delay taken by frames
+           during last L1 ping.
+          "
+        ::= { alaDot3OamLoopbackEntry 6 }
+
+      -- ***************************************************************
+--      DESCRIPTION:
+--                      "Port statistics information
+--                       for the 802.3ah Module.
+--                       Implementation of this group is mandantory"
+
+
+      alaDot3OamPortStats  OBJECT IDENTIFIER ::= { alcatelIND1Dot3OamMIBObjects 10 }
+
+      alaDot3OamStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDot3OamStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "This table contains statistics for the OAM function on a
+          particular Ethernet like interface. There is an entry in the
+          table for every entry in the dot3OamStatsTable.
+
+          The counters in this table are defined as 32-bit entries to
+          match the counter size as defined in [802.3ah].  Given the OA
+          protocol is a slow protocol, the counters increment at a slow
+          rate.
+          "
+        ::= { alaDot3OamPortStats 1 }
+
+      alaDot3OamStatsEntry OBJECT-TYPE
+        SYNTAX      AlaDot3OamStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An entry in the table, containing statistics information on
+          the Ethernet OAM function for a single Ethernet like
+          interface.  Entries are automatically created for every entry
+          in the dot3OamStatsTable.  Counters are maintained across
+          transitions in dot3OamOperStatus.
+          "
+        AUGMENTS { dot3OamStatsEntry }
+        ::= { alaDot3OamStatsTable 1 }
+
+      AlaDot3OamStatsEntry ::=
+        SEQUENCE {
+                  alaDot3OamPortClearStats            INTEGER
+                 }
+
+      alaDot3OamPortClearStats OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    default (0),
+                    reset (1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Reset all statistics parameters corresponding to this port
+          By default, this objects contains a zero value.
+          "
+        DEFVAL   { default }
+        ::= { alaDot3OamStatsEntry 1 }
+
+      -- ***************************************************************
+--      DESCRIPTION:
+--                      "Port event logs information
+--                       for the 802.3ah Module.
+--                       Implementation of this group is mandantory"
+
+      alaDot3OamPortEventLogs  OBJECT IDENTIFIER ::= { alcatelIND1Dot3OamMIBObjects 11 }
+
+      alaDot3OamEventLogTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDot3OamEventLogEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "This table records a history of the events that have occurred
+          at the Ethernet OAM level.  These events can include locally
+          detected events, which may result in locally generated
+          OAMPDUs, and remotely detected events, which are detected by
+          the OAM peer entity and signaled to the local entity via
+          Ethernet OAM.  Ethernet OAM events can be signaled by Event
+          Notification OAMPDUs or by the flags field in any OAMPDU.
+          "
+        ::= { alaDot3OamPortEventLogs 1 }
+
+      alaDot3OamEventLogEntry OBJECT-TYPE
+        SYNTAX      AlaDot3OamEventLogEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An entry in the dot3OamEventLogTable.  Entries are
+          automatically created whenever Ethernet OAM events occur at
+          the local OAM entity, and when Event Notification OAMPDUs are
+          received at the local OAM entity (indicating events have
+          occurred at the peer OAM entity).  The size of the table is
+          implementation dependent, but when the table becomes full,
+          older events are automatically deleted to make room for newer
+          events.  The table index dot3OamEventLogIndex increments for
+          each new entry, and when the maximum value is reached the
+          value restarts at zero.
+          "
+        INDEX       { ifIndex }
+        ::= { alaDot3OamEventLogTable 1 }
+
+      AlaDot3OamEventLogEntry ::=
+        SEQUENCE {
+                  alaDot3OamPortClearEventLogs        INTEGER
+                 }
+
+      alaDot3OamPortClearEventLogs OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    default (0),
+                    reset (1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Reset all event logs corresponding to this port
+          By default, this objects contains a zero value.
+          "
+        DEFVAL   { default }
+        ::= { alaDot3OamEventLogEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- ETHERNET OAM MIB RETRIEVAL Request Table
+-- -------------------------------------------------------------
+
+--      DESCRIPTION:
+--                      "MIB Retrieval requests
+--                       for the 802.3ah Module.
+--                       Implementation of this group is mandantory"
+
+        alaDot3OamRetrieveRequest         OBJECT IDENTIFIER ::= { alcatelIND1Dot3OamMIBObjects 12 }
+
+        alaDot3OamRetrieveRequestTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaDot3OamRetrieveRequestEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+            "A table containing MIB variable retrieval request
+            information"
+            ::= { alaDot3OamRetrieveRequest 1 }
+
+        alaDot3OamRetrieveRequestEntry  OBJECT-TYPE
+            SYNTAX  AlaDot3OamRetrieveRequestEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A 802.3ah MIB variable retrieval request entry."
+            INDEX { ifIndex, alaDot3OamTransactionId, alaDot3OamVariableRequestBranch, alaDot3OamVariableRequestLeaf }
+            ::= { alaDot3OamRetrieveRequestTable 1 }
+
+        AlaDot3OamRetrieveRequestEntry ::= SEQUENCE {
+            alaDot3OamTransactionId                     Integer32,
+            alaDot3OamVariableRequestBranch             INTEGER,
+            alaDot3OamVariableRequestLeaf               Integer32,
+            alaDot3OamVariableRequestRetrieveStatus     INTEGER,
+            alaDot3OamVariableRequestRowStatus          RowStatus,
+            alaDot3OamPortClearVariableTransactions     INTEGER
+            }
+
+      alaDot3OamTransactionId OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "This object is used to set the available transaction id for
+          retrieving the remote MIB variable for this interface. The
+          value for this is obtained from alaDot3OamNextTransactionId,
+          which is part of alaDot3OamTable.
+          "
+        ::= { alaDot3OamRetrieveRequestEntry 1 }
+
+      alaDot3OamVariableRequestBranch OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        object(3),
+                        package(4),
+                        attribute(7)
+                        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "This object is used to set the branch to reference the MIB
+          object to be retrieved. This is set to attribute, package or
+          object depending upon the request for getting the MIB variables.
+          "
+        DEFVAL { attribute }
+        ::= { alaDot3OamRetrieveRequestEntry 2 }
+
+      alaDot3OamVariableRequestLeaf OBJECT-TYPE
+        SYNTAX  Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "This object is used to set the leaf to reference the MIB
+          object to be retrieved.
+          "
+        ::= { alaDot3OamRetrieveRequestEntry 3 }
+
+      alaDot3OamVariableRequestRetrieveStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        active(1),
+                        failed(2),
+                        success(3)
+                        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This object is used to check the status of a MIB request,
+          Active means that the request is currently in progress),
+          failed means that the request has failed, and success
+          means that the request returned successfully.
+          "
+        ::= { alaDot3OamRetrieveRequestEntry 4 }
+
+      alaDot3OamVariableRequestRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Row Status for initiating a MIB retrieval request.
+          "
+        ::= { alaDot3OamRetrieveRequestEntry 5 }
+
+      alaDot3OamPortClearVariableTransactions   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                        default(0),
+                        reset(1)
+                        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+        "Reset all variable transactions corresponding to this port
+        By default, this objects contains a zero value.
+        "
+        DEFVAL  { default }
+        ::= { alaDot3OamRetrieveRequestEntry 6 }
+-- -------------------------------------------------------------
+-- ETHERNET OAM MIB RETRIEVAL Response Table
+-- -------------------------------------------------------------
+
+--      DESCRIPTION:
+--                      "MIB Retrieval response
+--                       for the 802.3ah Module.
+--                       Implementation of this group is mandantory"
+
+        alaDot3OamRetrieveResponse        OBJECT IDENTIFIER ::= { alcatelIND1Dot3OamMIBObjects 13 }
+
+        alaDot3OamRetrieveResponseTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaDot3OamRetrieveResponseEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+            "A table containing MIB variable retrieval response
+            information"
+            ::= { alaDot3OamRetrieveResponse 1 }
+
+        alaDot3OamRetrieveResponseEntry  OBJECT-TYPE
+            SYNTAX  AlaDot3OamRetrieveResponseEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A 802.3ah MIB variable retrieval response entry."
+            INDEX { ifIndex, alaDot3OamTransactionId, alaDot3OamVariableResponseBranch, alaDot3OamVariableResponseLeaf }
+            ::= { alaDot3OamRetrieveResponseTable 1 }
+
+        AlaDot3OamRetrieveResponseEntry ::= SEQUENCE {
+            alaDot3OamVariableResponseBranch            INTEGER,
+            alaDot3OamVariableResponseLeaf              Integer32,
+            alaDot3OamVariableResponseValue     DisplayString
+            }
+
+      alaDot3OamVariableResponseBranch OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        object(3),
+                        package(4),
+                        attribute(7)
+                        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The branch to reference the MIB object retrieved.
+          "
+        ::= { alaDot3OamRetrieveResponseEntry 1 }
+
+      alaDot3OamVariableResponseLeaf OBJECT-TYPE
+        SYNTAX  Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The leaf to reference the MIB object retrieved.
+          "
+        ::= { alaDot3OamRetrieveResponseEntry 2 }
+
+      alaDot3OamVariableResponseValue OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The value of the retrived attribute.
+          "
+        ::= { alaDot3OamRetrieveResponseEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- 802.3ah Event Notification
+-- -------------------------------------------------------------
+
+      alaDot3OamThresholdEventClear NOTIFICATION-TYPE
+        OBJECTS { dot3OamEventLogTimestamp,
+                  dot3OamEventLogOui,
+                  dot3OamEventLogType,
+                  dot3OamEventLogLocation,
+                  dot3OamEventLogWindowHi,
+                  dot3OamEventLogWindowLo,
+                  dot3OamEventLogThresholdHi,
+                  dot3OamEventLogThresholdLo,
+                  dot3OamEventLogValue,
+                  dot3OamEventLogRunningTotal,
+                  dot3OamEventLogEventTotal
+                }
+        STATUS  current
+        DESCRIPTION
+          "A alaDot3OamThresholdEventClear notification is sent when a local or
+          remote threshold crossing event is recovered.
+
+          The OAM entity can be derived from extracting the ifIndex from
+          the variable bindings.  The objects in the notification
+          correspond to the values in a row instance in the
+          dot3OamEventLogTable."
+       ::= { alcatelIND1Dot3OamNotifications 1 }
+
+      alaDot3OamNonThresholdEventClear NOTIFICATION-TYPE
+        OBJECTS { dot3OamEventLogTimestamp,
+                  dot3OamEventLogOui,
+                  dot3OamEventLogType,
+                  dot3OamEventLogLocation,
+                  dot3OamEventLogEventTotal
+                }
+        STATUS  current
+        DESCRIPTION
+          "A alaDot3OamNonThresholdEventClear notification is sent when a local
+          or remote non-threshold crossing event is recovered.
+
+          The OAM entity can be derived from extracting the ifIndex from
+          the variable bindings.  The objects in the notification
+          correspond to the values in a row instance of the
+          dot3OamEventLogTable."
+       ::= { alcatelIND1Dot3OamNotifications 2 }
+
+
+
+-- -------------------------------------------------------------
+-- COMPLIANCE
+-- -------------------------------------------------------------
+alcatelIND1Dot3OamMIBCompliance MODULE-COMPLIANCE
+   STATUS    current
+   DESCRIPTION
+        "Compliance statement for 802.3ah."
+   MODULE
+        MANDATORY-GROUPS
+        {
+                alaDot3OamBaseGroup,
+                alaDot3OamPortConfigGroup,
+                alaDot3OamPortLoopbackControlGroup,
+                alaDot3OamPortStatsGroup,
+                alaDot3OamPortEventLogsGroup,
+                alaDot3OamRetrieveRequestGroup,
+                alaDot3OamRetrieveResponseGroup,
+                alaDot3OamNotificationGroup
+        }
+   ::= { alcatelIND1Dot3OamMIBCompliances 1 }
+
+-- -------------------------------------------------------------
+-- UNITS OF CONFORMANCE
+-- -------------------------------------------------------------
+
+alaDot3OamBaseGroup   OBJECT-GROUP
+OBJECTS
+{
+    alaDot3OamStatus,
+    alaDot3OamGlobalClearStats,
+    alaDot3OamGlobalClearEventLogs,
+    alaDot3OamGlobalClearVariableTransactions,
+    alaDot3OamMultiplePduCount
+}
+  STATUS  current
+  DESCRIPTION
+  "Collection of objects for management of 802.3ah Base Group."
+  ::= { alcatelIND1Dot3OamMIBGroups 1 }
+
+alaDot3OamPortConfigGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaDot3OamKeepAliveInterval,
+        alaDot3OamHelloInterval,
+        alaDot3OamNextTransactionId
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of 802.3ah Port Configuration Table."
+   ::= { alcatelIND1Dot3OamMIBGroups 2 }
+
+
+alaDot3OamPortLoopbackControlGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaDot3OamPortL1PingFramesConf,
+        alaDot3OamPortL1PingFramesDelay,
+        alaDot3OamPortL1PingStatus,
+        alaDot3OamPortL1PingFramesSent,
+        alaDot3OamPortL1PingFramesReceived,
+        alaDot3OamPortL1PingAverageRoundTripDelay
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of 802.3ah Loopback Table."
+   ::= { alcatelIND1Dot3OamMIBGroups 3 }
+
+alaDot3OamPortStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaDot3OamPortClearStats
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of 802.3ah Statistics Table."
+   ::= { alcatelIND1Dot3OamMIBGroups 4 }
+
+alaDot3OamPortEventLogsGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaDot3OamPortClearEventLogs
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of 802.3ah Event Log Table."
+   ::= { alcatelIND1Dot3OamMIBGroups 5 }
+
+alaDot3OamRetrieveRequestGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaDot3OamVariableRequestRetrieveStatus,
+        alaDot3OamVariableRequestRowStatus,
+        alaDot3OamPortClearVariableTransactions
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of 802.3ah Retrieve Request Table."
+   ::= { alcatelIND1Dot3OamMIBGroups 6 }
+
+alaDot3OamRetrieveResponseGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaDot3OamVariableResponseValue
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of 802.3ah Retrieve Response Table."
+   ::= { alcatelIND1Dot3OamMIBGroups 7 }
+
+alaDot3OamNotificationGroup NOTIFICATION-GROUP
+
+       NOTIFICATIONS {
+                   alaDot3OamThresholdEventClear,
+                   alaDot3OamNonThresholdEventClear
+                     }
+       STATUS      current
+       DESCRIPTION
+         "A collection of notifications used by 802.3ah to signal
+         to a management entity that local or remote events have
+         recovered on a specified Ethernet link. "
+       ::= { alcatelIND1Dot3OamMIBGroups 8 }
+
+END
