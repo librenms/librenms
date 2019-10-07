@@ -5611,6 +5611,7 @@ var i18n = new vue_i18n__WEBPACK_IMPORTED_MODULE_1__["default"]({
   locale: document.querySelector('html').getAttribute('lang'),
   fallbackLocale: 'en',
   silentFallbackWarn: true,
+  silentTranslationWarn: true,
   messages: _vue_i18n_locales_generated_js__WEBPACK_IMPORTED_MODULE_2__["default"]
 }); // re-enable after vue-i8ln-generator is working for split locales
 
@@ -6430,13 +6431,6 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   "en": {
-    "New": "New",
-    "Undo": "Undo",
-    "Reset to default": "Reset to default",
-    "Admin": "Admin",
-    "Global Read": "Global Read",
-    "Normal": "Normal",
-    "No Default Dashboard": "No Default Dashboard",
     "syslog": {
       "severity": ["Emergency", "Alert", "Critical", "Error", "Warning", "Notice", "Informational", "Debug"],
       "facility": ["kernel messages", "user-level messages", "mail-system", "system daemons", "security/authorization messages", "messages generated internally by syslogd", "line printer subsystem", "network news subsystem", "UUCP subsystem", "clock daemon", "security/authorization messages", "FTP daemon", "NTP subsystem", "log audit", "log alert", "clock daemon (note 2)", "local use 0  (local0)", "local use 1  (local1)", "local use 2  (local2)", "local use 3  (local3)", "local use 4  (local4)", "local use 5  (local5)", "local use 6  (local6)", "local use 7  (local7)"]

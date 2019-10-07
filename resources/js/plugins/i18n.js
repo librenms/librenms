@@ -33,6 +33,7 @@ export const i18n = new VueI18n({
     locale: document.querySelector('html').getAttribute('lang'),
     fallbackLocale: 'en',
     silentFallbackWarn: true,
+    silentTranslationWarn: true,
     messages: messages,
 });
 
