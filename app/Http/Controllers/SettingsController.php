@@ -92,7 +92,7 @@ class SettingsController extends Controller
             return $this->jsonResponse($id, $config_item->getValidationMessage($value), $current, 400);
         }
 
-        if (\LibreNMS\Config::set($id, $value, true)) {
+        if (\LibreNMS\Config::persist($id, $value)) {
             return $this->jsonResponse($id, "Successfully set $id", $value);
         }
 

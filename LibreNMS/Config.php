@@ -246,35 +246,42 @@ class Config
      *
      * @param mixed $key period separated config variable name
      * @param mixed $value
-     * @param bool $persist set the setting in the database so it persists across runs
-     * @return bool returns false if persisting failed
      */
-    public static function set($key, $value, $persist = false)
+    public static function set($key, $value)
     {
-        if ($persist) {
-            try {
-                // flatten an array if sent one as value
-                $values = is_array($value) ? Arr::dot($value, "$key.") : [$key => $value];
-                foreach ($values as $key => $value) {
-                    \App\Models\Config::updateOrCreate(['config_name' => $key], [
-                        'config_name' => $key,
-                        'config_value' => $value,
-                    ]);
-                }
-            } catch (QueryException $e) {
-                if (class_exists(\Log::class)) {
-                    \Log::error($e);
-                }
-                global $debug;
-                if ($debug) {
-                    echo $e;
-                }
-                return false;
-            }
-        }
-
         Arr::set(self::$config, $key, $value);
-        return true;
+    }
+
+    /**
+     * Save setting to persistent storage.
+     *
+     * @param mixed $key period separated config variable name
+     * @param mixed $value
+     * @return bool if the save was successful
+     */
+    public static function persist($key, $value)
+    {
+        try {
+            // flatten an array if sent one as value
+            $values = is_array($value) ? Arr::dot($value, "$key.") : [$key => $value];
+            foreach ($values as $key => $value) {
+                \App\Models\Config::updateOrCreate(['config_name' => $key], [
+                    'config_name' => $key,
+                    'config_value' => $value,
+                ]);
+                Arr::set(self::$config, $key, $value);
+            }
+            return true;
+        } catch (QueryException $e) {
+            if (class_exists(\Log::class)) {
+                \Log::error($e);
+            }
+            global $debug;
+            if ($debug) {
+                echo $e;
+            }
+            return false;
+        }
     }
 
     /**
@@ -446,7 +453,11 @@ class Config
         // make sure we have full path to binaries in case PATH isn't set
         foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6') as $bin) {
             if (!is_executable(self::get($bin))) {
-                self::set($bin, self::locateBinary($bin), $persist, $bin);
+                if ($persist) {
+                    self::persist($bin, self::locateBinary($bin));
+                } else {
+                    self::set($bin, self::locateBinary($bin));
+                }
             }
         }
     }
