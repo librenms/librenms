@@ -560,17 +560,20 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     settingShown: function settingShown(setting_name) {
       var setting = this.settings[setting_name];
 
-      if (setting.when !== null) {
-        for (var _i2 = 0, _Object$entries = Object.entries(setting.when); _i2 < _Object$entries.length; _i2++) {
-          var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
-              key = _Object$entries$_i[0],
-              value = _Object$entries$_i[1];
-
-          return this.settings[key].value === value;
-        }
+      if (setting.when === null) {
+        return true;
       }
 
-      return true;
+      switch (setting.when.operator) {
+        case 'equals':
+          return this.settings[setting.when.setting].value === setting.when.value;
+
+        case 'in':
+          return setting.when.value.includes(this.settings[setting.when.setting].value);
+
+        default:
+          return true;
+      }
     }
   },
   mounted: function mounted() {
@@ -587,8 +590,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       // populate layout data
       var groups = {};
 
-      for (var _i3 = 0, _Object$keys = Object.keys(this.settings); _i3 < _Object$keys.length; _i3++) {
-        var key = _Object$keys[_i3];
+      for (var _i2 = 0, _Object$keys = Object.keys(this.settings); _i2 < _Object$keys.length; _i2++) {
+        var key = _Object$keys[_i2];
         var setting = this.settings[key]; // filter
 
         if (!setting.name.includes(this.search_phrase)) {

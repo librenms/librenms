@@ -103,13 +103,19 @@
             },
             settingShown(setting_name) {
                 let setting = this.settings[setting_name];
-                if (setting.when !== null) {
-                    for (let [key, value] of Object.entries(setting.when)) {
-                        return this.settings[key].value === value;
-                    }
+
+                if (setting.when === null) {
+                    return true;
                 }
 
-                return true;
+                switch (setting.when.operator) {
+                    case 'equals':
+                        return this.settings[setting.when.setting].value === setting.when.value;
+                    case 'in':
+                        return setting.when.value.includes(this.settings[setting.when.setting].value);
+                    default:
+                        return true;
+                }
             }
         },
         mounted() {

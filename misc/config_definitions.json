@@ -902,7 +902,11 @@
             "true": "Yes",
             "false": "No"
         },
-        "when": {"email_backend": "smtp"}
+        "when": {
+            "setting": "email_backend",
+            "operator": "equals",
+            "value": "smtp"
+        }
     },
     "email_backend": {
         "default": "mail",
@@ -936,7 +940,11 @@
         "section": "email",
         "order": 5,
         "type": "text",
-        "when": {"email_backend": "sendmail"}
+        "when": {
+            "setting": "email_backend",
+            "operator": "equals",
+            "value": "sendmail"
+        }
     },
     "email_smtp_auth": {
         "default": false,
@@ -944,7 +952,11 @@
         "section": "email",
         "order": 11,
         "type": "boolean",
-        "when": {"email_backend": "smtp"}
+        "when": {
+            "setting": "email_backend",
+            "operator": "equals",
+            "value": "smtp"
+        }
     },
     "email_smtp_host": {
         "default": "localhost",
@@ -953,7 +965,11 @@
         "order": 6,
         "type": "text",
         "pattern": "[a-zA-Z0-9_\\-.]+",
-        "when": {"email_backend": "smtp"}
+        "when": {
+            "setting": "email_backend",
+            "operator": "equals",
+            "value": "smtp"
+        }
     },
     "email_smtp_password": {
         "default": "NULL",
@@ -961,7 +977,11 @@
         "section": "email",
         "order": 13,
         "type": "password",
-        "when": {"email_backend": "smtp"}
+        "when": {
+            "setting": "email_backend",
+            "operator": "equals",
+            "value": "smtp"
+        }
     },
     "email_smtp_port": {
         "default": 25,
@@ -969,7 +989,11 @@
         "section": "email",
         "order": 7,
         "type": "integer",
-        "when": {"email_backend": "smtp"}
+        "when": {
+            "setting": "email_backend",
+            "operator": "equals",
+            "value": "smtp"
+        }
     },
     "email_smtp_secure": {
         "default": false,
@@ -982,7 +1006,11 @@
             "tls": "TLS",
             "ssl": "SSL"
         },
-        "when": {"email_backend": "smtp"}
+        "when": {
+            "setting": "email_backend",
+            "operator": "equals",
+            "value": "smtp"
+        }
     },
     "email_smtp_timeout": {
         "default": 10,
@@ -990,7 +1018,11 @@
         "section": "email",
         "order": 8,
         "type": "integer",
-        "when": {"email_backend": "smtp"}
+        "when": {
+            "setting": "email_backend",
+            "operator": "equals",
+            "value": "smtp"
+        }
     },
     "email_smtp_username": {
         "default": "NULL",
@@ -998,7 +1030,11 @@
         "section": "email",
         "order": 12,
         "type": "text",
-        "when": {"email_backend": "smtp"}
+        "when": {
+            "setting": "email_backend",
+            "operator": "equals",
+            "value": "smtp"
+        }
     },
     "email_user": {
         "default": "LibreNMS",
@@ -1133,7 +1169,16 @@
         "section": "location",
         "order": 1,
         "type": "text",
-        "required": true
+        "required": true,
+        "when": {
+            "setting": "geoloc.engine",
+            "operator": "in",
+            "value": [
+                "google",
+                "mapquest",
+                "bing"
+            ]
+        }
     },
     "geoloc.engine": {
         "default": false,
