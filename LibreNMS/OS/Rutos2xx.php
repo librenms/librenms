@@ -49,4 +49,3 @@ class Rutos2xx extends OS implements WirelessSnrDiscovery,
         );
     }
 }
-
