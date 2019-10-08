@@ -2,7 +2,7 @@
 echo "Checking Fan Speed...\n";
     $rpm=[];
     $rpm_oid = '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.11.1'; // alaChasEntPhysFanTable
-    $data = snmp_walk($device, 'alaChasEntPhysFanTable', "-OQUn", 'ALCATEL-IND1-CHASSIS-MIB', ':mibs/aos7:mibs');
+    $data = snmp_walk($device, 'alaChasEntPhysFanTable', "-OQUn", 'ALCATEL-IND1-CHASSIS-MIB', ':mibs/nokia/aos7:mibs');
 foreach (explode("\n", $data) as $entry) {
     list($oid,$value)  = explode('=', $entry, 2);
     $oid               = trim($oid);
