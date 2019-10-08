@@ -1,6 +1,10 @@
+source: Developing/Modules.md
+path: blob/master/doc/
+
+# Modules
+
 > This document is based around `cisco-qfp` module as a example. 
 
-# Intro
 When starting your work on the new LibreNMS module you should ask yourself the following questions:
 
 1. Which operating systems or devices this module relates to?
@@ -41,7 +45,7 @@ Discovery phase usually collects data about the devices that will be helpful in 
 
 In contrast, polling phase focuses on the statistics that change regularly. Data like interface statistics, CPU utilization, used RAM and disk space are expected to change continuously. This is the data that we usually graph and monitor through time or create alerts for. Polling is based on the information that is gathered by discovery module and you should avoid walking the whole MIB tables (if not necessary) or doing discovery of new components. Polling should be as fast as possible because even though one module alone is not exceeding the polling interval time, we should consider combined time for multiple modules, and those that will be written in the future.
 
-Most of the data in LibreNMS is stored in RRD files. This is a great storage when you need to store numeric data that should be graphed, but in many cases you will need some additional data saved such as list of components that you collect the data for, text descriptions, statuses or something alert related. You should consider using Components if possible instead of creating new database tables, especially if the module data is not complex or is highly specific to some device or vendor.
+Most of the data in LibreNMS is stored in RRD files. This is a great storage when you need to store numeric data that should be graphed, but in many cases you will need some additional data saved such as list of components that you collect the data for, text descriptions, statuses or something alert related. You should consider using [Components](/Extensions/Component/) if possible instead of creating new database tables, especially if the module data is not complex or is highly specific to some device or vendor.
 
 
 # Web UI
@@ -57,6 +61,8 @@ Below is the list of directories that could be interesting while developing a ne
  - `includes/graphs/` - Generic code for generating graphs from RRD files
  - `includes/graphs/device/` - Code for generating graphs for device
  - `includes/graphs/port/` - Code for generating graphs for perts
+
+> You should check [Code Structure](Code-Structure.md) for more information on code structure.
 
 When you choose the location in the UI to display your data, you should ideally group it in a section with similar data. Avoid making new tabs (on the same level as Overview, Graphs, Health) if not necessary. Since the place on users display is limited, we should pay attention to the organization of data inside tabs and sections.
 

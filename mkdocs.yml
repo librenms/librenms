@@ -145,6 +145,7 @@ nav:
       - Creating Documentation: Developing/Creating-Documentation.md
       - Licensing: Developing/Licensing.md
       - Component: Extensions/Component.md
+      - Modules: Developing/Modules.md
       - Mib Based Polling (Deprecated): Extensions/MIB-based-polling.md
       - Support for a new OS:
           - Intro: Developing/Support-New-OS.md
