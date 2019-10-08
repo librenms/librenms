@@ -4,8 +4,10 @@ if (strpos($device['sysDescr'], 'Enterprise')) {
 } elseif (strpos($device['sysObjectID'], '1.3.6.1.4.1.6486.800.1.1.2.2.4')) {
     $hardware = snmp_get($device, '.1.3.6.1.4.1.89.53.4.1.6.1', '-Osqv', 'RADLAN-Physicaldescription-MIB'); //RADLAN-Physicaldescription-MIB::rlPhdStackProductID
     $version = snmp_get($device, '.1.3.6.1.4.1.89.53.14.1.2.1', '-Osqv', 'RADLAN-Physicaldescription-MIB'); //RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion
-} elseif (($device['sysObjectID']==".1.3.6.1.4.1.6486.800.1.1.2.1.10.1.2")) {
-    list($hardware,$version,) = explode(' ', "OS6424 " . $device['sysDescr']);
+} elseif (strpos($device['sysObjectID'], ".1.3.6.1.4.1.6486.800.1.1.2.1.10") !== false) {
+    preg_match('/deviceOmniSwitch(....)(.+)/', snmp_get($device, 'sysObjectID.0', '-Osqv', 'ALCATEL-IND1-DEVICES:SNMPv2-MIB'), $model); // deviceOmniSwitch6400P24
+    $hardware='OS'.$model[1].'-'.$model[2];
+    list($hardware,$version,) = explode(' ', "OS6400-P24 " . $device['sysDescr']);
 } else {
     list(,$hardware,$version) = explode(' ', $device['sysDescr']);
 }
