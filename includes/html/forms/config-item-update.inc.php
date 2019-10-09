@@ -25,7 +25,7 @@ if (!is_numeric($_POST['config_id']) || empty($_POST['data'])) {
     exit;
 } else {
     $data   = mres($_POST['data']);
-    $update = dbUpdate(array('config_value' => "$data"), 'config', '`config_id` = ?', array($_POST['config_id']));
+    $update = dbUpdate(array('config_value' => json_encode($data, JSON_UNESCAPED_SLASHES)), 'config', '`config_id` = ?', array($_POST['config_id']));
     if (!empty($update) || $update == '0') {
         echo 'success';
         exit;

@@ -25,7 +25,7 @@
 $config['project_name'] = 'LibreNMS';
 $config['project_id']   = strtolower($config['project_name']);
 
-$config['temp_dir']    = '/tmp';
+//$config['temp_dir']    = '/tmp';
 $config['log_dir']     = $config['install_dir'].'/logs';
 
 // MySQL Debug level
@@ -815,6 +815,7 @@ $config['poller_modules']['cisco-asa-firewall']          = false;
 $config['poller_modules']['cisco-voice']                 = false;
 $config['poller_modules']['cisco-cbqos']                 = false;
 $config['poller_modules']['cisco-otv']                   = false;
+$config['poller_modules']['cisco-qfp']                   = false;
 $config['poller_modules']['cisco-vpdn']                  = false;
 $config['poller_modules']['nac']                         = false;
 $config['poller_modules']['netscaler-vsvr']              = false;
@@ -846,6 +847,7 @@ $config['discovery_modules']['cisco-cef']            = false;
 $config['discovery_modules']['cisco-sla']            = false;
 $config['discovery_modules']['cisco-cbqos']          = false;
 $config['discovery_modules']['cisco-otv']            = false;
+$config['discovery_modules']['cisco-qfp']            = false;
 $config['discovery_modules']['ipv4-addresses']       = true;
 $config['discovery_modules']['ipv6-addresses']       = true;
 $config['discovery_modules']['route']                = false;

@@ -843,7 +843,7 @@ mempools:
     - { Field: mempool_largestfree, Type: bigint(20), 'Null': true, Extra: '' }
     - { Field: mempool_lowestfree, Type: bigint(20), 'Null': true, Extra: '' }
     - { Field: mempool_deleted, Type: tinyint(1), 'Null': false, Extra: '', Default: '0' }
-    - { Field: mempool_perc_warn, Type: int(11), 'Null': true, Extra: '', Default: '75' }
+    - { Field: mempool_perc_warn, Type: int(11), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [mempool_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }

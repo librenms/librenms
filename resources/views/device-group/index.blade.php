@@ -56,6 +56,37 @@
                 </div>
             </div>
         </div>
+        <div id="unmanaged-devices-panel" class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                @lang('Ungrouped Devices') ({{ $ungrouped_devices->count() }})
+                </h4>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table id="ungrouped-devices-table" class="table table-condensed table-hover">
+                        <thead>
+                        <tr>
+                            <th style="width:32px">@lang('Vendor')</th>
+                            <th>@lang('Device')</th>
+                            <th>@lang('Platform')</th>
+                            <th>@lang('Operating System')</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($ungrouped_devices as $device)
+                            <tr id="row_{{ $device->device_id }}">
+                                <td><img alt="{{ $device->os }}" src="{{ asset($device->icon) }}" width="32px" height="32px" title="{{ $device->os }}"></td>
+                                <td>{!! \LibreNMS\Util\Url::deviceLink($device) !!}<br />{{ $device->sysName }}</td>
+                                <td>{{ $device->hardware }}</td>
+                                <td>{{ $device->os }} {{ $device->version }} @if($device->features) ({{ $device->features }}) @endif </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 

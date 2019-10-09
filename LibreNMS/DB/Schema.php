@@ -89,19 +89,14 @@ class Schema
      * Get the primary key column(s) for a table
      *
      * @param string $table
-     * @return string|array if a single column just the name is returned, otherwise an array of column names
+     * @return string if a single column just the name is returned, otherwise the first column listed will be returned
      */
     public function getPrimaryKey($table)
     {
         $schema = $this->getSchema();
-
         $columns = $schema[$table]['Indexes']['PRIMARY']['Columns'];
 
-        if (count($columns) == 1) {
-            return reset($columns);
-        }
-
-        return $columns;
+        return reset($columns);
     }
 
     public function getSchema()
@@ -170,7 +165,11 @@ class Schema
                 $base => $paths
             ];
 
-            file_put_contents($cache_file, serialize($cache));
+            if (is_writable($cache_file)) {
+                file_put_contents($cache_file, serialize($cache));
+            } else {
+                d_echo("Could not write cache file ($cache_file)!\n");
+            }
         }
 
         return $cache[$base];

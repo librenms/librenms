@@ -114,6 +114,45 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
             );
         }
 
+        // QFP processors (Forwarding Processors)
+        $qfp_data = snmpwalk_group($this->getDevice(), 'ceqfpUtilProcessingLoad', 'CISCO-ENTITY-QFP-MIB');
+
+        foreach ($qfp_data as $entQfpPhysicalIndex => $entry) {
+            /*
+             * .2 OID suffix is for 1 min SMA ('oneMinute')
+             * .3 OID suffix is for 5 min SMA ('fiveMinute')
+             * Could be dynamically changed to appropriate value if config had pol interval value
+             */
+            $qfp_usage_oid = '.1.3.6.1.4.1.9.9.715.1.1.6.1.14.' . $entQfpPhysicalIndex . '.3';
+            $qfp_usage = $entry['fiveMinute'];
+
+            if ($entQfpPhysicalIndex) {
+                if ($this->isCached('entPhysicalName')) {
+                    $entPhysicalName_array = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+                    $qfp_descr = $entPhysicalName_array[$entQfpPhysicalIndex];
+                }
+                if (empty($qfp_descr)) {
+                    $qfp_descr = snmp_get($this->getDevice(), 'entPhysicalName.'.$entQfpPhysicalIndex, '-Oqv', 'ENTITY-MIB');
+                }
+            }
+
+            if (empty($qfp_descr)) {
+                $qfp_desc = "QFP $entQfpPhysicalIndex";
+            }
+
+            $processors[] = Processor::discover(
+                'qfp',
+                $this->getDeviceId(),
+                $qfp_usage_oid,
+                $entQfpPhysicalIndex . '.3',
+                $qfp_descr,
+                1,
+                $qfp_usage,
+                null,
+                $entQfpPhysicalIndex
+            );
+        }
+
         return $processors;
     }
 
