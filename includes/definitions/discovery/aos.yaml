@@ -7,7 +7,7 @@ modules:
                     oid: alaChasEntPhysFanTable
                     value: alaChasEntPhysFanStatus
                     num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.11.1.2.{{ $index }}'
-                    descr: 'Fan {{ $index }}'
+                    descr: 'Fan State Sensor'
                     index: 'FanStatus.{{ $index }}'
                     states:
                         - { value: 0, descr:  noStatus, graph: 1, generic: 2 }
