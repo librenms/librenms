@@ -14,6 +14,7 @@
     </div>
 </div>
 
+@if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
 <div class="form-group @if($errors->has('enabled')) has-error @endif">
     <div class="col-sm-9 col-sm-offset-3">
         <div class="checkbox">
@@ -25,6 +26,7 @@
         <span class="help-block">{{ $errors->first('enabled') }}</span>
     </div>
 </div>
+@endif
 
 <div class="form-group @if($errors->has('descr')) has-error @endif">
     <label for="descr" class="control-label col-sm-3">@lang('Description')</label>
