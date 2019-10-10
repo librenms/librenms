@@ -158,14 +158,6 @@ class Component
             foreach ($this->reserved as $k => $v) {
                 $RESULT[$component_device_id][$COMPONENT['id']][$k] = $COMPONENT[$k];
             }
-
-            // Sort each component array so the attributes are in order.
-            if (is_array($RESULT[$RESULT[$component_device_id][$COMPONENT['id']]])) {
-                ksort($RESULT[$RESULT[$component_device_id][$COMPONENT['id']]]);
-            }
-            if (is_array($RESULT[$RESULT[$component_device_id]])) {
-                ksort($RESULT[$RESULT[$component_device_id]]);
-            }
         }
 
         // limit    array(start,count)
