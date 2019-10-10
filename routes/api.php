@@ -73,7 +73,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::put('rules', 'LegacyApiController@add_edit_rule')->name('edit_rule');
         Route::delete('rules/{id}', 'LegacyApiController@delete_rule')->name('delete_rule');
         Route::post('services/{hostname}', 'LegacyApiController@add_service_for_host')->name('add_service_for_host');
-        Route::get('oxidized/configsearch/{searchstring}', 'LegacyApiController@search_oxidized')->name('search_oxidized');
+        Route::get('oxidized/config/search/{searchstring}', 'LegacyApiController@search_oxidized')->name('search_oxidized');
     });
 
     // restricted by access
