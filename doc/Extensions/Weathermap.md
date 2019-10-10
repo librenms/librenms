@@ -60,7 +60,7 @@ Optional: If your install is in another directory than standard, set
 
 Automatically generate weathermaps from a LibreNMS database using WeatherMapper [Link](https://github.com/pblasquez/weathermapper)
 
-![Example Network Weather Map](/img/network-weather-map.PNG)
+![Example Network Weather Map](/img/network-weather-map.png)
 
 # Adding your Network Weathermaps to the Dashboards
 

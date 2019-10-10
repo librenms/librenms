@@ -65,6 +65,7 @@ snmp-server contact <YOUR-CONTACT>
 snmp-server location <YOUR-LOCATION>
 snmp-server host <INTERFACE> <LIBRENMS-IP> poll version 3 <USER-NAME>
 ```
+>Note: If the device is unable to find the SNMP user, reboot the ASA. Once rebooted, continue the steps as normal.
 
 #### IOS / IOS XE
 
@@ -86,6 +87,7 @@ snmp-server location <YOUR-LOCATION>
 
 snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix 
 ```
+>Note: If the device is unable to find the SNMP user, reboot the ASA. Once rebooted, continue the steps as normal.
 
 #### NX-OS
 
@@ -266,7 +268,7 @@ This command produces output like this
 Now define a SNMPv3 user:
 
 ```
-esxcli system snmp set --users authpriv/f3d8982fc28e8d1346c26eee49eb2c4a5950c934/0596ab30b315576a4e9f7d7bde65bf49b749e335/priv
+esxcli system snmp set --users <username>/f3d8982fc28e8d1346c26eee49eb2c4a5950c934/0596ab30b315576a4e9f7d7bde65bf49b749e335/priv
 esxcli system snmp set -L "Yourcity, Yourcountry [60.4,5.3]"
 esxcli system snmp set -C noc@your.org
 esxcli system snmp set --enable true
@@ -404,6 +406,13 @@ service snmpd restart
 systemctl restart snmpd
 ```
 
+Add SNMP to Firewalld
+
+```
+firewall-cmd --zone=public --permanent --add-service=snmp
+firewall-cmd --reload
+```
+
 ##### Ubuntu
 
 ```
@@ -438,6 +447,8 @@ service snmpd restart
 1. In "Accept SNMP packets from these hosts" click "Add" and add your
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
+
+>Note: SNMPv3 can be supported on Windows playforms with the use of Net-SNMP.
 
 ### Mac OSX
 
