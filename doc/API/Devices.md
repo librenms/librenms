@@ -1180,7 +1180,7 @@ Output:
 
 search all oxidized device configs for a string.
 
-Route: `api/v0/oxidized/configsearch/:searchstring`
+Route: `api/v0/oxidized/config/search/:searchstring`
 
   - searchstring is the specific string you would like to search for.
   
