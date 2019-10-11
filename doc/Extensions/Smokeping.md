@@ -291,7 +291,7 @@ rrd files to be the same as the main librenms dir or you can remove
 the -B argument from the rrdcached config to allow it to read from
 more than one dir.
 
-To remove the -B switch:
+### To remove the -B switch:
 
 ```bash
 sudo nano /etc/default/rrdcached
@@ -304,3 +304,39 @@ BASE_OPTIONS=
 ```
 
 If -B is in the list of arguments delete it.
+
+### To store smokeping rrd in librenms rrd folder
+
+```bash
+sudo systemctl stop smokeping
+sudo mv /var/lib/smokeping/ /opt/librenms/rrd/
+sudo nano /etc/smokeping/config.d/pathnames
+```
+Then update the config file:
+
+```bash
+datadir = /opt/librenms/rrd/smokeping
+dyndir = /opt/librenms/rrd/smokeping/__cgi
+```
+And give to smokeping rights to access files
+
+```bash
+sudo adduser smokeping librenms
+```
+
+Restart smokeping service
+
+```bash
+sudo systemctl start smokeping
+```
+
+Finally update smokeping rrd path in librenms
+
+```bash
+nano /opt/librenms/config.php
+```
+
+```php
+$config['smokeping']['dir'] = '/opt/librenms/rrd/smokeping';
+#$config['smokeping']['dir'] = '/var/lib/smokeping';
+```
