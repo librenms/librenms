@@ -19,14 +19,14 @@
  </item>
  <item>
    <title>Billing Data Changes</title>
-   <description>We have updated the method for storing billing data, removing a lot of information stored in 
-   the database which was not used.  Please check that your billing data is updating as expected, and 
+   <description>We have updated the method for storing billing data, removing a lot of information stored in
+   the database which was not used.  Please check that your billing data is updating as expected, and
    if you notice any problems open an issue on GitHub.</description>
    <pubDate>Mon, 07 Mar 2016 12:00:00 +0000</pubDate>
  </item>
  <item>
    <title>Introduction of default purge interval or alert history</title>
-   <description>We have introduced a purge setting for alert history which is set to 365 days as default. If you would like to update this then please 
+   <description>We have introduced a purge setting for alert history which is set to 365 days as default. If you would like to update this then please
    set $config['alert_log_purge'] to a custom value (set in days).</description>
    <pubDate>Mon, 02 May 2016 20:00:00 +0000</pubDate>
  </item>
@@ -62,6 +62,11 @@
     <title>LibreNMS Python Dispatcher Service V2 (breaking change)</title>
     <description>Version two of the LibreNMS python dispatcher service is merged. This code now requires Redis 5.x and redis-py 3.x to operate (if using distributed polling). If you are using the dispatcher service with Redis and have not updated, polling will stop functioning.</description>
     <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
+  </item>
+  <item>
+    <title>RutOS 2xx pinState renamed</title>
+    <description>RutOS 2xx pinState renamed to rutos2xx_pinState.  Update any alert rules you may have.</description>
+    <pubDate>Thu, 10 Oct 2019 00:00:00 +0000</pubDate>
   </item>
 </channel>
 </rss>
