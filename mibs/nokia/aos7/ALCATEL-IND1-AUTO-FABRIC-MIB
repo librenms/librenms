@@ -1,0 +1,422 @@
+ALCATEL-IND1-AUTO-FABRIC-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                Counter32, Unsigned32, MODULE-IDENTITY, OBJECT-IDENTITY,
+                NOTIFICATION-TYPE, OBJECT-TYPE
+                                        FROM SNMPv2-SMI
+                InterfaceIndex          FROM IF-MIB
+                MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+                                        FROM SNMPv2-CONF
+                SnmpAdminString         FROM SNMP-FRAMEWORK-MIB
+                softentIND1AutoFabric   FROM ALCATEL-IND1-BASE;
+
+
+        alcatelIND1AUTOFABRICMIB MODULE-IDENTITY
+                LAST-UPDATED "201211260000Z"
+                ORGANIZATION "Alcatel - Architects Of An Internet World"
+                CONTACT-INFO
+                "Please consult with Customer Service to insure the most appropriate
+                version of this document is used with the products in question:
+
+                        Alcatel Internetworking, Incorporated
+                        (Division 1, Formerly XYLAN Corporation)
+                        26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                        United States Of America
+
+                        Telephone:      North America  +1 800 995 2696
+                                        Latin America  +1 877 919 9526
+                                        Europe         +31 23 556 0100
+                                        Asia           +65 394 7933
+                                        All Other      +1 818 878 4507
+
+                Electronic Mail:         support@ind.alcatel.com
+                World Wide Web:          http://www.ind.alcatel.com
+                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                        "This module describes an authoritative enterprise-specific Simple
+                        Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                        For the Birds Of Prey Product Line
+                        AUTOFABRIC for automatic detection and configuration of LACP, SPB and MVRP.
+
+
+                        The right to make changes in specification and other information
+                        contained in this document without prior notice is reserved.
+
+                        No liability shall be assumed for any incidental, indirect, special, or
+                        consequential damages whatsoever arising from or related to this
+                        document or the information contained herein.
+
+                        Vendors, end-users, and other interested parties are granted
+                        non-exclusive license to use this specification in connection with
+                        management of the products for which it is intended to be used.
+
+                        Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
+                        ALL RIGHTS RESERVED WORLDWIDE"
+
+                REVISION      "201211250000Z"
+                DESCRIPTION
+                "The AUTOFABRIC MIB defines a set of AUTOFABRIC related management objects for ports
+                that support Autofabric feature. AUTOFABRIC as a
+                feature provides mechanisms to automatically detect and configure LACP aggregates, SPB adjacencies
+                and enables MVRP for automatically learning VLANs advertised by other switches                
+
+                This MIB comprises proprietary managed objects as well the objects required
+                for conforming to the feature."
+                ::= { softentIND1AutoFabric 1}
+
+-- --------------------------------------------------------------
+                alcatelIND1AUTOFABRICMIBObjects OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                    "Branch For AUTO-FABRIC
+                    Subsystem Managed Objects."
+                ::= { alcatelIND1AUTOFABRICMIB 1 }
+
+                alcatelIND1AUTOFABRICMIBConformance OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Branch for AUTOFABRIC Module MIB Subsystem Conformance Information."
+                ::= { alcatelIND1AUTOFABRICMIB 2 }
+
+                alcatelIND1AUTOFABRICMIBGroups OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Branch for AUTOFABRIC Module MIB Subsystem Units of Conformance."
+                ::= { alcatelIND1AUTOFABRICMIBConformance 1 }
+
+                alcatelIND1AUTOFABRICMIBCompliances OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Branch for AUTOFABRIC Module MIB Subsystem Compliance Statements."
+                ::= { alcatelIND1AUTOFABRICMIBConformance 2 }
+
+-- --------------------------------------------------------------
+
+-- --------------------------------------------------------------
+-- AUTO-FABRIC MIB
+-- --------------------------------------------------------------
+
+        alaAutoFabricGlobalStatus     OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to enable or diable Autofabric on the switch.
+                        The value enable (1) indicates that Autofabric should be enabled on
+                        the switch. The value disable (2) is used to disable Autofabric on
+                        the switch. By default, Autofabric is enabled on the switch."
+                DEFVAL  { enable }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 1 }
+
+        alaAutoFabricGlobalDiscovery OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                default(1),
+                                restart(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "Defines the global discovery window control for Autofabric.
+                        The value restart (2) indicates that Autofabric should restart
+                        global discovery window.
+                        By default, this object contains a zero value."
+                DEFVAL  { default }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 2 }
+
+
+        alaAutoFabricGlobalLACPProtocolStatus     OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to enable or diable AutoFabric LACP discovery.
+                         on the switch. The value enable (1) indicates that during discovery
+                        the switch will attempt to create LACP link aggregates. The value 
+                        disable (2) indicates that there would be no attempt to create LACP
+                        link aggregates during the discovery phase. By default LACP is enabled
+						on the switch"
+                DEFVAL  { enable }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 3 }		
+
+				
+        alaAutoFabricGlobalSPBProtocolStatus     OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to enable or diable AutoFabric SPB discovery.
+                         on the switch. The value enable (1) indicates that during discovery
+                        the switch will attempt to create SPB adjacencies. The value 
+                        disable (2) indicates that there would be no attempt to create SPB
+                        adjacencies during the discovery phase. By default SPB is enabled
+						on the switch"
+                DEFVAL  { enable }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 4 }
+
+				
+        alaAutoFabricGlobalMVRPProtocolStatus     OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to enable or diable AutoFabric MVRP discovery.
+                         on the switch. The value enable (1) indicates that during discovery
+                        the switch will enable MVRP and attempt to propagate and learn VLANs.
+						The value disable (2) indicates that MVRP would not be enabled in 
+						discovery phase. By default MVRP is enabled on the switch"
+                DEFVAL  { enable }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 5 }				
+
+
+        alaAutoFabricGlobalConfigSaveTimer OBJECT-TYPE
+                SYNTAX  Unsigned32  ( 60 .. 3600 )
+                UNITS   "seconds"
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Maximum period of time after which configuration built up by AutoFabric
+                would get written to the boot.cfg or vcboot.cfg.
+				The range supported is 60-3600 seconds."
+                DEFVAL  { 300 }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 6 }
+				
+
+        alaAutoFabricGlobalConfigSaveTimerStatus     OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to enable or diable AutoFabric config save
+						timer on the switch. The value enable (1) indicates that 
+						after the expiry of the config save timer, all AutoFabric 
+						configurations would get written to the boot.cfg ot the vcboot.cfg
+                        The value disable (2) would disable the config save timer.
+						By default it is enabled"
+                DEFVAL  { enable }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 7 }
+
+        alaAutoFabricGlobalDiscoveryTimer OBJECT-TYPE
+                SYNTAX  Unsigned32  ( 1 .. 3600 )
+                UNITS   "Minutes"
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "This variable is used to specify auto-fabric auto
+				discovery interval, zero disables it, configurable
+                Value is from 1 to 3600 minutes."
+                DEFVAL  { 1 }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 8 }				
+
+        alaAutoFabricRemoveGlobalConfig  OBJECT-TYPE
+                SYNTAX          INTEGER {
+				default(1),	
+                                removeGlobalConfig(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to remove the auto fabric global configuration when the user chooses to disable auto fabric"
+                DEFVAL  { default }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 10 }
+
+-- -------------------------------------------------------------
+-- AUTO-FABRIC Port Config Table
+-- -------------------------------------------------------------
+
+--      DESCRIPTION:
+--                      "Port configuration information
+--                       data for the AUTO-FABRIC Module.
+--                       Implementation of this group is mandantory"
+
+
+        alaAutoFabricPortConfig  OBJECT IDENTIFIER ::= { alcatelIND1AUTOFABRICMIBObjects 9 }
+
+
+        alaAutoFabricPortConfigTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaAutoFabricPortConfigEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table containing Autofabric port configuration information."
+            ::= { alaAutoFabricPortConfig 1 }
+
+        alaAutoFabricPortConfigEntry  OBJECT-TYPE
+            SYNTAX  AlaAutoFabricPortConfigEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "An AutoFabric port configuration entry."
+            INDEX { alaAutoFabricPortConfigIfIndex }
+            ::= { alaAutoFabricPortConfigTable 1 }
+
+        AlaAutoFabricPortConfigEntry ::= SEQUENCE {
+            alaAutoFabricPortConfigIfIndex            InterfaceIndex,
+            alaAutoFabricPortConfigStatus         INTEGER,
+            alaAutoFabricPortLACPProtocolStatus   INTEGER,
+			alaAutoFabricPortSPBProtocolStatus   INTEGER,
+			alaAutoFabricPortMVRPProtocolStatus   INTEGER,
+            alaAutoFabricPortStatus           INTEGER			
+            }
+
+            alaAutoFabricPortConfigIfIndex  OBJECT-TYPE
+            SYNTAX  InterfaceIndex
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The ifindex of the port on which AutoFabric is running"
+            ::= { alaAutoFabricPortConfigEntry 1 }
+
+            alaAutoFabricPortConfigStatus  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "This variable is used to enable or diable AutoFabric on the interface.
+                The value enable (1) indicates that AutoFabric should be enabled on
+                the interface. The value disable (2) is used to disable AutoFabric on
+                the interface. By default, AutoFabric is enabled on the interface."
+                DEFVAL  { enable }
+                ::= { alaAutoFabricPortConfigEntry 2 }
+
+
+            alaAutoFabricPortLACPProtocolStatus  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)						
+                }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "This variable is used to enable LACP in the AutoFabric discovery
+				on this port. The value enable (1) indicates during discovery window
+				this port will attempt to form LACP link aggregates. The value disable (2)
+				indicates this port will not participate in LACP discovery phase.
+				By default it is enabled"
+                DEFVAL  { enable }
+                ::= { alaAutoFabricPortConfigEntry 3 }
+				
+            alaAutoFabricPortSPBProtocolStatus  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)						
+                }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "This variable is used to enable SPB in the AutoFabric discovery
+				on this port. The value enable (1) indicates during discovery window
+				this port will attempt to form SPB adjacencies. The value disable (2)
+				indicates this port will not participate in SPB discovery phase.
+				By default it is enabled"
+                DEFVAL  { enable }
+                ::= { alaAutoFabricPortConfigEntry 4 }		
+
+				
+            alaAutoFabricPortMVRPProtocolStatus  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)						
+                }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "This variable is used to enable MVRP in the AutoFabric discovery
+				on this port. The value enable (1) indicates during discovery window
+				this port will enable MVRP and attempt to learn and propagate VLANs.
+				The value disable (2) indicates this port will not participate in MVRP
+				discovery phase.
+				By default it is enabled"
+                DEFVAL  { enable }
+                ::= { alaAutoFabricPortConfigEntry 5 }					
+
+
+            alaAutoFabricPortStatus OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled (1),
+                        pending (2),
+                        complete (3)                        
+                        }
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                "The state of the Autofabric discovery window on the port."
+                ::= { alaAutoFabricPortConfigEntry 6 }
+
+
+
+-- -------------------------------------------------------------
+-- COMPLIANCE
+-- -------------------------------------------------------------
+alcatelIND1AUTOFABRICMIBCompliance MODULE-COMPLIANCE
+   STATUS    current
+   DESCRIPTION
+        "Compliance statement for AUTOFABRIC."
+   MODULE
+        MANDATORY-GROUPS
+        {
+                alaAutoFabricBaseGroup,
+                alaAutoFabricPortConfigGroup
+        }
+   ::= { alcatelIND1AUTOFABRICMIBCompliances 1 }
+
+-- -------------------------------------------------------------
+-- UNITS OF CONFORMANCE
+-- -------------------------------------------------------------
+
+alaAutoFabricBaseGroup   OBJECT-GROUP
+   OBJECTS
+   {
+        alaAutoFabricGlobalStatus,
+        alaAutoFabricGlobalDiscovery,
+        alaAutoFabricGlobalLACPProtocolStatus,
+        alaAutoFabricGlobalSPBProtocolStatus,
+		alaAutoFabricGlobalMVRPProtocolStatus,
+		alaAutoFabricGlobalConfigSaveTimer,
+		alaAutoFabricGlobalConfigSaveTimerStatus,
+		alaAutoFabricGlobalDiscoveryTimer,
+		alaAutoFabricRemoveGlobalConfig
+   }
+  STATUS  current
+  DESCRIPTION
+  "Collection of objects for management of AutoFabric Base Group."
+  ::= { alcatelIND1AUTOFABRICMIBGroups 1 }
+
+alaAutoFabricPortConfigGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaAutoFabricPortConfigStatus,
+        alaAutoFabricPortLACPProtocolStatus,
+		alaAutoFabricPortSPBProtocolStatus,
+		alaAutoFabricPortMVRPProtocolStatus,
+        alaAutoFabricPortStatus
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of AutoFabric Port Configuration Table."
+   ::= { alcatelIND1AUTOFABRICMIBGroups 2 }
+
+-- -------------------------------------------------------------
+
+END
+
