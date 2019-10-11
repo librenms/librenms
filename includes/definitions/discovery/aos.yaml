@@ -28,7 +28,7 @@ modules:
                         - { value: 1, descr: normal, graph: 1, generic: 1 }
                         - { value: 2, descr: warning, graph: 1, generic: 0 }
                         - { value: 3, descr: critical, graph: 1, generic: 0 }
-                        - { value: 4, descr: ahutdown, graph: 1, generic: 0 }
+                        - { value: 4, descr: shutdown, graph: 1, generic: 0 }
                         - { value: 5, descr: notpresent, graph: 1, generic: 0 }
                         - { value: 6, descr: notFunctioning, graph: 1, generic: 0 }
                     skip_values:
@@ -46,7 +46,7 @@ modules:
                         - { value: 1, descr: normal, graph: 1, generic: 1 }
                         - { value: 2, descr: warning, graph: 1, generic: 0 }
                         - { value: 3, descr: critical, graph: 1, generic: 0 }
-                        - { value: 4, descr: ahutdown, graph: 1, generic: 0 }
+                        - { value: 4, descr: shutdown, graph: 1, generic: 0 }
                         - { value: 5, descr: notpresent, graph: 1, generic: 0 }
                         - { value: 6, descr: notFunctioning, graph: 1, generic: 0 }
                     skip_values:
