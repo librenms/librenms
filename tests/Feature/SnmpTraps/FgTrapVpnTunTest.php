@@ -27,12 +27,15 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Ipv4Address;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\DBTestCase;
 
-class FgTrapVpnTunTest extends LaravelTestCase
+class FgTrapVpnTunTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     public function testVpnTunDown()
     {
         $device = factory(Device::class)->create();

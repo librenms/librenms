@@ -622,7 +622,7 @@ class IRCBot
     private function _reload()
     {
         if ($this->user['level'] == 10) {
-            $new_config = Config::load();
+            $new_config = Config::reload();
             $this->respond('Reloading configuration & defaults');
             if ($new_config != $this->config) {
                 return $this->__construct();

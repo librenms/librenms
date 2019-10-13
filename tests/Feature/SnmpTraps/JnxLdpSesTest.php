@@ -31,11 +31,10 @@ use App\Models\Device;
 use App\Models\Port;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use Log;
+use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
-class JnxLdpSesTest extends LaravelTestCase
+class JnxLdpSesTest extends SnmpTrapTestCase
 {
-
     public function testJnxLdpSesDownTrap()
     {
         $device = factory(Device::class)->create();
