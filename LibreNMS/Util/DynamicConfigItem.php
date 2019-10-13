@@ -229,7 +229,8 @@ class DynamicConfigItem implements \ArrayAccess
         return "settings.settings.$this->name.options.$option";
     }
 
-    private function buildValidator($value) {
+    private function buildValidator($value)
+    {
         return Validator::make(['value' => $value], $this->validate);
     }
 }

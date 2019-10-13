@@ -58,7 +58,8 @@ class DashboardController extends SelectController
         ];
     }
 
-    private function describe($dashboard) {
+    private function describe($dashboard)
+    {
         return "{$dashboard->user->username}: {$dashboard->dashboard_name} ("
             . ($dashboard->access == 1 ? __('read-only') : __('read-write')) . ')';
     }

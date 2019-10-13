@@ -82,7 +82,7 @@ class Config
      */
     public static function getDefinitions()
     {
-        return json_decode(file_get_contents(self::get('install_dir') . '/misc/config_definitions.json'), true)['config'];
+        return json_decode(file_get_contents(base_path('misc/config_definitions.json')), true)['config'];
     }
 
     private static function loadDefaults()
@@ -97,7 +97,7 @@ class Config
         }
 
         // load macros from json
-        $macros = json_decode(file_get_contents(self::get('install_dir') . '/misc/macros.json'), true);
+        $macros = json_decode(file_get_contents(base_path('misc/macros.json')), true);
         Arr::set($def_config, 'alert.macros.rule', $macros);
 
         self::processDefaults($def_config);
@@ -114,11 +114,10 @@ class Config
     {
         $config = [];
 
-        $install_dir = realpath(__DIR__ . '/../');
-        $config['install_dir'] = $install_dir;
+        $config['install_dir'] = base_path();
 
         // Load user config file
-        @include $install_dir . '/config.php';
+        @include base_path('config.php');
 
         return $config;
     }
@@ -393,7 +392,7 @@ class Config
      */
     private static function processDefaults(&$def_config)
     {
-        Arr::set($def_config, 'log_dir', self::get('install_dir') . '/logs');
+        Arr::set($def_config, 'log_dir', base_path('logs'));
         Arr::set($def_config, 'distributed_poller_name', php_uname('n'));
 
          // set base_url from access URL
