@@ -32,14 +32,18 @@ use LibreNMS\DB\Eloquent;
 
 class Config
 {
+    private static $config;
+
     /**
      * Load the config, if the database connected, pull in database settings.
      *
      * return &array
      */
-    public static function &load()
+    public static function load()
     {
-        global $config;
+        if (!is_null(self::$config)) {
+            return self::$config;
+        }
 
         self::loadFiles();
 
@@ -58,7 +62,21 @@ class Config
             self::processConfig(false);
         }
 
-        return $config;
+        // set to global for legacy/external things
+        global $config;
+        $config = self::$config;
+
+        return self::$config;
+    }
+
+    /**
+     * Reload the config from files/db
+     * @return mixed
+     */
+    public static function reload()
+    {
+        self::$config = null;
+        return self::load();
     }
 
     /**
@@ -69,8 +87,6 @@ class Config
      */
     private static function &loadFiles()
     {
-        global $config;
-
         $config = []; // start fresh
 
         $install_dir = realpath(__DIR__ . '/../');
@@ -82,12 +98,15 @@ class Config
 
         // import standard settings
         $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
-        self::set('alert.macros.rule', $macros);
+        $config['alert']['macros']['rule'] = $macros;
 
         // Load user config
         @include $install_dir . '/config.php';
 
-        return $config;
+        // set it
+        self::$config = $config;
+
+        return self::$config;
     }
 
 
@@ -100,10 +119,8 @@ class Config
      */
     public static function get($key, $default = null)
     {
-        global $config;
-
-        if (isset($config[$key])) {
-            return $config[$key];
+        if (isset(self::$config[$key])) {
+            return self::$config[$key];
         }
 
         if (!str_contains($key, '.')) {
@@ -112,7 +129,7 @@ class Config
 
         $keys = explode('.', $key);
 
-        $curr = &$config;
+        $curr = &self::$config;
         foreach ($keys as $k) {
             // do not add keys that don't exist
             if (!isset($curr[$k])) {
@@ -136,8 +153,7 @@ class Config
      */
     public static function forget($key)
     {
-        global $config;
-        Arr::forget($config, $key);
+        Arr::forget(self::$config, $key);
     }
 
     /**
@@ -175,11 +191,9 @@ class Config
      */
     public static function getOsSetting($os, $key, $default = null)
     {
-        global $config;
-
         if ($os) {
-            if (isset($config['os'][$os][$key])) {
-                return $config['os'][$os][$key];
+            if (isset(self::$config['os'][$os][$key])) {
+                return self::$config['os'][$os][$key];
             }
 
             if (!str_contains($key, '.')) {
@@ -207,13 +221,11 @@ class Config
      */
     public static function getCombined($os, $key, $default = array())
     {
-        global $config;
-
         if (!self::has($key)) {
             return self::get("os.$os.$key", $default);
         }
 
-        if (!isset($config['os'][$os][$key])) {
+        if (!isset(self::$config['os'][$os][$key])) {
             if (!str_contains($key, '.')) {
                 return self::get($key, $default);
             }
@@ -241,8 +253,6 @@ class Config
      */
     public static function set($key, $value, $persist = false, $default = null, $descr = null, $group = null, $sub_group = null)
     {
-        global $config;
-
         if ($persist) {
             try {
                 \App\Models\Config::updateOrCreate(['config_name' => $key], collect([
@@ -267,7 +277,7 @@ class Config
 
         $keys = explode('.', $key);
 
-        $curr = &$config;
+        $curr = &self::$config;
         foreach ($keys as $k) {
             $curr = &$curr[$k];
         }
@@ -283,9 +293,7 @@ class Config
      */
     public static function has($key)
     {
-        global $config;
-
-        if (isset($config[$key])) {
+        if (isset(self::$config[$key])) {
             return true;
         }
 
@@ -296,7 +304,7 @@ class Config
         $keys = explode('.', $key);
         $last = array_pop($keys);
 
-        $curr = &$config;
+        $curr = &self::$config;
         foreach ($keys as $k) {
             // do not add keys that don't exist
             if (!isset($curr[$k])) {
@@ -315,9 +323,7 @@ class Config
      */
     public static function json_encode()
     {
-        global $config;
-
-        return json_encode($config);
+        return json_encode(self::$config);
     }
 
     /**
@@ -326,8 +332,7 @@ class Config
      */
     public static function getAll()
     {
-        global $config;
-        return $config;
+        return self::$config;
     }
 
     /**
@@ -336,8 +341,6 @@ class Config
      */
     private static function mergeDb()
     {
-        global $config;
-
         $db_config = [];
 
         try {
@@ -349,13 +352,11 @@ class Config
             // possibly table config doesn't exist yet
         }
 
-        $config = array_replace_recursive($db_config, $config);
+        self::$config = array_replace_recursive($db_config, self::$config);
     }
 
     private static function loadGraphsFromDb()
     {
-        global $config;
-
         try {
             $graph_types = GraphType::all()->toArray();
         } catch (QueryException $e) {
@@ -376,7 +377,7 @@ class Config
                 $g[$key] = $v;
             }
 
-            $config['graph_types'][$g['type']][$g['subtype']] = $g;
+            self::$config['graph_types'][$g['type']][$g['subtype']] = $g;
         }
     }
 

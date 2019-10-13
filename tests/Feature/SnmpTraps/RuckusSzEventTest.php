@@ -30,9 +30,8 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
 
-class RuckusSzEventTest extends LaravelTestCase
+class RuckusSzEventTest extends SnmpTrapTestCase
 {
     public function testSzApConf()
     {

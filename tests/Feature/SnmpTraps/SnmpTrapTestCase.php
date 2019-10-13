@@ -1,8 +1,8 @@
 <?php
 /**
- * DBTestCase.php
+ * SnmpTrapTestCase.php
  *
- * Base Test Case for Database tests
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,20 +19,16 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
+ * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-abstract class DBTestCase extends TestCase
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Tests\DBTestCase;
+
+class SnmpTrapTestCase extends DBTestCase
 {
-    public static function setUpBeforeClass()
-    {
-        if (!getenv('DBTEST')) {
-            static::markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
-        }
-
-        parent::setUpBeforeClass();
-    }
+    use DatabaseTransactions; // people skip this a lot so extract it to here
 }
