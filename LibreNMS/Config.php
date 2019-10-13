@@ -29,7 +29,7 @@ use App\Models\GraphType;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
-use LibreNMS\Util\Version;
+use Log;
 
 class Config
 {
@@ -42,22 +42,23 @@ class Config
      */
     public static function load()
     {
+        // don't reload the config if it is already loaded, reload() should be used for that
         if (!is_null(self::$config)) {
             return self::$config;
         }
 
-        $config = self::loadFiles();
-        $def_config = self::loadDefaults();
-        $db_config = Eloquent::isConnected() ? self::loadDB() : [];
-
         // merge all config sources together config.php > db config > config_definitions.json
-        $config = array_replace_recursive($def_config, $db_config, $config);
+        self::$config = array_replace_recursive(
+            self::loadDefaults(),
+            Eloquent::isConnected() ? self::loadDB() : [],
+            self::loadUserConfigFile()
+        );
 
         // final cleanups and validations
         self::processConfig();
         self::populateTime();
 
-        // set to global for legacy/external things
+        // set to global for legacy/external things (is this needed?)
         global $config;
         $config = self::$config;
 
@@ -105,25 +106,21 @@ class Config
     }
 
     /**
-     * Load the user config from config.php, defaults.inc.php and definitions.inc.php, etc.
-     * Erases existing config.
+     * Load the user config from config.php
      *
      * @return array
      */
-    private static function loadFiles()
+    private static function loadUserConfigFile()
     {
-        $config = []; // start fresh
+        $config = [];
 
         $install_dir = realpath(__DIR__ . '/../');
         $config['install_dir'] = $install_dir;
 
-        // Load user config
+        // Load user config file
         @include $install_dir . '/config.php';
 
-        // set it
-        self::$config = $config;
-
-        return self::$config;
+        return $config;
     }
 
 
@@ -290,8 +287,8 @@ class Config
             }
             return true;
         } catch (QueryException $e) {
-            if (class_exists(\Log::class)) {
-                \Log::error($e);
+            if (class_exists(Log::class)) {
+                Log::error($e);
             }
             global $debug;
             if ($debug) {
