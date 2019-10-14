@@ -6,6 +6,9 @@ $graphs['apache']    = array(
     'scoreboard',
     'cpu',
 );
+$graphs['detailedcpu'] = array(
+    'stats',
+);
 $graphs['drbd']      = array(
     'disk_bits',
     'network_bits',
