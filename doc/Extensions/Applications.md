@@ -89,6 +89,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Asterisk](#asterisk) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [C.H.I.P.](#chip) - SNMP extend
+1. [Detailed CPU Info](#detailedcpu) - SNMP extend
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
 1. [Entropy](#entropy) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
@@ -354,6 +355,32 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/chip.
 
 ```
 extend power-stat /etc/snmp/power-stat.sh
+```
+
+4: Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
+
+# Detailed CPU information
+
+A small shell script that returns your CPUs user, system, idle, io wait, and steal percentages.
+
+## SNMP Extend
+
+1: Copy the shell script to the desired host.
+
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/detailedcpu.sh -O /etc/snmp/detailedcpu.sh
+```
+
+2: Run `chmod +x /etc/snmp/detailedcpu.sh`
+
+3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+
+```
+extend detailedcpu /etc/snmp/detailedcpu.sh
 ```
 
 4: Restart snmpd on your host
