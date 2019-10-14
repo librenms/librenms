@@ -37,8 +37,9 @@ return [
         ],
         'system' => [
             'cleanup' => 'Cleanup',
-            'server' => 'Server',
+            'proxy' => 'Proxy',
             'updates' => 'Updates',
+            'server' => 'Server',
         ],
         'webui' => [
             'availability-map' => 'Availability Map Settings',
@@ -52,7 +53,7 @@ return [
         'active_directory' => [
             'users_purge' => [
                 'description' => 'Keep inactive users for',
-                'help' => 'Delete users from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in.',
+                'help' => 'Users will be deleted from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in.',
             ]
         ],
         'addhost_alwayscheckip' => [
@@ -403,6 +404,10 @@ return [
                     'bing' => 'Bing Maps'
                 ]
             ]
+        ],
+        'http_proxy' => [
+            'description' => 'HTTP(S) Proxy',
+            'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.'
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool'

@@ -6490,7 +6490,8 @@ __webpack_require__.r(__webpack_exports__);
         "system": {
           "cleanup": "Cleanup",
           "server": "Server",
-          "updates": "Updates"
+          "updates": "Updates",
+          "proxy": "Proxy"
         },
         "webui": {
           "availability-map": "Availability Map Settings",
@@ -6504,7 +6505,7 @@ __webpack_require__.r(__webpack_exports__);
         "active_directory": {
           "users_purge": {
             "description": "Keep inactive users for",
-            "help": "Delete users from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in."
+            "help": "Users will be deleted from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in."
           }
         },
         "addhost_alwayscheckip": {
@@ -6855,6 +6856,10 @@ __webpack_require__.r(__webpack_exports__);
               "bing": "Bing Maps"
             }
           }
+        },
+        "http_proxy": {
+          "description": "HTTP(S) Proxy",
+          "help": "Set this as a fallback if http_proxy or https_proxy environment variable is not available."
         },
         "ipmitool": {
           "description": "Path to ipmtool"
