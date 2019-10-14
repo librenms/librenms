@@ -499,6 +499,8 @@
                         @admin
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Global Settings')</a></li>
+                        <li><a href="{{ url('rrdcleanup') }}"><i class="fa fa-trash fa-fw fa-lg"
+                                                               aria-hidden="true"></i> @lang('orphaned RRD Cleanup')</a></li>
                         <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Validate Config')</a></li>
                         <li role="presentation" class="divider"></li>

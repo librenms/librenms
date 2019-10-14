@@ -905,6 +905,10 @@ $config['dateformat']['mysql']['compact'] = '%Y-%m-%d %H:%i:%s';
 $config['dateformat']['mysql']['date']    = '%Y-%m-%d';
 $config['dateformat']['mysql']['time']    = '%H:%i:%s';
 
+// time difference to last RRD File modification in seconds to detect file as orphaned
+// minimum of 24h = 24 * 60 * 60 is recommended
+$config['rrd_file_max_age']  = 24 * 60 * 60;
+
 $config['enable_clear_discovery'] = 1;
 // Set this to 0 if you want to disable the web option to rediscover devices
 $config['force_ip_to_sysname']          = false;// Set to true if you want to use sysName in place of IPs

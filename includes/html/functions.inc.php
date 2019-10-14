@@ -13,6 +13,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Time;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -63,6 +64,128 @@ function data_uri($file, $mime)
 function nicecase($item)
 {
     return \LibreNMS\Util\StringHelpers::niceCase($item);
+}
+
+
+/**
+ * Convert byte size to human readable size description
+ *
+ * @param $byte_size
+ * @param $unit
+ * @return size with human readable filesize
+ */
+function human_readable_size($byte_size, $unit=0) {
+
+    $unit_descr = array('', 'k', 'M', 'G', 'T', 'P', 'E');
+
+    while ($byte_size >=1024) {
+        $byte_size /= 1024;
+        $unit +=1;
+        if ( $unit == count($unit_descr) -1 ) {
+            break;
+        }
+    }
+
+    $byte_size = round($byte_size, 2);
+
+    return $byte_size.$unit_descr[$unit].'B';
+}
+
+
+/**
+ * deletes files as parameter specified
+ *
+ * @param array, list of files to be deleted
+ * @return array, list of RRD files and success of deletion
+ */
+function delete_rrd_files($rrd_file_list)
+{
+    $delete_result_list = array();
+    $date_string = date(Config::get('dateformat.compact'));
+
+    $rrd_dir = Config::get('rrd_dir');
+    foreach ($rrd_file_list as $rrd_file) {
+        $filename = $rrd_dir . '/' . $rrd_file;
+        if ( ! file_exists($filename)) {
+            continue;
+        }
+        if (pathinfo($filename)['extension'] != "rrd") {
+            continue;
+        }
+        if (strpos(realpath(dirname($filename)), $rrd_dir) !== 0) {
+            // absolute path not in rrd_dir, so ignore it
+            // ensure pathes like this are not working:
+            // /opt/librenms/rrd/../../../etc/passwd
+            continue;
+        }
+
+        $file_delete_success = unlink($filename);
+        $delete_result = $file_delete_success ? 'success': 'failed';
+        $logstring = $date_string . " - delete orpaned RRD File '$filename' - $delete_result";
+
+        d_echo($logstring . "\n");
+        logfile($logstring);
+
+        $delete_result_list[] = array('file' => $rrd_file, 'deleted' => $file_delete_success);
+    }
+
+    return $delete_result_list;
+}
+
+
+/**
+ * searches RRD files which are not refreshed for a specified time
+ * it returns a associative array with
+ * host => list of RRD files
+ *
+ * @return associative array
+ */
+function orphaned_rrd_files()
+{
+    $rrd_dir = Config::get('rrd_dir');
+    $timestamp_format = Config::get('timestamp_format');
+    $max_age = Config::get('rrd_file_max_age');
+    $now = time();
+
+    $host_list = array();
+    $rrd_list = array();
+
+    if ($handle = opendir($rrd_dir)) {
+        while (false !== ($entry = readdir($handle))) {
+            if (( $entry == '.') || ( $entry == '..')) {
+                continue;
+            }
+            if ( ! is_dir($rrd_dir . '/' . $entry)) {
+                continue;
+            }
+            $host_list[] = $entry;
+        }
+        closedir($handle);
+    }
+
+    asort($host_list);
+
+    foreach ($host_list as $host) {
+        $file_list = array();
+        foreach (glob( $rrd_dir . '/' . $host . '/*.rrd') as $file) {
+            $age = ($now - filemtime($file));
+            $date = date($timestamp_format, filemtime($file));
+            $size = filesize($file);
+            if ($age > $max_age) {
+                // file last change longer than $max_age
+                $file_list[] = array('name' => basename($file),
+                                     'age'  => Time::formatInterval($age, 'short'),
+                                     'date' => $date,
+                                     'size' => human_readable_size($size));
+            }
+        }
+        closedir($handle);
+
+        asort($file_list);
+
+        $rrd_list[$host] = $file_list;
+    }
+    return $rrd_list;
 }
 
 
