@@ -89,7 +89,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Asterisk](#asterisk) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [C.H.I.P.](#chip) - SNMP extend
-1. [Detailed CPU Info](#detailedcpu) - SNMP extend
+1. [Detailed CPU Info](#detailed-cpu-information) - SNMP extend
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
 1. [Entropy](#entropy) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
