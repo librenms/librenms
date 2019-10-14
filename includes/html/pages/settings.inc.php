@@ -87,6 +87,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                 'auth_ad_bindpassword',
             );
 
+            ksort($a);
+
             $r = '<table class="table table-condensed table-hover"><tbody>';
             foreach ($a as $k => $v) {
                 if (!empty($v)) {
