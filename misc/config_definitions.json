@@ -3469,7 +3469,7 @@
             "section": "snmp",
             "order": 4,
             "type": "integer",
-            "default": 4
+            "default": 0
         },
         "snmp.port": {
             "group": "poller",
