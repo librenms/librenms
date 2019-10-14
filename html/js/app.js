@@ -497,6 +497,10 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LibrenmsSettings",
   props: {
@@ -1736,7 +1740,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#settings-search[data-v-d702796c] {\n    border-radius: 4px\n}\n#settings-search[data-v-d702796c]::-webkit-search-cancel-button {\n    -webkit-appearance: searchfield-cancel-button;\n}\n", ""]);
+exports.push([module.i, "\n#settings-search[data-v-d702796c] {\n    border-radius: 4px\n}\n#settings-search[data-v-d702796c]::-webkit-search-cancel-button {\n    -webkit-appearance: searchfield-cancel-button;\n}\nul.settings-list[data-v-d702796c] {\n    list-style-type: none;\n}\n", ""]);
 
 // exports
 
@@ -2497,7 +2501,20 @@ var render = function() {
             text: _vm.$t("settings.groups.global")
           }
         },
-        [_vm._v("Global tab")]
+        [
+          _c(
+            "ul",
+            { staticClass: "settings-list" },
+            _vm._l(_vm.settings, function(setting) {
+              return _c("li", [
+                _c("strong", [_vm._v(_vm._s(setting.name))]),
+                _vm._v(" "),
+                _c("code", [_vm._v(_vm._s(setting.value))])
+              ])
+            }),
+            0
+          )
+        ]
       ),
       _vm._v(" "),
       _vm._l(_vm.groups, function(sections, group) {

@@ -31,7 +31,11 @@
                 </div>
             </form>
         </template>
-        <tab name="global" :selected="'global' === tab" :text="$t('settings.groups.global')">Global tab</tab>
+        <tab name="global" :selected="'global' === tab" :text="$t('settings.groups.global')">
+            <ul class="settings-list">
+                <li v-for="setting in settings"><strong>{{ setting.name }}</strong> <code>{{ setting.value }}</code></li>
+            </ul>
+        </tab>
         <tab v-for="(sections, group) in groups" :key="group" :name="group" :selected="group === tab" :text="$t('settings.groups.' + group)">
             <accordion @expanded="sectionExpanded" @collapsed="sectionCollapsed">
                 <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :text="$t('settings.sections.' + group + '.' + item)" :active="item === section">
@@ -163,5 +167,8 @@
     }
     #settings-search::-webkit-search-cancel-button {
         -webkit-appearance: searchfield-cancel-button;
+    }
+    ul.settings-list {
+        list-style-type: none;
     }
 </style>
