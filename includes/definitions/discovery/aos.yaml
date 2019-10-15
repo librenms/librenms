@@ -25,12 +25,12 @@ modules:
                     descr: 'Fan State Sensor'
                     index: 'FanStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 1 }
-                        - { value: 2, descr: warning, graph: 1, generic: 0 }
-                        - { value: 3, descr: critical, graph: 1, generic: 0 }
-                        - { value: 4, descr: shutdown, graph: 1, generic: 0 }
-                        - { value: 5, descr: notpresent, graph: 1, generic: 0 }
-                        - { value: 6, descr: notFunctioning, graph: 1, generic: 0 }
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: critical, graph: 1, generic: 2 }
+                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
+                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
                     skip_values:
                       -
                         oid: rlEnvMonFanState
@@ -43,12 +43,12 @@ modules:
                     descr: 'PowerSupply State Sensor'
                     index: 'PowerSupply.{{ $index }}'
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 1 }
-                        - { value: 2, descr: warning, graph: 1, generic: 0 }
-                        - { value: 3, descr: critical, graph: 1, generic: 0 }
-                        - { value: 4, descr: shutdown, graph: 1, generic: 0 }
-                        - { value: 5, descr: notpresent, graph: 1, generic: 0 }
-                        - { value: 6, descr: notFunctioning, graph: 1, generic: 0 }
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: critical, graph: 1, generic: 2 }
+                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
+                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
                     skip_values:
                       -
                         oid: rlEnvMonSupplyState
