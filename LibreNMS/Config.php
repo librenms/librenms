@@ -397,13 +397,10 @@ class Config
 
          // set base_url from access URL
         if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
-            if (str_contains($_SERVER['SERVER_NAME'], ':')) {
-                // Literal IPv6
-                $base_url = 'http://['.$_SERVER['SERVER_NAME'].']'.($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
-            } else {
-                $base_url = 'http://'.$_SERVER['SERVER_NAME'].($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
-            }
-            Arr::set($def_config, 'base_url', $base_url);
+            $port = $_SERVER['SERVER_PORT'] != 80 ? ':' . $_SERVER['SERVER_PORT'] : '';
+            // handle literal IPv6
+            $server = str_contains($_SERVER['SERVER_NAME'], ':') ? "[{$_SERVER['SERVER_NAME']}]" : $_SERVER['SERVER_NAME'];
+            Arr::set($def_config, 'base_url', "http://$server$port/");
         }
 
         // graph color copying
