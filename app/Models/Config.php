@@ -29,21 +29,10 @@ class Config extends BaseModel
 {
     public $timestamps = false;
     protected $table = 'config';
-    public $primaryKey = 'config_name';
-    public $incrementing = false;
+    public $primaryKey = 'config_id';
     protected $fillable = [
         'config_name',
         'config_value',
-        'config_default',
-        'config_descr',
-        'config_group',
-        'config_sub_group',
-    ];
-    protected $attributes = [
-        'config_default' => '',
-        'config_descr' => '',
-        'config_group' => '',
-        'config_sub_group' => '',
     ];
     protected $casts = [
         'config_default' => 'array'

@@ -21,7 +21,7 @@ $sqlparams     = array();
 $options       = getopt('h:m:i:n:d::v::a::q', array('os:','type:'));
 
 if (!isset($options['q'])) {
-    echo \LibreNMS\Config::get('project_name_version') . " Discovery\n";
+    echo \LibreNMS\Config::get('project_name')." Discovery\n";
 }
 
 if (isset($options['h'])) {

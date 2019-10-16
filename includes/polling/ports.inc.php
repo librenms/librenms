@@ -555,11 +555,9 @@ foreach ($ports as $port) {
             $port['update']['ifIndex'] = $ifIndex;
         }
 
-        if (Config::get('slow_statistics') == true) {
-            $port['update']['poll_time'] = $polled;
-            $port['update']['poll_prev'] = $port['poll_time'];
-            $port['update']['poll_period'] = $polled_period;
-        }
+        $port['update']['poll_time'] = $polled;
+        $port['update']['poll_prev'] = $port['poll_time'];
+        $port['update']['poll_period'] = $polled_period;
 
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
             $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', array(), 'UBNT-AirFIBER-MIB');
@@ -755,10 +753,8 @@ foreach ($ports as $port) {
                     $port_update = 'update_extended';
                 }
 
-                if (Config::get('slow_statistics') == true) {
-                    $port[$port_update][$oid] = set_numeric($this_port[$oid]);
-                    $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid]);
-                }
+                $port[$port_update][$oid] = set_numeric($this_port[$oid]);
+                $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid]);
 
                 $oid_prev = $oid . '_prev';
                 if (isset($port[$oid])) {
@@ -771,11 +767,8 @@ foreach ($ports as $port) {
 
                     $port['stats'][$oid . '_rate'] = $oid_rate;
                     $port['stats'][$oid . '_diff'] = $oid_diff;
-
-                    if (Config::get('slow_statistics') == true) {
-                        $port[$port_update][$oid . '_rate'] = $oid_rate;
-                        $port[$port_update][$oid . '_delta'] = $oid_diff;
-                    }
+                    $port[$port_update][$oid . '_rate'] = $oid_rate;
+                    $port[$port_update][$oid . '_delta'] = $oid_diff;
 
 
                     d_echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n");
