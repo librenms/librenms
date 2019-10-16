@@ -914,18 +914,6 @@ function clean_bootgrid($string)
     return $output;
 }//end clean_bootgrid()
 
-
-function get_config_by_group($group)
-{
-    return \App\Models\Config::query()->where('config_group', $group)->get()->map(function ($config_item) {
-        if ($config_item['config_value'] === true) {
-            $config_item['config_checked']  = 'checked';
-        }
-
-        return $config_item;
-    })->keyBy('config_name')->toArray();
-}//end get_config_by_group()
-
 function get_url()
 {
     // http://stackoverflow.com/questions/2820723/how-to-get-base-url-with-php
@@ -1037,95 +1025,6 @@ function dynamic_override_config($type, $name, $device)
         return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . $name . '" data-device_id="' . $device['device_id'] . '" value="' . $attrib_val . '">';
     }
 }//end dynamic_override_config()
-
-function generate_dynamic_config_panel($title, $config_groups, $items = array(), $transport = '', $end_panel = true)
-{
-    $anchor = md5($title);
-    $output = '
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#' . $anchor . '"><i class="fa fa-caret-down"></i> ' . $title . '</a>
-    ';
-    if (!empty($transport)) {
-        $output .= '<button name="test-alert" id="test-alert" type="button" data-transport="' . $transport . '" class="btn btn-primary btn-xs pull-right">Test transport</button>';
-    }
-    $output .= '
-        </h4>
-    </div>
-    <div id="' . $anchor . '" class="panel-collapse collapse">
-        <div class="panel-body">
-    ';
-
-    if (!empty($items)) {
-        foreach ($items as $item) {
-            $output .= '
-            <div class="form-group has-feedback ' . (isset($item['class']) ? $item['class'] : '') . '">
-                <label for="' . $item['name'] . '"" class="col-sm-4 control-label">' . $item['descr'] . ' </label>
-                <div data-toggle="tooltip" title="' . $config_groups[$item['name']]['config_descr'] . '" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
-                <div class="col-sm-4">
-            ';
-            if ($item['type'] == 'checkbox') {
-                $output .= '<input id="' . $item['name'] . '" type="checkbox" name="global-config-check" ' . $config_groups[$item['name']]['config_checked'] . ' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">';
-            } elseif ($item['type'] == 'text') {
-                $pattern = isset($item['pattern']) ? ' pattern="' . $item['pattern'] . '"' : "";
-                $pattern .= isset($item['required']) && $item['required'] ? " required" : "";
-                $output .= '
-                <input id="' . $item['name'] . '" class="form-control validation" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '"' . $pattern . '>
-                <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
-                ';
-            } elseif ($item['type'] == 'password') {
-                $output .= '
-                <input id="' . $item['name'] . '" class="form-control" type="password" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
-                <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
-                ';
-            } elseif ($item['type'] == 'numeric') {
-                $output .= '
-                <input id="' . $item['name'] . '" class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
-                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                ';
-            } elseif ($item['type'] == 'select') {
-                $output .= '
-                <select id="' . ($config_groups[$item['name']]['name'] ?: $item['name']) . '" class="form-control" name="global-config-select" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
-                ';
-                if (!empty($item['options'])) {
-                    foreach ($item['options'] as $option) {
-                        if (gettype($option) == 'string') {
-                            /* for backwards-compatibility */
-                            $tmp_opt = $option;
-                            $option = array(
-                                'value' => $tmp_opt,
-                                'description' => $tmp_opt,
-                            );
-                        }
-                        $output .= '<option value="' . $option['value'] . '"';
-                        if ($option['value'] == $config_groups[$item['name']]['config_value']) {
-                            $output .= ' selected';
-                        }
-                        $output .= '>' . $option['description'] . '</option>';
-                    }
-                }
-                $output .= '
-                </select>
-                <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
-                ';
-            }
-            $output .= '
-                </div>
-            </div>
-            ';
-        }
-    }
-
-    if ($end_panel === true) {
-        $output .= '
-        </div>
-    </div>
-</div>
-        ';
-    }
-    return $output;
-}//end generate_dynamic_config_panel()
 
 /**
  * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.

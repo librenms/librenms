@@ -932,7 +932,7 @@ function send_mail($emails, $subject, $message, $html = false)
                 $mail->addAddress($email, $email_name);
             }
             $mail->Subject = $subject;
-            $mail->XMailer = Config::get('project_name_version');
+            $mail->XMailer = Config::get('project_name');
             $mail->CharSet = 'utf-8';
             $mail->WordWrap = 76;
             $mail->Body = $message;

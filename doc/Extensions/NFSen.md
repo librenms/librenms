@@ -69,7 +69,7 @@ $config['nfsen_suffix']   = "_yourdomain_com";
 
 The above is a very important bit as device names in NfSen are limited
 to 21 characters. This means full domain names for devices can be very
-problematic to squeeze in, so there for this chunk is usually removed.
+problematic to squeeze in, so therefor this chunk is usually removed.
 
 On a similar note, NfSen profiles for channels should be created with
 the same name.
@@ -78,7 +78,7 @@ the same name.
 
 Below are the default settings used with nfdump for stats.
 
-For more defailted information on that, please see nfdump(1).
+For more defaulted information on that, please see nfdump(1).
 
 ```php
 $config['nfsen_last_max'] = 153600;
