@@ -143,7 +143,7 @@ class Api extends Transport
                 [
                     'title' => 'body',
                     'name' => 'api-body',
-                    'descr' => 'Enter the body if need',
+                    'descr' => 'Enter the body if need (format: json, xml, etc.)',
                     'type' => 'textarea',
                 ],
                 [
