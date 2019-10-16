@@ -22,8 +22,8 @@ if (! $hwversion) {
     $hwversion = $data['1']['rlPhdUnitGenParamHardwareVersion'];
 }
 
-if(preg_match('/\.1\.3\.6\.1\.4\.1\.9\.6\.1\.72\.(....).+/', $device['sysObjectID'], $model)) {
-    $hardware = 'SGE' . $model[1] . '-' . substr($device['sysDescr'],0,2);
+if (preg_match('/\.1\.3\.6\.1\.4\.1\.9\.6\.1\.72\.(....).+/', $device['sysObjectID'], $model)) {
+    $hardware = 'SGE' . $model[1] . '-' . substr($device['sysDescr'], 0, 2);
 } else {
     if ($device['sysObjectID'] == '.1.3.6.1.4.1.9.6.1.89.26.1') {
         $hardware = 'SG220-26';
