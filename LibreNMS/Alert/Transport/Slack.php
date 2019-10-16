@@ -49,7 +49,7 @@ class Slack extends Transport
                     'title' => $obj['title'],
                     'text' => $slack_msg,
                     'mrkdwn_in' => ['text', 'fallback'],
-                    'author_name' => $api['author_name'],
+                    'author_name' => $api['author_name'], 
                 ],
             ],
             'channel' => $api['channel'],
