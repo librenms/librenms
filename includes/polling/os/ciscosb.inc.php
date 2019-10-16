@@ -24,15 +24,13 @@ if (! $hwversion) {
 
 if (preg_match('/\.1\.3\.6\.1\.4\.1\.9\.6\.1\.72\.(....).+/', $device['sysObjectID'], $model)) {
     $hardware = 'SGE' . $model[1] . '-' . substr($device['sysDescr'], 0, 2);
+} elseif ($device['sysObjectID'] == '.1.3.6.1.4.1.9.6.1.89.26.1') {
+    $hardware = 'SG220-26';
 } else {
-    if ($device['sysObjectID'] == '.1.3.6.1.4.1.9.6.1.89.26.1') {
-        $hardware = 'SG220-26';
-    } else {
-        $hardware = str_replace(' ', '', $data['1']['rlPhdUnitGenParamModelName']);
-    }
-    if ($hwversion) {
-        $hardware .= " " . $hwversion;
-    }
+    $hardware = str_replace(' ', '', $data['1']['rlPhdUnitGenParamModelName']);
+}
+if ($hwversion) {
+    $hardware .= " " . $hwversion;
 }
 $version  = 'Software ' . $data['1']['rlPhdUnitGenParamSoftwareVersion'];
 $boot = $data['0']['rndBaseBootVersion'];
