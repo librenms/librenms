@@ -104,12 +104,14 @@ class Plugins
         chdir(Config::get('install_dir') . '/html');
         $plugin = self::getInstance($file, $pluginName);
 
-        $class = get_class($plugin);
-        $hooks = get_class_methods($class);
+        if (!is_null($plugin)) {
+            $class = get_class($plugin);
+            $hooks = get_class_methods($class);
 
-        foreach ((array)$hooks as $hookName) {
-            if ($hookName[0] != '_') {
-                self::$plugins[$hookName][] = $class;
+            foreach ((array)$hooks as $hookName) {
+                if ($hookName[0] != '_') {
+                    self::$plugins[$hookName][] = $class;
+                }
             }
         }
 
