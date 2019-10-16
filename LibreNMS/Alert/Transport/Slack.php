@@ -53,6 +53,8 @@ class Slack extends Transport
                 ],
             ],
             'channel' => $api['channel'],
+            'username' => $api['username'],
+            'icon_emoji' => ':' .$api['icon_emoji'].':',
         ];
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
