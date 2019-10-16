@@ -14,6 +14,15 @@ For example: a good setting for snmp community, would be `snmp.community`.
 The dot notation is path and when the config is hydrated, it is converted to a nested array.
 If the user is overriding the option in config.php it would use the format `$config['snmp']['community']`
 
+## Translation
+
+The config definition system inherently supports translation. You must add the English names in the 
+`resoures/lang/en/settings.php` file (and other languages if you can).
+
+    Note: Right now the Vue.js translation is a little cumbersome.  First you need to update the language
+    files, then run `./lnms vue-i18n:generate`, run `npm run development` or `npm run watch`, then hard refresh your web
+    page.
+
 # Definition Format
 
 For snmp.community, this is the definition:
