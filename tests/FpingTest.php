@@ -118,7 +118,8 @@ OUT;
         $this->assertSame($expected, $actual);
     }
 
-    private function mockFpingProcess($output, $exitCode) {
+    private function mockFpingProcess($output, $exitCode)
+    {
         $process = \Mockery::mock(Process::class);
         $process->shouldReceive('getCommandLine', 'run');
         $process->shouldReceive('getErrorOutput')->andReturn($output);
