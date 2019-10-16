@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ $pagetitle }}</title>
-    <base href="{{ LibreNMS\Config::get('base_url') }}" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @if(!LibreNMS\Config::get('favicon', false))
@@ -40,12 +39,13 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190603" rel="stylesheet" type="text/css" />
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190912" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/' . LibreNMS\Config::get('site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
     @endforeach
     @yield('css')
+    @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
@@ -112,5 +112,6 @@
 
 {!! Toastr::render() !!}
 
+@stack('scripts')
 </body>
 </html>
