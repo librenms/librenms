@@ -28,10 +28,10 @@
         <div v-for="(item, id) in localList">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{{ id+1 }}. <span class="pull-right text-danger" @click="removeItem(id)"><i class="fa fa-minus-circle"></i></span></h3>
+                    <h3 class="panel-title">{{ id+1 }}. <span class="pull-right text-danger" @click="removeItem(id)" v-if="!disabled"><i class="fa fa-minus-circle"></i></span></h3>
                 </div>
                 <div class="panel-body">
-            <form @onsubmit.prevent :disabled="disabled">
+            <form @onsubmit.prevent>
                 <div class="form-group">
                     <div class="col-sm-12">
                         <select class="form-control" id="authlevel" v-model="item.authlevel" :disabled="disabled" @change="updateItem(id, $event.target.id, $event.target.value)">
@@ -92,7 +92,7 @@
             </div>
         </div>
         </draggable>
-        <div class="row snmp3-add-button">
+        <div class="row snmp3-add-button" v-if="!disabled">
             <div class="col-sm-12">
                 <button class="btn btn-primary" @click="addItem()"><i class="fa fa-plus-circle"></i> {{ $t('New') }}</button>
             </div>

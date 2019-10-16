@@ -3273,18 +3273,20 @@ var render = function() {
               _c("div", { staticClass: "panel-heading" }, [
                 _c("h3", { staticClass: "panel-title" }, [
                   _vm._v(_vm._s(id + 1) + ". "),
-                  _c(
-                    "span",
-                    {
-                      staticClass: "pull-right text-danger",
-                      on: {
-                        click: function($event) {
-                          return _vm.removeItem(id)
-                        }
-                      }
-                    },
-                    [_c("i", { staticClass: "fa fa-minus-circle" })]
-                  )
+                  !_vm.disabled
+                    ? _c(
+                        "span",
+                        {
+                          staticClass: "pull-right text-danger",
+                          on: {
+                            click: function($event) {
+                              return _vm.removeItem(id)
+                            }
+                          }
+                        },
+                        [_c("i", { staticClass: "fa fa-minus-circle" })]
+                      )
+                    : _vm._e()
                 ])
               ]),
               _vm._v(" "),
@@ -3292,7 +3294,6 @@ var render = function() {
                 _c(
                   "form",
                   {
-                    attrs: { disabled: _vm.disabled },
                     on: {
                       onsubmit: function($event) {
                         $event.preventDefault()
@@ -3678,25 +3679,27 @@ var render = function() {
         0
       ),
       _vm._v(" "),
-      _c("div", { staticClass: "row snmp3-add-button" }, [
-        _c("div", { staticClass: "col-sm-12" }, [
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-primary",
-              on: {
-                click: function($event) {
-                  return _vm.addItem()
-                }
-              }
-            },
-            [
-              _c("i", { staticClass: "fa fa-plus-circle" }),
-              _vm._v(" " + _vm._s(_vm.$t("New")))
-            ]
-          )
-        ])
-      ])
+      !_vm.disabled
+        ? _c("div", { staticClass: "row snmp3-add-button" }, [
+            _c("div", { staticClass: "col-sm-12" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary",
+                  on: {
+                    click: function($event) {
+                      return _vm.addItem()
+                    }
+                  }
+                },
+                [
+                  _c("i", { staticClass: "fa fa-plus-circle" }),
+                  _vm._v(" " + _vm._s(_vm.$t("New")))
+                ]
+              )
+            ])
+          ])
+        : _vm._e()
     ],
     1
   )
@@ -6489,9 +6492,9 @@ __webpack_require__.r(__webpack_exports__);
         },
         "system": {
           "cleanup": "Cleanup",
-          "server": "Server",
+          "proxy": "Proxy",
           "updates": "Updates",
-          "proxy": "Proxy"
+          "server": "Server"
         },
         "webui": {
           "availability-map": "Availability Map Settings",
