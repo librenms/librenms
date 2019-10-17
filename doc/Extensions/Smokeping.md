@@ -211,7 +211,7 @@ Then you just need to add to your config `auth_basic` parameters
                 index smokeping.cgi;
                 gzip off;
                 auth_basic "Private Property";
-                auth_basic_user_file /etc/nginx/.htpasswd
+                auth_basic_user_file /etc/nginx/.htpasswd;
         }
 ```
 
