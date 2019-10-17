@@ -3,7 +3,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwoo$
+ * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
