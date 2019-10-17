@@ -114,25 +114,14 @@ def scan_host(ip):
 
     try:
         try:
-            # attempt to convert IP to hostname, if anything goes wrong, just use the IP
-            tmp = gethostbyaddr(ip)[0]
-            if gethostbyname(tmp) == ip:  # check that forward resolves
-                hostname = tmp
+            if not args.ip_only:
+                # attempt to convert IP to hostname, if anything goes wrong, just use the IP
+                tmp = gethostbyaddr(ip)[0]
+                if gethostbyname(tmp) == ip:  # check that forward resolves
+                    hostname = tmp
         except (herror, gaierror):
             pass
-
-        # If there is no hostname and the configuration option to add by IP is
-        # not set, we should not add this to LibreNMS
-        if hostname is None and not CONFIG.get('discovery_by_ip'):
-            try:
-                arguments = ['/usr/sbin/fping', ip]
-                check_output(arguments)
-            except CalledProcessError as err:
-                output = err.output.decode().rstrip()
-                return Result(ip, hostname, Outcome.UNPINGABLE, output)
-
-            return Result(ip, hostname, Outcome.FAILED, 'no dns entry found and discovery_by_ip is not set in config.php!')
-
+        print(hostname or ip)
         try:
             arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or ip]
             if args.ping:
@@ -166,6 +155,7 @@ Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two add
 Example: 192.168.0.1/32 will be treated as a single host address""")
     parser.add_argument('-P', '--ping', action='store_const', const="-b", default="", help="""Add the device as an ICMP only device if it replies to ping but not SNMP.
 Example: """ + __file__ + """ -P 192.168.0.0/24""")
+    parser.add_argument('-I', '--ip-only', action='store_true', help="Only add hosts by IP.  Do not try to lookup the hostname via reverse DNS.")
     parser.add_argument('-t', dest='threads', type=int,
                         help="How many IPs to scan at a time.  More will increase the scan speed," +
                              " but could overload your system. Default: {}".format(THREADS))
