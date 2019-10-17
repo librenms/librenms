@@ -56,7 +56,10 @@ class SetConfigCommand extends LnmsCommand
         $value = $this->juggleType($value);
         $configItem = $definition->get($setting);
         if (!$configItem->checkValue($value)) {
-            $this->error($configItem->getValidationMessage($value));
+            $message = ($configItem->type || $configItem->validate)
+                ? $configItem->getValidationMessage($value)
+                : __('Cannot set :setting, it is missing validation definition.', ['setting' => $setting]);
+            $this->error($message);
             return 2;
         }
 
