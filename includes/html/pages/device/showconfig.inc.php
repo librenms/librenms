@@ -5,8 +5,8 @@ use LibreNMS\Config;
 use Symfony\Component\Process\Process;
 
 if (Auth::user()->hasGlobalAdmin()) {
-    if (!is_array(Config::get('rancid_configs'))) {
-        Config::set('rancid_configs', array(Config::get('rancid_configs')));
+    if (Config::has('rancid_configs') && !is_array(Config::get('rancid_configs'))) {
+        Config::set('rancid_configs', (array)Config::get('rancid_configs', []));
     }
 
     if (Config::has('rancid_configs.0')) {
