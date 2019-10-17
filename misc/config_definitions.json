@@ -248,17 +248,7 @@
             "type": "text"
         },
         "auth_ad_groups": {
-            "default": {
-                "admin": {
-                    "level": 10
-                },
-                "pfy": {
-                    "level": 5
-                },
-                "support": {
-                    "level": 1
-                }
-            },
+            "default": {},
             "group": "auth",
             "section": "ad",
             "order": 4,
@@ -370,17 +360,7 @@
             }
         },
         "auth_ldap_groups": {
-            "default": {
-                "admin": {
-                    "level": 10
-                },
-                "pfy": {
-                    "level": 5
-                },
-                "support": {
-                    "level": 1
-                }
-            },
+            "default": {},
             "group": "auth",
             "section": "ldap",
             "order": 4,
