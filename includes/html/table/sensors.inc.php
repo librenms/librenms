@@ -16,7 +16,7 @@
 */
 
 $table = 'sensors';
-$tab = 'health';
+$group = 'health';
 $translations = 'sensors';
 
 include 'sensors-common.php';

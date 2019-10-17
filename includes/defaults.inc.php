@@ -21,105 +21,6 @@
 // Please don't edit this file -- make changes to the configuration array in config.php
 //
 
-// Default directories
-$config['project_name'] = 'LibreNMS';
-$config['project_id']   = strtolower($config['project_name']);
-
-//$config['temp_dir']    = '/tmp';
-$config['log_dir']     = $config['install_dir'].'/logs';
-
-// MySQL Debug level
-$config['mysql_log_level']       = 'ERROR';
-
-//MySQL Settings
-$config['db_port']               = 3306;
-$config['db_socket']             = null;
-$config['db_name']               = 'librenms';
-$config['db_user']               = 'librenms';
-$config['db_pass']               = null;
-$config['db_socket']             = null;
-
-// What is my own hostname (used to identify this host in its own database)
-$config['own_hostname'] = 'localhost';
-
-// Location of executables
-//$config['fping']                    = '/usr/sbin/fping';
-//$config['fping6']                   = '/usr/sbin/fping6';
-// https://docs.librenms.org/Support/Configuration/#fping
-$config['fping_options']['timeout'] = 500;
-$config['fping_options']['count']   = 3;
-$config['fping_options']['interval'] = 500;
-$config['snmpwalk']                  = '/usr/bin/snmpwalk';
-$config['snmpget']                   = '/usr/bin/snmpget';
-$config['snmpbulkwalk']              = '/usr/bin/snmpbulkwalk';
-$config['snmptranslate']             = '/usr/bin/snmptranslate';
-$config['whois']          = '/usr/bin/whois';
-$config['ping']           = '/bin/ping';
-$config['mtr']            = '/usr/bin/mtr';
-$config['nmap']           = '/usr/bin/nmap';
-$config['nagios_plugins'] = '/usr/lib/nagios/plugins';
-$config['ipmitool']       = '/usr/bin/ipmitool';
-$config['virsh']          = '/usr/bin/virsh';
-$config['dot']            = '/usr/bin/dot';
-$config['sfdp']           = '/usr/bin/sfdp';
-$config['nfdump']         = '/usr/bin/nfdump';
-
-$config['slow_statistics'] = true;
-// THIS WILL CHANGE TO FALSE IN FUTURE
-// RRD Format Settings
-// These should not normally be changed
-// Though one could conceivably increase or decrease the size of each RRA if one had performance problems
-// Or if one had a very fast I/O subsystem with no performance worries.
-$config['rrd_rra']  = ' RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ';
-$config['rrd_rra'] .= ' RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 ';
-$config['rrd_rra'] .= ' RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797 ';
-$config['rrd_rra'] .= ' RRA:LAST:0.5:1:1440 ';
-//$config['rrd']['heartbeat'] = 600;
-//$config['rrd']['step'] = 300;
-
-// RRDCacheD - Make sure it can write to your RRD dir!
-// $config['rrdcached']    = "unix:/var/run/rrdcached.sock";
-
-// Web Interface Settings
-if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
-    if (strpos($_SERVER['SERVER_NAME'], ':')) {
-        // Literal IPv6
-        $config['base_url'] = 'http://['.$_SERVER['SERVER_NAME'].']'.($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
-    } else {
-        $config['base_url'] = 'http://'.$_SERVER['SERVER_NAME'].($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
-    }
-}
-
-$config['project_home']   = 'http://www.librenms.org/';
-$config['project_issues'] = 'https://community.librenms.org/c/help';
-$config['github_api']   = 'https://api.github.com/repos/librenms/librenms/';
-$config['site_style']     = 'light';
-// Options are dark or light
-$config['stylesheet']   = 'css/styles.css';
-$config['mono_font']    = 'DejaVuSansMono';
-$config['favicon']      = '';
-$config['page_refresh'] = '300';
-// Refresh the page every xx seconds, 0 to disable
-$config['front_page'] = 'pages/front/tiles.php';
-$config['front_page_settings']['top']['ports']   = 10;
-$config['front_page_settings']['top']['devices'] = 10;
-$config['front_page_down_box_limit']             = 10;
-$config['vertical_summary'] = 0;
-// Enable to use vertical summary on front page instead of horizontal
-$config['top_ports'] = 1;
-// This enables the top X ports box
-$config['top_devices'] = 1;
-// This enables the top X devices box
-$config['page_title_prefix'] = '';
-$config['page_title_suffix'] = $config['project_name'];
-$config['timestamp_format']  = 'd-m-Y H:i:s';
-$config['page_gen']          = 0;
-$config['enable_lazy_load']  = true;
-// display MySqL & PHP stats in footer?
-$config['login_message'] = 'Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.';
-$config['public_status'] = false;
-// Enable public accessable status page
-$config['old_graphs'] = 1;
 // RRDfiles from before the great rra reform. This is default for a while.
 $config['int_customers'] = 1;
 // Enable Customer Port Parsing
@@ -160,28 +61,6 @@ $config['snmp']['transports'] = array(
     'tcp6',
 );
 
-$config['snmp']['version'] = ['v2c', 'v3', 'v1'];
-// Default version to use
-// SNMPv1/2c default settings
-$config['snmp']['community'][0] = 'public';
-// Communities to try during adding hosts and discovery
-$config['snmp']['port'] = 161;
-// Port Client SNMP is running on
-// SNMPv3 default settings
-// The array can be expanded to give another set of parameters
-// NOTE: If you change these, also change the equivalents in includes/defaults.inc.php - not sure why they are separate
-$config['snmp']['v3'][0]['authlevel'] = 'noAuthNoPriv';
-// noAuthNoPriv | authNoPriv | authPriv
-$config['snmp']['v3'][0]['authname'] = 'root';
-// User Name (required even for noAuthNoPriv)
-$config['snmp']['v3'][0]['authpass'] = '';
-// Auth Passphrase
-$config['snmp']['v3'][0]['authalgo'] = 'MD5';
-// MD5 | SHA
-$config['snmp']['v3'][0]['cryptopass'] = '';
-// Privacy (Encryption) Passphrase
-$config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
-// AES | DES
 
 // Devices must respond to icmp by default
 $config['icmp_check'] = true;
@@ -537,31 +416,7 @@ $config['smokeping']['pings']             = 20;
 // $config['oxidized']['enabled']         = FALSE;//Set to TRUE
 // $config['oxidized']['url']             = 'http://127.0.0.1:8888';// Set the Oxidized rest URL
 // $config['oxidized']['reload_nodes'] = FALSE;//Set to TRUE, check documentation
-// NFSen RRD dir.
-$config['nfsen_enable'] = 0;
-// $config['nfsen_split_char']   = "_";
-// $config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
-// $config['nfsen_suffix']   = "_yourdomain_com";
-$config['nfsen_subdirlayout'] = 1;
-$config['nfsen_last_max'] = 153600; // 48 hours ago in seconds
-$config['nfsen_top_max'] = 500; // max topN value for stats
-$config['nfsen_top_N']=array( 10, 20, 50, 100, 200, 500 );
-$config['nfsen_top_default']=20;
-$config['nfsen_stat_default']='srcip';
-$config['nfsen_order_default']='packets';
-$config['nfsen_last_default']=900;
-$config['nfsen_lasts']=array(
-                            '300'=>'5 minutes',
-                            '600'=>'10 minutes',
-                            '900'=>'15 minutes',
-                            '1800'=>'30 minutes',
-                            '3600'=>'1 hour',
-                            '9600'=>'3 hours',
-                            '38400'=>'12 hours',
-                            '76800'=>'24 hours',
-                            '115200'=>'36 hours',
-                            '153600'=>'48 hours',
-                            );
+
 // Location Mapping
 // Use this feature to map ugly locations to pretty locations
 // config['location_map']['Under the Sink'] = "Under The Sink, The Office, London, UK";
@@ -613,9 +468,6 @@ $config['bad_if_regexp'][] = '/^sl[0-9]/';
 
 // Rewrite Interfaces
 $config['rewrite_if_regexp']['/^cpu interface/'] = 'Mgmt';
-
-// Storage default warning percentage
-$config['storage_perc_warn'] = 60;
 
 $config['ignore_mount_removable'] = 1;
 // Ignore removable disk storage
@@ -751,10 +603,6 @@ $config['libvirt_protocols'] = array(
     'qemu+ssh',
     'xen+ssh',
 );
-// Mechanisms used, add or remove if not using this on any of your machines.
-// Hardcoded ASN descriptions
-$config['astext'][65332] = 'Cymru FullBogon Feed';
-$config['astext'][65333] = 'Cymru Bogon Feed';
 
 // Nicer labels for the SLA types
 $config['sla_type_labels']['echo']              = 'ICMP ping';
@@ -988,9 +836,6 @@ $config['gui']['network-map']['style']                  = 'new';//old is also va
 
 // Show errored ports in the summary table on the dashboard
 $config['summary_errors']                               = 0;
-
-// Default width of the availability map's tiles
-$config['availability-map-width']                       = 25;
 
 // Default notifications Feed
 $config['notifications']['LibreNMS']                    = 'http://www.librenms.org/notifications.rss';

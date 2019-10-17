@@ -398,14 +398,6 @@ config:
     - { Field: config_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
     - { Field: config_name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: config_value, Type: varchar(512), 'Null': false, Extra: '' }
-    - { Field: config_default, Type: varchar(512), 'Null': false, Extra: '' }
-    - { Field: config_descr, Type: varchar(100), 'Null': false, Extra: '' }
-    - { Field: config_group, Type: varchar(50), 'Null': false, Extra: '' }
-    - { Field: config_group_order, Type: int(11), 'Null': false, Extra: '', Default: '0' }
-    - { Field: config_sub_group, Type: varchar(50), 'Null': false, Extra: '' }
-    - { Field: config_sub_group_order, Type: int(11), 'Null': false, Extra: '', Default: '0' }
-    - { Field: config_hidden, Type: 'enum(''0'',''1'')', 'Null': false, Extra: '', Default: '0' }
-    - { Field: config_disabled, Type: 'enum(''0'',''1'')', 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [config_id], Unique: true, Type: BTREE }
     uniqueindex_configname: { Name: uniqueindex_configname, Columns: [config_name], Unique: true, Type: BTREE }

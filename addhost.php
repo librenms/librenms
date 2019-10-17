@@ -215,7 +215,7 @@ if (!empty($argv[1])) {
     }
 } else {
     c_echo(
-        "\n" . Config::get('project_name_version') . ' Add Host Tool
+        "\n". Config::get('project_name').' Add Host Tool
 
     Usage (SNMPv1/2c)    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> [community] [v1|v2c] [port] [' . $transports_regex . ']
     Usage (SNMPv3)       :
