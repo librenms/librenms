@@ -70,11 +70,13 @@ class DynamicConfigItem implements \ArrayAccess
         } elseif ($this->type == 'boolean') {
             return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
         } elseif ($this->type == 'integer') {
-            return filter_var($value, FILTER_VALIDATE_INT) || $value === "0" || $value === 0;
+            return (!is_bool($value) && filter_var($value, FILTER_VALIDATE_INT)) || $value === "0" || $value === 0;
         } elseif ($this->type == 'select') {
             return in_array($value, array_keys($this->options));
         } elseif ($this->type == 'email') {
             return filter_var($value, FILTER_VALIDATE_EMAIL);
+        } elseif ($this->type == 'array') {
+            return is_array($value); // this should probably have more complex validation via validator rules
         } elseif (in_array($this->type, ['text', 'password'])) {
             return true;
         }
@@ -185,7 +187,7 @@ class DynamicConfigItem implements \ArrayAccess
     {
         return $this->validate
             ? implode(" \n", $this->buildValidator($value)->messages()->get('value'))
-            : __('settings.validate.' . $this->type, ['id' => $this->name, 'value' => is_array($value) ? json_encode($value) : $value]);
+            : __('settings.validate.' . $this->type, ['id' => $this->name, 'value' => json_encode($value)]);
     }
 
     // ArrayAccess functions

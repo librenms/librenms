@@ -32,7 +32,7 @@ class GetConfigCommand extends LnmsCommand
     {
         $setting = $this->argument('setting');
         if ($this->option('json')) {
-            $this->line($setting ? json_encode(Config::get($setting)) : Config::json_encode());
+            $this->line($setting ? json_encode(Config::get($setting)) : Config::toJson());
             return 0;
         }
 

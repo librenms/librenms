@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Util\DynamicConfig;
 use Symfony\Component\Console\Input\InputArgument;
 
 class SetConfigCommand extends LnmsCommand
@@ -28,17 +30,14 @@ class SetConfigCommand extends LnmsCommand
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(DynamicConfig $definition)
     {
         $setting = $this->argument('setting');
         $value = $this->argument('value');
 
-        if (!$value) {
-            if ($this->confirm(__('Unset :setting?', ['setting' => $setting]))) {
-                \App\Models\Config::query()->where('config_name', $setting)->delete();
-                return 0;
-            }
-            return 3;
+        if (!$definition->isValidSetting($setting)) {
+            $this->error(__('This is not a valid setting. Please check your spelling'));
+            return 2;
         }
 
         if (!Eloquent::isConnected()) {
@@ -46,8 +45,38 @@ class SetConfigCommand extends LnmsCommand
             return 1;
         }
 
-        \LibreNMS\Config::set($setting, $value, true);
+        if (!$value) {
+            if ($this->confirm(__('Reset :setting to the default?', ['setting' => $setting]))) {
+                Config::erase($setting);
+                return 0;
+            }
+            return 3;
+        }
 
-        return 0;
+        $value = $this->juggleType($value);
+        $configItem = $definition->get($setting);
+        if (!$configItem->checkValue($value)) {
+            $this->error($configItem->getValidationMessage($value));
+            return 2;
+        }
+
+        if (Config::persist($setting, $value)) {
+            return 0;
+        }
+
+        $this->error(__('Failed to set :setting', ['setting' => $setting]));
+        return 1;
+    }
+
+    /**
+     * Convert the string input into the appropriate PHP native type
+     *
+     * @param $value
+     * @return mixed
+     */
+    private function juggleType($value)
+    {
+        $json = json_decode($value, true);
+        return json_last_error() ? $value : $json;
     }
 }
