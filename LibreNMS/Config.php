@@ -298,6 +298,23 @@ class Config
     }
 
     /**
+     * Forget a key and all it's descendants from persistent storage.
+     * This will effectively set it back to default.
+     *
+     * @param string $key
+     * @return int|false
+     */
+    public static function erase($key)
+    {
+        self::forget($key);
+        try {
+            return \App\Models\Config::withChildren($key)->delete();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
      * Check if a setting is set
      *
      * @param string $key period separated config variable name

@@ -38,6 +38,8 @@ class Config extends BaseModel
         'config_default' => 'array'
     ];
 
+    // ---- Accessors/Mutators ----
+
     public function getConfigValueAttribute($value)
     {
         return json_decode($value);
@@ -46,5 +48,13 @@ class Config extends BaseModel
     public function setConfigValueAttribute($value)
     {
         $this->attributes['config_value'] = json_encode($value, JSON_UNESCAPED_SLASHES);
+    }
+
+    // ---- Query Scopes ----
+
+    public function scopeWithChildren($query, $name)
+    {
+        return $query->where('config_name', $name)
+            ->orWhere('config_name', 'like', "$name.%");
     }
 }

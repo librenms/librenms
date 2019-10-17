@@ -69,7 +69,7 @@ class SettingsController extends Controller
             return $this->jsonResponse($id, ":id is not a valid setting", null, 400);
         }
 
-        $dbConfig = \App\Models\Config::where('config_name', 'like', "$id%")->get();
+        $dbConfig = \App\Models\Config::withChildren($id)->get();
         if ($dbConfig->isEmpty()) {
             return $this->jsonResponse($id, ":id is not set", $config->get($id)->default, 400);
         }
