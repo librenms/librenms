@@ -6486,6 +6486,7 @@ __webpack_require__.r(__webpack_exports__);
           "unix-agent": "Unix-Agent Integration"
         },
         "poller": {
+          "distributed": "Distributed Poller",
           "ping": "Ping",
           "rrdtool": "RRDTool Setup",
           "snmp": "SNMP"
@@ -6759,6 +6760,18 @@ __webpack_require__.r(__webpack_exports__);
         "device_perf_purge": {
           "description": "Device performance entries older than (days)",
           "help": "Cleanup done by daily.sh"
+        },
+        "distributed_poller": {
+          "description": "Enable Distributed Polling (requires additional setup)",
+          "help": "Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/"
+        },
+        "distributed_poller_memcached_host": {
+          "description": "Memcached host",
+          "help": "The hostname or ip for the memcached server. This is required for poller_wrapper.py and daily.sh locking."
+        },
+        "distributed_poller_memcached_port": {
+          "description": "Memcached port",
+          "help": "The port for the memcached server. Default is 11211"
         },
         "email_auto_tls": {
           "description": "Enable / disable Auto TLS support",
@@ -7557,6 +7570,22 @@ __webpack_require__.r(__webpack_exports__);
       "lang": "English"
     },
     "commands": {
+      "config{get}": {
+        "description": "Get configuration value",
+        "arguments": {
+          "setting": "setting to get value of in dot notation (example: snmp.community.0)"
+        },
+        "options": {
+          "json": "Output setting or entire config as json"
+        }
+      },
+      "config{set}": {
+        "description": "Set configuration value (or unset)",
+        "arguments": {
+          "setting": "setting to set in dot notation (example: snmp.community.0)",
+          "value": "value to set, unset setting if this is omitted"
+        }
+      },
       "user{add}": {
         "description": "Add a local user, you can only log in with this user if auth is set to mysql",
         "arguments": {
