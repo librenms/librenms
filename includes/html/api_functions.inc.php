@@ -1186,6 +1186,18 @@ function get_inventory(\Illuminate\Http\Request $request)
 }
 
 
+function search_oxidized(\Illuminate\Http\Request $request)
+{
+    $search_in_conf_textbox = $request->route('searchstring');
+    $result = search_oxidized_config($search_in_conf_textbox);
+
+    if (!$result) {
+        return api_error(404, "Received no data from Oxidized");
+    } else {
+        return api_success($result, 'nodes');
+    }
+}
+
 function list_oxidized(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
