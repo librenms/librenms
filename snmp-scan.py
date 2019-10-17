@@ -54,6 +54,7 @@ class Outcome:
     FAILED = 4
     EXCLUDED = 5
     TERMINATED = 6
+    SKIPPED = 7
 
 
 VERBOSE_LEVEL = 0
@@ -66,6 +67,7 @@ stats = {
     Outcome.ADDED: 0,
     Outcome.UNPINGABLE: 0,
     Outcome.KNOWN: 0,
+    Outcome.SKIPPED: 0,
     Outcome.FAILED: 0,
     Outcome.EXCLUDED: 0,
     Outcome.TERMINATED: 0
@@ -83,6 +85,7 @@ def get_outcome_symbol(outcome):
         Outcome.ADDED: '+',
         Outcome.UNPINGABLE: '.',
         Outcome.KNOWN: '*',
+        Outcome.SKIPPED: '^',
         Outcome.FAILED: '-',
         Outcome.TERMINATED: ''
     }[outcome]
@@ -122,6 +125,9 @@ def scan_host(ip):
             except (herror, gaierror):
                 pass
 
+        if args.hostname_only and not hostname:
+            return Result(ip, hostname, Outcome.SKIPPED, 'No DNS')
+
         try:
             arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or ip]
             if args.ping:
@@ -153,8 +159,8 @@ This argument is only required if 'nets' config is not set
 Example: 192.168.0.0/24
 Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
 Example: 192.168.0.1/32 will be treated as a single host address""")
-    parser.add_argument('-P', '--ping', action='store_const', const="-b", default="", help="""Add the device as an ICMP only device if it replies to ping but not SNMP.
-Example: """ + __file__ + """ -P 192.168.0.0/24""")
+    parser.add_argument('-P', '--ping', action='store_const', const="-b", default="", help="Add the device as an ICMP only device if it replies to ping but not SNMP.")
+    parser.add_argument('-H', '--hostname-only', action='store_true', help="Only add hosts by hostname. Disables fallback to IP when there is no reverse and forward DNS.")
     parser.add_argument('-I', '--ip-only', action='store_true', help="Only add hosts by IP.  Do not try to lookup the hostname via reverse DNS.")
     parser.add_argument('-t', dest='threads', type=int,
                         help="How many IPs to scan at a time.  More will increase the scan speed," +
@@ -249,6 +255,8 @@ Example: """ + __file__ + """ -P 192.168.0.0/24""")
     base = 'Scanned {} IPs: {} known devices, added {} devices, failed to add {} devices'
     summary = base.format(stats['count'], stats[Outcome.KNOWN], stats[Outcome.ADDED], stats[Outcome.FAILED])
     if stats[Outcome.EXCLUDED]:
-        summary += ', {} ips excluded by config'.format(stats[Outcome.EXCLUDED])
+        summary += ', {} IPs excluded by config'.format(stats[Outcome.EXCLUDED])
+    if stats[Outcome.SKIPPED]:
+        summary += ', {} IPs skipped no DNS'.format(stats[Outcome.SKIPPED])
     print(summary)
     print('Runtime: {:.2f} seconds'.format(time() - start_time))
