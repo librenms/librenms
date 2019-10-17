@@ -452,13 +452,7 @@ class Config
         self::populateTime();
 
         // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
-        $db_config = config('database.connections.' . config('database.default'));
-        self::set('db_host', $db_config['host'] ?? 'localhost');
-        self::set('db_name', $db_config['database'] ?? 'librenms');
-        self::set('db_user', $db_config['username'] ?? 'librenms');
-        self::set('db_pass', $db_config['password'] ?? null);
-        self::set('db_socket', $db_config['unix_socket'] ?? null);
-        self::set('db_port', $db_config['port'] ?? 3306);
+        self::populateLegacyDbCredentials();
     }
 
     /**
