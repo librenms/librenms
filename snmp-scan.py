@@ -113,14 +113,14 @@ def scan_host(ip):
     hostname = None
 
     try:
-        try:
-            if not args.ip_only:
+        if not args.ip_only:
+            try:
                 # attempt to convert IP to hostname, if anything goes wrong, just use the IP
                 tmp = gethostbyaddr(ip)[0]
                 if gethostbyname(tmp) == ip:  # check that forward resolves
                     hostname = tmp
-        except (herror, gaierror):
-            pass
+            except (herror, gaierror):
+                pass
 
         try:
             arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or ip]
