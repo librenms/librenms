@@ -121,7 +121,7 @@ def scan_host(ip):
                     hostname = tmp
         except (herror, gaierror):
             pass
-        print(hostname or ip)
+
         try:
             arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or ip]
             if args.ping:
