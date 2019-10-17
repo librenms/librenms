@@ -2488,71 +2488,39 @@
         "graphite.port": {
             "default": 2003
         },
-        "graphs.mini.normal.day": {
-            "default": "24 Hours"
+        "graphs.mini.normal": {
+            "default": {
+                "day": "24 Hours",
+                "week": "One Week",
+                "month": "One Month",
+                "year": "One Year"
+            }
         },
-        "graphs.mini.normal.month": {
-            "default": "One Month"
+        "graphs.mini.widescreen": {
+            "default": {
+                "sixhour": "6 Hours",
+                "day": "24 Hours",
+                "twoday": "48 Hours",
+                "week": "One Week",
+                "twoweek": "Two Weeks",
+                "month": "One Month",
+                "twomonth": "Two Months",
+                "year": "One Year",
+                "twoyear": "Two Years"
+            }
         },
-        "graphs.mini.normal.week": {
-            "default": "One Week"
-        },
-        "graphs.mini.normal.year": {
-            "default": "One Year"
-        },
-        "graphs.mini.widescreen.day": {
-            "default": "24 Hours"
-        },
-        "graphs.mini.widescreen.month": {
-            "default": "One Month"
-        },
-        "graphs.mini.widescreen.sixhour": {
-            "default": "6 Hours"
-        },
-        "graphs.mini.widescreen.twoday": {
-            "default": "48 Hours"
-        },
-        "graphs.mini.widescreen.twomonth": {
-            "default": "Two Months"
-        },
-        "graphs.mini.widescreen.twoweek": {
-            "default": "Two Weeks"
-        },
-        "graphs.mini.widescreen.twoyear": {
-            "default": "Two Years"
-        },
-        "graphs.mini.widescreen.week": {
-            "default": "One Week"
-        },
-        "graphs.mini.widescreen.year": {
-            "default": "One Year"
-        },
-        "graphs.row.normal.day": {
-            "default": "24 Hours"
-        },
-        "graphs.row.normal.month": {
-            "default": "One Month"
-        },
-        "graphs.row.normal.sixhour": {
-            "default": "6 Hours"
-        },
-        "graphs.row.normal.twoday": {
-            "default": "48 Hours"
-        },
-        "graphs.row.normal.twomonth": {
-            "default": "Two Months"
-        },
-        "graphs.row.normal.twoweek": {
-            "default": "Two Weeks"
-        },
-        "graphs.row.normal.twoyear": {
-            "default": "Two Years"
-        },
-        "graphs.row.normal.week": {
-            "default": "One Week"
-        },
-        "graphs.row.normal.year": {
-            "default": "One Year"
+        "graphs.row.normal": {
+            "default": {
+                "sixhour": "6 Hours",
+                "day": "24 Hours",
+                "twoday": "48 Hours",
+                "week": "One Week",
+                "twoweek": "Two Weeks",
+                "month": "One Month",
+                "twomonth": "Two Months",
+                "year": "One Year",
+                "twoyear": "Two Years"
+            }
         },
         "gui.network-map.style": {
             "default": "new"
