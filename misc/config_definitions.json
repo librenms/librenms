@@ -860,16 +860,31 @@
             "default": true
         },
         "distributed_poller": {
-            "default": false
+            "default": false,
+            "group": "poller",
+            "section": "distributed",
+            "order": 0,
+            "type": "boolean"
         },
         "distributed_poller_group": {
             "default": 0
         },
         "distributed_poller_memcached_host": {
-            "default": "example.net"
+            "default": "example.net",
+            "group": "poller",
+            "section": "distributed",
+            "order": 1,
+            "type": "text",
+            "validate": {
+                "value": "ip_or_hostname"
+            }
         },
         "distributed_poller_memcached_port": {
-            "default": 11211
+            "default": 11211,
+            "group": "poller",
+            "section": "distributed",
+            "order": 2,
+            "type": "integer"
         },
         "distributed_poller_name": {
         },

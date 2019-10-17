@@ -31,6 +31,7 @@ return [
             'unix-agent' => 'Unix-Agent Integration',
         ],
         'poller' => [
+            'distributed' => 'Distributed Poller',
             'ping' => 'Ping',
             'rrdtool' => 'RRDTool Setup',
             'snmp' => 'SNMP',
@@ -304,6 +305,18 @@ return [
         'device_perf_purge' => [
             'description' => 'Device performance entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'distributed_poller' => [
+            'description' => 'Enable Distributed Polling (requires additional setup)',
+            'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/'
+        ],
+        'distributed_poller_memcached_host' => [
+            'description' => 'Memcached host',
+            'help' => 'The hostname or ip for the memcached server. This is required for poller_wrapper.py and daily.sh locking.'
+        ],
+        'distributed_poller_memcached_port' => [
+            'description' => 'Memcached port',
+            'help' => 'The port for the memcached server. Default is 11211'
         ],
         'email_auto_tls' => [
             'description' => 'Enable / disable Auto TLS support',
