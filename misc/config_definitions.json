@@ -2500,7 +2500,6 @@
             "default": {
                 "sixhour": "6 Hours",
                 "day": "24 Hours",
-                "twoday": "48 Hours",
                 "week": "One Week",
                 "twoweek": "Two Weeks",
                 "month": "One Month",
