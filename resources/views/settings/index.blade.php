@@ -22,6 +22,6 @@
     @routes
     <script src="{{ mix('/js/manifest.js') }}?v=10132019"></script>
     <script src="{{ mix('/js/vendor.js') }}?v=10132019"></script>
-    <script src="{{ mix('/js/app.js') }}?v=10132019"></script>
+    <script src="{{ mix('/js/app.js') }}?v=10172019"></script>
 @endpush
 
