@@ -300,8 +300,8 @@ function list_devices(\Illuminate\Http\Request $request)
         $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
         $sql = "`locations`.`location` LIKE '%".$query."%'";
-    } elseif ($type == 'domain') {
-        $sql = "`d`.`hostname` LIKE '%".$query."'";
+    } elseif ($type == 'hostname') {
+        $sql = "`d`.`hostname` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
         $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
