@@ -54,6 +54,13 @@ systems, and use redis-sentinel.
 You should not rely on the password for the security of your
 system. See <https://redis.io/topics/security>
 
+## Memcached (distributed polling)
+
+Although believed by many that by switching to the Dispatcher Service, one needs to 
+disable memcached and only enable redis. This is however not the case. A central
+memcached service is still needed, just like in the Distribute Poller setup, to handle 
+locking in the php processes. 
+
 ## MySQL
 
 You should already have this, but the pollers do need access to the
