@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use HTMLPurifier;
 use HTMLPurifier_Config;
+use Carbon\Carbon;
 use LibreNMS\Config;
 
 class Html
@@ -78,6 +79,7 @@ class Html
         $graph_data = [];
         foreach ($periods as $period => $period_text) {
             $graph_array['from'] = Config::get("time.$period");
+            $graph_array['to'] = Carbon::now()->timestamp;
             $graph_array_zoom = $graph_array;
             $graph_array_zoom['height'] = '150';
             $graph_array_zoom['width'] = '400';
