@@ -264,37 +264,37 @@ if ($stage == 0) {
             <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="2">
           <div class="form-group">
-            <label for="dbhost" class="col-sm-4" control-label">DB Host: </label>
+            <label for="dbhost" class="col-sm-4 control-label">DB Host: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbhost" id="dbhost" value="<?php echo $dbhost; ?>" placeholder="Leave empty if using Unix-Socket">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbport" class="col-sm-4" control-label">DB Port: </label>
+            <label for="dbport" class="col-sm-4 control-label">DB Port: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbport" id="dbport" value="<?php echo $dbport; ?>" placeholder="Leave empty if using Unix-Socket">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbsocket" class="col-sm-4" control-label">DB Unix-Socket: </label>
+            <label for="dbsocket" class="col-sm-4 control-label">DB Unix-Socket: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbsocket" id="dbsocket" value="<?php echo $dbsocket; ?>" placeholder="Leave empty if using Host">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbuser" class="col-sm-4" control-label">DB User: </label>
+            <label for="dbuser" class="col-sm-4 control-label">DB User: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbuser" id="dbuser" value="<?php echo $dbuser; ?>">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbpass" class="col-sm-4" control-label">DB Pass: </label>
+            <label for="dbpass" class="col-sm-4 control-label">DB Pass: </label>
             <div class="col-sm-8">
               <input type="password" class="form-control" name="dbpass" id="dbpass" value="<?php echo $dbpass; ?>">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbname" class="col-sm-4" control-label">DB Name: </label>
+            <label for="dbname" class="col-sm-4 control-label">DB Name: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbname" id="dbname" value="<?php echo $dbname; ?>">
             </div>
