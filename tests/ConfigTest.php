@@ -142,9 +142,9 @@ class ConfigTest extends TestCase
 
         $query->delete();
         $this->assertFalse($query->exists(), "$key should not be set, clean database");
-        Config::set($key, 'one', true);
+        Config::persist($key, 'one');
         $this->assertEquals('one', $query->value('config_value'));
-        Config::set($key, 'two', true);
+        Config::persist($key, 'two');
         $this->assertEquals('two', $query->value('config_value'));
 
         $this->dbTearDown();
