@@ -290,7 +290,7 @@ if ($vars['view'] == 'sdps') {
 
 if ($vars['view'] == 'sdpbinds') {
     echo '<tr><th><a title="Device">Device</a></th>
-        <th><a title="The value of this object specifies the Service identifier. This value should be unique within the service domain.">Service Id</a></th>
+        <th><a title="The value of this object specifies the Service identifier. This value should be unique within the service domain">Service Id</a></th>
         <th><a title="SDP Binding identifier. SDP identifier : Service identifier">SDP Bind Id</a></th>
         <th><a title="This object specifies whether this Service SDP binding is a spoke or a mesh.">Bind Type</a></th>
         <th><a title="The value of VC Type is an enumerated integer that specifies the type of virtual circuit (VC) associated with the SDP binding">VC Type</a></th>
