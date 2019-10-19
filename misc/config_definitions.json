@@ -10,7 +10,8 @@
             "type": "integer"
         },
         "addhost_alwayscheckip": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "alert.ack_until_clear": {
             "default": false,
@@ -117,48 +118,65 @@
             "type": "integer"
         },
         "alerts.bgp.whitelist": {
-            "default": null
+            "type": "array"
         },
         "alerts.email.default_only": {
+            "type": "boolean"
         },
         "alerts.email.enable": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "alerts.port.ifdown": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "alerts.port_util_alert": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "alerts.port_util_perc": {
-            "default": 85
+            "default": 85,
+            "type": "integer",
+            "validate": {
+                "value": "integer|between:0,100"
+            }
         },
         "allow_duplicate_sysName": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "allow_entity_sensor.amperes": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "allow_entity_sensor.celsius": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "allow_entity_sensor.dBm": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "allow_entity_sensor.specialEnum": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "allow_entity_sensor.truthvalue": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "allow_entity_sensor.voltsAC": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "allow_entity_sensor.voltsDC": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "allow_entity_sensor.watts": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "allow_unauth_graphs": {
             "default": false,
@@ -195,13 +213,20 @@
             "type": "array"
         },
         "api.cors.enabled": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "api.cors.maxage": {
-            "default": 86400
+            "default": 86400,
+            "type": "integer",
+            "units": "seconds",
+            "validate": {
+                "value": "integer|min:0"
+            }
         },
         "api.cors.origin": {
-            "default": "*"
+            "default": "*",
+            "type": "text"
         },
         "api_demo": {
             "default": false,
@@ -731,133 +756,176 @@
             "type": "array"
         },
         "discover_services": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_by_ip": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.os": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.ports": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.ports-stack": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.entity-physical": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.entity-state": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.processors": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.mempools": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.cisco-vrf-lite": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.cisco-mac-accounting": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.cisco-pw": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.vrf": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.cisco-cef": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.cisco-sla": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.cisco-cbqos": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.cisco-otv": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.cisco-qfp": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.ipv4-addresses": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.ipv6-addresses": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.route": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.sensors": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.storage": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.hr-device": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.discovery-protocols": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.arp-table": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.discovery-arp": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.junose-atm-vp": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.bgp-peers": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.vlans": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.vmware-vminfo": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.libvirt-vminfo": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.toner": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.ucd-diskio": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.applications": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.services": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.stp": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.ntp": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.loadbalancers": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.mef": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "discovery_modules.wireless": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.fdb-table": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "discovery_modules.mpls": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "distributed_poller": {
             "default": false,
@@ -3079,142 +3147,232 @@
         "plugin_dir": {
         },
         "poller_modules.unix-agent": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "poller_modules.os": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.ipmi": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.sensors": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.processors": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.mempools": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.storage": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.netstats": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.hr-mib": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.ucd-mib": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.ipSystemStats": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.ports": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.bgp-peers": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.junose-atm-vp": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.toner": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.ucd-diskio": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.wifi": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.wireless": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.ospf": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-ipsec-flow-monitor": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-remote-access-monitor": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-cef": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-sla": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-mac-accounting": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cipsec-tunnels": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-ace-loadbalancer": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-ace-serverfarms": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-asa-firewall": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-voice": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-cbqos": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-otv": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-qfp": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.cisco-vpdn": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.nac": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.netscaler-vsvr": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.aruba-controller": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.entity-physical": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.entity-state": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.applications": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.mib": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.stp": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.ntp": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "poller_modules.loadbalancers": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.mef": {
-            "default": false
+            "default": false,
+            "type": "boolean"
+
         },
         "poller_modules.mpls": {
-            "default": true
+            "default": true,
+            "type": "boolean"
+
         },
         "port_descr_parser": {
-            "default": "includes/port-descr-parser.inc.php"
+            "default": "includes/port-descr-parser.inc.php",
+            "type": "text"
         },
         "ports_fdb_purge": {
             "default": 10,
@@ -3225,22 +3383,34 @@
             "type": "integer"
         },
         "ports_page_default": {
-            "default": "details"
+            "default": "details",
+            "type": "select",
+            "options":{
+                "basic": "Basic",
+                "details": "Details",
+                "arp": "ARP",
+                "fdb": "FDB"
+            }
         },
         "project_home": {
-            "default": "http://www.librenms.org/"
+            "default": "http://www.librenms.org/",
+            "type": "text"
         },
         "project_id": {
-            "default": "librenms"
+            "default": "librenms",
+            "type": "text"
         },
         "project_issues": {
-            "default": "https://community.librenms.org/c/help"
+            "default": "https://community.librenms.org/c/help",
+            "type": "text"
         },
         "project_name": {
-            "default": "LibreNMS"
+            "default": "LibreNMS",
+            "type": "text"
         },
         "prometheus.job": {
-            "default": "librenms"
+            "default": "librenms",
+            "type": "text"
         },
         "public_status": {
             "default": false,
@@ -3250,13 +3420,20 @@
             "type": "boolean"
         },
         "rancid_ignorecomments": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "rancid_repo_type": {
-            "default": "svn"
+            "default": "svn",
+            "type": "select",
+            "options": {
+                "svn": "SVN",
+                "git": "Git"
+            }
         },
         "rewrite_if_regexp./^cpu interface/": {
-            "default": "Mgmt"
+            "default": "Mgmt",
+            "type": "text"
         },
         "rrd.heartbeat": {
             "default": 600,
@@ -3626,10 +3803,15 @@
             }
         },
         "uptime_warning": {
-            "default": 84600
+            "default": 84600,
+            "type": "integer",
+            "validate": {
+                "value": "integer|min:0"
+            }
         },
         "vertical_summary": {
-            "default": 0
+            "default": 0,
+            "type": "integer"
         },
         "virsh": {
             "default": "/usr/bin/virsh",
@@ -3639,16 +3821,20 @@
             "type": "text"
         },
         "warn.ifdown": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "warn_colour": {
-            "default": "#ffeeee"
+            "default": "#ffeeee",
+            "type": "color"
         },
         "warn_colour_alt": {
-            "default": "#ffcccc"
+            "default": "#ffcccc",
+            "type": "color"
         },
         "web_mouseover": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "webui.availability_map_box_size": {
             "default": 165,
@@ -3736,7 +3922,8 @@
             "type": "text"
         },
         "xirrus_disable_stations": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         }
     }
 }
