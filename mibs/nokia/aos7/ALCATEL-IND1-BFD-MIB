@@ -1,0 +1,830 @@
+ALCATEL-IND1-BFD-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+      Unsigned32, Counter64,TimeTicks,
+      OBJECT-IDENTITY
+         FROM SNMPv2-SMI                        -- [RFC2578]
+
+      MODULE-COMPLIANCE,OBJECT-GROUP
+	     FROM SNMPv2-CONF
+
+      TEXTUAL-CONVENTION, TruthValue, RowStatus
+         FROM SNMPv2-TC                         -- [RFC2579]
+
+      InterfaceIndex, InterfaceIndexOrZero
+         FROM IF-MIB                            -- [RFC2863]
+
+      InetAddress, InetAddressType, InetPortNumber
+         FROM INET-ADDRESS-MIB                  -- [RFC4001]
+
+      SnmpAdminString
+         FROM SNMP-FRAMEWORK-MIB
+
+      softentIND1BFD
+         FROM ALCATEL-IND1-BASE;
+
+
+      alcatelIND1BfdMIB  MODULE-IDENTITY
+        LAST-UPDATED  "201005050000Z"
+        ORGANIZATION  "Alcatel-Lucent"
+        CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                      Alcatel-Lucent, Enterprise Solutions Division
+                    (Formerly Alcatel Internetworking, Incorporated)
+                              26801 West Agoura Road
+                              Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+      DESCRIPTION
+            "This document describes the Management Information Base for
+             Bidirectional Forwarding Detection(BFD) Protocol.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+      REVISION      "201005050000Z"
+      DESCRIPTION
+            "The latest version of this MIB Module."
+      ::= { softentIND1BFD 1}
+
+
+      alaBfdObjects    OBJECT-IDENTITY
+         STATUS  current
+         DESCRIPTION
+         "Branch for Bidirectional Forwarding Detection subsystem managed objects"
+         ::= { alcatelIND1BfdMIB 1 }
+
+      alcatelIND1BfdMIBConformance OBJECT-IDENTITY
+         STATUS  current
+         DESCRIPTION
+         "Conformance"
+         ::= { alcatelIND1BfdMIB 2 }
+
+
+ --  Textual Conventions
+
+      AlaBfdInterval ::= TEXTUAL-CONVENTION
+         STATUS        current
+         DESCRIPTION
+         "The BFD interval delay, in milliseconds."
+         SYNTAX        Unsigned32 (0..4294967295)
+
+      AlaBfdDiag ::= TEXTUAL-CONVENTION
+         STATUS        current
+         DESCRIPTION
+         "A common BFD diagnostic code."
+         SYNTAX INTEGER {
+                        noDiagnostic(0),
+                        controlDetectionTimeExpired(1),
+                        echoFunctionFailed(2),
+                        neighborSignaledSessionDown(3),
+                        forwardingPlaneReset(4),
+                        pathDown(5),
+                        concatenatedPathDown(6),
+                        administrativelyDown(7),
+                        reverseConcatenatedPathDown (8)
+                       }
+
+      AlaBfdStatus ::= TEXTUAL-CONVENTION
+         STATUS        current
+         DESCRIPTION
+         "Administrative status"
+         SYNTAX  INTEGER {
+                          enabled(1),
+                          disabled(2)
+                         }
+
+
+ --  BFD General Variables
+
+      alaBfdGlobalObjects OBJECT IDENTIFIER ::= { alaBfdObjects 1 }
+
+      alaBfdGlobalVersionNumber OBJECT-TYPE
+         SYNTAX          Unsigned32
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION
+         "The version number of the BFD protocol that is used by BFD sessions in this
+          router instance."
+         DEFVAL { 1 }
+         ::= { alaBfdGlobalObjects 1 }
+
+      alaBfdGlobalAdminStatus  OBJECT-TYPE
+         SYNTAX          AlaBfdStatus
+         MAX-ACCESS      read-write
+         STATUS          current
+         DESCRIPTION
+         "The administrative status of BFD in this router instance."
+         DEFVAL { disabled }
+         ::= { alaBfdGlobalObjects 2 }
+
+      alaBfdGlobalTxInterval   OBJECT-TYPE
+         SYNTAX          AlaBfdInterval
+         MAX-ACCESS      read-write
+         STATUS          current
+         DESCRIPTION
+         "The Desired Tx interval, in milliseconds, at which packets should be
+          transmitted on BFD sessions in this router instance."
+         DEFVAL { 300 }
+         ::= { alaBfdGlobalObjects 3 }
+
+      alaBfdGlobalRxInterval   OBJECT-TYPE
+         SYNTAX          AlaBfdInterval
+         MAX-ACCESS      read-write
+         STATUS          current
+         DESCRIPTION
+         "The Minimum Rx interval, in milliseconds, at which packets can be
+          received on BFD sessions in this router instance."
+         DEFVAL { 300 }
+         ::= { alaBfdGlobalObjects 4 }
+
+      alaBfdGlobalDetectMult OBJECT-TYPE
+         SYNTAX          Integer32 (3..10)
+         MAX-ACCESS      read-write
+         STATUS          current
+         DESCRIPTION
+         "The Detection time multiplier. The negotiated transmit interval, multiplied by
+          the value of this object, provides the detection time for the receiving system."
+         DEFVAL { 3 }
+         ::= { alaBfdGlobalObjects 5}
+
+      alaBfdGlobalEchoRxInterval OBJECT-TYPE
+         SYNTAX          AlaBfdInterval
+         MAX-ACCESS      read-write
+         STATUS          current
+         DESCRIPTION
+         "The Minimum Echo Rx interval, in milliseconds, at which packets can be
+          received on BFD sessions in this router instance."
+          DEFVAL { 300 }
+          ::= { alaBfdGlobalObjects 6 }
+
+      alaBfdGlobalProtocolApps   OBJECT-TYPE
+       	 SYNTAX BITS {
+                      vrrp(0),
+                      staticRtg(1),
+                      ospf(2),
+                      bgp(3),
+                      isis(4),
+                      pim(5),
+                      dvmrp(6)
+                     }
+         MAX-ACCESS    read-only
+		 STATUS        current
+		 DESCRIPTION
+         "Bit map object to reflect BFD applications currently registered to
+         request BFD session state notifications. Bits 0 - 6 are currently in use, and
+         if set, indicate that the respective application is registered with BFD:
+		     	bit 0 - VRRP
+		        bit 1 - STATIC ROUTING (i.e. IP Route Manager)
+		        bit 2 - OSPF
+          	    bit 3 - BGP 
+          	    bit 4 - ISIS
+          	    bit 5 - PIM
+          	    bit 6 - DVMRP "
+         ::= { alaBfdGlobalObjects 7}
+       	
+
+--  BFD interface Table
+--  BFD interface Table specifies the configured session parameters used over the IP interface.
+
+      alaBfdIntfTable OBJECT-TYPE
+         SYNTAX       SEQUENCE OF AlaBfdIntfEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+         "The BFD Interface Table describes the configured parameters used for
+          BFD sessions on this outgoing IP interface, identified by the interface index."
+         ::= { alaBfdObjects 2 }
+
+      alaBfdIntfEntry OBJECT-TYPE
+         SYNTAX      AlaBfdIntfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+         "The BFD interface Entry describes BFD session configuration for the IP
+         interface."
+         INDEX  { alaBfdIntfIndex }
+         ::= { alaBfdIntfTable 1 }
+
+      AlaBfdIntfEntry ::= SEQUENCE {
+               alaBfdIntfIndex                      InterfaceIndex,
+               alaBfdIntfAddrType                   InetAddressType,
+               alaBfdIntfAddr                       InetAddress,
+               alaBfdIntfAdminStatus                AlaBfdStatus,
+               alaBfdIntfDesiredMinTxInterval       AlaBfdInterval,
+               alaBfdIntfReqMinRxInterval           AlaBfdInterval,
+               alaBfdIntfReqMinEchoRxInterval       AlaBfdInterval,
+               alaBfdIntfDetectMult                 Integer32,
+               alaBfdIntfAuthPresFlag               TruthValue,
+               alaBfdIntfAuthenticationType         INTEGER,
+               alaBfdIntfIfName                     SnmpAdminString,
+               alaBfdIntfOperStatus                 INTEGER,
+               alaBfdIntfRowStatus                  RowStatus
+             }
+
+      alaBfdIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+         "The ifIndex of the IP Interface for which the BFD session configuration is applied"
+         ::= { alaBfdIntfEntry 1}
+
+      alaBfdIntfAddrType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+         "This object specifies IP address type values - unknown(0), ipv4(1) or ipv6(2)."
+         ::= { alaBfdIntfEntry 2}
+
+      alaBfdIntfAddr OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+         "The address of the IP interface for which BFD session parameters are configured"
+         ::= { alaBfdIntfEntry 3}
+
+      alaBfdIntfAdminStatus OBJECT-TYPE
+         SYNTAX      AlaBfdStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+         "The administrative status of the BFD interface."
+         DEFVAL { disabled }
+         ::= { alaBfdIntfEntry 4}
+
+      alaBfdIntfDesiredMinTxInterval OBJECT-TYPE
+         SYNTAX      AlaBfdInterval
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+         "The Minimum Desired Tx interval at which packets should be transmitted for
+          BFD sessions on this interface. The default value for this object is derived
+          from the value of alaBfdGlobalTxInterval."
+         ::= { alaBfdIntfEntry 5}
+
+      alaBfdIntfReqMinRxInterval OBJECT-TYPE
+         SYNTAX      AlaBfdInterval
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+         "The Minimum Rx interval at which packets can be received for BFD sessions on
+          this interface. The default value for this object is derived from the value of
+          alaBfdGlobalRxInterval."
+         ::= { alaBfdIntfEntry 6}
+
+      alaBfdIntfReqMinEchoRxInterval  OBJECT-TYPE
+         SYNTAX      AlaBfdInterval
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+         "The Minimum Echo Rx interval at which ECHO packets can be received for BFD
+         sessions on this interface. The default value for this object is derived from the
+         value of alaBfdGlobalEchoRxInterval."
+         ::= { alaBfdIntfEntry 7}
+
+      alaBfdIntfDetectMult  OBJECT-TYPE
+         SYNTAX      Integer32 (3..10)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+         "The Detection time multiplier for BFD sessions on this interface. The default
+          value for this object is derived from the value of alaBfdGlobalDetectMult."
+         ::= { alaBfdIntfEntry 8}
+
+      alaBfdIntfAuthPresFlag    OBJECT-TYPE
+         SYNTAX          TruthValue
+         MAX-ACCESS      read-create
+         STATUS          current
+         DESCRIPTION
+         "This object indicates the local system's desire to use authentication on BFD
+         sessions. If set to true(1), the local system wishes the session to be authenticated
+         and set to false(0) if not."
+         DEFVAL { false }
+         ::= { alaBfdIntfEntry 9}
+
+      alaBfdIntfAuthenticationType  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                           none (1),
+                           simplePassword(2),
+                           keyedMD5(3),
+                           meticulousKeyedMD5(4),
+                           keyedSHA1(5),
+                           meticulousKeyedSHA1(6)
+                         }
+         MAX-ACCESS       read-create
+         STATUS           current
+         DESCRIPTION
+         "The Authentication Type used for BFD sessions on this interface. This field is valid
+          only when the Authentication Present bit is set."
+         DEFVAL { none }
+         ::= { alaBfdIntfEntry 10}
+
+      alaBfdIntfIfName       OBJECT-TYPE
+         SYNTAX          SnmpAdminString
+         MAX-ACCESS      read-create
+         STATUS          current
+         DESCRIPTION
+         "The user defined name used to identify the IP interface"
+         ::= { alaBfdIntfEntry  11}
+
+      alaBfdIntfOperStatus      OBJECT-TYPE
+         SYNTAX         INTEGER  {
+                            up(1),
+                            down(2)
+                        }
+         MAX-ACCESS     read-create
+         STATUS         current
+         DESCRIPTION
+         "The operational status of this BFD IP interface, which is dependent on IP interface
+         status."
+         ::= { alaBfdIntfEntry  12}
+
+      alaBfdIntfRowStatus       OBJECT-TYPE
+         SYNTAX          RowStatus
+         MAX-ACCESS      read-create
+         STATUS          current
+         DESCRIPTION
+         "Snmp row status variable for this interface entry."
+         ::= { alaBfdIntfEntry  13}
+
+ --  BFD Session Table
+ --  The BFD Session Table describes BFD session specific information.
+
+      alaBfdSessTable OBJECT-TYPE
+         SYNTAX   SEQUENCE OF AlaBfdSessEntry
+         MAX-ACCESS   not-accessible
+         STATUS   current
+         DESCRIPTION
+         "The BFD Session Table describes the BFD sessions for this router instance."
+         ::= { alaBfdObjects 3 }
+
+      alaBfdSessEntry OBJECT-TYPE
+         SYNTAX      AlaBfdSessEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+         "The BFD Session Entry describes the BFD session."
+         INDEX  { alaBfdSessDiscriminator}
+         ::= { alaBfdSessTable 1 }
+
+      AlaBfdSessEntry ::= SEQUENCE {
+                alaBfdSessDiscriminator            Unsigned32,
+                alaBfdSessNeighborAddrType         InetAddressType,
+                alaBfdSessNeighborAddr             InetAddress,
+                alaBfdSessSessionType              BITS,
+                alaBfdSessRemoteDiscr              Unsigned32,
+                alaBfdSessUdpPort                  InetPortNumber,
+                alaBfdSessState                    INTEGER,
+                alaBfdSessDiag                     AlaBfdDiag,
+                alaBfdSessOperMode                 INTEGER,
+                alaBfdSessControlPlanIndepFlag     TruthValue,
+                alaBfdSessIfIndex                  InterfaceIndexOrZero,
+                alaBfdSessNegotiatedTxInterval     AlaBfdInterval,
+                alaBfdSessNegotiatedRxInterval     AlaBfdInterval,
+                alaBfdSessEchoRxInterval           AlaBfdInterval,
+                alaBfdSessProtocolApps             BITS
+             }
+
+      alaBfdSessDiscriminator    OBJECT-TYPE
+         SYNTAX        Unsigned32 (1..1024)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "The systemwide-unique local discriminator that identifies this BFD session."
+         ::= { alaBfdSessEntry 1}
+
+      alaBfdSessNeighborAddrType   OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+         "This object specifies the IP address type of the neighbor or remote router."
+         ::= { alaBfdSessEntry 2}
+
+      alaBfdSessNeighborAddr     OBJECT-TYPE
+         SYNTAX        InetAddress
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The IP address of the neighbor or remote router for this BFD session."
+         ::= { alaBfdSessEntry 3}
+
+      alaBfdSessSessionType	    OBJECT-TYPE
+         SYNTAX BITS {
+                       asynchronous(0),
+                       echo(1),
+                       demand(2)
+                     }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+         "This bit map object specifies the session type(s) that have been requested by
+          BFD applications to this session's remote address. One or more applications can
+          request different types of sessions to the same remote address.
+          Bits 0 - 2 are currently in use, and if set, indicate that the respective
+          session type has been requested for this session:
+                bit 0 - Asynchronous
+                bit 1 - Echo Function
+                bit 2 - Demand "
+         ::= { alaBfdSessEntry 4}
+
+      alaBfdSessRemoteDiscr   OBJECT-TYPE
+         SYNTAX        Unsigned32 (1..4294967295)
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The discriminator used by the remote router for this BFD session."
+         ::= { alaBfdSessEntry 5}
+
+      alaBfdSessUdpPort OBJECT-TYPE
+         SYNTAX      InetPortNumber
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+         "The unique source UDP Port for this BFD session in this router instance."
+         ::= { alaBfdSessEntry 6}
+
+      alaBfdSessState    OBJECT-TYPE
+         SYNTAX   INTEGER {
+                            adminDown(1),
+                            down(2),
+                            init(3),
+                            up(4)
+                          }
+         MAX-ACCESS   read-only
+         STATUS      current
+         DESCRIPTION
+         "The protocol state of the BFD session."
+         ::= { alaBfdSessEntry 7}
+
+      alaBfdSessDiag        OBJECT-TYPE
+         SYNTAX      AlaBfdDiag
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+         "A diagnostic code specifying the local system's reason for the last transition
+          of the session from up(4)to some other state."
+         ::= { alaBfdSessEntry 8}
+
+      alaBfdSessOperMode     OBJECT-TYPE
+         SYNTAX   INTEGER {
+                            asyncModeWEchoFunction(1),
+                            asynchModeWOEchoFunction(2),
+                            demandModeWEchoFunction(3),
+                            demandModeWOEchoFunction(4),
+                            echoOnly(5)
+                          }
+         MAX-ACCESS   read-only
+         STATUS   current
+         DESCRIPTION
+         "This object specifies the current operating mode of the BFD session."
+         ::= { alaBfdSessEntry 10}
+
+      alaBfdSessControlPlanIndepFlag    OBJECT-TYPE
+         SYNTAX        TruthValue
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "This object indicates the local system's ability to continue to
+          function through a disruption of the control plane. Specifically, it is
+          set  to true(1) if the local system's BFD implementation independent of the
+          control plane. Otherwise, the value is set to false(0)"
+         ::= { alaBfdSessEntry 11}
+
+      alaBfdSessIfIndex      OBJECT-TYPE
+         SYNTAX        InterfaceIndexOrZero
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "This object contains an ifIndex of the IP interface on which this
+          BFD session is running. This value can be zero if there are no interface associated
+          with this BFD session."
+         ::= { alaBfdSessEntry 12}
+
+      alaBfdSessNegotiatedTxInterval  OBJECT-TYPE
+         SYNTAX          AlaBfdInterval
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION
+         "This object specifies the minimum interval, in milliseconds, that the local system
+          will transmit BFD Control packets."
+         ::= { alaBfdSessEntry 13}
+
+      alaBfdSessNegotiatedRxInterval OBJECT-TYPE
+         SYNTAX          AlaBfdInterval
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION
+         "This object specifies the minimum interval, in milliseconds, that the local system
+          will receive BFD Control packets."
+         ::= { alaBfdSessEntry 14}
+
+      alaBfdSessEchoRxInterval OBJECT-TYPE
+         SYNTAX          AlaBfdInterval
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION
+         "This object specifies the minimum echo rx interval, in milliseconds, that the local system
+          will receive BFD Echo packets."
+         ::= { alaBfdSessEntry 15}
+
+      alaBfdSessProtocolApps	    OBJECT-TYPE
+         SYNTAX BITS {
+                       vrrp(0),
+      	               staticRtg(1),
+      	               ospf(2),
+		               bgp(3),
+		               isis(4),
+		               pim(5),
+		               dvmrp(6)
+      	             }
+      	 MAX-ACCESS    read-only
+      	 STATUS        current
+      	 DESCRIPTION
+         "Bit map object to reflect BFD applications that have requested for detection to
+         this session's remote address. Bits 0 - 6 are currently in use, and if set,
+         indicate that the respective application has requested BFD session state event
+         notifications:
+		     	bit 0 - VRRP
+		        bit 1 - STATIC ROUTING (i.e. IP Route Manager)
+		        bit 2 - OSPF
+          	    bit 3 - BGP 
+          	    bit 4 - ISIS
+          	    bit 5 - PIM
+          	    bit 6 - DVMRP "
+         ::= { alaBfdSessEntry 16}
+
+
+ -- BFD Session Performance Table
+
+      alaBfdSessPerfTable OBJECT-TYPE
+         SYNTAX        SEQUENCE OF AlaBfdSessPerfEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "This table specifies BFD Session performance and statistics."
+         ::= { alaBfdObjects 4 }
+
+      alaBfdSessPerfEntry OBJECT-TYPE
+         SYNTAX        AlaBfdSessPerfEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "An entry in this table is created for every BFD Session in this router
+         instance."
+         AUGMENTS    { alaBfdSessEntry }
+         ::= { alaBfdSessPerfTable 1 }
+
+      AlaBfdSessPerfEntry ::= SEQUENCE {
+                alaBfdSessPerfPktIn               Counter64,
+                alaBfdSessPerfPktOut              Counter64,
+                alaBfdSessPerfEchoOut             Counter64,
+                alaBfdSessPerfEchoIn              Counter64,
+                alaBfdSessPerfUpTime              TimeTicks,
+                alaBfdSessPerfLastSessDownTime    TimeTicks,
+                alaBfdSessPerfLastCommLostDiag    AlaBfdDiag,
+                alaBfdSessPerfSessUpCount         Counter64,
+                alaBfdSessPerfDiscTime            TimeTicks
+              }
+
+      alaBfdSessPerfPktIn      OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+         "The total number of BFD packets received for this BFD session."
+         ::= { alaBfdSessPerfEntry 1 }
+
+      alaBfdSessPerfPktOut     OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+         "The total number of BFD packets sent for this BFD session."
+         ::= { alaBfdSessPerfEntry 2 }
+
+      alaBfdSessPerfEchoOut    OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+         "The total number of BFD Echo packets sent for this BFD session."
+         ::= { alaBfdSessPerfEntry 3 }
+
+      alaBfdSessPerfEchoIn     OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+         "The total number of BFD Echo packets received for this BFD session."
+         ::= { alaBfdSessPerfEntry 4 }
+
+      alaBfdSessPerfUpTime   OBJECT-TYPE
+         SYNTAX       TimeTicks
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+         "The system time elapsed since the most recent occasion at which the session became up.
+          If no such event occured, this object contains a zero value."
+         ::= { alaBfdSessPerfEntry 5 }
+
+      alaBfdSessPerfLastSessDownTime OBJECT-TYPE
+         SYNTAX       TimeTicks
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+         "The system time elapsed since the most recent occasion at which communication
+          was lost with the remote end (i.e. session was down). If no such event occured, 
+          this object contains a zero value."
+         ::= { alaBfdSessPerfEntry 6 }
+
+      alaBfdSessPerfLastCommLostDiag OBJECT-TYPE
+         SYNTAX       AlaBfdDiag
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+         "The BFD diagnostic code for the last time communication was lost with the remote
+          end. If no such event occured, this object contains a zero value."
+         ::= { alaBfdSessPerfEntry 7 }
+
+      alaBfdSessPerfSessUpCount      OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+         "The number of times this session has gone into the Up state since the
+          router last rebooted."
+         ::= { alaBfdSessPerfEntry 8 }
+
+      alaBfdSessPerfDiscTime   OBJECT-TYPE
+         SYNTAX       TimeTicks
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+         "The value of system time on the most recent occasion at which any one or more of the
+          session counters suffered a discontinuity.The relevant counters are the specific
+          instances associated with this BFD session of any Counter64 object contained in
+          the BfdSessPerfTable. If no such discontinuities have occurred since the last
+          re-initialization of the local management  subsystem, then this object
+          contains a zero value."
+         ::= { alaBfdSessPerfEntry 9 }
+
+  -- BFD Conformance
+
+      alcatelIND1BfdMIBGroups OBJECT IDENTIFIER ::=
+              { alcatelIND1BfdMIBConformance 1}
+
+      alcatelIND1BfdMIBCompliances  OBJECT IDENTIFIER ::=
+              { alcatelIND1BfdMIBConformance 2}
+
+
+  -- compliance statements
+
+      alcatelIND1BfdMIBCompliance MODULE-COMPLIANCE
+         STATUS  current
+         DESCRIPTION
+         "The compliance statement for device support of BFD."
+         MODULE
+         MANDATORY-GROUPS {
+                     alaBfdBasicGroup,
+                     alaBfdIntfCfgGroup,
+                     alaBfdSessGroup,
+                     alaBfdSessPerfGroup
+                 }
+         ::= { alcatelIND1BfdMIBCompliances 1}
+
+        -- units of conformance
+
+      alaBfdBasicGroup	OBJECT-GROUP
+         OBJECTS {
+		          alaBfdGlobalVersionNumber,
+                  alaBfdGlobalAdminStatus,
+		          alaBfdGlobalTxInterval,
+		          alaBfdGlobalRxInterval,
+		          alaBfdGlobalDetectMult,
+		          alaBfdGlobalEchoRxInterval,
+		          alaBfdGlobalProtocolApps
+		        }
+		 STATUS      current
+		 DESCRIPTION
+		 "A collection of objects providing information about the
+		  configuration done for BFD at global level."
+         ::= { alcatelIND1BfdMIBGroups 1}
+
+      alaBfdIntfCfgGroup 	OBJECT-GROUP
+         OBJECTS {
+                  -- alaBfdIntfIndex,
+                  alaBfdIntfAddr,
+                  alaBfdIntfAddrType,
+			      alaBfdIntfAdminStatus,
+			      alaBfdIntfDesiredMinTxInterval,
+			      alaBfdIntfReqMinRxInterval,
+			      alaBfdIntfReqMinEchoRxInterval,
+			      alaBfdIntfDetectMult,
+			      alaBfdIntfAuthPresFlag,
+			      alaBfdIntfAuthenticationType,
+                  alaBfdIntfIfName,
+                  alaBfdIntfOperStatus,
+                  alaBfdIntfRowStatus
+              	}
+		 STATUS      current
+		 DESCRIPTION
+		 "A collection of objects providing information about the
+		  configuration done for a BFD interface."
+		 ::= { alcatelIND1BfdMIBGroups 2}
+		
+      alaBfdSessGroup      	OBJECT-GROUP
+	     OBJECTS {
+			    --  alaBfdSessDiscriminator,
+			      alaBfdSessNeighborAddrType,
+			      alaBfdSessNeighborAddr,
+                  alaBfdSessSessionType,
+			      alaBfdSessRemoteDiscr,
+			      alaBfdSessUdpPort,
+			      alaBfdSessState,
+			      alaBfdSessDiag,
+			      alaBfdSessOperMode,
+			      alaBfdSessControlPlanIndepFlag,
+			      alaBfdSessIfIndex,
+			      alaBfdSessNegotiatedTxInterval,
+			      alaBfdSessNegotiatedRxInterval,
+			      alaBfdSessEchoRxInterval,
+                  alaBfdSessProtocolApps
+                }
+		 STATUS      current
+		 DESCRIPTION
+		 "A collection of objects providing information about the BFD session."
+		 ::= { alcatelIND1BfdMIBGroups 3}
+		
+	  alaBfdSessPerfGroup 	OBJECT-GROUP
+		 OBJECTS {
+			       alaBfdSessPerfPktIn,
+			       alaBfdSessPerfPktOut,
+			       alaBfdSessPerfEchoOut,
+			       alaBfdSessPerfEchoIn,
+			       alaBfdSessPerfUpTime,
+			       alaBfdSessPerfLastSessDownTime,
+			       alaBfdSessPerfLastCommLostDiag,
+			       alaBfdSessPerfSessUpCount,
+                   alaBfdSessPerfDiscTime
+                  }
+         STATUS      current
+		 DESCRIPTION
+		 "A collection of objects providing information about the BFD session
+          performance counters."
+		 ::= { alcatelIND1BfdMIBGroups 4}
+	
+ END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

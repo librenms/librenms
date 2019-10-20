@@ -1,0 +1,753 @@
+ALCATEL-IND1-PIM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+	IpAddress, Integer32, TimeTicks,
+	Unsigned32, Counter32
+		FROM SNMPv2-SMI
+    InetAddressType, InetAddress,
+    InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+	pimInterfaceEntry
+		FROM PIM-STD-MIB
+	RowStatus, TruthValue
+		FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    	FROM SNMPv2-CONF
+	routingIND1Pim
+		FROM ALCATEL-IND1-BASE;
+
+alcatelIND1PIMMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200704030000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for 
+             the configuration of PIM-SM and PIM-DM global configuration 
+             parameters.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Pim 1 }
+
+alcatelIND1PIMMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1PIMMIB 1 }
+
+alaPimsmGlobalConfig OBJECT IDENTIFIER ::= { alcatelIND1PIMMIBObjects 1 }
+alaPimdmGlobalConfig OBJECT IDENTIFIER ::= { alcatelIND1PIMMIBObjects 2 }
+alaPimGlobalConfig   OBJECT IDENTIFIER ::= { alcatelIND1PIMMIBObjects 3 }
+
+-- ************************************************************************
+--  PIM-SM Global Configuration
+-- ************************************************************************
+
+alaPimsmAdminStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM-SM protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 1}
+
+alaPimsmMaxRPs    OBJECT-TYPE
+    SYNTAX     Integer32 (1..100)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "The maximum number of C-RPs allowed in the PIM-SM
+                domain."
+    DEFVAL     { 32 }
+    ::= { alaPimsmGlobalConfig 2 }
+
+alaPimsmProbeTime OBJECT-TYPE
+    SYNTAX     Integer32 (1..300)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "When NULL Registers are used, this is the time
+                between sending a NULL Register and the Register-
+                Suppression-Timer expiring unless it is restarted
+                by receiving a Register-Stop."
+    DEFVAL     { 5 }
+    ::= { alaPimsmGlobalConfig 3}
+
+alaPimsmOldRegisterMessageSupport    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    header(1),
+                    full(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "Specifies the application of the checksum function on
+                received Register messages in the PIM-SM domain.  When
+                set to full(2), the checksum for a register message
+                is computed for the entire packet (i.e. includes data).
+                When set to header(1), the checksum is done only on the
+                first 8 bytes of the packet.  This variable is provided
+                for interoperability reasons and may be required for
+                Compatibility with older implementations of PIM-SM v2.
+                This parameter must be set the same throughout the
+                PIM-SM domain."
+    DEFVAL     { header }
+    ::= { alaPimsmGlobalConfig 4 }
+
+alaPimsmAdminSPTConfig     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables SPT Switchover
+                upon receiving the first data packet."
+    DEFVAL     { enable }
+    ::= {alaPimsmGlobalConfig 5 }
+
+alaPimsmRPThreshold     OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the RP threshold value (in bps) to be used
+                in determining when to switch to native
+                forwarding at the RP.  The value of 0
+                disables the RP Threshold functionality."
+    DEFVAL     { 1 }
+    ::= {alaPimsmGlobalConfig 6 }
+
+alaPimsmV6AdminStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM-SM IPv6 protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 7 }
+
+alaPimsmV6SPTConfig     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables PIM IPv6 SPT Switchover
+                upon receiving the first data packet."
+    DEFVAL     { enable }
+    ::= {alaPimsmGlobalConfig 8 }
+
+alaPimsmV6RPSwitchover     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables whether PIM IPv6
+                will attempt to switch to native forwarding at the RP
+                upon receiving the first register-encapsulated packet."
+    DEFVAL     { enable }
+    ::= {alaPimsmGlobalConfig 9 }
+
+alaPimsmBidirStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM BIDIR protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 10}
+
+alaPimsmBidirPeriodicInterval    OBJECT-TYPE
+    SYNTAX     Integer32 (0..2000)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "This is the interval at which the DF for each RPA
+                will periodically announce its status in a
+                Winner message.
+
+                A value of 0 indicates that periodic messages will
+                not be sent."
+    DEFVAL     { 60 }
+    ::= { alaPimsmGlobalConfig 11 }
+
+alaPimsmBidirDFAbort     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables whether the DF 
+                election will be automatically aborted if a PIM hello 
+                is received from a PIM neighbor without the 
+                bidirectional capable option.  By default, the DF 
+                election will still occur among those PIM routers that 
+                support BIDIR.  By enabling this option, if a BIDIR-
+                capable router receives a PIM hello from a 
+                non-BIDIR-capable router, the DF election is aborted."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 12}
+
+
+alaPimsmNonBidirHelloPeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (10..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The minimum time that must elapse between
+            alaPimNonBidirHello notifications originated by this router.
+            The default value of 65535 represents an 'infinite' time, in
+            which case, no alaPimNonBidirHello notifications are ever
+            sent.
+
+            The non-zero minimum allowed value provides resilience
+            against propagation of denial-of-service attacks from the
+            control plane to the network management plane."
+    DEFVAL { 65535 }
+    ::= { alaPimsmGlobalConfig 13 }
+
+alaPimsmNonBidirHelloMsgsRcvd OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Hello messages that have been
+            received by a BIDIR-capable device that do not have the
+            Bidirectional Capable option.
+
+            This counter is incremented if BIDIR mode is enabled on
+            this router and a PIM Hello message is received from a
+            PIM neighbor that does not include the Bidirectional Capable
+            option. 
+
+            By default, the reception of these messages will not 
+            effect the BIDIR DF election.  The alaPimsmBidirDFAbort 
+            object may be used to change the default behavior
+            and have the DF election aborted whenever a BIDIR-capable
+            router receives a PIM hello from a non-BIDIR-capable
+            router."
+    ::= { alaPimsmGlobalConfig 14 }
+
+alaPimsmNonBidirHelloAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address type stored in alaPimsmNonBidirHelloOrigin.
+
+            If no Non Bidir Hello messages have been received, this
+            object is set to unknown(0)."
+    ::= { alaPimsmGlobalConfig 15 }
+
+alaPimsmNonBidirHelloOrigin OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The source address of the last Non Bidir Hello message
+            received by this device."
+    ::= { alaPimsmGlobalConfig 16 }
+
+alaPimsmV6BidirStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM IPv6 BIDIR protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 17}
+
+
+-- ************************************************************************
+--  PIM-DM Global Configuration
+-- ************************************************************************
+
+alaPimdmAdminStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM-DM protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimdmGlobalConfig 1}
+
+alaPimdmStateRefreshTimeToLive OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The TTL to be used by this router's originated State
+                 Refresh messages if the data packet's TTL is not
+                 recorded."
+    DEFVAL { 16 }
+    ::= {alaPimdmGlobalConfig 2}
+
+alaPimdmStateRefreshLimitInterval OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "This router will not forward successive State Refresh
+                 messages received at less than this interval."
+    DEFVAL { 0 }
+    ::= {alaPimdmGlobalConfig 3}
+
+alaPimdmV6AdminStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM-DM IPv6 protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimdmGlobalConfig 4}
+
+--
+-- The PIM Dense Group Table
+-- This table allows the configuration of pim group mappings to be
+-- used with dense mode.  These mappings correspond to the sparse 
+-- mappings defined in the pimStaticRPTable defined in the PIM-STD-MIB.
+--
+
+alaPimdmDenseGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AlaPimdmDenseGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This table is used to manage configuration of dense groups.
+
+            If the group prefixes configured for two or more rows in
+            this table overlap, the row with the greatest value of
+            alaPimdmDenseGroupGrpPrefixLength is used for the overlapping
+            range."
+    ::= { alaPimdmGlobalConfig 5 }
+
+alaPimdmDenseGroupEntry OBJECT-TYPE
+    SYNTAX     AlaPimdmDenseGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the alaPimdmDenseGroupTable.  This
+            entry is preserved on agent restart."
+    INDEX      { alaPimdmDenseGroupAddressType,
+                 alaPimdmDenseGroupGrpAddress,
+                 alaPimdmDenseGroupGrpPrefixLength }
+    ::= { alaPimdmDenseGroupTable 1 }
+
+AlaPimdmDenseGroupEntry ::= SEQUENCE {
+    alaPimdmDenseGroupAddressType      InetAddressType,
+    alaPimdmDenseGroupGrpAddress       InetAddress,
+    alaPimdmDenseGroupGrpPrefixLength  InetAddressPrefixLength,
+    alaPimdmDenseGroupOverrideDynamic  TruthValue,
+    alaPimdmDenseGroupPrecedence       Unsigned32,
+    alaPimdmDenseGroupRowStatus        RowStatus
+}
+
+alaPimdmDenseGroupAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of this entry."
+    ::= { alaPimdmDenseGroupEntry 1 }
+
+alaPimdmDenseGroupGrpAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The multicast group address that, when combined with
+            alaPimdmDenseGroupGrpPrefixLength, gives the group prefix for this
+            entry.  The InetAddressType is given by the
+            alaPimdmDenseGroupAddressType object.
+
+            This address object is only significant up to
+            alaPimdmDenseGroupGrpPrefixLength bits.  The remainder of the
+            address bits are zero.  This is especially important for
+            this index field, which is part of the index of this entry.
+            Any non-zero bits would signify an entirely different
+            entry."
+    ::= { alaPimdmDenseGroupEntry 2 }
+
+alaPimdmDenseGroupGrpPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength (4..128)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The multicast group prefix length that, when combined
+            with alaPimdmDenseGroupGrpAddress, gives the group prefix for this
+            entry.  The InetAddressType is given by the
+            alaPimdmDenseGroupAddressType object.  If alaPimdmDenseGroupAddressType is
+            'ipv4' or 'ipv4z', this object must be in the range 4..32.
+            If alaPimdmDenseGroupGrpAddressType is 'ipv6' or 'ipv6z', this
+            object must be in the range 8..128."
+    ::= { alaPimdmDenseGroupEntry 3 }
+
+alaPimdmDenseGroupOverrideDynamic OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Whether this dense group configuration will override other
+            group mappings in this group prefix.  If this object is
+            TRUE, then it will override:
+
+            -  RP information learned dynamically for groups in this
+            group prefix.
+
+            -  RP information configured in alaPimdmDenseGroupTable with
+            alaPimdmDenseGroupOverrideDynamic set to FALSE.
+
+            See pimGroupMappingTable for details."
+    DEFVAL { false }
+    ::= { alaPimdmDenseGroupEntry 4 }
+
+alaPimdmDenseGroupPrecedence OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The value for pimGroupMappingPrecedence to be used for this
+            static RP configuration.  This allows fine control over
+            which configuration is overridden by this static
+            configuration.
+
+            If alaPimdmDenseGroupOverrideDynamic is set to TRUE, all dynamic RP
+            configuration is overridden by this static configuration,
+            whatever the value of this object.
+
+            The absolute values of this object have a significance only
+            on the local router and do not need to be coordinated with
+            other routers.  A setting of this object may have different
+            effects when applied to other routers.
+
+            Do not use this object unless fine control of static RP
+            behavior on the local router is required."
+    ::= { alaPimdmDenseGroupEntry 5 }
+
+alaPimdmDenseGroupRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The status of this row, by which rows in this table can
+            be created and destroyed.
+
+            All writeable objects in this entry can be modified when the
+            status of this entry is active(1)."
+    ::= { alaPimdmDenseGroupEntry 6 }
+
+
+-- ************************************************************************
+--  PIM Global Configuration
+-- ************************************************************************
+
+alaPimBfdStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables PIM
+                with the BFD protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimGlobalConfig 1}
+
+alaPimBfdAllInterfaceStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables BFD
+                for all PIM interfaces on this router."
+    DEFVAL     { disable }
+    ::= {alaPimGlobalConfig 2}
+
+alaPimMoFRRStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables MoFRR
+                (Multicast only Fast Re-Route) on this router."
+    DEFVAL     { disable }
+    ::= {alaPimGlobalConfig 3}
+
+alaPimMoFRRAllRouteStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "By default, MoFRR is only applied to multicast
+                routes that have local clients.  Enabling 
+                alaPimMoFRRAllRouteStatus will enable MoFRR
+                on all routes whether there are local clients
+                or not.  alaPimMoFRRStatus must be enabled for
+                this to take effect."
+    DEFVAL     { disable }
+    ::= {alaPimGlobalConfig 4}
+
+-- ************************************************************************
+-- Expansion of pimInterfaceEntry
+-- ************************************************************************
+
+alaPimInterfaceAugTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AlaPimInterfaceAugEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+               "Expansion for pimInterfaceTable"
+    ::= { alaPimGlobalConfig 5 }
+  
+alaPimInterfaceAugEntry OBJECT-TYPE
+    SYNTAX     AlaPimInterfaceAugEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+               "An entry of alaPimInterfaceAugTable"
+    AUGMENTS { pimInterfaceEntry }
+    ::= { alaPimInterfaceAugTable 1 }
+  
+AlaPimInterfaceAugEntry ::= SEQUENCE {
+    alaPimInterfaceBfdStatus INTEGER
+}  
+  
+alaPimInterfaceBfdStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current     
+    DESCRIPTION     
+               "Enables/Disables BFD for particular interfaces of PIM."
+    DEFVAL { disable }     
+    ::= { alaPimInterfaceAugEntry 1 }
+
+alaPimMbrAllSourcesStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables PIM to notify DVMRP about
+                the routes to all multicast sources learned instead of just
+                the directly connected subnets so that these routes can be
+                advertised in the DVMRP domain via standard DVMRP mechanisms.
+                This object is only applicable if the router is operating as 
+                a Multicast Border Router."
+    DEFVAL     { disable }
+    ::= {alaPimGlobalConfig 6}
+
+alaPimMbrOperStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+               "Whether MBR is currently enabled/disabled for PIM."
+    ::= {alaPimGlobalConfig 7}
+
+-- ************************************************************************
+--  PIM Notifications
+-- ************************************************************************
+
+alaPimNotifications OBJECT IDENTIFIER ::= { alcatelIND1PIMMIB 0 }
+
+alaPimNonBidirHello NOTIFICATION-TYPE
+    OBJECTS { alaPimsmNonBidirHelloAddressType,
+              alaPimsmNonBidirHelloOrigin }
+    STATUS      current
+    DESCRIPTION
+            "An alaPimNonBidirHello notification signifies that
+            a bidir-capable router has received a PIM hello from 
+            a non-bidir-capable router.
+
+            This notification is generated whenever the counter
+            alaPimsmNonBidirHelloMsgsRcvd is incremented, subject
+            to the rate limit specified by
+            alaPimsmNonBidirHelloNotificationPeriod."
+    ::= { alaPimNotifications 1 }
+
+-- conformance information
+
+alcatelIND1PIMMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1PIMMIB 2 }
+alcatelIND1PIMMIBCompliances OBJECT IDENTIFIER ::= 
+                                          { alcatelIND1PIMMIBConformance 1 }
+alcatelIND1PIMMIBGroups      OBJECT IDENTIFIER ::= 
+                                          { alcatelIND1PIMMIBConformance 2 }
+
+
+-- compliance statements
+
+alaPimsmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running PIM Sparse
+            Mode and implementing the ALCATEL-IND1-PIM MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaPimsmConfigMIBGroup, alaPimConfigMIBGroup }
+
+    ::= { alcatelIND1PIMMIBCompliances 1 }
+
+alaPimdmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running PIM Dense
+            Mode and implementing the ALCATEL-IND1-PIM MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { alaPimdmConfigMIBGroup, alaPimConfigMIBGroup }
+
+    ::= { alcatelIND1PIMMIBCompliances 2 }
+
+-- units of conformance
+
+alaPimsmConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaPimsmAdminStatus, alaPimsmMaxRPs,
+              alaPimsmProbeTime, alaPimsmOldRegisterMessageSupport,
+			  alaPimsmAdminSPTConfig, alaPimsmRPThreshold,
+              alaPimsmV6AdminStatus, alaPimsmV6SPTConfig,
+              alaPimsmV6RPSwitchover, alaPimsmBidirStatus,
+              alaPimsmBidirPeriodicInterval, alaPimsmBidirDFAbort,
+              alaPimsmNonBidirHelloPeriod, alaPimsmNonBidirHelloMsgsRcvd,
+              alaPimsmV6BidirStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of global
+            configuration parameters of PIM Sparse Mode routers."
+    ::= { alcatelIND1PIMMIBGroups 1 }
+
+alaPimdmConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaPimdmAdminStatus, alaPimdmStateRefreshTimeToLive,
+              alaPimdmStateRefreshLimitInterval,
+              alaPimdmV6AdminStatus, alaPimdmDenseGroupOverrideDynamic,
+              alaPimdmDenseGroupPrecedence, alaPimdmDenseGroupRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of global
+            configuration parameters of PIM Dense Mode routers."
+    ::= { alcatelIND1PIMMIBGroups 2 }
+
+alaPimConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaPimBfdStatus, 
+              alaPimBfdAllInterfaceStatus, 
+              alaPimMoFRRStatus,
+              alaPimMoFRRAllRouteStatus,
+              alaPimInterfaceBfdStatus,
+              alaPimMbrAllSourcesStatus, 
+              alaPimMbrOperStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of global
+            configuration parameters of PIM routers."
+    ::= { alcatelIND1PIMMIBGroups 3 }
+
+alaPimOptionalGroup OBJECT-GROUP
+    OBJECTS { 
+             alaPimsmNonBidirHelloAddressType,
+             alaPimsmNonBidirHelloOrigin
+            }
+    STATUS  current
+    DESCRIPTION
+            " PIM objects to stop the tools from complaining "
+    ::= { alcatelIND1PIMMIBGroups 4 }
+
+alaPimNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { 
+              alaPimNonBidirHello
+            }
+    STATUS  current
+    DESCRIPTION
+            " PIM Notification objects "
+    ::= { alcatelIND1PIMMIBGroups 5 }
+
+END
