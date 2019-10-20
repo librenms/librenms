@@ -1,0 +1,515 @@
+  ALCATEL-IND1-OPENFLOW-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+          MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+          Integer32,NOTIFICATION-TYPE
+              FROM SNMPv2-SMI
+
+          RowStatus
+              FROM SNMPv2-TC
+
+          MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+              FROM SNMPv2-CONF
+
+          InetAddressType, InetAddress
+              FROM INET-ADDRESS-MIB
+
+          SnmpAdminString         FROM SNMP-FRAMEWORK-MIB
+
+          softentIND1OpenflowMIB
+              FROM ALCATEL-IND1-BASE
+      ;
+
+
+      alcatelIND1OpenflowMIB MODULE-IDENTITY
+          LAST-UPDATED  "201311080000Z"
+          ORGANIZATION  "Alcatel-Lucent"
+          CONTACT-INFO
+              "Please consult with Customer Service to ensure the most appropriate
+               version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                      (Formerly Alcatel Internetworking, Incorporated)
+                                 26801 West Agoura Road
+                              Agoura Hills, CA  91301-5122
+                                United States Of America
+
+              Telephone:               North America  +1 800 995 2696
+                                       Latin America  +1 877 919 9526
+                                       Europe         +31 23 556 0100
+                                       Asia           +65 394 7933
+                                       All Other      +1 818 878 4507
+
+              Electronic Mail:         support@ind.alcatel.com
+              World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+              File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+          DESCRIPTION
+              "This module describes an authoritative enterprise-specific Simple
+               Network Management Protocol (SNMP) Management Information Base (MIB):
+
+               Openflow for OS6900 Product Line.
+
+               The right to make changes in specification and other information
+               contained in this document without prior notice is reserved.
+
+               No liability shall be assumed for any incidental, indirect, special, or
+               consequential damages whatsoever arising from or related to this
+               document or the information contained herein.
+
+               Vendors, end-users, and other interested parties are granted
+               non-exclusive license to use this specification in connection with
+               management of the products for which it is intended to be used.
+
+                           Copyright (C) 2013 Alcatel-Lucent
+                               ALL RIGHTS RESERVED WORLDWIDE"
+
+          REVISION      "201311080000Z"
+          DESCRIPTION
+              "The latest version of this MIB Module."
+          ::= { softentIND1OpenflowMIB 1 }
+
+  -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  -- Hook into the Alcatel Tree
+  -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+  alcatelIND1OpenflowMIBNotifications OBJECT IDENTIFIER ::= { alcatelIND1OpenflowMIB 0 }
+
+  alcatelIND1OpenflowMIBObjects OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+           " Alcatel-Lucent Openflow Managed Objects."
+         ::= { alcatelIND1OpenflowMIB 1 }
+
+  alcatelIND1OpenflowMIBConformance OBJECT-IDENTITY
+       STATUS current
+       DESCRIPTION
+                  " Alcatel-Lucent Openflow Conformance Information."
+       ::= { alcatelIND1OpenflowMIB 2 }
+
+
+  alaOpenflowGlobalConfigObjects OBJECT IDENTIFIER ::= { alcatelIND1OpenflowMIBObjects 1 }
+
+  alaOpenflowGlobalBackoffMax OBJECT-TYPE
+       SYNTAX  Integer32 (1..60)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+          " Alcatel-Lucent Openflow maximum back-off time in seconds for controller connection attempts."
+       DEFVAL { 60 }
+       ::= { alaOpenflowGlobalConfigObjects 1 }
+
+  alaOpenflowGlobalIdleProbeTimeout OBJECT-TYPE
+       SYNTAX  Integer32 (0..60)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+          " Alcatel-Lucent Openflow idle probe timeout value in seconds. If set to 0, idle probing is disabled."
+       DEFVAL { 15 }
+       ::= { alaOpenflowGlobalConfigObjects 2 }
+
+  -- Openflow LogicalSwitch Table
+
+  alaOpenflowLogicalSwitchTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AlaOpenflowLogicalSwitchEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This table contains one row for each Logical Switch."
+    ::= { alcatelIND1OpenflowMIBObjects 2 }
+
+  alaOpenflowLogicalSwitchEntry OBJECT-TYPE
+            SYNTAX AlaOpenflowLogicalSwitchEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+              "Information about the Openflow Logical Switches. "
+            INDEX { alaOpenflowLogicalSwitch }
+    ::= { alaOpenflowLogicalSwitchTable 1 }
+
+  AlaOpenflowLogicalSwitchEntry ::= SEQUENCE
+         {
+             alaOpenflowLogicalSwitch                 SnmpAdminString,
+             alaOpenflowLogicalSwitchAdminState       INTEGER,
+             alaOpenflowLogicalSwitchMode             INTEGER,
+             alaOpenflowLogicalSwitchVersions         BITS,
+             alaOpenflowLogicalSwitchVlan             Integer32,
+             alaOpenflowLogicalSwitchControllerCount  Integer32,
+             alaOpenflowLogicalSwitchInterfaceCount   Integer32,
+             alaOpenflowLogicalSwitchFlowCount        Integer32,
+             alaOpenflowLogicalSwitchRowStatus        RowStatus
+         }
+
+  alaOpenflowLogicalSwitch OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..31))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+         "Openflow Logical Switch Name."
+        ::= { alaOpenflowLogicalSwitchEntry 1 }
+
+  alaOpenflowLogicalSwitchAdminState OBJECT-TYPE
+        SYNTAX INTEGER {
+             enabled(1),
+             disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Logical Switch Admin State. Enable or disable the Logical Switch.
+          When disabled, all controllers for the Logical Switch will be
+          operationally disabled and flows added by those controllers will
+          be removed."
+        DEFVAL { enabled }
+        ::= { alaOpenflowLogicalSwitchEntry 2 }
+
+  alaOpenflowLogicalSwitchMode OBJECT-TYPE
+        SYNTAX INTEGER {
+             normal(1),
+             api(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Openflow Logical Switch Mode. Normal is regular Openflow,
+         API is for ACL-like flow operation. Only one Logical Switch
+         can be in api mode at a time. This object cannot be modified
+         after the Logical Switch has been created."
+        DEFVAL { normal }
+        ::= { alaOpenflowLogicalSwitchEntry 3 }
+
+  alaOpenflowLogicalSwitchVersions OBJECT-TYPE
+        SYNTAX BITS {
+             v1dot0 (0),
+             v1dot3dot1 (1)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Openflow Logical Switch Bitmap of enabled Openflow versions.
+         At least one version must be enabled."
+        DEFVAL { { v1dot0, v1dot3dot1 } }
+        ::= { alaOpenflowLogicalSwitchEntry 4 }
+
+  alaOpenflowLogicalSwitchVlan OBJECT-TYPE
+       SYNTAX  Integer32 (0|2..4093)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+          "Openflow Logical Switch VLAN. The value 0 indicates that no
+          VLAN has been specified, it is not a valid value to write.
+          This object is not valid to write when creating/modifying an
+          entry with alaOpenflowLogicalSwitchMode api(2)"
+       DEFVAL { 0 }
+       ::= { alaOpenflowLogicalSwitchEntry 5 }
+
+  alaOpenflowLogicalSwitchControllerCount OBJECT-TYPE
+       SYNTAX  Integer32 (0..3)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+          "Count of the configured controllers for the Logical Switch."
+       ::= { alaOpenflowLogicalSwitchEntry 6 }
+
+  alaOpenflowLogicalSwitchInterfaceCount OBJECT-TYPE
+       SYNTAX  Integer32 (0..5000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+          "Count of the configured interfaces (ports and link aggregations) for the Logical Switch."
+       ::= { alaOpenflowLogicalSwitchEntry 7 }
+
+  alaOpenflowLogicalSwitchFlowCount OBJECT-TYPE
+       SYNTAX  Integer32 (0..511)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+          "Count of the flows pushed to the Logical Switch by its controllers."
+       ::= { alaOpenflowLogicalSwitchEntry 8 }
+
+
+  alaOpenflowLogicalSwitchRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+         "Deleting a row from this table will also remove associated entries from other tables in this mib
+         that have a logical switch as part of their index."
+        ::= { alaOpenflowLogicalSwitchEntry 9 }
+
+  -- Openflow Controller Table
+
+  alaOpenflowControllerTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AlaOpenflowControllerEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This table contains one row for each controller on each logical switch.
+           Currently, up to three controllers per logical switch are supported per logical switch."
+    ::= { alcatelIND1OpenflowMIBObjects 3 }
+
+  alaOpenflowControllerEntry OBJECT-TYPE
+            SYNTAX AlaOpenflowControllerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+              "Information about the Openflow Controllers attached to Logical Switches. "
+            INDEX { alaOpenflowControllerLogicalSwitch, alaOpenflowControllerIpType, alaOpenflowControllerIp, alaOpenflowControllerPort }
+    ::= { alaOpenflowControllerTable 1 }
+
+  AlaOpenflowControllerEntry ::= SEQUENCE
+         {
+             alaOpenflowControllerLogicalSwitch   SnmpAdminString,
+             alaOpenflowControllerIpType          InetAddressType,
+             alaOpenflowControllerIp              InetAddress,
+             alaOpenflowControllerPort            Integer32,
+             alaOpenflowControllerRole            INTEGER,
+             alaOpenflowControllerAdminState      INTEGER,
+             alaOpenflowControllerOperState       INTEGER,
+             alaOpenflowControllerRowStatus       RowStatus
+         }
+
+  alaOpenflowControllerLogicalSwitch OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..31))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+         "Openflow Logical Switch Name."
+        ::= { alaOpenflowControllerEntry 1 }
+
+  alaOpenflowControllerIpType OBJECT-TYPE
+        SYNTAX      InetAddressType(1)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+         "Openflow Controller IP Address Type. The only type currently supported is ipv4(1)"
+        ::= { alaOpenflowControllerEntry 2 }
+
+  alaOpenflowControllerIp OBJECT-TYPE
+        SYNTAX      InetAddress(SIZE (4|16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+         "Openflow Controller IP Address. As specified by alaOpenflowControllerIpType,
+         only ipv4 is currently supported"
+        ::= { alaOpenflowControllerEntry 3 }
+
+  alaOpenflowControllerPort OBJECT-TYPE
+        SYNTAX  Integer32 (1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+         "Openflow Controller Port."
+        ::= { alaOpenflowControllerEntry 4 }
+
+  alaOpenflowControllerRole OBJECT-TYPE
+        SYNTAX INTEGER {
+             equal(1),
+             master(2),
+             slave(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "Role of the Controller for the Logical Switch. The role is negotiated by the
+         controllers and the switch is notified of the outcome (1.3.1+). 1.0 controllers
+         will always have the role of equal. Only one controller per Logical Switch
+         can have the role of master."
+        ::= { alaOpenflowControllerEntry 5 }
+
+  alaOpenflowControllerAdminState OBJECT-TYPE
+        SYNTAX INTEGER {
+             enabled(1),
+             disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Controller Admin State. Enable or disable connection to the controller.
+          The Logical Switch runs in 'Fail Secure Mode' so all flow aging, etc
+          continues unaffected when the controller is administratively disabled."
+        DEFVAL { enabled }
+        ::= { alaOpenflowControllerEntry 6 }
+
+  alaOpenflowControllerOperState OBJECT-TYPE
+        SYNTAX INTEGER {
+             invalid(1),
+             disabled(2),
+             sendError(3),
+             init(4),
+             connecting(5),
+             backoff(6),
+             exchangingHello(7),
+             active(8),
+             idle(9),
+             disconnected(10)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "State of the Logical Switch connection to the Controller."
+        ::= { alaOpenflowControllerEntry 7 }
+
+  alaOpenflowControllerRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+         "On create, if the specified logical switch does not exist in alaOpenflowLogicalSwitchTable,
+          an entry will be created in that table. Delete does not effect alaOpenflowLogicalSwitchTable."
+        ::= { alaOpenflowControllerEntry 8 }
+
+  -- Openflow Interface Table
+
+  alaOpenflowInterfaceTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AlaOpenflowInterfaceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This table contains one row for each interface (port or link aggregation) assigned to
+           a logical switch. An interface can only belong to one logical switch at a time.
+           If a logical switch in API mode exists, interfaces cannot be manually added to/deleted from it;
+           instead, interfaces default to the API mode logical switch when not assigned to another Logical Switch.
+           Interfaces can be reassigned from the API mode logical switch to a normal mode logical switch
+           (by adding it to that normal mode logical switch) but not directly reassigned from one normal mode
+           logical switch to another normal mode logical switch."
+    ::= { alcatelIND1OpenflowMIBObjects 4 }
+
+  alaOpenflowInterfaceEntry OBJECT-TYPE
+            SYNTAX AlaOpenflowInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+              "Information about the interfaces assigned to Openflow Logical Switches."
+            INDEX { alaOpenflowInterfaceLogicalSwitch, alaOpenflowInterface }
+    ::= { alaOpenflowInterfaceTable 1 }
+
+  AlaOpenflowInterfaceEntry ::= SEQUENCE
+         {
+             alaOpenflowInterfaceLogicalSwitch   SnmpAdminString,
+             alaOpenflowInterface                Integer32,
+             alaOpenflowInterfaceMode            INTEGER,
+             alaOpenflowInterfaceRowStatus       RowStatus
+         }
+
+  alaOpenflowInterfaceLogicalSwitch OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..31))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+         "Openflow Logical Switch Name."
+        ::= { alaOpenflowInterfaceEntry 1 }
+
+  alaOpenflowInterface OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+         "Openflow Interface attached to a Logical Switch. Port values are dot1dBasePort values,
+         Link Aggregations start at 32769."
+        ::= { alaOpenflowInterfaceEntry 2 }
+
+  alaOpenflowInterfaceMode OBJECT-TYPE
+        SYNTAX INTEGER {
+             normal(1),
+             api(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "Openflow Interface Mode. Normal is regular Openflow,
+         API is for ACL like flow operation."
+        ::= { alaOpenflowInterfaceEntry 3 }
+
+  alaOpenflowInterfaceRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+         "On create, if the specified logical switch does not exist in alaOpenflowLogicalSwitchTable,
+          an entry will be created in that table. Delete does not effect alaOpenflowLogicalSwitchTable."
+        ::= { alaOpenflowInterfaceEntry 4 }
+
+   -- Openflow MIB Conformance and Compliances
+
+  alcatelIND1OpenflowMIBGroups OBJECT-IDENTITY
+       STATUS current
+       DESCRIPTION
+          "Branch For ALU Openflow MIB Subsystem Units Of Conformance."
+       ::= { alcatelIND1OpenflowMIBConformance 1 }
+
+  alcatelIND1OpenflowMIBCompliances OBJECT-IDENTITY
+       STATUS current
+       DESCRIPTION
+          "Branch For ALU Openflow MIB Subsystem Compliance Statements."
+       ::= { alcatelIND1OpenflowMIBConformance 2 }
+
+
+  alaOpenflowMIBCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+          "Compliance statement for Openflow."
+       MODULE -- This module
+           MANDATORY-GROUPS
+           {
+               alaOpenflowModuleConfigGroup,
+               alaOpenflowModuleLogicalSwitchGroup,
+               alaOpenflowModuleControllerGroup,
+               alaOpenflowModuleInterfaceGroup
+           }
+       ::= { alcatelIND1OpenflowMIBCompliances 1 }
+
+  alaOpenflowModuleConfigGroup OBJECT-GROUP
+       OBJECTS
+       {
+         alaOpenflowGlobalBackoffMax,
+         alaOpenflowGlobalIdleProbeTimeout
+       }
+       STATUS  current
+       DESCRIPTION
+          "Openflow Global Configuration Modules Group."
+       ::= { alcatelIND1OpenflowMIBGroups 1 }
+
+
+  alaOpenflowModuleLogicalSwitchGroup OBJECT-GROUP
+       OBJECTS
+       {
+           alaOpenflowLogicalSwitchAdminState,
+           alaOpenflowLogicalSwitchMode,
+           alaOpenflowLogicalSwitchVersions,
+           alaOpenflowLogicalSwitchVlan,
+           alaOpenflowLogicalSwitchControllerCount,
+           alaOpenflowLogicalSwitchInterfaceCount,
+           alaOpenflowLogicalSwitchFlowCount,
+           alaOpenflowLogicalSwitchRowStatus
+       }
+       STATUS  current
+       DESCRIPTION
+          "Openflow Logical Switch Configuration Modules Group."
+       ::= { alcatelIND1OpenflowMIBGroups 2 }
+
+  alaOpenflowModuleControllerGroup OBJECT-GROUP
+       OBJECTS
+       {
+           alaOpenflowControllerRole,
+           alaOpenflowControllerAdminState,
+           alaOpenflowControllerOperState,
+           alaOpenflowControllerRowStatus
+       }
+       STATUS  current
+       DESCRIPTION
+          "Openflow Controller Configuration Modules Group."
+       ::= { alcatelIND1OpenflowMIBGroups 3 }
+
+  alaOpenflowModuleInterfaceGroup OBJECT-GROUP
+       OBJECTS
+       {
+           alaOpenflowInterfaceMode,
+           alaOpenflowInterfaceRowStatus
+       }
+       STATUS  current
+       DESCRIPTION
+          "Openflow Interface Configuration Modules Group."
+       ::= { alcatelIND1OpenflowMIBGroups 4 }
+
+  END

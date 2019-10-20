@@ -1,0 +1,1062 @@
+ALCATEL-IND1-DCBX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32,
+    Counter64,
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    OBJECT-IDENTITY,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TruthValue,
+    RowStatus,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    LldpXdot1dcbxSupportedCapacity,
+    LldpXdot1dcbxTrafficClassValue,
+    LldpXdot1dcbxTrafficClassBandwidthValue,
+    LldpXdot1dcbxTrafficSelectionAlgorithm,
+    LldpXdot1dcbxAppSelector,
+    LldpXdot1dcbxAppProtocol,
+    lldpXdot1dcbxAdminApplicationPriorityAEProtocol,
+    lldpXdot1dcbxAdminApplicationPriorityAESelector
+        FROM LLDP-EXT-DOT1-V2-MIB
+    IEEE8021PriorityValue
+        FROM IEEE8021-TC-MIB
+    lldpV2LocPortIfIndex
+        FROM LLDP-V2-MIB
+    VfcEnableState
+        FROM ALCATEL-IND1-VIRTUAL-FLOW-CONTROL-MIB
+    softentIND1Dcbx
+        FROM ALCATEL-IND1-BASE;
+
+alcatelIND1DcbxMIB MODULE-IDENTITY
+    LAST-UPDATED "201106280000Z"
+    ORGANIZATION "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+         Telephone:              North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+         Electronic Mail:         support@ind.alcatel.com
+             World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+             File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+        Network Management Protocol (SNMP) Management Information Base (MIB):
+
+        For the Birds Of Prey Product Line
+        System Capability Manager, to allow for system control and limitation setting, of
+        different, features through out the system.
+        Capability manager is a centralized process which provides hardware information and
+        capability to other processes. To optimize the system performance , certain features
+        may be configured to a lower than the hardware limit through capability manager.
+
+        The right to make changes in specification and other information
+        contained in this document without prior notice is reserved.
+
+        No liability shall be assumed for any incidental, indirect, special, or
+        consequential damages whatsoever arising from or related to this
+        document or the information contained herein.
+
+        Vendors, end-users, and other interested parties are granted
+        non-exclusive license to use this specification in connection with
+        management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2011 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "201106280000Z"
+    DESCRIPTION
+        "Capability Manager is used to set system wide limitation."
+    ::= { softentIND1Dcbx 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1DcbxMIBObjects OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For VFC-DCBX Subsystem Managed Objects."
+    ::= { alcatelIND1DcbxMIB 1 }
+
+    alcatelIND1DcbxMIBConformance OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For VFC-DCBX Subsystem Conformance Information."
+    ::= { alcatelIND1DcbxMIB 2 }
+
+    alcatelIND1DcbxMIBGroups OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For VFC-DCBX Subsystem Units Of Conformance."
+    ::= { alcatelIND1DcbxMIBConformance 1 }
+
+    alcatelIND1DcbxMIBCompliances OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For VFC-DCBX Subsystem Compliance Statements."
+    ::= { alcatelIND1DcbxMIBConformance 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alaDcbxConfig  OBJECT IDENTIFIER ::= { alcatelIND1DcbxMIBObjects 1 }
+    alaDcbxConformance  OBJECT IDENTIFIER ::= { alcatelIND1DcbxMIBObjects 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+DcbxTrafficFlow ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the traffic flow
+        0: Lossy
+        1: Lossless"
+    SYNTAX INTEGER {
+        tfLossy(0),
+        tfLossless(1) 
+    }
+
+DcbxPriorityTCMap ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     
+        "Each group of four octets in this string specify
+        a 32-bit Traffic class ID.  The IDs are stored in network
+        byte order; i.e. octet N corresponds to the most
+        significant 8 bits of the ID, and octet N+3 correspond
+        to the least significant 8 bits.  The list is
+        large enough to hold 8 TC IDs, one per priority. The first
+        first 4 octets represent the first priority."
+    SYNTAX OCTET STRING (SIZE (32))
+
+DcbxStatus ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the dcbx status (could be related to hardware)
+        0: OK
+        1: PFC Resources Exhausted
+        2: PFC TLV Mismatch
+        3: ETS TLV Mismatch
+        4: PFC and ETS TLV Mismatch"
+    SYNTAX INTEGER {
+        ok(0),
+        pfcResourcesExhausted(1),
+        pfcTlvMismatch(2),
+        etsTlvMismatch(3),
+        etsPfcTlvMismatch(4)
+    }
+
+
+DcbxActionTaken ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the action taken as a result of DcbxStatus
+        0: No action taken (dcbx might not be operationaly UP)
+        1: Restored ETS admin config
+        2: Restored PFC admin config
+        3: Disabled PFC
+        4: Restored ETS and PFC admin config
+        5: Configured local admin
+        6: Configured local recommended
+        7: Configured remote admin
+        8: Configured remote recommended"
+    SYNTAX INTEGER {
+        na(0),
+        restEtsAdminCfg(1),
+        restPfcAdminCfg(2),
+        disabledPfc(3),
+        restEtsPfcAdminCfg(4),
+        cfgLocalAdmin(5),
+        cfgLocalRecom(6),
+        cfgRemoteAdmin(7),
+        cfgRemoteRecom(8)
+    }
+
+DcbxTCsPresent ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     
+        "Octet representing the traffic classes present
+        in a particular profile. Each bit represents the 
+        presence of the traffic class. The first bit indicates
+        if TC 0 is present, the second bit indicates TC 1,
+        and so forth. Bit value 1 indicates the TC is present.
+        Bit value 0 indicates the TC is not present.
+        Can be used to change the TC numbering."
+    SYNTAX OCTET STRING (SIZE (1))
+
+DcbxVersion ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the dcbx version
+        0: IEEE
+        1: CEE
+        2: AUTO"
+    SYNTAX INTEGER {
+        ieee(0),
+        cee(1),
+        auto(2)
+    }
+
+RemoteDcbxVersion ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the remote dcbx version
+        0: IEEE
+        1: CEE
+        2: AUTO
+        3: Unknown"
+    SYNTAX INTEGER {
+        ieee(0),
+        cee(1),
+        auto(2),
+        unknown(3)
+    }
+
+
+-- xxxxxxxxxxxxxxxxxx
+-- DCB Profile Table
+-- xxxxxxxxxxxxxxxxxx
+
+alaDcbxDCProfileTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlaDcbxDCProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of Data Center profiles."
+    ::= { alaDcbxConfig 1 }
+
+alaDcbxDCProfileEntry  OBJECT-TYPE
+    SYNTAX  AlaDcbxDCProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A DCB profile entry."
+    INDEX { alaDcbxDCPId }
+    ::= { alaDcbxDCProfileTable 1 }
+
+AlaDcbxDCProfileEntry ::= SEQUENCE {
+    alaDcbxDCPId
+        Unsigned32,
+    alaDcbxDCPName
+        SnmpAdminString,
+    alaDcbxDCPETSTrafficClassesSupported
+        LldpXdot1dcbxSupportedCapacity,
+    alaDcbxDCPPFCCap
+        LldpXdot1dcbxSupportedCapacity,
+    alaDcbxDCPPriorityTCMap
+        DcbxPriorityTCMap,
+    alaDcbxDCPTemplateDCPId
+        Unsigned32,
+    alaDcbxDCPTemplateDCPName
+        SnmpAdminString,
+    alaDcbxDCPTCsPresent
+        DcbxTCsPresent,
+    alaDcbxDCP8023xPauseReady
+        VfcEnableState,
+    alaDcbxDCPRowStatus
+        RowStatus
+    }
+
+alaDcbxDCPId  OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Identifier of DCB profile."
+    ::= { alaDcbxDCProfileEntry 1 }
+
+alaDcbxDCPName  OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Name of DCB profile."
+    ::= { alaDcbxDCProfileEntry 2 }
+
+alaDcbxDCPETSTrafficClassesSupported OBJECT-TYPE
+    SYNTAX        LldpXdot1dcbxSupportedCapacity
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of traffic classes supported."
+    ::= { alaDcbxDCProfileEntry 3 }
+
+alaDcbxDCPPFCCap OBJECT-TYPE
+    SYNTAX        LldpXdot1dcbxSupportedCapacity
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of traffic classes on the local device
+        that may simultaneously have PFC enabled."
+    ::= { alaDcbxDCProfileEntry 4 }
+
+alaDcbxDCPPriorityTCMap OBJECT-TYPE
+    SYNTAX        DcbxPriorityTCMap
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the priority TC map. All 8 priorities are assigned a TC."
+    ::= { alaDcbxDCProfileEntry 5 }
+
+alaDcbxDCPTemplateDCPId  OBJECT-TYPE
+    SYNTAX  Unsigned32(1..128)
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Identifier of Template DCB profile. Used when creating a new profile.
+        The template profile values will be copied to the new profile."
+    ::= { alaDcbxDCProfileEntry 6 }
+
+alaDcbxDCPTemplateDCPName  OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Name of Template DCB profile. Used when creating a new profile.
+        The template profile values will be copied to the new profile."
+    ::= { alaDcbxDCProfileEntry 7 }
+
+alaDcbxDCPTCsPresent OBJECT-TYPE
+    SYNTAX        DcbxTCsPresent
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Represents the traffic classes present in this particular profile.
+        Can be used to change the TC numbering. For example, a profile
+        with TCs numbered 0, 1, 2, can be changed to 1, 5, 7. The numbering
+        is assigned in increasing order. The number of TCs specified must
+        match the current number of TCs in the profile."
+    ::= { alaDcbxDCProfileEntry 8 }
+
+alaDcbxDCP8023xPauseReady OBJECT-TYPE
+    SYNTAX        VfcEnableState
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION 
+        "Makes a profile pause-ready. Can only be set during profile creation.
+         When enabled, the PFC is lossy for all traffic classes in the profile
+         and they cannot be changed to lossless. Applying this profile to a port
+         will allow the port to have 802.2x pause enabled through the interfaces
+         commands. Can be applied to ports with a standard VFC profile. Can
+         be applied to a DCB port only if pfc willing and pfc tlv bits are disabled."
+    DEFVAL         { disabled }
+    ::= { alaDcbxDCProfileEntry 9 }
+
+alaDcbxDCPRowStatus  OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "alaDcbxDCPRowStatus controls the creation and deletion of
+         rows in the table."
+    ::= { alaDcbxDCProfileEntry 10 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- DCB Profile Traffic Class Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaDcbxDCPTrafficClassTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlaDcbxDCPTCEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of Traffic Classes for the DCB Profiles."
+    ::= { alaDcbxConfig 2 }
+
+alaDcbxDCPTCEntry  OBJECT-TYPE
+    SYNTAX  AlaDcbxDCPTCEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A DCB profile traffic class entry."
+    INDEX { alaDcbxDCPTCDCPId, alaDcbxDCPTCTrafficClass }
+    ::= { alaDcbxDCPTrafficClassTable 1 }
+
+AlaDcbxDCPTCEntry ::= SEQUENCE {
+    alaDcbxDCPTCDCPId
+        Unsigned32,
+    alaDcbxDCPTCTrafficClass
+        LldpXdot1dcbxTrafficClassValue,
+    alaDcbxDCPTCDCPName
+        SnmpAdminString,
+    alaDcbxDCPTCMaximumBandwidth
+        LldpXdot1dcbxTrafficClassBandwidthValue,
+    alaDcbxDCPTCMinimumBandwidth
+        LldpXdot1dcbxTrafficClassBandwidthValue,
+    alaDcbxDCPTCPFCLinkDelay
+        Unsigned32,
+    alaDcbxDCPTCPFCLinkDelayUserModified
+        TruthValue,
+    alaDcbxDCPTCPFCTrafficFlow
+        DcbxTrafficFlow,
+    alaDcbxDCPTCPriorityMap
+        Unsigned32,
+    alaDcbxDCPTCTrafficScheduler
+        LldpXdot1dcbxTrafficSelectionAlgorithm,
+    alaDcbxDCPTCRecommendedBandwidth
+        LldpXdot1dcbxTrafficClassBandwidthValue,
+    alaDcbxDCPTCRecommendedTrafficScheduler
+        LldpXdot1dcbxTrafficSelectionAlgorithm
+    }
+
+alaDcbxDCPTCDCPId  OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Identifier of DCB profile."
+    ::= { alaDcbxDCPTCEntry 1 }
+
+alaDcbxDCPTCTrafficClass OBJECT-TYPE
+    SYNTAX        LldpXdot1dcbxTrafficClassValue
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class."
+    ::= { alaDcbxDCPTCEntry 2 }
+
+alaDcbxDCPTCDCPName  OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Name of DCB profile."
+    ::= { alaDcbxDCPTCEntry 3 }
+
+alaDcbxDCPTCMaximumBandwidth OBJECT-TYPE
+    SYNTAX        LldpXdot1dcbxTrafficClassBandwidthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the max bandwidth assigned to this traffic class."
+    ::= { alaDcbxDCPTCEntry 4 }
+
+alaDcbxDCPTCMinimumBandwidth OBJECT-TYPE
+    SYNTAX        LldpXdot1dcbxTrafficClassBandwidthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the min bandwidth assigned to this traffic class."
+    ::= { alaDcbxDCPTCEntry 5 }
+
+alaDcbxDCPTCPFCLinkDelay  OBJECT-TYPE
+    SYNTAX  Unsigned32 (0 | 10..100)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "PFC link delay allowance.
+         Default for a lossy TC is 0 and cannot be any other value.
+         Default for a lossless TC is 52 and can be changed in a valid range (10-100)."
+    ::= { alaDcbxDCPTCEntry 6 }
+
+alaDcbxDCPTCPFCLinkDelayUserModified OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the Link Delay value has been modified by the user."
+    DEFVAL         { false }
+    ::= { alaDcbxDCPTCEntry 7 }
+
+alaDcbxDCPTCPFCTrafficFlow OBJECT-TYPE
+    SYNTAX        DcbxTrafficFlow
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC traffic flow is enabled on this traffic class"
+    ::= { alaDcbxDCPTCEntry 8 }
+
+alaDcbxDCPTCPriorityMap OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A bitmap that indicates the priorities assigned to this traffic 
+        class."
+    ::= { alaDcbxDCPTCEntry 9 }
+
+alaDcbxDCPTCTrafficScheduler OBJECT-TYPE
+    SYNTAX        LldpXdot1dcbxTrafficSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class scheduler algorithm assigned to 
+         this traffic class."
+    ::= { alaDcbxDCPTCEntry 10 }
+
+alaDcbxDCPTCRecommendedBandwidth OBJECT-TYPE
+    SYNTAX        LldpXdot1dcbxTrafficClassBandwidthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the recommended min bandwidth assigned to this traffic class."
+    ::= { alaDcbxDCPTCEntry 11 }
+
+alaDcbxDCPTCRecommendedTrafficScheduler OBJECT-TYPE
+    SYNTAX        LldpXdot1dcbxTrafficSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the recommended traffic class scheduler algorithm assigned to 
+         this traffic class."
+    ::= { alaDcbxDCPTCEntry 12 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxx
+-- DCB Port Instance Table
+-- xxxxxxxxxxxxxxxxxxxxxxxx
+
+alaDcbxPortInstanceTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlaDcbxPortInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of DCP Port Instances."
+    ::= { alaDcbxConfig 3 }
+
+alaDcbxPortInstanceEntry  OBJECT-TYPE
+    SYNTAX  AlaDcbxPortInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A DCP Port Instance Entry.
+         Creating this entry for a port will change the port mode
+         to DCB, set the default DCB profile (if none is specified),
+         will disable NDCB features, and will create a set of
+         alaDcbxPIPrioEntrys for the port."
+    INDEX { alaDcbxPIIfIndex }
+    ::= { alaDcbxPortInstanceTable 1 }
+
+AlaDcbxPortInstanceEntry ::= SEQUENCE {
+    alaDcbxPIIfIndex
+        Unsigned32,
+    alaDcbxPIDCBXAdmin
+        VfcEnableState,
+    alaDcbxPIDCBXOper
+        VfcEnableState,
+    alaDcbxPIAdminDCPId
+        Unsigned32,
+    alaDcbxPIAdminDCPName
+        SnmpAdminString,
+    alaDcbxPILocalModified
+        TruthValue,
+    alaDcbxPIPFCDefense
+        VfcEnableState,
+    alaDcbxPIPFCStatsClear
+        VfcEnableState,
+    alaDcbxPIStatus
+        DcbxStatus,
+    alaDcbxPIActionTaken
+        DcbxActionTaken,
+    alaDcbxPIRowStatus
+        RowStatus,
+    alaDcbxPIDCBXVersion
+        DcbxVersion,
+    alaDcbxPIDCBXOperVersion
+        DcbxVersion,
+    alaDcbxPIDCBXRemoteOperVersion
+        RemoteDcbxVersion
+
+    }
+
+alaDcbxPIIfIndex  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Identifier of DCB profile applied to this port."
+    ::= { alaDcbxPortInstanceEntry 1 }
+
+alaDcbxPIDCBXAdmin OBJECT-TYPE
+    SYNTAX        VfcEnableState
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION 
+        "DCBX Admin State. Enable or Disable all DCBX features on this port."
+    DEFVAL         { enabled }
+    ::= { alaDcbxPortInstanceEntry 2 }
+
+alaDcbxPIDCBXOper OBJECT-TYPE
+    SYNTAX        VfcEnableState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION 
+        "DCBX Oper State. Enable or Disable all DCBX features on this port."
+    DEFVAL         { disabled }
+    ::= { alaDcbxPortInstanceEntry 3 }
+
+alaDcbxPIAdminDCPId  OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..128)
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Identifier of DCB profile applied to this port."
+    ::= { alaDcbxPortInstanceEntry 4 }
+
+alaDcbxPIAdminDCPName  OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Name of DCB profile applied to this port."
+    ::= { alaDcbxPortInstanceEntry 5 }
+
+alaDcbxPILocalModified OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION 
+        "Value is true if local configuration is different from configuration
+         imported from the DCB profile applied to this port."
+    DEFVAL         { false }
+    ::= { alaDcbxPortInstanceEntry 6 }
+
+alaDcbxPIPFCDefense OBJECT-TYPE
+    SYNTAX        VfcEnableState
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION 
+        "PFC Defense Mode. Applies when PFC negotiation fails. If value is enabled,
+        then PFC becomes disabled but traffic still flows. If the value is disabled,
+        then PFC local configuration remains on the port."
+    DEFVAL         { enabled }
+    ::= { alaDcbxPortInstanceEntry 7 }
+
+alaDcbxPIPFCStatsClear OBJECT-TYPE
+    SYNTAX        VfcEnableState
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION 
+        "Clear the PFC stats for this port."
+    DEFVAL         { disabled }
+    ::= { alaDcbxPortInstanceEntry 8 }
+
+alaDcbxPIStatus OBJECT-TYPE
+    SYNTAX        DcbxStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates port status."
+    DEFVAL         { ok }
+    ::= { alaDcbxPortInstanceEntry 9 }
+
+alaDcbxPIActionTaken OBJECT-TYPE
+    SYNTAX        DcbxActionTaken
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the action taken as a result of the status."
+    DEFVAL         { na }
+    ::= { alaDcbxPortInstanceEntry 10 }
+
+alaDcbxPIRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Controls the creation and deletion of
+         rows in the alaDcbxPortInstanceTable."
+    ::= { alaDcbxPortInstanceEntry 11 }
+
+alaDcbxPIDCBXVersion OBJECT-TYPE
+    SYNTAX DcbxVersion
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "DCBX Version selected on this port."
+    ::= { alaDcbxPortInstanceEntry 12 }
+
+alaDcbxPIDCBXOperVersion OBJECT-TYPE
+    SYNTAX DcbxVersion
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "DCBX Version operating on this port."
+    ::= { alaDcbxPortInstanceEntry 13 }
+
+alaDcbxPIDCBXRemoteOperVersion OBJECT-TYPE
+    SYNTAX RemoteDcbxVersion
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "DCBX Remote Version operating on this port."
+    ::= { alaDcbxPortInstanceEntry 14 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- DCB Profile Traffic Class Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaDcbxPIPriorityTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlaDcbxPIPrioEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of Priorities for DCP Port Instances."
+    ::= { alaDcbxConfig 4 }
+
+alaDcbxPIPrioEntry  OBJECT-TYPE
+    SYNTAX  AlaDcbxPIPrioEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A DCB profile traffic class entry."
+    INDEX { alaDcbxPIPrioIfIndex, alaDcbxPIPrioPriority }
+    ::= { alaDcbxPIPriorityTable 1 }
+
+AlaDcbxPIPrioEntry ::= SEQUENCE {
+    alaDcbxPIPrioIfIndex
+        Unsigned32,
+    alaDcbxPIPrioPriority
+        IEEE8021PriorityValue,
+    alaDcbxPIPrioTC
+        LldpXdot1dcbxTrafficClassValue,
+    alaDcbxPIPrioPFCPacketsReceived
+        Counter64,
+    alaDcbxPIPrioPFCPacketsTransmitted
+        Counter64
+    }
+
+alaDcbxPIPrioIfIndex  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Identifier of DCP Port Instance."
+    ::= { alaDcbxPIPrioEntry 1 }
+
+alaDcbxPIPrioPriority OBJECT-TYPE
+    SYNTAX        IEEE8021PriorityValue
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Indicates the priority of the DCP Port Instance."
+    ::= { alaDcbxPIPrioEntry 2 }
+
+alaDcbxPIPrioTC OBJECT-TYPE
+    SYNTAX        LldpXdot1dcbxTrafficClassValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class this priority belongs to."
+    ::= { alaDcbxPIPrioEntry 3 }
+
+alaDcbxPIPrioPFCPacketsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total PFC received packet count."
+    ::= { alaDcbxPIPrioEntry 4 }
+
+alaDcbxPIPrioPFCPacketsTransmitted OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total PFC transmitted packet count."
+    ::= { alaDcbxPIPrioEntry 5 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxx
+-- PFC Lossless Usage Info
+-- xxxxxxxxxxxxxxxxxxxxxxx
+
+alaDcbxPfcLLPrioritiesUsed OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  deprecated
+    DESCRIPTION
+        "This object specifies the number of PFC Lossless Priorities
+         in use in the system."
+    ::= { alaDcbxConfig 5 }
+
+alaDcbxPfcLLPrioritiesReserved OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  deprecated
+    DESCRIPTION
+        "This object specifies the number of PFC Lossless Priorities
+         in reserved in the system."
+    ::= { alaDcbxConfig 6 }
+
+alaDcbxPfcLLPrioritiesAvailable OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  deprecated
+    DESCRIPTION
+        "This object specifies the number of Priorities
+         available to be configured as PFC Lossless."
+    ::= { alaDcbxConfig 7 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- PFC Lossless Usage Info - Virtual Chassis Compatible
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaDcbxPfcUsageTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlaDcbxPfcUsageEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table of chassis entries. Each depicts the pfc priorities available
+         per chassis. Only valid for TOR platform. In Virtual Chassis mode there is
+         an entry per chassis. In non-Virtual Chassis mode, only one entry is present."
+    ::= { alaDcbxConfig 8 }
+
+alaDcbxPfcUsageEntry  OBJECT-TYPE
+    SYNTAX  AlaDcbxPfcUsageEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A PFC usage class entry."
+    INDEX { alaDcbxPfcUsageChassisId }
+    ::= { alaDcbxPfcUsageTable 1 }
+
+AlaDcbxPfcUsageEntry ::= SEQUENCE {
+    alaDcbxPfcUsageChassisId
+        Unsigned32,
+    alaDcbxPfcUsagePrioritiesUsed
+        Unsigned32,
+    alaDcbxPfcUsagePrioritiesReserved
+        Unsigned32,
+    alaDcbxPfcUsagePrioritiesAvailable
+        Unsigned32
+    }
+
+alaDcbxPfcUsageChassisId OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Chassis ID."
+    ::= { alaDcbxPfcUsageEntry 1 }
+
+alaDcbxPfcUsagePrioritiesUsed OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object specifies the number of PFC Lossless Priorities
+         in use."
+    ::= { alaDcbxPfcUsageEntry 2 }
+
+alaDcbxPfcUsagePrioritiesReserved OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object specifies the number of PFC Lossless Priorities
+         reserved."
+    ::= { alaDcbxPfcUsageEntry 3 }
+
+alaDcbxPfcUsagePrioritiesAvailable OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object specifies the number of Priorities
+         available to be configured as PFC Lossless."
+    ::= { alaDcbxPfcUsageEntry 4 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- DCBX APP PRIO configuration. Used to delete an entry 
+---in standard mib containing application priorities
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaXdot1dcbxAdminApplicationPriorityAppTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF
+        AlaXdot1dcbxAdminApplicationPriorityAppEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Table containing entries indicating the status of the corresponding row in lldpXdot1dcbxAdminApplicationPriorityAppTable "
+    ::= { alaDcbxConfig 9 }
+
+alaXdot1dcbxAdminApplicationPriorityAppEntry OBJECT-TYPE
+    SYNTAX        AlaXdot1dcbxAdminApplicationPriorityAppEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION 
+        "Entry that indicates the rowstatus of application priority entry in lldpXdot1dcbxAdminApplicationPriorityAppTable "
+    INDEX         {
+                  lldpV2LocPortIfIndex,
+                  lldpXdot1dcbxAdminApplicationPriorityAESelector,
+                  lldpXdot1dcbxAdminApplicationPriorityAEProtocol
+    }
+    ::= { alaXdot1dcbxAdminApplicationPriorityAppTable 1 }
+
+AlaXdot1dcbxAdminApplicationPriorityAppEntry ::=
+SEQUENCE {
+    alaXdot1dcbxAdminApplicationPriorityAEPriority    
+        IEEE8021PriorityValue,
+    alaXdot1dcbxAdminApplicationPriorityAppRowStatus
+        RowStatus
+}
+
+alaXdot1dcbxAdminApplicationPriorityAEPriority OBJECT-TYPE
+    SYNTAX        IEEE8021PriorityValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The priority code point that should be used in
+        frames transporting the protocol indicated by
+        alaXdot1dcbxAdminApplicationPriorityAESelector and
+        alaXdot1dcbxAdminApplicationPriorityAEProtocol"
+    ::= { alaXdot1dcbxAdminApplicationPriorityAppEntry 1 }
+
+alaXdot1dcbxAdminApplicationPriorityAppRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "This object controls only the deletion of an entry in 
+        lldpXdot1dcbxAdminApplicationPriorityAppTable."
+    ::= { alaXdot1dcbxAdminApplicationPriorityAppEntry 2 }
+
+-- -------------------------------------------------------------
+-- Compliance Statements
+-- -------------------------------------------------------------
+
+alcatelIND1DcbxMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Compliance statement for VFC-DCBX Subsystem."
+    MODULE  -- this module
+        MANDATORY-GROUPS
+        {
+            alaDcbxDCProfileGroup,
+            alaDcbxDCPTrafficClassGroup,
+            alaDcbxPortInstanceGroup,
+            alaDcbxPortInstancePriorityGroup,
+            alaDcbxPfcUsageGroup,
+            alaDcbxPfcUsageNewGroup
+        }
+    ::= { alcatelIND1DcbxMIBCompliances 1 }
+
+-- -------------------------------------------------------------
+-- Units Of Conformance
+-- -------------------------------------------------------------
+
+alaDcbxDCProfileGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDcbxDCPName,
+        alaDcbxDCPETSTrafficClassesSupported,
+        alaDcbxDCPPFCCap,
+        alaDcbxDCPPriorityTCMap,
+        alaDcbxDCPTemplateDCPId,
+        alaDcbxDCPTemplateDCPName,
+        alaDcbxDCPTCsPresent,
+        alaDcbxDCP8023xPauseReady,
+        alaDcbxDCPRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "Collection of DCB Profile for management of DCBX."
+    ::= { alcatelIND1DcbxMIBGroups 1 }
+
+alaDcbxDCPTrafficClassGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDcbxDCPTCDCPName,
+        alaDcbxDCPTCMaximumBandwidth,
+        alaDcbxDCPTCMinimumBandwidth,
+        alaDcbxDCPTCPFCLinkDelay,
+        alaDcbxDCPTCPFCLinkDelayUserModified,
+        alaDcbxDCPTCPFCTrafficFlow,
+        alaDcbxDCPTCPriorityMap,
+        alaDcbxDCPTCTrafficScheduler,
+        alaDcbxDCPTCRecommendedBandwidth,
+        alaDcbxDCPTCRecommendedTrafficScheduler
+    }
+    STATUS current
+    DESCRIPTION
+        "Collection of DCB Profile Traffic Class for management of DCBX."
+    ::= { alcatelIND1DcbxMIBGroups 2 }
+
+alaDcbxPortInstanceGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDcbxPIDCBXAdmin,
+        alaDcbxPIDCBXOper,
+        alaDcbxPIAdminDCPId,
+        alaDcbxPIAdminDCPName,
+        alaDcbxPILocalModified,
+        alaDcbxPIPFCDefense,
+        alaDcbxPIPFCStatsClear,
+        alaDcbxPIStatus,
+        alaDcbxPIActionTaken,
+        alaDcbxPIRowStatus,
+        alaDcbxPIDCBXVersion,
+        alaDcbxPIDCBXOperVersion,
+        alaDcbxPIDCBXRemoteOperVersion
+
+    }
+    STATUS current
+    DESCRIPTION
+        "Collection of DCP Port Instances for management of DCBX."
+    ::= { alcatelIND1DcbxMIBGroups 3 }
+
+alaDcbxPortInstancePriorityGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDcbxPIPrioTC,
+        alaDcbxPIPrioPFCPacketsReceived,
+        alaDcbxPIPrioPFCPacketsTransmitted
+    }
+    STATUS current
+    DESCRIPTION
+        "Collection of DCP Port Instance Traffic Class for management of DCBX."
+    ::= { alcatelIND1DcbxMIBGroups 4 }
+
+alaDcbxPfcUsageGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDcbxPfcLLPrioritiesUsed,
+        alaDcbxPfcLLPrioritiesReserved,
+        alaDcbxPfcLLPrioritiesAvailable
+    }
+    STATUS current
+    DESCRIPTION
+        "Collection of PFC Lossless TC Usage Objects."
+    ::= { alcatelIND1DcbxMIBGroups 5 }
+
+alaDcbxPfcUsageNewGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaDcbxPfcUsagePrioritiesUsed,
+        alaDcbxPfcUsagePrioritiesReserved,
+        alaDcbxPfcUsagePrioritiesAvailable
+    }
+    STATUS current
+    DESCRIPTION
+        "Collection of PFC Lossless Priorities Usage Objects. Compatible with
+         Virtual Chassis mode."
+    ::= { alcatelIND1DcbxMIBGroups 6 }
+
+alaXdot1dcbxAdminApplicationPriorityGroup OBJECT-GROUP
+    OBJECTS
+    {
+        alaXdot1dcbxAdminApplicationPriorityAEPriority,
+        alaXdot1dcbxAdminApplicationPriorityAppRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "Collection of dcbx app priority configuration Usage Objects. "
+    ::= { alcatelIND1DcbxMIBGroups 7 }
+
+END

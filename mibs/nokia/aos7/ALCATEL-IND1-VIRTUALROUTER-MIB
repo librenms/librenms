@@ -1,0 +1,523 @@
+ALCATEL-IND1-VIRTUALROUTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    routingIND1Vrf
+        FROM ALCATEL-IND1-BASE ;
+
+alcatelIND1VirtualRouterMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "201308230000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for
+             the configuration of Virtual Router instances.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2006 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200803170000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Vrf 1 }
+
+alcatelIND1VirtualRouterMIBObjects  OBJECT IDENTIFIER ::= { alcatelIND1VirtualRouterMIB 1 }
+
+alaVirtualRouterConfig  OBJECT IDENTIFIER ::= { alcatelIND1VirtualRouterMIBObjects 1 }
+
+
+-- virtual router name table
+
+alaVirtualRouterNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaVirtualRouterNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing Virtual Router Name to Virtual Router Index bindings.
+         There is always an entry for the default Virtual Router which has the
+         name default"
+    ::= { alaVirtualRouterConfig 1 }
+
+alaVirtualRouterNameEntry OBJECT-TYPE
+    SYNTAX      AlaVirtualRouterNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry binds a Virtual Router Name to a Virtual Router index."
+    INDEX {
+        alaVirtualRouterName
+       }
+    ::= { alaVirtualRouterNameTable 1 }
+
+AlaVirtualRouterNameEntry ::= SEQUENCE {
+    alaVirtualRouterName                SnmpAdminString,
+    alaVirtualRouterNameIndex           Integer32,
+    alaVirtualRouterNameRowStatus       RowStatus,
+    alaVirtualRouterProfile             SnmpAdminString,
+    alaVirtualRouterMaxRouteMaps        Integer32,
+    alaVirtualRouterMaxSequences        Integer32,
+    alaVirtualRouterMaxTlvs             Integer32,
+    alaVirtualRouterMaxAccessLists      Integer32,
+    alaVirtualRouterMaxAddressBlocks    Integer32,
+    alaVirtualRouterMaxMatchInterfaces  Integer32,
+    alaVirtualRouterNoAutoLoadVrrp      TruthValue
+   }
+
+
+alaVirtualRouterName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..20))
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The name of a Virtual Router."
+    ::= { alaVirtualRouterNameEntry 1 }
+
+alaVirtualRouterNameIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The index associated with the Virtual Router name."
+    ::= { alaVirtualRouterNameEntry 2 }
+
+alaVirtualRouterNameRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Controls creation and deletion of Row Status entries."
+    ::= { alaVirtualRouterNameEntry 3 }
+
+alaVirtualRouterProfile OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..20))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The profile name of the VRF. Profiles place constraints on what the
+         VRF can contain."
+    ::= { alaVirtualRouterNameEntry 4 }
+
+alaVirtualRouterMaxRouteMaps OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of route-maps allowed in this VRF."
+    ::= { alaVirtualRouterNameEntry 5 }
+
+alaVirtualRouterMaxSequences OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of route-map sequences allowed in this VRF."
+    ::= { alaVirtualRouterNameEntry 6 }
+
+alaVirtualRouterMaxTlvs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of route-map TLV blocks allowed in this VRF."
+    ::= { alaVirtualRouterNameEntry 7 }
+
+alaVirtualRouterMaxAccessLists OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of access-lists allowed in this VRF."
+    ::= { alaVirtualRouterNameEntry 8 }
+
+alaVirtualRouterMaxAddressBlocks OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of access-list address blocks allowed in this VRF."
+    ::= { alaVirtualRouterNameEntry 9 }
+
+alaVirtualRouterMaxMatchInterfaces OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of route-map match interfaces allowed in this VRF."
+    ::= { alaVirtualRouterNameEntry 10 }
+
+alaVirtualRouterNoAutoLoadVrrp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "If true, do not automatically load VRRP in max profile VRF."
+    DEFVAL      { false }
+    ::= { alaVirtualRouterNameEntry 11 }
+
+
+-- virtual router protocol table
+
+alaVrConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaVrConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing Virtual Router protocol configuration."
+    ::= { alaVirtualRouterConfig 2 }
+
+alaVrConfigEntry OBJECT-TYPE
+    SYNTAX      AlaVrConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry exists for each VRF in the alaVrtualRouterNameTable.
+         The entry represents the status of routing protocols on a VRF instance."
+    INDEX {
+        alaVrConfigIndex
+       }
+    ::= { alaVrConfigTable 1 }
+
+AlaVrConfigEntry ::= SEQUENCE {
+    alaVrConfigIndex            Integer32,
+    alaVrConfigRipStatus        INTEGER,
+    alaVrConfigOspfStatus       INTEGER,
+    alaVrConfigIsisStatus       INTEGER,
+    alaVrConfigBgpStatus        INTEGER,
+    alaVrConfigPimStatus        INTEGER,
+    alaVrConfigDvmrpStatus      INTEGER,
+    alaVrConfigRipngStatus      INTEGER,
+    alaVrConfigOspf3Status      INTEGER,
+    alaVrConfigMplsLdpStatus    INTEGER,
+    alaVrConfigVrrpStatus       INTEGER
+   }
+
+alaVrConfigIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The index associated with the Virtual Router name."
+    ::= { alaVrConfigEntry 1 }
+
+alaVrConfigRipStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of RIP on this router.
+                 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 2 }
+
+alaVrConfigOspfStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of OSPF on this router.
+                 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 3 }
+
+alaVrConfigIsisStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of ISIS on this router.
+                 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 4 }
+
+alaVrConfigBgpStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of BGP on this router.
+                 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 5 }
+
+alaVrConfigPimStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of PIM on this router.
+                 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 6 }
+
+alaVrConfigDvmrpStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of DVMRP on this router.
+                 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 7 }
+
+alaVrConfigRipngStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of Ripng on this router.
+                 Loaded(1) is the only valid Set value."
+
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 8 }
+
+alaVrConfigOspf3Status     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of OSPFv3 on this router.
+                 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 9 }
+
+alaVrConfigMplsLdpStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of MPLS LDP on this router.
+                 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 10 }
+
+
+alaVrConfigVrrpStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   loaded(1),
+                   notloaded(2),
+                   loading(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+                "Controls the load status of VRRP on this router.
+                 Loaded(1) is the only valid Set value."
+    DEFVAL     { notloaded }
+    ::= {alaVrConfigEntry 11 }
+
+
+-- virtual router profile table
+alaVirtualRouterProfileTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF AlaVirtualRouterProfileEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Table contains capabilities of a VRF profile."
+    ::= { alaVirtualRouterConfig 3 }
+
+alaVirtualRouterProfileEntry OBJECT-TYPE
+    SYNTAX            AlaVirtualRouterProfileEntry
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION
+        "Each entry defines a VRF profile."
+    INDEX {
+        alaVirtualRouterProfileName
+    }
+    ::= { alaVirtualRouterProfileTable 1 }
+
+AlaVirtualRouterProfileEntry ::= SEQUENCE {
+    alaVirtualRouterProfileName               SnmpAdminString,
+    alaVirtualRouterProfileMaxRouteMaps       Integer32,
+    alaVirtualRouterProfileMaxSequences       Integer32,
+    alaVirtualRouterProfileMaxTlvs            Integer32,
+    alaVirtualRouterProfileMaxAccessLists     Integer32,
+    alaVirtualRouterProfileMaxAddressBlocks   Integer32,
+    alaVirtualRouterProfileMaxMatchInterfaces Integer32
+}
+
+alaVirtualRouterProfileName OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The name of the profile."
+    ::= { alaVirtualRouterProfileEntry 1 }
+
+alaVirtualRouterProfileMaxRouteMaps OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of route-maps supported in this VRF profile."
+    ::= { alaVirtualRouterProfileEntry 2 }
+
+alaVirtualRouterProfileMaxSequences OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of route-map sequences supported in this VRF
+         profile."
+    ::= { alaVirtualRouterProfileEntry 3 }
+
+alaVirtualRouterProfileMaxTlvs OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of route-map TLVs supported in this VRF profile.
+         TLVs are used to store match and set clauses."
+    ::= { alaVirtualRouterProfileEntry 4 }
+
+alaVirtualRouterProfileMaxAccessLists OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of route-map access-lists supported in this
+         VRF profile. Access-lists contain IPv4 or IPv6 addresses."
+    ::= { alaVirtualRouterProfileEntry 5 }
+
+alaVirtualRouterProfileMaxAddressBlocks OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of route-map address blocks supported in this
+         VRF profile. Address blocks are used to hold the access-lists
+         routes."
+    ::= { alaVirtualRouterProfileEntry 6 }
+
+alaVirtualRouterProfileMaxMatchInterfaces OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of route-map interfaces that can be configured
+         match clauses supported in this VRF profile."
+    ::= { alaVirtualRouterProfileEntry 7 }
+
+
+-- conformance information
+
+alcatelIND1VirtualRouterMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1VirtualRouterMIB 2 }
+alcatelIND1VirtualRouterMIBCompliances OBJECT IDENTIFIER ::=
+                                          { alcatelIND1VirtualRouterMIBConformance 1 }
+alcatelIND1VirtualRouterMIBGroups      OBJECT IDENTIFIER ::=
+                                          { alcatelIND1VirtualRouterMIBConformance 2 }
+
+-- compliance statements
+
+alaVirtualRouterCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running Route Maps
+            and implementing the ALCATEL-IND1-VIRTUALROUTER MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaVirtualRouterConfigMIBGroup }
+
+    ::= { alcatelIND1VirtualRouterMIBCompliances 1 }
+
+-- units of conformance
+
+alaVirtualRouterConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaVirtualRouterNameIndex, alaVirtualRouterNameRowStatus,
+              alaVirtualRouterProfile, alaVirtualRouterMaxRouteMaps,
+              alaVirtualRouterMaxSequences, alaVirtualRouterMaxTlvs,
+              alaVirtualRouterMaxAccessLists, alaVirtualRouterMaxAddressBlocks,
+              alaVirtualRouterMaxMatchInterfaces, alaVirtualRouterNoAutoLoadVrrp,
+              alaVrConfigRipStatus, alaVrConfigOspfStatus, alaVrConfigIsisStatus,
+              alaVrConfigBgpStatus, alaVrConfigPimStatus,
+              alaVrConfigDvmrpStatus, alaVrConfigRipngStatus,
+              alaVrConfigOspf3Status, alaVrConfigMplsLdpStatus, alaVrConfigVrrpStatus,
+              alaVirtualRouterProfileMaxRouteMaps, alaVirtualRouterProfileMaxSequences,
+              alaVirtualRouterProfileMaxTlvs, alaVirtualRouterProfileMaxAccessLists,
+              alaVirtualRouterProfileMaxAddressBlocks, alaVirtualRouterProfileMaxMatchInterfaces }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of global
+            configuration parameters of the Virtual Router Module."
+    ::= { alcatelIND1VirtualRouterMIBGroups 1 }
+
+
+END
