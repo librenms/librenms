@@ -54,6 +54,12 @@ systems, and use redis-sentinel.
 You should not rely on the password for the security of your
 system. See <https://redis.io/topics/security>
 
+## Memcached (distributed polling)
+
+LibreNMS still uses memcached for locking daily update processes when using
+distributed polling.  So you will still need to configure memecached
+unless you have updates disabled.
+
 ## MySQL
 
 You should already have this, but the pollers do need access to the
