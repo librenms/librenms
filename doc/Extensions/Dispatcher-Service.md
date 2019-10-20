@@ -56,8 +56,9 @@ system. See <https://redis.io/topics/security>
 
 ## Memcached (distributed polling)
 
-LibreNMS still uses memcached for locking daily update processes.  So you will
-still need to configure memecached unless you have updates disabled.
+LibreNMS still uses memcached for locking daily update processes when using
+distributed polling.  So you will still need to configure memecached
+unless you have updates disabled.
 
 ## MySQL
 
