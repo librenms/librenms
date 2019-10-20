@@ -107,7 +107,8 @@
             "type": "boolean"
         },
         "alert_graph_date_format": {
-            "default": "%Y-%m-%d %H:%i"
+            "default": "%Y-%m-%d %H:%i",
+            "type": "text"
         },
         "alert_log_purge": {
             "default": 365,
@@ -248,22 +249,20 @@
                 "65332": "Cymru FullBogon Feed",
                 "65333": "Cymru Bogon Feed"
             },
-            "type": "object"
+            "type": "array"
         },
         "auth_ad_base_dn": {
             "group": "auth",
             "section": "ad",
             "order": 1,
-            "type": "text",
-            "required": true
+            "type": "text"
         },
         "auth_ad_check_certificates": {
             "default": false,
             "group": "auth",
             "section": "ad",
             "order": 1,
-            "type": "boolean",
-            "required": true
+            "type": "boolean"
         },
         "auth_ad_group_filter": {
             "default": "(objectclass=group)",
@@ -497,7 +496,8 @@
             "type": "integer"
         },
         "autodiscovery.bgp": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "autodiscovery.cdp_exclude.platform_regexp": {
             "type": "array",
@@ -516,13 +516,16 @@
             ]
         },
         "autodiscovery.ospf": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "autodiscovery.snmpscan": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "autodiscovery.xdp": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
             "type": "array",
@@ -531,7 +534,8 @@
             ]
         },
         "bad_disk_regexp": {
-            "default": []
+            "default": [],
+            "type": "array"
         },
         "bad_if": {
             "type": "array",
@@ -587,78 +591,107 @@
             ]
         },
         "billing.base": {
-            "default": 1000
+            "default": 1000,
+            "type": "integer"
         },
         "billing.bill_autoadd": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "billing.circuit_autoadd": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "billing.customer_autoadd": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "callback_clear": {
-            "default": "https://stats.librenms.org/clear.php"
+            "default": "https://stats.librenms.org/clear.php",
+            "type": "text"
         },
         "callback_post": {
-            "default": "https://stats.librenms.org/log.php"
+            "default": "https://stats.librenms.org/log.php",
+            "type": "text"
         },
-        "core_descr.0": {
-            "default": "core"
+        "core_descr": {
+            "default": ["core"],
+            "type": "array"
         },
         "cpu_details_overview": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
-        "custom_descr.0": {
-            "default": ""
+        "custom_descr": {
+            "default": [""],
+            "type": "array"
         },
         "customers_descr": {
-            "default": "cust"
+            "default": "cust",
+            "type": "text"
         },
         "dateformat.byminute": {
-            "default": "Y-m-d H:i"
+            "default": "Y-m-d H:i",
+            "type": "text"
         },
         "dateformat.compact": {
-            "default": "Y-m-d H:i:s"
+            "default": "Y-m-d H:i:s",
+            "type": "text"
         },
         "dateformat.long": {
-            "default": "r"
+            "default": "r",
+            "type": "text"
         },
         "dateformat.mysql.compact": {
-            "default": "%Y-%m-%d %H:%i:%s"
+            "default": "%Y-%m-%d %H:%i:%s",
+            "type": "text"
         },
         "dateformat.mysql.date": {
-            "default": "%Y-%m-%d"
+            "default": "%Y-%m-%d",
+            "type": "text"
         },
         "dateformat.mysql.time": {
-            "default": "%H:%i:%s"
+            "default": "%H:%i:%s",
+            "type": "text"
         },
         "dateformat.time": {
-            "default": "H:i:s"
+            "default": "H:i:s",
+            "type": "text"
         },
         "db_name": {
             "default": "librenms",
-            "hidden": true
+            "hidden": true,
+            "type": "boolean"
         },
         "db_pass": {
             "default": null,
-            "hidden": true
+            "hidden": true,
+            "type": "boolean"
         },
         "db_port": {
             "default": 3306,
-            "hidden": true
+            "hidden": true,
+            "type": "boolean"
         },
         "db_socket": {
             "default": null,
-            "hidden": true
+            "hidden": true,
+            "type": "boolean"
         },
         "db_user": {
             "default": "librenms",
-            "hidden": true
+            "hidden": true,
+            "type": "boolean"
         },
         "default_port_association_mode": {
-            "default": "ifIndex"
+            "default": "ifIndex",
+            "type": "select",
+            "options": {
+                "ifIndex": "ifIndex",
+                "ifName": "ifName",
+                "ifDescr": "ifDescr",
+                "ifAlias": "ifAlias"
+            }
         },
         "device_perf_purge": {
             "default": 7,
@@ -935,7 +968,11 @@
             "type": "boolean"
         },
         "distributed_poller_group": {
-            "default": 0
+            "default": 0,
+            "type": "integer",
+            "group": "poller",
+            "section": "distributed",
+            "order": 3
         },
         "distributed_poller_memcached_host": {
             "default": "example.net",
@@ -954,10 +991,9 @@
             "order": 2,
             "type": "integer"
         },
-        "distributed_poller_name": {
-        },
         "dot": {
-            "default": "/usr/bin/dot"
+            "default": "/usr/bin/dot",
+            "type": "text"
         },
         "email_auto_tls": {
             "default": true,
@@ -1031,7 +1067,9 @@
             "section": "email",
             "order": 6,
             "type": "text",
-            "pattern": "[a-zA-Z0-9_\\-.]+",
+            "validate": {
+                "value": "^[a-zA-Z0-9_\\-.]+$"
+            },
             "when": {
                 "setting": "email_backend",
                 "operator": "equals",
@@ -1111,55 +1149,72 @@
             "type": "text"
         },
         "enable_bgp": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "enable_billing": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "enable_clear_discovery": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "enable_footer": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "enable_inventory": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "enable_lazy_load": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "enable_libvirt": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "enable_port_relationship": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "enable_ports_adsl": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "enable_ports_etherlike": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "enable_ports_junoseatmvp": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "enable_ports_poe": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "enable_pseudowires": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "enable_sla": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "enable_syslog": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "enable_vrf_lite_cisco": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "enable_vrfs": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "eventlog_purge": {
             "default": 30,
@@ -1176,10 +1231,12 @@
             "type": "text"
         },
         "force_hostname_to_sysname": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "force_ip_to_sysname": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "fping": {
             "default": "fping",
@@ -1219,16 +1276,20 @@
             "type": "text"
         },
         "front_page": {
-            "default": "pages/front/tiles.php"
+            "default": "pages/front/tiles.php",
+            "type": "text"
         },
         "front_page_down_box_limit": {
-            "default": 10
+            "default": 10,
+            "type": "integer"
         },
         "front_page_settings.top.devices": {
-            "default": 10
+            "default": 10,
+            "type": "integer"
         },
         "front_page_settings.top.ports": {
-            "default": 10
+            "default": 10,
+            "type": "integer"
         },
         "geoloc.api_key": {
             "default": "",
@@ -1236,7 +1297,6 @@
             "section": "location",
             "order": 1,
             "type": "text",
-            "required": true,
             "when": {
                 "setting": "geoloc.engine",
                 "operator": "in",
@@ -1261,7 +1321,8 @@
             }
         },
         "github_api": {
-            "default": "https://api.github.com/repos/librenms/librenms/"
+            "default": "https://api.github.com/repos/librenms/librenms/",
+            "type": "text"
         },
         "graph_colours.blues": {
             "default": [
@@ -1422,1154 +1483,1320 @@
             "type": "array"
         },
         "graph_descr.device_processor": {
-            "default": "This is an aggregate graph of all processors in the system."
+            "default": "This is an aggregate graph of all processors in the system.",
+            "type": "text"
         },
         "graph_descr.device_smokeping_in_all": {
-            "default": "This is an aggregate graph of the incoming smokeping tests to this host. The line corresponds to the average RTT. The shaded area around each line denotes the standard deviation."
+            "default": "This is an aggregate graph of the incoming smokeping tests to this host. The line corresponds to the average RTT. The shaded area around each line denotes the standard deviation.",
+            "type": "text"
         },
         "graph_types.device.agent": {
             "default": {
                 "section": "poller",
                 "order": 0,
                 "descr": "Agent Execution Time"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.arbos_flows": {
             "default": {
                 "section": "graphs",
                 "order": 0,
                 "descr": "Accumulative flow count per SP device"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.asa_conns": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Current connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.asyncos_conns": {
             "default": {
                 "section": "proxy",
                 "order": 0,
                 "descr": "Current connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.barracuda_firewall_sessions": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bigip_apm_sessions": {
             "default": {
                 "section": "apm",
                 "order": 0,
                 "descr": "Active Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bigip_system_client_concurrent_connections": {
             "default": {
                 "section": "ltm",
                 "order": 2,
                 "descr": "Global Client Concurrent Connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bigip_system_client_connection_rate": {
             "default": {
                 "section": "ltm",
                 "order": 4,
                 "descr": "Global Client Connection Rate"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bigip_system_server_concurrent_connections": {
             "default": {
                 "section": "ltm",
                 "order": 1,
                 "descr": "Global Server Concurrent Connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bigip_system_server_connection_rate": {
             "default": {
                 "section": "ltm",
                 "order": 3,
                 "descr": "Global Server Connection Rate"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bigip_system_tps": {
             "default": {
                 "section": "ltm",
                 "order": 0,
                 "descr": "SSL Transactions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bits": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "Total Traffic"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bluecoat_http_client_connections": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "HTTP Client Connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bluecoat_http_client_connections_active": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "HTTP Client Connections Active"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bluecoat_http_client_connections_idle": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "HTTP Client Connections Idle"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bluecoat_http_server_connections": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "HTTP Server Connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bluecoat_http_server_connections_active": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "HTTP Server Connections Active"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.bluecoat_http_server_connections_idle": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "HTTP Server Connections Idle"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cambium-epmp-frameUtilization": {
             "default": {
                 "section": "wireless",
                 "order": 7,
                 "descr": "Frame Utilization"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cambium_epmp_RFStatus": {
             "default": {
                 "section": "wireless",
                 "order": 0,
                 "descr": "RF Status"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cambium_epmp_access": {
             "default": {
                 "section": "wireless",
                 "order": 4,
                 "descr": "Access Info"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cambium_epmp_freq": {
             "default": {
                 "section": "wireless",
                 "order": 6,
                 "descr": "Frequency"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cambium_epmp_gpsSync": {
             "default": {
                 "section": "wireless",
                 "order": 5,
                 "descr": "GPS Sync Status"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cambium_epmp_modulation": {
             "default": {
                 "section": "wireless",
                 "order": 2,
                 "descr": "ePMP Modulation"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cambium_epmp_registeredSM": {
             "default": {
                 "section": "wireless",
                 "order": 3,
                 "descr": "ePMP Registered SM"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_450_linkRadioDbm": {
             "default": {
                 "section": "wireless",
                 "order": 5,
                 "descr": "Radio Link H/V"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_450_powerlevel": {
             "default": {
                 "section": "wireless",
                 "order": 4,
                 "descr": "Power Level of Registered SM"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_450_ptpSNR": {
             "default": {
                 "section": "wireless",
                 "order": 6,
                 "descr": "Master SNR"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_450_slaveHV": {
             "default": {
                 "section": "wireless",
                 "order": 7,
                 "descr": "Dbm H/V"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_crcErrors": {
             "default": {
                 "section": "wireless",
                 "order": 15,
                 "descr": "CRC Errors (Migrated to Wireless Sensor)"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_errorCount": {
             "default": {
                 "section": "wireless",
                 "order": 14,
                 "descr": "Error Count (Migrated to Wireless Sensor)"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_gpsStats": {
             "default": {
                 "section": "wireless",
                 "order": 0,
                 "descr": "GPS Stats"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_jitter": {
             "default": {
                 "section": "wireless",
                 "order": 2,
                 "descr": "Jitter"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_radioDbm": {
             "default": {
                 "section": "wireless",
                 "order": 13,
                 "descr": "Radio Dbm"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_regCount": {
             "default": {
                 "section": "wireless",
                 "order": 11,
                 "descr": "Registered SM"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.canopy_generic_signalHV": {
             "default": {
                 "section": "wireless",
                 "order": 3,
                 "descr": "Signal"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ceraos_DefectedBlocks": {
             "default": {
                 "section": "wireless",
                 "order": 4,
                 "descr": "DefectedBlocks"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ceraos_MSE": {
             "default": {
                 "section": "wireless",
                 "order": 2,
                 "descr": "Radial MSE"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ceraos_RxBitrate": {
             "default": {
                 "section": "wireless",
                 "order": 6,
                 "descr": "RxBitrate"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ceraos_RxLevel": {
             "default": {
                 "section": "wireless",
                 "order": 0,
                 "descr": "RX Level"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ceraos_TxBitrate": {
             "default": {
                 "section": "wireless",
                 "order": 5,
                 "descr": "TxBitrate"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ceraos_TxPower": {
             "default": {
                 "section": "wireless",
                 "order": 1,
                 "descr": "TX Power"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ceraos_XPI": {
             "default": {
                 "section": "wireless",
                 "order": 3,
                 "descr": "Cross Polarisation Interference"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.charge": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Battery Charge"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cipsec_flow_bits": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "IPSec Tunnel Traffic Volume"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cipsec_flow_pkts": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "IPSec Tunnel Traffic Packets"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cipsec_flow_stats": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "IPSec Tunnel Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cipsec_flow_tunnels": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "IPSec Active Tunnels"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cisco-iosdsp": {
             "default": {
                 "section": "voice",
                 "order": 0,
                 "descr": "DSP Utilisation"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cisco-iosmtp": {
             "default": {
                 "section": "voice",
                 "order": 0,
                 "descr": "Hardware MTP Utilisation"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cisco-iospri": {
             "default": {
                 "section": "voice",
                 "order": 0,
                 "descr": "PRI Utilisation"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cisco-iosxcode": {
             "default": {
                 "section": "voice",
                 "order": 0,
                 "descr": "Transcoder Utilisation"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cisco-voice-ip": {
             "default": {
                 "section": "voice",
                 "order": 0,
                 "descr": "IP Real Time Calls"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cisco_wwan_mnc": {
             "default": {
                 "section": "wireless",
                 "order": 1,
                 "descr": "MNC"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cisco_wwan_rssi": {
             "default": {
                 "section": "wireless",
                 "order": 0,
                 "descr": "Signal Rssi"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.cras_sessions": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Remote Access Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.fdb_count": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "MAC Addresses Learnt"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.fortigate_cpu": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "CPU"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.fortigate_sessions": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.fortios_lograte": {
             "default": {
                 "section": "analyzer",
                 "order": 0,
                 "descr": "Log Rate"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.hr_processes": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Running Processes"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.hr_users": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Users Logged In"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ib_dhcp_messages": {
             "default": {
                 "section": "dhcp",
                 "order": 0,
                 "descr": "DHCP messages"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ib_dns_dyn_updates": {
             "default": {
                 "section": "dns",
                 "order": 0,
                 "descr": "DNS dynamic updates"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ib_dns_performance": {
             "default": {
                 "section": "dns",
                 "order": 0,
                 "descr": "DNS performance"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ib_dns_request_return_codes": {
             "default": {
                 "section": "dns",
                 "order": 0,
                 "descr": "DNS request return codes"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ipsystemstats_ipv4": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "IPv4 Packet Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ipsystemstats_ipv4_frag": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "IPv4 Fragmentation Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ipsystemstats_ipv6": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "IPv6 Packet Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ipsystemstats_ipv6_frag": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "IPv6 Fragmentation Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.junos_jsrx_spu_flows": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "SPU Flows"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.junos_jsrx_spu_sessions": {
             "default": {
                 "section": "network",
                 "order": 1,
                 "descr": "Flow Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.mempool": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Memory Pool Usage"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netscaler_tcp_bits": {
             "default": {
                 "section": "load balancer",
                 "order": 0,
                 "descr": "TCP Traffic"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netscaler_tcp_conn": {
             "default": {
                 "section": "load balancer",
                 "order": 0,
                 "descr": "TCP Connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netscaler_tcp_pkts": {
             "default": {
                 "section": "load balancer",
                 "order": 0,
                 "descr": "TCP Packets"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netstat_icmp": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "ICMP Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netstat_icmp_info": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "ICMP Informational Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netstat_ip": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "IP Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netstat_ip_forward": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "IP Forwarding Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netstat_ip_frag": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "IP Fragmentation Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netstat_snmp": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "SNMP Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netstat_snmp_pkt": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "SNMP Packet Type Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netstat_tcp": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "TCP Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.netstat_udp": {
             "default": {
                 "section": "netstats",
                 "order": 0,
                 "descr": "UDP Statistics"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.panos_activetunnels": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active GlobalProtect Tunnels"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.panos_sessions": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.panos_sessions_icmp": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active ICMP Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.panos_sessions_ssl": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active SSL Proxy Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.panos_sessions_sslutil": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active SSL Proxy Utilization"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.panos_sessions_tcp": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active TCP Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.panos_sessions_udp": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active UDP Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_badoffset": {
             "default": {
                 "section": "firewall",
                 "order": 6,
                 "descr": "BadOffset"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_fragmented": {
             "default": {
                 "section": "firewall",
                 "order": 7,
                 "descr": "Fragmented"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_inserts": {
             "default": {
                 "section": "firewall",
                 "order": 3,
                 "descr": "Inserts"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_matches": {
             "default": {
                 "section": "firewall",
                 "order": 5,
                 "descr": "Matches"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_memdropped": {
             "default": {
                 "section": "firewall",
                 "order": 10,
                 "descr": "MemDropped"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_normalized": {
             "default": {
                 "section": "firewall",
                 "order": 9,
                 "descr": "Normalized"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_removals": {
             "default": {
                 "section": "firewall",
                 "order": 4,
                 "descr": "Removals"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_searches": {
             "default": {
                 "section": "firewall",
                 "order": 2,
                 "descr": "Searches"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_short": {
             "default": {
                 "section": "firewall",
                 "order": 8,
                 "descr": "Short"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pf_states": {
             "default": {
                 "section": "firewall",
                 "order": 1,
                 "descr": "States"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ping_perf": {
             "default": {
                 "section": "poller",
                 "order": 0,
                 "descr": "Ping Response"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.poller_modules_perf": {
             "default": {
                 "section": "poller",
                 "order": 0,
                 "descr": "Poller Modules Performance"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.poller_perf": {
             "default": {
                 "section": "poller",
                 "order": 0,
                 "descr": "Poller Time"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.processor": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Processor Usage"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pulse_sessions": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.pulse_users": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active Users"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.riverbed_connections": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "Connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.riverbed_datastore": {
             "default": {
                 "section": "network",
                 "order": 2,
                 "descr": "Datastore productivity"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.riverbed_optimization": {
             "default": {
                 "section": "network",
                 "order": 1,
                 "descr": "Optimization"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.riverbed_passthrough": {
             "default": {
                 "section": "network",
                 "order": 3,
                 "descr": "Bandwidth passthrough"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.routeros_leases": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "DHCP Lease Count"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.routeros_pppoe_sessions": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "PPPoE Session Count"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.rutos_2xx_mobileDataUsage": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "Mobile Data Usage"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.screenos_sessions": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.secureplatform_sessions": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sgos_average_requests": {
             "default": {
                 "section": "network",
                 "order": 0,
                 "descr": "Average HTTP Requests"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sgos_client_connections": {
             "default": {
                 "section": "network",
                 "order": 1,
                 "descr": "HTTP Client Connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sgos_client_connections_active": {
             "default": {
                 "section": "network",
                 "order": 2,
                 "descr": "HTTP Client Connections Active"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sgos_client_connections_idle": {
             "default": {
                 "section": "network",
                 "order": 3,
                 "descr": "HTTP Client Connections Idle"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sgos_server_connections": {
             "default": {
                 "section": "network",
                 "order": 4,
                 "descr": "HTTP Server Connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sgos_server_connections_active": {
             "default": {
                 "section": "network",
                 "order": 5,
                 "descr": "HTTP Server Connections Active"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sgos_server_connections_idle": {
             "default": {
                 "section": "network",
                 "order": 6,
                 "descr": "HTTP Server Connections Idle"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.siklu_rfinterfaceOctets": {
             "default": {
                 "section": "wireless",
                 "order": 5,
                 "descr": "Traffic"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.siklu_rfinterfaceOtherOctets": {
             "default": {
                 "section": "wireless",
                 "order": 6,
                 "descr": "Other Octets"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.siklu_rfinterfaceOtherPkts": {
             "default": {
                 "section": "wireless",
                 "order": 4,
                 "descr": "Other Packets"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.siklu_rfinterfacePkts": {
             "default": {
                 "section": "wireless",
                 "order": 3,
                 "descr": "Packets"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sonicwall_sessions": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.storage": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Filesystem Usage"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sub10_sub10RadioLclAFER": {
             "default": {
                 "section": "wireless",
                 "order": 4,
                 "descr": "Radio Air Frame Error Rate"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sub10_sub10RadioLclDataRate": {
             "default": {
                 "section": "wireless",
                 "order": 4,
                 "descr": "Data Rate on the Airside interface"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sub10_sub10RadioLclLnkLoss": {
             "default": {
                 "section": "wireless",
                 "order": 3,
                 "descr": "Radio Link Loss"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sub10_sub10RadioLclRxPower": {
             "default": {
                 "section": "wireless",
                 "order": 1,
                 "descr": "Radio Receive Power"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sub10_sub10RadioLclTxPower": {
             "default": {
                 "section": "wireless",
                 "order": 0,
                 "descr": "Radio Transmit Power"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.sub10_sub10RadioLclVectErr": {
             "default": {
                 "section": "wireless",
                 "order": 3,
                 "descr": "Radio Vector Error"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.temperature": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "temperature"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.topvision_cmoffline": {
             "default": {
                 "section": "cmts",
                 "order": 2,
                 "descr": "Cable Modem Offline"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.topvision_cmreg": {
             "default": {
                 "section": "cmts",
                 "order": 1,
                 "descr": "Cable Modem Registered"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.topvision_cmtotal": {
             "default": {
                 "section": "cmts",
                 "order": 0,
                 "descr": "Cable Modem Total"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_Capacity": {
             "default": {
                 "section": "wireless",
                 "order": 2,
                 "descr": "Link Capacity"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_LinkDist": {
             "default": {
                 "section": "wireless",
                 "order": 1,
                 "descr": "Link Distance"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_RFTotOctetsRx": {
             "default": {
                 "section": "wireless",
                 "order": 6,
                 "descr": "RF Total Octets Rx"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_RFTotOctetsTx": {
             "default": {
                 "section": "wireless",
                 "order": 4,
                 "descr": "RF Total Octets Tx"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_RFTotPktsRx": {
             "default": {
                 "section": "wireless",
                 "order": 7,
                 "descr": "RF Total Packets Rx"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_RFTotPktsTx": {
             "default": {
                 "section": "wireless",
                 "order": 5,
                 "descr": "RF Total Packets Tx"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_RadioFreqs": {
             "default": {
                 "section": "wireless",
                 "order": 0,
                 "descr": "Radio Frequencies"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_RadioTemp": {
             "default": {
                 "section": "wireless",
                 "order": 3,
                 "descr": "Radio Temperatures"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_RxPower": {
             "default": {
                 "section": "wireless",
                 "order": 8,
                 "descr": "Radio Rx Power"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ubnt_airfiber_TxPower": {
             "default": {
                 "section": "wireless",
                 "order": 0,
                 "descr": "Radio Tx Power"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ucd_contexts": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Context Switches"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ucd_cpu": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Detailed Processor Usage"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ucd_interrupts": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Interrupts"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ucd_io": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "System I/O Activity"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ucd_load": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Load Averages"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ucd_memory": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Detailed Memory Usage"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.ucd_swap_io": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Swap I/O Activity"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.uptime": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "System Uptime"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.vpdn_sessions_l2tp": {
             "default": {
                 "section": "vpdn",
                 "order": 0,
                 "descr": "VPDN L2TP Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.vpdn_tunnels_l2tp": {
             "default": {
                 "section": "vpdn",
                 "order": 0,
                 "descr": "VPDN L2TP Tunnels"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.waas_cwotfostatsactiveoptconn": {
             "default": {
                 "section": "graphs",
                 "order": 0,
                 "descr": "Optimized TCP Connections"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.xirrus_stations": {
             "default": {
                 "section": "wireless",
                 "order": 0,
                 "descr": "Associated Stations"
-            }
+            },
+            "type": "graph"
         },
         "graph_types.device.zywall_sessions": {
             "default": {
                 "section": "firewall",
                 "order": 0,
                 "descr": "Sessions"
-            }
+            },
+            "type": "graph"
         },
         "graphite.port": {
-            "default": 2003
+            "default": 2003,
+            "type": "integer"
         },
         "graphs.mini.normal": {
             "default": {
@@ -2577,7 +2804,8 @@
                 "week": "One Week",
                 "month": "One Month",
                 "year": "One Year"
-            }
+            },
+            "type": "array"
         },
         "graphs.mini.widescreen": {
             "default": {
@@ -2589,7 +2817,8 @@
                 "twomonth": "Two Months",
                 "year": "One Year",
                 "twoyear": "Two Years"
-            }
+            },
+            "type": "array"
         },
         "graphs.row.normal": {
             "default": {
@@ -2602,12 +2831,19 @@
                 "twomonth": "Two Months",
                 "year": "One Year",
                 "twoyear": "Two Years"
-            }
+            },
+            "type": "array"
         },
         "gui.network-map.style": {
-            "default": "new"
+            "default": "new",
+            "type": "select",
+            "options": {
+                "old": "Old",
+                "new": "New"
+            }
         },
         "html_dir": {
+            "type": "text"
         },
         "http_proxy": {
             "group": "system",
@@ -2616,7 +2852,8 @@
             "type": "text"
         },
         "icmp_check": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "ignore_mount": {
             "default": [
@@ -2630,10 +2867,12 @@
             "type": "array"
         },
         "ignore_mount_network": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "ignore_mount_optical": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "ignore_mount_regexp": {
             "default": [
@@ -2648,10 +2887,12 @@
                 "/^\\/var\\/dhcpd\\/dev/",
                 "/UMA/",
                 "/^\\/Volumes\\/OS X Base System/"
-            ]
+            ],
+            "type": "array"
         },
         "ignore_mount_removable": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "ignore_mount_string": {
             "default": [
@@ -2666,30 +2907,39 @@
             "type": "array"
         },
         "ignore_unmapable_port": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "influxdb.timeout": {
-            "default": 0
+            "default": 0,
+            "type": "integer"
         },
         "influxdb.verifySSL": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "install_dir": {
+            "type": "text"
         },
         "int_core": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "int_customers": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "int_l2tp": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "int_peering": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "int_transit": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "ipmi.type": {
             "default": [
@@ -2697,7 +2947,8 @@
                 "lan",
                 "imb",
                 "open"
-            ]
+            ],
+            "type": "array"
         },
         "ipmi_unit": {
             "default": {
@@ -2708,7 +2959,8 @@
                 "degrees C": "temperature",
                 "discrete": "",
                 "percent": "load"
-            }
+            },
+            "type": "array"
         },
         "ipmitool": {
             "default": "/usr/bin/ipmitool",
@@ -2718,57 +2970,74 @@
             "type": "text"
         },
         "irc_alert": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "irc_alert_short": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "irc_alert_utf8": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "irc_authtime": {
-            "default": 3
+            "default": 3,
+            "type": "integer"
         },
         "irc_chan": {
             "type": "array"
         },
         "irc_ctcp": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "irc_ctcp_version": {
-            "default": "LibreNMS IRCbot. https://www.librenms.org/"
+            "default": "LibreNMS IRCbot. https://www.librenms.org/",
+            "type": "text"
         },
         "irc_debug": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "irc_external": {
-            "default": ""
+            "default": "",
+            "type": "text"
         },
         "irc_host": {
-            "default": ""
+            "default": "",
+            "type": "text"
         },
         "irc_maxretry": {
-            "default": 3
+            "default": 3,
+            "type": "integer"
         },
         "irc_nick": {
+            "type": "text"
         },
         "irc_pass": {
-            "default": ""
+            "default": "",
+            "type": "password"
         },
         "irc_port": {
-            "default": ""
+            "default": "",
+            "type": "text"
         },
         "leaflet.default_lat": {
-            "default": 51.4800
+            "default": 51.4800,
+            "type": "float"
         },
         "leaflet.default_lng": {
-            "default": 0
+            "default": 0,
+            "type": "float"
         },
         "leaflet.default_zoom": {
-            "default": 2
+            "default": 2,
+            "type": "integer"
         },
         "leaflet.tile_url": {
-            "default": "{s}.tile.openstreetmap.org"
+            "default": "{s}.tile.openstreetmap.org",
+            "type": "text"
         },
         "libvirt_protocols": {
             "default": [
@@ -2778,29 +3047,38 @@
             "type": "array"
         },
         "list_colour.even": {
-            "default": "#ffffff"
+            "default": "#ffffff",
+            "type": "color"
         },
         "list_colour.even_alt": {
-            "default": "#f9f9f9"
+            "default": "#f9f9f9",
+            "type": "color"
         },
         "list_colour.even_alt2": {
-            "default": "#f0f0f0"
+            "default": "#f0f0f0",
+            "type": "color"
         },
         "list_colour.highlight": {
-            "default": "#ffcccc"
+            "default": "#ffcccc",
+            "type": "color"
         },
         "list_colour.odd": {
-            "default": "#eeeeee"
+            "default": "#eeeeee",
+            "type": "color"
         },
         "list_colour.odd_alt": {
-            "default": "#f0f0f0"
+            "default": "#f0f0f0",
+            "type": "color"
         },
         "list_colour.odd_alt2": {
-            "default": "#e3e3e3"
+            "default": "#e3e3e3",
+            "type": "color"
         },
         "log_dir": {
+            "type": "text"
         },
         "log_file": {
+            "type": "text"
         },
         "login_message": {
             "default": "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.",
@@ -2810,15 +3088,23 @@
             "type": "text"
         },
         "map.engine": {
-            "default": "leaflet"
+            "default": "leaflet",
+            "type": "select",
+            "options": {
+                "leaflet": "Leaflet",
+                "mapeal": "Mapeal"
+            }
         },
         "mapael.default_map": {
-            "default": "maps/world_countries.js"
+            "default": "maps/world_countries.js",
+            "type": "text"
         },
         "mib_dir": {
+            "type": "text"
         },
         "mono_font": {
-            "default": "DejaVuSansMono"
+            "default": "DejaVuSansMono",
+            "type": "text"
         },
         "mtr": {
             "default": "/usr/bin/mtr",
@@ -2828,10 +3114,8 @@
             "type": "text"
         },
         "nagios_plugins": {
-            "default": "/usr/lib/nagios/plugins"
-        },
-        "navbar.manage_groups.hide": {
-            "default": 0
+            "default": "/usr/lib/nagios/plugins",
+            "type": "text"
         },
         "network_map_items": {
             "default": [
@@ -2873,10 +3157,12 @@
                     "edge": "#ff777788",
                     "node": "#ffdddd"
                 }
-            }
+            },
+            "type": "array"
         },
         "network_map_vis_options": {
-            "default": "{\n  layout:{\n      randomSeed:2\n  },\n  \"edges\": {\n    arrows: {\n          to:     {enabled: true, scaleFactor:0.5},\n    },\n    \"smooth\": {\n        enabled: false\n    },\n    font: {\n        size: 14,\n        color: \"red\",\n        face: \"sans\",\n        background: \"white\",\n        strokeWidth:3,\n        align: \"middle\",\n        strokeWidth: 2\n    }\n  },\n  \"physics\": {\n     \"barnesHut\": {\n      \"gravitationalConstant\": -2000,\n      \"centralGravity\": 0.3,\n      \"springLength\": 200,\n      \"springConstant\": 0.04,\n      \"damping\": 0.09,\n      \"avoidOverlap\": 1\n    },\n\n     \"forceAtlas2Based\": {\n      \"gravitationalConstant\": -50,\n      \"centralGravity\": 0.01,\n      \"springLength\": 200,\n      \"springConstant\": 0.08,\n      \"damping\": 0.4,\n      \"avoidOverlap\": 1\n    },\n\n     \"repulsion\": {\n      \"centralGravity\": 0.2,\n      \"springLength\": 250,\n      \"springConstant\": 0.2,\n      \"nodeDistance\": 200,\n      \"damping\": 0.07\n    },\n\n     \"hierarchicalRepulsion\": {\n      \"nodeDistance\": 300,\n      \"centralGravity\": 0.2,\n      \"springLength\": 300,\n      \"springConstant\": 0.2,\n      \"damping\": 0.07\n    },\n\n  \"maxVelocity\": 50,\n  \"minVelocity\": 0.4,\n  \"solver\": \"hierarchicalRepulsion\",\n  \"stabilization\": {\n    \"enabled\": true,\n    \"iterations\": 1000,\n    \"updateInterval\": 100,\n    \"onlyDynamicEdges\": false,\n    \"fit\": true\n  },\n\n  \"timestep\": 0.4,\n }\n}"
+            "default": "{\n  layout:{\n      randomSeed:2\n  },\n  \"edges\": {\n    arrows: {\n          to:     {enabled: true, scaleFactor:0.5},\n    },\n    \"smooth\": {\n        enabled: false\n    },\n    font: {\n        size: 14,\n        color: \"red\",\n        face: \"sans\",\n        background: \"white\",\n        strokeWidth:3,\n        align: \"middle\",\n        strokeWidth: 2\n    }\n  },\n  \"physics\": {\n     \"barnesHut\": {\n      \"gravitationalConstant\": -2000,\n      \"centralGravity\": 0.3,\n      \"springLength\": 200,\n      \"springConstant\": 0.04,\n      \"damping\": 0.09,\n      \"avoidOverlap\": 1\n    },\n\n     \"forceAtlas2Based\": {\n      \"gravitationalConstant\": -50,\n      \"centralGravity\": 0.01,\n      \"springLength\": 200,\n      \"springConstant\": 0.08,\n      \"damping\": 0.4,\n      \"avoidOverlap\": 1\n    },\n\n     \"repulsion\": {\n      \"centralGravity\": 0.2,\n      \"springLength\": 250,\n      \"springConstant\": 0.2,\n      \"nodeDistance\": 200,\n      \"damping\": 0.07\n    },\n\n     \"hierarchicalRepulsion\": {\n      \"nodeDistance\": 300,\n      \"centralGravity\": 0.2,\n      \"springLength\": 300,\n      \"springConstant\": 0.2,\n      \"damping\": 0.07\n    },\n\n  \"maxVelocity\": 50,\n  \"minVelocity\": 0.4,\n  \"solver\": \"hierarchicalRepulsion\",\n  \"stabilization\": {\n    \"enabled\": true,\n    \"iterations\": 1000,\n    \"updateInterval\": 100,\n    \"onlyDynamicEdges\": false,\n    \"fit\": true\n  },\n\n  \"timestep\": 0.4,\n }\n}",
+            "type": "text"
         },
         "nfdump": {
             "default": "/usr/bin/nfdump",
@@ -2899,8 +3185,7 @@
             "group": "external",
             "section": "nfsen",
             "order": 1,
-            "type": "array",
-            "required": true
+            "type": "array"
         },
         "nfsen_subdirlayout": {
             "default": 1,
@@ -2990,7 +3275,8 @@
                 "76800": "24 hours",
                 "115200": "36 hours",
                 "153600": "48 hours"
-            }
+            },
+            "type": "array"
         },
         "nfsen_split_char": {
             "group": "external",
@@ -3012,13 +3298,16 @@
             "type": "text"
         },
         "notifications.LibreNMS": {
-            "default": "http://www.librenms.org/notifications.rss"
+            "default": "http://www.librenms.org/notifications.rss",
+            "type": "text"
         },
         "notifications.local": {
-            "default": "misc/notifications.rss"
+            "default": "misc/notifications.rss",
+            "type": "text"
         },
         "old_graphs": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "os.default.over": {
             "default": [
@@ -3030,10 +3319,12 @@
                     "graph": "device_mempool",
                     "text": "Memory Usage"
                 }
-            ]
+            ],
+            "type": "array"
         },
         "os_def_cache_time": {
-            "default": 86400
+            "default": 86400,
+            "type": "integer"
         },
         "os_group.unix.over": {
             "default": [
@@ -3045,19 +3336,24 @@
                     "graph": "device_ucd_memory",
                     "text": "Memory Usage"
                 }
-            ]
+            ],
+            "type": "array"
         },
         "os_group.unix.processor_stacked": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "os_group.unix.type": {
-            "default": "server"
+            "default": "server",
+            "type": "text"
         },
         "overlib_defaults": {
-            "default": ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'"
+            "default": ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'",
+            "type": "text"
         },
         "overview_show_sysDescr": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "own_hostname": {
             "default": "localhost",
@@ -3098,7 +3394,8 @@
             "default": false,
             "group": "external",
             "section": "oxidized",
-            "order": 5
+            "order": 5,
+            "type": "boolean"
         },
         "oxidized.url": {
             "default": false,
@@ -3106,19 +3403,27 @@
             "section": "oxidized",
             "order": 1,
             "type": "text",
-            "pattern": "[a-zA-Z0-9]{1,5}://.*",
-            "required": true
+            "validate": {
+                "value": "regex:^[a-zA-Z0-9]{1,5}://.*$"
+            }
         },
         "page_refresh": {
-            "default": 300
+            "default": 300,
+            "type": "integer",
+            "units": "seconds"
         },
         "page_title_prefix": {
-            "default": ""
+            "default": "",
+            "type": "text"
         },
         "page_title_suffix": {
+            "type": "text"
         },
-        "peering_descr.0": {
-            "default": "peering"
+        "peering_descr": {
+            "default": [
+                "peering"
+            ],
+            "type": "array"
         },
         "peeringdb.enabled": {
             "default": false,
@@ -3128,7 +3433,11 @@
             "type": "boolean"
         },
         "percentile_value": {
-            "default": 95
+            "default": 95,
+            "type": "integer",
+            "validate": {
+                "value": "integer|between:0,100"
+            }
         },
         "perf_times_purge": {
             "default": 30,
@@ -3145,6 +3454,7 @@
             "type": "text"
         },
         "plugin_dir": {
+            "type": "text"
         },
         "poller_modules.unix-agent": {
             "default": false,
@@ -3469,13 +3779,16 @@
             "type": "text"
         },
         "rrdgraph_def_text": {
-            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal"
+            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
+            "type": "text"
         },
         "rrdgraph_def_text_color": {
-            "default": "000000"
+            "default": "000000",
+            "type": "color"
         },
         "rrdgraph_real_percentile": {
-            "default": false
+            "default": false,
+            "type": "boolean"
         },
         "rrdtool": {
             "default": "rrdtool",
@@ -3492,9 +3805,11 @@
             "type": "boolean"
         },
         "secure_cookies": {
+            "type": "boolean"
         },
         "sensors.guess_limits": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "sfdp": {
             "default": "/usr/bin/sfdp",
@@ -3504,16 +3819,20 @@
             "type": "text"
         },
         "show_locations": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "show_locations_dropdown": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "show_overview_tab": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "show_services": {
-            "default": 0
+            "default": false,
+            "type": "boolean"
         },
         "site_style": {
             "default": "light",
@@ -3529,70 +3848,92 @@
             }
         },
         "sla_type_labels.dhcp": {
-            "default": "DHCP"
+            "default": "DHCP",
+            "type": "text"
         },
         "sla_type_labels.dlsw": {
-            "default": "DLSW"
+            "default": "DLSW",
+            "type": "text"
         },
         "sla_type_labels.dns": {
-            "default": "DNS"
+            "default": "DNS",
+            "type": "text"
         },
         "sla_type_labels.echo": {
-            "default": "ICMP ping"
+            "default": "ICMP ping",
+            "type": "text"
         },
         "sla_type_labels.ethernetJitter": {
-            "default": "Ethernet jitter"
+            "default": "Ethernet jitter",
+            "type": "text"
         },
         "sla_type_labels.ethernetPing": {
-            "default": "Ethernet ping"
+            "default": "Ethernet ping",
+            "type": "text"
         },
         "sla_type_labels.fileIO": {
-            "default": "File I/O"
+            "default": "File I/O",
+            "type": "text"
         },
         "sla_type_labels.ftp": {
-            "default": "FTP"
+            "default": "FTP",
+            "type": "text"
         },
         "sla_type_labels.http": {
-            "default": "HTTP"
+            "default": "HTTP",
+            "type": "text"
         },
         "sla_type_labels.icmpjitter": {
-            "default": "ICMP jitter"
+            "default": "ICMP jitter",
+            "type": "text"
         },
         "sla_type_labels.jitter": {
-            "default": "Jitter"
+            "default": "Jitter",
+            "type": "text"
         },
         "sla_type_labels.lspGroup": {
-            "default": "LSP group"
+            "default": "LSP group",
+            "type": "text"
         },
         "sla_type_labels.lspPing": {
-            "default": "LSP ping"
+            "default": "LSP ping",
+            "type": "text"
         },
         "sla_type_labels.lspPingPseudowire": {
-            "default": "LSP Pseudowire ping"
+            "default": "LSP Pseudowire ping",
+            "type": "text"
         },
         "sla_type_labels.lspTrace": {
-            "default": "LSP trace"
+            "default": "LSP trace",
+            "type": "text"
         },
         "sla_type_labels.pathEcho": {
-            "default": "Path ICMP ping"
+            "default": "Path ICMP ping",
+            "type": "text"
         },
         "sla_type_labels.rtp": {
-            "default": "RTP"
+            "default": "RTP",
+            "type": "text"
         },
         "sla_type_labels.script": {
-            "default": "Script"
+            "default": "Script",
+            "type": "text"
         },
         "sla_type_labels.tcpConnect": {
-            "default": "TCP connect"
+            "default": "TCP connect",
+            "type": "text"
         },
         "sla_type_labels.udpEcho": {
-            "default": "UDP ping"
+            "default": "UDP ping",
+            "type": "text"
         },
         "sla_type_labels.voip": {
-            "default": "VoIP"
+            "default": "VoIP",
+            "type": "text"
         },
         "smokeping.pings": {
-            "default": 20
+            "default": 20,
+            "type": "integer"
         },
         "snmp.community": {
             "group": "poller",
@@ -3691,7 +4032,12 @@
             "type": "text"
         },
         "snmptraps.eventlog": {
-            "default": "unhandled"
+            "default": "unhandled",
+            "type": "select",
+            "options": {
+                "unhandled": "Unhandled Traps",
+                "all": "All Traps"
+            }
         },
         "snmpwalk": {
             "default": "/usr/bin/snmpwalk",
@@ -3701,22 +4047,31 @@
             "type": "text"
         },
         "sso.create_users": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "sso.update_users": {
-            "default": true
+            "default": true,
+            "type": "boolean"
         },
         "sso.user_attr": {
-            "default": "REMOTE_USER"
+            "default": "REMOTE_USER",
+            "type": "text"
         },
         "storage_perc_warn": {
-            "default": 60
+            "default": 60,
+            "type": "integer",
+            "validate": {
+                "value": "integer|between:0,100"
+            }
         },
         "stylesheet": {
-            "default": "css/styles.css"
+            "default": "css/styles.css",
+            "type": "text"
         },
         "summary_errors": {
-            "default": 0
+            "default": 0,
+            "type": "integer"
         },
         "syslog_filter": {
             "default": [
@@ -3724,7 +4079,8 @@
                 "Connection from UDP: [",
                 "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented",
                 "diskio.c"
-            ]
+            ],
+            "type": "array"
         },
         "syslog_purge": {
             "default": 30,
@@ -3734,13 +4090,16 @@
             "type": "integer"
         },
         "temp_dir": {
-            "default": "/tmp"
+            "default": "/tmp",
+            "type": "text"
         },
         "top_devices": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "top_ports": {
-            "default": 1
+            "default": true,
+            "type": "boolean"
         },
         "traceroute": {
             "default": "traceroute",
@@ -3756,14 +4115,17 @@
             "order": 14,
             "type": "text"
         },
-        "transit_descr.0": {
-            "default": "transit"
+        "transit_descr": {
+            "default": ["transit"],
+            "type": "array"
         },
         "unix-agent-connection-time-out": {
-            "default": 10
+            "default": 10,
+            "type": "integer"
         },
         "unix-agent-read-time-out": {
-            "default": 10
+            "default": 10,
+            "type": "integer"
         },
         "unix-agent.connection-timeout": {
             "default": 10,
@@ -3886,8 +4248,7 @@
             "group": "webui",
             "section": "search",
             "order": 0,
-            "type": "integer",
-            "required": true
+            "type": "integer"
         },
         "webui.graph_stacked": {
             "default": false,

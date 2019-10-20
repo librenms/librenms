@@ -16,7 +16,22 @@
                     "default": {},
                     "type": {
                         "type": "string",
-                        "enum": ["integer", "text", "boolean", "select", "array", "password", "color"]
+                        "enum": [
+                            "integer",
+                            "text",
+                            "boolean",
+                            "select",
+                            "array",
+                            "password",
+                            "email",
+                            "color",
+                            "float",
+                            "graph",
+                            "dashboard-select",
+                            "snmp3auth",
+                            "ldap-groups",
+                            "ad-groups"
+                        ]
                     },
                     "section": {
                         "type": "string"
@@ -31,16 +46,41 @@
                         "type": "object",
                         "minProperties": 2
                     },
+                    "units": {
+                        "type": "string"
+                    },
                     "validate": {
+                        "propertyNames": {
+                            "pattern": "^value$",
+                            "type": "string"
+                        }
+                    },
+                    "when": {
                         "properties": {
-                            "value": {
+                            "setting": {
                                 "type": "string"
+                            },
+                            "operator": {
+                                "type": "string",
+                                "enum": [
+                                    "equals",
+                                    "in"
+                                ]
+                            },
+                            "value": {
+                                "type": ["string", "array"]
                             }
-                        },
-                        "required": ["value"]
+                        }
+                    },
+                    "disabled": {
+                        "type": "boolean"
+                    },
+                    "hidden": {
+                        "type": "boolean"
                     }
                 },
-                "required": ["type"]
+                "required": ["type"],
+                "additionalProperties": false
             }
         }
     },
