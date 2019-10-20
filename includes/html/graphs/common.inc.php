@@ -82,7 +82,7 @@ if (isset($scale_rigid)) {
 }
 
 $rrd_options .= ' -E --start '.$from.' --end '.$to.' --width '.$width.' --height '.$height.' ';
-$rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . \LibreNMS\Config::get('rrdgraph_def_text_color');
+$rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
 
 if ($_GET['bg']) {
     $rrd_options .= ' -c CANVAS#' . Clean::alphaDash($_GET['bg']) . ' ';
