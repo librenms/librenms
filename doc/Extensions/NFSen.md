@@ -78,7 +78,11 @@ the same name.
 
 Below are the default settings used with nfdump for stats.
 
-For more defaulted information on that, please see nfdump(1). Also check a path to the nfdump. Script is using by default path `/usr/bin/nfdump`, but in some instalation nfdump can be located in `usr/bin/local/bin/nfdump`. If is this your case, than just add `$config['nfdump'] = '/usr/local/bin/nfdump';`
+For more defaulted information on that, please see nfdump(1). 
+The default location for nfdump is `/usr/bin/nfdump`. If nfdump
+is located elsewhere, set it with 
+`$config['nfdump'] = '/usr/local/bin/nfdump';` for example.
+
 
 ```php
 $config['nfsen_last_max'] = 153600;
