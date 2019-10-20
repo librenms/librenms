@@ -56,10 +56,8 @@ system. See <https://redis.io/topics/security>
 
 ## Memcached (distributed polling)
 
-Although believed by many that by switching to the Dispatcher Service, one needs to 
-disable memcached and only enable redis. This is however not the case. A central
-memcached service is still needed, just like in the Distribute Poller setup, to handle 
-locking in the php processes. 
+LibreNMS still uses memcached for locking daily update processes.  So you will
+still need to configure memecached unless you have updates disabled.
 
 ## MySQL
 
