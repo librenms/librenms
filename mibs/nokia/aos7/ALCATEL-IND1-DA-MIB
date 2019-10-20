@@ -1,0 +1,2451 @@
+ALCATEL-IND1-DA-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY,
+                OBJECT-IDENTITY,
+                OBJECT-TYPE,
+                NOTIFICATION-TYPE,
+                Integer32, Unsigned32, IpAddress
+                        FROM SNMPv2-SMI
+                MacAddress, DateAndTime, TimeStamp, TEXTUAL-CONVENTION, TruthValue, RowStatus
+                        FROM SNMPv2-TC
+                softentIND1Da
+                        FROM ALCATEL-IND1-BASE
+                MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                        FROM SNMPv2-CONF
+                InterfaceIndex, InterfaceIndexOrZero
+                        FROM IF-MIB
+                InetAddressType, InetAddress, InetAddressIPv4
+                        FROM INET-ADDRESS-MIB
+                SnmpAdminString
+                        FROM SNMP-FRAMEWORK-MIB
+                TmnxEncapVal
+                        FROM ALCATEL-IND1-TIMETRA-TC-MIB
+                        ;
+
+        alcatelIND1DaMIB MODULE-IDENTITY
+                LAST-UPDATED "201008160000Z"
+                ORGANIZATION "Alcatel-Lucent"
+                CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                        "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+                REVISION      "200704030000Z"
+        DESCRIPTION
+            "DA module is taking care of the authentication and classification of MACs
+			on a DA port. The pkts from the MAC would be allowed to enter the network
+			only if the authentication and/or classification is done by the DA task."
+                ::= { softentIND1Da 1}
+
+
+
+alaIND1DaMIBNotifications OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For DA Subsystem Notifications."
+        ::= { alcatelIND1DaMIB 0 }
+
+alaIND1DaMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For DA Subsystem Managed Objects."
+        ::= { alcatelIND1DaMIB 1 }
+
+
+    alaIND1DaMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch for DA Module MIB Subsystem Conformance Information."
+        ::= { alcatelIND1DaMIB 2 }
+
+
+    alaIND1DaMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch for DA Module MIB Subsystem Units of Conformance."
+        ::= { alaIND1DaMIBConformance 1 }
+
+    AlaDaClassificationPolicyType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "This policy type is the classification policy used to classify
+                a device onto the system. "
+       SYNTAX  INTEGER {
+                authPassAltUnp ( 1 ),
+                authPassDefUnp ( 2 ),
+                authPassSrvUnp ( 3 ),
+                noAuthMacRuleUnp ( 4 ),
+                noAuthMacRangeRuleUnp ( 5 ),
+                noAuthIpRuleUnp ( 6 ),
+                authFailDefUnp ( 7 ),
+                authFailMacRuleUnp ( 8 ),
+                authFailMacRangeRuleUnp ( 9 ),
+                authFailIpRuleUnp ( 10 ),
+                authFailRuleDefUnp ( 11 ),
+                authFailMacRangeVlanTagRuleUnp ( 12 ),
+                tagAuthFailMacRuleUnp ( 13 ),
+                tagAuthFailMacVlanTagRuleUnp ( 14 ),
+                tagAuthFailMacRangeRuleUnp ( 15 ),
+                tagAuthFailMacRangeVlanTagRuleUnp ( 16 ),
+                tagAuthFailIpRuleUnp ( 17 ),
+                tagAuthFailIpVlanTagRuleUnp ( 18 ),
+                tagAuthFailVlanTagRuleUnp ( 19 ),
+                tagAuthPassAltUnp ( 20 ),
+                tagAuthPassDefUnp ( 21 ),
+                tagAuthPassSrvUnp ( 22 ),
+                tagMacRuleUnp ( 23 ),
+                tagMacVlanTagRuleUnp ( 24 ),
+                tagMacRangeRuleUnp ( 25 ),
+                tagMacRangeVlanTagRuleUnp ( 26 ),
+                tagIpRuleUnp ( 27 ),
+                tagIpVlanTagRuleUnp ( 28 ),
+                tagVlanTagRuleUnp ( 29 ),
+                tagRuleDefUnp ( 30 ),
+                authPassDefUnpBlk ( 31 ),
+                authFailDefUnpBlk ( 32 ),
+                authFailRuleDefUnpBlk ( 33 ),
+                tagAuthPassDefUnpBlk ( 34 ),
+                tagRuleDefUnpBlk ( 35 ),
+                authPassSrvUnpTagMismatchBlk ( 36 ),
+                authPassAltUnpTagMismatchBlk ( 37 ),
+                authPassDefUnpTagMismatchBlk ( 38 ),
+                authFailMacRuleUnpTagMismatchBlk ( 39 ),
+                authFailMacVlanRuleUnpTagMismatchBlk ( 40 ),
+                authFailMacRangeRuleUnpTagMismatchBlk ( 41 ),
+                authFailMacRangeVlanRuleUnpTagMismatchBlk ( 42 ),
+                authFailIpRuleUnpTagMismatchBlk ( 43 ),
+                authFailIpVlanRuleUnpTagMismatchBlk ( 44 ),
+                authFailVlanRuleUnpTagMismatchBlk ( 45 ),
+                defUnpBlk ( 46 ),
+                authPassSrvUnpBlk ( 47 ),
+                authPassAltUnpBlk ( 48 ),
+                authFailMacRuleUnpBlk ( 49 ),
+                authFailMacRangeRuleUnpBlk ( 50 ),
+                authFailIpRuleUnpBlk ( 51 ),
+                tagMacRuleUnpBlk ( 52 ),
+                tagMacVlanTagRuleUnpBlk ( 53 ),
+                tagMacRangeRuleUnpBlk ( 54 ),
+                tagMacRangeVlanTagRuleUnpBlk ( 55 ),
+                tagIpRuleUnpBlk ( 56 ),
+                tagIpVlanTagRuleUnpBlk ( 57 ),
+                tagVlanTagRuleUnpBlk ( 58 ),
+                authSrvDownUnpTagMismatchBlk (59),
+                noMatchingUnpBlk ( 60 ),
+                trustTag ( 61 ),
+                authSrvDownUnp (62),
+                defUnp ( 63 ),
+                lpsUnpBlk ( 64 ),
+                sysDefSpb ( 65 ),
+                defSpbProfile ( 66 ),
+                noSpbResource ( 67 )
+       }
+
+       AlaDaAuthenticationType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "The type of authentication used"
+       SYNTAX  INTEGER {
+                   noAuthentication   (1),
+                   dot1XAuthentication (2),
+                   macAuthentication  (3),
+                   captivePortal      (4)
+       }
+
+      AlaDaAuthenticationResult ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "The result of the authentication.  If the AlaDaAuthenticationType of this
+                 device is noAuthentication then this object will return notApplicable.  If the
+                 authentication has not completed then this object will return inProgress."
+       SYNTAX  INTEGER {
+                   notApplicable (0),
+                   inProgress    (1),
+                   success       (2),
+                   fail          (3)
+       }
+
+      AlaDaMacLearntState ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "The state of MAC address in the system"
+       SYNTAX  INTEGER {
+                   bridging      (0), -- Normal access to the network.
+                   filtering     (1) -- Access to the network blocked.
+       }
+
+	-- Should be used for all tables where MCLAG consistency status needs to be kept
+       AlaMultiChassisConfigStatus ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "The status of Multi-Chassis consistency check. If no MCLAG involved
+                then status is local to the switch."
+       SYNTAX  INTEGER {
+	        local (1),
+	        sync  (2),
+	        outOfSync (3)
+       }
+
+
+--------------------------------------------------
+-- User Network Profile Table configuration MIB --
+--------------------------------------------------
+
+    alaDaUserNetProfileTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AlaDaUserNetProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table stores the UNP profiles created in the system.
+			The entries would be mapped to vlan ID which would be used
+			by device authentication for classifying users."
+        ::= { alaIND1DaMIBObjects 1 }
+
+    alaDaUserNetProfileEntry OBJECT-TYPE
+        SYNTAX        AlaDaUserNetProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "User Network Profile entry"
+        INDEX {alaDaUserNetProfileName}
+        ::= { alaDaUserNetProfileTable 1 }
+
+    AlaDaUserNetProfileEntry ::= SEQUENCE
+        {
+            alaDaUserNetProfileName              SnmpAdminString,
+            alaDaUserNetProfileVlanID            Integer32,
+            alaDaUserNetProfileRowStatus         RowStatus,
+            alaDaUserNetProfileQosPolicyListName SnmpAdminString,
+            alaDaUserNetProfileMCLagConfigStatus AlaMultiChassisConfigStatus,
+            alaDaUserNetProfileSaaProfileName 	 SnmpAdminString
+        }
+
+    alaDaUserNetProfileName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 1 .. 32 ) )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The name of this profile."
+        ::= { alaDaUserNetProfileEntry 1 }
+
+    alaDaUserNetProfileVlanID OBJECT-TYPE
+        SYNTAX        Integer32 (1 .. 4094)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The VLAN id for this profile."
+        ::= { alaDaUserNetProfileEntry 2}
+
+    alaDaUserNetProfileRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { alaDaUserNetProfileEntry 3}
+
+    alaDaUserNetProfileQosPolicyListName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The name of the QoS Policy List name that will be used if this
+             User Network Profile is applied for a given device along with
+             alaDaUserNetProfileVlanID."
+        ::= { alaDaUserNetProfileEntry 4 }
+
+    alaDaUserNetProfileMCLagConfigStatus OBJECT-TYPE
+        SYNTAX      AlaMultiChassisConfigStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Result of MCLAG Consistency Check. All rows will be created as local.
+         Actual status will be set through remote chassis synchronization."
+        DEFVAL { local }
+    ::= {  alaDaUserNetProfileEntry 5 }
+
+    alaDaUserNetProfileSaaProfileName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The name of the SAA profile that is associated to this profile."
+        ::= { alaDaUserNetProfileEntry 6 }
+
+
+------------------------------------------------
+-- DA Classification IP network address rule  --
+------------------------------------------------
+
+        alaDaUNPIpNetRuleTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaDaUNPIpNetRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                "A list of IP network address rules.  This is used to match
+                 the InetAddress of a packet to a User Network Profile entry."
+            ::= { alaIND1DaMIBObjects 2 }
+
+        alaDaUNPIpNetRuleEntry  OBJECT-TYPE
+            SYNTAX  AlaDaUNPIpNetRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                 "An IP network address rule entry."
+            INDEX { alaDaUNPIpNetRuleAddrType,
+                    alaDaUNPIpNetRuleAddr,
+                    alaDaUNPIpNetRuleMask }
+            ::= { alaDaUNPIpNetRuleTable 1 }
+
+        AlaDaUNPIpNetRuleEntry ::= SEQUENCE {
+                alaDaUNPIpNetRuleAddrType
+                        InetAddressType,
+                alaDaUNPIpNetRuleAddr
+                        InetAddress,
+                alaDaUNPIpNetRuleMask
+                        InetAddress,
+                alaDaUNPIpNetRuleProfileName
+                        SnmpAdminString,
+		alaDaUNPIpNetRuleVlanTag
+			Integer32,
+                alaDaUNPIpNetRuleRowStatus
+                        RowStatus,
+                alaDaUNPIpNetRuleMCLagConfigStatus
+                        AlaMultiChassisConfigStatus
+                }
+
+        alaDaUNPIpNetRuleAddrType  OBJECT-TYPE
+            SYNTAX  InetAddressType
+            MAX-ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                 "The IP network address type used for VLAN classification.  For now
+                   Only IPv4 is supported."
+            ::= { alaDaUNPIpNetRuleEntry 1 }
+
+        alaDaUNPIpNetRuleAddr  OBJECT-TYPE
+            SYNTAX  InetAddress
+            MAX-ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                 "The IP network address used for VLAN classification.  Only IPv4 is
+                  supported."
+            ::= { alaDaUNPIpNetRuleEntry 2 }
+
+        alaDaUNPIpNetRuleMask  OBJECT-TYPE
+            SYNTAX  InetAddress
+            MAX-ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                 "The IP network mask applying to the IP network address."
+            ::= { alaDaUNPIpNetRuleEntry 3 }
+
+
+        alaDaUNPIpNetRuleProfileName  OBJECT-TYPE
+            SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+            MAX-ACCESS  read-create
+            STATUS  deprecated
+            DESCRIPTION
+                 "The profile name in the User Network Profile Table to be
+                  applied."
+            ::= { alaDaUNPIpNetRuleEntry 4 }
+
+        alaDaUNPIpNetRuleVlanTag  OBJECT-TYPE
+            SYNTAX  Integer32 (0..4094)
+            MAX-ACCESS  read-create
+            STATUS  deprecated
+            DESCRIPTION
+                 "The vlan tag to be used for classification of tagged pkts.
+                 Vlan tag of 0 indicates no VLAN is associated."
+            ::= { alaDaUNPIpNetRuleEntry 5 }
+
+        alaDaUNPIpNetRuleRowStatus  OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS  read-create
+            STATUS  deprecated
+            DESCRIPTION
+                "Row Status for creating/deleting rules."
+            ::= { alaDaUNPIpNetRuleEntry 6 }
+
+        alaDaUNPIpNetRuleMCLagConfigStatus  OBJECT-TYPE
+            SYNTAX  AlaMultiChassisConfigStatus
+            MAX-ACCESS  read-only
+            STATUS  deprecated
+            DESCRIPTION
+                "Result of MCLAG Consistency Check. All rows will be created as local.
+                 Actual status will be set through remote chassis synchronization."
+            DEFVAL { local }
+            ::= { alaDaUNPIpNetRuleEntry 7 }
+
+--
+-- DA Classification MAC address rule
+--
+
+
+        alaDaUNPMacRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AlaDaUNPMacRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  deprecated
+                DESCRIPTION
+                "A list of MAC address rules.  This is used to match
+                 the MAC Address of a packet to a User Network Profile entry "
+                ::= { alaIND1DaMIBObjects 3 }
+
+        alaDaUNPMacRuleEntry  OBJECT-TYPE
+            SYNTAX  AlaDaUNPMacRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                 "A MAC rule entry."
+            INDEX {alaDaUNPMacRuleAddr }
+            ::= { alaDaUNPMacRuleTable 1 }
+
+        AlaDaUNPMacRuleEntry ::= SEQUENCE {
+                alaDaUNPMacRuleAddr
+                        MacAddress,
+                alaDaUNPMacRuleProfileName
+                        SnmpAdminString,
+		alaDaUNPMacRuleVlanTag
+			Integer32,
+                alaDaUNPMacRuleRowStatus
+                        RowStatus,
+
+               alaDaUNPMacRuleMCLagConfigStatus
+                   AlaMultiChassisConfigStatus
+                }
+
+        alaDaUNPMacRuleAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  not-accessible
+                STATUS  deprecated
+                DESCRIPTION
+                "The MAC address used for VLAN classification."
+                ::= { alaDaUNPMacRuleEntry 1 }
+
+        alaDaUNPMacRuleProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  deprecated
+                DESCRIPTION
+                 "The profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPMacRuleEntry 2 }
+
+        alaDaUNPMacRuleVlanTag  OBJECT-TYPE
+            SYNTAX  Integer32 (0..4094)
+            MAX-ACCESS  read-create
+            STATUS  deprecated
+            DESCRIPTION
+                 "The vlan tag to be used for classification of tagged pkts.
+                 Vlan tag of 0 indicates no VLAN is associated."
+            ::= { alaDaUNPMacRuleEntry 3 }
+
+        alaDaUNPMacRuleRowStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  deprecated
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { alaDaUNPMacRuleEntry 4 }
+
+         alaDaUNPMacRuleMCLagConfigStatus  OBJECT-TYPE
+                SYNTAX  AlaMultiChassisConfigStatus
+                MAX-ACCESS  read-only
+                STATUS  deprecated
+                DESCRIPTION
+                    "Result of MCLAG Consistency Check. All rows will be created as local.
+                     Actual status will be set through remote chassis synchronization."
+                DEFVAL { local }
+                 ::= { alaDaUNPMacRuleEntry 5 }
+
+--
+-- DA Classification MAC range rule
+--
+
+        alaDaUNPMacRangeRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AlaDaUNPMacRangeRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  deprecated
+                DESCRIPTION
+                "A list of MAC range rules.  This is used to match
+                 the MAC Address Range of a packet to a User Network Profile entry."
+                ::= { alaIND1DaMIBObjects 4 }
+
+        alaDaUNPMacRangeRuleEntry  OBJECT-TYPE
+            SYNTAX  AlaDaUNPMacRangeRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                 "A MAC range rule entry."
+            INDEX {alaDaUNPMacRangeRuleLoAddr }
+            ::= { alaDaUNPMacRangeRuleTable 1 }
+
+        AlaDaUNPMacRangeRuleEntry ::= SEQUENCE {
+                alaDaUNPMacRangeRuleLoAddr
+                        MacAddress,
+                alaDaUNPMacRangeRuleHiAddr
+                        MacAddress,
+                alaDaUNPMacRangeRuleProfileName
+                        SnmpAdminString,
+		alaDaUNPMacRangeRuleVlanTag
+			Integer32,
+                alaDaUNPMacRangeRuleRowStatus
+                        RowStatus,
+
+             alaDaUNPMacRangeRuleMCLagConfigStatus
+                        AlaMultiChassisConfigStatus
+                }
+
+        alaDaUNPMacRangeRuleLoAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  not-accessible
+                STATUS  deprecated
+                DESCRIPTION
+                "The lower bound of  MAC address range used for VLAN classification."
+                ::= { alaDaUNPMacRangeRuleEntry 1 }
+
+        alaDaUNPMacRangeRuleHiAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-create
+                STATUS  deprecated
+                DESCRIPTION
+                "The upper bound of MAC address range used for VLAN classification."
+                ::= { alaDaUNPMacRangeRuleEntry 2 }
+
+        alaDaUNPMacRangeRuleProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  deprecated
+                DESCRIPTION
+                 "The profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPMacRangeRuleEntry 3 }
+
+        alaDaUNPMacRangeRuleVlanTag  OBJECT-TYPE
+                SYNTAX  Integer32 (0..4094)
+                MAX-ACCESS  read-create
+                STATUS  deprecated
+                DESCRIPTION
+                     "The vlan tag to be used for classification of tagged pkts.
+                     The range states the valid vlan range in the system.
+                     Vlan tag of 0 indicates no VLAN is associated."
+                ::= { alaDaUNPMacRangeRuleEntry 4 }
+
+        alaDaUNPMacRangeRuleRowStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  deprecated
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { alaDaUNPMacRangeRuleEntry 5 }
+
+
+
+        alaDaUNPMacRangeRuleMCLagConfigStatus  OBJECT-TYPE
+                SYNTAX  AlaMultiChassisConfigStatus
+                MAX-ACCESS  read-only
+                STATUS  deprecated
+                DESCRIPTION
+                    "Result of MCLAG Consistency Check. All rows will be created as local.
+                     Actual status will be set through remote chassis synchronization."
+                DEFVAL { local }
+                 ::= { alaDaUNPMacRangeRuleEntry 6 }
+
+--
+-- DA Classification VLAN TAG rule
+--
+
+        alaDaUNPVlanTagRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AlaDaUNPVlanTagRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  deprecated
+                DESCRIPTION
+                "A list of Vlan Tag based classification rules.  This is used to match
+                 the vlan tag in a packet to a User Network Profile entry "
+                ::= { alaIND1DaMIBObjects 5 }
+
+        alaDaUNPVlanTagRuleEntry  OBJECT-TYPE
+            SYNTAX  AlaDaUNPVlanTagRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                 "A Vlan Tag rule entry."
+            INDEX {alaDaUNPVlanTagRuleVlan }
+            ::= { alaDaUNPVlanTagRuleTable 1 }
+
+        AlaDaUNPVlanTagRuleEntry ::= SEQUENCE {
+                alaDaUNPVlanTagRuleVlan
+			Integer32,
+                alaDaUNPVlanTagRuleProfileName
+                        SnmpAdminString,
+                alaDaUNPVlanTagRuleRowStatus
+                        RowStatus,
+                alaDaUNPVlanTagRuleMCLagConfigStatus
+
+                        AlaMultiChassisConfigStatus
+                }
+
+        alaDaUNPVlanTagRuleVlan  OBJECT-TYPE
+                SYNTAX  Integer32 (1..4094)
+                MAX-ACCESS  not-accessible
+                STATUS  deprecated
+                DESCRIPTION
+                "The Vlan Tag used for VLAN classification. The range states the valid
+				Vlan range in the system."
+                ::= { alaDaUNPVlanTagRuleEntry 1 }
+
+        alaDaUNPVlanTagRuleProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  deprecated
+                DESCRIPTION
+                 "The profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPVlanTagRuleEntry 2 }
+
+        alaDaUNPVlanTagRuleRowStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  deprecated
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { alaDaUNPVlanTagRuleEntry 3 }
+
+         alaDaUNPVlanTagRuleMCLagConfigStatus OBJECT-TYPE
+                SYNTAX  AlaMultiChassisConfigStatus
+                MAX-ACCESS  read-only
+                STATUS  deprecated
+                DESCRIPTION
+                    "Result of MCLAG Consistency Check. All rows will be created as local.
+                     Actual status will be set through remote chassis synchronization."
+                DEFVAL { local }
+                 ::= { alaDaUNPVlanTagRuleEntry 4 }
+
+--
+-- DA MAC User Table. This is deperecated in 7.2.1.R02.
+-- The new user table is alaDaMacVlanUserTable.
+--
+
+alaDaMacUserTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDaMacUserEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "A table of MAC address learned on an UNP port."
+::= { alaIND1DaMIBObjects 6 }
+
+alaDaMacUserEntry OBJECT-TYPE
+        SYNTAX      AlaDaMacUserEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Non 802.1x supplicant information."
+        INDEX { alaDaMacUserIntfNum,
+                alaDaMacUserMACAddress }
+::= { alaDaMacUserTable 1 }
+
+
+AlaDaMacUserEntry ::=
+        SEQUENCE {
+                alaDaMacUserIntfNum
+                   	InterfaceIndex,
+
+                alaDaMacUserMACAddress
+
+			MacAddress,
+
+                alaDaMacUserVlanID
+
+			Integer32,
+
+                alaDaAuthenticationStatus
+
+			INTEGER,
+		alaDaMacUserIpAddress     
+			IpAddress,
+		alaDaMacUserUnpUsed    
+			SnmpAdminString,
+		alaDaMacUserLoginTimeStamp
+			DateAndTime,
+		alaDaMacUserAuthtype
+			INTEGER,
+		alaDaMacUserClassificationSource
+			AlaDaClassificationPolicyType
+                }
+
+alaDaMacUserIntfNum OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex representing the slot and port where the non 802.1x supplicant is learned."
+    ::= { alaDaMacUserEntry 1 }
+
+alaDaMacUserMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the non 802.1x supplicant."
+    ::= { alaDaMacUserEntry 2 }
+
+alaDaMacUserVlanID OBJECT-TYPE
+        SYNTAX      Integer32 (1..4096)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The Id of the VLAN on which the non 802.1x supplicant is learned."
+    ::= { alaDaMacUserEntry 3 }
+
+alaDaAuthenticationStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                idle (1),
+                inProgress (2),
+                authenticated (3),
+                failed (4),
+                failedTimeout (5),
+                failedNoServer (6),
+                failedNoResources (7)
+            }
+
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Authentication status of the non 802.1x supplicant."
+    ::= { alaDaMacUserEntry 4 }
+
+alaDaMacUserIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ip address from which the mac user is sending the packets"
+    ::= { alaDaMacUserEntry 5 }
+
+alaDaMacUserUnpUsed OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UNP used for classifying the mac user"
+    ::= { alaDaMacUserEntry 6 }
+
+alaDaMacUserLoginTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Login time stamp of the mac user"
+    ::= { alaDaMacUserEntry 7 }
+
+alaDaMacUserAuthtype OBJECT-TYPE
+    SYNTAX      INTEGER {
+		macAuthentication	(0),
+		others (1)
+	}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The authentication type of the mac user"
+    ::= { alaDaMacUserEntry 8 }
+
+alaDaMacUserClassificationSource OBJECT-TYPE
+        SYNTAX      AlaDaClassificationPolicyType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Classification policy under which the non 802.1x supplicant is learned."
+    ::= { alaDaMacUserEntry 9 }
+
+--
+-- Logical Port table
+--
+
+alaDaUNPPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDaUNPPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system level information for each port
+        supported by the Port Access Entity.  An entry appears
+        in this table for each port of this system."
+    ::= { alaIND1DaMIBObjects 7 }
+
+alaDaUNPPortEntry OBJECT-TYPE
+    SYNTAX      AlaDaUNPPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each of these entries represents a user port on which UNP is enabled and their
+		 configuration."
+    INDEX { alaDaUNPPortIfIndex }
+    ::= { alaDaUNPPortTable 1 }
+
+
+AlaDaUNPPortEntry ::=
+    SEQUENCE {
+	alaDaUNPPortIfIndex
+
+            InterfaceIndexOrZero,
+        alaDaUNPPortDefaultProfileName
+            SnmpAdminString,
+        alaDaUNPPortPassAltProfileName
+            SnmpAdminString,
+        alaDaUNPPortRowStatus
+            RowStatus,
+        alaDaUNPPortMacAuthFlag
+            INTEGER,
+        alaDaUNPPortClassificationFlag
+            INTEGER,
+        alaDaUNPPortTrustTagStatus
+            INTEGER,
+
+       alaDaUNPPortMCLagConfigStatus
+            AlaMultiChassisConfigStatus,
+        alaDaUNPPortCustomerDomainId
+            Unsigned32,
+
+        alaDaUNPPortType
+            INTEGER,
+        alaDaUNPPortPassAltSpbProfileName
+            SnmpAdminString,
+        alaDaUNPPortDefaultSpbProfileName
+            SnmpAdminString
+        }
+
+alaDaUNPPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface index of the UNP enabled port."
+    ::= { alaDaUNPPortEntry 1 }
+
+alaDaUNPPortDefaultProfileName OBJECT-TYPE
+    SYNTAX      SnmpAdminString ( SIZE( 0 .. 32 ) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The default UNP name."
+    ::= { alaDaUNPPortEntry 2 }
+
+alaDaUNPPortPassAltProfileName OBJECT-TYPE
+    SYNTAX      SnmpAdminString ( SIZE( 0 .. 32 ) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Pass alternate UNP name."
+    ::= { alaDaUNPPortEntry 3 }
+
+alaDaUNPPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { alaDaUNPPortEntry 4 }
+
+alaDaUNPPortMacAuthFlag OBJECT-TYPE
+    SYNTAX      INTEGER {
+		enable  (1),
+		disable (2)
+	}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The flag to indicate if MAC AUTH is enabled on port."
+    ::= { alaDaUNPPortEntry 5 }
+
+alaDaUNPPortClassificationFlag OBJECT-TYPE
+    SYNTAX      INTEGER {
+		enable  (1),
+		disable (2)
+	}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The flag to indicate if Classification is enabled on port."
+    ::= { alaDaUNPPortEntry 6 }
+
+alaDaUNPPortTrustTagStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+		enable  (1),
+		disable (2)
+	}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The flag to indicate whether the vlan tag in the incoming packet
+		could be used for classifying the user when mac authentication fails
+		and classification rules dont match."
+    ::= { alaDaUNPPortEntry 7 }
+
+alaDaUNPPortMCLagConfigStatus OBJECT-TYPE
+    SYNTAX      AlaMultiChassisConfigStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Result of MCLAG Consistency Check. All rows will be created as local.
+           Actual status will be set through remote chassis synchronization."
+    DEFVAL { local }
+    ::= { alaDaUNPPortEntry 8 }
+
+
+alaDaUNPPortCustomerDomainId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Customer Domain that this port belongs to.  Default is on domain 0."
+    ::= { alaDaUNPPortEntry 9 }
+
+alaDaUNPPortType OBJECT-TYPE
+    SYNTAX      INTEGER {
+		bridgePort    (1),
+		spbAccessPort (2)
+	}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object defines the port as UNP enable bridge port (1), spb-access-port (2)."
+    ::= { alaDaUNPPortEntry 10 }
+
+alaDaUNPPortPassAltSpbProfileName OBJECT-TYPE
+    SYNTAX      SnmpAdminString ( SIZE( 0 .. 32 ) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Pass alternate Spb Profile name.  This is to be used on a successful authentication
+         and there is no SPB profile passed back from the Authentication Server."
+    ::= { alaDaUNPPortEntry 11 }
+
+alaDaUNPPortDefaultSpbProfileName OBJECT-TYPE
+    SYNTAX      SnmpAdminString ( SIZE( 0 .. 32 ) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The default Spb Profile name."
+    ::= { alaDaUNPPortEntry 12 }
+
+--
+--  UNP Global configuration
+--
+
+    alaDaUNPGlobalConfiguration    OBJECT IDENTIFIER ::= { alaIND1DaMIBObjects 8 }
+
+    alaDaUNPDynamicVlanConfigFlag OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enable  (1),
+                disable (2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether dynamic vlan configuration is enabled or not."
+	DEFVAL      { disable }
+    ::= { alaDaUNPGlobalConfiguration 1 }
+
+    alaDaUNPAuthServerDownUnp OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+	"The UNP to be used for classification if the authentication server
+	is not reachable."
+    ::= { alaDaUNPGlobalConfiguration 2 }
+
+    alaDaUNPAuthServerDownTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (10..1000)
+    UNITS       "Seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+	"The timeout, in seconds, after which all the users learned in the auth-server-down
+	UNP will be sent for re-authentication."
+	DEFVAL      { 60 }
+    ::= { alaDaUNPGlobalConfiguration 3 }
+
+ alaDaUNPDynamicVlanMCLagConfigStatus   OBJECT-TYPE
+    SYNTAX      AlaMultiChassisConfigStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether dynamic vlan configuration is sync across both MCLAG chassis or not.
+         All rows will be created as local. Actual status will be set through remote chassis
+         synchronization."
+    DEFVAL      { local }
+    ::= { alaDaUNPGlobalConfiguration 4 }
+
+    alaDaUNPAuthServerDownUNPMCLagConfigStatus OBJECT-TYPE
+    SYNTAX      AlaMultiChassisConfigStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Indicated whether Auth server down UNP config is sync across both MCLAG
+     chassis or not. All rows will be created as local. Actual status will be
+     set through remote chassis synchronization."
+    DEFVAL      { local }
+    ::= { alaDaUNPGlobalConfiguration 5 }
+
+    alaDaUNPAuthServerDownTimeoutMCLagConfigStatus OBJECT-TYPE
+    SYNTAX      AlaMultiChassisConfigStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Indicated whether Auth server down timeout config is sync across both MCLAG
+     chassis or not. All rows will be created as local. Actual status will be set
+     through remote chassis synchronization."
+    DEFVAL      { local }
+    ::= { alaDaUNPGlobalConfiguration 6 }
+
+    alaDaUNPDynamicProfileConfigFlag OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enable  (1),
+                disable (2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether dynamic profile configuration is enabled or not."
+    DEFVAL      { disable }
+    ::= { alaDaUNPGlobalConfiguration 7 }
+
+    alaDaUNPDynamicProfileConfigMCLagConfigStatus OBJECT-TYPE
+    SYNTAX      AlaMultiChassisConfigStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Indicated whether dynamic profile creation is sync across both MCLAG
+    chassis or not."
+    DEFVAL      { local }
+    ::= { alaDaUNPGlobalConfiguration 8 }
+
+    alaDaUNPReloadVsiTypeDB OBJECT-TYPE
+    SYNTAX      INTEGER {
+                default  (0),
+                true     (1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+	"The object triggers the system to reload the VSI Type DB from flash.  
+         Once the operation is done it is reset to zero (0)."
+    ::= { alaDaUNPGlobalConfiguration 9 }
+
+--
+-- DA MAC VLAN User Table
+--
+
+alaDaMacVlanUserTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDaMacVlanUserEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "A table of non 802.1x supplicants learned on 802.1x authenticated ports."
+::= { alaIND1DaMIBObjects 9 }
+
+alaDaMacVlanUserEntry OBJECT-TYPE
+        SYNTAX      AlaDaMacVlanUserEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Non 802.1x supplicant information."
+        INDEX { alaDaMacVlanUserIntfNum,
+                alaDaMacVlanUserMACAddress,
+				alaDaMacVlanUserVlanID }
+::= { alaDaMacVlanUserTable 1 }
+
+
+AlaDaMacVlanUserEntry ::=
+        SEQUENCE {
+                alaDaMacVlanUserIntfNum
+                    InterfaceIndex,
+                alaDaMacVlanUserMACAddress
+					MacAddress,
+				alaDaMacVlanUserVlanID
+					Integer32,
+                alaDaMacVlanUserAuthStatus
+					INTEGER,
+                alaDaMacVlanUserIpAddressType
+					InetAddressType,
+				alaDaMacVlanUserIpAddress
+					InetAddress,
+				alaDaMacVlanUserUnpUsed
+					SnmpAdminString,
+				alaDaMacVlanUserLoginTimeStamp
+					DateAndTime,
+				alaDaMacVlanUserAuthtype
+					INTEGER,
+				alaDaMacVlanUserClassificationSource
+					AlaDaClassificationPolicyType,
+				alaDaMacVlanUserMCLagLearningLoc
+					INTEGER	
+                }
+
+alaDaMacVlanUserIntfNum OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex representing the slot and port where the non 802.1x supplicant is learned."
+    ::= { alaDaMacVlanUserEntry 1 }
+
+alaDaMacVlanUserMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the non 802.1x supplicant."
+    ::= { alaDaMacVlanUserEntry 2 }
+
+alaDaMacVlanUserVlanID OBJECT-TYPE
+        SYNTAX      Integer32 (1..4096)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The Id of the VLAN on which the non 802.1x supplicant is learned."
+    ::= { alaDaMacVlanUserEntry 3 }
+
+alaDaMacVlanUserAuthStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                idle (1),
+                inProgress (2),
+                authenticated (3),
+                failed (4),
+                failedTimeout (5),
+                failedNoServer (6),
+                failedNoResources (7)
+            }
+
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Authentication status of the non 802.1x supplicant."
+    ::= { alaDaMacVlanUserEntry 4 }
+
+alaDaMacVlanUserIpAddressType  OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The type of the IP address of the user.  For now
+         only IPv4 is supported."
+    ::= { alaDaMacVlanUserEntry 5 }
+
+alaDaMacVlanUserIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ip address from which the mac user is sending the packets"
+    ::= { alaDaMacVlanUserEntry 6 }
+
+alaDaMacVlanUserUnpUsed OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UNP used for classifying the mac user"
+    ::= { alaDaMacVlanUserEntry 7 }
+
+alaDaMacVlanUserLoginTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Login time stamp of the mac user"
+    ::= { alaDaMacVlanUserEntry 8 }
+
+alaDaMacVlanUserAuthtype OBJECT-TYPE
+    SYNTAX      INTEGER {
+		macAuthentication	(0),
+		others (1)
+	}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The authentication type of the mac user"
+    ::= { alaDaMacVlanUserEntry 9 }
+
+alaDaMacVlanUserClassificationSource OBJECT-TYPE
+        SYNTAX      AlaDaClassificationPolicyType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Classification policy under which the non 802.1x supplicant is learned."
+    ::= { alaDaMacVlanUserEntry 10 }
+
+alaDaMacVlanUserMCLagLearningLoc OBJECT-TYPE
+        SYNTAX      INTEGER { local (1), 
+							  remote (2) 
+				    		}
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Source of Learning. Informs whether the Mac was learnt locally or through remote."
+    ::= { alaDaMacVlanUserEntry 11 }
+
+--
+--  Trap Definitions
+--
+
+alaDaUNPNotificationObjects    OBJECT IDENTIFIER ::= { alaIND1DaMIBObjects 10 }
+
+unpMcLagMacIgnored NOTIFICATION-TYPE
+    OBJECTS      { alaDaUnpMacAddr,
+                   alaDaUnpSourceIpAddr,
+                   alaDaUnpNativeVlan,
+                   alaDaUnpVlan,
+                   alaDaUnpMCLAGId
+
+                 }
+    STATUS       current
+    DESCRIPTION
+        "This trap is generated if a MAC/User is dropped due to vlan not existing or UNP is not enabled on the MCLAG"
+    ::= { alaIND1DaMIBNotifications    1 }
+
+unpMcLagConfigInconsistency NOTIFICATION-TYPE
+    OBJECTS      {
+                   alaDaUnpCommandType,
+                   alaDaUnpName,
+                   alaDaUnpMacAddr1,
+                   alaDaUnpMacAddr2,
+                   alaDaUnpIpAddr,
+                   alaDaUnpIpMask,
+                   alaDaUnpVlanTag,
+                   alaDaUnpMCLAGId
+                 }
+    STATUS       current
+    DESCRIPTION
+        "This trap is generated when configuration becomes Out_of_Sync."
+    ::= { alaIND1DaMIBNotifications 2 }
+
+
+alaDaUnpMacAddr OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The mac which failed to get configured on peer chassis."
+    ::= { alaDaUNPNotificationObjects 1 }
+
+alaDaUnpSourceIpAddr OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The ip-address of mac which failed to get configured on peer chassis."
+    ::= { alaDaUNPNotificationObjects 2 }
+
+alaDaUnpNativeVlan OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The native vlan of MCLAG on which the mac ingressed."
+    ::= { alaDaUNPNotificationObjects 3 }
+
+
+alaDaUnpVlan OBJECT-TYPE
+    SYNTAX        Integer32 (1..4094)
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The vlan on which mac was classified on local chassis"
+    ::= { alaDaUNPNotificationObjects 4 }
+
+alaDaUnpMCLAGId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The lag id for MCLAG"
+    ::= { alaDaUNPNotificationObjects 5 }
+
+
+
+alaDaUnpCommandType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unpConfigCmd (1),
+                macRuleConfigCmd (2),
+                macRangeRuleConfigCmd (3),
+                ipRuleConfigCmd (4),
+                vlanTagRuleConfigCmd (5),
+                authServerUnpConfigCmd (6),
+                authServerTimerConfigCmd (7),
+                dynamicVlanConfigCmd (8),
+                lagConfigCmd (9),
+                dynamicProfileConfigCmd (10)
+            }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Indicates which configuration command is out-of-sync"
+    ::= { alaDaUNPNotificationObjects 6 }
+
+alaDaUnpName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE( 1 .. 32 ))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Indicates which unp profile is out-of-sync. If there is no UNP Profile
+        associated then zero length string is sent"
+    ::= { alaDaUNPNotificationObjects 7 }
+
+alaDaUnpMacAddr1 OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The mac for mac rule or the lower limit of mac-range rule."
+    ::= { alaDaUNPNotificationObjects 8 }
+
+alaDaUnpMacAddr2 OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The upper limit of mac-range rule."
+    ::= { alaDaUNPNotificationObjects 9 }
+
+alaDaUnpIpAddr OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The ip-address in ip-rule"
+    ::= { alaDaUNPNotificationObjects 10 }
+
+alaDaUnpIpMask OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The ip-address in ip-rule"
+    ::= { alaDaUNPNotificationObjects 11 }
+
+
+alaDaUnpVlanTag OBJECT-TYPE
+    SYNTAX        Integer32 (0..4094)
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The vlan vlan-tag rule. Zero value means it is not applicable"
+    ::= { alaDaUNPNotificationObjects 12 }
+
+
+
+-- UNP Customer Domain Table configuration MIB --
+
+    alaDaUnpCustomerDomainTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AlaDaUnpCustomerDomainEntry
+
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table creates and deletes the UNP group within a switch."
+        ::= { alaIND1DaMIBObjects 11 }
+
+    alaDaUnpCustomerDomainEntry OBJECT-TYPE
+        SYNTAX        AlaDaUnpCustomerDomainEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "UNP Group: entry"
+        INDEX {alaDaUnpCustomerDomainId}
+        ::= { alaDaUnpCustomerDomainTable 1 }
+
+    AlaDaUnpCustomerDomainEntry ::= SEQUENCE
+        {
+            alaDaUnpCustomerDomainId        Unsigned32,
+            alaDaUnpCustomerDomainDesc      SnmpAdminString,
+            alaDaUnpCustomerDomainRowStatus RowStatus
+        }
+
+    alaDaUnpCustomerDomainId OBJECT-TYPE
+        SYNTAX        Unsigned32 (0..4294967295)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The Customer Domain ID.  Domain ID zero (0) is the default and is always present in the switch."
+        ::= { alaDaUnpCustomerDomainEntry 1 }
+
+    alaDaUnpCustomerDomainDesc OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 128 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "A field to provide meaningful description of the Customer Domain for easy identification of the domain."
+        ::= { alaDaUnpCustomerDomainEntry 2 }
+
+    alaDaUnpCustomerDomainRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { alaDaUnpCustomerDomainEntry 3}
+
+------------------------------------------------------------
+-- Spb Classification Profile Table configuration MIB --
+------------------------------------------------------------
+
+    alaDaSpbProfileTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AlaDaSpbProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table stores the Service Classification profiles created in the system.
+             The entries provides information to classify device in the Service domain."
+        ::= { alaIND1DaMIBObjects 12 }
+
+    alaDaSpbProfileEntry OBJECT-TYPE
+        SYNTAX        AlaDaSpbProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Service Classification Profile entry"
+        INDEX {alaDaSpbProfileName}
+        ::= { alaDaSpbProfileTable 1 }
+
+    AlaDaSpbProfileEntry ::= SEQUENCE
+        {
+            alaDaSpbProfileName              SnmpAdminString,
+            alaDaSpbProfileEncapVal          TmnxEncapVal,
+            alaDaSpbProfileQosPolicyListName SnmpAdminString,
+            alaDaSpbProfileIsid              Unsigned32,
+            alaDaSpbProfileBVlan             Unsigned32,
+            alaDaSpbProfileRowStatus         RowStatus,
+            alaDaSpbProfileMulticastMode     INTEGER,
+            alaDaSpbProfileSapVlanXlation    INTEGER
+        }
+
+    alaDaSpbProfileName OBJECT-TYPE
+
+        SYNTAX        SnmpAdminString ( SIZE( 1 .. 32 ) )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The name of this profile."
+        ::= { alaDaSpbProfileEntry 1 }
+
+    alaDaSpbProfileEncapVal OBJECT-TYPE
+
+        SYNTAX        TmnxEncapVal
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The encapsulation to be used for the SAP connecting to the service."
+        ::= { alaDaSpbProfileEntry 2}
+
+    alaDaSpbProfileQosPolicyListName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The name of the QoS Policy List name that will be used if this
+             User Network Profile is applied for a given device along with
+             alaDaSpbProfileVlanID."
+        ::= { alaDaSpbProfileEntry 3 }
+
+    alaDaSpbProfileIsid OBJECT-TYPE
+        SYNTAX        Unsigned32 (256..16777214)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The object represnet the I-SID that is to be dynamically created when 
+             alaDaSpbProfileServiceID does not exist in the system and must be 
+             used along with alaDaSpbProfileBVlan."
+        ::= { alaDaSpbProfileEntry 4}
+
+    alaDaSpbProfileBVlan OBJECT-TYPE
+        SYNTAX        Unsigned32 (1..4094)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The Backbone VLAN ID (BVLAN) used for the I-SID specified in alaDaSpbProfileIsid.
+             This object must be specified along with alaDaSpbProfileIsid."
+        ::= { alaDaSpbProfileEntry 5}
+
+    alaDaSpbProfileRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The row status of this table entry."
+        ::= { alaDaSpbProfileEntry 6}
+
+    alaDaSpbProfileMulticastMode OBJECT-TYPE
+        SYNTAX          INTEGER { headend(1), tandem(2) }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "To configure the multicast replication mode for each service:
+                         Head-end(1) where a non-unicast packet entering the SAP port
+                         is replicated once for each receiver in the b-domain using its
+                         unicast BMAC.
+                         Tandem(2) where a non-unicast packet entering the SAP port is
+                         replicated once at each node using the multicast group address."
+        DEFVAL          { headend }
+        ::= { alaDaSpbProfileEntry 7 }
+
+    alaDaSpbProfileSapVlanXlation OBJECT-TYPE
+        SYNTAX          INTEGER { enable (1), disable (2) }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "To enable/disable the vlan translation for all the SAPs configured
+                         in this service if the corresponding access ports for the SAPs also
+                         has the vlan translation enabled."
+        DEFVAL          { enable }
+        ::= { alaDaSpbProfileEntry 8 }
+
+--
+-- DA Classification Customer Domain EVB Group ID rule --
+--
+
+        alaDaUNPCustDomainEvbGpIdRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AlaDaUNPCustDomainEvbGpIdRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of EVB group ID based classification rules.  This is used to match
+                 the EVB Group ID passed from EVB to a User Network Profile entry "
+                ::= { alaIND1DaMIBObjects 13 }
+
+        alaDaUNPCustDomainEvbGpIdRuleEntry  OBJECT-TYPE
+            SYNTAX  AlaDaUNPCustDomainEvbGpIdRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A EVB Group ID rule entry."
+            INDEX {alaDaUNPCustDomainEvbGpIdRuleCustomerDomainId, alaDaUNPCustDomainEvbGpIdRuleGroupId }
+            ::= { alaDaUNPCustDomainEvbGpIdRuleTable 1 }
+
+        AlaDaUNPCustDomainEvbGpIdRuleEntry ::= SEQUENCE {
+                alaDaUNPCustDomainEvbGpIdRuleCustomerDomainId Unsigned32,
+                alaDaUNPCustDomainEvbGpIdRuleGroupId          Unsigned32,
+                alaDaUNPCustDomainEvbGpIdRuleVlanProfileName  SnmpAdminString,
+                alaDaUNPCustDomainEvbGpIdRuleSpbProfileName   SnmpAdminString,
+                alaDaUNPCustDomainEvbGpIdRuleRowStatus        RowStatus
+                }
+
+        alaDaUNPCustDomainEvbGpIdRuleCustomerDomainId  OBJECT-TYPE
+                SYNTAX  Unsigned32 (0..4294967295)
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                 "The UNP Customer Domain ID that will be used for profile lookup."
+
+                ::= { alaDaUNPCustDomainEvbGpIdRuleEntry 1 }
+
+        alaDaUNPCustDomainEvbGpIdRuleGroupId  OBJECT-TYPE
+                SYNTAX  Unsigned32 (0..4294967295)
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "The EVB Group ID used for profile lookup."
+                ::= { alaDaUNPCustDomainEvbGpIdRuleEntry 2 }
+
+        alaDaUNPCustDomainEvbGpIdRuleVlanProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The VLAN profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPCustDomainEvbGpIdRuleEntry 3 }
+
+        alaDaUNPCustDomainEvbGpIdRuleSpbProfileName  OBJECT-TYPE
+
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The SBP profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPCustDomainEvbGpIdRuleEntry 4 }
+
+        alaDaUNPCustDomainEvbGpIdRuleRowStatus  OBJECT-TYPE
+
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { alaDaUNPCustDomainEvbGpIdRuleEntry 5 }
+
+
+--
+-- DA Classification Customer Domain VLAN TAG rule
+--
+
+        alaDaUNPCustDomainVlanTagRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AlaDaUNPCustDomainVlanTagRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of Customer Domain and Vlan Tag based classification rules.  This is used to match
+                 the vlan tag in a packet and the port's UNP Customer Domain to a User Network Profile entry "
+                ::= { alaIND1DaMIBObjects 14 }
+
+        alaDaUNPCustDomainVlanTagRuleEntry  OBJECT-TYPE
+            SYNTAX  AlaDaUNPCustDomainVlanTagRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A Vlan Tag rule entry."
+            INDEX {alaDaUNPCustDomainVlanTagRuleDomainId, alaDaUNPCustDomainVlanTagRuleVlan }
+            ::= { alaDaUNPCustDomainVlanTagRuleTable 1 }
+
+        AlaDaUNPCustDomainVlanTagRuleEntry ::= SEQUENCE {
+                alaDaUNPCustDomainVlanTagRuleDomainId
+                        Integer32,
+                alaDaUNPCustDomainVlanTagRuleVlan
+			Integer32,
+                alaDaUNPCustDomainVlanTagRuleVlanProfileName
+                        SnmpAdminString,
+                alaDaUNPCustDomainVlanTagRuleRowStatus
+                        RowStatus,
+                alaDaUNPCustDomainVlanTagRuleMCLagConfigStatus
+                        AlaMultiChassisConfigStatus,
+                alaDaUNPCustDomainVlanTagRuleSpbProfileName
+                        SnmpAdminString,
+                alaDaUNPCustDomainVlanTagRuleTagPosition
+			INTEGER
+                }
+
+        alaDaUNPCustDomainVlanTagRuleDomainId  OBJECT-TYPE
+                SYNTAX  Integer32 (0..4294967295)
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                 "The UNP Customer Domain ID for profile lookup."
+                ::= { alaDaUNPCustDomainVlanTagRuleEntry 1 }
+
+        alaDaUNPCustDomainVlanTagRuleVlan  OBJECT-TYPE
+                SYNTAX  Integer32 (1..4094)
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "The Vlan Tag used for VLAN classification. The range states the valid
+				Vlan range in the system."
+                ::= { alaDaUNPCustDomainVlanTagRuleEntry 2 }
+
+        alaDaUNPCustDomainVlanTagRuleVlanProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The VLAN profile name in the User Network Profile Table to be applied."
+                ::= { alaDaUNPCustDomainVlanTagRuleEntry 3 }
+
+        alaDaUNPCustDomainVlanTagRuleRowStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { alaDaUNPCustDomainVlanTagRuleEntry 4 }
+
+         alaDaUNPCustDomainVlanTagRuleMCLagConfigStatus OBJECT-TYPE
+                SYNTAX  AlaMultiChassisConfigStatus
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                    "Result of MCLAG Consistency Check. All rows will be created as local.
+                     Actual status will be set through remote chassis synchronization."
+                DEFVAL { local }
+                 ::= { alaDaUNPCustDomainVlanTagRuleEntry 5 }
+
+        alaDaUNPCustDomainVlanTagRuleSpbProfileName  OBJECT-TYPE
+
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPCustDomainVlanTagRuleEntry 6 }
+
+        alaDaUNPCustDomainVlanTagRuleTagPosition  OBJECT-TYPE
+       		SYNTAX  INTEGER {
+                   notApplicable (0),
+                   outerTag      (1),
+                   innerTag      (2)}
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "This object specify the tag position to apply this Vlan Tag rule for 
+		 double tagged frames."
+        	DEFVAL { outerTag }
+                ::= { alaDaUNPCustDomainVlanTagRuleEntry 7 }
+
+
+------------------------------------------------
+-- DA Classification Customer Domain IP network address rule  --
+------------------------------------------------
+
+        alaDaUNPCustDomainIpNetRuleTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaDaUNPCustDomainIpNetRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A list of IP network address rules.  This is used to match
+                 the InetAddress of a packet to a User Network Profile entry."
+            ::= { alaIND1DaMIBObjects 15 }
+
+        alaDaUNPCustDomainIpNetRuleEntry  OBJECT-TYPE
+            SYNTAX  AlaDaUNPCustDomainIpNetRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "An IP network address rule entry."
+            INDEX { alaDaUNPCustDomainIpNetRuleDomainId,
+                    alaDaUNPCustDomainIpNetRuleAddrType,
+                    alaDaUNPCustDomainIpNetRuleAddr,
+                    alaDaUNPCustDomainIpNetRuleMask}
+            ::= { alaDaUNPCustDomainIpNetRuleTable 1 }
+
+        AlaDaUNPCustDomainIpNetRuleEntry ::= SEQUENCE {
+                alaDaUNPCustDomainIpNetRuleDomainId 
+                        Integer32,
+                alaDaUNPCustDomainIpNetRuleAddrType
+                        InetAddressType,
+                alaDaUNPCustDomainIpNetRuleAddr
+                        InetAddress,
+                alaDaUNPCustDomainIpNetRuleMask
+                        InetAddress,
+                alaDaUNPCustDomainIpNetRuleProfileName
+                        SnmpAdminString,
+		alaDaUNPCustDomainIpNetRuleVlanTag
+			Integer32,
+                alaDaUNPCustDomainIpNetRuleRowStatus
+                        RowStatus,
+                alaDaUNPCustDomainIpNetRuleMCLagConfigStatus
+                        AlaMultiChassisConfigStatus,
+                alaDaUNPCustDomainIpNetRuleSpbProfileName
+                        SnmpAdminString
+                }
+
+        alaDaUNPCustDomainIpNetRuleDomainId  OBJECT-TYPE
+            SYNTAX  Integer32 (0..4294967295)
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The UNP Customer Domain ID for profile lookup."
+            ::= { alaDaUNPCustDomainIpNetRuleEntry 1 }
+
+        alaDaUNPCustDomainIpNetRuleAddrType  OBJECT-TYPE
+            SYNTAX  InetAddressType
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The IP network address type used for VLAN classification.  For now
+                   Only IPv4 is supported."
+            ::= { alaDaUNPCustDomainIpNetRuleEntry 2 }
+
+        alaDaUNPCustDomainIpNetRuleAddr  OBJECT-TYPE
+            SYNTAX  InetAddress (SIZE (4|16))
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The IP network address used for VLAN classification.  Only IPv4 is
+                  supported."
+            ::= { alaDaUNPCustDomainIpNetRuleEntry 3 }
+
+        alaDaUNPCustDomainIpNetRuleMask  OBJECT-TYPE
+            SYNTAX  InetAddress (SIZE (4|16))
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The IP network mask applying to the IP network address."
+            ::= { alaDaUNPCustDomainIpNetRuleEntry 4 }
+
+        alaDaUNPCustDomainIpNetRuleProfileName  OBJECT-TYPE
+            SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                 "The profile name in the User Network Profile Table to be
+                  applied."
+            ::= { alaDaUNPCustDomainIpNetRuleEntry 5 }
+
+        alaDaUNPCustDomainIpNetRuleVlanTag  OBJECT-TYPE
+            SYNTAX  Integer32 (0..4094)
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                 "The vlan tag to be used for classification of tagged pkts.
+                 Vlan tag of 0 indicates no VLAN is associated."
+            ::= { alaDaUNPCustDomainIpNetRuleEntry 6 }
+
+        alaDaUNPCustDomainIpNetRuleRowStatus  OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "Row Status for creating/deleting rules."
+            ::= { alaDaUNPCustDomainIpNetRuleEntry 7 }
+
+        alaDaUNPCustDomainIpNetRuleMCLagConfigStatus  OBJECT-TYPE
+            SYNTAX  AlaMultiChassisConfigStatus
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Result of MCLAG Consistency Check. All rows will be created as local.
+                 Actual status will be set through remote chassis synchronization."
+            DEFVAL { local }
+            ::= { alaDaUNPCustDomainIpNetRuleEntry 8 }
+
+        alaDaUNPCustDomainIpNetRuleSpbProfileName  OBJECT-TYPE
+
+            SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                 "The profile name in the User Network Profile Table to be
+                  applied."
+            ::= { alaDaUNPCustDomainIpNetRuleEntry 9 }
+
+--
+-- DA Classification Customer Domain MAC address rule
+--
+
+
+        alaDaUNPCustDomainMacRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AlaDaUNPCustDomainMacRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of MAC address rules.  This is used to match
+                 the MAC Address of a packet to a User Network Profile entry "
+                ::= { alaIND1DaMIBObjects 16 }
+
+        alaDaUNPCustDomainMacRuleEntry  OBJECT-TYPE
+            SYNTAX  AlaDaUNPCustDomainMacRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC rule entry."
+            INDEX {alaDaUNPCustDomainMacRuleDomainId, alaDaUNPCustDomainMacRuleAddr }
+            ::= { alaDaUNPCustDomainMacRuleTable 1 }
+
+        AlaDaUNPCustDomainMacRuleEntry ::= SEQUENCE {
+                alaDaUNPCustDomainMacRuleDomainId
+                        Integer32,
+                alaDaUNPCustDomainMacRuleAddr
+                        MacAddress,
+                alaDaUNPCustDomainMacRuleProfileName
+                        SnmpAdminString,
+		alaDaUNPCustDomainMacRuleVlanTag
+			Integer32,
+                alaDaUNPCustDomainMacRuleRowStatus
+                        RowStatus,
+               alaDaUNPCustDomainMacRuleMCLagConfigStatus
+                   AlaMultiChassisConfigStatus,
+                alaDaUNPCustDomainMacRuleSpbProfileName
+                        SnmpAdminString
+                }
+
+        alaDaUNPCustDomainMacRuleDomainId  OBJECT-TYPE
+                SYNTAX  Integer32 (0..4294967295)
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                 "The UNP Customer Domain ID for profile lookup."
+                ::= { alaDaUNPCustDomainMacRuleEntry 1 }
+
+        alaDaUNPCustDomainMacRuleAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "The MAC address used for VLAN classification."
+                ::= { alaDaUNPCustDomainMacRuleEntry 2 }
+
+        alaDaUNPCustDomainMacRuleProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPCustDomainMacRuleEntry 3 }
+
+        alaDaUNPCustDomainMacRuleVlanTag  OBJECT-TYPE
+            SYNTAX  Integer32 (0..4094)
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                 "The vlan tag to be used for classification of tagged pkts.
+                 Vlan tag of 0 indicates no VLAN is associated."
+            ::= { alaDaUNPCustDomainMacRuleEntry 4 }
+
+        alaDaUNPCustDomainMacRuleRowStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { alaDaUNPCustDomainMacRuleEntry 5 }
+
+         alaDaUNPCustDomainMacRuleMCLagConfigStatus  OBJECT-TYPE
+                SYNTAX  AlaMultiChassisConfigStatus
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                    "Result of MCLAG Consistency Check. All rows will be created as local.
+                     Actual status will be set through remote chassis synchronization."
+                DEFVAL { local }
+                 ::= { alaDaUNPCustDomainMacRuleEntry 6 }
+
+
+        alaDaUNPCustDomainMacRuleSpbProfileName  OBJECT-TYPE
+
+                SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The SBP profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPCustDomainMacRuleEntry 7 }
+
+
+--
+-- DA Classification Customer Domain MAC range rule
+--
+
+        alaDaUNPCustDomainMacRangeRuleTable  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AlaDaUNPCustDomainMacRangeRuleEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "A list of MAC range rules.  This is used to match
+                 the MAC Address Range of a packet to a User Network Profile entry."
+                ::= { alaIND1DaMIBObjects 17 }
+
+        alaDaUNPCustDomainMacRangeRuleEntry  OBJECT-TYPE
+            SYNTAX  AlaDaUNPCustDomainMacRangeRuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A MAC range rule entry."
+            INDEX {alaDaUNPCustDomainMacRangeRuleDomainId, 
+                   alaDaUNPCustDomainMacRangeRuleLoAddr }
+            ::= { alaDaUNPCustDomainMacRangeRuleTable 1 }
+
+        AlaDaUNPCustDomainMacRangeRuleEntry ::= SEQUENCE {
+                alaDaUNPCustDomainMacRangeRuleDomainId
+                        Integer32,
+                alaDaUNPCustDomainMacRangeRuleLoAddr
+                        MacAddress,
+                alaDaUNPCustDomainMacRangeRuleHiAddr
+                        MacAddress,
+                alaDaUNPCustDomainMacRangeRuleProfileName
+                        SnmpAdminString,
+		alaDaUNPCustDomainMacRangeRuleVlanTag
+			Integer32,
+                alaDaUNPCustDomainMacRangeRuleRowStatus
+                        RowStatus,
+
+             alaDaUNPCustDomainMacRangeRuleMCLagConfigStatus
+                        AlaMultiChassisConfigStatus,
+                alaDaUNPCustDomainMacRangeRuleSpbProfileName
+                        SnmpAdminString
+                }
+
+        alaDaUNPCustDomainMacRangeRuleDomainId  OBJECT-TYPE
+                SYNTAX  Integer32 (0..4294967295)
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                 "The UNP Customer Domain ID for profile lookup."
+                ::= { alaDaUNPCustDomainMacRangeRuleEntry 1 }
+
+        alaDaUNPCustDomainMacRangeRuleLoAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                "The lower bound of  MAC address range used for VLAN classification."
+                ::= { alaDaUNPCustDomainMacRangeRuleEntry 2 }
+
+        alaDaUNPCustDomainMacRangeRuleHiAddr  OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "The upper bound of MAC address range used for VLAN classification."
+                ::= { alaDaUNPCustDomainMacRangeRuleEntry 3 }
+
+        alaDaUNPCustDomainMacRangeRuleProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPCustDomainMacRangeRuleEntry 4 }
+
+        alaDaUNPCustDomainMacRangeRuleVlanTag  OBJECT-TYPE
+                SYNTAX  Integer32 (0..4094)
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                     "The vlan tag to be used for classification of tagged pkts.
+                     The range states the valid vlan range in the system.
+                     Vlan tag of 0 indicates no VLAN is associated."
+                ::= { alaDaUNPCustDomainMacRangeRuleEntry 5 }
+
+        alaDaUNPCustDomainMacRangeRuleRowStatus  OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Row Status for creating/deleting rules."
+                 ::= { alaDaUNPCustDomainMacRangeRuleEntry 6 }
+
+        alaDaUNPCustDomainMacRangeRuleMCLagConfigStatus  OBJECT-TYPE
+                SYNTAX  AlaMultiChassisConfigStatus
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                    "Result of MCLAG Consistency Check. All rows will be created as local.
+                     Actual status will be set through remote chassis synchronization."
+                DEFVAL { local }
+                 ::= { alaDaUNPCustDomainMacRangeRuleEntry 7 }
+
+        alaDaUNPCustDomainMacRangeRuleSpbProfileName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                 "The SBP profile name in the User Network Profile Table to be
+                  applied."
+                ::= { alaDaUNPCustDomainMacRangeRuleEntry 8 }
+
+------------------------------------------------------------
+-- SAA Profile Table configuration MIB --
+------------------------------------------------------------
+
+    alaDaSaaProfileTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AlaDaSaaProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table stores the SAA Performance Monitoring profiles 
+             that holds the Latency and Jitter Threshold of a network connection."
+        ::= { alaIND1DaMIBObjects 18 }
+
+    alaDaSaaProfileEntry OBJECT-TYPE
+        SYNTAX        AlaDaSaaProfileEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Service Classification Profile entry"
+        INDEX {alaDaSaaProfileName}
+        ::= { alaDaSaaProfileTable 1 }
+
+    AlaDaSaaProfileEntry ::= SEQUENCE
+        {
+            alaDaSaaProfileName              SnmpAdminString,
+            alaDaSaaProfileLatencyThreshold  Integer32,
+            alaDaSaaProfileJitterThreshold   Integer32,
+            alaDaSaaProfileRowStatus         RowStatus
+        }
+
+    alaDaSaaProfileName OBJECT-TYPE
+
+        SYNTAX        SnmpAdminString ( SIZE( 1 .. 32 ) )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The name of this profile."
+        ::= { alaDaSaaProfileEntry 1 }
+
+    alaDaSaaProfileLatencyThreshold OBJECT-TYPE
+        SYNTAX        Integer32 (0..1000000)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The object holds the Latency Threshold. A value of zero (0) means no threshold"
+	DEFVAL { 0 }
+        ::= { alaDaSaaProfileEntry 4}
+
+    alaDaSaaProfileJitterThreshold OBJECT-TYPE
+        SYNTAX        Integer32 (0..1000000)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The object holds the Jitter Threshold. A value of zero (0) means no threshold"
+	DEFVAL { 0 }
+        ::= { alaDaSaaProfileEntry 5}
+
+    alaDaSaaProfileRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The row status of this table entry."
+        ::= { alaDaSaaProfileEntry 6}
+--
+-- MIB compliance
+--
+
+    alaIND1DaMIBCompliances MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Alcatel DA module."
+        MODULE
+           MANDATORY-GROUPS
+           {
+		alaDaUserNetProfileGroup,
+		alaDaUNPIpNetRuleGroup,
+		alaDaUNPMacRuleGroup,
+		alaDaUNPMacRangeGroup,
+		alaDaUNPVlanTagGroup,
+		alaDaMacUserGroup,
+		alaDaUNPPortGroup,
+            	alaDaUNPGlobalGroup,
+
+            alaDaNotificationObjectGroup,
+
+            alaDaNotificationsGroup,
+		alaDaUnpCustomerDomainGroup,
+		alaDaSpbProfileGroup,
+		alaDaUNPCustDomainEvbGpIdRuleGroup,
+		alaDaUNPCustDomainVlanTagRuleGroup,
+		alaDaSaaProfileGroup
+           }
+        ::= { alaIND1DaMIBConformance 2 }
+	
+--
+-- Units of Conformance
+--
+
+    alaDaUserNetProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaUserNetProfileVlanID,
+            alaDaUserNetProfileRowStatus,
+            alaDaUserNetProfileQosPolicyListName,
+
+	    alaDaUserNetProfileMCLagConfigStatus,
+            alaDaUserNetProfileSaaProfileName
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for UNP Table"
+        ::= { alaIND1DaMIBGroups 1 }
+
+    alaDaUNPIpNetRuleGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaUNPIpNetRuleProfileName ,
+	    alaDaUNPIpNetRuleVlanTag ,
+	    alaDaUNPIpNetRuleRowStatus,
+
+	    alaDaUNPIpNetRuleMCLagConfigStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for system level UNP Ip rule"
+        ::= { alaIND1DaMIBGroups 2 }
+
+    alaDaUNPMacRuleGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaUNPMacRuleProfileName ,
+	    alaDaUNPMacRuleVlanTag ,
+            alaDaUNPMacRuleRowStatus,
+
+	    alaDaUNPMacRuleMCLagConfigStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for system level UNP Mac Rule"
+        ::= { alaIND1DaMIBGroups 3 }
+
+    alaDaUNPMacRangeGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaUNPMacRangeRuleHiAddr ,
+            alaDaUNPMacRangeRuleProfileName ,
+	    alaDaUNPMacRangeRuleVlanTag ,
+            alaDaUNPMacRangeRuleRowStatus,
+
+	    alaDaUNPMacRangeRuleMCLagConfigStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for system level UNP Mac Range Rule"
+        ::= { alaIND1DaMIBGroups 4 }
+
+    alaDaUNPVlanTagGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    alaDaUNPVlanTagRuleProfileName ,
+            alaDaUNPVlanTagRuleRowStatus,
+
+	    alaDaUNPVlanTagRuleMCLagConfigStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for system level Vlan Tag Rule"
+        ::= { alaIND1DaMIBGroups 5 }
+
+    alaDaMacUserGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaDaMacUserVlanID,
+		alaDaAuthenticationStatus,
+		alaDaMacUserIpAddress,
+		alaDaMacUserUnpUsed,
+		alaDaMacUserLoginTimeStamp,
+		alaDaMacUserAuthtype,
+		alaDaMacUserClassificationSource
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for UNP Mac User"
+        ::= { alaIND1DaMIBGroups 6 }
+
+    alaDaUNPPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	alaDaUNPPortDefaultProfileName,
+        	alaDaUNPPortPassAltProfileName,
+        	alaDaUNPPortRowStatus,
+        	alaDaUNPPortMacAuthFlag,
+        	alaDaUNPPortClassificationFlag,
+
+		alaDaUNPPortTrustTagStatus,
+
+		alaDaUNPPortMCLagConfigStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA UNP Ports"
+        ::= { alaIND1DaMIBGroups 7 }
+
+    alaDaUNPGlobalGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	alaDaUNPDynamicVlanConfigFlag,
+        	alaDaUNPAuthServerDownUnp,
+        	alaDaUNPAuthServerDownTimeout,
+
+        alaDaUNPDynamicVlanMCLagConfigStatus,
+        alaDaUNPAuthServerDownUNPMCLagConfigStatus,
+        alaDaUNPAuthServerDownTimeoutMCLagConfigStatus,
+
+        alaDaUNPDynamicProfileConfigFlag,
+        alaDaUNPDynamicProfileConfigMCLagConfigStatus,
+		alaDaUNPReloadVsiTypeDB
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for Global parameters"
+        ::= { alaIND1DaMIBGroups 8 }
+
+   alaDaNotificationObjectGroup OBJECT-GROUP
+        OBJECTS
+        {
+                   alaDaUnpMacAddr,
+                   alaDaUnpSourceIpAddr,
+                   alaDaUnpNativeVlan,
+                   alaDaUnpVlan,
+                   alaDaUnpMCLAGId,
+                   alaDaUnpCommandType,
+                   alaDaUnpName,
+                   alaDaUnpMacAddr1,
+                   alaDaUnpMacAddr2,
+                   alaDaUnpIpAddr,
+                   alaDaUnpIpMask,
+                   alaDaUnpVlanTag
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for Notifications"
+        ::= { alaIND1DaMIBGroups 9 }
+
+    alaDaNotificationsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+        unpMcLagMacIgnored,
+        unpMcLagConfigInconsistency
+            }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Notifications for management of DA."
+        ::= { alaIND1DaMIBGroups 10 }
+
+    alaDaMacVlanUserGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaMacVlanUserAuthStatus,
+                        alaDaMacVlanUserIpAddressType,
+                        alaDaMacVlanUserIpAddress,
+                        alaDaMacVlanUserUnpUsed,
+                        alaDaMacVlanUserLoginTimeStamp,
+                        alaDaMacVlanUserAuthtype,
+                        alaDaMacVlanUserClassificationSource,
+                        alaDaMacVlanUserMCLagLearningLoc
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for UNP Mac User"
+        ::= { alaIND1DaMIBGroups 11 }
+
+    alaDaUnpCustomerDomainGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaUnpCustomerDomainDesc,
+            alaDaUnpCustomerDomainRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for UNP Group"
+        ::= { alaIND1DaMIBGroups 12 }
+
+    alaDaSpbProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaSpbProfileEncapVal,         
+            alaDaSpbProfileQosPolicyListName, 
+            alaDaSpbProfileIsid,            
+            alaDaSpbProfileBVlan,
+            alaDaSpbProfileRowStatus,
+            alaDaSpbProfileMulticastMode,            
+            alaDaSpbProfileSapVlanXlation
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for Service Classification Profile."
+        ::= { alaIND1DaMIBGroups 13 }
+
+    alaDaUNPCustDomainEvbGpIdRuleGroup OBJECT-GROUP 
+        OBJECTS
+        {
+            alaDaUNPCustDomainEvbGpIdRuleVlanProfileName,
+            alaDaUNPCustDomainEvbGpIdRuleRowStatus,
+            alaDaUNPCustDomainEvbGpIdRuleSpbProfileName
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for system level EVB Group ID Rule."
+        ::= { alaIND1DaMIBGroups 14 }
+
+    alaDaUNPCustDomainVlanTagRuleGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    alaDaUNPCustDomainVlanTagRuleVlanProfileName,
+	    alaDaUNPCustDomainVlanTagRuleSpbProfileName,
+            alaDaUNPCustDomainVlanTagRuleRowStatus,
+	    alaDaUNPCustDomainVlanTagRuleMCLagConfigStatus,
+	    alaDaUNPCustDomainVlanTagRuleTagPosition
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for system level Vlan Tag Rule"
+        ::= { alaIND1DaMIBGroups 15 }
+
+    alaDaUNPCustDomainIpNetRuleGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaUNPCustDomainIpNetRuleProfileName ,
+            alaDaUNPCustDomainIpNetRuleSpbProfileName ,
+            alaDaUNPCustDomainIpNetRuleVlanTag ,
+            alaDaUNPCustDomainIpNetRuleRowStatus,
+            alaDaUNPCustDomainIpNetRuleMCLagConfigStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for system level UNP Ip rule"
+        ::= { alaIND1DaMIBGroups 16 }
+
+    alaDaUNPCustDomainMacRuleGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaUNPCustDomainMacRuleProfileName ,
+            alaDaUNPCustDomainMacRuleSpbProfileName ,
+            alaDaUNPCustDomainMacRuleVlanTag ,
+            alaDaUNPCustDomainMacRuleRowStatus,
+            alaDaUNPCustDomainMacRuleMCLagConfigStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for system level UNP Mac Rule"
+        ::= { alaIND1DaMIBGroups 17 }
+
+    alaDaUNPCustDomainMacRangeGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaUNPCustDomainMacRangeRuleHiAddr ,
+            alaDaUNPCustDomainMacRangeRuleProfileName ,
+            alaDaUNPCustDomainMacRangeRuleSpbProfileName ,
+            alaDaUNPCustDomainMacRangeRuleVlanTag ,
+            alaDaUNPCustDomainMacRangeRuleRowStatus,
+            alaDaUNPCustDomainMacRangeRuleMCLagConfigStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for system level UNP Mac Range Rule"
+        ::= { alaIND1DaMIBGroups 18 }
+
+    alaDaUNPGroupObjects OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaUNPPortCustomerDomainId,
+            alaDaUNPPortType,
+            alaDaUNPPortPassAltSpbProfileName,
+            alaDaUNPPortDefaultSpbProfileName
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects created to keep SNMP4J compiler happy."
+        ::= { alaIND1DaMIBGroups 19 }
+
+    alaDaSaaProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDaSaaProfileLatencyThreshold,            
+            alaDaSaaProfileJitterThreshold,
+            alaDaSaaProfileRowStatus         
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of DA objects for SAA Profile."
+        ::= { alaIND1DaMIBGroups 20 }
+END
