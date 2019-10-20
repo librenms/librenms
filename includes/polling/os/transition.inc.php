@@ -12,9 +12,7 @@
  * the source code distribution for details.
  */
 
-$objectID = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, ".1.0.8802.1.1.2.1.3.3.0", "-OQv"));
-
-$data = $objectID;
+$data = snmp_get($device, ".1.0.8802.1.1.2.1.3.3.0", "-OQv");
 
 if (isset($data)) {
     $hardware = $data;
