@@ -51,7 +51,7 @@ allow you to use an IP address instead. However, in LibreNMS, if your
 device is added by an IP address, add your source with any name of
 your choice, and create a symbolic link to the rrd file.
 
-```sh
+```bash
 cd /var/nfsen/profiles-stat/sitea/
 ln -s mychannel.rrd librenmsdeviceIP.rrd
 ```

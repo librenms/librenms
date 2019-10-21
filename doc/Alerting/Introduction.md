@@ -20,7 +20,7 @@ template, it is limited in the data that you will receive in the alerts.
 
 [Configuring alert templates](Templates.md)
 
-### Managing alerts
+## Managing alerts
 
 When an alert has triggered you will see these in the Alerts ->
 Notifications page within the Web UI.
@@ -28,7 +28,7 @@ Notifications page within the Web UI.
 This list has a couple of options available to it and we'll explain
 what these are here.
 
-#### ACK
+### ACK
 
 This column provides you visibility on the status of the alert:
 
@@ -43,7 +43,7 @@ currently acknowledged until the alert worsens or gets
 better, at which stage it will be automatically unacknowledged and
 alerts will resume. Click this icon to un-acknowledge the alert.
 
-#### Notes
+### Notes
 
 ![alert notes](img/notes.png) This column will allow you access to the
 acknowledge/unacknowledge notes for this alert.
