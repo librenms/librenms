@@ -94,6 +94,9 @@ SOCKGROUP=librenms
 BASE_OPTIONS="-B -F -R"
 ```
 
+Note: there's an issue between RRDCached and Smokeping:
+https://docs.librenms.org/Extensions/Smokeping/#Issues
+
 2: Fix permissions
 
 ```bash
