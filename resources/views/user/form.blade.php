@@ -20,7 +20,7 @@
         <div class="checkbox">
             <label class="checkbox-inline">
                 <input type="hidden" value="0" name="enabled">
-                <input type="checkbox" id="enabled" name="enabled" @if(old('enabled', $user->enabled)) checked @endif> @lang('Enabled')
+                <input type="checkbox" id="enabled" name="enabled" @if(old('enabled', $user->enabled)) checked @endif @if(Auth::id() == $user->user_id) disabled @endif>@lang('Enabled')
             </label>
         </div>
         <span class="help-block">{{ $errors->first('enabled') }}</span>
