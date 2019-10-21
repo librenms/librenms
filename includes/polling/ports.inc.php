@@ -81,6 +81,20 @@ $cisco_oids = array(
     'locIfOutputQueueDrops',
 );
 
+/*
+ * CISCO-IF-EXTENSION MIB
+ */
+$cisco_if_extension_oids = array(
+    'cieIfInRuntsErrs',
+    'cieIfInGiantsErrs',
+    'cieIfInFramingErrs',
+    'cieIfInOverrunErrs',
+    'cieIfInIgnored',
+    'cieIfInAbortErrs',
+    'cieIfInputQueueDrops',
+    'cieIfOutputQueueDrops'
+);
+
 $pagp_oids = array(
     'pagpOperationMode',
 );
@@ -416,6 +430,16 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortEncapsulationOperType', $port_stats, 'CISCO-VTP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortNativeVlan', $port_stats, 'CISCO-VTP-MIB');
 }//end if
+
+/*
+ *  Most (all) of the IOS/IOS-XE devices support CISCO-IF-EXTENSION MIB that provides
+ *  additional informationa bout input and output errors as seen in `show interface` output.
+ */
+if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
+    foreach ($cisco_if_extension_oids as $oid) {
+        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-IF-EXTENSION-MIB');
+    }
+}
 
 $polled = time();
 
@@ -864,7 +888,7 @@ foreach ($ports as $port) {
             // Add delta rate between current poll and last poll.
             $fields['ifInBits_rate'] = $port['stats']['ifInBits_rate'];
             $fields['ifOutBits_rate'] = $port['stats']['ifOutBits_rate'];
-            
+
             prometheus_push($device, 'ports', rrd_array_filter($tags), $fields);
             influx_update($device, 'ports', rrd_array_filter($tags), $fields);
             graphite_update($device, 'ports|' . $ifName, $tags, $fields);
@@ -897,6 +921,10 @@ foreach ($ports as $port) {
             // Do PoE MIBs
             if (Config::get('enable_ports_poe')) {
                 include 'ports/port-poe.inc.php';
+            }
+
+            if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
+                include 'ports/cisco-if-extension.inc.php';
             }
         }
 
