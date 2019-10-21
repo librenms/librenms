@@ -1068,7 +1068,7 @@
             "order": 6,
             "type": "text",
             "validate": {
-                "value": "^[a-zA-Z0-9_\\-.]+$"
+                "value": "ip_or_hostname"
             },
             "when": {
                 "setting": "email_backend",
@@ -3404,7 +3404,7 @@
             "order": 1,
             "type": "text",
             "validate": {
-                "value": "regex:^[a-zA-Z0-9]{1,5}://.*$"
+                "value": "regex:/^[a-zA-Z0-9]{1,5}://.*$/"
             }
         },
         "page_refresh": {

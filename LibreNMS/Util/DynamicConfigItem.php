@@ -74,6 +74,11 @@ class DynamicConfigItem implements \ArrayAccess
         } elseif ($this->type == 'select') {
             return in_array($value, array_keys($this->options));
         } elseif ($this->type == 'email') {
+            // allow email format that includes display text
+            if (preg_match('/.* <(.*)>/', $value, $matches)) {
+                $value = $matches[1];
+            }
+
             return filter_var($value, FILTER_VALIDATE_EMAIL);
         } elseif ($this->type == 'array') {
             return is_array($value); // this should probably have more complex validation via validator rules
