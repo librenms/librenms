@@ -138,7 +138,7 @@ class Api extends Transport
                 [
                     'title' => 'body',
                     'name' => 'api-body',
-                    'descr' => 'Enter the body (only used by 'PUT' method, discarded otherwise)',
+                    'descr' => 'Enter the body (only used by PUT method, discarded otherwise)',
                     'type' => 'textarea',
                 ],
                 [
