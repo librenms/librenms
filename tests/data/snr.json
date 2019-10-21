@@ -13,7 +13,7 @@
                     "os": "snr",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "snr.png",
                     "location": null
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "snr",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "snr.png",
                     "location": "<private>"
                 }
             ]
