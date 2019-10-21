@@ -14,7 +14,7 @@
     </div>
 </div>
 
-@if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
+@if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
 <div class="form-group @if($errors->has('enabled')) has-error @endif">
     <div class="col-sm-9 col-sm-offset-3">
         <div class="checkbox">
