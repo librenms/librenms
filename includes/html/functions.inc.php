@@ -787,11 +787,6 @@ function generate_ap_url($ap, $vars = array())
     return generate_url(array('page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoint', 'ap' => $ap['accesspoint_id']), $vars);
 }//end generate_ap_url()
 
-function report_this_text($message)
-{
-    return $message . '\nPlease report this to the ' . Config::get('project_name') . ' developers at ' . Config::get('project_issues') . '\n';
-}//end report_this_text()
-
 
 // Find all the files in the given directory that match the pattern
 
