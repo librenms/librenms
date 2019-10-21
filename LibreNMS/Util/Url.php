@@ -46,6 +46,10 @@ class Url
      */
     public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
+        if (!$device->canAccess(Auth::user())) {
+            return $device->displayName();
+        }
+
         if (!$start) {
             $start = Carbon::now()->subDay(1)->timestamp;
         }
@@ -107,11 +111,7 @@ class Url
             $link = Url::overlibLink($url, $text, $contents, $class);
         }
 
-        if ($device->canAccess(Auth::user())) {
-            return $link;
-        } else {
-            return $device->displayName();
-        }
+        return $link;
     }
 
     /**
