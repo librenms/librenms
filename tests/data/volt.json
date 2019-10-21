@@ -1,0 +1,40 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.17095",
+                    "sysDescr": "VoltTest",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "volt",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "generic.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.17095",
+                    "sysDescr": "VoltTest",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "volt",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "generic.svg",
+                    "location": "<private>"
+                }
+            ]
+        }
+    }
+}
