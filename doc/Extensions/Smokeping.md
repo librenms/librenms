@@ -321,7 +321,7 @@ dyndir = /opt/librenms/rrd/smokeping/__cgi
 And give to smokeping rights to access files
 
 ```bash
-sudo adduser smokeping librenms
+sudo usermod -a -G librenms smokeping
 ```
 
 Restart smokeping service
