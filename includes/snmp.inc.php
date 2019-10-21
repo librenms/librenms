@@ -267,7 +267,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     $time_start = microtime(true);
 
     if (strstr($oid, ' ')) {
-        echo "snmp_get called for multiple OIDs: $oid";
+        echo report_this_text("snmp_get called for multiple OIDs: $oid");
     }
 
     $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
