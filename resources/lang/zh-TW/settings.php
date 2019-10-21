@@ -309,6 +309,10 @@ return [
         'distributed_poller' => [
             'description' => 'Enable Distributed Polling (requires additional setup)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/'
+        ],        
+        'distributed_poller_group' => [
+            'description' => 'Default Poller Group',
+            'help' => 'The default poller group all pollers should poll if none is set in config.php'
         ],
         'distributed_poller_memcached_host' => [
             'description' => 'Memcached host',
@@ -722,6 +726,7 @@ return [
     ],
     'validate' => [
         'boolean' => ':value is not a valid boolean',
+        'color' => ':value is not a valid hex color code',
         'email' => ':value is not a valid email',
         'integer' => ':value is not an integer',
         'password' => 'The password is incorrect',
