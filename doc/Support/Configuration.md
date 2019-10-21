@@ -459,12 +459,12 @@ Default SNMP options including retry and timeout settings and also
 default version and port.
 
 ```php
-$config['snmp']['timeout'] = 1;            				# timeout in seconds
-$config['snmp']['retries'] = 5;            				# how many times to retry the query
-$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');	# Transports to use
-$config['snmp']['version'] = ['v2c', 'v3', 'v1'];         		# Default versions to use
-$config['snmp']['port'] = 161;						# Default port
-$config['snmp']['exec_timeout'] = 1200;					# execution time limit in seconds
+$config['snmp']['timeout'] = 1;                         # timeout in seconds
+$config['snmp']['retries'] = 5;                         # how many times to retry the query
+$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');    # Transports to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];               # Default versions to use
+$config['snmp']['port'] = 161;                      # Default port
+$config['snmp']['exec_timeout'] = 1200;                 # execution time limit in seconds
 ```
 
 >NOTE: `timeout` is the time to wait for an answer and `exec_timeout`
@@ -725,26 +725,25 @@ $config['sensors']['guess_limits'] = false;
 
 It is possible to filter some sensors from the configuration:
 
-- Ignore all temperature sensors
+* Ignore all temperature sensors
 
 ```php
 $config['disabled_sensors']['current'] = true;
 ```
 
-- Filter all sensors matching regexp ``` '/PEM Iout/' ```.
+* Filter all sensors matching regexp ```'/PEM Iout/'```.
 
 ```php
 $config['disabled_sensors_regex'][] = '/PEM Iout/';
 ```
 
-- Filter all 'current' sensors for Operating System 'vrp'.
+* Filter all 'current' sensors for Operating System 'vrp'.
 
 ```php
 $config['os']['vrp']['disabled_sensors']['current'] = true;
 ```
 
-- Filter all sensors matching regexp ``` '/PEM Iout/' ``` for 
-Operating System iosxe.
+* Filter all sensors matching regexp ```'/PEM Iout/'``` for Operating System iosxe.
 
 ```php
 $config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';

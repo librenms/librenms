@@ -291,12 +291,12 @@ info-center timestamp debugging short-date without-timezone // Optional
 info-center timestamp log short-date // Optional
 info-center timestamp trap short-date // Optional
 //This is optional config, especially if the device is in public ip and you dont'want to get a lot of messages of ACL
-info-center filter-id bymodule-alias VTY ACL_DENY 
-info-center filter-id bymodule-alias SSH SSH_FAIL 
-info-center filter-id bymodule-alias SNMP SNMP_FAIL 
-info-center filter-id bymodule-alias SNMP SNMP_IPLOCK 
-info-center filter-id bymodule-alias SNMP SNMP_IPUNLOCK 
-info-center filter-id bymodule-alias HTTP ACL_DENY 
+info-center filter-id bymodule-alias VTY ACL_DENY
+info-center filter-id bymodule-alias SSH SSH_FAIL
+info-center filter-id bymodule-alias SNMP SNMP_FAIL
+info-center filter-id bymodule-alias SNMP SNMP_IPLOCK
+info-center filter-id bymodule-alias SNMP SNMP_IPUNLOCK
+info-center filter-id bymodule-alias HTTP ACL_DENY
 ```
 
 ## Huawei SmartAX (GPON OLT)
@@ -311,9 +311,9 @@ loghost activate name librenms
 ```config
 log date-format iso // Required so syslog-ng/LibreNMS can correctly interpret the log message formatting.
 log host x.x.x.x
-log host x.x.x.x level <errors> // Required. A log-level must be specified for syslog messages to send. 
+log host x.x.x.x level <errors> // Required. A log-level must be specified for syslog messages to send.
 log host x.x.x.x level notices program imish // Useful for seeing all commands executed by users.
-log host x.x.x.x level notices program imi // Required for Oxidized Syslog hook log message.  
+log host x.x.x.x level notices program imi // Required for Oxidized Syslog hook log message.
 log host source <eth0>
 ```
 
