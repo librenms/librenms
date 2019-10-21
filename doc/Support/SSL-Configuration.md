@@ -117,7 +117,9 @@ Your VirtualHost for 443 will need to look something like this for LibreNMS
 ```
 
 ### Step 2
+
 Then restart Apache `sudo systemctl restart httpd`
 
 ### Step 3
+
 Follow the rest of the How To, especially if you have the server's firewall enabled.

@@ -42,7 +42,7 @@ commit process. You can do this in two ways:
 
 to be excecuted when you run `git commit`.
 
-2. You can symlink the `pre-commit.php` file so it's executed directly
+1. You can symlink the `pre-commit.php` file so it's executed directly
    on a `git commit`:
 
 `ln -s /opt/librenms/scripts/pre-commit.php /opt/librenms/.git/hooks/pre-commit`

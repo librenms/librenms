@@ -19,7 +19,7 @@ On each of the hosts you would like to use the agent on, you need to do the foll
 
 1: Clone the `librenms-agent` repository:
 
-```shell
+```bash
 cd /opt/
 git clone https://github.com/librenms/librenms-agent.git
 cd librenms-agent
@@ -31,7 +31,7 @@ cd librenms-agent
 | --- | --- |
 | `cp check_mk_agent /usr/bin/check_mk_agent` | `cp check_mk_agent_freebsd /usr/bin/check_mk_agent` |
 
-```shell
+```bash
 chmod +x /usr/bin/check_mk_agent
 ```
 
@@ -43,7 +43,7 @@ chmod +x /usr/bin/check_mk_agent
 
 4: Create the relevant directories.
 
-```shell
+```bash
 mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 ```
 

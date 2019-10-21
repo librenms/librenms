@@ -71,7 +71,7 @@ snmp-server host <INTERFACE> <LIBRENMS-IP> poll version 3 <USER-NAME>
 
 ```
 # SNMPv2c
- 
+
 snmp-server community <YOUR-COMMUNITY> RO
 snmp-server contact <YOUR-CONTACT>
 snmp-server location <YOUR-LOCATION>
@@ -85,7 +85,7 @@ snmp-server location <YOUR-LOCATION>
 
 # Note: The following is also required if using SNMPv3 and you want to populate the FDB table.
 
-snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix 
+snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix
 ```
 >Note: If the device is unable to find the SNMP user, reboot the ASA. Once rebooted, continue the steps as normal.
 

@@ -24,6 +24,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?asn=123
 ```
 
 Output:
+
 ```json
 {
  "status": "ok",
@@ -188,6 +189,7 @@ Output:
 }
 
 ```
+
 ### `get_network_ip_addresses`
 
 Get all IPv4 and IPv6 addresses for particular network.
@@ -358,6 +360,7 @@ Input:
 - vrfname = The VRF name you would like to filter by
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/vrf?hostname=host.example.com
