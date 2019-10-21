@@ -1438,7 +1438,7 @@ account_identifier = Defines how accounts are listed.
                      Options are: name, email
 hide_monitoring_account = With this Boolean you can hide the Account which you
                           use to access Seafile API
-
+```
 
 # SMART
 
