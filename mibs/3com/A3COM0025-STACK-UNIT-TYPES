@@ -1,0 +1,303 @@
+-- **********************************************************************
+--
+-- Name:        3Com SuperStack II/3 Stack Unit Types & Identifiers
+--
+-- Description:
+--
+--
+-- History  Date        Reason for Change
+--
+-- 1.00     1997        Issued as 3Com RFC.
+-- 1.01     11 Sep 97   Rename Hub110 to Dual Speed Hub 500
+-- 1.02      7 April 98 Add descriptions for the various products
+-- 1.03     26 May 98   Add sysObjID for stackSwitch3400 (popadom)
+-- 1.04     18 Aug 98   Add unitTypes for stackSwitch3400 (popadom)
+-- 1.05     19 Jan 99   Add sysObjID, unitTypes for stackSwitchMadras
+--                              This will be renamed when a product name is assigned.
+-- 1.06     28 Jan 99   Add sysObjID, unitTypes for stackSwitchGerry
+--                              This will be renamed when a product name is assigned.
+-- 1.07     19 Feb 99   Add sysObjID, unitTypes for stackSwitchBeefy
+--                              This will be renamed when a product name is assigned.
+-- 1.08     16 Mar 99   Add sysObjID, unitTypes for stackSwitchAsterix
+--                              This will be renamed when a product name is assigned.
+-- 1.09     28 Jun 99   Add unitType for 3300 XM
+-- 1.10     29 Jun 99   Add unitType for a 24 port Gerry
+-- 1.11 3  Feb 2000 Add unitType for 3300XMa 3300MM, 3300SM, 3300TM
+-- 1.12 4  Feb 2000 Rename Madras to Switch 4400
+-- 1.13 27 Apr 2000 Add 2 new unitTypes. One for a 12 port fibre Gerry
+--                              and one for a 24 port fibre Gerry.
+-- 1.14 6  Jun 2000 Add unitType for SuperStack 3 versions of the
+--                              3300, 3300XM 3300MM, 3300SM and 3300TM
+-- 1.15 23 Jun 2000 Add sysObjID, unitTypes for VCN switches
+-- 2.00 20 Sept 2000 Add unitTypes for 48port switch Mosquito
+-- 2.01 2 Oct 2000 Add unitTypes for Gerry+12 and update Gerry24
+-- 2.01 17 Nov 2000 Add sysObjID, unitTypes for Web Caches
+-- 2.02 8 Jan 2001 Paola Biti  Modified Web cache sysObjIDs
+-- 2.03 31Jan 2001 Paola Biti  Added stack24Port101001000BaseSXGBICSwitch
+-- 2.04 4 Jun 2001 Paola Biti/Tom Tanner Added 4960R unit
+-- 2.05 18 Sep 2001 Robert Coward Added reserved FlexPlus block
+-- 2.06 21 November 2001 Paola Biti/Paul Cramphorn
+-- stack24Port10100BaseTxSwitch2T
+-- stack24Port10100BaseTxSwitch2Sx
+-- stack48Port10100BaseTxSwitch2T
+-- stack48Port10100BaseTxSwitch2Sx
+
+-- 2.07 21 November 2001 Paola Biti/Allan Turner
+-- flexPlusSwitch
+
+-- 2.09 22 November 2001 Paola Biti/Paul Cramphorn
+-- stackSwitch4200
+
+-- 2.10 13 February 2002 Paola Biti/Michael Pieri
+-- stackSwitch4400 SE
+
+-- 2.11 25 February 2002 Paola Biti/Robert Coward
+-- stack32Port101001000BaseTSFPRswitch
+-- Paola Biti/Iain Kenney
+-- stack24Port10100BaseTxSwitch2T2G
+
+-- 2.12 21 May 2002 Paola Biti/William Roose
+-- stack24Port10100BaseTxSwitchPower
+
+-- 2.13 07 June 2002 Paola Biti/Colin Currie
+-- changed flexPlusSwitch to stackSwitch40x0
+-- xRNFabric, a dummy sysobject id required for Network Supervisor
+
+-- 2.14 21 January 2003 Paola Biti/Chris Smith
+-- stack24Port10100BaseTxSwitchFX  
+
+-- 2.15 17 February 2003 Paola Biti/Darren Moran
+-- stack24Port101001000SFPSwitch
+
+-- 2.16 12 March 2003 Paola Biti/Peter Saunderson
+-- stack24101001000BaseXSFP
+-- stack48101001000BaseXSFP
+-- stackSwitch4500
+
+-- 2.17 20 October 2003 Paola Biti/Malcolm Dodds
+-- added stackSecureIX50  
+-- added stackSecureIX100 
+-- added stackSecureIX500 
+
+
+-- **********************************************************************
+-- Copyright (c) 3Com Corporation. All Rights Reserved.
+-- **********************************************************************
+
+A3COM0025-STACK-UNIT-TYPES DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      stackSysObjIdentities, stackUnitTypes FROM A3COM0352-STACK-CONFIG
+      OBJECT-TYPE FROM RFC-1212
+      ;
+
+-- Define all possible sysObjectIDs values as a branch from this MIB.
+-- Note that to allow dumb management applications to distinguish between
+-- different products we are going to allocate a different sysObjID to each
+-- product category (but not different port configurations etc). This
+-- allocation will be hierarchical so where necessary we can have a family
+-- ID then a sub-family value.
+
+-- Note that for historical reasons the PSHub40 and PSHub50 will use the
+-- root of this tree. They will use stackDistributedAgent.
+--
+-- NOTE ALSO THAT ALL 3COM APPLICATIONS SHOULD DO A PARTIAL MATCH ON
+-- sysObjectIDs AGAINST stackDistributedAgent. ALL CHILDREN OF THESE VALUES
+-- SHOULD BE TREATED AS SUPERSTACK II/3 DISTRIBUTED AGENTS AND APPLICATIONS
+-- SHOULD BASE AGENT CAPABILITIES ON THE ACTUAL VALUE READ. INSTEAD
+-- APPLICATIONS SHOULD USE THE CONTENTS OF THE STACK CONFIGURATION MIB,
+-- AGENT CAPABILITIES VALUE TO DETERMINE WHAT THE AGENT CAN DO!
+--
+stackDistributedAgent      OBJECT IDENTIFIER ::= {stackSysObjIdentities 1}
+
+stackHub                   OBJECT IDENTIFIER ::= {stackDistributedAgent 1}
+stackSwitch                OBJECT IDENTIFIER ::= {stackDistributedAgent 2}
+stackAppliance             OBJECT IDENTIFIER ::= {stackDistributedAgent 3}
+
+stackDualSpeedHub500              OBJECT IDENTIFIER ::= {stackHub 1}
+
+stackSwitch1100                   OBJECT IDENTIFIER ::= {stackSwitch 1}
+stackSwitch3300                   OBJECT IDENTIFIER ::= {stackSwitch 2}
+stackSwitch3400                   OBJECT IDENTIFIER ::= {stackSwitch 3}
+stackSwitch4400                   OBJECT IDENTIFIER ::= {stackSwitch 4}
+stackSwitch4900                   OBJECT IDENTIFIER ::= {stackSwitch 5}
+stackSwitchBeefy                  OBJECT IDENTIFIER ::= {stackSwitch 6}
+stackSwitchBluetooth              OBJECT IDENTIFIER ::= {stackSwitch 7}
+stackSwitchVCN2010                OBJECT IDENTIFIER ::= {stackSwitch 8}
+stackSwitchVCN2100                OBJECT IDENTIFIER ::= {stackSwitch 9}
+stackSwitch40x0                   OBJECT IDENTIFIER ::= {stackSwitch 10}
+stackSwitch4200                   OBJECT IDENTIFIER ::= {stackSwitch 11}
+xRNFabric                         OBJECT IDENTIFIER ::= {stackSwitch 12}
+stackSwitch4500                   OBJECT IDENTIFIER ::= {stackSwitch 13}
+
+-- The sysObjectIDs for the Web Cache 1000 and 3000
+stackWebCache1000                 OBJECT IDENTIFIER ::= {stackAppliance 1}
+stackWebCache3000                 OBJECT IDENTIFIER ::= {stackAppliance 2}
+
+-- The stackUnitType is an integer id which applications can use to
+-- distinguish between different hardware devices in a stack. In order to
+-- administer these values the integer will be defined as the last level in
+-- an OID. The values are defined below. Note that these id's will also be
+-- used for other MIBs which require an OID to identify a unit type. For
+-- example rptrGroupObjectID.
+
+-- PSHub 40
+stack12Port10BaseTRepeater        OBJECT IDENTIFIER ::= {stackUnitTypes 1}
+stack24Port10BaseTRepeater        OBJECT IDENTIFIER ::= {stackUnitTypes 2}
+
+-- PSHub 50
+stack24Port10BaseTRepeaterSwitch  OBJECT IDENTIFIER ::= {stackUnitTypes 3}
+
+-- Dual Speed Hub 500
+stack12Port100BaseTxRepeater      OBJECT IDENTIFIER ::= {stackUnitTypes 4}
+stack24Port100BaseTxRepeater      OBJECT IDENTIFIER ::= {stackUnitTypes 5}
+stack12Port10100BaseTxRepeater    OBJECT IDENTIFIER ::= {stackUnitTypes 6}
+stack24Port10100BaseTxRepeater    OBJECT IDENTIFIER ::= {stackUnitTypes 7}
+
+-- Switch 1100
+stack12Port10BaseTSwitch          OBJECT IDENTIFIER ::= {stackUnitTypes 8}
+stack24Port10BaseTSwitch          OBJECT IDENTIFIER ::= {stackUnitTypes 9}
+
+-- Switch 3300 (SuperStack II)
+stack12Port10100BaseTxSwitch      OBJECT IDENTIFIER ::= {stackUnitTypes 10}
+stack24Port10100BaseTxSwitch      OBJECT IDENTIFIER ::= {stackUnitTypes 11}
+
+-- Switch 610a Fixed Configuration
+stack24Port10BaseTFixedSwitch     OBJECT IDENTIFIER ::= {stackUnitTypes 12}
+
+-- Switch 630a Fixed Configuration
+stack24Port10100BaseTxFixedSwitch OBJECT IDENTIFIER ::= {stackUnitTypes 13}
+
+-- Switch 3300 (SuperStack II)
+stack8Port100BaseFXSwitch         OBJECT IDENTIFIER ::= {stackUnitTypes 14}
+
+-- Switch 3400 (this was never released)
+stack12Port10100BaseTxSwitch2     OBJECT IDENTIFIER ::= {stackUnitTypes 15}
+stack24Port10100BaseTxSwitch2     OBJECT IDENTIFIER ::= {stackUnitTypes 16}
+
+-- Switch 4400 = Spitfire
+stack12Port10100BaseTxSwitch3     OBJECT IDENTIFIER ::= {stackUnitTypes 17}
+stack24Port10100BaseTxSwitch3     OBJECT IDENTIFIER ::= {stackUnitTypes 18}
+
+-- Switch 4900: Gerry 12 with 100/1000
+stack12Port1001000BaseTxSwitch    OBJECT IDENTIFIER ::= {stackUnitTypes 19}
+
+-- Switch Beefy (this was never released)
+stack12Port10100BaseTxSwitch4     OBJECT IDENTIFIER ::= {stackUnitTypes 20}
+stack24Port10100BaseTxSwitch4     OBJECT IDENTIFIER ::= {stackUnitTypes 21}
+
+-- Wireless Asterix (this was never released)
+stack10BaseT1Radio                OBJECT IDENTIFIER ::= {stackUnitTypes 22}
+stack10BaseT4Radio                OBJECT IDENTIFIER ::= {stackUnitTypes 23}
+
+-- Switch 3300 XM (SuperStack II)
+stack24Port10100BaseTxSwitchXM    OBJECT IDENTIFIER ::= {stackUnitTypes 24}
+
+-- Switch 4900: Gerry 24 with 10/100/1000
+stack24Port101001000BaseTxSwitch  OBJECT IDENTIFIER ::= {stackUnitTypes 25}
+
+-- Switch 3300 MM (SuperStack II)
+stack24Port10100BaseTxSwitchMM    OBJECT IDENTIFIER ::= {stackUnitTypes 26}
+
+-- Switch 3300 SM (SuperStack II)
+stack24Port10100BaseTxSwitchSM    OBJECT IDENTIFIER ::= {stackUnitTypes 27}
+
+-- Switch 3300 TM (SuperStack II)
+stack24Port10100BaseTxSwitchTM    OBJECT IDENTIFIER ::= {stackUnitTypes 28}
+
+-- Switch 3300 XMA (SuperStack II)
+stack24Port10100BaseTxSwitchXMA   OBJECT IDENTIFIER ::= {stackUnitTypes 29}
+
+-- Switch 4912 fibre
+stack12Port1000BaseSxSwitch       OBJECT IDENTIFIER ::= {stackUnitTypes 30}
+
+-- Switch 4924 fibre
+stack24Port1000BaseSxSwitch       OBJECT IDENTIFIER ::= {stackUnitTypes 31}
+
+-- Switch 3300 MM (SuperStack 3)
+stack24Port10100BaseTxSwitchMM2   OBJECT IDENTIFIER ::= {stackUnitTypes 32}
+
+-- Switch 3300 SM (SuperStack 3)
+stack24Port10100BaseTxSwitchSM2   OBJECT IDENTIFIER ::= {stackUnitTypes 33}
+
+-- Switch 3300 TM (SuperStack 3)
+stack24Port10100BaseTxSwitchTM2   OBJECT IDENTIFIER ::= {stackUnitTypes 34}
+
+-- Switch 3300 XMA (SuperStack 3)
+stack24Port10100BaseTxSwitchXM2   OBJECT IDENTIFIER ::= {stackUnitTypes 35}
+
+-- Switch 3300 (SuperStack 3)
+stack12Port10100BaseTxSwitch5     OBJECT IDENTIFIER ::= {stackUnitTypes 36}
+stack24Port10100BaseTxSwitch5     OBJECT IDENTIFIER ::= {stackUnitTypes 37}
+
+-- Switch 3300 FX (SuperStack 3)
+stack8Port100BaseFXSwitch2        OBJECT IDENTIFIER ::= {stackUnitTypes 38}
+
+-- 3CV2010 -> 3com VCN Services Switch 10 for Visitor Based Networking
+-- 3CV2100 -> 3com VCN Services Switch 100 for Visitor Based Networking
+stack24Port10BaseTSwitchVCN       OBJECT IDENTIFIER ::= {stackUnitTypes 39}
+stack24Port100BaseTxSwitchVCN     OBJECT IDENTIFIER ::= {stackUnitTypes 40}
+
+-- Switch 4400 - 48 port = Mosquito
+stack48Port10100BaseTxSwitch3     OBJECT IDENTIFIER ::= {stackUnitTypes 41}
+
+-- Switch 4900: Gerry 12 with 10/100/1000
+stack12Port101001000BaseTxSwitch  OBJECT IDENTIFIER ::= {stackUnitTypes 42}
+
+-- Web Cache 1000 and 3000
+stackWebCache1000UnitType         OBJECT IDENTIFIER ::= { stackUnitTypes 43}
+stackWebCache3000UnitType         OBJECT IDENTIFIER ::= { stackUnitTypes 44}
+
+-- Switch 4900: Gerry 12 with 10/100/1000 + SX + GBIC
+stack24Port101001000BaseTSXGBICSwitch OBJECT IDENTIFIER ::= { stackUnitTypes 45}
+
+-- Switch 4060R: Gerry 12 fibre + 6 copper +  6 GBIC
+stack24Port101001000BaseTSXGBICRswitch  OBJECT IDENTIFIER ::= { stackUnitTypes 46}
+
+-- Switch 4050R: Gerry 12 copper + 6 fibre +  6 GBIC
+stack24Port101001000BaseTSXGBICR2switch  OBJECT IDENTIFIER ::= { stackUnitTypes 47}
+
+-- Switch : Hardcore 24 copper  + 8 SFS
+stack32Port101001000BaseTSFPRswitch  OBJECT IDENTIFIER ::= { stackUnitTypes 48}
+
+-- Switch 4500 20 Base-T 4 BaseX SFP
+stack24101001000BaseXSFP        OBJECT IDENTIFIER ::= {stackUnitTypes 49}
+
+-- Switch 4500 48 Base-T 
+stack48101001000BaseXSFP        OBJECT IDENTIFIER ::= {stackUnitTypes 50}
+
+-- Hardcore Reserved block for future products
+stackFlexPlusReserved4        OBJECT IDENTIFIER ::= {stackUnitTypes 51}
+stackFlexPlusReserved5        OBJECT IDENTIFIER ::= {stackUnitTypes 52}
+stackFlexPlusReserved6        OBJECT IDENTIFIER ::= {stackUnitTypes 53}
+stackFlexPlusReserved7        OBJECT IDENTIFIER ::= {stackUnitTypes 54}
+stackFlexPlusReserved8        OBJECT IDENTIFIER ::= {stackUnitTypes 55}
+
+-- Switch 4200
+stack24Port10100BaseTxSwitch2T   OBJECT IDENTIFIER ::= {stackUnitTypes 56}
+
+stack24Port10100BaseTxSwitch2T2G OBJECT IDENTIFIER ::= {stackUnitTypes 57}
+
+stack48Port10100BaseTxSwitch2T   OBJECT IDENTIFIER ::= {stackUnitTypes 58}
+
+-- obsolete
+stack48Port10100BaseTxSwitch2Sx  OBJECT IDENTIFIER ::= {stackUnitTypes 59}
+
+-- Switch 4400 SE
+stack24Port10100BaseTxSwitchSE   OBJECT IDENTIFIER ::= {stackUnitTypes 60}
+
+-- Switch 4400 PWR 24-port
+stack24Port10100BaseTxSwitchPower OBJECT IDENTIFIER ::= {stackUnitTypes 61}
+
+-- Switch 4400 FX 24-port
+stack24Port10100BaseTxSwitchFX  OBJECT IDENTIFIER ::= {stackUnitTypes 62}
+
+-- Switch 4070 24 10/100/1000 SFP
+stack24Port101001000SFPSwitch OBJECT IDENTIFIER ::= {stackUnitTypes 63}
+
+-- secure firewall
+stackSecureIX50Firewall  OBJECT IDENTIFIER ::= {stackUnitTypes 64}
+stackSecureIX100Firewall OBJECT IDENTIFIER ::= {stackUnitTypes 65}
+stackSecureIX500Firewall OBJECT IDENTIFIER ::= {stackUnitTypes 66}
+
+END

@@ -7,4 +7,9 @@ if (strpos($device['sysDescr'], 'Software')) {
 } else {
     $hardware = str_replace("3Com ", '', $device['sysDescr']);
     $version='';
+    if (preg_match('/stackSwitch(.+)/', snmp_get($device, 'sysObjectID.0', '-Osqv', 'A3COM0025-STACK-UNIT-TYPES'), $model)) {
+        // stackSwitch4200
+        $hardware.= ' ' . $model[1];
+    }
 }
+
