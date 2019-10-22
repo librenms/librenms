@@ -2382,7 +2382,7 @@ function dump_db_schema()
             $output[$table]['Columns'][] = $def;
         }
 
-        foreach (dbFetchRows("SHOW INDEX FROM `$table`") as $key) {
+        foreach (array_sort_by_column(dbFetchRows("SHOW INDEX FROM `$table`"), 'Key_name') as $key) {
             $key_name = $key['Key_name'];
             if (isset($output[$table]['Indexes'][$key_name])) {
                 $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
