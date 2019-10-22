@@ -31,6 +31,7 @@ use App\Models\Port;
 use App\Models\User;
 use Auth;
 use DB;
+use LibreNMS\Config;
 
 class Permissions
 {
@@ -193,7 +194,18 @@ class Permissions
     public function getDevicePermissions()
     {
         if (is_null($this->devicePermissions)) {
-            $this->devicePermissions = DB::table('devices_perms')->get();
+            $this->devicePermissions = DB::table('devices_perms')
+                ->union(
+                    DB::table('devices_group_perms')
+                        ->select('devices_group_perms.user_id', 'devices.device_id')
+                        ->join('device_group_device', 'device_group_device.device_group_id', '=', 'devices_group_perms.device_group_id')
+                        ->join('devices', 'devices.device_id', '=', 'device_group_device.device_id')
+                        ->when(!Config::get('permission.device_group.user_allow_dynamic'), function ($query) {
+                            return $query
+                                ->join('device_groups', 'device_groups.id', '=', 'devices_group_perms.device_group_id')
+                                ->where('device_groups.type', 'static');
+                        })
+                )->get();
         }
 
         return $this->devicePermissions;

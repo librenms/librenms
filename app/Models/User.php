@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use LibreNMS\Authentication\LegacyAuth;
+use Permissions;
 
 class User extends Authenticatable
 {
@@ -83,7 +84,7 @@ class User extends Authenticatable
      */
     public function canAccessDevice($device)
     {
-        return $this->hasGlobalRead() || $this->devices->contains($device);
+        return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
     }
 
     /**

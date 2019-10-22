@@ -4503,6 +4503,13 @@
         "xirrus_disable_stations": {
             "default": false,
             "type": "boolean"
+        },
+        "permission.device_group.user_allow_dynamic": {
+            "default": false,
+            "group": "authorization",
+            "order": 1,
+            "section": "device-group",
+            "type": "boolean"
         }
     }
 }

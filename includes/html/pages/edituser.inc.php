@@ -32,6 +32,18 @@ if (! Auth::user()->hasGlobalAdmin()) {
             }
         }
 
+        if ($vars['action'] == 'deldevgroupperm') {
+            if (dbFetchCell('SELECT COUNT(*) FROM devices_group_perms WHERE `device_group_id` = ? AND `user_id` = ?', array($vars['device_group_id'], $user_data['user_id']))) {
+                dbDelete('devices_group_perms', '`device_group_id` =  ? AND `user_id` = ?', array($vars['device_group_id'], $user_data['user_id']));
+            }
+        }
+
+        if ($vars['action'] == 'adddevgroupperm') {
+            if (!dbFetchCell('SELECT COUNT(*) FROM devices_group_perms WHERE `device_group_id` = ? AND `user_id` = ?', array($vars['device_group_id'], $user_data['user_id']))) {
+                dbInsert(array('device_group_id' => $vars['device_group_id'], 'user_id' => $user_data['user_id']), 'devices_group_perms');
+            }
+        }
+
         if ($vars['action'] == 'delifperm') {
             if (dbFetchCell('SELECT COUNT(*) FROM ports_perms WHERE `port_id` = ? AND `user_id` = ?', array($vars['port_id'], $user_data['user_id']))) {
                 dbDelete('ports_perms', '`port_id` =  ? AND `user_id` = ?', array($vars['port_id'], $user_data['user_id']));
@@ -112,7 +124,65 @@ if (! Auth::user()->hasGlobalAdmin()) {
            </div>
            <button type='submit' class='btn btn-default' name='Submit'>Add</button></form>";
 
-        echo "</div>
+        echo '</div>
+           <div class="col-md-4">';
+
+        // Display devices this users has access to
+        echo '<h3>Device access via Device Group (beta)</h3>';
+
+        echo "<div class='panel panel-default panel-condensed'>
+            <table class='table table-hover table-condensed table-striped'>
+              <tr>
+                <th>Device Group</th>
+                <th>Action</th>
+              </tr>";
+
+        $devices_group_perms = dbFetchRows('SELECT DGP.device_group_id, DP.name from devices_group_perms DGP INNER JOIN device_groups DP ON DP.id = DGP.device_group_id  WHERE DGP.user_id = ?', array($user_data['user_id']));
+        foreach ($devices_group_perms as $device_group_perm) {
+            echo '<tr><td><strong>'.$device_group_perm['name']."</td><td> <a href='edituser/action=deldevgroupperm/user_id=".$vars['user_id'].'/device_group_id='.$device_group_perm['device_group_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
+            $access_group_list[] = $device_group_perm['device_group_id'];
+            $permgroupdone      = 'yes';
+        }
+
+        echo '</table>
+          </div>';
+
+        if (!$permgroupdone) {
+            echo 'None Configured';
+        }
+
+        // Display device groups this user doesn't have access to
+        echo '<h4>Grant access to new Device Group</h4>';
+        echo "<form class='form-inline' role='form' method='post' action=''>
+            " . csrf_field() . "
+            <input type='hidden' value='".$user_data['user_id']."' name='user_id'>
+            <input type='hidden' value='edituser' name='page'>
+            <input type='hidden' value='adddevgroupperm' name='action'>
+            <div class='form-group'>
+              <label class='sr-only' for='device_group_id'>Device</label>
+              <select name='device_group_id' id='device_group_id' class='form-control'>";
+
+        $device_groups = dbFetchRows('SELECT id, name FROM `device_groups` ORDER BY name');
+        foreach ($device_groups as $group) {
+            unset($done);
+            foreach ($access_group_list as $ac) {
+                if ($ac == $group['id']) {
+                    $done = 1;
+                }
+            }
+
+            if (!$done) {
+                echo "<option value='".$group['id']."'>".$group['name'].'</option>';
+            }
+        }
+
+        echo "</select>
+           </div>
+           <button type='submit' class='btn btn-default' name='Submit'>Add</button></form>";
+
+        echo "</div></div>
+
+        <div class='row'>
           <div class='col-md-4'>";
         echo '<h3>Interface Access</h3>';
 
@@ -143,7 +213,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             echo 'None Configured';
         }
 
-        // Display devices this user doesn't have access to
+        // Display interfaces this user doesn't have access to
         echo '<h4>Grant access to new interface</h4>';
 
         echo "<form action='' method='post' class='form-horizontal' role='form'>
