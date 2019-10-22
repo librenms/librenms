@@ -3741,9 +3741,14 @@
                 "git": "Git"
             }
         },
-        "rewrite_if_regexp./^cpu interface/": {
-            "default": "Mgmt",
-            "type": "text"
+        "rewrite_if": {
+            "type": "array"
+        },
+        "rewrite_if_regexp": {
+            "default": {
+                "/^cpu interface/": "Mgmt"
+            },
+            "type": "array"
         },
         "rrd.heartbeat": {
             "default": 600,
