@@ -15,13 +15,13 @@
 @endsection
 
 @push('styles')
-    <link href="{{ mix('/css/app.css') }}?v=10132019" rel="stylesheet">
+    <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
 @endpush
 
 @push('scripts')
     @routes
-    <script src="{{ mix('/js/manifest.js') }}?v=10132019"></script>
-    <script src="{{ mix('/js/vendor.js') }}?v=10132019"></script>
-    <script src="{{ mix('/js/app.js') }}?v=10202019"></script>
+    <script src="{{ mix('/js/manifest.js') }}"></script>
+    <script src="{{ mix('/js/vendor.js') }}"></script>
+    <script src="{{ mix('/js/app.js') }}"></script>
 @endpush
 
