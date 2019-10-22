@@ -14,6 +14,9 @@
                 "type": "object",
                 "properties": {
                     "default": {},
+                    "type": {
+                        "type": "string"
+                    },
                     "section": {
                         "type": "string"
                     },
@@ -58,12 +61,13 @@
                     },
                     "hidden": {
                         "type": "boolean"
-                    },
-                    "additionalProperties": false
+                    }
                 },
+                "required": ["type"],
+                "additionalProperties": false,
                 "anyOf": [
                     {
-                        "properties": { "type": {"const":  "select"} },
+                        "properties": { "type": {"const": "select"} },
                         "required": ["options"]
                     },
                     {
