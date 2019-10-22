@@ -14,25 +14,6 @@
                 "type": "object",
                 "properties": {
                     "default": {},
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "integer",
-                            "text",
-                            "boolean",
-                            "select",
-                            "array",
-                            "password",
-                            "email",
-                            "color",
-                            "float",
-                            "graph",
-                            "dashboard-select",
-                            "snmp3auth",
-                            "ldap-groups",
-                            "ad-groups"
-                        ]
-                    },
                     "section": {
                         "type": "string"
                     },
@@ -77,12 +58,46 @@
                     },
                     "hidden": {
                         "type": "boolean"
-                    }
+                    },
+                    "additionalProperties": false
                 },
-                "required": ["type"],
-                "additionalProperties": false
+                "anyOf": [
+                    {
+                        "properties": { "type": {"const":  "select"} },
+                        "required": ["options"]
+                    },
+                    {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "integer",
+                                    "text",
+                                    "boolean",
+                                    "array",
+                                    "password",
+                                    "email",
+                                    "color",
+                                    "float",
+                                    "graph",
+                                    "dashboard-select",
+                                    "snmp3auth",
+                                    "ldap-groups",
+                                    "ad-groups"
+                                ]
+                            }
+                        },
+                        "not": { "required": ["options"]}
+                    }
+                ],
+                "dependencies": {
+                    "group": { "required": ["order", "section"] },
+                    "order": { "required": ["group", "section"] },
+                    "section": { "required": ["group", "order"] }
+                }
             }
         }
     },
-    "required": ["Warning!", "config"]
+    "required": ["Warning!", "config"],
+    "additionalProperties": false
 }
