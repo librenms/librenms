@@ -1108,12 +1108,12 @@ function port_fill_missing(&$port, $device)
     if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
         $port['ifDescr'] = $port['ifName'];
         d_echo(' Using ifName as ifDescr');
-    } elseif (($device['os'] != 'fabos') && ($port['ifAlias'] == '' || $port['ifAlias'] == null))
+    }
     if (!empty($device['attribs']['ifName:' . $port['ifName']])) {
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
         d_echo(' ifAlias overriden by user');
-    } elseif ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
+    } elseif (($device['os'] != 'fabos') && ($port['ifAlias'] == '' || $port['ifAlias'] == null)) {
         $port['ifAlias'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifAlias');
     }
