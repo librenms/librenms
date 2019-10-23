@@ -28,7 +28,7 @@ class CreateCefSwitchingTable extends Migration
             $table->integer('punt2host_prev');
             $table->unsignedInteger('updated');
             $table->unsignedInteger('updated_prev');
-            $table->unique(['device_id','entPhysicalIndex','afi','cef_index'], 'device_id');
+            $table->unique(['device_id','entPhysicalIndex','afi','cef_index']);
         });
     }
 

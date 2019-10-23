@@ -18,7 +18,11 @@ class CreateDeviceMibsTable extends Migration
             $table->string('module');
             $table->string('mib');
             $table->string('included_by');
-            $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
+            if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+                $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
+            } else {
+                $table->timestamp('last_modified')->useCurrent();
+            }
             $table->primary(['device_id','module','mib']);
         });
     }

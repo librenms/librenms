@@ -1,6 +1,6 @@
 <?php
 /**
- * BasicApiTest.php
+ * SqliteTest.php
  *
  * -Description-
  *
@@ -19,34 +19,20 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2019 Tony Murray
+ * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Unit;
 
-use App\Models\ApiToken;
-use App\Models\Device;
-use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Artisan;
+use LibreNMS\Tests\TestCase;
 
-class BasicApiTest extends DBTestCase
+class SqliteTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function testListDevices()
+    public function testMigrationsRunWithoutError()
     {
-        $user = factory(User::class)->state('admin')->create();
-        $token = ApiToken::generateToken($user);
-        $device = factory(Device::class)->create();
-
-        $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => $token->token_hash])
-            ->assertStatus(200)
-            ->assertJson([
-                "status" => "ok",
-                "devices" => [$device->toArray()],
-                "count"=> 1
-            ]);
+        $result = Artisan::call('migrate', ['--database' => 'testing', '--seed' => true]);
+        $this->assertEquals(0, $result, "SQlite migration failed:\n" . Artisan::output());
     }
 }

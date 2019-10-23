@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', env('DBTEST') ? 'testing' : 'mysql'),
+    'default' => env('DB_CONNECTION', env('DBTEST') ? 'testing_mysql' : 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -46,13 +46,13 @@ return [
 
     'connections' => [
 
-//        'sqlite' => [
-//            'driver' => 'sqlite',
-//            'url' => env('DATABASE_URL'),
-//            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-//            'prefix' => '',
-//            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-//        ],
+        'sqlite' => [
+            'driver' => 'sqlite',
+            'url' => env('DATABASE_URL'),
+            'database' => env('DB_DATABASE', storage_path('librenms.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
 
         'mysql' => [
             'driver' => 'mysql',
@@ -74,7 +74,7 @@ return [
             ]) : [],
         ],
 
-        'testing' => [
+        'testing_mysql' => [
             'driver' => env('DB_TEST_DRIVER', 'mysql'),
             'host' => env('DB_TEST_HOST', 'localhost'),
             'port' => env('DB_TEST_PORT', ''),
@@ -117,10 +117,18 @@ return [
             'prefix_indexes' => true,
         ],
 
-        'memory' => [
+        'testing' => [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
+            'foreign_key_constraints' => true,
+        ],
+
+        'testing_persistent' => [
+            'driver' => 'sqlite',
+            'database' => storage_path('testing.sqlite'),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
         ]
 
     ],

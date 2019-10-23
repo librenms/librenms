@@ -25,11 +25,15 @@
 
 namespace LibreNMS\Tests;
 
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 class AuthSSOTest extends DBTestCase
 {
+    use RefreshDatabase;
+
     private $last_user = null;
     private $original_auth_mech = null;
     private $server;

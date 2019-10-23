@@ -22,7 +22,7 @@ class CreateIpsecTunnelsTable extends Migration
             $table->unsignedInteger('local_port');
             $table->string('tunnel_name', 96);
             $table->string('tunnel_status', 11);
-            $table->unique(['device_id','peer_addr'], 'unique_index');
+            $table->unique(['device_id','peer_addr']);
         });
     }
 
