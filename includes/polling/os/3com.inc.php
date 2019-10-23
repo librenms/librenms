@@ -11,7 +11,6 @@ if (strpos($device['sysDescr'], 'Software')) {
     if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.43.10.27.4.1.')) {
         $oids = ['stackUnitDesc.1', 'stackUnitPromVersion.1', 'stackUnitSWVersion.1', 'stackUnitSerialNumber.1','stackUnitCapabilities.1'];
         $data = snmp_get_multi($device, $oids, ['-OQUs','--hexOutputLength=0'], 'A3COM0352-STACK-CONFIG');
-        print_r($data);
         $hardware .= ' ' . $data[1]['stackUnitDesc'];
         $version = $data[1]['stackUnitSWVersion'];
         $serial = $data[1]['stackUnitSerialNumber'];
