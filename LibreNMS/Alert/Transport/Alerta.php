@@ -16,6 +16,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Config;
 
 class Alerta extends Transport
 {
