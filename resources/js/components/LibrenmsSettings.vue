@@ -60,7 +60,8 @@
         props: {
             prefix: String,
             initialTab: {type: String, default: 'alerting'},
-            initialSection: String
+            initialSection: String,
+            groups: {type: Object}
         },
         data() {
             return {
@@ -125,38 +126,6 @@
         mounted() {
             window.onpopstate = this.handleBack; // handle back button
             axios.get(route('settings.list')).then((response) => this.settings = response.data)
-        },
-        computed: {
-            groups() {
-                // populate layout data
-                let groups = {};
-                for (const key of Object.keys(this.settings)) {
-                    let setting = this.settings[key];
-
-                    // filter
-                    if (!setting.name.includes(this.search_phrase)) {
-                        continue
-                    }
-
-                    if (setting.group) {
-                        if (!(setting.group in groups)) {
-                            groups[setting.group] = {};
-                        }
-
-                        if (setting.section) {
-                            if (!(setting.section in groups[setting.group])) {
-                                groups[setting.group][setting.section] = [];
-                            }
-
-                            // insert based on order
-                            groups[setting.group][setting.section].splice(setting.order, 0, setting.name);
-                        }
-                    }
-                }
-
-                // sort groups
-                return Object.keys(groups).sort().reduce((a, c) => (a[c] = groups[c], a), {});
-            }
         }
     }
 </script>

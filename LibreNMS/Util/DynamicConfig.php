@@ -98,7 +98,10 @@ class DynamicConfig
     {
         /** @var Collection $grouped */
         $grouped = $this->definitions->filter->isValid()->sortBy('group')->groupBy('group')->map(function ($group) {
-            return $group->sortBy('section')->groupBy('section')->map->sortBy('order');
+            return $group->sortBy('section')->groupBy('section')->map(function ($section) {
+                /** @var Collection $section */
+                return $section->sortBy('order')->pluck('name');
+            });
         });
         $grouped->prepend($grouped->pull(''), 'global'); // rename '' to global
         return $grouped;

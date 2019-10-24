@@ -16,11 +16,12 @@ class SettingsController extends Controller
      * @param string $section
      * @return \Illuminate\Http\Response
      */
-    public function index($tab = 'global', $section = '')
+    public function index($tab = 'global', $section = '', DynamicConfig $dynamicConfig)
     {
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
+            'groups' => $dynamicConfig->getGrouped()->forget('global'),
         ];
 
         return view('settings.index', $data);

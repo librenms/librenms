@@ -9,6 +9,7 @@
                 prefix="{{ url('settings') }}"
                 initial-tab="{{ $active_tab }}"
                 initial-section="{{ $active_section }}"
+                :groups="{{ $groups }}"
             ></librenms-settings>
         </div>
     </div>

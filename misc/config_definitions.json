@@ -145,7 +145,10 @@
         },
         "allow_duplicate_sysName": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "general",
+            "order": 0
         },
         "allow_entity_sensor.amperes": {
             "default": true,
@@ -485,7 +488,7 @@
             "units": "days",
             "group": "auth",
             "section": "general",
-            "order": 1,
+            "order": 3,
             "type": "integer"
         },
         "authlog_purge": {
@@ -2834,6 +2837,91 @@
             },
             "type": "array"
         },
+        "graylog.base_uri": {
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 3,
+            "when": {
+                "setting": "graylog.version",
+                "operator": "equals",
+                "value": "other"
+            }
+        },
+        "graylog.device-page.loglevel": {
+            "default": 7,
+            "type": "select",
+            "group": "external",
+            "section": "graylog",
+            "order": 8,
+            "options": {
+                "0": "0",
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
+                "7": "7"
+            }
+        },
+        "graylog.device-page.rowCount": {
+            "default": 10,
+            "type": "integer",
+            "group": "external",
+            "section": "graylog",
+            "order": 9
+        },
+        "graylog.password": {
+            "type": "password",
+            "group": "external",
+            "section": "graylog",
+            "order": 5
+        },
+        "graylog.port": {
+            "type": "integer",
+            "group": "external",
+            "section": "graylog",
+            "order": 1,
+            "validate": {
+                "value": "int|nullable|between:1,65535"
+            }
+        },
+        "graylog.server": {
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 0,
+            "validate": {
+                "value": "nullable|url"
+            }
+        },
+        "graylog.timezone": {
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 6,
+            "validate": {
+                "value": "nullable|timezone"
+            }
+        },
+        "graylog.username": {
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 4
+        },
+        "graylog.version": {
+            "type": "select",
+            "group": "external",
+            "section": "graylog",
+            "order": 2,
+            "options": {
+                "2.0": "Less than 2.1",
+                "2.1": "2.1 or newer",
+                "other": "Other"
+            }
+        },
         "gui.network-map.style": {
             "default": "new",
             "type": "select",
@@ -3084,7 +3172,7 @@
             "default": "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.",
             "group": "auth",
             "section": "general",
-            "order": 3,
+            "order": 4,
             "type": "text"
         },
         "map.engine": {
@@ -3112,6 +3200,15 @@
             "section": "binaries",
             "order": 4,
             "type": "text"
+        },
+        "mydomain": {
+            "type": "text",
+            "group": "discovery",
+            "section": "general",
+            "order": 3,
+            "validate": {
+                "value": "regex:/^(((?!-))(xn--|_{1,1})?[a-z0-9-]{0,61}[a-z0-9]{1,1}\\.)*(xn--)?([a-z0-9][a-z0-9\\-]{0,60}|[a-z0-9-]{1,30}\\.[a-z]{2,})$/"
+            }
         },
         "nagios_plugins": {
             "default": "/usr/lib/nagios/plugins",
@@ -3726,7 +3823,7 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 4,
+            "order": 5,
             "type": "boolean"
         },
         "rancid_ignorecomments": {
@@ -4123,6 +4220,12 @@
         "transit_descr": {
             "default": ["transit"],
             "type": "array"
+        },
+        "twofactor": {
+            "type": "boolean",
+            "group": "auth",
+            "section": "general",
+            "order": 1
         },
         "unix-agent-connection-time-out": {
             "default": 10,
