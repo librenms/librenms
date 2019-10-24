@@ -3741,9 +3741,14 @@
                 "git": "Git"
             }
         },
-        "rewrite_if_regexp./^cpu interface/": {
-            "default": "Mgmt",
-            "type": "text"
+        "rewrite_if": {
+            "type": "array"
+        },
+        "rewrite_if_regexp": {
+            "default": {
+                "/^cpu interface/": "Mgmt"
+            },
+            "type": "array"
         },
         "rrd.heartbeat": {
             "default": 600,
@@ -4152,12 +4157,14 @@
             "default": 1,
             "group": "system",
             "section": "updates",
+            "order": 0,
             "type": "boolean"
         },
         "update_channel": {
             "default": "master",
             "group": "system",
             "section": "updates",
+            "order": 1,
             "type": "select",
             "options": {
                 "master": "master",
