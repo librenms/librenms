@@ -154,7 +154,7 @@ $(document).on("click", '.collapse-neighbors', function(event)
 
 //availability-map mode change
 $(document).on("change", '#mode', function() {
-    $.post('ajax_mapview.php',
+    $.post('ajax/set_map_view',
         {
             map_view: $(this).val()
         },
@@ -166,7 +166,7 @@ $(document).on("change", '#mode', function() {
 
 //availability-map device group
 $(document).on("change", '#group', function() {
-    $.post('ajax_mapview.php',
+    $.post('ajax/set_map_group',
         {
             group_view: $(this).val()
         },
@@ -433,7 +433,7 @@ function init_select2(selector, type, data, selected, placeholder) {
 
 function humanize_duration(seconds) {
     // transform xxx seconds into yy years MM months dd days hh hours mm:ss
-    
+
     var duration = moment.duration(Number(seconds), 's');
     var years = duration.years(),
         months = duration.months(),
