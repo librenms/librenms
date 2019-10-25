@@ -241,7 +241,7 @@ if ($options['f'] === 'alert_log') {
         if (is_numeric($alert_log_data_purge) && $alert_log_data_purge > 0) {
             echo "Deleting alert_logs more than $alert_log_data_purge days that are not active\n";
             $sql = "DELETE
-                        FROM alert_logs
+                        FROM alert_log a
                         WHERE  (a.device_id, a.rule_id, a.time_logged)
                         IN (SELECT alerts.device_id, alerts.rule_id, time_logged
                             FROM alert_log
