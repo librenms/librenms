@@ -206,7 +206,7 @@ if ($options['f'] === 'notifications') {
 if ($options['f'] === 'bill_data') {
     try {
         if (Config::get('distributed_poller')) {
-            MemcacheLock::lock('bill_data', 0, 86000);
+            MemcacheLock::lock('syslog_purge', 0, 86000);
         }
         $billing_data_purge = Config::get('billing_data_purge');
         if (is_numeric($billing_data_purge) && $billing_data_purge > 0) {
