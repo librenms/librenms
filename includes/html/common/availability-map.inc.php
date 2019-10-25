@@ -14,12 +14,9 @@
 
 use LibreNMS\Config;
 
+$mode = Session::get('map_view', 0);
 if (isset($settings['mode_select']) && $settings['mode_select'] !== '') {
     $mode = $settings['mode_select'];
-} elseif (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
-    $mode = $_SESSION["map_view"];
-} else {
-    $mode = 0;
 }
 
 $select_modes = array(
@@ -169,7 +166,7 @@ if (defined('SHOW_SETTINGS')) {
         // Only show devices if mode is 0 or 2 (Only Devices or both)
         if (Config::get('webui.availability_map_use_device_groups') != 0) {
             $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
-            $in_devices = dbFetchColumn($device_group, [$_SESSION['group_view']]);
+            $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
         }
 
         $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`ignore`, `D`.`disabled` FROM `devices` AS `D`';
@@ -342,7 +339,7 @@ if (defined('SHOW_SETTINGS')) {
             $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
             $dev_groups = dbFetchRows($sql);
 
-            if ($_SESSION['group_view'] == 0) {
+            if (Session::get('group_view') == 0) {
                 $selected = 'selected';
             } else {
                 $selected = '';
@@ -354,7 +351,7 @@ if (defined('SHOW_SETTINGS')) {
                 <option value="0" ' . $selected . '>show all devices</option>';
 
             foreach ($dev_groups as $dev_group) {
-                if ($_SESSION['group_view'] == $dev_group['id']) {
+                if (Session::get('group_view') == $dev_group['id']) {
                     $selected = 'selected';
                 } else {
                     $selected = '';

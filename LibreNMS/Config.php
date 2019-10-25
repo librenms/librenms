@@ -408,16 +408,11 @@ class Config
         // If we're on SSL, let's properly detect it
         if (isset($_SERVER['HTTPS'])) {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
-            self::set('secure_cookies', true);
         }
 
         // If we're on SSL, let's properly detect it
         if (isset($_SERVER['HTTPS'])) {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
-        }
-
-        if (self::get('secure_cookies')) {
-            ini_set('session.cookie_secure', 1);
         }
 
         if (!self::get('email_from')) {

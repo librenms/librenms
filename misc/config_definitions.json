@@ -3804,9 +3804,6 @@
             "order": 1,
             "type": "boolean"
         },
-        "secure_cookies": {
-            "type": "boolean"
-        },
         "sensors.guess_limits": {
             "default": true,
             "type": "boolean"
