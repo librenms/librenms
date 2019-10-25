@@ -206,7 +206,7 @@ if ($options['f'] === 'notifications') {
 if ($options['f'] === 'bill_data') {
     try {
         if (Config::get('distributed_poller')) {
-            MemcacheLock::lock('syslog_purge', 0, 86000);
+            MemcacheLock::lock('bill_data', 0, 86000);
         }
         $billing_data_purge = Config::get('billing_data_purge');
         if (is_numeric($billing_data_purge) && $billing_data_purge > 0) {
@@ -233,8 +233,28 @@ if ($options['f'] === 'bill_data') {
 }
 
 if ($options['f'] === 'alert_log') {
-    $ret = lock_and_purge('alert_log', 'time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)');
-    exit($ret);
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('alert_log', 0, 86000);
+        }
+        $alert_log_data_purge = Config::get('alert_log');
+        if (is_numeric($alert_log_data_purge) && $alert_log_data_purge > 0) {
+            echo "Deleting alert_logs more than $alert_log_data_purge days that are not active\n";
+            $sql = "DELETE
+                        FROM alert_logs
+                        WHERE  (a.device_id, a.rule_id, a.time_logged)
+                        IN (SELECT alerts.device_id, alerts.rule_id, time_logged
+                            FROM alert_log
+                            INNER JOIN alerts
+                            ON alerts.device_id=alert_log.device_id AND alerts.rule_id=alert_log.rule_id
+                            WHERE alerts.state=0 AND alert_log.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                            )";
+            dbQuery($sql, array($alert_log_data_purge));
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
+    }
 }
 
 if ($options['f'] === 'purgeusers') {
