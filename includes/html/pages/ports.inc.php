@@ -331,19 +331,19 @@ foreach ($vars as $var => $value) {
                 $param[] = $value;
                 break;
             case 'deleted':
-                if ($value == 1) {
+                if ($value == 1 || $value == 'yes') {
                     $where .= " AND `I`.`deleted` = 1";
                     $ignore_filter = 1;
                 }
                 break;
             case 'ignore':
-                if ($value == 1) {
+                if ($value == 1 || $value == 'yes') {
                     $where .= " AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0";
                     $ignore_filter = 1;
                 }
                 break;
             case 'disabled':
-                if ($value == 1) {
+                if ($value == 1 || $value == 'yes') {
                     $where .= " AND `I`.`disabled` = 1 AND `I`.`deleted` = 0";
                     $disabled_filter = 1;
                 }
@@ -364,7 +364,7 @@ foreach ($vars as $var => $value) {
                 $param[] = "%" . $value . "%";
                 break;
             case 'errors':
-                if ($value == 1) {
+                if ($value == 1 || $value == 'yes') {
                     $where .= " AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
                 }
                 break;

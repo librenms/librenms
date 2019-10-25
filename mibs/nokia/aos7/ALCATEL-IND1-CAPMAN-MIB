@@ -1,0 +1,800 @@
+ALCATEL-IND1-CAPMAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	MODULE-IDENTITY,
+        OBJECT-IDENTITY, Integer32, Unsigned32      FROM SNMPv2-SMI
+        RowStatus, MacAddress		       	FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                                        FROM SNMPv2-CONF
+        SnmpAdminString                 FROM SNMP-FRAMEWORK-MIB
+	InterfaceIndex		       	FROM IF-MIB
+        softentIND1CapMan		FROM ALCATEL-IND1-BASE;
+		
+
+	alcatelIND1CapManMIB MODULE-IDENTITY
+		LAST-UPDATED "200911230000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+		 System Capability Manager, to allow for system control and limitation setting, of
+		 different, features through out the system.
+		 Capability manager is a centralized process which provides hardware information and
+		 capability to other processes. To optimize the system performance , certain features
+		 may be configured to a lower than the hardware limit through capability manager.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2009 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200911230000Z"
+        DESCRIPTION
+            "Capability Manager is used to set system wide limitation."
+     	        ::= { softentIND1CapMan 1}
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	alcatelIND1CapManMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For System limitation setting , through Capability Manager
+            Subsystem Managed Objects."
+            ::= { alcatelIND1CapManMIB 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	alaCapabilityManager  OBJECT IDENTIFIER ::= { alcatelIND1CapManMIBObjects 1 }
+	alaCapManConformance  OBJECT IDENTIFIER ::= { alcatelIND1CapManMIBObjects 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+-- xxxxxxxxxxxxxxxxxxx
+-- capability Manager VRF Table
+-- xxxxxxxxxxxxxxxxxxx
+
+alaCapManVrfTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF AlaCapManVrfEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  deprecated
+	    DESCRIPTION
+		"A list of capabilities related to vrf limits."
+            ::= { alaCapabilityManager 1 }
+
+alaCapManVrfEntry  OBJECT-TYPE
+	SYNTAX  AlaCapManVrfEntry
+	MAX-ACCESS  not-accessible
+	STATUS  deprecated 
+	DESCRIPTION
+		"A Capability Manager VRF entry."
+	INDEX {alaCapabilityVrfContext, alaCapabilityVrfCapability }
+	    ::= { alaCapManVrfTable 1 }
+
+AlaCapManVrfEntry ::= SEQUENCE {
+	alaCapabilityVrfContext
+		INTEGER,
+	alaCapabilityVrfCapability
+		INTEGER,
+	alaCapabilityVrfLimit
+		Integer32
+	}
+
+alaCapabilityVrfContext  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		global (1),
+		primary (2),
+		subsidiary (3)
+	}
+	MAX-ACCESS  not-accessible
+	STATUS  deprecated 
+	DESCRIPTION
+		"Context of the change being done on vrf capability.
+        global is a setting which applies throughout the chassis.
+	primary is for the primary connection, and subsidiary, is for
+	all other connection."
+
+	::= { alaCapManVrfEntry 1 }
+
+alaCapabilityVrfCapability OBJECT-TYPE
+	SYNTAX  INTEGER  {
+		ipv4Routes(1),
+		ipv6Routes(2),
+ 		ipv4Interfaces(3),
+		ipv6Interfaces(4),
+		mcastInterfaces(5),
+		pimRPS(6),
+		bgpPeers(7),
+		bgpRoutes(8),
+		ripRoutes(9),
+		routingProtocols(10),
+		maxOSPF(11)
+		
+	}
+	MAX-ACCESS not-accessible
+	STATUS deprecated 
+	DESCRIPTION
+		"Identifies a vrf related capability."
+    ::= { alaCapManVrfEntry 2 }	
+
+alaCapabilityVrfLimit  OBJECT-TYPE
+	SYNTAX  Integer32  (0..524288)
+	MAX-ACCESS  read-write
+	STATUS  deprecated 
+	DESCRIPTION
+		"The actual limitation applied to the vrf capability."
+	::= { alaCapManVrfEntry 3 }
+
+
+
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- capability Manager TCAM Table
+-- xxxxxxxxxxxxxxxxxxx
+
+alaCapManTcamTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF AlaCapManTcamEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  deprecated 
+	    DESCRIPTION
+		"A list of capabilities related to TCAM limits."
+            ::= { alaCapabilityManager 2 }
+
+
+alaCapManTcamEntry  OBJECT-TYPE
+	SYNTAX  AlaCapManTcamEntry
+	MAX-ACCESS  not-accessible
+	STATUS  deprecated 
+	DESCRIPTION
+		"A Capability Manager Tcam entry."
+	INDEX {alaCapabilityTcamContext, alaCapabilityTcamCapability }
+	    ::= { alaCapManTcamTable 1 }
+
+AlaCapManTcamEntry ::= SEQUENCE {
+	alaCapabilityTcamContext
+		INTEGER,
+	alaCapabilityTcamCapability
+		INTEGER,
+	alaCapabilityTcamMode
+		Integer32
+	}
+
+
+alaCapabilityTcamContext  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		global (1)
+	}
+	MAX-ACCESS not-accessible
+	STATUS  deprecated 
+	DESCRIPTION
+		"Context of the change being done on TCAM capability."
+	::= { alaCapManTcamEntry 1 }
+
+alaCapabilityTcamCapability OBJECT-TYPE
+	SYNTAX  INTEGER {
+		mode(1)
+	}
+	MAX-ACCESS not-accessible
+	STATUS deprecated 
+	DESCRIPTION
+		"Identifies a TCAM related capability."
+    ::= { alaCapManTcamEntry 2 }	
+
+alaCapabilityTcamMode  OBJECT-TYPE
+	SYNTAX  Integer32  (0..6)
+	MAX-ACCESS  read-write
+	STATUS  deprecated 
+	DESCRIPTION
+		"Selected Tcam mode."
+	::= { alaCapManTcamEntry 3 }
+
+
+
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- capability Manager Mirroring Table
+-- xxxxxxxxxxxxxxxxxxx
+
+alaCapManMirrorTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF AlaCapManMirrorEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  deprecated 
+	    DESCRIPTION
+		"A list of capabilities related to mirroring limits."
+            ::= { alaCapabilityManager 3 }
+
+
+alaCapManMirrorEntry  OBJECT-TYPE
+	SYNTAX  AlaCapManMirrorEntry
+	MAX-ACCESS  not-accessible
+	STATUS  deprecated 
+	DESCRIPTION
+		"A Capability Manager Mirror entry."
+	INDEX { alaCapabilityMirrorContext, alaCapabilityMirrorCapability }
+	    ::= { alaCapManMirrorTable 1 }
+
+AlaCapManMirrorEntry ::= SEQUENCE {
+	alaCapabilityMirrorContext
+		INTEGER,
+	alaCapabilityMirrorCapability
+		INTEGER,
+	alaCapabilityMirrorLimit
+		Integer32
+	}
+
+alaCapabilityMirrorContext  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		global (1)
+	}
+	MAX-ACCESS not-accessible
+	STATUS  deprecated 
+	DESCRIPTION
+		"Context of the change being done on Mirroring capability."
+	::= { alaCapManMirrorEntry 1 }
+
+alaCapabilityMirrorCapability OBJECT-TYPE
+	SYNTAX  INTEGER {
+		maxMonitorSess (1)
+	}
+	MAX-ACCESS not-accessible
+	STATUS deprecated 
+	DESCRIPTION
+		"Identifies a Mirroring related capability."
+    ::= { alaCapManMirrorEntry 2 }	
+
+alaCapabilityMirrorLimit  OBJECT-TYPE
+	SYNTAX  Integer32  (0..3)
+	MAX-ACCESS  read-write
+	STATUS  deprecated 
+	DESCRIPTION
+		"Number of monitoring sessions."
+	::= { alaCapManMirrorEntry 3 }
+
+
+
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- capability Manager SourceLearning Table
+-- xxxxxxxxxxxxxxxxxxx
+
+alaCapManSourceLearningTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF AlaCapManSourceLearningEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  deprecated 
+	    DESCRIPTION
+		"A list of capabilities related to source learning modes."
+            ::= { alaCapabilityManager 4 }
+
+
+alaCapManSourceLearningEntry  OBJECT-TYPE
+	SYNTAX  AlaCapManSourceLearningEntry
+	MAX-ACCESS  not-accessible
+	STATUS  deprecated 
+	DESCRIPTION
+		"A Capability Manager SourceLearning entry."
+	INDEX { alaCapabilitySourceLearningContext, alaCapabilitySourceLearningCapability }
+	    ::= { alaCapManSourceLearningTable 1 }
+
+AlaCapManSourceLearningEntry ::= SEQUENCE {
+	alaCapabilitySourceLearningContext
+		INTEGER,
+	alaCapabilitySourceLearningCapability
+		INTEGER,
+	alaCapabilitySourceLearningMode
+		INTEGER
+	}
+
+alaCapabilitySourceLearningContext  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		global (1)
+	}
+	MAX-ACCESS not-accessible
+	STATUS  deprecated 
+	DESCRIPTION
+		"Context of the change being done on source learning capability."
+	::= { alaCapManSourceLearningEntry 1 }
+
+alaCapabilitySourceLearningCapability OBJECT-TYPE
+	SYNTAX  INTEGER {
+		mode (1)
+	}
+	MAX-ACCESS not-accessible
+	STATUS deprecated 
+	DESCRIPTION
+		"Identifies a source learning related capability."
+    ::= { alaCapManSourceLearningEntry 2 }	
+
+alaCapabilitySourceLearningMode  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		centralized(1),
+		distributed(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS  deprecated 
+	DESCRIPTION
+		"whether source learning should operate in centralized or distributed mode."
+	::= { alaCapManSourceLearningEntry 3 }
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- CAPABILITY MANAGER HASH CONTROL GLOBAL OBJECTS
+-- xxxxxxxxxxxxxxxxxxx
+
+alaCapManHashControlCommands OBJECT-IDENTITY
+        STATUS current
+    DESCRIPTION
+        "Branch For Hash-control commands."
+        ::= { alaCapabilityManager 5 }
+
+alaCapManHashMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        brief(1),
+                        extended(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When set to brief, Hash mode is enabled.
+             When set to Extended, Hash mode is disabled."
+        DEFVAL { extended }
+        ::= { alaCapManHashControlCommands 1 }
+
+alaCapManUdpTcpPortMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The control is used to enable or disable UDP TCP
+             port hashing. This option is applicable only when
+             Hash mode is set to disabled (i.e. extended)"
+        DEFVAL { disabled }
+        ::= { alaCapManHashControlCommands 2 }
+
+alaCapManNonUCHashControl OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This control is used to enable/disable
+             Load balance for non unicast traffic."
+    DEFVAL { disable }
+        ::= { alaCapManHashControlCommands 3 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- capability Manager VC Software Licensing
+-- xxxxxxxxxxxxxxxxxxx
+
+alaCapManSwLicensingConfig OBJECT IDENTIFIER ::= { alaCapabilityManager 6 }
+
+
+alaCapManSwLicensingAction OBJECT-TYPE
+	SYNTAX		INTEGER {
+				default (0),
+				applyFile (1),
+				applyKey (2),
+				deactivate (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Object to define the action related to software licensing."
+	::= { alaCapManSwLicensingConfig 1}
+
+
+alaCapManSwLicensingActionArg OBJECT-TYPE
+	SYNTAX          SnmpAdminString (SIZE (0..255))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Argument of the software licensing action."
+	::= { alaCapManSwLicensingConfig 2}
+
+
+alaCapManVcSwLicensingAction OBJECT-TYPE
+	SYNTAX		INTEGER {
+				default (0),
+				applyFile (1)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Object to define the action related to software licensing."
+	::= { alaCapManSwLicensingConfig 3}
+
+
+alaCapManVcSwLicensingActionArg OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Argument of the software licensing action."
+        ::= { alaCapManSwLicensingConfig 4}
+
+
+alaCapManSwLicensingInfoTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AlaCapManSwLicensingInfoEntry	
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Table of valid application license information"
+	::= { alaCapabilityManager 7 }
+
+alaCapManSwLicensingInfoEntry OBJECT-TYPE
+	SYNTAX		AlaCapManSwLicensingInfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Information of valid license applications"
+	INDEX {	alaLicenseId }
+	::= { alaCapManSwLicensingInfoTable 1 }
+
+AlaCapManSwLicensingInfoEntry ::=
+	SEQUENCE
+	{
+	  alaLicenseId			Unsigned32,
+	  alaLicensedApplication	SnmpAdminString,
+	  alaLicenseType		INTEGER,
+	  alaLicenseTimeRemaining	Integer32
+	}
+
+alaLicenseId OBJECT-TYPE
+  	SYNTAX      Unsigned32(0..4294967295)
+  	MAX-ACCESS  not-accessible
+  	STATUS      current
+  	DESCRIPTION "Number identifying a licence. This number is automatically generated in the
+		license generation process."
+  	::= { alaCapManSwLicensingInfoEntry 1 }
+
+alaLicensedApplication OBJECT-TYPE
+  	SYNTAX      SnmpAdminString (SIZE (1..32))
+  	MAX-ACCESS  read-only
+  	STATUS      current
+  	DESCRIPTION "String displaying the application for which this license is valid."
+  	::= { alaCapManSwLicensingInfoEntry 2 }
+
+alaLicenseType OBJECT-TYPE
+  	SYNTAX      INTEGER {
+			invalid (0),
+			demo (1),
+			permanent (2)
+		}
+  	MAX-ACCESS  read-only
+  	STATUS      current
+  	DESCRIPTION "License of an application can be either Permamnent or Demo. The value of this
+		indicated the type of this license."
+  	::= { alaCapManSwLicensingInfoEntry 3 }
+
+alaLicenseTimeRemaining OBJECT-TYPE
+  	SYNTAX      Integer32(-1..60)
+  	MAX-ACCESS  read-only
+  	STATUS      current
+  	DESCRIPTION "Number of days remaining to evaluate this demo license. For
+		permanent license this is not applicable."
+  	::= { alaCapManSwLicensingInfoEntry 4 }
+
+
+alaCapManVcSwLicensingInfoTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AlaCapManVcSwLicensingInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of valid application license information"
+        ::= { alaCapabilityManager 10 }
+
+alaCapManVcSwLicensingInfoEntry OBJECT-TYPE
+        SYNTAX          AlaCapManVcSwLicensingInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Information of valid license applications"
+        INDEX { alaVcLicensedSerialNum, alaVcLicensedMacAddress }
+        ::= { alaCapManVcSwLicensingInfoTable 1 }
+
+AlaCapManVcSwLicensingInfoEntry ::=
+        SEQUENCE
+        {
+	  alaVcLicensedSerialNum	OCTET STRING,
+	  alaVcLicensedMacAddress	MacAddress,
+	  alaVcLicenseType		INTEGER,
+	  alaVcLicenseVcSlot		Integer32,
+	  alaVcLicenseBitMap		Integer32,
+	  alaVcLicenseTimeRemain	Integer32
+        }
+
+
+alaVcLicensedSerialNum OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(25))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "String displaying the serial number for which this license is valid."
+        ::= { alaCapManVcSwLicensingInfoEntry 1 }
+ 
+
+alaVcLicensedMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "String displaying the MAC address for which this license is valid."
+        ::= { alaCapManVcSwLicensingInfoEntry 2 }
+
+
+alaVcLicenseType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        demo (1),
+                        permanent (2)
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "License of an application can be either Permamnent or Demo. The value of this
+                indicated the type of this license."
+	::= { alaCapManVcSwLicensingInfoEntry 3 }
+
+
+alaVcLicenseVcSlot OBJECT-TYPE
+	SYNTAX      Integer32(0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The virtual chassis unit ID + ni slot number."
+	::= { alaCapManVcSwLicensingInfoEntry 4 }
+
+
+alaVcLicenseBitMap OBJECT-TYPE
+	SYNTAX      Integer32(0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The chassis license bit map.
+		0x00000001  ADVANCD
+		0x00000002  DATACENTER
+		0x00000004  U16L
+	"
+	::= { alaCapManVcSwLicensingInfoEntry 5 }
+
+
+alaVcLicenseTimeRemain OBJECT-TYPE
+        SYNTAX      Integer32(-1..60)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of days remaining for demo license. For
+                permanent license this is not applicable."
+        ::= { alaCapManVcSwLicensingInfoEntry 6 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- capability Manager Ipmc Max Entry Table
+-- xxxxxxxxxxxxxxxxxxx
+
+-- Configured and operational limits on IPMC Table Entry."
+alaCapabilityIpmcMaxLimits  OBJECT IDENTIFIER ::= { alaCapabilityManager 8}
+
+alaCapabilityIpmcMaxAdminLimit  OBJECT-TYPE
+   SYNTAX  Integer32  (1..4096)
+   MAX-ACCESS  read-write
+   STATUS  current
+   DESCRIPTION
+               "Configured limit on maximum IPMC Table Entry count set by the user."
+   ::= { alaCapabilityIpmcMaxLimits 1 }
+
+
+
+alaCapabilityIpmcMaxOperLimit  OBJECT-TYPE
+   SYNTAX  Integer32  (1..4096)
+   MAX-ACCESS  read-only
+   STATUS  current
+   DESCRIPTION
+               "Operating limit on maximum IPMC Table Entry count. 
+        This number is calculated based on the configured number
+        and existing module types."
+   ::= { alaCapabilityIpmcMaxLimits 2 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxx
+-- CAPABILITY MANAGER FEATURE CONTROL COMMANDS
+-- Specific feature conontrol section, to be used to allow
+-- or prevent a feature from running based on Admin config.
+-- xxxxxxxxxxxxxxxxxxx
+
+alaCapManFeatureControlCommands OBJECT IDENTIFIER ::= { alaCapabilityManager 9 }
+
+alaCapManDcbCfgMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The control is used to globally enable or disable DCB feature"
+        DEFVAL { enabled }
+        ::= { alaCapManFeatureControlCommands 1 }
+
+alaCapManDcbOprMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "operating mode of DCB feature"
+        DEFVAL { enabled }
+        ::= { alaCapManFeatureControlCommands 2 }
+
+
+
+-- --------------------------------------------------------------
+-- Capability Manager MIB - Conformance Information
+-- --------------------------------------------------------------
+alaCapManGroups		OBJECT IDENTIFIER ::= { alaCapManConformance 1 }
+alaCapManCompliances	OBJECT IDENTIFIER ::= { alaCapManConformance 2 }
+-- --------------------------------------------------------------
+
+-- --------------------------------------------------------------
+-- Units of conformance
+-- --------------------------------------------------------------
+alaCapManVrfTableGroup OBJECT-GROUP
+   OBJECTS {
+   alaCapabilityVrfLimit
+   }
+   STATUS      current
+   DESCRIPTION
+      "Mandatory objects for VRF Table group"
+   ::= { alaCapManGroups 1 }
+
+alaCapManTcamTableGroup OBJECT-GROUP
+   OBJECTS {
+   alaCapabilityTcamMode
+  }
+   STATUS      current
+   DESCRIPTION
+      "Mandatory objects for TCAM Table group"
+   ::= { alaCapManGroups 2 }
+
+alaCapManMirrorTableGroup OBJECT-GROUP
+   OBJECTS {
+   alaCapabilityMirrorLimit
+  }
+   STATUS      current
+   DESCRIPTION
+      "Mandatory objects for Mirroring Table group"
+   ::= { alaCapManGroups 3 }
+
+alaCapManSourceLearningTableGroup OBJECT-GROUP
+   OBJECTS {
+   alaCapabilitySourceLearningMode
+  }
+   STATUS      current
+   DESCRIPTION
+      "Mandatory objects for source learning Table group"
+   ::= { alaCapManGroups 4 }
+
+alaCapManHashControlGroup OBJECT-GROUP
+   OBJECTS {
+   alaCapManHashMode,
+   alaCapManUdpTcpPortMode,
+   alaCapManNonUCHashControl
+   }
+   STATUS  current
+   DESCRIPTION
+     "Capability Manager Hash Control Group."
+   ::= { alaCapManGroups 5 }
+
+alaCapManSwLicensingGroup OBJECT-GROUP
+   OBJECTS {
+	alaCapManSwLicensingAction,
+	alaCapManSwLicensingActionArg,
+	alaCapManVcSwLicensingAction,
+	alaCapManVcSwLicensingActionArg
+  }
+   STATUS      current
+   DESCRIPTION
+      "Mandatory objects for software licensing group"
+   ::= { alaCapManGroups 6 }
+alaCapManSwLicensingInfoGroup OBJECT-GROUP
+   OBJECTS {
+	alaLicensedApplication,
+	alaLicenseType,
+	alaLicenseTimeRemaining
+  }
+   STATUS      current
+   DESCRIPTION
+      "Mandatory objects for software licensing table info group"
+   ::= { alaCapManGroups 7 }
+
+alaCapabilityIpmcMaxLimitsGroup OBJECT-GROUP
+   OBJECTS {
+     alaCapabilityIpmcMaxAdminLimit,
+     alaCapabilityIpmcMaxOperLimit
+
+  }
+   STATUS      current
+   DESCRIPTION
+      "Mandatory objects for MAX IPMC max group"
+   ::= { alaCapManGroups 8 }
+
+alaCapManDcbCfgModeGroup OBJECT-GROUP
+   OBJECTS {
+     alaCapManDcbCfgMode,
+     alaCapManDcbOprMode
+   }
+   STATUS      current
+   DESCRIPTION
+      "Created to keep SNMP4J compiler Happy"
+   ::= { alaCapManGroups 9 }
+
+alaVcLicenseCfgGroup OBJECT-GROUP
+   OBJECTS {
+     alaVcLicenseBitMap,
+     alaVcLicenseTimeRemain,
+     alaVcLicenseType,
+     alaVcLicenseVcSlot
+   }
+
+   STATUS      current
+   DESCRIPTION
+      "Created to keep SNMP4J compiler Happy"
+   ::= { alaCapManGroups 10 }
+
+
+-- --------------------------------------------------------------
+-- Compliance statements
+-- --------------------------------------------------------------
+alaCapManCompliance MODULE-COMPLIANCE
+   STATUS      current
+   DESCRIPTION
+      "The compliance statement for support of Capability Manager."
+   MODULE
+      MANDATORY-GROUPS {
+         alaCapManVrfTableGroup,
+         alaCapManTcamTableGroup,
+         alaCapManMirrorTableGroup,
+	 alaCapManSourceLearningTableGroup,
+         alaCapManHashControlGroup,
+	 alaCapManSwLicensingGroup,
+	 alaCapManSwLicensingInfoGroup,
+	 alaCapabilityIpmcMaxLimitsGroup
+      }
+   ::= { alaCapManCompliances 1 }
+-- --------------------------------------------------------------
+
+END

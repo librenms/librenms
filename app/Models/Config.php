@@ -29,25 +29,16 @@ class Config extends BaseModel
 {
     public $timestamps = false;
     protected $table = 'config';
-    public $primaryKey = 'config_name';
-    public $incrementing = false;
+    public $primaryKey = 'config_id';
     protected $fillable = [
         'config_name',
         'config_value',
-        'config_default',
-        'config_descr',
-        'config_group',
-        'config_sub_group',
-    ];
-    protected $attributes = [
-        'config_default' => '',
-        'config_descr' => '',
-        'config_group' => '',
-        'config_sub_group' => '',
     ];
     protected $casts = [
         'config_default' => 'array'
     ];
+
+    // ---- Accessors/Mutators ----
 
     public function getConfigValueAttribute($value)
     {
@@ -57,5 +48,13 @@ class Config extends BaseModel
     public function setConfigValueAttribute($value)
     {
         $this->attributes['config_value'] = json_encode($value, JSON_UNESCAPED_SLASHES);
+    }
+
+    // ---- Query Scopes ----
+
+    public function scopeWithChildren($query, $name)
+    {
+        return $query->where('config_name', $name)
+            ->orWhere('config_name', 'like', "$name.%");
     }
 }

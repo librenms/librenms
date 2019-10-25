@@ -300,6 +300,8 @@ function list_devices(\Illuminate\Http\Request $request)
         $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
         $sql = "`locations`.`location` LIKE '%".$query."%'";
+    } elseif ($type == 'hostname') {
+        $sql = "`d`.`hostname` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
         $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
@@ -1185,6 +1187,18 @@ function get_inventory(\Illuminate\Http\Request $request)
     });
 }
 
+
+function search_oxidized(\Illuminate\Http\Request $request)
+{
+    $search_in_conf_textbox = $request->route('searchstring');
+    $result = search_oxidized_config($search_in_conf_textbox);
+
+    if (!$result) {
+        return api_error(404, "Received no data from Oxidized");
+    } else {
+        return api_success($result, 'nodes');
+    }
+}
 
 function list_oxidized(\Illuminate\Http\Request $request)
 {

@@ -671,6 +671,11 @@ function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
         $address_family
     );
 
+    if ($status['dup'] > 0) {
+        Log::event('Duplicate ICMP response detected! This could indicate a network issue.', getidbyname($hostname), 'icmp', 4);
+        $status['exitcode'] = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
+    }
+
     return [
         'result' => ($status['exitcode'] == 0 && $status['loss'] < 100),
         'last_ping_timetaken' => $status['avg'],
@@ -927,7 +932,7 @@ function send_mail($emails, $subject, $message, $html = false)
                 $mail->addAddress($email, $email_name);
             }
             $mail->Subject = $subject;
-            $mail->XMailer = Config::get('project_name_version');
+            $mail->XMailer = Config::get('project_name');
             $mail->CharSet = 'utf-8';
             $mail->WordWrap = 76;
             $mail->Body = $message;
@@ -1445,26 +1450,29 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
 {
     // Default to ipv4
     $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
-    $fping_path = Config::get($fping_name, $fping_name);
-
-    // build the parameters
-    $params = '-e -q -c ' . max($count, 1);
-
     $interval = max($interval, 20);
-    $params .= ' -p ' . $interval;
 
-    $params .= ' -t ' . max($timeout, $interval);
+    // build the command
+    $cmd = [
+        Config::get($fping_name, $fping_name),
+        '-e',
+        '-q',
+        '-c',
+        max($count, 1),
+        '-p',
+        $interval,
+        '-t',
+        max($timeout, $interval),
+        $host
+    ];
 
-    $cmd = "$fping_path $params $host";
-
-    d_echo("[FPING] $cmd\n");
-
-    $process = new Process($cmd);
+    $process = app()->make(Process::class, ['command' => $cmd]);
+    d_echo('[FPING] ' . $process->getCommandLine() . PHP_EOL);
     $process->run();
     $output = $process->getErrorOutput();
 
-    preg_match('#= (\d+)/(\d+)/(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+)$#', $output, $parsed);
-    list(, $xmt, $rcv, $loss, $min, $avg, $max) = $parsed;
+    preg_match('#= (\d+)/(\d+)/(\d+)%(, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))?$#', $output, $parsed);
+    list(, $xmt, $rcv, $loss, , $min, $avg, $max) = array_pad($parsed, 8, 0);
 
     if ($loss < 0) {
         $xmt = 1;
@@ -1473,12 +1481,13 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
     }
 
     $response = [
-        'xmt'  => set_numeric($xmt),
-        'rcv'  => set_numeric($rcv),
-        'loss' => set_numeric($loss),
-        'min'  => set_numeric($min),
-        'max'  => set_numeric($max),
-        'avg'  => set_numeric($avg),
+        'xmt'  => (int)$xmt,
+        'rcv'  => (int)$rcv,
+        'loss' => (int)$loss,
+        'min'  => (float)$min,
+        'max'  => (float)$max,
+        'avg'  => (float)$avg,
+        'dup'  => substr_count($output, 'duplicate'),
         'exitcode' => $process->getExitCode(),
     ];
     d_echo($response);
@@ -2373,7 +2382,7 @@ function dump_db_schema()
             $output[$table]['Columns'][] = $def;
         }
 
-        foreach (dbFetchRows("SHOW INDEX FROM `$table`") as $key) {
+        foreach (array_sort_by_column(dbFetchRows("SHOW INDEX FROM `$table`"), 'Key_name') as $key) {
             $key_name = $key['Key_name'];
             if (isset($output[$table]['Indexes'][$key_name])) {
                 $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];

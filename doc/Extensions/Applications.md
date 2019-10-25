@@ -231,7 +231,7 @@ Extend` heading top of page.
 
 1: Create stats file with appropriate permissions:
 
-```shell
+```bash
 ~$ touch /var/run/named/stats
 ~$ chown bind:bind /var/run/named/stats
 ```
@@ -1432,6 +1432,53 @@ the user snmpd is using with `ps aux | grep snmpd`
 
 5: Restart snmpd on PI host
 
+# Seafile
+
+## SNMP Extend
+
+1: Copy the Python script, seafile.py, to the desired host. `wget
+https://github.com/librenms/librenms-agent/raw/master/snmp/seafile.py -O
+/etc/snmp/seafile.py`
+
+Also you have to install the requests Package for Python3.
+Under Ubuntu/Debian just run `apt install python3-requests`
+
+2: Run `chmod +x /etc/snmp/seafile.py`
+
+3: Edit your snmpd.conf file and add:
+
+```
+extend seafile /etc/snmp/seafile.py
+```
+
+4: You will also need to create the config file, which is named
+seafile.json . The script has to be located at /etc/snmp/.
+
+
+```
+{"url": "https://seafile.mydomain.org",
+ "username": "some_admin_login@mail.address",
+ "password": "password",
+ "account_identifier": "name"
+ "hide_monitoring_account": true
+}
+```
+
+The variables are as below.
+
+```
+url = Url how to get access to Seafile Server
+username = Login to Seafile Server.
+           It is important that used Login has admin privileges.
+           Otherwise most API calls will be denied.
+password = Password to the configured login.
+        the device name. 1 is the default. 0 will use the device name.
+account_identifier = Defines how accounts are listed.
+                     Options are: name, email
+hide_monitoring_account = With this Boolean you can hide the Account which you
+                          use to access Seafile API
+```
+
 # SMART
 
 ## SNMP Extend
@@ -1563,14 +1610,14 @@ adjust this path if necessary.
 1: Replace your _log_'s `run` file, typically located in
    `/service/dns/log/run` with:
 
-```shell
+```bash
 #!/bin/sh
 exec setuidgid dnslog tinystats ./main/tinystats/ multilog t n3 s250000 ./main/
 ```
 
 2: Create tinystats directory and chown:
 
-```shell
+```bash
 mkdir /service/dns/log/main/tinystats
 chown dnslog:nofiles /service/dns/log/main/tinystats
 ```

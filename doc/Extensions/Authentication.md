@@ -58,7 +58,7 @@ When using SELinux on the LibreNMS server, you need to allow Apache
 default. You can use SELinux Booleans to allow network access to LDAP
 resources with this command:
 
-```shell
+```bash
 setsebool -P httpd_can_connect_ldap=1
 ```
 
@@ -66,7 +66,7 @@ setsebool -P httpd_can_connect_ldap=1
 
 You can test authentication with this script:
 
-```shell
+```bash
 ./scripts/auth_test.php
 ```
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rule;
 use LibreNMS\Config;
 use LibreNMS\Permissions;
 use LibreNMS\Util\IP;
@@ -109,5 +110,14 @@ class AppServiceProvider extends ServiceProvider
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
             return IP::isValid($ip) || Validate::hostname($value);
         }, __('The :attribute must a valid IP address/network or hostname.'));
+
+        Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
+            if ($value === 0) {
+                return true;
+            }
+
+            $validator = Validator::make([$attribute => $value], [$attribute => 'exists:' . implode(',', $parameters)]);
+            return $validator->passes();
+        }, __('validation.exists'));
     }
 }
