@@ -176,7 +176,7 @@ class User extends Authenticatable
         if ($this->hasGlobalRead()) {
             return Device::query();
         } else {
-            return $this->belongsToMany('App\Models\Device', 'devices_perms', 'user_id', 'device_id');
+            return Device::HasAccess($this);
         }
     }
 

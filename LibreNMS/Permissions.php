@@ -195,17 +195,8 @@ class Permissions
     {
         if (is_null($this->devicePermissions)) {
             $this->devicePermissions = DB::table('devices_perms')
-                ->union(
-                    DB::table('devices_group_perms')
-                        ->select('devices_group_perms.user_id', 'devices.device_id')
-                        ->join('device_group_device', 'device_group_device.device_group_id', '=', 'devices_group_perms.device_group_id')
-                        ->join('devices', 'devices.device_id', '=', 'device_group_device.device_id')
-                        ->when(!Config::get('permission.device_group.user_allow_dynamic'), function ($query) {
-                            return $query
-                                ->join('device_groups', 'device_groups.id', '=', 'devices_group_perms.device_group_id')
-                                ->where('device_groups.type', 'static');
-                        })
-                )->get();
+                ->union($this->getDeviceGroupPermissionsQuery((new Device)))
+                ->get();
         }
 
         return $this->devicePermissions;
@@ -219,7 +210,9 @@ class Permissions
     public function getPortPermissions()
     {
         if (is_null($this->portPermissions)) {
-            $this->portPermissions = DB::table('ports_perms')->get();
+            $this->portPermissions = DB::table('ports_perms')
+                ->union($this->getDeviceGroupPermissionsQuery((new Port)))
+                ->get();
         }
 
         return $this->portPermissions;
@@ -273,5 +266,22 @@ class Permissions
     private function getBillId($bill)
     {
         return $bill instanceof Bill ? $bill->bill_id : (is_numeric($bill) ? (int)$bill : 0);
+    }
+
+    /**
+     * @param User|Port $model
+     * @return \Illuminate\Database\Query\Builder
+     */
+    private function getDeviceGroupPermissionsQuery($model)
+    {
+        return DB::table('devices_group_perms')
+        ->select('devices_group_perms.user_id', $model->getQualifiedKeyName())
+        ->join('device_group_device', 'device_group_device.device_group_id', '=', 'devices_group_perms.device_group_id')
+        ->join($model->getTable(), "{$model->getTable()}.device_id", '=', 'device_group_device.device_id')
+        ->when(!Config::get('permission.device_group.user_allow_dynamic'), function ($query) {
+            return $query
+                ->join('device_groups', 'device_groups.id', '=', 'devices_group_perms.device_group_id')
+                ->where('device_groups.type', 'static');
+        });
     }
 }
