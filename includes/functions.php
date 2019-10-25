@@ -2526,17 +2526,25 @@ function lock_and_purge($table, $sql)
     }
 }
 
+/**
+ * If Distributed, create a lock, then purge the mysql table according to the sql query
+ *
+ * @param string $table
+ * @param string $sql
+ * @param string $msg
+ * @return int exit code
+ */
 function lock_and_purge_query($table, $sql, $msg)
 {
     try {
-         $purge_name = $table . '_purge';
+        $purge_name = $table . '_purge';
 
         if (Config::get('distributed_poller')) {
             MemcacheLock::lock($purge_name, 0, 86000);
         }
         $purge_duration = Config::get($purge_name);
         if (is_numeric($purge_duration) && $purge_duration > 0) {
-            if (dbQuery($sql, array($purge_duration))){
+            if (dbQuery($sql, array($purge_duration))) {
                 printf($msg, $purge_duration);
             }
         }

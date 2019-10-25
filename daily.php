@@ -223,7 +223,7 @@ if ($options['f'] === 'bill_data') {
 }
 
 if ($options['f'] === 'alert_log') {
-   $msg = "Deleting alert_logs more than %d days that are not active\n";
+    $msg = "Deleting alert_logs more than %d days that are not active\n";
     $table = 'alert_log';
     $sql = "DELETE
                 FROM alert_log a
