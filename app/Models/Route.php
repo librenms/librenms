@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-class InetCidrRoute extends DeviceRelatedModel
+class Route extends DeviceRelatedModel
 {
-    protected $table = 'inetCidrRoute';
-    protected $primaryKey = 'inetCidrRoute_id';
+    protected $table = 'route';
+    protected $primaryKey = 'route_id';
     public static $translateProto = [
         '0-undefined',
         '1-other',

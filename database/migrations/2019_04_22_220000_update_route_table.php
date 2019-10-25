@@ -15,8 +15,11 @@ class UpdateRouteTable extends Migration
      */
     public function up()
     {
-        Schema::create('inetCidrRoute', function (Blueprint $table) {
-              $table->increments('inetCidrRoute_id');
+        //Remove the old route table, as it is not used anymore.
+        Schema::drop('route');
+
+        Schema::create('route', function (Blueprint $table) {
+              $table->increments('route_id');
               $table->timestamps();
               $table->unsignedInteger('device_id');
               $table->unsignedInteger('port_id');
@@ -33,8 +36,6 @@ class UpdateRouteTable extends Migration
               $table->string('inetCidrRoutePolicy');
               $table->unsignedInteger('inetCidrRoutePfxLen');
         });
-        //Remove the old route table, as it is not used anymore.
-        Schema::drop('route');
     }
 
     /**
@@ -44,7 +45,7 @@ class UpdateRouteTable extends Migration
      */
     public function down()
     {
-        Schema::drop('inetCidrRoute');
+        Schema::drop('route');
         // Create the old route table to reverse this.
         Schema::create('route', function (Blueprint $table) {
             $table->unsignedInteger('device_id');

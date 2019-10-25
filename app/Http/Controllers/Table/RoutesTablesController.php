@@ -2,7 +2,7 @@
 /**
  * RoutesTablesController.php
  *
- * InetCidrRoute tables data for bootgrid display
+ * Route tables data for bootgrid display
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\Ipv4Address;
 use App\Models\Ipv4Network;
 use App\Models\Ipv6Address;
-use App\Models\InetCidrRoute;
+use App\Models\Route;
 use App\Models\Port;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
@@ -53,8 +53,8 @@ class RoutesTablesController extends TableController
     protected function filterFields($request)
     {
         return [
-            'inetCidrRoute.context_name' => 'context_name',
-            'inetCidrRoute.inetCidrRouteProto' => 'proto',
+            'route.context_name' => 'context_name',
+            'route.inetCidrRouteProto' => 'proto',
             ];
     }
 
@@ -67,26 +67,26 @@ class RoutesTablesController extends TableController
     protected function baseQuery($request)
     {
         $join =  function ($query) {
-            $query->on('ports.port_id', 'inetCidrRoute.port_id');
+            $query->on('ports.port_id', 'route.port_id');
         };
         $showAllRoutes = trim(\Request::get('showAllRoutes'));
         if ($request->device_id && $showAllRoutes == 'false') {
-            $query=InetCidrRoute::hasAccess($request->user())
+            $query=Route::hasAccess($request->user())
                 ->leftJoin('ports', $join)
-                ->where('inetCidrRoute.device_id', $request->device_id)
-                ->where('updated_at', InetCidrRoute::hasAccess($request->user())
-                    ->where('inetCidrRoute.device_id', $request->device_id)
+                ->where('route.device_id', $request->device_id)
+                ->where('updated_at', Route::hasAccess($request->user())
+                    ->where('route.device_id', $request->device_id)
                     ->select('updated_at')
                     ->max('updated_at'));
             return $query;
         }
         if ($request->device_id && $showAllRoutes == 'true') {
-            $query=InetCidrRoute::hasAccess($request->user())
+            $query=Route::hasAccess($request->user())
                 ->leftJoin('ports', $join)
-                ->where('inetCidrRoute.device_id', $request->device_id);
+                ->where('route.device_id', $request->device_id);
             return $query;
         }
-        return InetCidrRoute::hasAccess($request->user())
+        return Route::hasAccess($request->user())
             ->leftJoin('ports', $join);
     }
 
@@ -100,8 +100,8 @@ class RoutesTablesController extends TableController
     {
         if ($search = trim(\Request::get('searchPhrase'))) {
             $searchLike = '%' . $search . '%';
-            return $query->where('inetCidrRoute.inetCidrRouteNextHop', 'like', $searchLike)
-                ->orWhere('inetCidrRoute.inetCidrRouteDest', 'like', $searchLike);
+            return $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
+                ->orWhere('route.inetCidrRouteDest', 'like', $searchLike);
         }
 
         return $query;
