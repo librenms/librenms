@@ -3878,6 +3878,13 @@
             },
             "type": "array"
         },
+        "route_purge": {
+            "default": 10,
+            "group": "system",
+            "section": "cleanup",
+            "order": 2,
+            "type": "integer"
+        },
         "rrd.heartbeat": {
             "default": 600,
             "group": "poller",

@@ -32,15 +32,9 @@ alerts:
     - { Field: info, Type: text, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-<<<<<<< HEAD
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     rule_id: { Name: rule_id, Columns: [rule_id], Unique: false, Type: BTREE }
     unique_alert: { Name: unique_alert, Columns: [device_id, rule_id], Unique: true, Type: BTREE }
-=======
-    unique_alert: { Name: unique_alert, Columns: [device_id, rule_id], Unique: true, Type: BTREE }
-    rule_id: { Name: rule_id, Columns: [rule_id], Unique: false, Type: BTREE }
-    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
->>>>>>> fix wonky column orders
 alert_device_map:
   Columns:
     - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -92,8 +86,8 @@ alert_schedulables:
     - { Field: alert_schedulable_type, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [item_id], Unique: true, Type: BTREE }
-    schedule_id: { Name: schedule_id, Columns: [schedule_id], Unique: false, Type: BTREE }
     schedulable_morph_index: { Name: schedulable_morph_index, Columns: [alert_schedulable_type, alert_schedulable_id], Unique: false, Type: BTREE }
+    schedule_id: { Name: schedule_id, Columns: [schedule_id], Unique: false, Type: BTREE }
 alert_schedule:
   Columns:
     - { Field: schedule_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -482,18 +476,12 @@ devices:
     - { Field: max_depth, Type: int(11), 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
-    status: { Name: status, Columns: [status], Unique: false, Type: BTREE }
     hostname: { Name: hostname, Columns: [hostname], Unique: false, Type: BTREE }
     last_poll_attempted: { Name: last_poll_attempted, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
     last_polled: { Name: last_polled, Columns: [last_polled], Unique: false, Type: BTREE }
     os: { Name: os, Columns: [os], Unique: false, Type: BTREE }
-<<<<<<< HEAD
     status: { Name: status, Columns: [status], Unique: false, Type: BTREE }
     sysName: { Name: sysName, Columns: [sysName], Unique: false, Type: BTREE }
-=======
-    last_polled: { Name: last_polled, Columns: [last_polled], Unique: false, Type: BTREE }
-    last_poll_attempted: { Name: last_poll_attempted, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
->>>>>>> fix wonky column orders
 devices_attribs:
   Columns:
     - { Field: attrib_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -776,15 +764,9 @@ links:
     - { Field: remote_version, Type: varchar(256), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-<<<<<<< HEAD
     dst_if: { Name: dst_if, Columns: [remote_port_id], Unique: false, Type: BTREE }
     local_device_id: { Name: local_device_id, Columns: [local_device_id, remote_device_id], Unique: false, Type: BTREE }
     src_if: { Name: src_if, Columns: [local_port_id], Unique: false, Type: BTREE }
-=======
-    src_if: { Name: src_if, Columns: [local_port_id], Unique: false, Type: BTREE }
-    dst_if: { Name: dst_if, Columns: [remote_port_id], Unique: false, Type: BTREE }
-    local_device_id: { Name: local_device_id, Columns: [local_device_id, remote_device_id], Unique: false, Type: BTREE }
->>>>>>> fix wonky column orders
 loadbalancer_rservers:
   Columns:
     - { Field: rserver_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -1416,13 +1398,8 @@ ports_fdb:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ports_fdb_id], Unique: true, Type: BTREE }
     mac_address: { Name: mac_address, Columns: [mac_address], Unique: false, Type: BTREE }
-<<<<<<< HEAD
     ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
-=======
-    ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
-    ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
->>>>>>> fix wonky column orders
     ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
 ports_nac:
   Columns:
@@ -1622,8 +1599,8 @@ sensors:
     - { Field: user_func, Type: varchar(100), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
-    sensor_host: { Name: sensor_host, Columns: [device_id], Unique: false, Type: BTREE }
     sensor_class: { Name: sensor_class, Columns: [sensor_class], Unique: false, Type: BTREE }
+    sensor_host: { Name: sensor_host, Columns: [device_id], Unique: false, Type: BTREE }
     sensor_type: { Name: sensor_type, Columns: [sensor_type], Unique: false, Type: BTREE }
   Constraints:
     sensors_device_id_foreign: { name: sensors_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
@@ -1758,14 +1735,9 @@ syslog:
     PRIMARY: { Name: PRIMARY, Columns: [seq], Unique: true, Type: BTREE }
     datetime: { Name: datetime, Columns: [timestamp], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
-<<<<<<< HEAD
     device_id-timestamp: { Name: device_id-timestamp, Columns: [device_id, timestamp], Unique: false, Type: BTREE }
     priority_level: { Name: priority_level, Columns: [priority, level], Unique: false, Type: BTREE }
-=======
->>>>>>> fix wonky column orders
     program: { Name: program, Columns: [program], Unique: false, Type: BTREE }
-    priority_level: { Name: priority_level, Columns: [priority, level], Unique: false, Type: BTREE }
-    device_id-timestamp: { Name: device_id-timestamp, Columns: [device_id, timestamp], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -1898,16 +1870,10 @@ vrf_lite_cisco:
     - { Field: vrf_name, Type: varchar(128), 'Null': true, Extra: '', Default: Default }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [vrf_lite_cisco_id], Unique: true, Type: BTREE }
-<<<<<<< HEAD
     context: { Name: context, Columns: [context_name], Unique: false, Type: BTREE }
     device: { Name: device, Columns: [device_id], Unique: false, Type: BTREE }
     mix: { Name: mix, Columns: [device_id, context_name, vrf_name], Unique: false, Type: BTREE }
-=======
->>>>>>> fix wonky column orders
     vrf: { Name: vrf, Columns: [vrf_name], Unique: false, Type: BTREE }
-    context: { Name: context, Columns: [context_name], Unique: false, Type: BTREE }
-    device: { Name: device, Columns: [device_id], Unique: false, Type: BTREE }
-    mix: { Name: mix, Columns: [device_id, context_name, vrf_name], Unique: false, Type: BTREE }
 widgets:
   Columns:
     - { Field: widget_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
