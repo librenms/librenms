@@ -1,5 +1,5 @@
 <?php
-  
+
 $brocade_stats = snmpwalk_group($device, 'swFCPortName', 'SW-MIB', 1, $brocade_stats);
 
 $brocade_ports = [];
