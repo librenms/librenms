@@ -3878,6 +3878,13 @@
             },
             "type": "array"
         },
+        "routes.max_number": {
+            "default": 1000,
+            "group": "discovery",
+            "section": "route",
+            "order": 3,
+            "type": "integer"
+        },
         "route_purge": {
             "default": 10,
             "group": "system",

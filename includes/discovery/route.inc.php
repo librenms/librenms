@@ -126,8 +126,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
             foreach ($next4 as $inetCidrRouteNextHopType => $next5) {
                 foreach ($next5 as $inetCidrRouteNextHop => $entry) {
                     $entry['inetCidrRouteDestType'] = $inetCidrRouteDestType;
-                    d_echo(normalize_snmp_ip_address($inetCidrRouteDest));
-                    $entry['inetCidrRouteDest'] = normalize_snmp_ip_address( $inetCidrRouteDest);
+                    $entry['inetCidrRouteDest'] = normalize_snmp_ip_address($inetCidrRouteDest);
                     $entry['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen;
                     $entry['inetCidrRoutePolicy'] = $inetCidrRoutePolicy;
                     $entry['inetCidrRouteNextHopType'] = $inetCidrRouteNextHopType;

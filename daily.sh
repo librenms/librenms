@@ -275,7 +275,7 @@ main () {
                                "alert_log"
                                "rrd_purge"
                                "ports_fdb"
-                               "inetCidrRoute"
+                               "route"
                                "ports_purge");
                 call_daily_php "${options[@]}";
             ;;

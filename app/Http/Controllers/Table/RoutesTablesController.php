@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
+use LibreNMS\Exceptions\InvalidIpException;
 
 class RoutesTablesController extends TableController
 {
@@ -103,7 +104,6 @@ class RoutesTablesController extends TableController
             return $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
                 ->orWhere('route.inetCidrRouteDest', 'like', $searchLike);
         }
-
         return $query;
     }
 
@@ -151,6 +151,22 @@ class RoutesTablesController extends TableController
         }
         if ($item['inetCidrRouteIfIndex'] == 0) {
             $item['inetCidrRouteIfIndex'] = 'Undefined';
+        }
+        if ($route_entry->inetCidrRouteNextHop) {
+            try {
+                $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
+                $item['inetCidrRouteNextHop'] =  $obj_inetCidrRouteNextHop->compressed();
+            } catch (Exception $e) {
+                $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
+            }
+        }
+        if ($route_entry->inetCidrRouteDest) {
+            try {
+                $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
+                $item['inetCidrRouteDest'] =  $obj_inetCidrRouteDest->compressed();
+            } catch (Exception $e) {
+                $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
+            }
         }
         $item['inetCidrRouteIfIndex'] = 'ifIndex ' . $item['inetCidrRouteIfIndex'];
         if ($port = $route_entry->port()->first()) {

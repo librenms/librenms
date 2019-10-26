@@ -24,7 +24,8 @@ return [
             'ldap' => 'LDAP Settings'
         ],
         'discovery' => [
-            'general' => 'General Discovery Settings'
+            'general' => 'General Discovery Settings',
+            'route' => 'Routes Discovery Module',
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -595,6 +596,10 @@ return [
         'public_status' => [
             'description' => 'Show status publicly',
             'help' => 'Shows the status of some devices on the logon page without authentication.'
+        ],
+        'route_purge' => [
+            'description' => 'Route entries older than (days)',
+            'help' => 'Cleanup done by daily.sh'
         ],
         'rrd' => [
             'heartbeat' => [
