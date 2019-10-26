@@ -78,7 +78,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=20190514') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=20191025') }}"></script>
     <script type="text/javascript">
         <!-- Begin
         function popUp(URL)

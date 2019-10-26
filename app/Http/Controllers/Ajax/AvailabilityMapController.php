@@ -1,6 +1,6 @@
 <?php
 /**
- * ResolutionController.php
+ * AvailabilityMapController.php
  *
  * -Description-
  *
@@ -28,21 +28,36 @@ namespace App\Http\Controllers\Ajax;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class ResolutionController extends Controller
+class AvailabilityMapController extends Controller
 {
-    public function set(Request $request)
+    public function setView(Request $request)
     {
         $this->validate($request, [
-            'width' => 'required|numeric',
-            'height' => 'required|numeric'
+            'map_view' => 'required|numeric|in:0,1,2'
         ]);
 
-        // laravel session
-        session([
-            'screen_width' => $request->width,
-            'screen_height' => $request->height
+        return $this->setSessionValue($request, 'map_view');
+    }
+
+    public function setGroup(Request $request)
+    {
+        $this->validate($request, [
+            'group_view' => 'required|numeric'
         ]);
 
-        return $request->width . 'x' . $request->height;
+        return $this->setSessionValue($request, 'group_view');
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param string $key
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function setSessionValue($request, $key)
+    {
+        $value = $request->get($key);
+        $request->session()->put($key, $value);
+
+        return response()->json([$key, $value]);
     }
 }
