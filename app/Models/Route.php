@@ -7,33 +7,33 @@ class Route extends DeviceRelatedModel
     protected $table = 'route';
     protected $primaryKey = 'route_id';
     public static $translateProto = [
-        '0-undefined',
-        '1-other',
-        '2-local',
-        '3-netmgmt',
-        '4-icmp',
-        '5-egp',
-        '6-ggp',
-        '7-hello',
-        '8-rip',
-        '9-isIs',
-        '10-esIs',
-        '11-ciscoIgrp',
-        '12-bbnSpfIgp',
-        '13-ospf',
-        '14-bgp',
-        '15-idpr',
-        '16-ciscoEigrp',
-        '17-dvmrp'
+        'undefined',
+        'other',
+        'local',
+        'netmgmt',
+        'icmp',
+        'egp',
+        'ggp',
+        'hello',
+        'rip',
+        'isIs',
+        'esIs',
+        'ciscoIgrp',
+        'bbnSpfIgp',
+        'ospf',
+        'bgp',
+        'idpr',
+        'ciscoEigrp',
+        'dvmrp'
     ];
 
     public static $translateType = [
-        '0-undefined',
-        '1-other',
-        '2-reject',
-        '3-local',
-        '4-remote',
-        '5-blackhole',
+        'undefined',
+        'other',
+        'reject',
+        'local',
+        'remote',
+        'blackhole',
     ];
 
     public $timestamps = true;

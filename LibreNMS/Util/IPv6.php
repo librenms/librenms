@@ -56,11 +56,10 @@ class IPv6 extends IP
     {
         $len = strlen($ip);
         if ($len == 16) {
-            return inet_ntop(pack('A' . $l, $ip));
+            return inet_ntop(pack('A' . $len, $ip));
         }
         return '';
     }
-
 
     /**
      * Check if the supplied IP is valid.

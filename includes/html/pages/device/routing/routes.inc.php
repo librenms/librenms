@@ -22,8 +22,6 @@ $no_refresh = true;
 </table>
 <div>Warning: Routing Table is only retrieved during device discovery. Devices are skipped if they have more than <?php echo Config::get('routes.max_number');?> routes.</div>
 <script>
-
-
 var grid = $("#routes").bootgrid({
     ajax: true,
     post: function ()
@@ -43,23 +41,14 @@ var grid = $("#routes").bootgrid({
 });
 
 var add = $(".actionBar").append(
-        '<div class="pull-left">' +
+        '<div class="search form-group pull-left" style="width:auto">' +
         '<?php echo csrf_field() ?>'+
-        '<div class="form-group"><div class="input-group">' + '<span class=" input-group-addon icon">' +
-        '<input type="checkbox" name="check_showAllRoutes" id="check_showAllRoutes"></span>' +
-        '<span class=" input-group-addon icon">' +
-        '<label class="form-check-label col-form-label col-form-label-sm"" for="check_showAllRoutes">' +
-        'Show all routes including history.' +
-        '</label>' +
-        '</span>' +
-        '</div></div>' +
+        '<input type="checkbox" name="check_showAllRoutes" data-size="small" id="check_showAllRoutes">' +
+        '&nbsp;Include historical routes in the table.' +
         '</div>');
-
-
-const check_showAllRoutes = document.getElementById('check_showAllRoutes')
-
-check_showAllRoutes.addEventListener('change', (event) => {
-    $('#routes').bootgrid('reload');    
-})
-
+$("#check_showAllRoutes").bootstrapSwitch({
+    'onSwitchChange': function(event, state){
+         $('#routes').bootgrid('reload');  
+    }
+});
 </script>
