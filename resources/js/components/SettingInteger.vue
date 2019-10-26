@@ -48,5 +48,7 @@
 </script>
 
 <style scoped>
-
+    .form-control {
+        padding-right: 12px;
+    }
 </style>
