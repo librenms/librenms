@@ -8,6 +8,7 @@ return [
         'external' => 'External',
         'global' => 'Global',
         'os' => 'OS',
+        'discovery' => 'Discovery',
         'poller' => 'Poller',
         'system' => 'System',
         'webui' => 'Web UI',
@@ -22,9 +23,13 @@ return [
             'ad' => 'Active Directory Settings',
             'ldap' => 'LDAP Settings'
         ],
+        'discovery' => [
+            'general' => 'General Discovery Settings'
+        ],
         'external' => [
             'binaries' => 'Binary Locations',
             'location' => 'Location Settings',
+            'graylog' => 'Graylog Integration',
             'oxidized' => 'Oxidized Integration',
             'peeringdb' => 'PeeringDB Integration',
             'nfsen' => 'NfSen Integration',
@@ -120,6 +125,10 @@ return [
         'alert_log_purge' => [
             'description' => 'Alert log entries older than',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'allow_duplicate_sysName' => [
+            'description' => 'Allow Duplicate sysName',
+            'help' => 'By default duplicate sysNames are disabled from being added to prevent a device with multiple interfaces from being added multiple times'
         ],
         'allow_unauth_graphs' => [
             'description' => 'Allow unauthenticated graph access',
@@ -422,6 +431,46 @@ return [
                 ]
             ]
         ],
+        'graylog' => [
+            'base_uri' => [
+                'description' => 'Base URI',
+                'help' => 'Override the base uri in the case you have modified the Graylog default.'
+            ],
+            'device-page' => [
+                'loglevel' => [
+                    'description' => 'Device Overview Log Level',
+                    'help' => 'Sets the maximum log level shown on the device overview page.'
+                ],
+                'rowCount' => [
+                    'description' => 'Device Overview Row Count',
+                    'help' => 'Sets the number of rows show on the device overview page.'
+                ]
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password for accessing Graylog API.'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port used to access the Graylog API. If none give, it will be 80 for http and 443 for https.'
+            ],
+            'server' => [
+                'description' => 'Server',
+                'help' => 'The ip or hostname of the Graylog server API endpoint.'
+            ],
+            'timezone' => [
+                'description' => 'Display Timezone',
+                'help' => 'Graylog times are stored in GMT, this setting will change the displayed timezone. The value must be a valid PHP timezone.'
+            ],
+            'username' => [
+                'description' => 'Username',
+                'help' => 'Username for accessing the Graylog API.'
+            ],
+            'version' => [
+                'description' => 'Version',
+                'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.'
+            ]
+        ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.'
@@ -438,6 +487,10 @@ return [
         ],
         'mtr' => [
             'description' => 'Path to mtr'
+        ],
+        'mydomain' => [
+            'description' => 'Primary Domain',
+            'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.'
         ],
         'nfsen_enable' => [
             'description' => 'Enable NfSen',
@@ -718,6 +771,10 @@ return [
         'whois' => [
             'description' => 'Path to whois'
         ]
+    ],
+    'twofactor' => [
+        'description' => 'Enable Two-Factor Auth',
+        'help' => "Enables the built in Two-Factor authentication. You must set up each account to make it active."
     ],
     'units' => [
         'days' => 'days',

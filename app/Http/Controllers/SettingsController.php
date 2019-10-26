@@ -12,15 +12,17 @@ class SettingsController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param DynamicConfig $dynamicConfig
      * @param string $tab
      * @param string $section
      * @return \Illuminate\Http\Response
      */
-    public function index($tab = 'global', $section = '')
+    public function index(DynamicConfig $dynamicConfig, $tab = 'global', $section = '')
     {
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
+            'groups' => $dynamicConfig->getGrouped()->forget('global'),
         ];
 
         return view('settings.index', $data);
