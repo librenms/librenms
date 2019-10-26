@@ -61,7 +61,9 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
-            Route::post('set_resolution', 'ResolutionController@set');
+            Route::post('set_map_group', 'AvailabilityMapController@setGroup');
+            Route::post('set_map_view', 'AvailabilityMapController@setView');
+            Route::post('set_resolution', 'RSesolutionController@set');
             Route::get('netcmd', 'NetCommand@run');
             Route::post('ripe/raw', 'RipeNccApiController@raw');
         });
