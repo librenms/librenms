@@ -126,11 +126,17 @@
                 // select all disable buttons
                 event.preventDefault();
                 $('.disable-check').prop('checked', true);
+                //TODO: find a better solution for 'select-all' button refresh
+                $('.disable-check').trigger('click');
+                $('.disable-check').trigger('click');
             });
             $('#ignore-select').click(function (event) {
                 // select all ignore buttons
                 event.preventDefault();
                 $('.ignore-check').prop('checked', true);
+                //TODO: find a better solution for 'select-all' button refresh
+                $('.ignore-check').trigger('click');
+                $('.ignore-check').trigger('click');
             });
             $('#down-select').click(function (event) {
                 // select ignore buttons for all ports which are down
@@ -201,6 +207,7 @@
         },
         url: "ajax_table.php"
     }).on("loaded.rs.jquery.bootgrid", function() {
+        $("[type='checkbox']").bootstrapSwitch();
         $("[name='override_config']").bootstrapSwitch('offColor','danger');
         $('input[name="override_config"]').on('switchChange.bootstrapSwitch',  function(event, state) {
             override_config(event,state,$(this));
