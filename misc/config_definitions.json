@@ -4188,6 +4188,9 @@
             "order": 2,
             "type": "integer"
         },
+        "temp_dir": {
+            "type": "text"
+        },
         "top_devices": {
             "default": true,
             "type": "boolean"
