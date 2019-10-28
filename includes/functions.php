@@ -2550,7 +2550,7 @@ function lock_and_purge_query($table, $sql, $msg)
         }
     } catch (LockException $e) {
         echo $e->getMessage() . PHP_EOL;
-        exit(-1);
+        return -1;
     }
 }
 
