@@ -232,7 +232,36 @@ if ($options['f'] === 'alert_log') {
                 WHERE alerts.state=0 AND alert_log.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
                 ";
     lock_and_purge_query($table, $sql, $msg);
+    
+    # alert_log older than $config['alert_log_purge'] days match now only the alert_log of active alerts
+    # in case of flapping of an alert, many entries are kept in alert_log
+    # we want only to keep the last alert_log that contains the alert details
+
+    $msg = "Deleting history of active alert_logs more than %d days\n";
+    $sql = "DELETE
+                    FROM alert_log
+                    WHERE id IN(
+                        SELECT id FROM(
+                            SELECT id
+                            FROM alert_log a1
+                            WHERE
+                                time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                                AND (device_id, rule_id, time_logged) NOT IN (
+                                    SELECT device_id, rule_id, max(time_logged)
+                                    FROM alert_log a2 WHERE a1.device_id = a2.device_id AND a1.rule_id = a2.rule_id
+                                    AND a2.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                                )
+                        ) as c
+                    )
+                ";
+    $purge_duration = Config::get('alert_log_purge');
+    if (!(is_numeric($purge_duration) && $purge_duration > 0)) {
+        return -2;
+    }
+    $sql = str_replace("?", strval($purge_duration), $sql);
+    lock_and_purge_query($table, $sql, $msg);
 }
+
 
 if ($options['f'] === 'purgeusers') {
     try {
