@@ -225,15 +225,12 @@ if ($options['f'] === 'bill_data') {
 if ($options['f'] === 'alert_log') {
     $msg = "Deleting alert_logs more than %d days that are not active\n";
     $table = 'alert_log';
-    $sql = "DELETE
-                FROM alert_log a
-                WHERE  (a.device_id, a.rule_id, a.time_logged)
-                IN (SELECT alerts.device_id, alerts.rule_id, time_logged
-                    FROM alert_log
-                    INNER JOIN alerts
-                    ON alerts.device_id=alert_log.device_id AND alerts.rule_id=alert_log.rule_id
-                    WHERE alerts.state=0 AND alert_log.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
-                    )";
+    $sql = "DELETE alert_log
+                FROM alert_log
+                INNER JOIN alerts
+                ON alerts.device_id=alert_log.device_id AND alerts.rule_id=alert_log.rule_id
+                WHERE alerts.state=0 AND alert_log.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                ";
     lock_and_purge_query($table, $sql, $msg);
 }
 
