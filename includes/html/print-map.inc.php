@@ -286,9 +286,11 @@ foreach ($list as $items) {
     $device_id1 = $items['local_device_id'].':'.$items['remote_device_id'];
     $device_id2 = $items['remote_device_id'].':'.$items['local_device_id'];
 
-    // Ensure only one link exists between any two ports.
+    // Ensure only one link exists between any two ports, or any two devices.
     if (!array_key_exists($link_id1, $link_assoc_seen) &&
-        !array_key_exists($link_id2, $link_assoc_seen)) {
+        !array_key_exists($link_id2, $link_assoc_seen) &&
+        !array_key_exists($device_id1, $device_assoc_seen) &&
+        !array_key_exists($device_id2, $device_assoc_seen)) {
         $local_port = cleanPort($local_port);
         $remote_port = cleanPort($remote_port);
         $links[] = array_merge(
