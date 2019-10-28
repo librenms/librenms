@@ -594,8 +594,10 @@
             ]
         },
         "base_url": {
-            "type": "text",
-            "default": ""
+            "group": "system",
+            "section": "server",
+            "order": 5,
+            "type": "text"
         },
         "billing.base": {
             "default": 1000,
@@ -3807,9 +3809,11 @@
             }
         },
         "ports_purge": {
+            "group": "system",
+            "section": "cleanup",
+            "order": 9,
             "default": false,
             "type": "boolean"
-
         },
         "project_home": {
             "default": "http://www.librenms.org/",
@@ -3880,6 +3884,9 @@
             "type": "text"
         },
         "rrd_purge": {
+            "group": "system",
+            "section": "cleanup",
+            "order": 8,
             "default": 0,
             "type": "integer"
         },

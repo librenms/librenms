@@ -311,6 +311,10 @@ return [
             'description' => 'Auth log entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
         ],
+            'base_url' => [
+            'description' => 'Specific URL',
+            'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname'
+        ],
         'device_perf_purge' => [
             'description' => 'Device performance entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
@@ -585,6 +589,10 @@ return [
             'description' => 'Port FDB entries older than',
             'help' => 'Cleanup done by daily.sh'
         ],
+        'port_purge' => [
+            'description' => 'Ports older than (days)',
+            'help' => 'Cleanup done by daily.sh'
+        ],
         'public_status' => [
             'description' => 'Show status publicly',
             'help' => 'Shows the status of some devices on the logon page without authentication.'
@@ -600,6 +608,10 @@ return [
         'rrd_dir' => [
             'description' => 'RRD Location',
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.'
+        ],
+        'rrd_purge' => [
+            'description' => 'RRD Files entries older than (days)',
+            'help' => 'Cleanup done by daily.sh'
         ],
         'rrd_rra' => [
             'description' => 'RRD Format Settings',
