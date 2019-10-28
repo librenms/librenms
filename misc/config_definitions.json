@@ -593,6 +593,10 @@
                 "mpls"
             ]
         },
+        "base_url": {
+            "type": "text",
+            "default": ""
+        },
         "billing.base": {
             "default": 1000,
             "type": "integer"
@@ -3123,6 +3127,10 @@
             "default": 2,
             "type": "integer"
         },
+        "leaflet.group_radius": {
+            "default": 10,
+            "type": "integer"
+        },
         "leaflet.tile_url": {
             "default": "{s}.tile.openstreetmap.org",
             "type": "text"
@@ -3565,7 +3573,6 @@
         "poller_modules.ipmi": {
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.sensors": {
             "default": true,
@@ -3799,6 +3806,11 @@
                 "fdb": "FDB"
             }
         },
+        "ports_purge": {
+            "default": false,
+            "type": "boolean"
+
+        },
         "project_home": {
             "default": "http://www.librenms.org/",
             "type": "text"
@@ -3866,6 +3878,10 @@
             "section": "rrdtool",
             "order": 6,
             "type": "text"
+        },
+        "rrd_purge": {
+            "default": 0,
+            "type": "integer"
         },
         "rrd_rra": {
             "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 ",
