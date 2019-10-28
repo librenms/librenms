@@ -2536,22 +2536,24 @@ function lock_and_purge($table, $sql)
  */
 function lock_and_purge_query($table, $sql, $msg)
 {
-    try {
-        $purge_name = $table . '_purge';
+    $purge_name = $table . '_purge';
 
-        if (Config::get('distributed_poller')) {
-            MemcacheLock::lock($purge_name, 0, 86000);
-        }
-        $purge_duration = Config::get($purge_name);
-        if (is_numeric($purge_duration) && $purge_duration > 0) {
-            if (dbQuery($sql, array($purge_duration))) {
-                printf($msg, $purge_duration);
-            }
+    if (Config::get('distributed_poller')) {
+        MemcacheLock::lock($purge_name, 0, 86000);
+    }
+    $purge_duration = Config::get($purge_name);
+    if (!(is_numeric($purge_duration) && $purge_duration > 0)) {
+        return -2;
+    }
+    try {
+        if (dbQuery($sql, array($purge_duration))) {
+            printf($msg, $purge_duration);
         }
     } catch (LockException $e) {
         echo $e->getMessage() . PHP_EOL;
         return -1;
     }
+    return 0;
 }
 
 /**
