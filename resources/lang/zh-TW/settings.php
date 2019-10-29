@@ -53,59 +53,59 @@ return [
     'settings' => [
         'active_directory' => [
             'users_purge' => [
-                'description' => 'Keep inactive users for',
-                'help' => 'Users will be deleted from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in.',
+                'description' => '保留未登入使用者於',
+                'help' => '設定使用者超過幾天沒有登入後，將會被 LibreNMS 自動刪除。設為 0 表示不會刪除，若使用者重新登入，將會重新建立帳戶。',
             ]
         ],
         'addhost_alwayscheckip' => [
-            'description' => 'Check for duplicate IP when adding devices',
-            'help' => 'If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.'
+            'description' => '新增裝置時檢察是否 IP 重複',
+            'help' => '以 IP 加入主機時，會先檢查此 IP 是否已存在於系統上，若有則不予加入。若是以主機名稱方式加入時，則不會做此檢查。若設定為 True 時，則以主機名稱方式加入時亦做此檢查，以避免加入重複主機的意外發生。'
         ],
         'alert' => [
             'ack_until_clear' => [
-                'description' => 'Default acknowledge until alert clears option',
-                'help' => 'Default acknowledge until alert clears'
+                'description' => '預設認可值到警報解除選項',
+                'help' => '預設認可值到警報解除'
             ],
             'admins' => [
-                'description' => 'Issue alerts to admins',
-                'help' => 'Alert administrators'
+                'description' => '向管理員發送警報',
+                'help' => '管理員警報'
             ],
             'default_copy' => [
-                'description' => 'Copy all email alerts to default contact',
-                'help' => 'Copy all email alerts to default contact'
+                'description' => '複製所有的郵件警報給預設連絡人',
+                'help' => '複製所有的郵件警報給預設連絡人'
             ],
             'default_if_none' => [
-                'description' => 'cannot set in webui?',
-                'help' => 'Send mail to default contact if no other contacts are found'
+                'description' => '無法在 WebUI 設定？',
+                'help' => '如果沒有找到其它連絡人，請把郵件發送到預設連絡人'
             ],
             'default_mail' => [
-                'description' => 'Default contact',
-                'help' => 'The default mail contact'
+                'description' => '預設連絡人',
+                'help' => '預設連絡人郵件位址'
             ],
             'default_only' => [
-                'description' => 'Send alerts to default contact only',
-                'help' => 'Only alert default mail contact'
+                'description' => '只發送警報給預設連絡人',
+                'help' => '只發送警報給預設郵件連絡人'
             ],
             'disable' => [
-                'description' => 'Disable alerting',
-                'help' => 'Stop alerts being generated'
+                'description' => '停用警報',
+                'help' => '停止產生警報'
             ],
             'fixed-contacts' => [
                 'description' => 'Updates to contact email addresses not honored',
                 'help' => 'If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active'
             ],
             'globals' => [
-                'description' => 'Issue alerts to read only users',
-                'help' => 'Alert read only administrators'
+                'description' => '只發送警報給唯讀使用者',
+                'help' => '只發送警報給唯讀管理員'
             ],
             'syscontact' => [
-                'description' => 'Issue alerts to sysContact',
-                'help' => 'Send alert to email in SNMP sysContact'
+                'description' => '發送警報給 sysContact',
+                'help' => '發送警報郵件給 SNMP sysContact'
             ],
             'transports' => [
                 'mail' => [
-                    'description' => 'Enable email alerting',
-                    'help' => 'Mail alerting transport'
+                    'description' => '啟用郵件警報',
+                    'help' => '啟用以郵件傳輸警報'
                 ]
             ],
             'tolerance_window' => [
@@ -113,8 +113,8 @@ return [
                 'help' => 'Tolerance window in seconds'
             ],
             'users' => [
-                'description' => 'Issue alerts to normal users',
-                'help' => 'Alert normal users'
+                'description' => '發送警報給一般使用者',
+                'help' => '警報通知一般使用者'
             ]
         ],
         'alert_log_purge' => [
@@ -130,7 +130,7 @@ return [
             'help' => 'Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)'
         ],
         'api_demo' => [
-            'description' => 'This is the demo'
+            'description' => '這是展示'
         ],
         'apps' => [
             'powerdns-recursor' => [
@@ -152,15 +152,15 @@ return [
             'description' => 'Key to hold cache of autonomous systems descriptions'
         ],
         'auth_ad_base_dn' => [
-            'description' => 'Base DN',
+            'description' => '基礎 DN',
             'help' => 'groups and users must be under this dn. Example: dc=example,dc=com'
         ],
         'auth_ad_check_certificates' => [
-            'description' => 'Check certificate',
+            'description' => '檢查憑證',
             'help' => 'Check certificates for validity. Some servers use self signed certificates, disabling this allows those.'
         ],
         'auth_ad_group_filter' => [
-            'description' => 'Group LDAP filter',
+            'description' => 'LDAP 群組篩選器',
             'help' => 'Active Directory LDAP filter for selecting groups'
         ],
         'auth_ad_groups' => [
@@ -168,7 +168,7 @@ return [
             'help' => 'Define groups that have access and level'
         ],
         'auth_ad_user_filter' => [
-            'description' => 'User LDAP filter',
+            'description' => 'LDAP 使用者篩選',
             'help' => 'Active Directory LDAP filter for selecting users'
         ],
         'auth_ldap_attr' => [
@@ -178,39 +178,39 @@ return [
             ]
         ],
         'auth_ldap_binddn' => [
-            'description' => 'Bind DN (overrides bind username)',
+            'description' => '繫結 DN (覆寫繫結使用者名稱)',
             'help' => 'Full DN of bind user'
         ],
         'auth_ldap_bindpassword' => [
-            'description' => 'Bind password',
+            'description' => '繫結密碼',
             'help' => 'Password for bind user'
         ],
         'auth_ldap_binduser' => [
-            'description' => 'Bind username',
+            'description' => '繫結使用者',
             'help' => 'Used to query the LDAP server when no user is logged in (alerts, API, etc)'
         ],
         'auth_ad_binddn' => [
-            'description' => 'Bind DN (overrides bind username)',
+            'description' => '繫結 DN (覆寫繫結使用者名稱)',
             'help' => 'Full DN of bind user'
         ],
         'auth_ad_bindpassword' => [
-            'description' => 'Bind password',
+            'description' => '繫結密碼',
             'help' => 'Password for bind user'
         ],
         'auth_ad_binduser' => [
-            'description' => 'Bind username',
+            'description' => '繫結使用者名稱',
             'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)'
         ],
         'auth_ldap_cache_ttl' => [
-            'description' => 'LDAP cache expiration',
+            'description' => 'LDAP 快取有效期',
             'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
         ],
         'auth_ldap_debug' => [
-            'description' => 'Show debug',
+            'description' => '顯示偵錯資訊',
             'help' => 'Shows debug information.  May expose private information, do not leave enabled.'
         ],
         'auth_ldap_emailattr' => [
-            'description' => 'Mail attribute'
+            'description' => '郵件屬性'
         ],
         'auth_ldap_group' => [
             'description' => 'Access group DN',
@@ -244,16 +244,16 @@ return [
             'help' => 'Used to turn a username into a distinguished name'
         ],
         'auth_ldap_server' => [
-            'description' => 'LDAP Server(s)',
+            'description' => 'LDAP 伺服器',
             'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl'
         ],
         'auth_ldap_starttls' => [
-            'description' => 'Use STARTTLS',
+            'description' => '使用 STARTTLS',
             'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
             'options' => [
-                'disabled' => 'Disabled',
-                'optional' => 'Optional',
-                'required' => 'Required'
+                'disabled' => '停用',
+                'optional' => '選用',
+                'required' => '必要'
             ]
         ],
         'auth_ldap_suffix' => [
@@ -261,7 +261,7 @@ return [
             'help' => 'Used to turn a username into a distinguished name'
         ],
         'auth_ldap_timeout' => [
-            'description' => 'Connection timeout',
+            'description' => '連線逾時',
             'help' => 'If one or more servers are unresponsive, higher timeouts will cause slow access. To low may cause connection failures in some cases',
         ],
         'auth_ldap_uid_attribute' => [
@@ -273,7 +273,7 @@ return [
             'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it’s member: uid=username,ou=groups,dc=domain,dc=com)"
         ],
         'auth_ldap_version' => [
-            'description' => 'LDAP version',
+            'description' => 'LDAP 版本',
             'help' => 'LDAP version to use to talk to the server.  Usually this should be v3',
             'options' => [
                 "2" => "2",
@@ -295,7 +295,7 @@ return [
             ]
         ],
         'auth_remember' => [
-            'description' => 'Remember me duration',
+            'description' => '記住我的期限',
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
@@ -307,30 +307,26 @@ return [
             'help' => 'Cleanup done by daily.sh'
         ],
         'distributed_poller' => [
-            'description' => 'Enable Distributed Polling (requires additional setup)',
+            'description' => '啟用分散式輪詢 (需要額外設定)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/'
-        ],        
-        'distributed_poller_group' => [
-            'description' => 'Default Poller Group',
-            'help' => 'The default poller group all pollers should poll if none is set in config.php'
         ],
         'distributed_poller_memcached_host' => [
-            'description' => 'Memcached host',
+            'description' => 'Memcached 主機',
             'help' => 'The hostname or ip for the memcached server. This is required for poller_wrapper.py and daily.sh locking.'
         ],
         'distributed_poller_memcached_port' => [
-            'description' => 'Memcached port',
+            'description' => 'Memcached 連接埠',
             'help' => 'The port for the memcached server. Default is 11211'
         ],
         'email_auto_tls' => [
-            'description' => 'Enable / disable Auto TLS support',
+            'description' => '啟用 / 停用自動 TLS 支援',
             'options' => [
-                'true' => 'Yes',
-                'false' => 'No'
+                'true' => '是',
+                'false' => '否'
             ]
         ],
         'email_backend' => [
-            'description' => 'How to deliver mail',
+            'description' => '如何寄送郵件',
             'help' => 'The backend to use for sending email, can be mail, sendmail or SMTP',
             'options' => [
                 'mail' => 'mail',
@@ -339,49 +335,49 @@ return [
             ]
         ],
         'email_from' => [
-            'description' => 'From email address',
+            'description' => '寄件者信箱位址',
             'help' => 'Email address used for sending emails (from)'
         ],
         'email_html' => [
-            'description' => 'Use HTML emails',
+            'description' => '使用 HTML 格式',
             'help' => 'Send HTML emails'
         ],
         'email_sendmail_path' => [
-            'description' => 'Location of sendmail if using this option'
+            'description' => '若啟用此選項，sendmail 所在的位置'
         ],
         'email_smtp_auth' => [
-            'description' => 'Enable / disable smtp authentication'
+            'description' => '啟用 / 停用e smtp 驗證'
         ],
         'email_smtp_host' => [
             'description' => 'SMTP Host for sending email if using this option'
         ],
         'email_smtp_password' => [
-            'description' => 'SMTP Auth password'
+            'description' => 'SMTP 驗證密碼'
         ],
         'email_smtp_port' => [
-            'description' => 'SMTP port setting'
+            'description' => 'SMTP 連接埠設定'
         ],
         'email_smtp_secure' => [
-            'description' => 'Enable / disable encryption (use tls or ssl)',
+            'description' => '啟用 / 停用加密 (使用 tls 或 ssl)',
             'options' => [
-                '' => 'Disabled',
+                '' => '停用',
                 'tls' => 'TLS',
                 'ssl' => 'SSL'
             ]
         ],
         'email_smtp_timeout' => [
-            'description' => 'SMTP timeout setting'
+            'description' => 'SMTP 逾時設定'
         ],
         'email_smtp_username' => [
-            'description' => 'SMTP Auth username'
+            'description' => 'SMTP 驗證使用者名稱'
         ],
         'email_user' => [
-            'description' => 'From name',
+            'description' => '寄件者名稱',
             'help' => 'Name used as part of the from address'
         ],
         'eventlog_purge' => [
-            'description' => 'Event log entries older than (days)',
-            'help' => 'Cleanup done by daily.sh'
+            'description' => '事件記錄大於 (天)',
+            'help' => '由 daily.sh 進行清理作業'
         ],
         'favicon' => [
             'description' => 'Favicon',
@@ -434,17 +430,17 @@ return [
             'help' => '顯示於登入頁面'
         ],
         'mono_font' => [
-            'description' => 'Monospaced Font',
+            'description' => 'Monospaced 字型',
         ],
         'mtr' => [
             'description' => 'mtr 路徑'
         ],
         'nfsen_enable' => [
-            'description' => 'Enable NfSen',
+            'description' => '啟用 NfSen',
             'help' => 'Enable Integration with NfSen',
         ],
         'nfsen_rrds' => [
-            'description' => 'NfSen RRD Directories',
+            'description' => 'NfSen RRD 目錄',
             'help' => 'This value specifies where your NFSen RRD files are located.'
         ],
         'nfsen_subdirlayout' => [
@@ -477,7 +473,7 @@ return [
             'description' => 'Default Last Options'
         ],
         'nfsen_split_char' => [
-            'description' => 'Split Char',
+            'description' => '分隔字元',
             'help' => 'This value tells us what to replace the full stops `.` in the devices hostname with. Usually: `_`'
         ],
         'nfsen_suffix' => [
@@ -517,8 +513,8 @@ return [
         ],
         'peeringdb' => [
             'enabled' => [
-                'description' => 'Enable PeeringDB lookup',
-                'help' => 'Enable PeeringDB lookup (data is downloaded with daily.sh)'
+                'description' => '啟用 PeeringDB lookup',
+                'help' => '起用 PeeringDB lookup (資料將於由 daily.sh 進行下載)'
             ]
         ],
         'perf_times_purge' => [
@@ -538,10 +534,10 @@ return [
         ],
         'rrd' => [
             'heartbeat' => [
-                'description' => 'Change the rrd heartbeat value (default 600)'
+                'description' => 'Change the rrd heartbeat value (預設 600)'
             ],
             'step' => [
-                'description' => 'Change the rrd step value (default 300)'
+                'description' => 'Change the rrd step value (預設 300)'
             ]
         ],
         'rrd_dir' => [
@@ -567,7 +563,7 @@ return [
             'description' => 'sfdp 路徑'
         ],
         'site_style' => [
-            'description' => 'Set the site css style',
+            'description' => '設定站台 css 樣式',
             'options' => [
                 'blue' => 'Blue',
                 'dark' => 'Dark',
@@ -577,15 +573,15 @@ return [
         ],
         'snmp' => [
             'transports' => [
-                'description' => 'Transport (priority)',
+                'description' => '傳輸 (priority)',
                 'help' => 'Select enabled transports and order them as you want them to be tried.'
             ],
             'version' => [
-                'description' => 'Version (priority)',
+                'description' => '版本 (priority)',
                 'help' => 'Select enabled versions and order them as you want them to be tried.'
             ],
             'community' => [
-                'description' => 'Communities (priority)',
+                'description' => '社群 (priority)',
                 'help' => 'Enter community strings for v1 and v2c and order them as you want them to be tried'
             ],
             'max_repeaters' => [
@@ -593,11 +589,11 @@ return [
                 'help' => 'Set repeaters to use for SNMP bulk requests'
             ],
             'port' => [
-                'description' => 'Port',
+                'description' => '連接埠',
                 'help' => 'Set the tcp/udp port to be used for SNMP'
             ],
             'v3' => [
-                'description' => 'SNMP v3 Authentication (priority)',
+                'description' => 'SNMP v3 驗證 (priority)',
                 'help' => 'Set up v3 authentication variables and order them as you want them to be tried',
                 'auth' => 'Auth',
                 'crypto' => 'Crypto',
@@ -657,7 +653,7 @@ return [
             ]
         ],
         'update' => [
-            'description' => 'Enable updates in ./daily.sh'
+            'description' => '啟用更新 ./daily.sh'
         ],
         'update_channel' => [
             'description' => '設定更新頻道',
@@ -691,7 +687,7 @@ return [
                 'help' => '對於沒有設定預設資訊看板的使用者，所要顯示的預設資訊看板'
             ],
             'dynamic_graphs' => [
-                'description' => 'Enable dynamic graphs',
+                'description' => '啟用動態群組',
                 'help' => 'Enable dynamic graphs, enables zooming and panning on graphs'
             ],
             'global_search_result_limit' => [
@@ -726,7 +722,6 @@ return [
     ],
     'validate' => [
         'boolean' => ':value is not a valid boolean',
-        'color' => ':value is not a valid hex color code',
         'email' => ':value is not a valid email',
         'integer' => ':value is not an integer',
         'password' => 'The password is incorrect',
