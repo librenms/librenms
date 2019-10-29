@@ -9,7 +9,6 @@ use LibreNMS\Exceptions\LdapMissingException;
 class LdapAuthorizer extends AuthorizerBase
 {
     protected $ldap_connection;
-    private $userloginname;
 
     public function authenticate($credentials)
     {
@@ -178,7 +177,9 @@ class LdapAuthorizer extends AuthorizerBase
                 // probably doesn't support memberOf, go through all users, this could be slow
                 $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
                 foreach (ldap_get_entries($connection, $search) as $entry) {
-                    if ($entry['uid'][0] != $this->$userloginname) { continue;}
+                    if ($entry['uid'][0] != $this->$userloginname) {
+                        continue;
+                    }
                     foreach ($ldap_groups as $ldap_group) {
                         if (ldap_compare(
                             $connection,
