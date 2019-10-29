@@ -174,31 +174,30 @@ class LdapAuthorizer extends AuthorizerBase
                     $user = $this->ldapToUser($entry);
                     $userlist[$user['username']] = $user;
                 }
-            } else {
-                // probably doesn't support memberOf, go through all users, this could be slow
-                $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
-                foreach (ldap_get_entries($connection, $search) as $entry) {
-                    if ($entry['uid'][0] != $this->userloginname) {
-                        continue;
-                    }
-                    foreach ($ldap_groups as $ldap_group) {
-                        if (ldap_compare(
-                            $connection,
-                            $ldap_group,
-                            Config::get('auth_ldap_groupmemberattr', 'memberUid'),
-                            $this->getMembername($entry['uid'][0])
-                        )) {
-                            $user = $this->ldapToUser($entry);
-                            $userlist[$user['username']] = $user;
-                        }
+                return $userlist;
+            }
+            // probably doesn't support memberOf, go through all users, this could be slow
+            $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+            foreach (ldap_get_entries($connection, $search) as $entry) {
+                if ($entry['uid'][0] != $this->userloginname) {
+                    continue;
+                }
+                foreach ($ldap_groups as $ldap_group) {
+                    if (ldap_compare(
+                        $connection,
+                        $ldap_group,
+                        Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                        $this->getMembername($entry['uid'][0])
+                    )) {
+                        $user = $this->ldapToUser($entry);
+                        $userlist[$user['username']] = $user;
                     }
                 }
             }
+            return $userlist;
         } catch (AuthenticationException $e) {
             echo $e->getMessage() . PHP_EOL;
         }
-
-        return $userlist;
     }
 
     public function getUser($user_id)
