@@ -25,8 +25,8 @@ $ipForwardNb = snmp_get_multi($device, ['inetCidrRouteNumber.0', 'ipCidrRouteNum
 
 //Get the configured max routes number
 $max_routes = 1000;
-if (null != (Config::get('routes.max_number'))) {
-    $max_routes = Config::get('routes.max_number');
+if (null != (Config::get('routes_max_number'))) {
+    $max_routes = Config::get('routes_max_number');
 }
 
 //Init update/create tables;

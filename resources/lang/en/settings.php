@@ -597,6 +597,10 @@ return [
             'description' => 'Show status publicly',
             'help' => 'Shows the status of some devices on the logon page without authentication.'
         ],
+        'routes_max_number' => [
+            'description' => 'Max number of routes allowed for discovery',
+            'help' => 'No route will be discovered if the size of the routing table is bigger than this number'
+        ],
         'route_purge' => [
             'description' => 'Route entries older than (days)',
             'help' => 'Cleanup done by daily.sh'

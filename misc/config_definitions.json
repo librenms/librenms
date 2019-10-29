@@ -3878,7 +3878,7 @@
             },
             "type": "array"
         },
-        "routes.max_number": {
+        "routes_max_number": {
             "default": 1000,
             "group": "discovery",
             "section": "route",
