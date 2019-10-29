@@ -235,7 +235,7 @@ if ($options['f'] === 'alert_log') {
     
     # alert_log older than $config['alert_log_purge'] days match now only the alert_log of active alerts
     # in case of flapping of an alert, many entries are kept in alert_log
-    # we want only to keep the last alert_log that contains the alert details
+    # we want only to keep the last alert_log that contains the alert details 
 
     $msg = "Deleting history of active alert_logs more than %d days\n";
     $sql = "DELETE
