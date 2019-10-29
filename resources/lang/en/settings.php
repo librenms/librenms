@@ -315,6 +315,7 @@ return [
             'description' => 'Specific URL',
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname'
         ],
+
         'device_perf_purge' => [
             'description' => 'Device performance entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
@@ -631,6 +632,10 @@ return [
         'sfdp' => [
             'description' => 'Path to sfdp'
         ],
+        'shorthost_target_length' => [
+            'description' => 'shortend hostname maximum length',
+            'help' => 'shrinks hostname to maximum length, but always complete subdomain parts'
+        ],
         'site_style' => [
             'description' => 'Set the site css style',
             'options' => [
@@ -702,6 +707,10 @@ return [
         'syslog_purge' => [
             'description' => 'Syslog entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'title_image' => [
+            'description' => 'Title Image',
+            'help' => 'Overrides the default Title Image.'
         ],
         'traceroute' => [
             'description' => 'Path to traceroute'

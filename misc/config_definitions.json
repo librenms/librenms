@@ -3940,6 +3940,13 @@
             "order": 7,
             "type": "text"
         },
+        "shorthost_target_length": {
+            "group": "webui",
+            "section": "graph",
+            "order": 8,
+            "default": 12,
+            "type": "integer"
+        },
         "show_locations": {
             "default": true,
             "type": "boolean"
@@ -4213,6 +4220,12 @@
         },
         "temp_dir": {
             "default": "/tmp",
+            "type": "text"
+        },
+        "title_image": {
+            "group": "webui",
+            "section": "style",
+            "order": 3,
             "type": "text"
         },
         "top_devices": {
