@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python3
 """
  discovery-wrapper A small tool which wraps around discovery and tries to
                 guide the discovery process with a more modern approach with a
@@ -7,7 +7,8 @@
  Based on the original version of poller-wrapper.py by Job Snijders
 
  Author:        Neil Lathwood <neil@librenms.org>
- Date:          Sep 2016
+                Orsiris de Jong <contact@netpower.fr>
+ Date:          Oct 2019
 
  Usage:         This program accepts one command line argument: the number of threads
                 that should run simultaneously. If no argument is given it will assume
@@ -15,6 +16,10 @@
 
  Ubuntu Linux:  apt-get install python-mysqldb
  FreeBSD:       cd /usr/ports/*/py-MySQLdb && make install clean
+ RHEL 7:        yum install MySQL-python
+ RHEL 8:        dnf install mariadb-connector-c-devel gcc && python -m pip install mysqlclient
+
+ Tested on:     Python 3.6.8 / PHP 7.2.11 / CentOS 8
 
  License:       This program is free software: you can redistribute it and/or modify it
                 under the terms of the GNU General Public License as published by the
@@ -35,7 +40,7 @@ try:
 
     import json
     import os
-    import Queue
+    import queue
     import subprocess
     import sys
     import threading
@@ -43,83 +48,76 @@ try:
     from optparse import OptionParser
 
 except:
-    print "ERROR: missing one or more of the following python modules:"
-    print "threading, Queue, sys, subprocess, time, os, json"
+    print("ERROR: missing one or more of the following python modules:")
+    print("threading, Queue, sys, subprocess, time, os, json")
     sys.exit(2)
 
 try:
     import MySQLdb
 except:
-    print "ERROR: missing the mysql python module:"
-    print "On ubuntu: apt-get install python-mysqldb"
-    print "On FreeBSD: cd /usr/ports/*/py-MySQLdb && make install clean"
+    print("ERROR: missing the mysql python module:")
+    print("On ubuntu: apt-get install python-mysqldb")
+    print("On FreeBSD: cd /usr/ports/*/py-MySQLdb && make install clean")
     sys.exit(2)
 
 """
     Fetch configuration details from the config_to_json.php script
 """
 
-install_dir = os.path.dirname(os.path.realpath(__file__))
-config_file = install_dir + '/config.php'
 
-
-def get_config_data():
-    config_cmd = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
+def get_config_data(install_dir):
+    command = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
+    decoder = 'utf-8'
+    timeout = 30
     try:
-        proc = subprocess.Popen(config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-    except:
-        print "ERROR: Could not execute: %s" % config_cmd
-        sys.exit(2)
-    return proc.communicate()[0]
-
-try:
-    with open(config_file) as f:
-        pass
-except IOError as e:
-    print "ERROR: Oh dear... %s does not seem readable" % config_file
-    sys.exit(2)
-
-try:
-    config = json.loads(get_config_data())
-except:
-    print "ERROR: Could not load or parse configuration, are PATHs correct?"
-    sys.exit(2)
-
-discovery_path = config['install_dir'] + '/discovery.php'
-log_dir = config['log_dir']
-db_username = config['db_user']
-db_password = config['db_pass']
-db_port = int(config['db_port'])
-
-if config['db_socket']:
-    db_server = config['db_host']
-    db_socket = config['db_socket']
-else:
-    db_server = config['db_host']
-    db_socket = None
-
-db_dbname = config['db_name']
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=False, timeout=30,
+                                         universal_newlines=False)
+        output = output.decode(decoder, errors='ignore')
+    except subprocess.CalledProcessError as iexc:
+        exit_code = iexc.returncode
+        try:
+            output = iexc.output
+            try:
+                output = output.decode(decoder, errors='ignore')
+            except Exception as subexc:
+                print('ERROR: %s', subexc)
+        except Exception:
+            output = "Could not obtain output from command."
+        if exit_code == 0:
+            print('Command [%s] returned with exit code [%s]. Command output was:' % (command, exit_code))
+            if output:
+                print(output)
+            return iexc.returncode, output
+        else:
+            print('Command [%s] failed with exit code [%s]. Command output was:' %
+                  (command, iexc.returncode))
+            return iexc.returncode, output
+    # OSError if not a valid executable
+    except OSError as exc:
+        print('Command [%s] returned:\n%s.' % (command, exc))
+        return None, exc
+    except subprocess.TimeoutExpired:
+        print('Timeout [%s seconds] expired for command [%s] execution.' % (timeout, command))
+        return None, 'Timeout of %s seconds expired.' % timeout
+    else:
+        return 0, output
 
 
 def db_open():
     try:
         if db_socket:
-            db = MySQLdb.connect(host=db_server, unix_socket=db_socket, user=db_username, passwd=db_password, db=db_dbname)
+            database = MySQLdb.connect(host=db_server, unix_socket=db_socket, user=db_username, passwd=db_password,
+                                       db=db_dbname)
         else:
-            db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
-        return db
-    except:
-        print "ERROR: Could not connect to MySQL database!"
+            database = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
+        return database
+    except Exception as dbexc:
+        print('ERROR: Could not connect to MySQL database!')
+        print('ERROR: %s' % dbexc)
         sys.exit(2)
 
 
-# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
-if 'distributed_poller_group' in config:
-    discovery_group = str(config['distributed_poller_group'])
-else:
-    discovery_group = False
-
-
+# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC0
 def memc_alive():
     try:
         global memc
@@ -142,98 +140,8 @@ def memc_touch(key, time):
     except:
         pass
 
-if ('distributed_poller' in config and
-    'distributed_poller_memcached_host' in config and
-    'distributed_poller_memcached_port' in config and
-        config['distributed_poller']):
-    try:
-        import memcache
-        import uuid
-        memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
-            str(config['distributed_poller_memcached_port'])])
-        if str(memc.get("discovery.master")) == config['distributed_poller_name']:
-            print "This system is already joined as the discovery master."
-            sys.exit(2)
-        if memc_alive():
-            if memc.get("discovery.master") is None:
-                print "Registered as Master"
-                memc.set("discovery.master", config['distributed_poller_name'], 30)
-                memc.set("discovery.nodes", 0, 3600)
-                IsNode = False
-            else:
-                print "Registered as Node joining Master %s" % memc.get("discovery.master")
-                IsNode = True
-                memc.incr("discovery.nodes")
-            distdisco = True
-        else:
-            print "Could not connect to memcached, disabling distributed discovery."
-            distdisco = False
-            IsNode = False
-    except SystemExit:
-        raise
-    except ImportError:
-        print "ERROR: missing memcache python module:"
-        print "On deb systems: apt-get install python-memcache"
-        print "On other systems: easy_install python-memcached"
-        print "Disabling distributed discovery."
-        distdisco = False
-else:
-    distdisco = False
-# EOC1
 
-s_time = time.time()
-real_duration = 0
-per_device_duration = {}
-discovered_devices = 0
-
-"""
-    Take the amount of threads we want to run in parallel from the commandline
-    if None are given or the argument was garbage, fall back to default of 1
-"""
-usage = "usage: %prog [options] <workers> (Default: 1 Do not set too high)"
-description = "Spawn multiple discovery.php processes in parallel."
-parser = OptionParser(usage=usage, description=description)
-parser.add_option('-d', '--debug', action='store_true', default=False,
-                  help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
-(options, args) = parser.parse_args()
-
-debug = options.debug
-try:
-    amount_of_workers = int(args[0])
-except (IndexError, ValueError):
-    amount_of_workers = 1
-
-devices_list = []
-
-"""
-    This query specificly orders the results depending on the last_discovered_timetaken variable
-    Because this way, we put the devices likely to be slow, in the top of the queue
-    thus greatening our chances of completing _all_ the work in exactly the time it takes to
-    discover the slowest device! cool stuff he
-"""
-# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC2
-if discovery_group is not False:
-    query = "select device_id from devices where poller_group IN(" + discovery_group + ") and disabled = 0 order by last_polled_timetaken desc"
-else:
-    query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
-# EOC2
-
-
-db = db_open()
-cursor = db.cursor()
-cursor.execute(query)
-devices = cursor.fetchall()
-for row in devices:
-    devices_list.append(int(row[0]))
-# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC3
-if distdisco and not IsNode:
-    query = "select max(device_id),min(device_id) from devices"
-    cursor.execute(query)
-    devices = cursor.fetchall()
-    maxlocks = devices[0][0]
-    minlocks = devices[0][1]
-# EOC3
-db.close()
+# EOC0
 
 """
     A seperate queue and a single worker for printing information to the screen prevents
@@ -247,7 +155,7 @@ db.close()
 def printworker():
     nodeso = 0
     while True:
-# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC4
+        # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC4
         global IsNode
         global distdisco
         if distdisco:
@@ -255,11 +163,11 @@ def printworker():
                 memc_touch('discovery.master', 30)
                 nodes = memc.get('discovery.nodes')
                 if nodes is None and not memc_alive():
-                    print "WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly."
+                    print("WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly.")
                     distdisco = False
                     nodes = nodeso
                 if nodes is not nodeso:
-                    print "INFO: %s Node(s) Total" % (nodes)
+                    print("INFO: %s Node(s) Total" % (nodes))
                     nodeso = nodes
             else:
                 memc_touch('discovery.nodes', 30)
@@ -274,7 +182,7 @@ def printworker():
                 continue
         else:
             worker_id, device_id, elapsed_time = print_queue.get()
-# EOC4
+        # EOC4
         global real_duration
         global per_device_duration
         global discovered_devices
@@ -282,10 +190,11 @@ def printworker():
         per_device_duration[device_id] = elapsed_time
         discovered_devices += 1
         if elapsed_time < 300:
-            print "INFO: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time)
+            print("INFO: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
         else:
-            print "WARNING: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time)
+            print("WARNING: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
         print_queue.task_done()
+
 
 """
     This class will fork off single instances of the discovery.php process, record
@@ -296,19 +205,19 @@ def printworker():
 def poll_worker():
     while True:
         device_id = poll_queue.get()
-# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
+        # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
         if not distdisco or memc.get('discovery.device.' + str(device_id)) is None:
             if distdisco:
                 result = memc.add('discovery.device.' + str(device_id), config['distributed_poller_name'], 300)
                 if not result:
-                    print "This device (%s) appears to be being discovered by another discovery node" % (device_id)
+                    print("This device (%s) appears to be being discovered by another discovery node" % (device_id))
                     poll_queue.task_done()
                     continue
                 if not memc_alive() and IsNode:
-                    print "Lost Memcached, Not discovering Device %s as Node. Master will discover it." % device_id
+                    print("Lost Memcached, Not discovering Device %s as Node. Master will discover it." % device_id)
                     poll_queue.task_done()
                     continue
-# EOC5
+            # EOC5
             try:
                 start_time = time.time()
 
@@ -324,73 +233,210 @@ def poll_worker():
                 pass
         poll_queue.task_done()
 
-poll_queue = Queue.Queue()
-print_queue = Queue.Queue()
 
-print "INFO: starting the discovery at %s with %s threads, slowest devices first" % (time.strftime("%Y-%m-%d %H:%M:%S"),
-        amount_of_workers)
+if __name__ == '__main__':
+    install_dir = os.path.dirname(os.path.realpath(__file__))
+    config_file = install_dir + '/config.php'
 
-for device_id in devices_list:
-    poll_queue.put(device_id)
+    try:
+        with open(config_file) as f:
+            pass
+    except IOError as e:
+        print("ERROR: Oh dear... %s does not seem readable" % config_file)
+        sys.exit(2)
 
-for i in range(amount_of_workers):
-    t = threading.Thread(target=poll_worker)
-    t.setDaemon(True)
-    t.start()
+    try:
+        _, conf = get_config_data(install_dir)
+        config = json.loads(conf)
+    except:
+        print("ERROR: Could not load or parse configuration, are PATHs correct?")
+        sys.exit(2)
 
-p = threading.Thread(target=printworker)
-p.setDaemon(True)
-p.start()
+    discovery_path = config['install_dir'] + '/discovery.php'
+    log_dir = config['log_dir']
 
-try:
-    poll_queue.join()
-    print_queue.join()
-except (KeyboardInterrupt, SystemExit):
-    raise
+    db_username = config['db_user']
+    db_password = config['db_pass']
+    db_port = int(config['db_port'])
 
-total_time = int(time.time() - s_time)
-
-print "INFO: discovery-wrapper polled %s devices in %s seconds with %s workers" % (discovered_devices, total_time, amount_of_workers)
-
-# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
-if distdisco or memc_alive():
-    master = memc.get("discovery.master")
-    if master == config['distributed_poller_name'] and not IsNode:
-        print "Wait for all discovery-nodes to finish"
-        nodes = memc.get("discovery.nodes")
-        while nodes > 0 and nodes is not None:
-            try:
-                time.sleep(1)
-                nodes = memc.get("discovery.nodes")
-            except:
-                pass
-        print "Clearing Locks"
-        x = minlocks
-        while x <= maxlocks:
-            memc.delete('discovery.device.' + str(x))
-            x = x + 1
-        print "%s Locks Cleared" % x
-        print "Clearing Nodes"
-        memc.delete("discovery.master")
-        memc.delete("discovery.nodes")
+    if config['db_socket']:
+        db_server = config['db_host']
+        db_socket = config['db_socket']
     else:
-        memc.decr("discovery.nodes")
-    print "Finished %s." % time.time()
-# EOC6
+        db_server = config['db_host']
+        db_socket = None
 
-show_stopper = False
+    db_dbname = config['db_name']
 
-if total_time > 21600:
-    print "WARNING: the process took more than 6 hours to finish, you need faster hardware or more threads"
-    print "INFO: in sequential style discovery the elapsed time would have been: %s seconds" % real_duration
-    for device in per_device_duration:
-        if per_device_duration[device] > 3600:
-            print "WARNING: device %s is taking too long: %s seconds" % (device, per_device_duration[device])
-            show_stopper = True
-    if show_stopper:
-        print "ERROR: Some devices are taking more than 3600 seconds, the script cannot recommend you what to do."
+    # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
+    if 'distributed_poller_group' in config:
+        discovery_group = str(config['distributed_poller_group'])
     else:
-        recommend = int(total_time / 300.0 * amount_of_workers + 1)
-        print "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend
+        discovery_group = False
 
-    sys.exit(2)
+    if ('distributed_poller' in config and
+            'distributed_poller_memcached_host' in config and
+            'distributed_poller_memcached_port' in config and
+            config['distributed_poller']):
+        try:
+            import memcache
+            import uuid
+
+            memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
+                                    str(config['distributed_poller_memcached_port'])])
+            if str(memc.get("discovery.master")) == config['distributed_poller_name']:
+                print("This system is already joined as the discovery master.")
+                sys.exit(2)
+            if memc_alive():
+                if memc.get("discovery.master") is None:
+                    print("Registered as Master")
+                    memc.set("discovery.master", config['distributed_poller_name'], 30)
+                    memc.set("discovery.nodes", 0, 3600)
+                    IsNode = False
+                else:
+                    print("Registered as Node joining Master %s" % memc.get("discovery.master"))
+                    IsNode = True
+                    memc.incr("discovery.nodes")
+                distdisco = True
+            else:
+                print("Could not connect to memcached, disabling distributed discovery.")
+                distdisco = False
+                IsNode = False
+        except SystemExit:
+            raise
+        except ImportError:
+            print("ERROR: missing memcache python module:")
+            print("On deb systems: apt-get install python-memcache")
+            print("On other systems: easy_install python-memcached")
+            print("Disabling distributed discovery.")
+            distdisco = False
+    else:
+        distdisco = False
+    # EOC1
+
+    s_time = time.time()
+    real_duration = 0
+    per_device_duration = {}
+    discovered_devices = 0
+
+    """
+        Take the amount of threads we want to run in parallel from the commandline
+        if None are given or the argument was garbage, fall back to default of 1
+    """
+    usage = "usage: %prog [options] <workers> (Default: 1 Do not set too high)"
+    description = "Spawn multiple discovery.php processes in parallel."
+    parser = OptionParser(usage=usage, description=description)
+    parser.add_option('-d', '--debug', action='store_true', default=False,
+                      help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
+    (options, args) = parser.parse_args()
+
+    debug = options.debug
+    try:
+        amount_of_workers = int(args[0])
+    except (IndexError, ValueError):
+        amount_of_workers = 1
+
+    devices_list = []
+
+    """
+        This query specificly orders the results depending on the last_discovered_timetaken variable
+        Because this way, we put the devices likely to be slow, in the top of the queue
+        thus greatening our chances of completing _all_ the work in exactly the time it takes to
+        discover the slowest device! cool stuff he
+    """
+    # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC2
+    if discovery_group is not False:
+        query = "select device_id from devices where poller_group IN(" + discovery_group + ") and disabled = 0 order by last_polled_timetaken desc"
+    else:
+        query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
+    # EOC2
+
+    db = db_open()
+    cursor = db.cursor()
+    cursor.execute(query)
+    devices = cursor.fetchall()
+    for row in devices:
+        devices_list.append(int(row[0]))
+    # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC3
+    if distdisco and not IsNode:
+        query = "select max(device_id),min(device_id) from devices"
+        cursor.execute(query)
+        devices = cursor.fetchall()
+        maxlocks = devices[0][0]
+        minlocks = devices[0][1]
+    # EOC3
+    db.close()
+
+    poll_queue = queue.Queue()
+    print_queue = queue.Queue()
+
+    print("INFO: starting the discovery at %s with %s threads, slowest devices first" % (
+    time.strftime("%Y-%m-%d %H:%M:%S"),
+    amount_of_workers))
+
+    for device_id in devices_list:
+        poll_queue.put(device_id)
+
+    for i in range(amount_of_workers):
+        t = threading.Thread(target=poll_worker)
+        t.setDaemon(True)
+        t.start()
+
+    p = threading.Thread(target=printworker)
+    p.setDaemon(True)
+    p.start()
+
+    try:
+        poll_queue.join()
+        print_queue.join()
+    except (KeyboardInterrupt, SystemExit):
+        raise
+
+    total_time = int(time.time() - s_time)
+
+    print("INFO: discovery-wrapper polled %s devices in %s seconds with %s workers" % (
+    discovered_devices, total_time, amount_of_workers))
+
+    # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
+    if distdisco or memc_alive():
+        master = memc.get("discovery.master")
+        if master == config['distributed_poller_name'] and not IsNode:
+            print("Wait for all discovery-nodes to finish")
+            nodes = memc.get("discovery.nodes")
+            while nodes > 0 and nodes is not None:
+                try:
+                    time.sleep(1)
+                    nodes = memc.get("discovery.nodes")
+                except:
+                    pass
+            print("Clearing Locks")
+            x = minlocks
+            while x <= maxlocks:
+                memc.delete('discovery.device.' + str(x))
+                x = x + 1
+            print("%s Locks Cleared" % x)
+            print("Clearing Nodes")
+            memc.delete("discovery.master")
+            memc.delete("discovery.nodes")
+        else:
+            memc.decr("discovery.nodes")
+        print("Finished %s." % time.time())
+    # EOC6
+
+    show_stopper = False
+
+    if total_time > 21600:
+        print("WARNING: the process took more than 6 hours to finish, you need faster hardware or more threads")
+        print("INFO: in sequential style discovery the elapsed time would have been: %s seconds" % real_duration)
+        for device in per_device_duration:
+            if per_device_duration[device] > 3600:
+                print("WARNING: device %s is taking too long: %s seconds" % (device, per_device_duration[device]))
+                show_stopper = True
+        if show_stopper:
+            print("ERROR: Some devices are taking more than 3600 seconds, the script cannot recommend you what to do.")
+        else:
+            recommend = int(total_time / 300.0 * amount_of_workers + 1)
+            print(
+                "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend)
+
+        sys.exit(2)
