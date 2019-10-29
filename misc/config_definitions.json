@@ -193,7 +193,7 @@
             "default": [],
             "group": "webui",
             "section": "graph",
-            "order": 5,
+            "order": 6,
             "type": "array"
         },
         "api.cors.allowheaders": {
@@ -3943,7 +3943,7 @@
         "shorthost_target_length": {
             "group": "webui",
             "section": "graph",
-            "order": 8,
+            "order": 5,
             "default": 12,
             "type": "integer"
         },
