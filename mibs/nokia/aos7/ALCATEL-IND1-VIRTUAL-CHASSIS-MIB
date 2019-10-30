@@ -1,0 +1,1243 @@
+ALCATEL-IND1-VIRTUAL-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+         OBJECT-TYPE,
+         OBJECT-IDENTITY,
+         MODULE-IDENTITY,
+         NOTIFICATION-TYPE,
+         Integer32, Unsigned32,
+         Counter32, TimeTicks   FROM SNMPv2-SMI
+         softentIND1VirtualChassisManager FROM ALCATEL-IND1-BASE
+         TruthValue,
+         MacAddress,
+         TEXTUAL-CONVENTION,
+         RowStatus              FROM SNMPv2-TC
+         SnmpAdminString        FROM SNMP-FRAMEWORK-MIB
+         MODULE-COMPLIANCE,
+         OBJECT-GROUP,
+         NOTIFICATION-GROUP     FROM SNMPv2-CONF
+         InterfaceIndex         FROM IF-MIB;
+
+
+alcatelIND1VirtualChassisMIB MODULE-IDENTITY
+    LAST-UPDATED "201105250000Z"
+    ORGANIZATION "Alcatel-Lucent, Enterprise Solutions Division"
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
+
+                 Alcatel-Lucent, Enterprise Solutions Division
+                (Formerly Alcatel Internetworking, Incorporated)
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
+
+     Telephone:               North America  +1 800 995 2696
+                              Latin America  +1 877 919 9526
+                              Europe         +31 23 556 0100
+                              Asia           +65 394 7933
+                              All Other      +1 818 878 4507
+
+     Electronic Mail:         support@ind.alcatel.com
+     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+        etwork Management Protocol (SNMP) Management Information Base (MIB):
+
+        For the Birds Of Prey Product Line, this is the Chassis Supervision
+        Chassis MIB
+        for managing physical chassis objects not covered in the IETF
+        Entity MIB (rfc 2737).
+
+        The right to make changes in specification and other information
+        contained in this document without prior notice is reserved.
+
+        No liability shall be assumed for any incidental, indirect, special, or
+        consequential damages whatsoever arising from or related to this
+        document or the information contained herein.
+
+        Vendors, end-users, and other interested parties are granted
+        non-exclusive license to use this specification in connection with
+        management of the products for which it is intended to be used.
+
+                   Copyright (C) 1995-2007 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "201105250000Z"
+
+  DESCRIPTION
+     "Addressing discrepancies with Alcatel Standard."
+     ::= { softentIND1VirtualChassisManager 1 }
+
+    alcatelIND1VirtualChassisMIBNotifications OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Virtual-Chassis manager MIB
+            Subsystem Managed Objects."
+        ::= { alcatelIND1VirtualChassisMIB 0 }
+
+    alcatelIND1VirtualChassisMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Virtual-Chassis manager MIB
+            Subsystem Managed Objects."
+        ::= { alcatelIND1VirtualChassisMIB 1 }
+
+
+    alcatelIND1VirtualChassisMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Virtual Chassis MIB
+            Subsystem Conformance Information."
+        ::= { alcatelIND1VirtualChassisMIB 2}
+
+
+    alcatelIND1VirtualChassisMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Virtual Chassis MIB
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1VirtualChassisMIBConformance 1 }
+
+
+    alcatelIND1VirtualChassisMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Chassis Supervision Virtual Chassis MIB
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1VirtualChassisMIBConformance 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Virtual-Chassis TEXTUAL-CONVENTION
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+VirtualOperChassisId ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                "Chassis identifier globally unique within a virtual-chassis domain,
+                 which is a set of chassis configured to operate together
+                 providing virtual-chassis services. When the value of this object
+                 is equal to 0, the chassis operates in stand-alone mode; otherwise,
+                 the chassis is capable of operating in a virtual-chassis system.
+                 This chassis ID is defined as following to do configuration.
+                 Standalone mode or boot up:
+                          (0) local chassis configuraiton
+                 VC mode: (0) all chassis configuration Note: this is not valid for get case
+                          (1..6) this indicates chassis id of virtual-chassis mode
+                          (101..) this indicates a chassis with duplicated chassis id status"
+                SYNTAX Integer32 (0..255)
+
+VirtualConfigChassisId ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                "This is a configuraion for chassis id.
+                 (0) if no chassis id been applied
+                 (1..6) configure VC valid chassis id"
+                SYNTAX Integer32 (0..6)
+
+VirtualChassisHelloInterval ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                "Time interval, in seconds, at which hello messages will be sent to the peer."
+                SYNTAX Integer32 (0..65535)
+
+VirtualChassisControlVlan ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual Chassis control vlan."
+                SYNTAX Integer32 (2..4094)
+
+VirtualChassisCmmSlot ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "CMM slot indicator."
+                SYNTAX INTEGER {
+                        notPresent(0),
+                        cmmSlot1(65),
+                        cmmSlot2(66)
+                    }
+
+VirtualChassisNiSlot ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "NI slot indicator."
+                SYNTAX Integer32 (0..8)
+
+VirtualChassisVflId ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual Fabric Link Id."
+                SYNTAX Integer32 (0..7)
+
+VirtualChassisConsistency ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual-chassis parameter consistency status with master chassis. 
+                         inconsis(0): able to compare with master chassis but not consistent 
+                         consis(1): able to compare with master chassis and consistent
+                         na(2): not able to compare with master chassis since virtual-chassis is not connected yet  
+                         disabeled(3):  not able to compare with master because of standalone mode"
+                SYNTAX INTEGER {
+                        inconsistent(0),
+                        consistent(1),
+                        na(2),
+                        disabled(3)
+                    }
+
+VirtualChassisRole ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual-chassis chassis role: 
+                         unassigned(0): init chassis role and election not complete yet
+                         master(1): indicate chasis is in master role after election
+                         slave(2): indicate chasis is in slave role after election
+                         inconsistent(3): indicate chassis is not consistent after election
+                         startuperror(4): chassis unable to start in virtual-chassis mode"
+                SYNTAX INTEGER {
+                        unassigned(0),
+                        master(1),
+                        slave(2),
+                        inconsistent(3),
+                        startuperror(4)
+                    }
+
+
+VirtualChassisStatus ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual-chassis chassis status: 
+                        init(0): init state
+                        running(1): running state
+                        invalidChassisId(2): invalid chassis id in vcsetup.cfg file
+                        helloDown(3): hello down
+                        duplicateChassisId(4): duplicate chassis id
+                        mismatchImage(5): images cross chassis are mismatching
+                        mismatchChassisType(6): slave's chassis type is different compared to the master's value
+                        mismatchHelloInterval(7): slave's hello interval is different compared to the master's value
+                        mismatchControlVlan(8): slave's control VLAN is different compared to the master's value
+                        mismatchGroup(9): slave's chassis group is different compared to the master's value
+                        mismatchLicenseConfig(10): slave's license settings are different compared to the master's value
+                        invalidLicense(11): invalid license settings
+                        splitTopology(12): the topology was split and the slave chassis became isolated from the master
+                        commandShutdown(13): chassis shutdown initiated by explicit management command
+                        failureShutdown(14): chassis shutdown triggered by a serious initialization failure"
+                SYNTAX INTEGER {
+                        init(0),
+                        running(1),
+                        invalidChassisId(2),
+                        helloDown(3),
+                        duplicateChassisId(4),
+                        mismatchImage(5),
+                        mismatchChassisType(6),
+                        mismatchHelloInterval(7),
+                        mismatchControlVlan(8),
+                        mismatchGroup(9), 
+                        mismatchLicenseConfig(10),
+                        invalidLicense(11),
+                        splitTopology(12),
+                        commandShutdown(13),
+                        failureShutdown(14)
+                    }
+
+VirtualChassisGroup ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual Chassis group."
+                SYNTAX Integer32 (0..255)
+
+VirtualChassisPriority ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual Chassis priority."
+                SYNTAX Integer32 (0..255)
+
+VirtualChassisSlotResetStatus ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual-chassis slot reset status: 
+                         supported(0): This slot can be reset without spliting virtual chassis setup
+                         split(1): Reset this slot will split virtual chassis setup
+                         "
+                SYNTAX INTEGER {
+                        supported(0),
+                        split(1)
+                    }
+
+VirtualChassisType ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual-chassis chassis type: 
+                        invalid(0): Only support Rushmore and Tor for now
+                        rushmore(1): OS10k
+                        tor(2): OS6900
+                         "
+                SYNTAX INTEGER {
+                        invalid(0),
+                        rushmore(1),
+                        tor(2)
+                    }
+
+VirtualChassisVflSpeedType ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual-chassis VFL speed type: 
+                        unassigned(0): VFL speed type is unassigned   
+                        unkown(1): VFL speed is unknown
+                        mismatch(2): This VFL has member ports operating at different speeds 
+                        tenGB(3): All member ports of this VFL are operating at 10 Gbps
+                        fourtyGB(4): All member ports of this VFL are operating at 40 Gbps
+                        twentyOneGB(5): All member ports of this VFL are operating at 21 Gbps
+                         "
+                SYNTAX INTEGER {
+                        unassigned(0),
+                        unknown(1),
+                        mismatch(2),
+                        tenGB(3),
+                        fortyGB(4),
+                        twentyOneGB(5)
+
+                    }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Virtual-Chassis MIB
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+-- ----------------------------------------------------------
+-- Virtual-Chassis Local Info
+-- ----------------------------------------------------------
+
+virtualChassisLocalInfo   OBJECT IDENTIFIER ::= { alcatelIND1VirtualChassisMIBObjects 1 }
+
+virtualChassisLocalInfoChasId OBJECT-TYPE
+        SYNTAX VirtualOperChassisId
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Local chassis ID"
+::= { virtualChassisLocalInfo 1 }
+
+-- ----------------------------------------------------------
+-- Virtual-Chassis Global Table
+-- ----------------------------------------------------------
+
+virtualChassisGlobalTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VirtualChassisGlobalEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Global Table"
+::= { alcatelIND1VirtualChassisMIBObjects 2 }
+
+virtualChassisGlobalEntry OBJECT-TYPE
+        SYNTAX VirtualChassisGlobalEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Global Table Entry"
+        INDEX { virtualChassisOperChasId }
+::= { virtualChassisGlobalTable 1 }
+
+
+VirtualChassisGlobalEntry ::= SEQUENCE
+        {
+                virtualChassisOperChasId                VirtualOperChassisId,
+                virtualChassisConfigChassisId           VirtualConfigChassisId,
+                virtualChassisRole                      VirtualChassisRole,
+                virtualChassisPreviousRole              VirtualChassisRole,
+                virtualChassisStatus                    VirtualChassisStatus,
+                virtualChassisOperPriority              VirtualChassisPriority,
+                virtualChassisConfigPriority            VirtualChassisPriority,
+                virtualChassisGroup                     VirtualChassisGroup,
+                virtualChassisMac                       MacAddress,
+                virtualChassisUpTime                    TimeTicks,
+                virtualChassisDesigNI                   VirtualChassisNiSlot,
+                virtualChassisPriCmm                    VirtualChassisCmmSlot,
+                virtualChassisSecCmm                    VirtualChassisCmmSlot,
+                virtualChassisOperHelloInterval         VirtualChassisHelloInterval,
+                virtualChassisOperControlVlan           VirtualChassisControlVlan, 
+                virtualChassisConfigHelloInterval       VirtualChassisHelloInterval,
+                virtualChassisConfigControlVlan         VirtualChassisControlVlan,
+                virtualChassisType                      VirtualChassisType ,
+                virtualChassisLicense                   SnmpAdminString ,
+                virtualChassisOperChasIdConsis          VirtualChassisConsistency,
+                virtualChassisConfigChasIdConsis        VirtualChassisConsistency,
+                virtualChassisOperControlVlanConsis     VirtualChassisConsistency,
+                virtualChassisConfigControlVlanConsis   VirtualChassisConsistency,
+                virtualChassisOperHelloIntervalConsis   VirtualChassisConsistency,
+                virtualChassisConfigHelloIntervalConsis VirtualChassisConsistency,
+                virtualChassisChassisTypeConsis         VirtualChassisConsistency,
+                virtualChassisGroupConsis               VirtualChassisConsistency,
+                virtualChassisLicenseConsis             VirtualChassisConsistency,
+                virtualChassisGlobalConsis              VirtualChassisConsistency,
+                virtualChassisNumOfNeighbor             Integer32 ,
+                virtualChassisNumOfDirectNeighbor       Integer32
+
+        }
+virtualChassisOperChasId OBJECT-TYPE
+        SYNTAX VirtualOperChassisId
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Operational Virtual-Chassis chassis ID."
+::= { virtualChassisGlobalEntry 1 }
+
+virtualChassisConfigChassisId OBJECT-TYPE
+        SYNTAX VirtualConfigChassisId
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Configured Virtual-Chassis chassis ID.
+        : This object can be configured for the local chassis or for a specific chassis."
+    DEFVAL { 0}
+::= { virtualChassisGlobalEntry 2 }
+
+virtualChassisRole OBJECT-TYPE
+        SYNTAX VirtualChassisRole
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis chassis role"
+::= { virtualChassisGlobalEntry 3 }
+
+virtualChassisPreviousRole OBJECT-TYPE
+        SYNTAX VirtualChassisRole
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis previous chassis role"
+::= { virtualChassisGlobalEntry 4 }
+
+virtualChassisStatus OBJECT-TYPE
+        SYNTAX      VirtualChassisStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Virtual-Chassis chassis status"
+::= { virtualChassisGlobalEntry 5 }
+
+virtualChassisOperPriority OBJECT-TYPE
+        SYNTAX VirtualChassisPriority
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis operational chassis priority"
+::= { virtualChassisGlobalEntry 6 }
+
+virtualChassisConfigPriority OBJECT-TYPE
+        SYNTAX VirtualChassisPriority
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis configured chassis priority
+        This object can be configured for the local chassis and for a specific chassis."
+DEFVAL { 100 }
+::= { virtualChassisGlobalEntry 7 }
+
+virtualChassisGroup OBJECT-TYPE
+        SYNTAX VirtualChassisGroup
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis chassis group.
+        When a master chassis is present in the topology, the chassis group can only be configured according to the following rules:
+        1. With exactly the same chassis group value as the current master chassis when the configuration applies to a single and specific chassis.   
+        2. With any value within the valid range as long as the configuration applies to all chassis at the same time." 
+DEFVAL { 0}
+::= { virtualChassisGlobalEntry 8 }
+
+virtualChassisMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis chassis mac address."
+::= { virtualChassisGlobalEntry 9 }
+
+virtualChassisUpTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis chassis up time"
+::= { virtualChassisGlobalEntry 10 }
+
+virtualChassisDesigNI OBJECT-TYPE
+        SYNTAX VirtualChassisNiSlot
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis designated NI slot num"
+::= { virtualChassisGlobalEntry 11 }
+
+virtualChassisPriCmm OBJECT-TYPE
+        SYNTAX VirtualChassisCmmSlot
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis primary CMM slot num"
+::= { virtualChassisGlobalEntry 12 }
+
+virtualChassisSecCmm OBJECT-TYPE
+        SYNTAX VirtualChassisCmmSlot 
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis secondary CMM slot num"
+::= { virtualChassisGlobalEntry 13 }
+
+virtualChassisOperHelloInterval OBJECT-TYPE
+        SYNTAX VirtualChassisHelloInterval
+        UNITS           "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Operational Virtual-Chassis hello interval."
+DEFVAL {10}
+::= { virtualChassisGlobalEntry 14 }
+
+virtualChassisOperControlVlan OBJECT-TYPE
+        SYNTAX VirtualChassisControlVlan
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Operational Virtual-Chassis control VLAN."
+::= { virtualChassisGlobalEntry 15 }
+
+virtualChassisConfigHelloInterval OBJECT-TYPE
+        SYNTAX VirtualChassisHelloInterval
+        UNITS           "seconds"
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+        "This is deprecated from release 7.3.3.R01."
+DEFVAL {2}
+::= { virtualChassisGlobalEntry 16 }
+
+virtualChassisConfigControlVlan OBJECT-TYPE
+        SYNTAX VirtualChassisControlVlan
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Configured Virtual-Chassis control VLAN.
+        This object can be configured for the local chassis, for a specific chassis and for all chassis."
+DEFVAL { 4094}
+::= { virtualChassisGlobalEntry 17 }
+
+virtualChassisType OBJECT-TYPE
+        SYNTAX VirtualChassisType
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis chassis type"
+::= { virtualChassisGlobalEntry 18 }
+
+virtualChassisLicense OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis chassis License string. A: Advanced; B: Data Center"
+::= { virtualChassisGlobalEntry 19 }
+
+virtualChassisOperChasIdConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis consis status compared with master chassis"
+::= { virtualChassisGlobalEntry 20 }
+
+virtualChassisConfigChasIdConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis consis status compared with master chassis"
+::= { virtualChassisGlobalEntry 21 }
+
+virtualChassisOperControlVlanConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis consis status compared with master chassis"
+::= { virtualChassisGlobalEntry 22 }
+
+virtualChassisConfigControlVlanConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis consis status compared with master chassis"
+::= { virtualChassisGlobalEntry 23 }
+
+virtualChassisOperHelloIntervalConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis consis status compared hello interval with master chassis"
+::= { virtualChassisGlobalEntry 24 }
+
+virtualChassisConfigHelloIntervalConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS deprecated
+        DESCRIPTION
+        "This is deprecated from release 7.3.3.R01."
+::= { virtualChassisGlobalEntry 25 }
+
+virtualChassisChassisTypeConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis consis status compared with master chassis"
+::= { virtualChassisGlobalEntry 26 }
+
+virtualChassisGroupConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis consis status compared with master chassis"
+::= { virtualChassisGlobalEntry 27 }
+
+virtualChassisLicenseConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis consis status compared with master chassis"
+::= { virtualChassisGlobalEntry 28 }
+
+virtualChassisGlobalConsis OBJECT-TYPE
+        SYNTAX VirtualChassisConsistency
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis consis status compared with master chassis"
+::= { virtualChassisGlobalEntry 29 }
+
+virtualChassisNumOfNeighbor OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis neighbor count"
+::= { virtualChassisGlobalEntry 30 }
+
+
+virtualChassisNumOfDirectNeighbor OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis direct neighbor count"
+::= { virtualChassisGlobalEntry 31 }
+
+-- ----------------------------------------------------------
+-- Virtual-Chassis Neighbor Table
+-- ----------------------------------------------------------
+
+virtualChassisNeighborTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VirtualChassisNeighborEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Neighbor Table"
+::= { alcatelIND1VirtualChassisMIBObjects 3 }
+
+virtualChassisNeighborEntry OBJECT-TYPE
+        SYNTAX VirtualChassisNeighborEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Neighbor Table Entry"
+        INDEX { virtualChassisOperChasId, virtualChassisNeighborChasId }
+::= { virtualChassisNeighborTable 1 }
+
+
+VirtualChassisNeighborEntry ::= SEQUENCE
+        {
+                virtualChassisNeighborChasId            VirtualOperChassisId,
+                virtualChassisNeighborShortestPath      SnmpAdminString,
+                virtualChassisNeighborIsDirect          TruthValue
+        }
+virtualChassisNeighborChasId OBJECT-TYPE
+        SYNTAX VirtualOperChassisId
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis Neighbor chassis ID."
+::= { virtualChassisNeighborEntry 1 }
+
+virtualChassisNeighborShortestPath OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Configured Virtual-Chassis neighbor shortest path. The format will be <chass_id>/<vfl_id>-><chass_id>/<vfl_id>-><chass_id>/<vfl_id>. EX: 2/0->1/0->3/1 "
+::= { virtualChassisNeighborEntry 2 }
+
+virtualChassisNeighborIsDirect OBJECT-TYPE
+                SYNTAX TruthValue
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+        "To determine if this is a direct neighbor"
+::= { virtualChassisNeighborEntry 3 }
+
+-- ----------------------------------------------------------
+-- Virtual-Chassis Chassis Reset List Table
+-- ----------------------------------------------------------
+
+virtualChassisChassisResetListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VirtualChassisChassisResetListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Chassis reset list Table"
+::= { alcatelIND1VirtualChassisMIBObjects 4}
+
+virtualChassisChassisResetListEntry OBJECT-TYPE
+        SYNTAX VirtualChassisChassisResetListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Chassis Reset List Table Entry"
+        INDEX { virtualChassisOperChasId}
+::= { virtualChassisChassisResetListTable 1 }
+
+
+VirtualChassisChassisResetListEntry ::= SEQUENCE
+        {
+                virtualChassisChassisResetList          SnmpAdminString
+        }
+
+virtualChassisChassisResetList OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Indicate the chassis reset list."
+::= { virtualChassisChassisResetListEntry 1 }
+
+
+-- ----------------------------------------------------------
+-- Virtual-Chassis Slot Reset List Table
+-- ----------------------------------------------------------
+
+virtualChassisSlotResetStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VirtualChassisSlotResetStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Slot reset Status Table"
+::= { alcatelIND1VirtualChassisMIBObjects 5 }
+
+virtualChassisSlotResetStatusEntry OBJECT-TYPE
+        SYNTAX VirtualChassisSlotResetStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Slot Reset Status Table Entry"
+        INDEX { virtualChassisOperChasId,virtualChassisSlotNum}
+::= { virtualChassisSlotResetStatusTable 1 }
+
+VirtualChassisSlotResetStatusEntry ::= SEQUENCE
+        {
+                virtualChassisSlotNum                   VirtualChassisNiSlot,
+                virtualChassisSlotResetStatus           VirtualChassisSlotResetStatus
+        }
+
+virtualChassisSlotNum OBJECT-TYPE
+        SYNTAX VirtualChassisNiSlot
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis slot num."
+::= { virtualChassisSlotResetStatusEntry 1 }
+
+virtualChassisSlotResetStatus OBJECT-TYPE
+        SYNTAX VirtualChassisSlotResetStatus
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis slot reset status."
+::= { virtualChassisSlotResetStatusEntry 2}
+
+-- ----------------------------------------------------------
+-- Virtual-Chassis Vfl Table
+-- ----------------------------------------------------------
+
+virtualChassisVflTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VirtualChassisVflEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Virtual Fabric Link Table
+        This object can be configured for the local chassis or for a specific chassis."
+::= { alcatelIND1VirtualChassisMIBObjects 6 }
+
+virtualChassisVflEntry OBJECT-TYPE
+        SYNTAX VirtualChassisVflEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Chassis Virtual Fabric Link Table Entry"
+        INDEX { virtualChassisOperChasId, virtualChassisVflId }
+::= { virtualChassisVflTable 1 }
+
+
+VirtualChassisVflEntry ::= SEQUENCE
+        {
+                virtualChassisVflId              VirtualChassisVflId,
+                virtualChassisVflDefaultVlan     Integer32,
+                virtualChassisVflOperStatus      INTEGER,
+                virtualChassisVflPrimaryPort     InterfaceIndex,
+                virtualChassisVflActivePortNum   Integer32,
+                virtualChassisVflConfigPortNum   Integer32,
+                virtualChassisVflRowStatus       RowStatus,
+                virtualChassisVflDirectNeighborChasId       VirtualOperChassisId,
+                virtualChassisVflSpeedType       VirtualChassisVflSpeedType
+        }
+
+virtualChassisVflId OBJECT-TYPE
+        SYNTAX VirtualChassisVflId
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Virtual Fabric Link Interface IfIndex"
+::= { virtualChassisVflEntry 1 }
+
+virtualChassisVflDefaultVlan OBJECT-TYPE
+        SYNTAX Integer32 (1..4094)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Virtual Fabric Link default vlan"
+    DEFVAL { 1}
+::= { virtualChassisVflEntry 2 }
+
+virtualChassisVflOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        disabled(0),
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Virtual Fabric Link Operational Status"
+::= { virtualChassisVflEntry 3 }
+
+virtualChassisVflPrimaryPort OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Virtual Fabric Link primary Port ifindex"
+::= { virtualChassisVflEntry 4 }
+
+virtualChassisVflActivePortNum OBJECT-TYPE
+        SYNTAX Integer32 (0..8)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Number of active member ports of participating on the Virtual Fabric Link."
+::= { virtualChassisVflEntry 5 }
+
+virtualChassisVflConfigPortNum OBJECT-TYPE
+        SYNTAX Integer32 (0..8)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Number of ports configured as members of the Virtual Fabric Link."
+::= { virtualChassisVflEntry 6 }
+
+virtualChassisVflRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Virtual Fabric Link RowStatus for creationh and deletion"
+::= { virtualChassisVflEntry 7 }
+
+virtualChassisVflDirectNeighborChasId OBJECT-TYPE
+        SYNTAX VirtualOperChassisId
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The Chassis ID of the direct neighbor that is reachable via this VFL link,
+         or 0 if no neighbor."
+::= { virtualChassisVflEntry 8 }
+
+virtualChassisVflSpeedType OBJECT-TYPE
+        SYNTAX VirtualChassisVflSpeedType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Virtual Fabric Link speed type"
+::= { virtualChassisVflEntry 9 }
+
+
+-- ----------------------------------------------------------
+-- Virtual-Chassis Vfl Member Port Table
+-- ----------------------------------------------------------
+
+virtualChassisVflMemberPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VirtualChassisVflMemberPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Fabric Link Member Port Table.
+        This object can be configured for the local chassis or for a specific chassis."
+::= { alcatelIND1VirtualChassisMIBObjects 7 }
+
+
+virtualChassisVflMemberPortEntry OBJECT-TYPE
+        SYNTAX VirtualChassisVflMemberPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Fabric Link Member Port Table Entry."
+        INDEX { virtualChassisOperChasId, 
+                virtualChassisVflId, 
+                virtualChassisVflMemberPortIfindex }
+::= { virtualChassisVflMemberPortTable 1 }
+
+VirtualChassisVflMemberPortEntry ::= SEQUENCE
+        {
+                virtualChassisVflMemberPortIfindex       InterfaceIndex,
+                virtualChassisVflMemberPortIsPrimay      TruthValue,
+                virtualChassisVflMemberPortOperStatus        INTEGER,
+                virtualChassisVflMemberPortRowStatus     RowStatus
+        }
+
+virtualChassisVflMemberPortIfindex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Virtual Fabric Link Member Port ifIndex."
+::= { virtualChassisVflMemberPortEntry 1 }
+
+
+virtualChassisVflMemberPortIsPrimay OBJECT-TYPE
+                SYNTAX TruthValue
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+        "To determine if this Virtual Fabric Link Member Port is primary or not"
+::= { virtualChassisVflMemberPortEntry 2 }
+
+virtualChassisVflMemberPortOperStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                    {
+                        disabled(0),
+                        up(1),
+                        down(2)
+                    }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+        "Virtual Fabric Link Member Port operational status"
+::= { virtualChassisVflMemberPortEntry 3 }
+
+virtualChassisVflMemberPortRowStatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+        "Virtual Fabric Link Member Port RowStatus for creation and deletion"
+::= { virtualChassisVflMemberPortEntry 4 }
+
+
+virtualChassisTrapInfo   OBJECT IDENTIFIER ::= { alcatelIND1VirtualChassisMIBObjects 8 }
+
+virtualChassisDiagnostic OBJECT-TYPE
+        SYNTAX INTEGER {
+                duplexMode (1),
+                speed (2)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Indicates why a port configured as virtual-fabric member is unable to join the virtual-fabric link"
+::= { virtualChassisTrapInfo 1 }
+
+virtualChassisUpgradeCompleteStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                success (1),
+                failure (2)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Indicates whether the software upgrade process has failed after a timeout or completed successfully.
+        Note that if the process fails, it may be still possible for the system to recover if the process
+        successfully completes later after the expired timeout." 
+
+::= { virtualChassisTrapInfo 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--  NOTIFICATIONS
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        virtualChassisStatusChange NOTIFICATION-TYPE
+           OBJECTS {
+                virtualChassisOperChasId,
+                virtualChassisStatus
+           }
+           STATUS   current
+           DESCRIPTION
+               "Critical trap indicates chassis status change."
+           ::= { alcatelIND1VirtualChassisMIBNotifications 1 }
+
+        virtualChassisRoleChange NOTIFICATION-TYPE
+           OBJECTS {
+                virtualChassisOperChasId,
+                virtualChassisRole
+           }
+           STATUS   current
+           DESCRIPTION
+               "Critical trap indicates chassis role change."
+           ::= { alcatelIND1VirtualChassisMIBNotifications 2 }
+
+        
+        virtualChassisVflStatusChange NOTIFICATION-TYPE
+           OBJECTS {
+                virtualChassisOperChasId, 
+                virtualChassisVflId, 
+                virtualChassisVflOperStatus
+           }
+           STATUS   current
+           DESCRIPTION
+               "Critical trap indicates vflink status change."
+           ::= { alcatelIND1VirtualChassisMIBNotifications 3 }
+        
+        virtualChassisVflMemberPortStatusChange NOTIFICATION-TYPE
+           OBJECTS {
+                virtualChassisOperChasId, 
+                virtualChassisVflId, 
+                virtualChassisVflMemberPortIfindex,
+                virtualChassisVflMemberPortOperStatus
+           }
+           STATUS   deprecated
+           DESCRIPTION
+               "This trap is been deprecated since 7.3.3.R01."
+           ::= { alcatelIND1VirtualChassisMIBNotifications 4 }
+
+        virtualChassisVflMemberPortJoinFailure NOTIFICATION-TYPE
+           OBJECTS {
+                virtualChassisOperChasId, 
+                virtualChassisVflId, 
+                virtualChassisVflMemberPortIfindex,  
+                virtualChassisDiagnostic
+           }
+           STATUS   current
+           DESCRIPTION
+               "Major trap indicates a port configured as virtual-fabric member is unable to join the virtual-fabric link."
+           ::= { alcatelIND1VirtualChassisMIBNotifications 5 }
+
+        virtualChassisUpgradeComplete NOTIFICATION-TYPE
+           OBJECTS {
+                virtualChassisUpgradeCompleteStatus
+           }
+           STATUS   current
+           DESCRIPTION
+               "Critical trap that indicates whether the software upgrade process has failed after a timeout or completed successfully.
+                Note that if the process fails, it may be still possible for the system to recover if the process
+                successfully completes later after the expired timeout." 
+           ::= { alcatelIND1VirtualChassisMIBNotifications 6 }
+
+        virtualChassisVflSpeedTypeChange NOTIFICATION-TYPE
+           OBJECTS {
+                virtualChassisOperChasId, 
+                virtualChassisVflId, 
+                virtualChassisVflSpeedType
+           }
+           STATUS   current
+           DESCRIPTION
+               "Critical trap indicates whenever vfl speed type is changed."
+           ::= { alcatelIND1VirtualChassisMIBNotifications 7 }
+   
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1VirtualChassisMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Virtual-Chassis Supervision."
+        MODULE
+            MANDATORY-GROUPS
+            {
+
+                virtualChassisLocalInfoGroup,
+                virtualChassisGlobalGroup,
+                virtualChassisNeighborGroup,
+                virtualChassisChassisResetListGroup,
+                virtualChassisSlotRestStatusGroup,
+                virtualChassisVflGroup,
+                virtualChassisVflMemberPortGroup
+
+            }
+        ::= { alcatelIND1VirtualChassisMIBCompliances 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        virtualChassisLocalInfoGroup OBJECT-GROUP
+        OBJECTS
+        {
+                virtualChassisLocalInfoChasId
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Virtual-Chassis Config Group."
+
+        ::= { alcatelIND1VirtualChassisMIBGroups 1 }    
+    
+    
+    virtualChassisGlobalGroup OBJECT-GROUP
+        OBJECTS
+        {
+                virtualChassisConfigChassisId,
+                virtualChassisRole,
+                virtualChassisPreviousRole,
+                virtualChassisStatus,
+                virtualChassisOperPriority,
+                virtualChassisConfigPriority,
+                virtualChassisGroup,
+                virtualChassisMac,
+                virtualChassisUpTime,
+                virtualChassisDesigNI,
+                virtualChassisPriCmm,
+                virtualChassisSecCmm,
+                virtualChassisOperHelloInterval,
+                virtualChassisOperControlVlan, 
+                virtualChassisConfigHelloInterval,
+                virtualChassisConfigControlVlan,
+                virtualChassisType,
+                virtualChassisLicense,
+                virtualChassisOperChasIdConsis,
+                virtualChassisConfigChasIdConsis,
+                virtualChassisOperControlVlanConsis,
+                virtualChassisConfigControlVlanConsis,
+                virtualChassisOperHelloIntervalConsis,
+                virtualChassisConfigHelloIntervalConsis,
+                virtualChassisChassisTypeConsis,
+                virtualChassisGroupConsis,
+                virtualChassisLicenseConsis,
+                virtualChassisGlobalConsis,
+                virtualChassisNumOfNeighbor,
+                virtualChassisNumOfDirectNeighbor
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Virtual-Chassis Config Group."
+
+        ::= { alcatelIND1VirtualChassisMIBGroups 2 }
+
+        virtualChassisNeighborGroup OBJECT-GROUP
+        OBJECTS
+        {
+                virtualChassisNeighborShortestPath,
+                virtualChassisNeighborIsDirect
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Virtual-Chassis neighbor Group."
+
+        ::= { alcatelIND1VirtualChassisMIBGroups 3 }    
+ 
+  
+        virtualChassisChassisResetListGroup OBJECT-GROUP
+        OBJECTS
+        {
+                virtualChassisChassisResetList
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Virtual-Chassis chassis reset list Group."
+
+        ::= { alcatelIND1VirtualChassisMIBGroups 4 }    
+
+        virtualChassisSlotRestStatusGroup OBJECT-GROUP
+        OBJECTS
+        {
+                virtualChassisSlotResetStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Virtual-Chassis slot reset statusGroup."
+
+        ::= { alcatelIND1VirtualChassisMIBGroups 5 }  
+
+    virtualChassisVflGroup OBJECT-GROUP
+        OBJECTS
+        {
+                virtualChassisVflDefaultVlan,
+                virtualChassisVflOperStatus,
+                virtualChassisVflPrimaryPort,
+                virtualChassisVflActivePortNum,
+                virtualChassisVflConfigPortNum,
+                virtualChassisVflRowStatus,
+                virtualChassisVflDirectNeighborChasId,
+                virtualChassisVflSpeedType
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Virtual-Chassis Vfl Group."
+        ::= { alcatelIND1VirtualChassisMIBGroups 6 }
+    virtualChassisVflMemberPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+                virtualChassisVflMemberPortIsPrimay,
+                virtualChassisVflMemberPortOperStatus,
+                virtualChassisVflMemberPortRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Virtual-Chassis Vfl Member Port Group."
+        ::= { alcatelIND1VirtualChassisMIBGroups 7 }
+
+  virtualChassisTrapInfoGroup OBJECT-GROUP
+        OBJECTS
+        {
+                virtualChassisDiagnostic,
+                virtualChassisUpgradeCompleteStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Virtual-Chassis trap info Group."
+        ::= { alcatelIND1VirtualChassisMIBGroups 8 }
+
+  virtualChassisTrapOBJGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+                virtualChassisStatusChange,
+                virtualChassisRoleChange,
+                virtualChassisVflStatusChange,
+                virtualChassisVflMemberPortStatusChange,
+                virtualChassisVflMemberPortJoinFailure,
+                virtualChassisUpgradeComplete,
+                virtualChassisVflSpeedTypeChange
+
+        }
+        STATUS  current
+        DESCRIPTION
+            "Chassis Supervision Virtual-Chassis trap object Group."
+        ::= { alcatelIND1VirtualChassisMIBGroups 9 }
+
+
+END
+
+
+
+
+

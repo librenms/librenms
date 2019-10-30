@@ -1,10 +1,8 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $bill_id = mres($vars['bill_id']);
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/pages/bill/actions.inc.php';
 }
 
@@ -100,7 +98,7 @@ if (bill_permitted($bill_id)) {
         'transfer' => 'Transfer Graphs',
         'history' => 'Historical Graphs'
     );
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     $menu_options['edit'] = 'Edit';
     $menu_options['delete'] = 'Delete';
     $menu_options['reset'] = 'Reset';
@@ -124,11 +122,11 @@ foreach ($menu_options as $option => $text) {
 
     print_optionbar_end();
 
-if ($vars['view'] == 'edit' && LegacyAuth::user()->hasGlobalAdmin()) {
+if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/pages/bill/edit.inc.php';
-} elseif ($vars['view'] == 'delete' && LegacyAuth::user()->hasGlobalAdmin()) {
+} elseif ($vars['view'] == 'delete' && Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/pages/bill/delete.inc.php';
-} elseif ($vars['view'] == 'reset' && LegacyAuth::user()->hasGlobalAdmin()) {
+} elseif ($vars['view'] == 'reset' && Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/pages/bill/reset.inc.php';
 } elseif ($vars['view'] == 'history') {
     include 'includes/html/pages/bill/history.inc.php';
@@ -187,10 +185,11 @@ if ($vars['view'] == 'edit' && LegacyAuth::user()->hasGlobalAdmin()) {
             $cdr       = $bill_data['bill_cdr'];
             $rate_95th = round($rate_95th, 2);
             $percent = round((($rate_95th) / $cdr * 100), 2);
+            $background = get_percentage_colours($percent);
             $type = '&amp;95th=yes';
 ?>
         <td>
-            <?php echo format_si($rate_95th) ?> of <?php echo format_si($cdr).'bps ('.$percent.'%)' ?> (95th%ile)
+            <?php echo format_si($rate_95th).'bps' ?> of <?php echo format_si($cdr).'bps ('.$percent.'%)' ?> (95th%ile)
         </td>
         <td style="width: 210px;">
             <?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']) ?>
@@ -199,7 +198,7 @@ if ($vars['view'] == 'edit' && LegacyAuth::user()->hasGlobalAdmin()) {
         <tr>
             <td colspan="2">
 <?php
-            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']));
+            echo 'Predicted usage: ' . format_si(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th'])).'bps';
 ?>
             </td>
 

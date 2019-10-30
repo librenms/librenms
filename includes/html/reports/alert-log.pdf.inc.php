@@ -1,7 +1,5 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $pdf->AddPage('L');
 $where = '1';
 
@@ -15,11 +13,11 @@ if ($_GET['string']) {
     $param[] = '%'.$_GET['string'].'%';
 }
 
-if (LegacyAuth::user()->hasGlobalRead()) {
+if (Auth::user()->hasGlobalRead()) {
     $query = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where ORDER BY `humandate` DESC";
 } else {
     $query   = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id RIGHT JOIN devices_perms AS P ON E.device_id = P.device_id WHERE $where AND P.user_id = ? ORDER BY `humandate` DESC";
-    $param[] = LegacyAuth::id();
+    $param[] = Auth::id();
 }
 
 if (isset($_GET['start']) && is_numeric($_GET['start'])) {
@@ -40,31 +38,32 @@ foreach (dbFetchRows($full_query, $param) as $alert_entry) {
     $hostname    = gethostbyid(mres($alert_entry['device_id']));
     $alert_state = $alert_entry['state'];
 
-    if ($alert_state != '') {
-        if ($alert_state == '0') {
-            $glyph_color = 'green';
-            $text        = 'Ok';
-        } elseif ($alert_state == '1') {
-            $glyph_color = 'red';
-            $text        = 'Alert';
-        } elseif ($alert_state == '2') {
-            $glyph_color = 'lightgrey';
-            $text        = 'Ack';
-        } elseif ($alert_state == '3') {
-            $glyph_color = 'orange';
-            $text        = 'Worse';
-        } elseif ($alert_state == '4') {
-            $glyph_color = 'khaki';
-            $text        = 'Better';
-        }
+    if ($alert_state == '0') {
+        $glyph_color = 'green';
+        $text        = 'Ok';
+    } elseif ($alert_state == '1') {
+        $glyph_color = 'red';
+        $text        = 'Alert';
+    } elseif ($alert_state == '2') {
+        $glyph_color = 'lightgrey';
+        $text        = 'Ack';
+    } elseif ($alert_state == '3') {
+        $glyph_color = 'orange';
+        $text        = 'Worse';
+    } elseif ($alert_state == '4') {
+        $glyph_color = 'khaki';
+        $text        = 'Better';
+    } else {
+        $glyph_color = 'red';
+        $text        = 'Unknown state';
+    }
 
-        $data[] = array(
-            $alert_entry['time_logged'],
-            $hostname,
-            htmlspecialchars($alert_entry['name']),
-            $text,
-        );
-    }//end if
+    $data[] = array(
+        $alert_entry['time_logged'],
+        $hostname,
+        htmlspecialchars($alert_entry['name']),
+        $text,
+    );
 }//end foreach
 
 $header = array(

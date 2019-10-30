@@ -3,6 +3,7 @@
 echo "
 <h3><span class='label label-success threeqtr-width'>Add Service</span></h3>
 <form id='addsrv' name='addsrv' method='post' action='' class='form-horizontal' role='form'>
+  " . csrf_field() . "
   <div class='well well-lg'>
     <div class='form-group'>
       <input type='hidden' name='addsrv' value='yes'>

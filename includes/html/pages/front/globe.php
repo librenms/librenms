@@ -29,8 +29,6 @@
 
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 include_once 'includes/html/object-cache.inc.php';
 echo '<div class="container-fluid">
     <div class="row">
@@ -97,11 +95,11 @@ if (\LibreNMS\Config::get('enable_syslog')) {
     echo("</div>");
     echo("</div>");
 } else {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         $query = "SELECT *,DATE_FORMAT(datetime, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
     } else {
         $query = "SELECT *,DATE_FORMAT(datetime, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
-            P.device_id AND P.user_id = " . LegacyAuth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
+            P.device_id AND P.user_id = " . Auth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
     }
 
     echo('<div class="container-fluid">

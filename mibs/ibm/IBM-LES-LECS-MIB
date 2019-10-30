@@ -1,0 +1,260 @@
+IBM-LES-LECS-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmlesrv.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    OBJECT-TYPE
+            FROM RFC-1212
+    RowStatus, TruthValue
+            FROM SNMPv2-TC-v1
+    mssServerLanE, AtmPrivateAddrEsi, AtmSelector, 
+    AtmVccTrafficType, Bandwidth
+            FROM NWAYSMSS-MIB;
+
+ibmLesLecsMIB OBJECT IDENTIFIER ::= { mssServerLanE 2 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9701171200Z
+--  OrgName
+--    IBM Corporation
+--  ContactInfo
+--     Florian K Kandefer
+--       Postal:  IBM Corporation
+--                800 Park Offices Drive
+--                Research Triangle Park, NC 27709
+--                US
+--       Tel:     +1 919 254 0685
+--       Fax:     +1 919 254 0391
+--       E-mail:  kandefer@vnet.ibm.com     
+--  Descr
+--    
+--    These are proprietary extensions for managing
+--    the interface between LECS and LES/BUS pairs.
+--  RevDate
+--    9701161200Z
+--  RevDescr
+--    
+--    2)  Updated MIB import names to match ATM Forum MIB names.
+--    
+--        Updated some of the description fields.
+--  RevDate
+--    9608281200Z
+--  RevDescr
+--    
+--    1)  This is the first version of this MIB
+
+ibmLesLecsConfGroup OBJECT IDENTIFIER ::= { ibmLesLecsMIB 1 }
+ibmLesLecsMIBConformance OBJECT IDENTIFIER ::= { ibmLesLecsMIB 2 }
+ibmLesLecsMIBGroups OBJECT IDENTIFIER ::= { ibmLesLecsMIBConformance 1 }
+ibmLesLecsMIBCompliances OBJECT IDENTIFIER ::= { ibmLesLecsMIBConformance 2 }
+
+lesLecsConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF LesLecsConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains the the configuration for LES-LECS interfaces."
+    ::= { ibmLesLecsConfGroup 1 }
+
+lesLecsConfEntry OBJECT-TYPE
+    SYNTAX LesLecsConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table contains configuration parameters for the
+        LES-LECS operation for an individual ATM physical interface.
+        Object lesLecsRowStatus is required during
+        row creation and deletion."
+    INDEX { lesLecsAtmDevNum }
+    ::= { lesLecsConfTable 1 }
+
+LesLecsConfEntry ::= SEQUENCE {
+    lesLecsOperStatus INTEGER,
+    lesLecsAdminStatus INTEGER,
+    lesLecsAtmDevNum INTEGER,
+    lesLecsUseBurnedInEsi TruthValue,
+    lesLecsConfiguredEsi AtmPrivateAddrEsi,
+    lesLecsConfiguredSelector AtmSelector,
+    configDirectVccType AtmVccTrafficType,
+    configDirectPcr Bandwidth,
+    configDirectScr Bandwidth,
+    lesLecsAtmDevLineSpeed UInteger32,
+    lesLecsConfRowStatus RowStatus
+    }
+
+lesLecsOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        other(1),
+        up(2),
+        down(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The operational state of LES/LECS on this entry.
+        
+         Other defines the transition states between up and down."
+    ::= { lesLecsConfEntry 1 }
+
+lesLecsAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        up(2),
+        down(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The administrative state of the LES/LECS on this entry."
+    ::= { lesLecsConfEntry 2 }
+
+lesLecsAtmDevNum OBJECT-TYPE
+    SYNTAX INTEGER(0..255)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Identifies ATM device to be used to interface with LECS."
+    ::= { lesLecsConfEntry 3 }
+
+lesLecsAtmDevLineSpeed OBJECT-TYPE
+    SYNTAX UInteger32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Line Speed of LECS ATM Device.
+         This should not exposed to the user."
+    ::= { lesLecsConfEntry 4 }
+
+lesLecsUseBurnedInEsi OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies whether a MAC Address burned into the ATM
+         device should be used as the End System Identifier
+         component of local ATM Address used when calling LECS."
+    ::= { lesLecsConfEntry 5 }
+
+lesLecsConfiguredEsi OBJECT-TYPE
+    SYNTAX AtmPrivateAddrEsi
+--    Rsyntax OCTET STRING(SIZE(6))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Locally Administered End System Identifier that is to be
+         used as the ESI component of the local ATM Address used
+         when calling the LECS."
+    ::= { lesLecsConfEntry 6 }
+
+lesLecsConfiguredSelector OBJECT-TYPE
+    SYNTAX AtmSelector
+--    Rsyntax OCTET STRING(SIZE(1))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies value to be used as Selector field component
+         of local ATM Address used when calling the LECS."
+    ::= { lesLecsConfEntry 7 }
+
+configDirectVccType OBJECT-TYPE
+    SYNTAX AtmVccTrafficType
+--    Rsyntax INTEGER {
+--        bestEffort(1),
+--        reservedBandwidth(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies type of traffic characteristics to be
+         associated with Configuration Direct VCC to LECS.
+         Bandwidth is not reserved for best effort traffic."
+    ::= { lesLecsConfEntry 8 }
+
+configDirectPcr OBJECT-TYPE
+    SYNTAX Bandwidth
+--    Rsyntax Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the Peak Cell Rate (PCR) Traffic Parameter
+         for the Configuration Direct VCC to the LECS.  The
+         specified rate is used for both forward and backward
+         directions.  When a best effort connection is rejected
+         due to the PCR, the call may be automatically retried
+         with a lower PCR.  Retries are performed under the
+         following conditions:
+         if (rejected PCR > 100 Mbps)
+            retry with PCR = 100 Mbps
+         else if (25 < rejected PCR <= 100 Mbps)
+            retry with PCR = 25 Mbps"
+    ::= { lesLecsConfEntry 9 }
+
+configDirectScr OBJECT-TYPE
+    SYNTAX Bandwidth
+--    Rsyntax Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the Sustained Cell Rate (SCR) Traffic
+         Parameter for the Configuration Direct VCC to the
+         LECS.  The specified rate is used for both forward
+         and backward directions.  If the SCR equals the PCR
+         specified in LECS-INTF-7, the call is signalled
+         with PCR only.  If SCR is signalled, the Maximum
+         Burst Size traffic parameter is set to accomodate
+         the maximum control frame size of 1516 bytes."
+    ::= { lesLecsConfEntry 10 }
+
+lesLecsConfRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+--    Rsyntax INTEGER {
+--        active(1),
+--        notInService(2),
+--        notReady(3),
+--        createAndGo(4),
+--        createAndWait(5),
+--        destroy(6)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to create or
+         delete entries in the lesLecsConfTable."
+    REFERENCE
+        "RFC 1903, Textual Conventions
+        for version 2 of the Simple Network Management
+        Protocol (SNMPv2)."
+    ::= { lesLecsConfEntry 11 }
+
+ibmLesLecsCConfGroup OBJECT IDENTIFIER ::= { ibmLesLecsMIBGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing configuration information
+--    about the LES/LECS interface.
+--  objects
+--    lesLecsOperStatus, lesLecsAdminStatus, lesLecsAtmDevNum, 
+--    lesLecsAtmDevLineSpeed, lesLecsUseBurnedInEsi, 
+--    lesLecsConfiguredEsi, lesLecsConfiguredSelector, 
+--    configDirectVccType, configDirectPcr, configDirectScr, 
+--    lesLecsConfRowStatus
+
+ibmLesLecsMIBCompliance OBJECT IDENTIFIER ::= { ibmLesLecsMIBCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The compliance statement for SNMP IBM extensions
+--    to for ATM emulated LANS.
+--  Module
+--    >>current<<
+--   OptGroup
+--    ibmLesLecsCConfGroup
+
+
+END

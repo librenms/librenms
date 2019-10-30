@@ -26,15 +26,11 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
 
-class AdvaNetThresholdCrossingAlertTest extends LaravelTestCase
+class AdvaNetThresholdCrossingAlertTest extends SnmpTrapTestCase
 {
-    use DatabaseTransactions;
-
     public function testNetThresholdTrap()
     {
         $device = factory(Device::class)->create();

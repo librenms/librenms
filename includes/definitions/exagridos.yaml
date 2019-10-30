@@ -1,0 +1,14 @@
+os: exagridos
+text: 'Exagrid'
+type: storage
+icon: exagrid
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+mib_dir:
+    - exagrid
+discovery:
+    - sysDescr:
+        -  'ExaGrid'

@@ -1563,7 +1563,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "2",
@@ -1579,7 +1579,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 }
             ]
         },
@@ -1599,7 +1599,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "2",
@@ -1615,7 +1615,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 }
             ]
         }
@@ -1624,32 +1624,6 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "3",
-                    "storage_type": "hrFSBerkeleyFFS",
-                    "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
-                    "storage_size": 7890923520,
-                    "storage_units": 4096,
-                    "storage_used": 865779712,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "5",
-                    "storage_type": "hrFSBerkeleyFFS",
-                    "storage_descr": "/var/run, type: ufs, dev: /dev/md0",
-                    "storage_size": 3567616,
-                    "storage_units": 4096,
-                    "storage_used": 102400,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
                     "storage_mib": "ucd-dsktable",
                     "storage_index": "1",
                     "storage_type": "dsk",
@@ -1657,6 +1631,19 @@
                     "storage_size": 7890923520,
                     "storage_units": 1024,
                     "storage_used": 7890923520,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "3",
+                    "storage_type": "hrFSBerkeleyFFS",
+                    "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
+                    "storage_size": 7890923520,
+                    "storage_units": 4096,
+                    "storage_used": 865779712,
                     "storage_free": 0,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -1674,23 +1661,6 @@
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
-                }
-            ]
-        },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "3",
-                    "storage_type": "hrFSBerkeleyFFS",
-                    "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
-                    "storage_size": 7890923520,
-                    "storage_units": 4096,
-                    "storage_used": 865779712,
-                    "storage_free": 7025143808,
-                    "storage_perc": 11,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
                 },
                 {
                     "storage_mib": "hrstorage",
@@ -1700,11 +1670,15 @@
                     "storage_size": 3567616,
                     "storage_units": 4096,
                     "storage_used": 102400,
-                    "storage_free": 3465216,
-                    "storage_perc": 3,
+                    "storage_free": 0,
+                    "storage_perc": 0,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
-                },
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
                 {
                     "storage_mib": "ucd-dsktable",
                     "storage_index": "1",
@@ -1719,6 +1693,19 @@
                     "storage_deleted": 0
                 },
                 {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "3",
+                    "storage_type": "hrFSBerkeleyFFS",
+                    "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
+                    "storage_size": 7890923520,
+                    "storage_units": 4096,
+                    "storage_used": 865779712,
+                    "storage_free": 7025143808,
+                    "storage_perc": 11,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
                     "storage_mib": "ucd-dsktable",
                     "storage_index": "3",
                     "storage_type": "dsk",
@@ -1728,6 +1715,19 @@
                     "storage_used": 385024,
                     "storage_free": 3182592,
                     "storage_perc": 11,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "5",
+                    "storage_type": "hrFSBerkeleyFFS",
+                    "storage_descr": "/var/run, type: ufs, dev: /dev/md0",
+                    "storage_size": 3567616,
+                    "storage_units": 4096,
+                    "storage_used": 102400,
+                    "storage_free": 3465216,
+                    "storage_perc": 3,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
                 }

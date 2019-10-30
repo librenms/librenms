@@ -1,0 +1,96 @@
+IBMCPU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+          enterprises, Gauge
+                  FROM RFC1155-SMI
+          OBJECT-TYPE
+                  FROM RFC-1212;
+
+
+ibm                     OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd                 OBJECT IDENTIFIER ::= { ibm 6 }
+ibm6611                 OBJECT IDENTIFIER ::= { ibmProd 2 }
+ibmsystem               OBJECT IDENTIFIER ::= { ibm6611 4 }
+netView6000SubAgent     OBJECT IDENTIFIER ::= { ibmProd 4 }
+nv6saComputerSystem     OBJECT IDENTIFIER ::= { netView6000SubAgent 5 }
+
+
+--
+-- The following main processor snapshot was initially
+-- defined for the IBM Netview management platform, which
+-- has a tool bar application to query and plot the main
+-- processor utilization of various products.
+--
+-- This same MIB can be used to monitor the Nways router
+-- products main processor load. We have intentionally
+-- left this anchor point under the netview6000SubAgent portion
+-- of the MIB tree. This is in order to allow the tool bar
+-- application to continue to be supported.
+--
+
+nv6saComputerSystemLoad OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A snapshot of the main cpu load as a percentage i.e. 25% is 25."
+        ::= { nv6saComputerSystem 1 }
+
+
+--
+-- The following main processor load table was initially
+-- defined for the IBM 6611 router and is therefore
+-- anchored under the ibm6611 portion of the MIB tree.
+--
+-- This same MIB can be used to monitor the Nways router
+-- products main processor load. We have intentionally
+-- left this anchor point under the ibm6611 portion
+-- of the MIB tree. This is in order to allow any applications,
+-- that may have been developed for 6611, to continue to be utilized.
+--
+
+ibmMainProcessorLoadTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IbmMainProcessorLoadEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table containing the average main processor
+                load over each minute for the last 60 minutes."
+        ::= { ibmsystem 1 }
+
+ibmMainProcessorLoadEntry OBJECT-TYPE
+        SYNTAX  IbmMainProcessorLoadEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the main processor load table."
+        INDEX   { ibmMainProcessorLoadIndex }
+        ::= { ibmMainProcessorLoadTable 1 }
+
+IbmMainProcessorLoadEntry ::=
+    SEQUENCE {
+        ibmMainProcessorLoadIndex
+            INTEGER,
+        ibmMainProcessorLoad
+            Gauge
+    }
+
+ibmMainProcessorLoadIndex OBJECT-TYPE
+        SYNTAX  INTEGER (1..60)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the number of minutes ago that this
+                entry contains main processor load information for."
+        ::= { ibmMainProcessorLoadEntry 1 }
+
+ibmMainProcessorLoad OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The main processor load averaged over one minute
+                 represented as a percentage, i.e. - 25% is 25."
+        ::= { ibmMainProcessorLoadEntry 2 }
+
+END

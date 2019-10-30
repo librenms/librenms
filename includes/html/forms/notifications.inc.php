@@ -22,8 +22,6 @@
  * @subpackage Notifications
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 header('Content-type: application/json');
 
 if (!isset($_REQUEST['action'])) {
@@ -33,7 +31,7 @@ if (!isset($_REQUEST['action'])) {
     ]));
 }
 
-if (in_array($_REQUEST['action'], ['stick', 'unstick', 'create']) && !LegacyAuth::user()->hasGlobalAdmin()) {
+if (in_array($_REQUEST['action'], ['stick', 'unstick', 'create']) && !Auth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
         'message' => 'ERROR: Need to be GlobalAdmin or DemoUser',
@@ -42,19 +40,19 @@ if (in_array($_REQUEST['action'], ['stick', 'unstick', 'create']) && !LegacyAuth
 
 
 if ($_REQUEST['action'] == 'read' && isset($_REQUEST['notification_id'])) {
-    if (dbInsert(['notifications_id'=>$_REQUEST['notification_id'],'user_id'=>LegacyAuth::id(),'key'=>'read','value'=>1], 'notifications_attribs')) {
+    if (dbInsert(['notifications_id'=>$_REQUEST['notification_id'],'user_id'=>Auth::id(),'key'=>'read','value'=>1], 'notifications_attribs')) {
         die(json_encode([
             'status' => 'ok',
             'message' => 'Set as Read',
         ]));
     }
 } elseif ($_REQUEST['action'] == 'read-all-notif') {
-    $unread = dbFetchColumn("SELECT `notifications_id` FROM `notifications` AS N WHERE NOT EXISTS ( SELECT 1 FROM `notifications_attribs` WHERE `notifications_id` = N.`notifications_id` AND `user_id`=? AND `key`='read' AND `value`=1)", [LegacyAuth::id()]);
+    $unread = dbFetchColumn("SELECT `notifications_id` FROM `notifications` AS N WHERE NOT EXISTS ( SELECT 1 FROM `notifications_attribs` WHERE `notifications_id` = N.`notifications_id` AND `user_id`=? AND `key`='read' AND `value`=1)", [Auth::id()]);
     foreach ($unread as $notification_id) {
         dbInsert(
             [
                 'notifications_id' => $notification_id,
-                'user_id' => LegacyAuth::id(),
+                'user_id' => Auth::id(),
                 'key' => 'read',
                 'value' => 1
             ],
@@ -66,21 +64,21 @@ if ($_REQUEST['action'] == 'read' && isset($_REQUEST['notification_id'])) {
         'message' => 'All notifications set as read',
     ]));
 } elseif ($_REQUEST['action'] == 'stick' && isset($_REQUEST['notification_id'])) {
-    if (dbInsert(['notifications_id'=>$_REQUEST['notification_id'],'user_id'=>LegacyAuth::id(),'key'=>'sticky','value'=>1], 'notifications_attribs')) {
+    if (dbInsert(['notifications_id'=>$_REQUEST['notification_id'],'user_id'=>Auth::id(),'key'=>'sticky','value'=>1], 'notifications_attribs')) {
         die(json_encode([
             'status' => 'ok',
             'message' => 'Set as Sticky',
         ]));
     }
 } elseif ($_REQUEST['action'] == 'unstick' && isset($_REQUEST['notification_id'])) {
-    if (dbDelete('notifications_attribs', "notifications_id = ? && user_id = ? AND `key`='sticky'", [$_REQUEST['notification_id'],LegacyAuth::id()])) {
+    if (dbDelete('notifications_attribs', "notifications_id = ? && user_id = ? AND `key`='sticky'", [$_REQUEST['notification_id'],Auth::id()])) {
         die(json_encode([
             'status' => 'ok',
             'message' => 'Removed Sticky',
         ]));
     }
 } elseif ($_REQUEST['action'] == 'create' && (!empty($_REQUEST['title']) && !empty($_REQUEST['body']))) {
-    if (dbInsert(['title'=>$_REQUEST['title'],'body'=>$_REQUEST['body'],'checksum'=>hash('sha512', LegacyAuth::id().'.LOCAL.'.$_REQUEST['title']),'source'=>LegacyAuth::id()], 'notifications')) {
+    if (dbInsert(['title'=>$_REQUEST['title'],'body'=>$_REQUEST['body'],'checksum'=>hash('sha512', Auth::id().'.LOCAL.'.$_REQUEST['title']),'source'=>Auth::id()], 'notifications')) {
         die(json_encode([
             'status' => 'ok',
             'message' => 'Created',

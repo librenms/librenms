@@ -23,10 +23,10 @@
  */
 
 use Auth;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 
 $install_dir = Config::get('install_dir');
-require_once $install_dir . '/includes/alerts.inc.php';
 
 if (Config::get('map.engine', 'leaflet') == 'leaflet') {
     $temp_output = '
@@ -96,9 +96,9 @@ var greenMarker = L.AwesomeMarkers.icon({
                 LEFT JOIN `locations` ON `devices`.location_id=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
                 AND `devices`.`device_id` = `devices_perms`.`device_id`
-                AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($status_select)) .
+                AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($show_status)) .
                 " ORDER BY `status` ASC, `hostname`";
-        $param = array_merge([Auth::id()], $status_select);
+        $param = array_merge([Auth::id()], $show_status);
     }
 
     foreach (dbFetchRows($sql, $param) as $map_devices) {
@@ -110,7 +110,7 @@ var greenMarker = L.AwesomeMarkers.icon({
             $map_devices['lng'] = $tmp_loc['lng'];
         }
         if ($map_devices['status'] == 0) {
-            if (IsMaintenance($map_devices['device_id'])) {
+            if (AlertUtil::isMaintenance($map_devices['device_id'])) {
                 if ($show_status == 0) { // Don't show icon if only down devices should be shown
                     continue;
                 } else {

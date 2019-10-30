@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\PortsNac;
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 if (!is_numeric($vars['device'])) {
@@ -357,7 +356,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             </a>
             </li>';
 
-        if (LegacyAuth::user()->hasGlobalAdmin()) {
+        if (Auth::user()->hasGlobalAdmin()) {
             foreach ((array)Config::get('rancid_configs', []) as $configs) {
                 if ($configs[(strlen($configs) - 1)] != '/') {
                     $configs .= '/';
@@ -455,9 +454,15 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                   <span class="caret"></span></button>
                   <ul class="dropdown-menu">
                     <li><a href="https://'.$device['hostname'].'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
+
+        foreach (Config::get('html.device.links') as $links) {
+            $html_link = view(['template' => $links['url']], ['device' => $device])->__toString();
+            echo '<li><a href="'.$html_link.'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" aria-hidden="true"></i> '.$links['title'].'</a></li>';
+        }
+
         if (Config::has('gateone.server')) {
             if (Config::get('gateone.use_librenms_user') == true) {
-                echo '<li><a href="' . Config::get('gateone.server') . '?ssh=ssh://' . LegacyAuth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
+                echo '<li><a href="' . Config::get('gateone.server') . '?ssh=ssh://' . Auth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
             } else {
                 echo '<li><a href="' . Config::get('gateone.server') . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
             }
@@ -467,7 +472,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
         }
             echo '<li><a href="telnet://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-terminal fa-lg icon-theme"  aria-hidden="true"></i> Telnet</a></li>';
 
-        if (LegacyAuth::user()->hasGlobalAdmin()) {
+        if (Auth::user()->hasGlobalAdmin()) {
             echo '<li>
                 <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
                 <i class="fa fa-pencil fa-lg icon-theme"  aria-hidden="true"></i> Edit </a>

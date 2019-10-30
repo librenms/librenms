@@ -23,11 +23,10 @@
  * @subpackage Search
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 print_optionbar_start(28);
 ?>
 <form method="post" action="" class="form-inline" role="form">
+    <?php echo csrf_field() ?>
     <div class="form-group">
         <label for="package">Package</label>
         <input type="text" name="package" id="package" size=20 value="<?php echo($_POST['package']); ?>" class="form-control input-sm" placeholder="Any" />
@@ -53,6 +52,7 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 
 ?>
 <form method="post" action="search/search=packages/" id="result_form">
+    <?php echo csrf_field() ?>
     <table class="table table-hover table-condensed table-striped">
         <tr>
             <td colspan="3"><strong>Packages</strong></td>
@@ -76,10 +76,10 @@ $full_query = "";
 $query = 'SELECT packages.name FROM packages,devices ';
 $param = array();
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     $query .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
     $sql_where .= " AND `DP`.`user_id`=?";
-    $param[] = LegacyAuth::id();
+    $param[] = Auth::id();
 }
 
 $query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%".mres($_POST['package'])."%' $sql_where GROUP BY packages.name";

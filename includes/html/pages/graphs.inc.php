@@ -14,12 +14,8 @@ if (session('widescreen')) {
     $thumb_width=113;
 }
 
-if (!is_numeric($vars['from'])) {
-    $vars['from'] = strtotime($vars['from']) ?: Config::get('time.day');
-}
-if (!is_numeric($vars['to'])) {
-    $vars['to'] = strtotime($vars['to']) ?: Config::get('time.now');
-}
+$vars['from'] = parse_at_time($vars['from']) ?: Config::get('time.day');
+$vars['to'] = parse_at_time($vars['to']) ?: Config::get('time.now');
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
 
@@ -67,6 +63,7 @@ if (!$auth) {
     // FIXME allow switching between types for sensor and wireless also restrict types to ones that have data
     if ($type != 'sensor') {
         echo '<div style="float: right;"><form action="">';
+        echo csrf_field();
         echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" >";
 
         foreach (get_graph_subtypes($type, $device) as $avail_type) {
@@ -110,19 +107,19 @@ if (!$auth) {
     $graph_array['height'] = Config::get('webui.min_graph_height');
     $graph_array['width']  = $graph_width;
 
-    if ($_SESSION['screen_width']) {
-        if ($_SESSION['screen_width'] > 800) {
-            $graph_array['width'] = ($_SESSION['screen_width'] - ($_SESSION['screen_width']/10));
+    if ($screen_width = Session::get('screen_width')) {
+        if ($screen_width > 800) {
+            $graph_array['width'] = ($screen_width - ($screen_width /10));
         } else {
-            $graph_array['width'] = ($_SESSION['screen_width'] - ($_SESSION['screen_width']/4));
+            $graph_array['width'] = ($screen_width - ($screen_width /4));
         }
     }
 
-    if ($_SESSION['screen_height']) {
-        if ($_SESSION['screen_height'] > 960) {
-            $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/2));
+    if ($screen_height = Session::get('screen_height')) {
+        if ($screen_height > 960) {
+            $graph_array['height'] = ($screen_height - ($screen_height /2));
         } else {
-            $graph_array['height'] = max($graph_array['height'], ($_SESSION['screen_height'] - ($_SESSION['screen_height']/1.5)));
+            $graph_array['height'] = max($graph_array['height'], ($screen_height - ($screen_height /1.5)));
         }
     }
 
@@ -155,6 +152,11 @@ if (!$auth) {
     } else {
         echo(generate_link("Show RRD Command", $vars, array('page' => "graphs", 'showcommand' => "yes")));
     }
+
+    if ($vars['type'] == 'port_bits') {
+        echo ' | To show trend, set to future date';
+    }
+
     echo('</center>');
 
     echo generate_graph_js_state($graph_array);

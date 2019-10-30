@@ -24,6 +24,7 @@
         <div class="panel-body">
             <form method="POST" action="{{ route('users.update', [$user->user_id]) }}" class="form-horizontal" role="form">
                 <input type="hidden" name="_method" value="PATCH">
+                @csrf
                 <div class="form-group">
                     <label for="old_password" class="col-sm-4 control-label">@lang('Current Password')</label>
                     <div class="col-sm-4">
@@ -56,6 +57,7 @@
         <div class="panel-heading">@lang('Preferences')</div>
         <div class="panel-body">
             <form class="form-horizontal" role="form">
+                @csrf
                 <div class="form-group">
                     <label for="dashboard" class="col-sm-4 control-label">@lang('Dashboard')</label>
                     <div class="col-sm-4">
@@ -101,6 +103,7 @@
             </div>
             <div id="twofactorkeycontainer">
                 <form id="twofactorkey" class="form-horizontal" role="form">
+                    @csrf
                     <div class="form-group">
                         <label for="twofactorkey" class="col-sm-4 control-label">@lang('Secret Key')</label>
                         <div class="col-sm-4">
@@ -120,10 +123,12 @@
             </div>
                 <br/>
                 <form method="post" class="form-horizontal" role="form" action="{{ route('2fa.remove') }}">
+                    @csrf
                     <button class="btn btn-danger" type="submit">@lang('Disable TwoFactor')</button>
                 </form>
         @else
             <form method="post" class="form-horizontal" role="form" action="{{ route('2fa.add') }}">
+                @csrf
                 <div class="form-group">
                     <label for="twofactortype" class="col-sm-4 control-label">@lang('TwoFactor Type')</label>
                     <div class="col-sm-4">
@@ -165,7 +170,7 @@
 
 @section('javascript')
     <script src="{{ asset('js/jquery.qrcode.min.js') }}"></script>
-    @endsection
+@endsection
 
 @section('scripts')
     <script>

@@ -20,8 +20,7 @@ if (count($processors)) {
     $graph_array['from'] = \LibreNMS\Config::get('time.day');
     $graph_array['legend'] = 'no';
 
-    $totalPercent=0;
-    $totalPercentWarn=0;
+    $total_percent=[];
 
     foreach ($processors as $proc) {
         $text_descr = rewrite_entity_descr($proc['processor_descr']);
@@ -54,19 +53,28 @@ if (count($processors)) {
                 </a></td>
               </tr>';
         } else {
-            $totalPercent = $totalPercent + $percent;
-            $totalPercentWarn = $totalPercentWarn + $proc['processor_perc_warn'];
+            if (!isset($total_percent[$proc['processor_type']])) {
+                $total_percent[$proc['processor_type']] = array(
+                    'usage' => 0,
+                    'warn' => 0,
+                    'descr' => $text_descr,
+                    'count' => 0
+                );
+            }
+            $total_percent[$proc['processor_type']]['usage'] += $percent;
+            $total_percent[$proc['processor_type']]['warn'] += $proc['processor_perc_warn'];
+            $total_percent[$proc['processor_type']]['count'] += 1;
         }
     }//end foreach
 
     if (\LibreNMS\Config::get('cpu_details_overview') === false) {
-        if ($_SESSION['screen_width']) {
-            if ($_SESSION['screen_width'] > 970) {
-                $graph_array['width'] = round(($_SESSION['screen_width'] - 390 )/2, 0);
+        if ($screen_width = Session::get('screen_width')) {
+            if ($screen_width > 970) {
+                $graph_array['width'] = round(($screen_width - 390 )/2, 0);
                 $graph_array['height'] = round($graph_array['width'] /3);
                 $graph_array['lazy_w'] = $graph_array['width'] + 80;
             } else {
-                $graph_array['width'] = $_SESSION['screen_width'] - 190;
+                $graph_array['width'] = $screen_width - 190;
                 $graph_array['height'] = round($graph_array['width'] /3);
                 $graph_array['lazy_w'] = $graph_array['width'] + 80;
             }
@@ -93,17 +101,19 @@ if (count($processors)) {
         echo overlib_link($link, $graph, $overlib_content, null);
         echo '  </td>
             </tr>';
+        foreach ($total_percent as $type => $values) {
+            //Add a row with CPU desc, count and percent graph
+            $percent_usage = ceil($values['usage']/$values['count']);
+            $percent_warn = $values['warn']/$values['count'];
+            $background   = get_percentage_colours($percent_usage, $percent_warn);
 
-        //Add a row with CPU desc, count and percent graph
-        $totalPercent=$totalPercent/count($processors);
-        $totalPercentWarn=$totalPercentWarn/count($processors);
-        $background   = get_percentage_colours($totalPercent, $totalPercentWarn);
-
-         echo '<tr>
-             <td class="col-md-4">'.overlib_link($link, $text_descr, $overlib_content).'</td>
-             <td class="col-md-4">'.overlib_link($link, 'x'.count($processors), $overlib_content).'</td>
-             <td class="col-md-4">'.overlib_link($link, print_percentage_bar(200, 20, $totalPercent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']), $overlib_content).'</td>
-           </tr>';
+            echo '
+              <tr>
+                <td class="col-md-4">' . overlib_link($link, $values['descr'], $overlib_content).'</td>
+                <td class="col-md-4">' . overlib_link($link, 'x' . $values['count'], $overlib_content).'</td>
+                <td class="col-md-4">' . overlib_link($link, print_percentage_bar(200, 20, $percent_usage, null, 'ffffff', $background['left'], $percent_usage.'%', 'ffffff', $background['right']), $overlib_content) . '</td>
+              </tr>';
+        }
     }
 
     echo '</table>

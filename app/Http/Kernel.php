@@ -38,7 +38,6 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \App\Http\Middleware\LegacyExternalAuth::class,
-            \App\Http\Middleware\LegacySession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
@@ -49,7 +48,8 @@ class Kernel extends HttpKernel
 
         'api' => [
             'bindings',
-            'auth:token'
+            'auth:token',
+            \Spatie\Cors\Cors::class,
         ],
     ];
 

@@ -1,23 +1,39 @@
 #!/usr/bin/env php
 <?php
-
 /**
- * LibreNMS
+ * poller.php
  *
- *   This file is part of LibreNMS.
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
  * @subpackage poller
  * @copyright  (C) 2006 - 2012 Adam Armstrong
+
+ * Modified 4/17/19
+ * @author Heath Barnhart <hbarnhart@kanren.net>
  */
 
 use LibreNMS\Config;
+use LibreNMS\Alert\AlertRules;
 
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $poller_start = microtime(true);
-echo Config::get('base_url') . " Poller\n";
+echo Config::get('project_name')." Poller\n";
 
 $options = getopt('h:m:i:n:r::d::v::a::f::q');
 
@@ -159,7 +175,8 @@ foreach (dbFetch($query) as $device) {
     }
 
     echo "#### Start Alerts ####\n";
-    RunRules($device['device_id']);
+    $rules = new AlertRules();
+    $rules->runRules($device['device_id']);
     echo "#### End Alerts ####\r\n";
     $polled_devices++;
 }

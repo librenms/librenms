@@ -927,6 +927,7 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
+  - hostname: search by hostname
 - query: If searching by, then this will be used as the input.
 
 Example:
@@ -1173,4 +1174,40 @@ Output:
         ]
     }
 ]
+```
+
+
+### `search_oxidized`
+
+search all oxidized device configs for a string.
+
+Route: `api/v0/oxidized/config/search/:searchstring`
+
+  - searchstring is the specific string you would like to search for.
+  
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/configsearch/vlan10
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "nodes": [
+        {
+            "node": "asr9k.librenms.org",
+            "full_name": "cisco\/ASR9K.Librenms.org"
+        },
+        {
+            "node": "ios.Librenms.org",
+            "full_name": "cisco\/ios.Librenms.org"
+        }
+    ],
+    "count": 2
+}
 ```

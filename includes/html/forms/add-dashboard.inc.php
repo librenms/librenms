@@ -22,11 +22,9 @@
  * @subpackage Dashboards
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 header('Content-type: application/json');
 
-if (!LegacyAuth::check()) {
+if (!Auth::check()) {
     $response = array(
         'status'  => 'error',
         'message' => 'Unauthenticated',
@@ -40,7 +38,7 @@ $message   = 'unknown error';
 
 $dashboard_name = display($_REQUEST['dashboard_name']);
 
-if (!empty($dashboard_name) && ($dash_id = dbInsert(['dashboard_name' => $dashboard_name, 'user_id' => LegacyAuth::id()], 'dashboards'))) {
+if (!empty($dashboard_name) && ($dash_id = dbInsert(['dashboard_name' => $dashboard_name, 'user_id' => Auth::id()], 'dashboards'))) {
     $status  = 'ok';
     $message = 'Dashboard ' . $dashboard_name . ' created';
 } else {

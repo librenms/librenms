@@ -1,9 +1,7 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 if ($_POST['editing']) {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         $override_sysContact_bool = mres($_POST['override_sysContact']);
         if (isset($_POST['sysContact'])) {
             $override_sysContact_string = mres($_POST['sysContact']);
@@ -54,6 +52,7 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
 
 
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
+    <?php echo csrf_field() ?>
   <input type="hidden" name="editing" value="yes">
   <div class="form-group">
     <label for="override_sysContact" class="col-sm-3 control-label">Override sysContact:</label>

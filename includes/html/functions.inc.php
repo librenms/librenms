@@ -12,7 +12,6 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 /**
@@ -288,11 +287,11 @@ function print_graph_popup($graph_array)
 
 function bill_permitted($bill_id)
 {
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         return true;
     }
 
-    return \Permissions::canAccessBill($bill_id, LegacyAuth::id());
+    return \Permissions::canAccessBill($bill_id, Auth::id());
 }
 
 function port_permitted($port_id, $device_id = null)
@@ -305,7 +304,7 @@ function port_permitted($port_id, $device_id = null)
         return true;
     }
 
-    return \Permissions::canAccessPort($port_id, LegacyAuth::id());
+    return \Permissions::canAccessPort($port_id, Auth::id());
 }
 
 function application_permitted($app_id, $device_id = null)
@@ -323,10 +322,10 @@ function application_permitted($app_id, $device_id = null)
 
 function device_permitted($device_id)
 {
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user() && Auth::user()->hasGlobalRead()) {
         return true;
     }
-    return \Permissions::canAccessDevice($device_id, LegacyAuth::id());
+    return \Permissions::canAccessDevice($device_id, Auth::id());
 }
 
 function print_graph_tag($args)
@@ -456,6 +455,18 @@ function generate_entity_link($type, $entity, $text = null, $graph_type = null)
     return ($link);
 }//end generate_entity_link()
 
+/**
+ * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
+ * @param string $type
+ * @return array [type, subtype]
+ */
+function extract_graph_type($type): array
+{
+    preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $type, $graphtype);
+    $type = basename($graphtype['type']);
+    $subtype = basename($graphtype['subtype']);
+    return [$type, $subtype];
+}
 
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
@@ -572,7 +583,7 @@ function generate_sensor_url($sensor, $vars = array())
     return generate_url(array('page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => Config::get('time.day')), $vars);
 }//end generate_sensor_url()
 
- 
+
 function generate_port_url($port, $vars = array())
 {
     return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
@@ -686,11 +697,11 @@ function devclass($device)
 
 function getlocations()
 {
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         return dbFetchRows('SELECT id, location FROM locations ORDER BY location');
     }
 
-    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [LegacyAuth::id()]);
+    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [Auth::id()]);
 }
 
 
@@ -775,11 +786,6 @@ function generate_ap_url($ap, $vars = array())
 {
     return generate_url(array('page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoint', 'ap' => $ap['accesspoint_id']), $vars);
 }//end generate_ap_url()
-
-function report_this_text($message)
-{
-    return $message . '\nPlease report this to the ' . Config::get('project_name') . ' developers at ' . Config::get('project_issues') . '\n';
-}//end report_this_text()
 
 
 // Find all the files in the given directory that match the pattern
@@ -903,55 +909,6 @@ function clean_bootgrid($string)
     return $output;
 }//end clean_bootgrid()
 
-
-function get_config_by_group($group)
-{
-    $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = ?", array($group)) as $config_item) {
-        $val = $config_item['config_value'];
-        if (filter_var($val, FILTER_VALIDATE_INT)) {
-            $val = (int)$val;
-        } elseif (filter_var($val, FILTER_VALIDATE_FLOAT)) {
-            $val = (float)$val;
-        } elseif (filter_var($val, FILTER_VALIDATE_BOOLEAN)) {
-            $val = (boolean)$val;
-        }
-
-        if ($val === true) {
-            $config_item += array('config_checked' => 'checked');
-        }
-
-        $items[$config_item['config_name']] = $config_item;
-    }
-
-    return $items;
-}//end get_config_by_group()
-
-
-function get_config_like_name($name)
-{
-    $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE ?", array("%$name%")) as $config_item) {
-        $items[$config_item['config_id']] = $config_item;
-    }
-
-    return $items;
-}//end get_config_like_name()
-
-
-function get_config_by_name($name)
-{
-    $config_item = dbFetchRow('SELECT * FROM `config` WHERE `config_name` = ?', array($name));
-    return $config_item;
-}//end get_config_by_name()
-
-
-function set_config_name($name, $config_value)
-{
-    return dbUpdate(array('config_value' => $config_value), 'config', '`config_name`=?', array($name));
-}//end set_config_name()
-
-
 function get_url()
 {
     // http://stackoverflow.com/questions/2820723/how-to-get-base-url-with-php
@@ -1063,95 +1020,6 @@ function dynamic_override_config($type, $name, $device)
         return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . $name . '" data-device_id="' . $device['device_id'] . '" value="' . $attrib_val . '">';
     }
 }//end dynamic_override_config()
-
-function generate_dynamic_config_panel($title, $config_groups, $items = array(), $transport = '', $end_panel = true)
-{
-    $anchor = md5($title);
-    $output = '
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#' . $anchor . '"><i class="fa fa-caret-down"></i> ' . $title . '</a>
-    ';
-    if (!empty($transport)) {
-        $output .= '<button name="test-alert" id="test-alert" type="button" data-transport="' . $transport . '" class="btn btn-primary btn-xs pull-right">Test transport</button>';
-    }
-    $output .= '
-        </h4>
-    </div>
-    <div id="' . $anchor . '" class="panel-collapse collapse">
-        <div class="panel-body">
-    ';
-
-    if (!empty($items)) {
-        foreach ($items as $item) {
-            $output .= '
-            <div class="form-group has-feedback ' . (isset($item['class']) ? $item['class'] : '') . '">
-                <label for="' . $item['name'] . '"" class="col-sm-4 control-label">' . $item['descr'] . ' </label>
-                <div data-toggle="tooltip" title="' . $config_groups[$item['name']]['config_descr'] . '" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
-                <div class="col-sm-4">
-            ';
-            if ($item['type'] == 'checkbox') {
-                $output .= '<input id="' . $item['name'] . '" type="checkbox" name="global-config-check" ' . $config_groups[$item['name']]['config_checked'] . ' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">';
-            } elseif ($item['type'] == 'text') {
-                $pattern = isset($item['pattern']) ? ' pattern="' . $item['pattern'] . '"' : "";
-                $pattern .= isset($item['required']) && $item['required'] ? " required" : "";
-                $output .= '
-                <input id="' . $item['name'] . '" class="form-control validation" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '"' . $pattern . '>
-                <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
-                ';
-            } elseif ($item['type'] == 'password') {
-                $output .= '
-                <input id="' . $item['name'] . '" class="form-control" type="password" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
-                <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
-                ';
-            } elseif ($item['type'] == 'numeric') {
-                $output .= '
-                <input id="' . $item['name'] . '" class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
-                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                ';
-            } elseif ($item['type'] == 'select') {
-                $output .= '
-                <select id="' . ($config_groups[$item['name']]['name'] ?: $item['name']) . '" class="form-control" name="global-config-select" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
-                ';
-                if (!empty($item['options'])) {
-                    foreach ($item['options'] as $option) {
-                        if (gettype($option) == 'string') {
-                            /* for backwards-compatibility */
-                            $tmp_opt = $option;
-                            $option = array(
-                                'value' => $tmp_opt,
-                                'description' => $tmp_opt,
-                            );
-                        }
-                        $output .= '<option value="' . $option['value'] . '"';
-                        if ($option['value'] == $config_groups[$item['name']]['config_value']) {
-                            $output .= ' selected';
-                        }
-                        $output .= '>' . $option['description'] . '</option>';
-                    }
-                }
-                $output .= '
-                </select>
-                <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
-                ';
-            }
-            $output .= '
-                </div>
-            </div>
-            ';
-        }
-    }
-
-    if ($end_panel === true) {
-        $output .= '
-        </div>
-    </div>
-</div>
-        ';
-    }
-    return $output;
-}//end generate_dynamic_config_panel()
 
 /**
  * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.
@@ -1423,6 +1291,38 @@ function get_postgres_databases($device_id)
 }
 
 /**
+ * Get all application data from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @param string  $category which category of seafile graphs are searched
+ * @return array list of entry data
+ */
+function get_arrays_with_application($device, $app_id, $app_name, $category = null)
+{
+    $entries = array();
+
+    if ($category) {
+        $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id, $category);
+    } else {
+        $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id);
+    }
+
+    foreach (glob($pattern) as $rrd) {
+        $filename = basename($rrd, '.rrd');
+
+        list(,,, $entry) = explode("-", $filename, 4);
+
+        if ($entry) {
+            array_push($entries, $entry);
+        }
+    }
+
+    return $entries;
+}
+
+/**
  * Get all certificate names from the collected
  * rrd files.
  *
@@ -1432,21 +1332,23 @@ function get_postgres_databases($device_id)
  */
 function get_domains_with_certificates($device, $app_id)
 {
-    $certificates = array();
+    $app_name = 'certificate';
+    return get_arrays_with_application($device, $app_id, $app_name);
+}
 
-    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'certificate', $app_id);
-
-    foreach (glob($pattern) as $rrd) {
-        $filename = basename($rrd, '.rrd');
-
-        list(,,, $cert_name) = explode("-", $filename, 4);
-
-        if ($cert_name) {
-            array_push($certificates, $cert_name);
-        }
-    }
-
-    return $certificates;
+/**
+ * Get all seafile data from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @param string $category which category of seafile graphs are searched
+ * @return array list of seafile data
+ */
+function get_arrays_with_seafile($device, $app_id, $category)
+{
+    $app_name = 'seafile';
+    return get_arrays_with_application($device, $app_id, $app_name, $category);
 }
 
 /**
@@ -1455,25 +1357,12 @@ function get_domains_with_certificates($device, $app_id)
  *
  * @param array $device device for which we get the rrd's
  * @param int   $app_id application id on the device
- * @return array list of disks
+ * @return array list of raid-arrays
  */
 function get_arrays_with_mdadm($device, $app_id)
 {
-    $arrays = array();
-
-    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'mdadm', $app_id);
-
-    foreach (glob($pattern) as $rrd) {
-        $filename = basename($rrd, '.rrd');
-
-        list(,,, $array_name) = explode("-", $filename, 4);
-
-        if ($array_name) {
-            array_push($arrays, $array_name);
-        }
-    }
-
-    return $arrays;
+    $app_name = 'mdadm';
+    return get_arrays_with_application($device, $app_id, $app_name);
 }
 
 /**
@@ -1486,21 +1375,8 @@ function get_arrays_with_mdadm($device, $app_id)
  */
 function get_disks_with_smart($device, $app_id)
 {
-    $disks = array();
-
-    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'smart', $app_id);
-
-    foreach (glob($pattern) as $rrd) {
-        $filename = basename($rrd, '.rrd');
-
-        list(,,, $disk) = explode("-", $filename, 4);
-
-        if ($disk) {
-            array_push($disks, $disk);
-        }
-    }
-
-    return $disks;
+    $app_name = 'smart';
+    return get_arrays_with_application($device, $app_id, $app_name);
 }
 
 /**
@@ -1540,6 +1416,34 @@ function generate_stacked_graphs($transparency = '88')
     } else {
         return array('transparency' => '', 'stacked' => '-1');
     }
+}
+
+/**
+ * Parse AT time spec, does not handle the entire spec.
+ * @param string $time
+ * @return int
+ */
+function parse_at_time($time)
+{
+    if (is_numeric($time)) {
+        return $time < 0 ? time() + $time : intval($time);
+    }
+
+    if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
+        $units = [
+            'm' => 60,
+            'h' => 3600,
+            'd' => 86400,
+            'y' => 31557600,
+        ];
+        $value = substr($time, 1, -1);
+        $unit = substr($time, -1);
+
+        $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
+        return time() + $offset;
+    }
+
+    return (int)strtotime($time);
 }
 
 /**
@@ -1666,5 +1570,111 @@ function get_sensor_label_color($sensor, $type = 'sensors')
         $label_style = "label-danger";
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");
+    if ($sensor['sensor_class'] == 'runtime') {
+        $sensor['sensor_current'] = formatUptime($sensor['sensor_current'] * 60, 'short');
+        return "<span class='label $label_style'>".trim($sensor['sensor_current'])."</span>";
+    }
     return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
+}
+
+/**
+ * @params int unix time
+ * @params int seconds
+ * @return int
+ *
+ * Rounds down to the nearest interval.
+ *
+ * The first argument is required and it is the unix time being
+ * rounded down.
+ *
+ * The second value is the time interval. If not specified, it
+ * defaults to 300, or 5 minutes.
+ */
+function lowest_time($time, $seconds = 300)
+{
+    return $time - ($time % $seconds);
+}
+
+/**
+ * @params int
+ * @return string
+ *
+ * This returns the subpath for working with nfdump.
+ *
+ * 1 value is taken and that is a unix time stamp. It will be then be rounded
+ * off to the lowest five minutes earlier.
+ *
+ * The return string will be a path partial you can use with nfdump to tell it what
+ * file or range of files to use.
+ *
+ * Below ie a explanation of the layouts as taken from the NfSen config file.
+ *  0             no hierachy levels - flat layout - compatible with pre NfSen version
+ *  1 %Y/%m/%d    year/month/day
+ *  2 %Y/%m/%d/%H year/month/day/hour
+ *  3 %Y/%W/%u    year/week_of_year/day_of_week
+ *  4 %Y/%W/%u/%H year/week_of_year/day_of_week/hour
+ *  5 %Y/%j       year/day-of-year
+ *  6 %Y/%j/%H    year/day-of-year/hour
+ *  7 %Y-%m-%d    year-month-day
+ *  8 %Y-%m-%d/%H year-month-day/hour
+ */
+function time_to_nfsen_subpath($time)
+{
+    $time=lowest_time($time);
+    $layout=Config::get('nfsen_subdirlayout');
+
+    if ($layout == 0) {
+        return 'nfcapd.'.date('YmdHi', $time);
+    } elseif ($layout == 1) {
+        return date('Y\/m\/d\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 2) {
+        return date('Y\/m\/d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 3) {
+        return date('Y\/W\/w\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 4) {
+        return date('Y\/W\/w\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 5) {
+        return date('Y\/z\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 6) {
+        return date('Y\/z\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 7) {
+        return date('Y\-m\-d\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ($layout == 8) {
+        return date('Y\-m\-d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    }
+}
+
+/**
+ * @params string hostname
+ * @return string
+ *
+ * Takes a hostname and transforms it to the name
+ * used by nfsen.
+*/
+function nfsen_hostname($hostname)
+{
+    $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
+
+    if (!is_null(Config::get('nfsen_suffix'))) {
+        $nfsen_hostname=str_replace(Config::get('nfsen_suffix'), '', $nfsen_hostname);
+    }
+    return $nfsen_hostname;
+}
+
+/**
+ * @params string hostname
+ * @return string
+ *
+ * Takes a hostname and returns the path to the nfsen
+ * live dir.
+*/
+function nfsen_live_dir($hostname)
+{
+    $hostname=nfsen_hostname($hostname);
+
+    foreach (Config::get('nfsen_base') as $base_dir) {
+        if (file_exists($base_dir) && is_dir($base_dir)) {
+            return $base_dir.'/profiles-data/live/'.$hostname;
+        }
+    }
 }

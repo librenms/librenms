@@ -17,18 +17,30 @@ Auth::routes();
 // WebUI
 Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     // Test
-    Route::get('/laravel', function () {
-        return view('laravel');
-    });
+    Route::get('/vue/{sub?}', function () {
+        return view('vue');
+    })->where('sub', '.*');
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
+    Route::get('about', 'AboutController@index');
+    Route::get('authlog', 'UserController@authlog');
+
+    // admin pages
+    Route::group(['guard' => 'admin'], function () {
+        Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
+        Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
+        Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
+    });
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'pollers/tab=log/');
+    Route::get('settings/sub={tab}', function ($tab) {
+        return redirect("settings/$tab");
+    });
 
     // Two Factor Auth
     Route::group(['prefix' => '2fa', 'namespace' => 'Auth'], function () {
@@ -49,10 +61,15 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
+            Route::post('set_map_group', 'AvailabilityMapController@setGroup');
+            Route::post('set_map_view', 'AvailabilityMapController@setView');
             Route::post('set_resolution', 'ResolutionController@set');
             Route::get('netcmd', 'NetCommand@run');
             Route::post('ripe/raw', 'RipeNccApiController@raw');
         });
+
+
+        Route::get('settings/list', 'SettingsController@listAll')->name('settings.list');
 
         // form ajax handlers, perhaps should just be page controllers
         Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
@@ -63,6 +80,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
             Route::get('application', 'ApplicationController');
             Route::get('bill', 'BillController');
+            Route::get('dashboard', 'DashboardController')->name('ajax.select.dashboard');
             Route::get('device', 'DeviceController');
             Route::get('device-field', 'DeviceFieldController');
             Route::get('device-group', 'DeviceGroupController');

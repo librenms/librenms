@@ -622,7 +622,7 @@ class IRCBot
     private function _reload()
     {
         if ($this->user['level'] == 10) {
-            $new_config = Config::load();
+            $new_config = Config::reload();
             $this->respond('Reloading configuration & defaults');
             if ($new_config != $this->config) {
                 return $this->__construct();
@@ -669,9 +669,9 @@ class IRCBot
     {
         $versions       = version_info();
         $schema_version = $versions['db_schema'];
-        $version        = substr($versions['local_sha'], 0, 7);
+        $version        = $versions['local_ver'];
 
-        $msg = $this->config['project_name_version'].', Version: '.$version.', DB schema: '.$schema_version.', PHP: '.PHP_VERSION;
+        $msg = $this->config['project_name'].', Version: '.$version.', DB schema: '.$schema_version.', PHP: '.PHP_VERSION;
         return $this->respond($msg);
     }//end _version()
 

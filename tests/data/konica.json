@@ -481,16 +481,16 @@
                     "entPhysicalIndex": null,
                     "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
-                    "mempool_precision": "1048576",
+                    "mempool_precision": 1048576,
                     "mempool_descr": "RAM",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
                 }
             ]
         },
@@ -501,16 +501,16 @@
                     "entPhysicalIndex": null,
                     "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
-                    "mempool_precision": "1048576",
+                    "mempool_precision": 1048576,
                     "mempool_descr": "RAM",
-                    "mempool_perc": "79",
-                    "mempool_used": "1898971136",
-                    "mempool_free": "516947968",
-                    "mempool_total": "2415919104",
+                    "mempool_perc": 79,
+                    "mempool_used": 1898971136,
+                    "mempool_free": 516947968,
+                    "mempool_total": 2415919104,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
                 }
             ]
         }
@@ -523,26 +523,26 @@
                     "storage_index": "2",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "HDD",
-                    "storage_size": "250028752896",
-                    "storage_units": "1048576",
-                    "storage_used": "70976012288",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
+                    "storage_size": 250028752896,
+                    "storage_units": 1048576,
+                    "storage_used": 70976012288,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
                 },
                 {
                     "storage_mib": "hrstorage",
                     "storage_index": "3",
                     "storage_type": "hrStorageFlashMemory",
                     "storage_descr": "NVRAM",
-                    "storage_size": "2097152",
-                    "storage_units": "1048576",
-                    "storage_used": "2097152",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
+                    "storage_size": 2097152,
+                    "storage_units": 1048576,
+                    "storage_used": 2097152,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
                 }
             ]
         },
@@ -553,26 +553,26 @@
                     "storage_index": "2",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "HDD",
-                    "storage_size": "250028752896",
-                    "storage_units": "1048576",
-                    "storage_used": "70976012288",
-                    "storage_free": "179052740608",
-                    "storage_perc": "28",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
+                    "storage_size": 250028752896,
+                    "storage_units": 1048576,
+                    "storage_used": 70976012288,
+                    "storage_free": 179052740608,
+                    "storage_perc": 28,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
                 },
                 {
                     "storage_mib": "hrstorage",
                     "storage_index": "3",
                     "storage_type": "hrStorageFlashMemory",
                     "storage_descr": "NVRAM",
-                    "storage_size": "2097152",
-                    "storage_units": "1048576",
-                    "storage_used": "2097152",
-                    "storage_free": "0",
-                    "storage_perc": "100",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
+                    "storage_size": 2097152,
+                    "storage_units": 1048576,
+                    "storage_used": 2097152,
+                    "storage_free": 0,
+                    "storage_perc": 100,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
                 }
             ]
         }

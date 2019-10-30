@@ -1,8 +1,8 @@
 <?php
 
-if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "proxmox" || $device['os'] == "recoveryos") {
+if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) {
     list(,,$version) = explode(" ", $device['sysDescr']);
-    if (strstr($device['sysDescr'], "386")|| strstr($device['sysDescr'], "486")||strstr($device['sysDescr'], "586")||strstr($device['sysDescr'], "686")) {
+    if (preg_match('[3-6]86', $device['sysDescr'])) {
         $hardware = "Generic x86";
     } elseif (strstr($device['sysDescr'], "x86_64")) {
         $hardware = "Generic x86 64-bit";
@@ -19,6 +19,8 @@ if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "p
         $hardware = "Generic ARMv6";
     } elseif (strstr($device['sysDescr'], "armv7")) {
         $hardware = "Generic ARMv7";
+    } elseif (strstr($device['sysDescr'], "aarch64")) {
+        $hardware = "Generic ARMv8 64-bit";
     } elseif (strstr($device['sysDescr'], "armv")) {
         $hardware = "Generic ARM";
     }
@@ -159,4 +161,16 @@ if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "p
     $output = preg_split("/ /", $device['sysDescr']);
     $version = $output[2];
     $hardware = $output[6];
+} elseif ($device['os'] == "aix") {
+    $aix_descr = explode("\n", $device['sysDescr']);
+    # AIX standard snmp deamon
+    if ($aix_descr[1]) {
+        $serial = explode("Processor id: ", $aix_descr[1])[1];
+        $aix_long_version = explode(" version: ", $aix_descr[2])[1];
+        list($version,$aix_version_min) = array_map('intval', explode(".", $aix_long_version));
+    # AIX net-snmp
+    } else {
+        list(,,$aix_version_min,$version,$serial) = explode(" ", $aix_descr[0]);
+    }
+    $version .= "." . $aix_version_min;
 }
