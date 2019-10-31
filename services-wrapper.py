@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 """
  services-wrapper A small tool which wraps around check-services.php and tries to
                 guide the services process with a more modern approach with a
@@ -36,11 +36,23 @@
 
                 LICENSE.txt contains a copy of the full GPLv3 licensing conditions.
 """
+
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import librenms_library as LNMS
+
 try:
 
     import json
     import os
-    import queue
+
+    # Python 2 compatibility where queue is named Queue
+    try:
+        import queue
+    except ImportError:
+        import Queue as queue
+
     import subprocess
     import sys
     import threading
@@ -52,70 +64,10 @@ except:
     print("threading, Queue, sys, subprocess, time, os, json")
     sys.exit(2)
 
-try:
-    import MySQLdb
-except:
-    print("ERROR: missing the mysql python module:")
-    print("On ubuntu: apt-get install python-mysqldb")
-    print("On FreeBSD: cd /usr/ports/*/py-MySQLdb && make install clean")
-    sys.exit(2)
 
-"""
-    Fetch configuration details from the config_to_json.php script
-"""
-
-
-def get_config_data(install_dir):
-    command = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
-    decoder = 'utf-8'
-    timeout = 30
-    try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=False, timeout=30,
-                                         universal_newlines=False)
-        output = output.decode(decoder, errors='ignore')
-    except subprocess.CalledProcessError as iexc:
-        exit_code = iexc.returncode
-        try:
-            output = iexc.output
-            try:
-                output = output.decode(decoder, errors='ignore')
-            except Exception as subexc:
-                print('ERROR: %s', subexc)
-        except Exception:
-            output = "Could not obtain output from command."
-        if exit_code == 0:
-            print('Command [%s] returned with exit code [%s]. Command output was:' % (command, exit_code))
-            if output:
-                print(output)
-            return iexc.returncode, output
-        else:
-            print('Command [%s] failed with exit code [%s]. Command output was:' %
-                  (command, iexc.returncode))
-            return iexc.returncode, output
-    # OSError if not a valid executable
-    except OSError as exc:
-        print('Command [%s] returned:\n%s.' % (command, exc))
-        return None, exc
-    except subprocess.TimeoutExpired:
-        print('Timeout [%s seconds] expired for command [%s] execution.' % (timeout, command))
-        return None, 'Timeout of %s seconds expired.' % timeout
-    else:
-        return 0, output
-
-
-def db_open():
-    try:
-        if db_socket:
-            database = MySQLdb.connect(host=db_server, unix_socket=db_socket, user=db_username, passwd=db_password,
-                                       db=db_dbname)
-        else:
-            database = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
-        return database
-    except Exception as dbexc:
-        print('ERROR: Could not connect to MySQL database!')
-        print('ERROR: %s' % dbexc)
-        sys.exit(2)
-
+APP_NAME = "poller_wrapper"
+LOG_FILE = APP_NAME + ".log"
+_DEBUG = True
 
 """
  Threading helper functions
@@ -228,6 +180,7 @@ def poll_worker():
                 start_time = time.time()
 
                 output = "-d >> %s/services_device_%s.log" % (log_dir, device_id) if debug else ">> /dev/null"
+                # TODO replace with command_runner
                 command = "/usr/bin/env php %s -h %s %s 2>&1" % (service_path, device_id, output)
                 subprocess.check_call(command, shell=True)
 
@@ -241,19 +194,15 @@ def poll_worker():
 
 
 if __name__ == '__main__':
+    logger = LNMS.logger_get_logger(LOG_FILE, debug=_DEBUG)
+
     install_dir = os.path.dirname(os.path.realpath(__file__))
     config_file = install_dir + '/config.php'
 
-    try:
-        with open(config_file) as f:
-            pass
-    except IOError as exc:
-        print('ERROR: Oh dear... %s does not seem readable' % config_file)
-        print('ERROR: %s' % exc)
-        sys.exit(2)
+    LNMS.check_for_file(config_file)
 
     try:
-        _, conf = get_config_data(install_dir)
+        conf = LNMS.get_config_data(install_dir)
         config = json.loads(conf)
     except:
         print("ERROR: Could not load or parse configuration, are PATHs correct?")
@@ -262,6 +211,7 @@ if __name__ == '__main__':
     service_path = config['install_dir'] + '/check-services.php'
     log_dir = config['log_dir']
 
+    # TODO: Use LibreNMS.DB
     db_username = config['db_user']
     db_password = config['db_pass']
     db_port = int(config['db_port'])
@@ -354,7 +304,7 @@ if __name__ == '__main__':
     # EOC2
 
 
-    db = db_open()
+    db = LNMS.db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname)
     cursor = db.cursor()
     cursor.execute(query)
     devices = cursor.fetchall()
