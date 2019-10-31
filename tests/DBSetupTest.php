@@ -39,14 +39,9 @@ class DBSetupTest extends DBTestCase
 
     public function testSetupDB()
     {
-        global $schema;
-        foreach ($schema as $output) {
-            if (preg_match('/([1-9]+) errors/', $output) || preg_match('/Cannot execute query/', $output)) {
-                throw new PHPUnitException("Errors loading DB Schema: " . $output);
-            }
-        }
+        global $migrate_output, $migrate_result;
 
-        $this->expectNotToPerformAssertions();
+        $this->assertSame(0, $migrate_result, "Errors loading DB Schema: " . $migrate_output);
     }
 
     public function testSchemaFiles()
@@ -126,7 +121,7 @@ class DBSetupTest extends DBTestCase
     public function testSqlMode()
     {
         $this->assertEquals(
-            'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',
+            'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION',
             dbFetchCell("SELECT @@sql_mode")
         );
     }

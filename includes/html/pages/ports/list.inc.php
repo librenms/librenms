@@ -60,7 +60,7 @@ if ($vars['errors']) {
                     data-css-class="red">Errors Out
                 </th>
                 <th data-column-id="ifType">Media</th>
-                <th data-column-id="description">Description</th>
+                <th data-column-id="ifAlias">Description</th>
                 <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>
             </tr>
             </thead>

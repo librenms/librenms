@@ -162,6 +162,16 @@ $graphs['nvidia'] = array(
     'sbecc',
     'dbecc',
 );
+$graphs['seafile'] = array(
+    'connected',
+    'enabled',
+    'libraries',
+    'trashed_libraries',
+    'size_consumption',
+    'groups',
+    'version',
+    'platform',
+);
 $graphs['squid'] = array(
     'memory',
     'clients',

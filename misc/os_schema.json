@@ -53,10 +53,16 @@
         "icon": {
             "type": "string"
         },
+        "config_highlighting": {
+            "type": "string"
+        },
         "poller_modules": {
             "type": "object",
             "properties": {
                 "cisco-cbqos": {
+                    "type": "boolean"
+                },
+                "cisco-qfp": {
                     "type": "boolean"
                 },
                 "cisco-cef": {
@@ -200,6 +206,9 @@
         "discovery_modules": {
             "type": "object",
             "properties": {
+                "cisco-qfp": {
+                    "type": "boolean"
+                },
                 "cisco-cef": {
                     "type": "boolean"
                 },
@@ -375,6 +384,7 @@
         "processor_stacked": {
             "type": "boolean"
         },
+        "bad_ifname_regexp": {"$ref": "#/definitions/regex_group"},
         "bad_if_regexp": {"$ref": "#/definitions/regex_group"},
         "bad_snmpEngineTime": {
             "type": "boolean"

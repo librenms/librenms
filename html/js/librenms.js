@@ -57,80 +57,6 @@ $(document).ready(function() {
         });
     });
 
-    // Checkbox config ajax calls
-    $("[name='global-config-check']").bootstrapSwitch('offColor','danger');
-    $('input[name="global-config-check"]').on('switchChange.bootstrapSwitch',  function(event, state) {
-        event.preventDefault();
-        var $this = $(this);
-        var config_id = $this.data("config_id");
-        $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: "update-config-item", config_id: config_id, config_value: state},
-            dataType: "json",
-            success: function (data) {
-                if (data.status == 'ok') {
-                    toastr.success('Config updated');
-                } else {
-                    toastr.error(data.message);
-                }
-            },
-            error: function () {
-                toastr.error(data.message);
-            }
-        });
-    });
-
-    // Input field config ajax calls
-    $(document).on('blur', 'input[name="global-config-input"]', function(event) {
-        event.preventDefault();
-        var $this = $(this);
-        var config_id = $this.data("config_id");
-        var config_value = $this.val();
-        if ($this[0].checkValidity()) {
-            $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {type: "update-config-item", config_id: config_id, config_value: config_value},
-                dataType: "json",
-                success: function (data) {
-                    if (data.status == 'ok') {
-                        toastr.success('Config updated');
-                    } else {
-                        toastr.error(data.message);
-                    }
-                },
-                error: function () {
-                    toastr.error(data.message);
-                }
-            });
-        }
-    });
-
-    // Select config ajax calls
-    $( 'select[name="global-config-select"]').change(function(event) {
-        event.preventDefault();
-        var $this = $(this);
-        var config_id = $this.data("config_id");
-        var config_value = $this.val();
-        $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: "update-config-item", config_id: config_id, config_value: config_value},
-            dataType: "json",
-            success: function (data) {
-                if (data.status == 'ok') {
-                    toastr.success('Config updated');
-                } else {
-                    toastr.error(data.message);
-                }
-            },
-            error: function () {
-                toastr.error(data.message);
-            }
-        });
-    });
-
     oldW=$(window).width();
     oldH=$(window).height();
 });
@@ -228,7 +154,7 @@ $(document).on("click", '.collapse-neighbors', function(event)
 
 //availability-map mode change
 $(document).on("change", '#mode', function() {
-    $.post('ajax_mapview.php',
+    $.post('ajax/set_map_view',
         {
             map_view: $(this).val()
         },
@@ -240,7 +166,7 @@ $(document).on("change", '#mode', function() {
 
 //availability-map device group
 $(document).on("change", '#group', function() {
-    $.post('ajax_mapview.php',
+    $.post('ajax/set_map_group',
         {
             group_view: $(this).val()
         },
@@ -507,7 +433,7 @@ function init_select2(selector, type, data, selected, placeholder) {
 
 function humanize_duration(seconds) {
     // transform xxx seconds into yy years MM months dd days hh hours mm:ss
-    
+
     var duration = moment.duration(Number(seconds), 's');
     var years = duration.years(),
         months = duration.months(),

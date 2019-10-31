@@ -21,6 +21,8 @@ Table of Content:
     - [RouterOS 6.x](#routeros-6x)
   - [Palo Alto](#palo-alto)
     - [PANOS 6.x/7.x](#panos-6x7x)
+  - [Ubiquiti](#ubiquiti)
+    - [EdgeOs](#edgeos)
   - [VMware](#vmware)
     - [ESX/ESXi 5.x/6.x](#esxesxi-5x6x)
     - [VCenter 6.x](#vcenter-6x)
@@ -63,12 +65,13 @@ snmp-server contact <YOUR-CONTACT>
 snmp-server location <YOUR-LOCATION>
 snmp-server host <INTERFACE> <LIBRENMS-IP> poll version 3 <USER-NAME>
 ```
+>Note: If the device is unable to find the SNMP user, reboot the ASA. Once rebooted, continue the steps as normal.
 
 #### IOS / IOS XE
 
 ```
 # SNMPv2c
- 
+
 snmp-server community <YOUR-COMMUNITY> RO
 snmp-server contact <YOUR-CONTACT>
 snmp-server location <YOUR-LOCATION>
@@ -82,8 +85,9 @@ snmp-server location <YOUR-LOCATION>
 
 # Note: The following is also required if using SNMPv3 and you want to populate the FDB table.
 
-snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix 
+snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix
 ```
+>Note: If the device is unable to find the SNMP user, reboot the ASA. Once rebooted, continue the steps as normal.
 
 #### NX-OS
 
@@ -213,6 +217,33 @@ username@devicename# commit
 username@devicename# exit
 ```
 
+### Ubiquiti
+
+#### EdgeOs
+
+If you use the HTTP interface:
+1. Access the legacy web admin page and log in
+1. Go to System > Advanced Configuration
+1. Go to the sub-tab "SNMP" > "Community"
+1. Click "Add Community Group"
+1. Enter your SNMP community, ip address and click submit
+1. Go to System > Summary
+1. Go to the sub-tab "Description"
+1. Enter your System Name, System Location and System Contact.
+1. Click submit
+1. Click "Save Configuration"
+
+If you use CLI:
+```
+username@devicename> enable
+username@devicename# configure
+username@devicename (Config)# snmp-server community "public" ro
+username@devicename (Config)# snmp-server sysname "devicename"
+username@devicename (Config)# snmp-server contact "noc@example.com"
+username@devicename (Config)# exit
+username@devicename# write memory
+```
+
 ### VMware
 
 #### ESX/ESXi 5.x/6.x
@@ -237,7 +268,7 @@ This command produces output like this
 Now define a SNMPv3 user:
 
 ```
-esxcli system snmp set --users authpriv/f3d8982fc28e8d1346c26eee49eb2c4a5950c934/0596ab30b315576a4e9f7d7bde65bf49b749e335/priv
+esxcli system snmp set --users <username>/f3d8982fc28e8d1346c26eee49eb2c4a5950c934/0596ab30b315576a4e9f7d7bde65bf49b749e335/priv
 esxcli system snmp set -L "Yourcity, Yourcountry [60.4,5.3]"
 esxcli system snmp set -C noc@your.org
 esxcli system snmp set --enable true
@@ -375,6 +406,13 @@ service snmpd restart
 systemctl restart snmpd
 ```
 
+Add SNMP to Firewalld
+
+```
+firewall-cmd --zone=public --permanent --add-service=snmp
+firewall-cmd --reload
+```
+
 ##### Ubuntu
 
 ```
@@ -409,6 +447,8 @@ service snmpd restart
 1. In "Accept SNMP packets from these hosts" click "Add" and add your
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
+
+>Note: SNMPv3 can be supported on Windows playforms with the use of Net-SNMP.
 
 ### Mac OSX
 

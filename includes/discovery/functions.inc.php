@@ -657,12 +657,12 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 
 //end discover_processor()
 
-function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = '1', $entPhysicalIndex = null, $hrDeviceIndex = null)
+function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = '1', $entPhysicalIndex = null, $hrDeviceIndex = null, $perc_warn = '90')
 {
 
     $descr = substr($descr, 0, 64);
 
-    d_echo("Discover Mempool: $index, $type, $descr, $precision, $entPhysicalIndex, $hrDeviceIndex\n");
+    d_echo("Discover Mempool: $index, $type, $descr, $precision, $entPhysicalIndex, $hrDeviceIndex, $perc_warn\n");
 
     // FIXME implement the mempool_perc, mempool_used, etc.
     if ($descr) {
@@ -677,6 +677,7 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
                 'mempool_used' => 0,
                 'mempool_free' => 0,
                 'mempool_total' => 0,
+                'mempool_perc_warn' => $perc_warn,
             );
 
             if (is_numeric($entPhysicalIndex)) {

@@ -16,6 +16,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Config;
 
 class Alerta extends Transport
 {
@@ -34,7 +35,7 @@ class Alerta extends Transport
         $curl = curl_init();
         $text = strip_tags($obj['msg']);
         $severity = ($obj['state'] == 0 ? $opts['recoverstate'] : $opts['alertstate']);
-        $deviceurl = "https://librenms.rochester.k12.mn.us/device/device=".$obj['device_id'];
+        $deviceurl = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
         $devicehostname = $obj['hostname'];
         $data = [
             'resource' => $devicehostname,

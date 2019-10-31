@@ -63,16 +63,16 @@
                     "entPhysicalIndex": null,
                     "hrDeviceIndex": null,
                     "mempool_type": "dcn-software",
-                    "mempool_precision": "1",
+                    "mempool_precision": 1,
                     "mempool_descr": "Memory Usage",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
                 }
             ]
         },
@@ -83,16 +83,16 @@
                     "entPhysicalIndex": null,
                     "hrDeviceIndex": null,
                     "mempool_type": "dcn-software",
-                    "mempool_precision": "1",
+                    "mempool_precision": 1,
                     "mempool_descr": "Memory Usage",
-                    "mempool_perc": "81",
-                    "mempool_used": "218152960",
-                    "mempool_free": "50282496",
-                    "mempool_total": "268435456",
+                    "mempool_perc": 81,
+                    "mempool_used": 218152960,
+                    "mempool_free": 50282496,
+                    "mempool_total": 268435456,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
                 }
             ]
         }

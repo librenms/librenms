@@ -1,0 +1,351 @@
+ALCATEL-IND1-DHCP-SRV-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                Unsigned32, IpAddress,
+                MODULE-IDENTITY, OBJECT-TYPE,
+                NOTIFICATION-TYPE, OBJECT-IDENTITY
+                                        FROM SNMPv2-SMI
+                MacAddress, DisplayString, DateAndTime
+                                        FROM SNMPv2-TC
+                MODULE-COMPLIANCE, OBJECT-GROUP,
+                NOTIFICATION-GROUP
+                                        FROM SNMPv2-CONF
+		InetAddress, InetAddressType
+                        		FROM INET-ADDRESS-MIB
+                softentIND1DhcpSrv
+                                        FROM ALCATEL-IND1-BASE;
+
+
+                alcatelIND1DhcpSrvMIB MODULE-IDENTITY
+                LAST-UPDATED "200812100000Z"
+                ORGANIZATION "Alcatel - Architects Of An Internet World"
+                CONTACT-INFO
+                "Please consult with Customer Service to insure the most appropriate
+                version of this document is used with the products in question:
+
+                        Alcatel Internetworking, Incorporated
+                        (Division 1, Formerly XYLAN Corporation)
+                        26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                        United States Of America
+
+                        Telephone:      North America  +1 800 995 2696
+                                        Latin America  +1 877 919 9526
+                                        Europe         +31 23 556 0100
+                                        Asia           +65 394 7933
+                                        All Other      +1 818 878 4507
+
+                Electronic Mail:         support@ind.alcatel.com
+                World Wide Web:          http://www.ind.alcatel.com
+                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                        "This module describes an authoritative enterprise-specific Simple
+                        Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                        For the Birds Of Prey Product Line
+                        DhcpSrv for dynamically assigning IP to clients.
+
+                        The right to make changes in specification and other information
+                        contained in this document without prior notice is reserved.
+
+                        No liability shall be assumed for any incidental, indirect, special, or
+                        consequential damages whatsoever arising from or related to this
+                        document or the information contained herein.
+
+                        Vendors, end-users, and other interested parties are granted
+                        non-exclusive license to use this specification in connection with
+                        management of the products for which it is intended to be used.
+
+                        Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
+                        ALL RIGHTS RESERVED WORLDWIDE"
+
+                REVISION      "200910260000Z"
+                DESCRIPTION
+                        "The Dynamic Host Configuration Protocol (DHCP) provides a framework
+                        for passing configuration information to hosts on a TCPIP network.
+                        DHCP is based on the Bootstrap Protocol (BOOTP), adding the
+                        capability of automatic allocation of reusable network addresses and
+                        additional configuration options.
+
+                        This MIB provides the configuration information for DHCP Server."
+                ::= { softentIND1DhcpSrv 1 }
+
+-- --------------------------------------------------------------
+                alcatelIND1DhcpSrvMIBNotifications OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                        "Branch For DHCP Server Subsystem Notifications."
+                ::= { alcatelIND1DhcpSrvMIB 0 }
+
+                alcatelIND1DhcpSrvMIBObjects OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                        "Branch For DHCP Server Subsystem Managed Objects."
+                ::= { alcatelIND1DhcpSrvMIB 1 }
+
+                alcatelIND1DhcpSrvMIBConformance OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                        "Branch for DhcpSrv Module MIB Subsystem Conformance Information."
+                ::= { alcatelIND1DhcpSrvMIB 2 }
+
+                alcatelIND1DhcpSrvMIBGroups OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                        "Branch for DhcpSrv Module MIB Subsystem Units of Conformance."
+                ::= { alcatelIND1DhcpSrvMIBConformance 1 }
+
+                alcatelIND1DhcpSrvMIBCompliances OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                        "Branch for DhcpSrv Module MIB Subsystem Compliance Statements."
+                ::= { alcatelIND1DhcpSrvMIBConformance 2 }
+
+-- --------------------------------------------------------------
+
+
+alaDhcpSrvGlobalConfigStatus OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  enable(1),
+                  disable(2)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to enable(1) or disable(2) DHCP Server on the switch."
+	DEFVAL { disable }
+::= { alcatelIND1DhcpSrvMIBObjects 1 }
+
+alaDhcpSrvGlobalRestart OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  inactive(1),
+                  restart(2)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to restart(2) the DHCP Server on the switch. Default value is
+            inactive(1) which user can not set."
+        DEFVAL { inactive }
+::= { alcatelIND1DhcpSrvMIBObjects 2 }
+
+alaDhcpSrvGlobalClearStat OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  default(1),
+                  reset(2)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Defines the global clear statistics control for DHCP Server.
+                default(1) - default value for this object,
+                reset(2)   - indicates that all statistic related to DHCP
+                             server in the system should get cleared."
+        DEFVAL  { default }
+::= { alcatelIND1DhcpSrvMIBObjects 3 }
+
+-- --------------------------------------------------------------
+
+alaDhcpSrvLease OBJECT IDENTIFIER ::= { alcatelIND1DhcpSrvMIBObjects 4 }
+
+alaDhcpSrvLeaseTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF AlaDhcpSrvLeaseEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "DHCP server lease table."
+::= { alaDhcpSrvLease 1 }
+
+alaDhcpSrvLeaseEntry OBJECT-TYPE
+        SYNTAX       AlaDhcpSrvLeaseEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "DHCP server lease entry."
+        INDEX { alaDhcpSrvLeaseInetAddressType, alaDhcpSrvLeaseInetAddress }
+::= { alaDhcpSrvLeaseTable 1 }
+
+AlaDhcpSrvLeaseEntry ::= SEQUENCE {
+		alaDhcpSrvLeaseInetAddressType  InetAddressType,
+                alaDhcpSrvLeaseInetAddress      InetAddress,
+                alaDhcpSrvLeaseMACAddress       MacAddress,
+                alaDhcpSrvLeaseLeaseGrant       DateAndTime,
+                alaDhcpSrvLeaseLeaseExpiry      DateAndTime,
+                alaDhcpSrvLeaseType             INTEGER
+        }
+
+alaDhcpSrvLeaseInetAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType
+	MAX-ACCESS	not-accessible
+	STATUS          current
+	DESCRIPTION
+	    "Thie object specifies the type of DHCP Server lease address.
+	    Currently only InetAddressIPv4(1) is supported."
+::= { alaDhcpSrvLeaseEntry 1 }
+
+alaDhcpSrvLeaseInetAddress OBJECT-TYPE
+        SYNTAX          InetAddress (SIZE(1 .. 16))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object specifies IP address assigned to the client."
+::= { alaDhcpSrvLeaseEntry 2 }
+
+alaDhcpSrvLeaseMACAddress OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "MAC address assigned to the client."
+::= { alaDhcpSrvLeaseEntry 3 }
+
+alaDhcpSrvLeaseLeaseGrant OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Lease granted time for the client."
+::= { alaDhcpSrvLeaseEntry 4 }
+
+alaDhcpSrvLeaseLeaseExpiry OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Lease expiry of the client."
+::= { alaDhcpSrvLeaseEntry 5 }
+
+alaDhcpSrvLeaseType OBJECT-TYPE
+        SYNTAX          INTEGER
+                          {
+                            unavailable(1),
+                            dynamic(2),
+                            manual(3)
+                          }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Type of the lease."
+::= { alaDhcpSrvLeaseEntry 6 }
+
+-- --------------------------------------------------------------
+-- Trap Description
+-- --------------------------------------------------------------
+alaDhcpSrvTrapsObj OBJECT IDENTIFIER ::= { alcatelIND1DhcpSrvMIBObjects 5 }
+
+-- Notifications
+
+alaDhcpSrvLeaseUtilizationThresholdTrap NOTIFICATION-TYPE
+        OBJECTS  {
+                    alaDhcpSrvLeaseThresholdStatus,
+                    alaDhcpSrvSubnetDescriptor
+                 }
+        STATUS   current
+        DESCRIPTION
+                "When the lease utilization in a subnet exceeds or deceeds threshold
+                value set by the application, a notification is sent to the Management Entity,
+                with the DHCP Server lease utilization information."
+        ::= { alcatelIND1DhcpSrvMIBNotifications 1 }
+
+-- Notification Objects
+
+alaDhcpSrvLeaseThresholdStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                    crossedBelow80Threshold(1),
+                    crossedAbove80Threshold(2),
+                    reached100Threshold(3)
+                }
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "This object specifies the threshold status of subnet utilization."
+        ::= { alaDhcpSrvTrapsObj 1 }
+
+alaDhcpSrvSubnetDescriptor OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "This object specifies the subnet Descriptor. If the subnet belongs
+                to shared network, this object specifies the shared network name, else
+                specifies the Subnet IP."
+        ::= { alaDhcpSrvTrapsObj 2 }
+
+-- -------------------------------------------------------------
+-- COMPLIANCE
+-- -------------------------------------------------------------
+alcatelIND1DhcpSrvMIBCompliance MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+            "Compliance statement for DHCP Server."
+        MODULE
+        MANDATORY-GROUPS
+        {
+                alaDhcpSrvGlobalConfigGroup,
+                alaDhcpSrvLeaseGroup,
+                alaDhcpSrvNotificationGroup,
+                alaDhcpSrvLeaseUtilizationThresholdGroup
+        }
+        ::= { alcatelIND1DhcpSrvMIBCompliances 1 }
+
+-- -------------------------------------------------------------
+-- UNITS OF CONFORMANCE
+-- -------------------------------------------------------------
+alaDhcpSrvGlobalConfigGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaDhcpSrvGlobalConfigStatus,
+                alaDhcpSrvGlobalRestart,
+                alaDhcpSrvGlobalClearStat
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of DHCP Server Global Configuration."
+        ::= { alcatelIND1DhcpSrvMIBGroups 1 }
+
+alaDhcpSrvLeaseGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaDhcpSrvLeaseMACAddress,
+                alaDhcpSrvLeaseLeaseGrant,
+                alaDhcpSrvLeaseLeaseExpiry,
+                alaDhcpSrvLeaseType
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for DHCP Server Lease Configuration."
+::= { alcatelIND1DhcpSrvMIBGroups 2 }
+
+alaDhcpSrvNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+                alaDhcpSrvLeaseUtilizationThresholdTrap
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for DHCP Server Trap information."
+::= { alcatelIND1DhcpSrvMIBGroups 3 }
+
+alaDhcpSrvLeaseUtilizationThresholdGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	alaDhcpSrvLeaseThresholdStatus,
+            alaDhcpSrvSubnetDescriptor
+        }
+        STATUS  current
+        DESCRIPTION
+            "When the lease utilization in a subnet exceeds or deceeds threshold
+                value set by the application, a notification is sent to the Management Entity,
+                with the DHCP Server lease utilization information."
+::= { alcatelIND1DhcpSrvMIBGroups 4 }
+
+
+-- -------------------------------------------------------------
+
+END
+

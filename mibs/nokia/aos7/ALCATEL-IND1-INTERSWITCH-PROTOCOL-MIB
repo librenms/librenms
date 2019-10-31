@@ -1,0 +1,171 @@
+ALCATEL-IND1-INTERSWITCH-PROTOCOL-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                NOTIFICATION-TYPE,
+                MODULE-IDENTITY,
+                OBJECT-IDENTITY,
+                OBJECT-TYPE,
+                IpAddress, Integer32, Unsigned32
+                        FROM SNMPv2-SMI
+                SnmpAdminString
+                        FROM SNMP-FRAMEWORK-MIB
+                MacAddress,TruthValue
+                        FROM SNMPv2-TC
+                softentIND1Aip
+                        FROM ALCATEL-IND1-BASE
+                MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                        FROM SNMPv2-CONF
+                InterfaceIndex
+                        FROM IF-MIB
+
+                        ;
+
+        alcatelIND1InterswitchProtocolMIB MODULE-IDENTITY
+                LAST-UPDATED "201005130000Z"
+                ORGANIZATION "Alcatel-Lucent"
+                CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                        "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 Health Monitoring for dissemination of resource consumption information.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2010 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201005130000Z"
+        DESCRIPTION
+            "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
+
+        REVISION      "200704030000Z"
+        DESCRIPTION
+            "Addressing discrepancies with Alcatel Standard."
+                ::= { softentIND1Aip 1 }
+
+
+
+   alcatelIND1InterswitchProtocolMIBNotifications OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Inter Switch Protocol MIB Subsystem Notifications."
+        ::= { alcatelIND1InterswitchProtocolMIBObjects 0 }
+alcatelIND1InterswitchProtocolMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1InterswitchProtocolMIB 1 }
+aipLLDPConfig OBJECT IDENTIFIER ::= { alcatelIND1InterswitchProtocolMIBObjects 1 }
+
+
+alcatelIND1InterswitchProtocolMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1InterswitchProtocolMIB 2 }
+
+
+aipLLDPConfigManAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AipLLDPConfigManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table that controls selection of LLDP management address
+            TLV instances to be transmitted on individual ports."
+    ::= { aipLLDPConfig 1 }
+
+aipLLDPConfigManAddrEntry  OBJECT-TYPE
+    SYNTAX      AipLLDPConfigManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "LLDP configuration information for a particular port
+             on which the local system management address instance will be transmitted."
+
+    INDEX { aipLLDPConfigManAddrPortNum }
+    ::= { aipLLDPConfigManAddrTable 1 }
+
+AipLLDPConfigManAddrEntry  ::= SEQUENCE {
+    aipLLDPConfigManAddrPortNum   InterfaceIndex,
+    aipLLDPConfigManAddrTlvTxEnable TruthValue
+}
+
+aipLLDPConfigManAddrPortNum   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The  port ifindex of the port associated with this entry."
+    ::= { aipLLDPConfigManAddrEntry 1 }
+
+aipLLDPConfigManAddrTlvTxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            " This object controls, on a per port basis, whether or not
+              management address TLV instances are transmitted. The value
+              true(1) means that management address TLVs are transmitted ;
+              the value false(2) means that they are not.The default value
+              for this object is false(2). "
+
+    DEFVAL  { false }
+    ::= { aipLLDPConfigManAddrEntry 2 }
+
+
+-- AIP Conformance
+
+alcatelIND1InterswitchProtocolMIBGroups OBJECT IDENTIFIER      ::=
+{ alcatelIND1InterswitchProtocolMIBConformance 1 }
+
+alcatelIND1InterswitchProtocolMIBCompliances OBJECT IDENTIFIER ::=
+{ alcatelIND1InterswitchProtocolMIBConformance 2 }
+
+aipLLDPConfGroup OBJECT-GROUP
+    OBJECTS {
+        aipLLDPConfigManAddrTlvTxEnable
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about LLDP."
+    ::= { alcatelIND1InterswitchProtocolMIBGroups 1 }
+
+alcatelIND1InterswitchProtocolMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for device support of AIP."
+
+
+    MODULE
+        MANDATORY-GROUPS {
+            aipLLDPConfGroup
+        }
+
+    ::= { alcatelIND1InterswitchProtocolMIBCompliances 1 }
+
+
+
+END
+

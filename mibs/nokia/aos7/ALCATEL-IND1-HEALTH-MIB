@@ -1,0 +1,674 @@
+ALCATEL-IND1-HEALTH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE,
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY,
+        NOTIFICATION-TYPE, Integer32   FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP             FROM SNMPv2-CONF
+        softentIND1Health              FROM ALCATEL-IND1-BASE;
+
+
+        alcatelIND1HealthMonitorMIB MODULE-IDENTITY
+                LAST-UPDATED "201005130000Z"
+                ORGANIZATION "Alcatel-Lucent"
+                CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                        "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 Health Monitoring for dissemination of resource consumption information.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201005130000Z"
+        DESCRIPTION
+            "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
+
+        REVISION      "200704030000Z"
+        DESCRIPTION
+            "Addressing discrepancies with Alcatel Standard."
+                ::= { softentIND1Health 1}
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        alcatelIND1HealthMonitorMIBNotifications OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Health Monitor MIB Subsystem Notifications."
+        ::= { alcatelIND1HealthMonitorMIB 0 }
+
+        alcatelIND1HealthMonitorMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Health Montor Subsystem Managed Objects."
+            ::= { alcatelIND1HealthMonitorMIB 1 }
+
+
+        alcatelIND1HealthMonitorMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Health Montor Subsystem Managed Objects."
+            ::= { alcatelIND1HealthMonitorMIB 2 }
+
+
+        alcatelIND1HealthMonitorMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Health Montor Subsystem Managed Objects."
+            ::= { alcatelIND1HealthMonitorMIBConformance 1}
+
+
+        alcatelIND1HealthMonitorMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Health Montor Subsystem Managed Objects."
+            ::= { alcatelIND1HealthMonitorMIBConformance 2}
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        healthModuleInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        --  healthModuleInfo contains slot-level health monitoring information.
+
+        healthModuleTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF HealthModuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A list of installed modules in this chassis."
+            ::= { healthModuleInfo 1 }
+
+        healthModuleEntry  OBJECT-TYPE
+            SYNTAX  HealthModuleEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A module entry containing objects for a module in a specific 'slot'."
+            INDEX { healthModuleSlot }
+            ::= { healthModuleTable 1 }
+
+        HealthModuleEntry ::= SEQUENCE {
+            healthModuleSlot
+                        Integer32,
+            healthModuleRx1MinAvg
+                        Integer32,
+            healthModuleRx1HrAvg
+                        Integer32,
+            healthModuleRx1DayAvg
+                        Integer32,
+            healthModuleRxTx1MinAvg
+                        Integer32,
+            healthModuleRxTx1HrAvg
+                        Integer32,
+            healthModuleRxTx1DayAvg
+                        Integer32,
+            healthModuleMemory1MinAvg
+                        Integer32,
+            healthModuleMemory1HrAvg
+                        Integer32,
+            healthModuleMemory1DayAvg
+                        Integer32,
+            healthModuleCpu1MinAvg
+                        Integer32,
+            healthModuleCpu1HrAvg
+                        Integer32,
+            healthModuleCpu1DayAvg
+                        Integer32,
+            healthModuleChassisId
+                        Integer32
+            }
+
+        healthModuleSlot  OBJECT-TYPE
+            SYNTAX  Integer32 (0..7016)
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "The slot number for the chassis. Slot 0 is
+                 reserved for CMM and slots 1 to 16 are for
+                 NIs in those slots"
+            ::= { healthModuleEntry 1 }
+
+        healthModuleRx1MinAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average module-level input utilization over the
+                 last minute (percent)."
+            ::= { healthModuleEntry 2 }
+
+        healthModuleRx1HrAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average module-level input utilization over the
+                 last hour (percent)."
+            ::= { healthModuleEntry 3 }
+
+        healthModuleRx1DayAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Maximum one-minute module-level input utilization over the
+                 last hour (percent)."
+            ::= { healthModuleEntry 4 }
+
+        healthModuleRxTx1MinAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average module-level i/o utilization over the
+                 last minute (percent)."
+            ::= { healthModuleEntry 5 }
+
+        healthModuleRxTx1HrAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average module-level i/o utilization over the
+                 last hour (percent)."
+            ::= { healthModuleEntry 6 }
+
+        healthModuleRxTx1DayAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Maximum one-minute module-level i/o utilization over the
+                 last hour (percent)."
+            ::= { healthModuleEntry 7 }
+
+        healthModuleMemory1MinAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average module-level memory utilization over the
+                 last minute (percent)."
+            ::= { healthModuleEntry 8 }
+
+        healthModuleMemory1HrAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average module-level memory utilization over the
+                 last hour (percent)."
+            ::= { healthModuleEntry 9 }
+
+        healthModuleMemory1DayAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Maximum one-minute module-level memory utilization over the
+                 last hour (percent)."
+            ::= { healthModuleEntry 10 }
+
+        healthModuleCpu1MinAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average module-level CPU utilization over the
+                 last minute (percent)."
+            ::= { healthModuleEntry 11 }
+
+        healthModuleCpu1HrAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average module-level CPU utilization over the
+                 last hour (percent)."
+            ::= { healthModuleEntry 12 }
+
+        healthModuleCpu1DayAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Maximum one-minute module-level CPU utilization over the
+                 last hour (percent)."
+            ::= { healthModuleEntry 13 }
+
+        healthModuleChassisId  OBJECT-TYPE
+            SYNTAX  Integer32 (0..2)
+            MAX-ACCESS  read-only
+            STATUS  current
+	    DESCRIPTION
+	        "This is a configuraion for chassis id.
+	         (0) if no chassis id been applied
+	         (1..2) configure VC valid chassis id"
+	    ::= { healthModuleEntry 14 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        healthPortInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        --  healthPortInfo contains port-level health monitoring information.
+
+        healthPortTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF HealthPortEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A list of Physical Port health instances."
+            ::= { healthPortInfo 1 }
+
+        healthPortEntry  OBJECT-TYPE
+            SYNTAX  HealthPortEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A Physical Port health entry."
+            INDEX { healthPortIfIndex }
+            ::= { healthPortTable 1 }
+
+        HealthPortEntry ::= SEQUENCE {
+            healthPortIfIndex
+                        Integer32,
+            healthPortRx1MinAvg
+                        Integer32,
+            healthPortRx1HrAvg
+                        Integer32,
+            healthPortRx1DayAvg
+                        Integer32,
+            healthPortRxTx1MinAvg
+                        Integer32,
+            healthPortRxTx1HrAvg
+                        Integer32,
+            healthPortRxTx1DayAvg
+                        Integer32
+            }
+
+        healthPortIfIndex  OBJECT-TYPE
+            SYNTAX  Integer32 (1..2147483647)
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "The ifIndex representing any physical port in
+                 the system."
+            ::= { healthPortEntry 1 }
+
+        healthPortRx1MinAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average port-level input utilization over the
+                 last minute (percent)."
+            ::= { healthPortEntry 2 }
+
+        healthPortRx1HrAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average port-level input utilization over the
+                 last hour (percent)."
+            ::= { healthPortEntry 3 }
+
+        healthPortRx1DayAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Maximum one-minute port-level input utilization over the
+                 last hour (percent)."
+            ::= { healthPortEntry 4 }
+
+        healthPortRxTx1MinAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average port-level i/o utilization over the
+                 last minute (percent)."
+            ::= { healthPortEntry 5 }
+
+        healthPortRxTx1HrAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average port-level i/o utilization over the
+                 last hour (percent)."
+            ::= { healthPortEntry 6 }
+
+        healthPortRxTx1DayAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Maximum one-minute port-level i/o utilization over the
+                 last hour (percent)."
+            ::= { healthPortEntry 7 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        healthControlInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        --  healthControl contains the variables
+        --  which control operation of resource utilization sampling.
+        --
+        healthSamplingInterval OBJECT-TYPE
+              SYNTAX  Integer32 (1..30)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                 "Time interval between consecutive samples of resources.
+                  Units are seconds.  Legal values are:10,12,15,20,30."
+              DEFVAL  { 10 }
+              ::= { healthControlInfo 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        healthThreshInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        --  healthThreshInfo contains the threshold data.
+        --
+
+        healthThreshRxLimit  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Device input threshold value.  Units are percent."
+            DEFVAL  { 80 }
+            ::= { healthThreshInfo 1 }
+
+        healthThreshRxTxLimit  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Device input/output threshold value.  Units are percent."
+            DEFVAL  { 80 }
+            ::= { healthThreshInfo 2 }
+
+        healthThreshMemoryLimit  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Device memory threshold value.  Units are percent."
+            DEFVAL  { 80 }
+            ::= { healthThreshInfo 3 }
+
+        healthThreshCpuLimit  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Device Cpu threshold value.  Units are percent."
+            DEFVAL  { 80 }
+            ::= { healthThreshInfo 4 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        healthTrapInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 5 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        --  healthTrapInfo contains objects exclusively used in traps.
+        --
+
+        healthMonRxStatus  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                     crossedBelowThreshold (1),
+                     noChange              (2),
+                     crossedAboveThreshold (3)
+                             }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Rx threshold status."
+            ::= { healthTrapInfo 1 }
+
+        healthMonRxTxStatus  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                     crossedBelowThreshold (1),
+                     noChange              (2),
+                     crossedAboveThreshold (3)
+                             }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "RxTx threshold status."
+            ::= { healthTrapInfo 2 }
+
+        healthMonMemoryStatus  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                     crossedBelowThreshold (1),
+                     noChange              (2),
+                     crossedAboveThreshold (3)
+                             }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Memory threshold status."
+            ::= { healthTrapInfo 3 }
+
+        healthMonCpuStatus  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                     crossedBelowThreshold (1),
+                     noChange              (2),
+                     crossedAboveThreshold (3)
+                             }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "CPU threshold status."
+            ::= { healthTrapInfo 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--  NOTIFICATIONS
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        healthMonModuleTrap NOTIFICATION-TYPE
+           OBJECTS {
+               healthModuleChassisId,
+	       healthModuleSlot,
+	       healthMonRxStatus,
+	       healthMonRxTxStatus,
+	       healthMonMemoryStatus,
+	       healthMonCpuStatus
+           }
+           STATUS   current
+           DESCRIPTION
+               "Module-level rising/falling threshold crossing trap.
+	 	This trap applies to NI slots."
+           ::= { alcatelIND1HealthMonitorMIBNotifications 1 }
+
+        healthMonPortTrap NOTIFICATION-TYPE
+           OBJECTS {
+               healthModuleChassisId,
+               healthModuleSlot,
+	       healthPortIfIndex,
+	       healthMonRxStatus,
+	       healthMonRxTxStatus
+           }
+           STATUS   current
+           DESCRIPTION
+	       "Port-level rising/falling threshold crossing trap."
+           ::= { alcatelIND1HealthMonitorMIBNotifications 2 }
+
+        healthMonCmmTrap NOTIFICATION-TYPE
+           OBJECTS {
+	       healthMonMemoryStatus,
+	       healthMonCpuStatus
+           }
+           STATUS   current
+           DESCRIPTION
+               "Module-level rising/falling threshold crossing trap.
+	 	This trap applies to NI slots."
+           ::= { alcatelIND1HealthMonitorMIBNotifications 3 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1HealthMonitorMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Health Monitoring."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                healthModuleGroup,
+                healthPortGroup,
+                healthControlGroup,
+                healthThreshGroup,
+                healthTrapsGroup
+            }
+
+        ::= { alcatelIND1HealthMonitorMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    healthModuleGroup OBJECT-GROUP
+        OBJECTS
+        {
+
+                        healthModuleRx1MinAvg,
+                        healthModuleRx1HrAvg,
+                        healthModuleRx1DayAvg,
+                        healthModuleRxTx1MinAvg,
+                        healthModuleRxTx1HrAvg,
+                        healthModuleRxTx1DayAvg,
+                        healthModuleMemory1MinAvg,
+                        healthModuleMemory1HrAvg,
+                        healthModuleMemory1DayAvg,
+                        healthModuleCpu1MinAvg,
+                        healthModuleCpu1HrAvg,
+                        healthModuleCpu1DayAvg
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of slot-level health monitoring objects."
+        ::= { alcatelIND1HealthMonitorMIBGroups 1 }
+
+
+    healthPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+                        healthPortRx1MinAvg,
+                        healthPortRx1HrAvg,
+                        healthPortRx1DayAvg,
+                        healthPortRxTx1MinAvg,
+                        healthPortRxTx1HrAvg,
+                        healthPortRxTx1DayAvg
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of port-level health monitoring objects."
+        ::= { alcatelIND1HealthMonitorMIBGroups 2 }
+
+
+    healthControlGroup OBJECT-GROUP
+        OBJECTS
+        {
+                        healthSamplingInterval
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects which control operation of resource utilization sampling."
+        ::= { alcatelIND1HealthMonitorMIBGroups 3 }
+
+
+    healthThreshGroup OBJECT-GROUP
+        OBJECTS
+        {
+                        healthThreshRxLimit,
+                        healthThreshRxTxLimit,
+                        healthThreshMemoryLimit,
+                        healthThreshCpuLimit
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of threshold objects."
+        ::= { alcatelIND1HealthMonitorMIBGroups 4 }
+
+
+    healthTrapObjectsGroup OBJECT-GROUP
+        OBJECTS
+        {
+                        healthMonRxStatus,
+                        healthMonRxTxStatus,
+                        healthMonMemoryStatus,
+                        healthMonCpuStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects which appear only in traps."
+        ::= { alcatelIND1HealthMonitorMIBGroups 5 }
+
+
+    healthTrapsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                        healthMonModuleTrap,
+                        healthMonPortTrap,
+                        healthMonCmmTrap
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of Traps for health monitoring."
+        ::= { alcatelIND1HealthMonitorMIBGroups 6 }
+
+END

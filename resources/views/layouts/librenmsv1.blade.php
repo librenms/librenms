@@ -40,12 +40,13 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190603" rel="stylesheet" type="text/css" />
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190912" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/' . LibreNMS\Config::get('site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
     @endforeach
     @yield('css')
+    @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
@@ -77,7 +78,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=20190514') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=20191025') }}"></script>
     <script type="text/javascript">
         <!-- Begin
         function popUp(URL)
@@ -112,5 +113,6 @@
 
 {!! Toastr::render() !!}
 
+@stack('scripts')
 </body>
 </html>

@@ -61,7 +61,7 @@ Command | Description
 
 # Examples
 
-## Server examples:
+## Server examples
 
 Unencrypted Connection to `irc.freenode.org`:
 
@@ -91,7 +91,7 @@ SSL-Encrypted Connection to `irc.localdomain` with Server-Password and odd port:
    ...
 ```
 
-## Channel notations:
+## Channel notations
 
 Channels can be defined using Array-Notation like:
 
@@ -111,7 +111,7 @@ Or using a single string using `,` as delimiter between various channels:
    ...
 ```
 
-## Hostmask authentication:
+## Hostmask authentication
 
 ```php
    ...

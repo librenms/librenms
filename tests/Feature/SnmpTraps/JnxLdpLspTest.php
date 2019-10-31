@@ -31,11 +31,10 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use Log;
+use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
-class JnxLdpLspTest extends LaravelTestCase
+class JnxLdpLspTest extends SnmpTrapTestCase
 {
-
     public function testLdpLspDownTrap()
     {
         $device = factory(Device::class)->create();

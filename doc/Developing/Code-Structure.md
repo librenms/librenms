@@ -13,7 +13,7 @@ documentation applies: <https://laravel.com/docs/structure>
 Directories from the (filtered) structure tree below are some of the
 directories that will be most interesting during development:
 
-```
+```text
 .
 ├─ app
 ├─ database
@@ -70,9 +70,13 @@ through. It loads the majority of the relevant includes needed for the
 control panel to function. CSS and JS files are also loaded here.
 
 ### html/css/
+
 All used CSS files are located here.
+
 ### html/css/custom/
+
 This is a directory you can put custom css files into that won't interfere with auto updates
+
 ### html/js/
 
 All used JS files are located here.

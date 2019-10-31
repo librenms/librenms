@@ -54,6 +54,12 @@ systems, and use redis-sentinel.
 You should not rely on the password for the security of your
 system. See <https://redis.io/topics/security>
 
+## Memcached (distributed polling)
+
+LibreNMS still uses memcached for locking daily update processes when using
+distributed polling.  So you will still need to configure memecached
+unless you have updates disabled.
+
 ## MySQL
 
 You should already have this, but the pollers do need access to the
@@ -82,9 +88,13 @@ Once you have your Redis database set up, configure it in the .env file on each 
 
 ```dotenv
 REDIS_HOST=127.0.0.1
-#REDIS_DB=0
+REDIS_PORT=6379
+# OR
+REDIS_SENTINEL=192.0.2.1:26379
+REDIS_SENTINEL_SERVICE=myservice
+
+REDIS_DB=0
 #REDIS_PASSWORD=
-#REDIS_PORT=6379
 ```
 
 ## Basic Configuration
@@ -196,7 +206,7 @@ replacement scl.
 
 #### Debian 9 (stretch)
 
-install python3 and python-mysqldb. python-dotenv is not yes
+install python3 and python-mysqldb. python-dotenv is not yet
 available, but the testing package is working fine, you can grab it on
 <https://packages.debian.org/fr/buster/all/python3-dotenv/download> (the
 package may be updated and have a new version number).

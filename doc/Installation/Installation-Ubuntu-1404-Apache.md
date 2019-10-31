@@ -56,13 +56,13 @@ If you are deploying a separate database server, you need to change
 the `bind-address`.  If your MySQL database resides on the same server
 as LibreNMS, you should skip this step.
 
-```
+```bash
 vim /etc/mysql/my.cnf
 ```
 
 Within the [mysqld] section please add:
 
-```
+```mysql
 innodb_file_per_table=1
 ```
 
@@ -73,7 +73,7 @@ listen on.  Restart MySQL:
 
 If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
 
-```
+```bash
 service mysql restart
 ```
 
@@ -84,7 +84,7 @@ the same machine as your database server.
 
 Install the required software:
 
-```
+```bash
 apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear php5-curl snmp graphviz php5-mcrypt php5-json apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
 ```
 
@@ -113,7 +113,7 @@ needed for LibreNMS include
 
 # Adding the librenms-user
 
-```
+```bash
 useradd librenms -d /opt/librenms -M -r
 usermod -a -G librenms www-data
 ```
@@ -129,7 +129,7 @@ You can clone the repository via HTTPS or SSH.  In either case, you
 need to ensure that the appropriate port (443 for HTTPS, 22 for SSH)
 is open in the outbound direction for your server.
 
-```
+```bash
 cd /opt
 git clone https://github.com/librenms/librenms.git librenms
 cd /opt/librenms
@@ -148,7 +148,7 @@ repos), but if you're not planning to develop for LibreNMS it's an
 acceptable option.  To perform the initial clone without full history,
 run the following instead:
 
-```
+```bash
 cd /opt
 git clone --depth 1 https://github.com/librenms/librenms.git librenms
 cd /opt/librenms
@@ -161,7 +161,7 @@ to create and chown a directory as well as create an Apache vhost.
 
 First, create and chown the `rrd` directory and create the `logs` directory:
 
-```
+```bash
 mkdir rrd logs
 chown -R librenms:librenms /opt/librenms
 chmod 775 rrd
@@ -195,7 +195,7 @@ If you are running Apache 2.2.18 or higher then change
 If you have Apache 2.3 or newer then please add the following line
 before `AllowOverride All`:
 
-```
+```apache
 Require all granted
 ```
 
@@ -203,14 +203,14 @@ On at least Ubuntu 14.04 (and possibly other distributions and
 versions as well), mcrypt is not enabled on install.  Run the
 following to enable it:
 
-```
+```bash
 php5enmod mcrypt
 ```
 
 Change `librenms.example.com` to the appropriate hostname for your
 domain, then enable the vhost and restart Apache:
 
-```
+```bash
 a2ensite librenms.conf
 a2enmod rewrite
 service apache2 restart
@@ -219,7 +219,7 @@ service apache2 restart
 If this is the only site you are hosting on this server (it should be
 :)) then you will need to disable the default site setup in Ubuntu:
 
-```
+```bash
 a2dissite 000-default
 ```
 
@@ -234,7 +234,7 @@ instructions then skip to the 'Add localhost' section. Alternatively
 if you want to continue the setup manually then just keep following
 these instructions.
 
-```
+```bash
 cp config.php.default config.php
 vim config.php
 ```
@@ -254,7 +254,7 @@ graphs will break otherwise. **
 
 Initiate the follow database with the following command:
 
-```
+```bash
 php build-base.php
 ```
 
@@ -262,7 +262,7 @@ php build-base.php
 
 Create the admin user - priv should be 10
 
-```
+```bash
 php adduser.php <name> <pass> 10 <email>
 ```
 
@@ -273,7 +273,7 @@ leave the angled brackets off.
 
 Run validate.php as root in the librenms directory
 
-```
+```bash
 php validate.php
 ```
 
@@ -281,7 +281,7 @@ This will check your install to verify it is set up correctly.
 
 # Add localhost
 
-```
+```bash
 php addhost.php localhost public v2c
 ```
 
@@ -292,7 +292,7 @@ come).
 
 Discover localhost::
 
-```
+```bash
 php discovery.php -h all
 ```
 
@@ -305,13 +305,13 @@ the thread count needs to be changed, you can do so by editing the
 cron file (`/etc/cron.d/librenms`).  Just add a number after
 `poller-wrapper.py`, as in the example below:
 
-```
+```bash
 /opt/librenms/poller-wrapper.py 12 >> /dev/null 2>&1
 ```
 
 Create the cronjob
 
-```
+```bash
 cp librenms.nonroot.cron /etc/cron.d/librenms
 ```
 
@@ -329,7 +329,7 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can
 become large and be rotated out.  To rotate out the old logs you can
 use the provided logrotate config file:
 
-```
+```bash
 cp misc/librenms.logrotate /etc/logrotate.d/librenms
 ```
 
@@ -340,13 +340,13 @@ every day, a `git pull --no-edit --quiet` is performed.  You can
 override this default by editing your `config.php` file.  Remove the
 comment (the `#` mark) on the line:
 
-```
+```php
 #$config['update'] = 0;
 ```
 
 so that it looks like this:
 
-```
+```php
 $config['update'] = 0;
 ```
 

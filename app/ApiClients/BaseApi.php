@@ -37,7 +37,7 @@ class BaseApi
         if (is_null($this->client)) {
             $this->client = new Client([
                 'base_uri' => $this->base_uri,
-                'tiemout' => 2,
+                'timeout' => 2,
             ]);
         }
 

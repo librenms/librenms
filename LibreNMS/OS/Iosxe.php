@@ -25,6 +25,10 @@
 
 namespace LibreNMS\OS;
 
-class Iosxe extends Ciscowlc
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\OS\Traits\CiscoCellular;
+
+class Iosxe extends Ciscowlc implements WirelessRssiDiscovery
 {
+    use CiscoCellular;
 }

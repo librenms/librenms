@@ -4,14 +4,17 @@ path: blob/master/doc/
 # Installing LibreNMS
 
 ## Docker
+
 An official LibreNMS docker image based on Alpine Linux and Nginx is available on [DockerHub](https://hub.docker.com/r/librenms/librenms/) and [Quay](https://quay.io/repository/librenms/librenms). Documentation can be found on the [Github repository](https://github.com/librenms/docker).
 
 ## Images
+
 We have some pre-built VirtualBox images you can use to get started:
 
 - [Virtual Machines](http://docs.librenms.org/Installation/Images/)
 
 ## Manually
+
 If you want to install manually then we have some documentation which should make it easy.
 
 **Please note the minimum supported PHP version is 7.1.3**
@@ -22,6 +25,7 @@ If you want to install manually then we have some documentation which should mak
 - [RHEL / CentOS 7 Nginx](http://docs.librenms.org/Installation/Installation-CentOS-7-Nginx/)
 
 ### Old Install Docs
+
 These install docs are no longer updated and may result in an unsuccessful install.
 
 - [Ubuntu 16.04 Apache](http://docs.librenms.org/Installation/Installation-Ubuntu-1604-Apache/)

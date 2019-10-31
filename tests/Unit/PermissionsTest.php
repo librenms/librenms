@@ -29,10 +29,10 @@ use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 use Mockery\Mock;
 
-class PermissionsTest extends LaravelTestCase
+class PermissionsTest extends TestCase
 {
     public function testUserCanAccessDevice()
     {

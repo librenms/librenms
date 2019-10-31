@@ -37,12 +37,6 @@ class ResolutionController extends Controller
             'height' => 'required|numeric'
         ]);
 
-        // legacy session
-        session_start();
-        $_SESSION['screen_width'] = $request->width;
-        $_SESSION['screen_height'] = $request->height;
-        session_write_close();
-
         // laravel session
         session([
             'screen_width' => $request->width,

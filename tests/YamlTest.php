@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
 use LibreNMS\Config;
@@ -34,6 +35,11 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlTest extends TestCase
 {
+    public function testConfigSchema()
+    {
+        $this->validateFileAgainstSchema('/misc/config_definitions.json', '/misc/config_schema.json');
+    }
+
     /**
      * @group os
      */
@@ -52,36 +58,8 @@ class YamlTest extends TestCase
 
     private function validateYamlFilesAgainstSchema($dir, $schema_file)
     {
-        $schema = (object)['$ref' => 'file://' . Config::get('install_dir') . $schema_file];
-
-        foreach ($this->listFiles($dir . '/*.yaml') as $info) {
-            list($file, $path) = $info;
-
-            try {
-                $data = Yaml::parse(file_get_contents($path));
-            } catch (ParseException $e) {
-                throw new ExpectationFailedException("$path Could not be parsed", null, $e);
-            }
-
-            try {
-                $validator = new \JsonSchema\Validator;
-                $validator->validate(
-                    $data,
-                    $schema,
-                    Constraint::CHECK_MODE_TYPE_CAST  // | Constraint::CHECK_MODE_VALIDATE_SCHEMA
-                );
-            } catch (JsonDecodingException $e) {
-                // Output the filename so we know what file failed
-                echo "Json format invalid in $schema_file\n";
-                throw $e;
-            }
-
-            $errors = collect($validator->getErrors())
-                ->reduce(function ($out, $error) {
-                    return sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']);
-                }, '');
-
-            $this->assertTrue($validator->isValid(), "$file does not validate. Violations:\n$errors");
+        foreach ($this->listFiles($dir . '/*.yaml') as $file) {
+            $this->validateFileAgainstSchema($file, $schema_file);
         }
     }
 
@@ -102,8 +80,47 @@ class YamlTest extends TestCase
         return collect(glob($pattern))
             ->reduce(function ($array, $file) {
                 $name = basename($file);
-                $array[$name] = [$name, $file];
+                $array[$name] = $file;
                 return $array;
             }, []);
+    }
+
+    /**
+     * @param $filePath
+     * @param $schema_file
+     */
+    private function validateFileAgainstSchema($filePath, $schema_file)
+    {
+        $schema = (object)['$ref' => 'file://' . Config::get('install_dir') . $schema_file];
+        $filename = basename($filePath);
+        $filePath = Str::start($filePath, Config::get('install_dir'));
+
+        try {
+            $data = Str::endsWith($filePath, '.json')
+            ? json_decode(file_get_contents($filePath))
+            : Yaml::parse(file_get_contents($filePath));
+        } catch (ParseException $e) {
+            throw new ExpectationFailedException("$filePath Could not be parsed", null, $e);
+        }
+
+        try {
+            $validator = new \JsonSchema\Validator;
+            $validator->validate(
+                $data,
+                $schema,
+                Constraint::CHECK_MODE_TYPE_CAST  // | Constraint::CHECK_MODE_VALIDATE_SCHEMA
+            );
+        } catch (JsonDecodingException $e) {
+            // Output the filename so we know what file failed
+            echo "Json format invalid in $schema_file\n";
+            throw $e;
+        }
+
+        $errors = collect($validator->getErrors())
+            ->reduce(function ($out, $error) {
+                return sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']);
+            }, '');
+
+        $this->assertTrue($validator->isValid(), "$filename does not validate. Violations:\n$errors");
     }
 }
