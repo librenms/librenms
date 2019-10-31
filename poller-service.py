@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 """
  poller-service A service to wrap SNMP polling.  It will poll up to $threads devices at a time, and will not re-poll
                 devices that have been polled within the last $poll_frequency seconds. It will prioritize devices based
@@ -24,17 +24,22 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import librenms_library as LNMS
+
 import json
 import os
 import subprocess
 import sys
 import threading
 import time
-import MySQLdb
 import logging
 import logging.handlers
 from datetime import datetime, timedelta
 from collections import namedtuple
+
 
 log = logging.getLogger('poller-service')
 log.setLevel(logging.DEBUG)
@@ -49,95 +54,7 @@ config_file = install_dir + '/config.php'
 
 log.info('INFO: Starting poller-service')
 
-class DB:
-    conn = None
 
-    def __init__(self):
-        self.in_use = threading.Lock()
-        self.connect()
-
-    def connect(self):
-        self.in_use.acquire(True)
-        while True:
-            try:
-                self.conn.close()
-            except:
-                pass
-
-            try:
-                if db_port == 0:
-                    self.conn = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
-                else:
-                    self.conn = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password,
-                                                db=db_dbname)
-                break
-            except (AttributeError, MySQLdb.OperationalError):
-                log.warning('WARNING: MySQL Error, reconnecting.')
-                time.sleep(.5)
-
-        self.conn.autocommit(True)
-        self.conn.ping(True)
-        self.in_use.release()
-
-    def query(self, sql):
-        self.in_use.acquire(True)
-        while True:
-            try:
-                cursor = self.conn.cursor()
-                cursor.execute(sql)
-                ret = cursor.fetchall()
-                cursor.close()
-                self.in_use.release()
-                return ret
-            except (AttributeError, MySQLdb.OperationalError):
-                log.warning('WARNING: MySQL Operational Error during query, reconnecting.')
-                self.in_use.release()
-                self.connect()
-            except (AttributeError, MySQLdb.ProgrammingError):
-                log.warning('WARNING: MySQL Programming Error during query, attempting query again.')
-                cursor.close()
-
-
-"""
-    Fetch configuration details from the config_to_json.php script
-"""
-
-def get_config_data(install_dir):
-    command = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
-    decoder = 'utf-8'
-    timeout = 30
-    try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=False, timeout=30,
-                                         universal_newlines=False)
-        output = output.decode(decoder, errors='ignore')
-    except subprocess.CalledProcessError as iexc:
-        exit_code = iexc.returncode
-        try:
-            output = iexc.output
-            try:
-                output = output.decode(decoder, errors='ignore')
-            except Exception as subexc:
-                print('ERROR: %s', subexc)
-        except Exception:
-            output = "Could not obtain output from command."
-        if exit_code == 0:
-            print('Command [%s] returned with exit code [%s]. Command output was:' % (command, exit_code))
-            if output:
-                print(output)
-            return iexc.returncode, output
-        else:
-            print('Command [%s] failed with exit code [%s]. Command output was:' %
-                  (command, iexc.returncode))
-            return iexc.returncode, output
-    # OSError if not a valid executable
-    except OSError as exc:
-        print('Command [%s] returned:\n%s.' % (command, exc))
-        return None, exc
-    except subprocess.TimeoutExpired:
-        print('Timeout [%s seconds] expired for command [%s] execution.' % (timeout, command))
-        return None, 'Timeout of %s seconds expired.' % timeout
-    else:
-        return 0, output
 
 
 def lockFree(lock, db):
@@ -175,7 +92,7 @@ def poll_worker():
     if single_connection:
         global db
     else:
-        db = DB()
+        db = LNMS.DB(db_socket, db_server, db_port, db_username, db_password, db_dbname)
 
     while True:
         if datetime.now() < dont_query_until:
@@ -219,6 +136,7 @@ def poll_worker():
             if action == 'discovery':
                 path = discover_path
             command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (path, device_id)
+            # TODO: Replace with command_runner
             subprocess.check_call(command, shell=True)
             elapsed_time = int(time.time() - start_time)
             if elapsed_time < 300:
@@ -237,16 +155,13 @@ def poll_worker():
             releaseLock('{0}.{1}'.format(action, device_id), db)
 
 if __name__ == '__main__':
-    try:
-        with open(config_file) as f:
-            pass
-    except IOError as exc:
-        print('ERROR: Oh dear... %s does not seem readable' % config_file)
-        print('ERROR: %s' % exc)
-        sys.exit(2)
+    install_dir = os.path.dirname(os.path.realpath(__file__))
+    config_file = install_dir + '/config.php'
+
+    LNMS.check_for_file(config_file)
 
     try:
-        _, conf = get_config_data(install_dir)
+        conf = LNMS.get_config_data(install_dir)
         config = json.loads(conf)
     except:
         print("ERROR: Could not load or parse configuration, are PATHs correct?")
@@ -270,18 +185,18 @@ if __name__ == '__main__':
 
     poller_path = config['install_dir'] + '/poller.php'
     discover_path = config['install_dir'] + '/discovery.php'
+
+    # TODO: Use LibreNMS.DB
     db_username = config['db_user']
     db_password = config['db_pass']
     db_port = int(config['db_port'])
 
-    if config['db_host'][:5].lower() == 'unix:':
+    if config['db_socket']:
         db_server = config['db_host']
-        db_port = 0
-    elif config['db_socket']:
-        db_server = config['db_socket']
-        db_port = 0
+        db_socket = config['db_socket']
     else:
         db_server = config['db_host']
+        db_socket = None
 
     db_dbname = config['db_name']
 
@@ -325,7 +240,7 @@ if __name__ == '__main__':
     except KeyError:
         single_connection = False
 
-    db = DB()
+    db = LNMS.DB(db_socket, db_server, db_port, db_username, db_password, db_dbname)
 
 
     poller_group = ('and poller_group IN({0}) '
