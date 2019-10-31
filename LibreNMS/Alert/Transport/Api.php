@@ -50,22 +50,22 @@ class Api extends Transport
         $method = strtolower($method);
         $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
-        //get each line of key-values and process the variables;
+        //get each line of key-values and process the variables for Headers;
         foreach (preg_split("/\\r\\n|\\r|\\n/", $headers, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
             list($u_key, $u_val) = explode('=', $current_line, 2);
+            foreach ($obj as $p_key => $p_val) {
+                $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
+            }
             //store the parameter in the array for HTTP headers
             $request_heads[$u_key] = $u_val;
         }
-
-        //get each line of key-values and process the variables;
+        //get each line of key-values and process the variables for Options;
         foreach (preg_split("/\\r\\n|\\r|\\n/", $options, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
             list($u_key, $u_val) = explode('=', $current_line, 2);
-
             // Replace the values
             foreach ($obj as $p_key => $p_val) {
                 $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
             }
-
             //store the parameter in the array for HTTP query
             $query[$u_key] = $u_val;
         }
@@ -77,22 +77,17 @@ class Api extends Transport
         if (count($request_heads) > 0) {
             $request_opts['headers'] = $request_heads;
         }
-        if (strlen($body)) {
-            $request_opts['body'] = $body;
-        }
-
         if ($method == "get") {
             $request_opts['query'] = $query;
             $res = $client->request('GET', $host, $request_opts);
         } elseif ($method == "put") {
             $request_opts['query'] = $query;
+            $request_opts['body'] = $body;
             $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
             $request_opts['form_params'] = $query;
             $res = $client->request('POST', $host, $request_opts);
         }
-
-
 
         $code = $res->getStatusCode();
         if ($code != 200) {
@@ -143,7 +138,7 @@ class Api extends Transport
                 [
                     'title' => 'body',
                     'name' => 'api-body',
-                    'descr' => 'Enter the body if need (format: json, xml, etc.)',
+                    'descr' => 'Enter the body (only used by PUT method, discarded otherwise)',
                     'type' => 'textarea',
                 ],
                 [
