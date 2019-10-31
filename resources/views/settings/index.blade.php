@@ -16,13 +16,13 @@
 @endsection
 
 @push('styles')
-    <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset(mix('/css/app.css')) }}" rel="stylesheet">
 @endpush
 
 @push('scripts')
     @routes
-    <script src="{{ mix('/js/manifest.js') }}"></script>
-    <script src="{{ mix('/js/vendor.js') }}"></script>
-    <script src="{{ mix('/js/app.js') }}"></script>
+    <script src="{{ asset(mix('/js/manifest.js')) }}"></script>
+    <script src="{{ asset(mix('/js/vendor.js')) }}"></script>
+    <script src="{{ asset(mix('/js/app.js')) }}"></script>
 @endpush
 
