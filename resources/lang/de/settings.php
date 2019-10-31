@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'readonly' => 'Konfiguriere in config.php, entferne aus config.php zur Aktivierung.',
+    'readonly' => 'Ist in config.php konfiguriert. Zur Aktivierung entfernen Sie den Eintrag aus der config.php.',
     'groups' => [
         'alerting' => 'Alarmierung',
         'auth' => 'Authentifizierung',
@@ -27,7 +27,7 @@ return [
             'general' => 'Generelle Discovery Einstellungen'
         ],
         'external' => [
-            'binaries' => 'Binary Locations',
+            'binaries' => 'Programmpfade',
             'location' => 'Location Settings',
             'graylog' => 'Graylog Integration',
             'oxidized' => 'Oxidized Integration',
@@ -58,7 +58,7 @@ return [
     'settings' => [
         'active_directory' => [
             'users_purge' => [
-                'description' => 'Behalte inaktive Nutzer für',
+                'description' => 'Behalte inaktive Nutzer',
                 'help' => 'Benutzer werden von LibreNMS gelöscht nach diesen Tagen Inaktivität. 0 bedeutet nie und der Benutzer wird neu erstellt wenn er sich erneut anmeldet',
             ]
         ],
@@ -104,13 +104,13 @@ return [
                 'help' => 'Alarmiere Administratoren welche nur Leserechte haben'
             ],
             'syscontact' => [
-                'description' => 'Melde Alarme an sysContact',
+                'description' => 'Benachrictige sysContact über Alarme',
                 'help' => 'Sende AlarmierungsE-Mail an den SNMP sysContact'
             ],
             'transports' => [
                 'mail' => [
-                    'description' => 'Aktiviere Alarmierungen via E-Mail',
-                    'help' => 'Benachrichtige über Alarme via E-Mail'
+                    'description' => 'Aktiviere Benachrichtigungen per E-Mail',
+                    'help' => 'Benachrichtige via E-Mail'
                 ]
             ],
             'tolerance_window' => [
@@ -124,7 +124,7 @@ return [
         ],
         'alert_log_purge' => [
             'description' => 'Entferne Alarm Logeinträge älter als',
-            'help' => 'Bereinigung wirde erledigt von daily.sh',
+            'help' => 'Bereinigung wird erledigt von daily.sh',
         ],
         'allow_duplicate_sysName' => [
             'description' => 'Erlaube doppelten sysName',
