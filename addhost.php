@@ -222,7 +222,7 @@ if (!empty($argv[1])) {
         Config Defaults  : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> any v3 [user] [port] [' . $transports_regex . ']
         No Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> nanp v3 [user] [port] [' . $transports_regex . ']
         Auth, No Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> anp v3 <user> <password> [md5|sha] [port] [' . $transports_regex . ']
-        Auth,    Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|dsa] [port] [' . $transports_regex . ']
+        Auth,    Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|des] [port] [' . $transports_regex . ']
     Usage (ICMP only)    : ./addhost.php [-g <poller group>] [-f] -P <%Whostname%n> [os] [hardware]
 
     -g <poller group> allows you to add a device to be pinned to a specific poller when using distributed polling. X can be any number associated with a poller group
