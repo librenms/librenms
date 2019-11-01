@@ -226,9 +226,9 @@ return [
         'auth_ldap_groupmembertype' => [
             'description' => 'Find group members by',
             'options' => [
-                'username' => 'Username',
+                'username' => '使用者名稱',
                 'fulldn' => 'Full DN (using prefix and suffix)',
-                'puredn' => 'DN Search (search using uid attribute)'
+                'puredn' => 'DN 搜尋 (使用 uid 屬性搜尋)'
             ]
         ],
         'auth_ldap_groups' => [
@@ -236,7 +236,7 @@ return [
             'help' => 'Define groups that have access and level'
         ],
         'auth_ldap_port' => [
-            'description' => 'LDAP port',
+            'description' => 'LDAP 連接埠',
             'help' => 'Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636'
         ],
         'auth_ldap_prefix' => [
@@ -274,24 +274,24 @@ return [
         ],
         'auth_ldap_version' => [
             'description' => 'LDAP 版本',
-            'help' => 'LDAP version to use to talk to the server.  Usually this should be v3',
+            'help' => '用來與 LDAP Server 進行連接的版本，通常應是 v3',
             'options' => [
                 "2" => "2",
                 "3" => "3"
             ]
         ],
         'auth_mechanism' => [
-            'description' => 'Authorization Method (Caution!)',
-            'help' => "Authorization method.  Caution, you may lose the ability to log in. You can override this back to mysql by setting \$config['auth_mechanism'] = 'mysql'; in your config.php",
+            'description' => '授權方法 (慎選!)',
+            'help' => "授權方法。注意，若設定錯誤將導致您無法登入系統。若真的發生，您可以手動將 config.php 的設定改回 \$config['auth_mechanism'] = 'mysql';",
             'options' => [
-                'mysql' => 'MySQL (default)',
+                'mysql' => 'MySQL (預設)',
                 'active_directory' => 'Active Directory',
                 'ldap' => 'LDAP',
                 'radius' => 'Radius',
-                'http-auth' => 'HTTP Authentication',
-                'ad-authorization' => 'Externally authenticated AD',
-                'ldap-authorization' => 'Externally authenticated LDAP',
-                'sso' => 'Single Sign On'
+                'http-auth' => 'HTTP 驗證',
+                'ad-authorization' => '外部 AD 驗證',
+                'ldap-authorization' => '外部 LDAP 驗證',
+                'sso' => '單一簽入 SSO'
             ]
         ],
         'auth_remember' => [
@@ -340,7 +340,7 @@ return [
         ],
         'email_html' => [
             'description' => '使用 HTML 格式',
-            'help' => 'Send HTML emails'
+            'help' => '寄送 HTML 格式的郵件'
         ],
         'email_sendmail_path' => [
             'description' => '若啟用此選項，sendmail 所在的位置'
@@ -381,7 +381,7 @@ return [
         ],
         'favicon' => [
             'description' => 'Favicon',
-            'help' => 'Overrides the default favicon.'
+            'help' => '取代預設 Favicon.'
         ],
         'fping' => [
             'description' => 'fping 路徑'
@@ -395,11 +395,11 @@ return [
                 'help' => 'The number of pings to send when checking if a host is up or down via icmp'
             ],
             'interval' => [
-                'description' => 'fping interval',
+                'description' => 'fping 間隔',
                 'help' => 'The amount of milliseconds to wait between pings',
             ],
             'timeout' => [
-                'description' => 'fping timeout',
+                'description' => 'fping 逾時',
                 'help' => 'The amount of milliseconds to wait for an echo response before giving up',
             ]
         ],
@@ -437,7 +437,7 @@ return [
         ],
         'nfsen_enable' => [
             'description' => '啟用 NfSen',
-            'help' => 'Enable Integration with NfSen',
+            'help' => '啟用 NfSen 整合',
         ],
         'nfsen_rrds' => [
             'description' => 'NfSen RRD 目錄',
@@ -477,7 +477,7 @@ return [
             'help' => 'This value tells us what to replace the full stops `.` in the devices hostname with. Usually: `_`'
         ],
         'nfsen_suffix' => [
-            'description' => 'File name suffix',
+            'description' => '檔案名稱首碼',
             'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.'
         ],
         'nmap' => [
@@ -595,15 +595,15 @@ return [
             'v3' => [
                 'description' => 'SNMP v3 驗證 (priority)',
                 'help' => 'Set up v3 authentication variables and order them as you want them to be tried',
-                'auth' => 'Auth',
-                'crypto' => 'Crypto',
+                'auth' => '驗證',
+                'crypto' => '加密',
                 'fields' => [
-                    'authalgo' => 'Algorithm',
-                    'authlevel' => 'Level',
-                    'authname' => 'Username',
-                    'authpass' => 'Password',
-                    'cryptoalgo' => 'Algorithm',
-                    'cryptopass' => 'Password'
+                    'authalgo' => '演算法',
+                    'authlevel' => '鄧級',
+                    'authname' => '使用者名稱',
+                    'authpass' => '密碼',
+                    'cryptoalgo' => '演算法',
+                    'cryptopass' => '演算法密碼'
                 ],
                 'level' => [
                     'noAuthNoPriv' => 'No Authentication, No Privacy',
@@ -667,11 +667,11 @@ return [
         ],
         'webui' => [
             'availability_map_box_size' => [
-                'description' => 'Availability box width',
+                'description' => '可用性區塊寬度',
                 'help' => 'Input desired tile width in pixels for box size in full view'
             ],
             'availability_map_compact' => [
-                'description' => 'Availability map compact view',
+                'description' => '可用性地圖精簡模式',
                 'help' => 'Availability map view with small indicators'
             ],
             'availability_map_sort_status' => [
