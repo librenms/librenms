@@ -64,11 +64,18 @@ entered as a new line.
 
 ## API
 
-The API transport allows to reach any service provider using POST or GET URLs
+The API transport allows to reach any service provider using POST, PUT or GET URLs
 (Like SMS provider, etc). It can be used in multiple ways:
 
-- The same text built from the Alert template is available in the variable `$msg`, which can then be sent as an option to the API. Be carefull that HTTP GET requests are usually limited in length.
-- The API-Option fields can be directly built from the variables defined in [Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix. For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the API transport
+- The same text built from the Alert template is available in the variable
+``` $msg ```, which can then be sent as an option to the API. Be carefull that
+HTTP GET requests are usually limited in length.
+- The API-Option fields can be directly built from the variables defined in
+[Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
+For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the
+API transport
+- The API-Headers allows you to add the headers that the api endpoint requires.
+- The API-body allow sending data in the format required by the ApI endpoint.
 
 A few variables commonly used :
 
@@ -111,6 +118,16 @@ the title and text of the alert to a screen in the Network Operation Center.
 | API Method    | POST |
 | API URL       | <http://my.example.com/wall-display>
 | API Options   | title={{ $title }} <br/> msg={{ $msg }}|
+
+The example below will use the API named component of my.example.com with id 1, body as json status value and headers send token authentication and content type required.
+
+| Config | Example |
+| ------ | ------- |
+| API Method    | PUT |
+| API URL       | http://my.example.com/comonent/1
+| API Headers   | X-Token=HASH
+|               | Content-Type=application/json
+| API Body      | { "status": 2 }
 
 ## Boxcar
 
