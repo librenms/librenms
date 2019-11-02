@@ -3,9 +3,11 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - cpiPduOutletName
-                    - cpiPduOutletDescription
+                - 
+                    oid:
+                        - cpiPduOutletName
+                        - cpiPduOutletDescription
+                    snmp_flags: ['-OeQUsb', '-Pu']
         current:
             data:
                 -
