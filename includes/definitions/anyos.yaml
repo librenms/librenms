@@ -1,0 +1,16 @@
+os: anyos
+text: AnyOS
+type: network
+group: zyxel
+icon: zyxel
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+      sysObjectID:
+        - .1.3.6.1.4.1.4413
+      snmpget:
+          oid: .1.3.6.1.4.1.890.1.2.2.1.0
+          value:
+              - 'AATO'
+              - 'AAJZ'
