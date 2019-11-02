@@ -1,7 +1,7 @@
 --
 -- Chatsworth Products Inc.
 -- Copyright (c) Chatsworth Products Inc., 1998-2019.
--- Version : 2.1.0
+-- Version : 2.1.0.1 (netsnmp compliant)
 -- ************************************************************************
 
 CPI-UNITY-MIB DEFINITIONS ::= BEGIN
