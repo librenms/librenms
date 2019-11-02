@@ -1,0 +1,117 @@
+-- ****************************************************************************
+-- * NEXANS-MIB   ( January 29, 2014, HUBERT THEISSEN)
+-- * Copyright (c) 2003-2014 Nexans Advanced Networking Solutions
+-- * 
+-- * MIB for Nexans Products
+-- * Release version = 4.01
+-- *
+-- * Changes in version 4.01
+-- * - bmSwitch: products {bmSwitch 40,41,42, 62,63,64,66,67,70,71} added
+-- * Changes in version 4.00
+-- * - No changes. Renamed to 4.00 only
+-- * Changes in version 3.9
+-- * - bmSwitch: products {bmSwitch 62,63,64,66,67,70,71} added
+-- * Changes in version 3.8
+-- * - bmSwitch: products {bmSwitch 60,61} added
+-- * Changes in version 3.7
+-- * - bmSwitch: products {bmSwitch 27,28,36,37,38} added
+-- * Changes in version 3.6
+-- * - bmSwitch: products {bmSwitch 35} added
+-- * Changes in version 3.5
+-- * - bmSwitch: products {bmSwitch 52...56} added
+-- * - bmSwitch: products {bmSwitch 50, 51} renamed
+-- * Changes in version 3.4
+-- * - bmSwitch: products {bmSwitch 22, 23} renamed
+-- * - bmSwitch: products {bmSwitch 24, 25, 33, 34} added
+-- * Changes in version 3.2
+-- * - Minor changes for compatibility with Omnivista management software
+-- * Changes in version 3.1
+-- * - bmSwitch: products {bmSwitch 23, 30...32, 50...51}added
+-- * Changes in version 3.0
+-- * - bmSwitch: products {bmSwitch 18} ... {bmSwitch 22} added
+-- * Changes in version 2.2
+-- * - dualSwitch100BmPlusDeskFiberFiber renamed to dualSwitch100BmPlusDeskFibFib
+-- * - dualSwitch100BmPlusDeskCopperCopper renamed to dualSwitch100BmPlusDeskCopCop
+-- * - dualSwitch100BmPlusDeskCopperFiber renamed to dualSwitch100BmPlusDeskCopFib
+-- * Changes in version 2.1
+-- * - bmSwitch: products fiberSwitchM100Bm and copperSwitchM100Bm added
+-- ****************************************************************************
+
+NEXANS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+    		FROM RFC1155-SMI;
+
+--
+--  Organization & Product branches
+--
+
+nexansANS			OBJECT IDENTIFIER ::= { enterprises 266 }
+
+products			OBJECT IDENTIFIER ::= { nexansANS 1 }
+
+--
+-- BM Switch Products
+--
+
+-- Maxium length 30 chars ---- 
+bmSwitch	 			OBJECT IDENTIFIER ::= { products 3 }
+
+fiberSwitch100Bm			OBJECT IDENTIFIER ::= { bmSwitch 1 }
+copperSwitch100Bm			OBJECT IDENTIFIER ::= { bmSwitch 2 }
+fiberSwitch100BmADesk			OBJECT IDENTIFIER ::= { bmSwitch 3 }
+copperSwitch100BmADesk			OBJECT IDENTIFIER ::= { bmSwitch 4 }
+fiberSwitch100BmA			OBJECT IDENTIFIER ::= { bmSwitch 5 }
+copperSwitch100BmA			OBJECT IDENTIFIER ::= { bmSwitch 6 }
+fiberSwitch100BmPlus			OBJECT IDENTIFIER ::= { bmSwitch 7 }
+copperSwitch100BmPlus			OBJECT IDENTIFIER ::= { bmSwitch 8 }
+fiberSwitch100BmPlusDesk		OBJECT IDENTIFIER ::= { bmSwitch 9 }
+copperSwitch100BmPlusDesk		OBJECT IDENTIFIER ::= { bmSwitch 10 }
+dualSwitch100BmPlusDeskFibFib		OBJECT IDENTIFIER ::= { bmSwitch 11 }
+dualSwitch100BmPlusDeskCopCop		OBJECT IDENTIFIER ::= { bmSwitch 12 }
+dualSwitch100BmPlusDeskCopFib		OBJECT IDENTIFIER ::= { bmSwitch 13 }
+fiberSwitch100BmPlusDeskVersA		OBJECT IDENTIFIER ::= { bmSwitch 14 }
+copperSwitch100BmPlusDeskVersA		OBJECT IDENTIFIER ::= { bmSwitch 15 }
+fiberSwitchM100Bm			OBJECT IDENTIFIER ::= { bmSwitch 16 }
+copperSwitchM100Bm			OBJECT IDENTIFIER ::= { bmSwitch 17 }
+fiberSwitch100BmPlusDeskVersC		OBJECT IDENTIFIER ::= { bmSwitch 18 }
+copperSwitch100BmPlusDeskVersC		OBJECT IDENTIFIER ::= { bmSwitch 19 }
+fiberSwitch1000BmPlus			OBJECT IDENTIFIER ::= { bmSwitch 20 }
+dualSwitch1000BmPlusFibFib		OBJECT IDENTIFIER ::= { bmSwitch 21 }
+dualSwitch1000BmPlusDeskFibFib		OBJECT IDENTIFIER ::= { bmSwitch 22 }
+dualSwitch1000BmPlusCopFib		OBJECT IDENTIFIER ::= { bmSwitch 23 }
+dualSwitch1000BmPlusCopCop		OBJECT IDENTIFIER ::= { bmSwitch 24 }
+copperSwitch1000BmPlus			OBJECT IDENTIFIER ::= { bmSwitch 25 }
+gigaSwitchG541Desk			OBJECT IDENTIFIER ::= { bmSwitch 27 }
+gigaSwitchG542SfpDesk			OBJECT IDENTIFIER ::= { bmSwitch 28 }
+iSwitch740CopCop			OBJECT IDENTIFIER ::= { bmSwitch 30 }
+iSwitch741CopFib			OBJECT IDENTIFIER ::= { bmSwitch 31 }
+iSwitch742FibFib			OBJECT IDENTIFIER ::= { bmSwitch 32 }
+iSwitch1042FibFib			OBJECT IDENTIFIER ::= { bmSwitch 33 }
+iSwitch1043				OBJECT IDENTIFIER ::= { bmSwitch 34 }
+iSwitch742SfpSfp			OBJECT IDENTIFIER ::= { bmSwitch 35 }
+iSwitch1043Sfp3Vi			OBJECT IDENTIFIER ::= { bmSwitch 36 }
+iGigaSwitch541				OBJECT IDENTIFIER ::= { bmSwitch 37 }
+iGigaSwitch542Sfp2Vi			OBJECT IDENTIFIER ::= { bmSwitch 38 }
+iGigaSwitch1604				OBJECT IDENTIFIER ::= { bmSwitch 40 }
+iGigaSwitch1608				OBJECT IDENTIFIER ::= { bmSwitch 41 }
+iGigaSwitch1612				OBJECT IDENTIFIER ::= { bmSwitch 42 }
+gigaSwitchBmFib				OBJECT IDENTIFIER ::= { bmSwitch 50 }
+gigaSwitchBmCop				OBJECT IDENTIFIER ::= { bmSwitch 51 }
+gigaSwitchV2Fib				OBJECT IDENTIFIER ::= { bmSwitch 52 }
+gigaSwitchV2CopFib			OBJECT IDENTIFIER ::= { bmSwitch 53 }
+gigaSwitchV2CopCop			OBJECT IDENTIFIER ::= { bmSwitch 54 }
+gigaSwitchV2SfpFib			OBJECT IDENTIFIER ::= { bmSwitch 55 }
+gigaSwitchV2Cop				OBJECT IDENTIFIER ::= { bmSwitch 56 }
+gigaSwitchV3FibTp			OBJECT IDENTIFIER ::= { bmSwitch 60 }
+gigaSwitchV3SfpTp			OBJECT IDENTIFIER ::= { bmSwitch 61 }
+gigaSwitchV3d2SfpTp			OBJECT IDENTIFIER ::= { bmSwitch 62 }
+gigaSwitchV3d2SfpSfp			OBJECT IDENTIFIER ::= { bmSwitch 63 }
+gigaSwitchV3d2Fib			OBJECT IDENTIFIER ::= { bmSwitch 64 }
+fiberSwitch1000BmV3			OBJECT IDENTIFIER ::= { bmSwitch 66 }
+fiberSwitch100BmV3			OBJECT IDENTIFIER ::= { bmSwitch 67 }
+gigaSwitch641DeskSfpTp			OBJECT IDENTIFIER ::= { bmSwitch 70 }
+gigaSwitch642DeskSfpSfp			OBJECT IDENTIFIER ::= { bmSwitch 71 }
+
+END
