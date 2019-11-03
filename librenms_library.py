@@ -127,7 +127,7 @@ def command_runner(command, valid_exit_codes=None, timeout=30, shell=False, deco
         # universal_newlines=True makes netstat command fail under windows
         # timeout does not work under Python 2.7 with subprocess32 < 3.5
         # decoder may be unicode_escape for dos commands or utf-8 for powershell
-        if sys.version >= (3, 0):
+        if sys.version_info >= (3, 0):
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=shell,
                                              timeout=timeout, universal_newlines=False)
         else:
