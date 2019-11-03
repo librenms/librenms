@@ -589,7 +589,7 @@ return [
             'description' => 'Port FDB Einträge älter als',
             'help' => 'Bereinigung wird erledigt durch daily.sh'
         ],
-        'port_purge' => [
+        'ports_purge' => [
             'description' => 'Ports älter als (days)',
             'help' => 'Bereinigung wird erledigt durch daily.sh'
         ],
