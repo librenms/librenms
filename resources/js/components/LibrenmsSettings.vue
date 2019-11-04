@@ -61,7 +61,7 @@
             prefix: String,
             initialTab: {type: String, default: 'alerting'},
             initialSection: String,
-            groups: {type: Object}
+            tabs: {type: Object}
         },
         data() {
             return {
@@ -100,9 +100,6 @@
             handleBack(event) {
                 [this.tab, this.section] = event.state.split('/');
             },
-            loadData(response) {
-                this.settings = response.data;
-            },
             updateSetting(name, value) {
                 this.$set(this.settings[name], 'value', value)
             },
@@ -126,6 +123,46 @@
         mounted() {
             window.onpopstate = this.handleBack; // handle back button
             axios.get(route('settings.list')).then((response) => this.settings = response.data)
+        },
+        computed: {
+            groups() {
+                if (_.isEmpty(this.settings)) {
+                    return this.tabs;
+                }
+
+                // group data
+                let groups = {};
+                for (const key of Object.keys(this.settings)) {
+                    let setting = this.settings[key];
+                    // filter
+                    if (!setting.name.includes(this.search_phrase)) {
+                        continue
+                    }
+                    if (setting.group) {
+                        if (!(setting.group in groups)) {
+                            groups[setting.group] = {};
+                        }
+                        if (setting.section) {
+                            if (!(setting.section in groups[setting.group])) {
+                                groups[setting.group][setting.section] = [];
+                            }
+
+                            groups[setting.group][setting.section].push(setting);
+                        }
+                    }
+                }
+
+                // sort groups
+                let sorted = {};
+                for (const group_key of Object.keys(groups).sort()) {
+                    sorted[group_key] = {};
+                    for (const section_key of Object.keys(groups[group_key]).sort()) {
+                        sorted[group_key][section_key] = _.sortBy(groups[group_key][section_key], 'order').map(a => a.name);
+                    }
+                }
+
+                return sorted;
+            }
         }
     }
 </script>
