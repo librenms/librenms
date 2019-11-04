@@ -3507,7 +3507,6 @@
             "type": "boolean"
         },
         "oxidized.url": {
-            "default": null,
             "group": "external",
             "section": "oxidized",
             "order": 1,
