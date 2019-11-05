@@ -965,7 +965,7 @@ function list_alerts(\Illuminate\Http\Request $request)
             $sql .= ' AND `R`.severity=?';
         }
     }
-    
+
     $order = 'timestamp desc';
 
     if ($request->has('order')) {
@@ -1958,6 +1958,7 @@ function list_ip_networks()
 function list_arp(\Illuminate\Http\Request $request)
 {
     $ip       = $request->route('ip');
+    $cidr     = $request->route('cidr');
     $hostname = $request->get('device');
 
     if (empty($ip)) {
@@ -1969,9 +1970,9 @@ function list_arp(\Illuminate\Http\Request $request)
     if ($ip === "all") {
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
         $arp = dbFetchRows("SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?", [$device_id]);
-    } elseif (str_contains($ip, '/')) {
+    } elseif ($cidr) {
         try {
-            $ip = new IPv4($ip);
+            $ip = new IPv4("$ip/$cidr");
             $arp = dbFetchRows(
                 'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
                 [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())]
