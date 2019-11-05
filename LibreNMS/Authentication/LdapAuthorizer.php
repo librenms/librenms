@@ -191,11 +191,9 @@ class LdapAuthorizer extends AuthorizerBase
         }
         return $userlist;
     }
-    
-    public function getUserAttributes()
-    {
-        $userlist = [];
 
+    public function getUser($user_id)
+    {
         try {
             $connection = $this->getLdapConnection();
 
@@ -220,22 +218,15 @@ class LdapAuthorizer extends AuthorizerBase
                         $this->getMembername($entry['uid'][0])
                     )) {
                         $user = $this->ldapToUser($entry);
-                        $userlist[$user['username']] = $user;
+                        if ((int)$user['user_id'] === (int)$user_id) {
+                            return $user;
+                        }
                     }
                 }
             }
             return $userlist;
         } catch (AuthenticationException $e) {
             echo $e->getMessage() . PHP_EOL;
-        }
-    }
-
-    public function getUser($user_id)
-    {
-        foreach ($this->getUserAttributes() as $user) {
-            if ((int)$user['user_id'] === (int)$user_id) {
-                return $user;
-            }
         }
         return 0;
     }
