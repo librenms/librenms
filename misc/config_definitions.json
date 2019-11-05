@@ -3507,13 +3507,12 @@
             "type": "boolean"
         },
         "oxidized.url": {
-            "default": false,
             "group": "external",
             "section": "oxidized",
             "order": 1,
             "type": "text",
             "validate": {
-                "value": "regex:/^[a-zA-Z0-9]{1,5}://.*$/"
+                "value": "url"
             }
         },
         "page_refresh": {
