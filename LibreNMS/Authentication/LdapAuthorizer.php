@@ -194,39 +194,50 @@ class LdapAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
+        $connection = $this->getLdapConnection();
+        $ldap_groups = $this->getGroupList();
+        if (empty($ldap_groups)) {
+            d_echo('No groups defined.  Cannot search for users.');
+            return 0;
+        }
+
+        $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
+        if (Config::get('auth_ldap_userlist_filter') != null) {
+            $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
+        }
+        
         try {
-            $connection = $this->getLdapConnection();
-
-            $ldap_groups = $this->getGroupList();
-            if (empty($ldap_groups)) {
-                d_echo('No groups defined.  Cannot search for users.');
-                return [];
-            }
-
-            $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
-            if (Config::get('auth_ldap_userlist_filter') != null) {
-                $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
-            }
-
             $search = ldap_search($connection, $this->getFullDn($this->userloginname), $filter);
-            foreach (ldap_get_entries($connection, $search) as $entry) {
-                foreach ($ldap_groups as $ldap_group) {
-                    if (ldap_compare(
-                        $connection,
-                        $ldap_group,
-                        Config::get('auth_ldap_groupmemberattr', 'memberUid'),
-                        $this->getMembername($entry['uid'][0])
+            $entries = ldap_get_entries($connection, $search);
+        } catch (AuthenticationException $e) {
+            echo $e->getMessage() . PHP_EOL;
+            return 0;
+        }
+        return $this->getUserAttributes($user_id, $entries, $ldap_groups);
+    }
+    
+    private function getUserAttributes($user_id, $ldap_user_entries, $ldap_groups) {
+        $connection = $this->getLdapConnection();
+        foreach ($ldap_user_entries as $entry) {
+            if ($this->getMembername($entry['uid'][0]) == "") {
+                continue;
+            }
+            foreach ($ldap_groups as $ldap_group) {
+                if ($ldap_group == "" ) {
+                    continue;
+                }
+                if (ldap_compare(
+                    $connection,
+                    $ldap_group,
+                    Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                    $this->getMembername($entry['uid'][0])
                     )) {
-                        $user = $this->ldapToUser($entry);
-                        if ((int)$user['user_id'] === (int)$user_id) {
-                            return $user;
-                        }
+                    $user = $this->ldapToUser($entry);
+                    if ((int)$user['user_id'] === (int)$user_id) {
+                        return $user;
                     }
                 }
             }
-            return $userlist;
-        } catch (AuthenticationException $e) {
-            echo $e->getMessage() . PHP_EOL;
         }
         return 0;
     }
@@ -258,7 +269,7 @@ class LdapAuthorizer extends AuthorizerBase
     public function getGroupList()
     {
         $ldap_groups = array();
-
+        //print_r($ldap_groups);
         $default_group = 'cn=groupname,ou=groups,dc=example,dc=com';  // in the documentation
         if (Config::get('auth_ldap_group', $default_group) !== $default_group) {
             $ldap_groups[] = Config::get('auth_ldap_group');
@@ -266,8 +277,10 @@ class LdapAuthorizer extends AuthorizerBase
 
         foreach (Config::get('auth_ldap_groups') as $key => $value) {
             $ldap_groups[] = "cn=$key,".Config::get('auth_ldap_groupbase');
+            //print_r($key);
+            //echo "\n";
         }
-
+        //print_r($ldap_groups);
         return $ldap_groups;
     }
 
