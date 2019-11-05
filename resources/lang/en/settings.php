@@ -598,7 +598,7 @@ return [
         ],
         'permission' => [
             'device_group' => [
-                'user_allow_dynamic' => [
+                'allow_dynamic' => [
                     'description' => 'Enable user access via dynamic Device Groups',
                 ]
             ]

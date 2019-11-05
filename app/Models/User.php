@@ -180,6 +180,11 @@ class User extends Authenticatable
         }
     }
 
+    public function deviceGroups()
+    {
+        return $this->belongsToMany('App\Models\DeviceGroup', 'devices_group_perms', 'user_id', 'device_group_id');
+    }
+
     public function ports()
     {
         if ($this->hasGlobalRead()) {

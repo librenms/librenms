@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\DeviceGroup;
 use App\Models\User;
 
 $no_refresh = true;
@@ -33,15 +34,11 @@ if (! Auth::user()->hasGlobalAdmin()) {
         }
 
         if ($vars['action'] == 'deldevgroupperm') {
-            if (dbFetchCell('SELECT COUNT(*) FROM devices_group_perms WHERE `device_group_id` = ? AND `user_id` = ?', array($vars['device_group_id'], $user_data['user_id']))) {
-                dbDelete('devices_group_perms', '`device_group_id` =  ? AND `user_id` = ?', array($vars['device_group_id'], $user_data['user_id']));
-            }
+            $user->deviceGroups()->detach($vars['device_group_id']);
         }
 
         if ($vars['action'] == 'adddevgroupperm') {
-            if (!dbFetchCell('SELECT COUNT(*) FROM devices_group_perms WHERE `device_group_id` = ? AND `user_id` = ?', array($vars['device_group_id'], $user_data['user_id']))) {
-                dbInsert(array('device_group_id' => $vars['device_group_id'], 'user_id' => $user_data['user_id']), 'devices_group_perms');
-            }
+            $user->deviceGroups()->syncWithoutDetaching($vars['device_group_id']);
         }
 
         if ($vars['action'] == 'delifperm') {
@@ -137,17 +134,14 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 <th>Action</th>
               </tr>";
 
-        $devices_group_perms = dbFetchRows('SELECT DGP.device_group_id, DP.name from devices_group_perms DGP INNER JOIN device_groups DP ON DP.id = DGP.device_group_id  WHERE DGP.user_id = ?', array($user_data['user_id']));
-        foreach ($devices_group_perms as $device_group_perm) {
-            echo '<tr><td><strong>'.$device_group_perm['name']."</td><td> <a href='edituser/action=deldevgroupperm/user_id=".$vars['user_id'].'/device_group_id='.$device_group_perm['device_group_id']."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
-            $access_group_list[] = $device_group_perm['device_group_id'];
-            $permgroupdone      = 'yes';
+        foreach ($user->deviceGroups as $device_group_perm) {
+            echo '<tr><td><strong>'.$device_group_perm->name."</td><td> <a href='edituser/action=deldevgroupperm/user_id=".$user->user_id.'/device_group_id='.$device_group_perm->id."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
         }
 
         echo '</table>
           </div>';
 
-        if (!$permgroupdone) {
+        if ($user->deviceGroups->isEmpty()) {
             echo 'None Configured';
         }
 
@@ -162,18 +156,14 @@ if (! Auth::user()->hasGlobalAdmin()) {
               <label class='sr-only' for='device_group_id'>Device</label>
               <select name='device_group_id' id='device_group_id' class='form-control'>";
 
-        $device_groups = dbFetchRows('SELECT id, name FROM `device_groups` ORDER BY name');
+        $device_groups = DeviceGroup::query()
+            ->whereNotIn('id', $user->deviceGroups->pluck('id'))
+            ->orderBy('name')->get(['id', 'type', 'name']);
+        $allow_dynamic = \LibreNMS\Config::get('permission.device_group.allow_dynamic');
         foreach ($device_groups as $group) {
-            unset($done);
-            foreach ($access_group_list as $ac) {
-                if ($ac == $group['id']) {
-                    $done = 1;
-                }
-            }
-
-            if (!$done) {
-                echo "<option value='".$group['id']."'>".$group['name'].'</option>';
-            }
+                echo '<option value="'.$group->id . '"';
+                echo ($allow_dynamic || $group->type == 'static') ? '>' : ' disabled title="Dynamic groups are disabled by default. Set permission.device_group.allow_dynamic to enable.">';
+                echo $group->name . '</option>';
         }
 
         echo "</select>

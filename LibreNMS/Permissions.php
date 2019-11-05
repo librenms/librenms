@@ -278,7 +278,7 @@ class Permissions
         ->select('devices_group_perms.user_id', $model->getQualifiedKeyName())
         ->join('device_group_device', 'device_group_device.device_group_id', '=', 'devices_group_perms.device_group_id')
         ->join($model->getTable(), "{$model->getTable()}.device_id", '=', 'device_group_device.device_id')
-        ->when(!Config::get('permission.device_group.user_allow_dynamic'), function ($query) {
+        ->when(!Config::get('permission.device_group.allow_dynamic'), function ($query) {
             return $query
                 ->join('device_groups', 'device_groups.id', '=', 'devices_group_perms.device_group_id')
                 ->where('device_groups.type', 'static');
