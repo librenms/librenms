@@ -195,11 +195,6 @@ class LdapAuthorizer extends AuthorizerBase
     public function getUser($user_id)
     {
         $connection = $this->getLdapConnection();
-        $ldap_groups = $this->getGroupList();
-        if (empty($ldap_groups)) {
-            d_echo('No groups defined.  Cannot search for users.');
-            return 0;
-        }
 
         $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
         if (Config::get('auth_ldap_userlist_filter') != null) {
@@ -208,7 +203,7 @@ class LdapAuthorizer extends AuthorizerBase
         
         $search = ldap_search($connection, $this->getFullDn($this->userloginname), $filter);
         $entries = ldap_get_entries($connection, $search);
-        foreach ($entries as $entry) {         
+        foreach ($entries as $entry) {
             $user = $this->ldapToUser($entry);
             if ((int)$user['user_id'] !== (int)$user_id) {
                 continue;
