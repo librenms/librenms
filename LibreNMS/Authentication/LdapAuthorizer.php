@@ -143,17 +143,21 @@ class LdapAuthorizer extends AuthorizerBase
     public function getUserlist()
     {
         $userlist = [];
+
         try {
             $connection = $this->getLdapConnection();
+
             $ldap_groups = $this->getGroupList();
             if (empty($ldap_groups)) {
                 d_echo('No groups defined.  Cannot search for users.');
                 return [];
             }
+
             $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
             if (Config::get('auth_ldap_userlist_filter') != null) {
                 $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
             }
+
             // build group filter
             $group_filter = '';
             foreach ($ldap_groups as $group) {
@@ -162,6 +166,7 @@ class LdapAuthorizer extends AuthorizerBase
             if (count($ldap_groups) > 1) {
                 $group_filter = "(|$group_filter)";
             }
+
             // search using memberOf
             $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), "(&$filter$group_filter)");
             if (ldap_count_entries($connection, $search)) {
@@ -189,6 +194,7 @@ class LdapAuthorizer extends AuthorizerBase
         } catch (AuthenticationException $e) {
             echo $e->getMessage() . PHP_EOL;
         }
+
         return $userlist;
     }
 
@@ -241,7 +247,7 @@ class LdapAuthorizer extends AuthorizerBase
     public function getGroupList()
     {
         $ldap_groups = array();
-        //print_r($ldap_groups);
+
         $default_group = 'cn=groupname,ou=groups,dc=example,dc=com';  // in the documentation
         if (Config::get('auth_ldap_group', $default_group) !== $default_group) {
             $ldap_groups[] = Config::get('auth_ldap_group');
@@ -249,10 +255,8 @@ class LdapAuthorizer extends AuthorizerBase
 
         foreach (Config::get('auth_ldap_groups') as $key => $value) {
             $ldap_groups[] = "cn=$key,".Config::get('auth_ldap_groupbase');
-            //print_r($key);
-            //echo "\n";
         }
-        //print_r($ldap_groups);
+
         return $ldap_groups;
     }
 
