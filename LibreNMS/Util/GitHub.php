@@ -56,6 +56,8 @@ class GitHub
         'discovery' => [],
         'polling' => [],
         'bug' => [],
+        'refactor' => [],
+        'cleanup' => [],
         'documentation' => [],
         'translation' => [],
         'misc' => [],
