@@ -282,12 +282,9 @@ if (Config::get('distributed_poller') === true) {
 }//endif
 ?>
       <div class="form-group">
-          <div class="col-sm-offset-3 col-sm-9">
-              <div class="checkbox">
-                  <label>
-                      <input type="checkbox" name="force_add" id="force_add"> Force add - No ICMP or SNMP checks performed
-                  </label>
-              </div>
+          <label for="force_add" class="col-sm-3 control-label">Force add<br><small>(No ICMP or SNMP checks performed)</small></label>
+          <div class="col-sm-9">
+                  <input type="checkbox" name="force_add" id="force_add" data-size="small">
           </div>
       </div>
     <hr>
@@ -364,6 +361,7 @@ if (Config::get('distributed_poller') === true) {
     });
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
+    $("[name='force_add']").bootstrapSwitch();
 <?php
 if (!$snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';
