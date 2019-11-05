@@ -143,6 +143,58 @@ class LdapAuthorizer extends AuthorizerBase
     public function getUserlist()
     {
         $userlist = [];
+        try {
+            $connection = $this->getLdapConnection();
+            $ldap_groups = $this->getGroupList();
+            if (empty($ldap_groups)) {
+                d_echo('No groups defined.  Cannot search for users.');
+                return [];
+            }
+            $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
+            if (Config::get('auth_ldap_userlist_filter') != null) {
+                $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
+            }
+            // build group filter
+            $group_filter = '';
+            foreach ($ldap_groups as $group) {
+                $group_filter .= '(memberOf=' . trim($group) . ')';
+            }
+            if (count($ldap_groups) > 1) {
+                $group_filter = "(|$group_filter)";
+            }
+            // search using memberOf
+            $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), "(&$filter$group_filter)");
+            if (ldap_count_entries($connection, $search)) {
+                foreach (ldap_get_entries($connection, $search) as $entry) {
+                    $user = $this->ldapToUser($entry);
+                    $userlist[$user['username']] = $user;
+                }
+            } else {
+                // probably doesn't support memberOf, go through all users, this could be slow
+                $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+                foreach (ldap_get_entries($connection, $search) as $entry) {
+                    foreach ($ldap_groups as $ldap_group) {
+                        if (ldap_compare(
+                            $connection,
+                            $ldap_group,
+                            Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                            $this->getMembername($entry['uid'][0])
+                        )) {
+                            $user = $this->ldapToUser($entry);
+                            $userlist[$user['username']] = $user;
+                        }
+                    }
+                }
+            }
+        } catch (AuthenticationException $e) {
+            echo $e->getMessage() . PHP_EOL;
+        }
+        return $userlist;
+    }
+    
+    public function getUserAttributes()
+    {
+        $userlist = [];
 
         try {
             $connection = $this->getLdapConnection();
@@ -158,30 +210,8 @@ class LdapAuthorizer extends AuthorizerBase
                 $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
             }
 
-            // build group filter
-            $group_filter = '';
-            foreach ($ldap_groups as $group) {
-                $group_filter .= '(memberOf=' . trim($group) . ')';
-            }
-            if (count($ldap_groups) > 1) {
-                $group_filter = "(|$group_filter)";
-            }
-
-            // search using memberOf
-            $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), "(&$filter$group_filter)");
-            if (ldap_count_entries($connection, $search)) {
-                foreach (ldap_get_entries($connection, $search) as $entry) {
-                    $user = $this->ldapToUser($entry);
-                    $userlist[$user['username']] = $user;
-                }
-                return $userlist;
-            }
-            // probably doesn't support memberOf, go through all users, this could be slow
-            $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+            $search = ldap_search($connection, $this->getFullDn($this->userloginname), $filter);
             foreach (ldap_get_entries($connection, $search) as $entry) {
-                if ($entry['uid'][0] != $this->userloginname) {
-                    continue;
-                }
                 foreach ($ldap_groups as $ldap_group) {
                     if (ldap_compare(
                         $connection,
@@ -202,7 +232,7 @@ class LdapAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        foreach ($this->getUserlist() as $user) {
+        foreach ($this->getUserAttributes() as $user) {
             if ((int)$user['user_id'] === (int)$user_id) {
                 return $user;
             }
