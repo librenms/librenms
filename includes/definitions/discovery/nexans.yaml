@@ -1,0 +1,34 @@
+mib: NEXANS-BM-MIB:NEXANS-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: bmSwitchInfo
+                    value: infoTemperature
+                    num_oid: '.1.3.6.1.4.1.266.20.1.12.{{ $index }}'
+                    index: 'infoTemperature.{{ $index }}'
+                    high_limit: infoTemperatureMaxAllowed
+                    descr: 'Unit Temperature'
+        voltage:
+            data:
+                -
+                    oid: bmSwitchInfo
+                    value: infoPoeInputVoltage
+                    num_oid: '.1.3.6.1.4.1.266.20.1.19.{{ $index }}'
+                    index: 'infoPoeInputVoltage.{{ $index }}'
+                    descr: 'PoeInputVoltage'
+                -
+                    oid: bmSwitchInfo
+                    value: infoPowerVoltage2500
+                    num_oid: '.1.3.6.1.4.1.266.20.1.14.{{ $index }}'
+                    index: 'infoPowerVoltage2500.{{ $index }}'
+                    descr: '2.5V input'
+                    divisor: 1000
+                -
+                    oid: bmSwitchInfo
+                    value: infoPowerVoltage3300
+                    num_oid: '.1.3.6.1.4.1.266.20.1.15.{{ $index }}'
+                    index: 'infoPowerVoltage3300.{{ $index }}'
+                    descr: '3.3V input'
+                    divisor: 1000
