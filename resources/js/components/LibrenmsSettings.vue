@@ -110,11 +110,20 @@
                     return true;
                 }
 
-                switch (setting.when.operator) {
+                if (setting.when.hasOwnProperty('and')) {
+                    return setting.when.and.reduce((result, logic) => this.checkLogic(logic) && result, true)
+                } else if (setting.when.hasOwnProperty('or')) {
+                    return setting.when.or.reduce((result, logic) => this.checkLogic(logic) || result, false)
+                }
+
+                return this.checkLogic(setting.when);
+            },
+            checkLogic(logic) {
+                switch (logic.operator) {
                     case 'equals':
-                        return this.settings[setting.when.setting].value === setting.when.value;
+                        return this.settings[logic.setting].value === logic.value;
                     case 'in':
-                        return setting.when.value.includes(this.settings[setting.when.setting].value);
+                        return logic.value.includes(this.settings[logic.setting].value);
                     default:
                         return true;
                 }
