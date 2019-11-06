@@ -101,26 +101,45 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$query = 'FROM alert_rules';
-$where = '';
-$param = [];
+$query_device = 'select alert_rules.id as id from alert_rules left join alert_device_map on alert_rules.id=alert_device_map.rule_id';
+$where_device = '';
+
+$query_device_group = 'select alert_group_map.rule_id as id from device_group_device left join alert_group_map on device_group_device.device_group_id=alert_group_map.group_id';
+$where_device_group = '';
+
 if (isset($device['device_id']) && $device['device_id'] > 0) {
-    $query .= ' LEFT JOIN alert_device_map ON alert_rules.id=alert_device_map.rule_id';
-    $where   = 'WHERE (device_id=? OR device_id IS NULL)';
+    $where_device .= 'where alert_device_map.device_id=?';
+    $where_device_group .= 'where device_group_device.device_id=?';
+    $param[] = $device['device_id'];
     $param[] = $device['device_id'];
 }
 
-$count = dbFetchCell("SELECT COUNT(*) $query $where", $param);
+$full_query = "select alert_rules.* from alert_rules where id in ($query_device $where_device UNION DISTINCT $query_device_group $where_device_group) ORDER BY id ASC";
+$query_result = dbFetchRows($full_query, $param);
+
+$count = count($query_result);
 if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_number'] <= $count) {
     $page_number = $_POST['page_number'];
 } else {
     $page_number = 1;
 }
 
+# start printing rules starting at result number $start
 $start = (($page_number - 1) * $results);
-$full_query = "SELECT alert_rules.* $query $where ORDER BY alert_rules.id ASC LIMIT $start,$results";
+# print only $result counts, beginning from $start
+$end = $start + $results;
 
-foreach (dbFetchRows($full_query, $param) as $rule) {
+$index = 0;
+foreach ($query_result as $rule) {
+    $index++;
+
+    if ($index < $start) {
+        continue;
+    }
+    if ($index > $start + $results) {
+        break;
+    }
+
     $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
     $ico   = 'check';
     $col   = 'success';
