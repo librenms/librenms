@@ -1009,11 +1009,7 @@
             "group": "alerting",
             "section": "email",
             "order": 10,
-            "type": "select",
-            "options": {
-                "true": "Yes",
-                "false": "No"
-            },
+            "type": "boolean",
             "when": {
                 "setting": "email_backend",
                 "operator": "equals",
