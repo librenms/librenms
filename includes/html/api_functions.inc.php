@@ -1684,6 +1684,68 @@ function rename_device(\Illuminate\Http\Request $request)
     }
 }
 
+function add_device_group(\Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || !is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    // Mostly stolen from the app/Http/Controllers/DeviceGroupController.php store function
+    $missing_fields = [];
+
+    if(empty($data['name'])) {
+        $missing_fields[] = 'name';
+    }
+
+    if(empty($data['type'])) {
+        $missing_fields[] = 'type';
+    }
+
+    if(!empty($data['type']) && ($data['type'] == 'static')) {
+        // TODO: all of which should be an integer
+        if(empty($data['devices'])) {
+            $missing_fields[] = 'devices';
+        }
+    }
+
+    if(!empty($data['type']) && ($data['type'] == 'dynamic')) {
+        if(empty($data['rules'])) {
+            $missing_fields[] = 'rules';
+        }
+    }
+
+    if (!empty($missing_fields)) {
+        return api_error(400, sprintf("Device Group field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
+    }
+
+    $types = [
+        'static',
+        'dynamic',
+    ];
+
+    if (!in_array($data['type'], $types)) {
+        return api_error(400, 'Device Group missing valid type. ' . $data['type'] . ' is not in ' . $types);
+    }
+
+    // Only use the rules if they are able to be parsed by the QueryBuilder
+    $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+    if (empty($query)) {
+        return api_error(500, "We couldn't parse your rule");
+    }
+
+    $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
+    $deviceGroup->rules = json_decode($data['rules']);
+    $deviceGroup->save();
+
+    if ($data['type'] == 'static') {
+        $deviceGroup->devices()->sync($data['devices']);
+    }
+
+    return api_success($deviceGroup->id, 'id', 'Device group ' . $deviceGroup->name . ' created', 201);
+}
+
+
 function get_device_groups(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
