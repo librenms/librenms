@@ -12491,7 +12491,7 @@ aclEgressProfileTable OBJECT-TYPE
 		STATUS current
 		DESCRIPTION
 			""
-		INDEX { fdbMacLearningVlanPort, fdbMacLearningVlanVlanId, fdbMacLearningVlanPhysAddress}
+		INDEX { fdbMacLearningVlanPort, fdbMacLearningVlanPhysAddress, fdbMacLearningVlanVlanId}
 		::= { fdbMacLearningVlanTable 1 }
 
 		FdbMacLearningVlanEntry ::=
@@ -20196,6 +20196,106 @@ tacacsplusAuthor		OBJECT IDENTIFIER ::= { tacacsplus 3 }
 		DESCRIPTION
 			"SYMBOLS"
 	::= { vdslInmCount1dayEntry 26 }
+
+
+	xturInfo	OBJECT IDENTIFIER ::= { vdsl 12 }
+
+	xturInfoTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF XturInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"xtur info table"
+	::= { xturInfo 1 }
+
+	xturInfoEntry OBJECT-TYPE
+	SYNTAX XturInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { ifIndex }
+	::= { xturInfoTable 1 }
+
+	XturInfoEntry ::=
+		SEQUENCE {
+			xturInfoHsCountryCode		DisplayString,
+			xturInfoHsProviderCode		DisplayString,
+			xturInfoHsVendorInfo		DisplayString,
+			xturInfoFeSysCountryCode	DisplayString,
+			xturInfoFeSysProviderCode	DisplayString,
+			xturInfoFeSysVendorInfo		DisplayString,
+			xturInfoFeSysVersion		DisplayString,
+			xturInfoFeSysSerial			DisplayString
+		}
+
+	xturInfoHsCountryCode OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Displays XTUR HS country code on specific port."
+	::= { xturInfoEntry 1 }
+	
+	xturInfoHsProviderCode OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Displays XTUR HS provider code on specific port."
+	::= { xturInfoEntry 2 }
+	
+	xturInfoHsVendorInfo OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Displays XTUR HS vendor info on specific port."
+	::= { xturInfoEntry 3 }
+	
+	xturInfoFeSysCountryCode OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Displays XTUR FE system country code on specific port."
+	::= { xturInfoEntry 4 }
+	
+	xturInfoFeSysProviderCode OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Displays XTUR FE system provider code on specific port."
+	::= { xturInfoEntry 5 }
+	
+	xturInfoFeSysVendorInfo OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Displays XTUR FE system vendor info on specific port."
+	::= { xturInfoEntry 6 }
+	
+	xturInfoFeSysVersion OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Displays XTUR FE system version on specific port."
+	::= { xturInfoEntry 7 }
+	
+	xturInfoFeSysSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Displays XTUR FE system serial number on specific port."
+	::= { xturInfoEntry 8 }
+
+
+
+
 --------------------------------------------------------------------------------
 -- coa
 --------------------------------------------------------------------------------
