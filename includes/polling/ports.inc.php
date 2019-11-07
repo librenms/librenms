@@ -764,7 +764,7 @@ foreach ($ports as $port) {
         }//end if
 
         // We don't care about statistics for skipped selective polling ports
-        if (!empty($port['skipped'])) {
+        if (!empty($port['skipped']) || ($port['ifOperStatus'] == "down" && $port['ifOperStatus_prev'] == "down" && $this_port['ifOperStatus'] == "down" && $this_port['ifLastChange'] == $port['ifLastChange'])) {
             echo " $port_id skipped.";
         } else {
             // End parse ifAlias
