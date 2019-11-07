@@ -101,7 +101,7 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$query_device = 'select alert_rules.id as id from alert_rules left join alert_device_map on alert_rules.id=alert_device_map.rule_id';
+$query_device = 'select alert_device_map.rule_id as id from alert_device_map';
 $where_device = '';
 
 $query_device_group = 'select alert_group_map.rule_id as id from device_group_device left join alert_group_map on device_group_device.device_group_id=alert_group_map.group_id';
