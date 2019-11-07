@@ -18,6 +18,7 @@ use App\Models\PortsFdb;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Validator;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -1691,41 +1692,17 @@ function add_device_group(\Illuminate\Http\Request $request)
         return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
     }
 
-    // Mostly stolen from the app/Http/Controllers/DeviceGroupController.php store function
-    $missing_fields = [];
-
-    if(empty($data['name'])) {
-        $missing_fields[] = 'name';
-    }
-
-    if(empty($data['type'])) {
-        $missing_fields[] = 'type';
-    }
-
-    if(!empty($data['type']) && ($data['type'] == 'static')) {
-        // TODO: all of which should be an integer
-        if(empty($data['devices'])) {
-            $missing_fields[] = 'devices';
-        }
-    }
-
-    if(!empty($data['type']) && ($data['type'] == 'dynamic')) {
-        if(empty($data['rules'])) {
-            $missing_fields[] = 'rules';
-        }
-    }
-
-    if (!empty($missing_fields)) {
-        return api_error(400, sprintf("Device Group field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
-    }
-
-    $types = [
-        'static',
-        'dynamic',
+    $rules = [
+        'name' => 'required|string|unique:device_groups',
+        'type' => 'required|in:dynamic,static',
+        'devices' => 'array|required_if:type,static',
+        'devices.*' => 'integer',
+        'rules' => 'json|required_if:type,dynamic',
     ];
 
-    if (!in_array($data['type'], $types)) {
-        return api_error(400, 'Device Group missing valid type. ' . $data['type'] . ' is not in ' . $types);
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
     }
 
     // Only use the rules if they are able to be parsed by the QueryBuilder
