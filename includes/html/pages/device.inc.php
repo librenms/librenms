@@ -17,6 +17,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     }
     $select = array($tab => 'class="active"');
 
+    DeviceCache::setPrimary($vars['device']);
     $device = device_by_id_cache($vars['device']);
     $attribs = get_dev_attribs($device['device_id']);
     $device['attribs'] = $attribs;
