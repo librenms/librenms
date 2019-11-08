@@ -18,6 +18,7 @@ use App\Models\PortsFdb;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Validator;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -1683,6 +1684,44 @@ function rename_device(\Illuminate\Http\Request $request)
         }
     }
 }
+
+function add_device_group(\Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || !is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $rules = [
+        'name' => 'required|string|unique:device_groups',
+        'type' => 'required|in:dynamic,static',
+        'devices' => 'array|required_if:type,static',
+        'devices.*' => 'integer',
+        'rules' => 'json|required_if:type,dynamic',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    // Only use the rules if they are able to be parsed by the QueryBuilder
+    $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+    if (empty($query)) {
+        return api_error(500, "We couldn't parse your rule");
+    }
+
+    $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
+    $deviceGroup->rules = json_decode($data['rules']);
+    $deviceGroup->save();
+
+    if ($data['type'] == 'static') {
+        $deviceGroup->devices()->sync($data['devices']);
+    }
+
+    return api_success($deviceGroup->id, 'id', 'Device group ' . $deviceGroup->name . ' created', 201);
+}
+
 
 function get_device_groups(\Illuminate\Http\Request $request)
 {
