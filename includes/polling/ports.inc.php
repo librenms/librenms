@@ -593,7 +593,7 @@ foreach ($ports as $port) {
             $port['update']['ifIndex'] = $ifIndex;
         }
         
-        if ($last_poll_time != $port['poll_time']){
+        if ($last_poll_time != $port['poll_time']) {
             $port['update']['poll_time'] = $polled;
             $port['update']['poll_prev'] = $port['poll_time'];
             $port['update']['poll_period'] = $polled_period;
