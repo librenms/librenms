@@ -55,7 +55,7 @@ return [
     | Note: the path will be prepended to point to the App directory.
     |
     */
-    'jsPath' => '/resources/js/lang/',
+    'jsPath' => '/html/js/lang/',
     'jsFile' => '/resources/js/vue-i18n-locales.generated.js',
 
     /*
