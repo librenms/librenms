@@ -19,9 +19,10 @@ If the user is overriding the option in config.php it would use the format `$con
 The config definition system inherently supports translation. You must add the English names in the 
 `resoures/lang/en/settings.php` file (and other languages if you can).
 
-    Note: Right now the Vue.js translation is a little cumbersome.  First you need to update the language
-    files, then run `./lnms vue-i18n:generate`, run `npm run development` or `npm run watch`, then hard refresh your web
-    page.
+To update the javascript translation files, run:
+
+    ./lnms vue-i18n:generate --multi-locales --format=umd
+    npm run production
 
 # Definition Format
 

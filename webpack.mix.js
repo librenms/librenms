@@ -15,4 +15,4 @@ mix.setPublicPath('html/')
     .js('resources/js/app.js', 'js')
     .sass('resources/sass/app.scss', 'css')
     .extract()
-    .version();
+    .version('html/js/lang/*.js');
