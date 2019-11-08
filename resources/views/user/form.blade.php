@@ -6,6 +6,16 @@
     </div>
 </div>
 
+@if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
+<div class="form-group @if($errors->has('enabled')) has-error @endif">
+    <label for="enabled" class="control-label col-sm-3">@lang('Enabled')</label>
+    <div class="col-sm-9">
+        <input type="hidden" value="@if(Auth::id() == $user->user_id) 1 else 0 @endif" name="enabled">
+        <input type="checkbox" id="enabled" name="enabled" data-size="small" @if(old('enabled', $user->enabled)) checked @endif @if(Auth::id() == $user->user_id) disabled @endif>
+    </div>
+</div>
+@endif
+
 <div class="form-group @if($errors->has('email')) has-error @endif">
     <label for="email" class="control-label col-sm-3">@lang('Email')</label>
     <div class="col-sm-9">
@@ -68,15 +78,16 @@
 @endif
 
 @if(\LibreNMS\Authentication\LegacyAuth::get()->canUpdatePasswords())
-    <div class="form-group @if($errors->has('can_modify_passwd')) has-error @endif">
-        <div class="col-sm-9 col-sm-offset-3">
-            <div class="checkbox">
-                <label class="checkbox-inline">
-                    <input type="hidden" value="0" name="can_modify_passwd">
-                    <input type="checkbox" id="can_modify_passwd" name="can_modify_passwd" @if(old('can_modify_passwd', $user->can_modify_passwd)) checked @endif> @lang('Can Modify Password')
-                </label>
-            </div>
-            <span class="help-block">{{ $errors->first('can_modify_passwd') }}</span>
-        </div>
+<div class="form-group @if($errors->has('can_modify_passwd')) has-error @endif">
+    <label for="can_modify_passwd" class="control-label col-sm-3">@lang('Can Modify Password')</label>
+    <div class="col-sm-9">
+        <input type="hidden" value="0" name="can_modify_passwd">
+        <input type="checkbox" id="can_modify_passwd" name="can_modify_passwd" data-size="small" @if(old('can_modify_passwd', $user->can_modify_passwd)) checked @endif>
+        <span class="help-block">{{ $errors->first('can_modify_passwd') }}</span>
     </div>
+</div>
 @endif
+
+<script>
+$("[type='checkbox']").bootstrapSwitch();
+</script>

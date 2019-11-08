@@ -13,7 +13,7 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $primaryKey = 'user_id';
-    protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id'];
+    protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
     protected $hidden = ['password', 'remember_token', 'pivot'];
     protected $attributes = [ // default values
         'descr' => '',
@@ -156,6 +156,11 @@ class User extends Authenticatable
     public function setCanModifyPasswdAttribute($modify)
     {
         $this->attributes['can_modify_passwd'] = $modify ? 1 : 0;
+    }
+
+    public function setEnabledAttribute($enable)
+    {
+        $this->attributes['enabled'] = $enable ? 1 : 0;
     }
 
     // ---- Define Relationships ----
