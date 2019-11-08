@@ -361,6 +361,11 @@ class Device extends BaseModel
         }
     }
 
+    public function getAttribs()
+    {
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
+    }
+
     // ---- Accessors/Mutators ----
 
     public function getIconAttribute($icon)

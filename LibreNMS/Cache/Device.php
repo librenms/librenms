@@ -25,8 +25,6 @@
 
 namespace LibreNMS\Cache;
 
-use DB;
-
 class Device
 {
     private $devices = [];
