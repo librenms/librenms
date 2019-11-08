@@ -16,6 +16,7 @@
  * the source code distribution for details.
  */
 
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Git;
@@ -239,23 +240,6 @@ function get_port_by_ifIndex($device_id, $ifIndex)
     return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device_id, $ifIndex));
 }
 
-function get_all_devices()
-{
-    global $cache;
-    $devices = array();
-
-    // FIXME needs access control checks!
-    // FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
-
-    if (isset($cache['devices']['hostname'])) {
-        $devices = array_keys($cache['devices']);
-    } else {
-        $devices = dbFetchRows("SELECT * FROM `devices` ORDER BY hostname");
-    }
-
-    return $devices;
-}
-
 function table_from_entity_type($type)
 {
     // Fuck you, english pluralisation.
@@ -347,10 +331,9 @@ function ifclass($ifOperStatus, $ifAdminStatus)
     return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
 }
 
-function device_by_name($name, $refresh = 0)
+function device_by_name($name)
 {
-    // FIXME - cache name > id too.
-    return device_by_id_cache(getidbyname($name), $refresh);
+    return device_by_id_cache(getidbyname($name));
 }
 
 
@@ -365,29 +348,14 @@ function accesspoint_by_id($ap_id, $refresh = '0')
 
 function device_by_id_cache($device_id, $refresh = false)
 {
-    global $cache;
+    $model = $refresh ? DeviceCache::refresh($device_id) : DeviceCache::get($device_id);
+    $device = $model->toArray();
+    $device['location'] = $model->location->location;
+    $device['lat'] = $model->location->lat;
+    $device['lng'] = $model->location->lng;
+    $device['attribs'] = $model->getAttribs();
+    $device['vrf_lite_cisco'] = $model->vrfLites->keyBy('context_name')->toArray();
 
-    if (!$refresh && isset($cache['devices']['id'][$device_id]) && is_array($cache['devices']['id'][$device_id])) {
-        $device = $cache['devices']['id'][$device_id];
-    } else {
-        $device = dbFetchRow("SELECT `devices`.*, `location`, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.location_id=`locations`.`id` WHERE `device_id` = ?", [$device_id]);
-        $device['attribs'] = get_dev_attribs($device['device_id']);
-        load_os($device);
-
-        //order vrf_lite_cisco with context, this will help to get the vrf_name and instance_name all the time
-        $vrfs_lite_cisco = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ?", array($device_id));
-        if (!empty($vrfs_lite_cisco)) {
-            $device['vrf_lite_cisco'] = array();
-            foreach ($vrfs_lite_cisco as $vrf) {
-                $device['vrf_lite_cisco'][$vrf['context_name']] = $vrf;
-            }
-        }
-
-        if (!empty($device['ip'])) {
-            $device['ip'] = inet6_ntop($device['ip']);
-        }
-        $cache['devices']['id'][$device_id] = $device;
-    }
     return $device;
 }
 
@@ -419,17 +387,9 @@ function getifhost($id)
     return dbFetchCell("SELECT `device_id` from `ports` WHERE `port_id` = ?", array($id));
 }
 
-function gethostbyid($id)
+function gethostbyid($device_id)
 {
-    global $cache;
-
-    if (isset($cache['devices']['id'][$id]['hostname'])) {
-        $hostname = $cache['devices']['id'][$id]['hostname'];
-    } else {
-        $hostname = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
-    }
-
-    return $hostname;
+    return DeviceCache::get($device_id)->hostname;
 }
 
 function strgen($length = 16)
@@ -470,28 +430,13 @@ function getifdescrbyid($id)
 
 function getidbyname($hostname)
 {
-    global $cache;
+    $device_id = collect(DeviceCache::all())->pluck('device_id', 'hostname')->get($hostname);
 
-    if (isset($cache['devices']['hostname'][$hostname])) {
-        $id = $cache['devices']['hostname'][$hostname];
-    } else {
-        $id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", array($hostname));
+    if ($device_id === null) {
+        return Device::query()->where('hostname', $hostname)->value('device_id');
     }
 
-    return $id;
-}
-
-function gethostosbyid($id)
-{
-    global $cache;
-
-    if (isset($cache['devices']['id'][$id]['os'])) {
-        $os = $cache['devices']['id'][$id]['os'];
-    } else {
-        $os = dbFetchCell("SELECT `os` FROM `devices` WHERE `device_id` = ?", array($id));
-    }
-
-    return $os;
+    return $device_id;
 }
 
 function safename($name)

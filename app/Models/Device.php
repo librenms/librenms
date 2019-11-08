@@ -337,15 +337,20 @@ class Device extends BaseModel
 
     public function getAttrib($name)
     {
-        return $this->attribs->where('attrib_type', $name)->pluck('attrib_value')->first();
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name);
     }
 
     public function setAttrib($name, $value)
     {
-        if (!($attrib = $this->attribs->where('attrib_type', $name)->first())) {
+        $attrib = $this->attribs->first(function ($item) use ($name) {
+            return $item->attrib_type === $name;
+        });
+
+        if (!$attrib) {
             $attrib = new DeviceAttrib(['attrib_type' => $name]);
             $this->attribs->push($attrib);
         }
+
         $attrib->attrib_value = $value;
         return (bool)$this->attribs()->save($attrib);
     }

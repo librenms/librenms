@@ -30,7 +30,7 @@ class Device
     private $devices = [];
     private $primary;
 
-    public function getPrimary() : \App\Models\Device
+    public function getPrimary(): \App\Models\Device
     {
         return self::get($this->primary);
     }
@@ -40,13 +40,24 @@ class Device
         $this->primary = $device_id;
     }
 
-    public function get(int $device_id) : \App\Models\Device
+    public function get(int $device_id): \App\Models\Device
     {
         if (!array_key_exists($device_id, $this->devices)) {
             self::load($device_id);
         }
 
         return $this->devices[$device_id];
+    }
+
+    public function refresh(int $device_id) : \App\Models\Device
+    {
+        unset($this->devices[$device_id]);
+        return self::get($device_id);
+    }
+
+    public function all() : array
+    {
+        return $this->devices;
     }
 
     private function load(int $device_id)
