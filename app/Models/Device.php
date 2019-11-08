@@ -347,7 +347,7 @@ class Device extends BaseModel
             $this->attribs->push($attrib);
         }
         $attrib->attrib_value = $value;
-        $this->attribs()->save($attrib);
+        return (bool)$this->attribs()->save($attrib);
     }
 
     public function forgetAttrib($name)
@@ -355,10 +355,13 @@ class Device extends BaseModel
         $attrib_index = $this->attribs->search(function ($attrib) use ($name) {
             return $attrib->attrib_type === $name;
         });
+
         if ($attrib_index !== false) {
-            $this->attribs->get($attrib_index)->delete();
             $this->attribs->forget($attrib_index);
+            return (bool)$this->attribs->get($attrib_index)->delete();
         }
+
+        return false;
     }
 
     public function getAttribs()

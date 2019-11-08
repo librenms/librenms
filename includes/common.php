@@ -516,21 +516,12 @@ function zeropad($num, $length = 2)
 
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
-    if (dbFetchCell("SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?", array($device['device_id'],$attrib_type))) {
-        $return = dbUpdate(array('attrib_value' => $attrib_value), 'devices_attribs', 'device_id=? and attrib_type=?', array($device['device_id'], $attrib_type));
-    } else {
-        $return = dbInsert(array('device_id' => $device['device_id'], 'attrib_type' => $attrib_type, 'attrib_value' => $attrib_value), 'devices_attribs');
-    }
-    return $return;
+    return DeviceCache::get($device['device_id'])->setAttrib($attrib_type, $attrib_value);
 }
 
-function get_dev_attribs($device)
+function get_dev_attribs($device_id)
 {
-    $attribs = array();
-    foreach (dbFetchRows("SELECT * FROM devices_attribs WHERE `device_id` = ?", array($device)) as $entry) {
-        $attribs[$entry['attrib_type']] = $entry['attrib_value'];
-    }
-    return $attribs;
+    return DeviceCache::get($device_id)->getAttribs();
 }
 
 function get_dev_entity_state($device)
@@ -543,36 +534,14 @@ function get_dev_entity_state($device)
     return $state;
 }
 
-function get_dev_attrib($device, $attrib_type, $attrib_value = '')
+function get_dev_attrib($device, $attrib_type)
 {
-    $sql = '';
-    $params = array($device['device_id'], $attrib_type);
-    if (!empty($attrib_value)) {
-        $sql = " AND `attrib_value`=?";
-        array_push($params, $attrib_value);
-    }
-    if ($row = dbFetchRow("SELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ? $sql", $params)) {
-        return $row['attrib_value'];
-    } else {
-        return null;
-    }
-}
-
-function is_dev_attrib_enabled($device, $attrib, $default = true)
-{
-    $val = get_dev_attrib($device, $attrib);
-    if ($val != null) {
-        // attribute is set
-        return ($val != 0);
-    } else {
-        // attribute not set
-        return $default;
-    }
+    return DeviceCache::get($device['device_id'])->getAttrib($attrib_type);
 }
 
 function del_dev_attrib($device, $attrib_type)
 {
-    return dbDelete('devices_attribs', "`device_id` = ? AND `attrib_type` = ?", array($device['device_id'], $attrib_type));
+    return DeviceCache::get($device['device_id'])->forgetAttrib($attrib_type);
 }
 
 function formatRates($value, $round = '2', $sf = '3')
