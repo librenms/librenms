@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "64d21ebc508842b15a10ebbf99b6dc8e",
+    "content-hash": "7eacde667faf1dd423a5af1b8ae561a3",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -1558,16 +1558,16 @@
         },
         {
             "name": "martinlindhe/laravel-vue-i18n-generator",
-            "version": "0.1.40",
+            "version": "0.1.42",
             "source": {
                 "type": "git",
                 "url": "https://github.com/martinlindhe/laravel-vue-i18n-generator.git",
-                "reference": "0da6b5b7782bf0a79e47f6c02d39115550638e1e"
+                "reference": "f546c3f520d085f508b73933000da95ad528e1f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/martinlindhe/laravel-vue-i18n-generator/zipball/0da6b5b7782bf0a79e47f6c02d39115550638e1e",
-                "reference": "0da6b5b7782bf0a79e47f6c02d39115550638e1e",
+                "url": "https://api.github.com/repos/martinlindhe/laravel-vue-i18n-generator/zipball/f546c3f520d085f508b73933000da95ad528e1f1",
+                "reference": "f546c3f520d085f508b73933000da95ad528e1f1",
                 "shasum": ""
             },
             "require": {
@@ -1607,7 +1607,7 @@
                 "laravel",
                 "vue-i18n"
             ],
-            "time": "2019-09-03T16:59:43+00:00"
+            "time": "2019-10-22T05:26:37+00:00"
         },
         {
             "name": "monolog/monolog",
