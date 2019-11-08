@@ -1009,11 +1009,7 @@
             "group": "alerting",
             "section": "email",
             "order": 10,
-            "type": "select",
-            "options": {
-                "true": "Yes",
-                "false": "No"
-            },
+            "type": "boolean",
             "when": {
                 "setting": "email_backend",
                 "operator": "equals",
@@ -1092,9 +1088,18 @@
             "order": 13,
             "type": "password",
             "when": {
-                "setting": "email_backend",
-                "operator": "equals",
-                "value": "smtp"
+                "and" : [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_auth",
+                        "operator": "equals",
+                        "value": true
+                    }
+                ]
             }
         },
         "email_smtp_port": {
@@ -1110,7 +1115,7 @@
             }
         },
         "email_smtp_secure": {
-            "default": false,
+            "default": "",
             "group": "alerting",
             "section": "email",
             "order": 9,
@@ -1145,9 +1150,18 @@
             "order": 12,
             "type": "text",
             "when": {
-                "setting": "email_backend",
-                "operator": "equals",
-                "value": "smtp"
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_auth",
+                        "operator": "equals",
+                        "value": true
+                    }
+                ]
             }
         },
         "email_user": {

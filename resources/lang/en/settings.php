@@ -336,11 +336,8 @@ return [
             'help' => 'The port for the memcached server. Default is 11211'
         ],
         'email_auto_tls' => [
-            'description' => 'Enable / disable Auto TLS support',
-            'options' => [
-                'true' => 'Yes',
-                'false' => 'No'
-            ]
+            'description' => 'Auto TLS support',
+            'help' => 'Tries to use TLS before falling back to un-encrypted'
         ],
         'email_backend' => [
             'description' => 'How to deliver mail',
@@ -360,13 +357,15 @@ return [
             'help' => 'Send HTML emails'
         ],
         'email_sendmail_path' => [
-            'description' => 'Location of sendmail if using this option'
+            'description' => 'Path to sendmail binary'
         ],
         'email_smtp_auth' => [
-            'description' => 'Enable / disable smtp authentication'
+            'description' => 'SMTP authentication',
+            'help' => 'Enable this if your SMTP server requires authentication'
         ],
         'email_smtp_host' => [
-            'description' => 'SMTP Host for sending email if using this option'
+            'description' => 'SMTP Server',
+            'help' => 'IP or dns name for the SMTP server to deliver mail to'
         ],
         'email_smtp_password' => [
             'description' => 'SMTP Auth password'
@@ -375,7 +374,7 @@ return [
             'description' => 'SMTP port setting'
         ],
         'email_smtp_secure' => [
-            'description' => 'Enable / disable encryption (use tls or ssl)',
+            'description' => 'Encryption',
             'options' => [
                 '' => 'Disabled',
                 'tls' => 'TLS',
