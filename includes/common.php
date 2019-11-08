@@ -348,13 +348,16 @@ function accesspoint_by_id($ap_id, $refresh = '0')
 
 function device_by_id_cache($device_id, $refresh = false)
 {
+    $device = [];
     $model = $refresh ? DeviceCache::refresh($device_id) : DeviceCache::get($device_id);
-    $device = $model->toArray();
-    $device['location'] = $model->location->location;
-    $device['lat'] = $model->location->lat;
-    $device['lng'] = $model->location->lng;
-    $device['attribs'] = $model->getAttribs();
-    $device['vrf_lite_cisco'] = $model->vrfLites->keyBy('context_name')->toArray();
+    if ($model) {
+        $device = $model->toArray();
+        $device['location'] = $model->location->location;
+        $device['lat'] = $model->location->lat;
+        $device['lng'] = $model->location->lng;
+        $device['attribs'] = $model->getAttribs();
+        $device['vrf_lite_cisco'] = $model->vrfLites->keyBy('context_name')->toArray();
+    }
 
     return $device;
 }
@@ -430,13 +433,8 @@ function getifdescrbyid($id)
 
 function getidbyname($hostname)
 {
-    $device_id = collect(DeviceCache::all())->pluck('device_id', 'hostname')->get($hostname);
-
-    if ($device_id === null) {
-        return Device::query()->where('hostname', $hostname)->value('device_id');
-    }
-
-    return $device_id;
+    $device = DeviceCache::getByHostname($hostname);
+    return $device ? $device->device_id : null;
 }
 
 function safename($name)

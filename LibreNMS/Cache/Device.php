@@ -30,41 +30,80 @@ class Device
     private $devices = [];
     private $primary;
 
-    public function getPrimary(): \App\Models\Device
+    /**
+     * Gets the current primary device.
+     *
+     * @return \App\Models\Device|null
+     */
+    public function getPrimary()
     {
         return self::get($this->primary);
     }
 
-    public function setPrimary(int $device_id)
+    /**
+     * Set the primary device.
+     * This will be fetched by getPrimary()
+     *
+     * @param int $device_id
+     */
+    public function setPrimary($device_id)
     {
         $this->primary = $device_id;
     }
 
-    public function get(int $device_id): \App\Models\Device
+    /**
+     * Get a device by device_id
+     *
+     * @param int $device_id
+     * @return \App\Models\Device|null
+     */
+    public function get($device_id)
     {
         if (!array_key_exists($device_id, $this->devices)) {
-            self::load($device_id);
+            return self::load($device_id);
         }
 
         return $this->devices[$device_id];
     }
 
-    public function refresh(int $device_id) : \App\Models\Device
+    /**
+     * Get a device by hostname
+     *
+     * @param string $hostname
+     * @return \App\Models\Device|null
+     */
+    public function getByHostname($hostname)
+    {
+        $device_id = $device_id = collect($this->devices)->pluck('device_id', 'hostname')->get($hostname);
+
+        if (!$device_id) {
+            return $this->load($hostname, 'hostname');
+        }
+
+        return $this->devices[$device_id];
+    }
+
+    /**
+     * Ignore cache and load the device fresh from the database
+     *
+     * @param int $device_id
+     * @return \App\Models\Device|null
+     */
+    public function refresh($device_id)
     {
         unset($this->devices[$device_id]);
         return self::get($device_id);
     }
 
-    public function all() : array
+    private function load($value, $field = 'device_id')
     {
-        return $this->devices;
-    }
+        $device = \App\Models\Device::query()->where($field, $value)->first();
 
-    private function load(int $device_id)
-    {
-        $device = \App\Models\Device::find($device_id);
-        $device->loadOs();
+        if ($device) {
+            $device->loadOs();
+            $this->devices[$device->device_id] = $device;
+        }
 
-        $this->devices[$device_id] = $device;
+        return $device;
     }
 }
