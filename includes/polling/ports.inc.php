@@ -766,7 +766,7 @@ foreach ($ports as $port) {
         if (!empty($port['skipped'])) {
             // We don't care about statistics for skipped selective polling ports
             echo " $port_id skipped because selective polling ports is set.";
-        } elif ($port['ifOperStatus'] == "down" && $port['ifOperStatus_prev'] == "down" && $this_port['ifOperStatus'] == "down" && $this_port['ifLastChange'] == $port['ifLastChange'])) {
+        } elseif ($port['ifOperStatus'] == "down" && $port['ifOperStatus_prev'] == "down" && $this_port['ifOperStatus'] == "down" && $this_port['ifLastChange'] == $port['ifLastChange']) {
             // We don't care about statistics for down ports on which states did not change since last polling
             echo " $port_id skipped because port is still down since last polling.";
         } else {
