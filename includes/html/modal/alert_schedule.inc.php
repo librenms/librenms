@@ -48,7 +48,7 @@ if (\Auth::user()->hasGlobalAdmin()) {
                     <div class="form-group">
                         <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong>: </label>
                         <div class="col-sm-8">
-                            <input type="checkbox" id="recurring" name="recurring" data-size="small" data-on-text="Yes" data-off-text="No" onChange="recurring_switch();"/>
+                            <input type="checkbox" id="recurring" name="recurring" data-size="small" data-on-text="Yes" data-off-text="No" onChange="recurring_switch();" value=0 />
                         </div>
                     </div>
                     <div id="norecurringgroup">
@@ -139,6 +139,8 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#start_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
     $('#end_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
     $('#recurring_day').prop('checked', false);
+    $("#recurring").bootstrapSwitch('state', false);
+    $('#recurring').val(0);
     $('#norecurringgroup').show();
     $('#recurringgroup').hide();
     $('#schedulemodal-alert').remove();
@@ -183,6 +185,8 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     $('#start_recurring_hr').val('');
                     $('#end_recurring_hr').val('');
                     $('#recurring_day').prop('checked', false);
+                    $("#recurring").bootstrapSwitch('state', false);
+                    $('#recurring').val(0);
                 }else{
                     var start_recurring_dt = $('#start_recurring_dt').data("DateTimePicker");
                     if (output['start_recurring_dt']) {
@@ -198,6 +202,8 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     start_recurring_hr.date(output['start_recurring_hr']);
                     $('#end_recurring_hr').data("DateTimePicker").date(output['end_recurring_hr']);
 
+                    $("#recurring").bootstrapSwitch('state', true);
+                    $('#recurring').val(1);
                     var recdayupd = output['recurring_day'];
                     if (recdayupd){
                         var arrayrecdayupd = recdayupd.split(',');
@@ -224,9 +230,11 @@ function recurring_switch() {
     if (document.getElementById("recurring").checked){
         $('#norecurringgroup').hide();
         $('#recurringgroup').show();
+        $('#recurring').val(1);
     }else{
         $('#norecurringgroup').show();
         $('#recurringgroup').hide();
+        $('#recurring').val(0);
     }
 };
 
