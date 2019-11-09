@@ -21,8 +21,7 @@ The config definition system inherently supports translation. You must add the E
 
 To update the javascript translation files, run:
 
-    ./lnms vue-i18n:generate --multi-locales --format=umd
-    npm run production
+    ./lnms translation:generate
 
 # Definition Format
 

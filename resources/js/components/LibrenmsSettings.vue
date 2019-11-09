@@ -27,7 +27,7 @@
         <template v-slot:header>
             <form class="form-inline" @submit.prevent>
                 <div class="input-group">
-                    <input id="settings-search" type="search" class="form-control" placeholder="Filter Settings" v-model.trim="search_phrase">
+                    <input id="settings-search" type="search" class="form-control" :placeholder="$t('Filter Settings')" v-model.trim="search_phrase">
                 </div>
             </form>
         </template>
