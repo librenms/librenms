@@ -465,7 +465,7 @@
                 @csrf
                 <div class="form-group">
                     <input class="form-control typeahead" type="search" id="gsearch" name="gsearch"
-                           placeholder="Global Search" autocomplete="off">
+                           placeholder="@lang('Global Search')" autocomplete="off">
                 </div>
             </form>
             <ul class="nav navbar-nav navbar-right">
