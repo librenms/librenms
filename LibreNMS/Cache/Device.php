@@ -95,6 +95,14 @@ class Device
         return self::get($device_id);
     }
 
+    /**
+     * Flush the cache
+     */
+    public function flush()
+    {
+        $this->devices = [];
+    }
+
     private function load($value, $field = 'device_id')
     {
         $device = \App\Models\Device::query()->where($field, $value)->first();
