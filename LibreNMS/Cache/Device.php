@@ -33,9 +33,9 @@ class Device
     /**
      * Gets the current primary device.
      *
-     * @return \App\Models\Device|null
+     * @return \App\Models\Device
      */
-    public function getPrimary()
+    public function getPrimary() : \App\Models\Device
     {
         return self::get($this->primary);
     }
@@ -55,24 +55,24 @@ class Device
      * Get a device by device_id
      *
      * @param int $device_id
-     * @return \App\Models\Device|null
+     * @return \App\Models\Device
      */
-    public function get($device_id)
+    public function get($device_id) : \App\Models\Device
     {
         if (!array_key_exists($device_id, $this->devices)) {
             return self::load($device_id);
         }
 
-        return $this->devices[$device_id];
+        return $this->devices[$device_id] ?: new \App\Models\Device;
     }
 
     /**
      * Get a device by hostname
      *
      * @param string $hostname
-     * @return \App\Models\Device|null
+     * @return \App\Models\Device
      */
-    public function getByHostname($hostname)
+    public function getByHostname($hostname) : \App\Models\Device
     {
         $device_id = $device_id = collect($this->devices)->pluck('device_id', 'hostname')->get($hostname);
 
@@ -80,16 +80,16 @@ class Device
             return $this->load($hostname, 'hostname');
         }
 
-        return $this->devices[$device_id];
+        return $this->devices[$device_id] ?: new \App\Models\Device;
     }
 
     /**
      * Ignore cache and load the device fresh from the database
      *
      * @param int $device_id
-     * @return \App\Models\Device|null
+     * @return \App\Models\Device
      */
-    public function refresh($device_id)
+    public function refresh($device_id) : \App\Models\Device
     {
         unset($this->devices[$device_id]);
         return self::get($device_id);
@@ -99,11 +99,12 @@ class Device
     {
         $device = \App\Models\Device::query()->where($field, $value)->first();
 
-        if ($device) {
-            $device->loadOs();
-            $this->devices[$device->device_id] = $device;
+        if (!$device) {
+            return new \App\Models\Device;
         }
 
+        $device->loadOs();
+        $this->devices[$device->device_id] = $device;
         return $device;
     }
 }
