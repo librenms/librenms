@@ -57,8 +57,11 @@ class UserPreferencesController extends Controller
             'dashboards' => Dashboard::allAvailable($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
-            'locale' => UserPref::getPref($user, 'locale') ?: 'en',
+            'locale' => UserPref::getPref($user, 'locale') ?: Config::get('locale'),
             'locales' => $this->getValidLocales(),
+            'site_style' => UserPref::getPref($user, 'site_style') ?: Config::get('site_style'),
+            'site_styles' => $this->getValidStyles(),
+
         ];
 
         if (Config::get('twofactor')) {
@@ -91,6 +94,10 @@ class UserPreferencesController extends Controller
                 'required',
                 Rule::in(array_keys($this->getValidLocales())),
             ],
+            'site_style' => [
+                'required',
+                Rule::in(array_keys($this->getValidStyles())),
+            ],
         ];
 
         $this->validate($request, [
@@ -102,6 +109,10 @@ class UserPreferencesController extends Controller
 
         if ($request->pref == 'locale') {
             Session::put('locale', $request->value);
+        }
+
+        if ($request->pref == 'site_style') {
+            Session::put('site_style', $request->value);
         }
 
         return response()->json(['status' => 'success']);
@@ -117,5 +128,15 @@ class UserPreferencesController extends Controller
                 return $locales;
             }
         }, []);
+    }
+
+    private function getValidStyles()
+    {
+        $config_data = json_decode(file_get_contents(Config::get('install_dir') . '/misc/config_definitions.json'), true)['config'];
+        $site_styles = $config_data['site_style']['options'];
+
+        asort($site_styles);
+
+        return $site_styles;
     }
 }

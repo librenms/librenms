@@ -40,8 +40,11 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190912" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('css/' . LibreNMS\Config::get('site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190912" rel="stylesheet" type="text/css" />@if(Auth::user())
+    <link href="{{ asset('css/' . App\Models\UserPref::getPref(Auth::user(), 'site_style') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
+    @else
+    <link href="{{ asset('css/' . LibreNMS\Config::get('site_style') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
+    @endif
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
     @endforeach

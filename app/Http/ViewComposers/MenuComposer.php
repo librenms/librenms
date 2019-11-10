@@ -33,6 +33,7 @@ use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
 use App\Models\User;
+use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Auth;
@@ -54,7 +55,8 @@ class MenuComposer
         /** @var User $user */
         $user = Auth::user();
 
-        $vars['navbar'] = in_array(Config::get('site_style'), ['mono', 'dark']) ? 'navbar-inverse' : '';
+        //Todo: should be handled via CSS Themes
+        $vars['navbar'] = in_array(UserPref::getPref($user, 'site_style'), ['mono', 'dark']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $site_style = Config::get('site_style', 'light');

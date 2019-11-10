@@ -69,6 +69,16 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="site_style" class="col-sm-4 control-label">@lang('CSS Style')</label>
+                    <div class="col-sm-4">
+                        <select class="form-control ajax-select" name="site_style" data-pref="site_style" data-previous="{{ $site_style }}">
+                            @foreach($site_styles as $site_style => $descr)
+                                <option value="{{ $site_style }}" @if($site_style == App\Models\UserPref::getPref(Auth::user(), 'site_style')) selected @endif>{{ $descr }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="locale" class="col-sm-4 control-label">@lang('Language')</label>
                     <div class="col-sm-4">
                         <select class="form-control ajax-select" name="locale" data-pref="locale" data-previous="{{ $locale }}">
@@ -216,6 +226,9 @@
                 },
                 success: function () {
                     if (pref === 'locale') {
+                        location.reload();
+                    }
+                    if (pref === 'site_style') {
                         location.reload();
                     }
 
