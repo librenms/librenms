@@ -74,7 +74,7 @@ class Device
      */
     public function getByHostname($hostname) : \App\Models\Device
     {
-        $device_id = $device_id = collect($this->devices)->pluck('device_id', 'hostname')->get($hostname);
+        $device_id = collect($this->devices)->pluck('device_id', 'hostname')->get($hostname);
 
         if (!$device_id) {
             return $this->load($hostname, 'hostname');
