@@ -9,7 +9,13 @@ $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width']  = '400';
 $graph_array['legend']      = 'no';
 
-$app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ? ORDER BY hostname', array($vars['app']));
+
+$device_filter = '';
+if ( ! Auth::user()->hasGlobalRead()) {
+    $device_filter = "D.device_id in (SELECT device_id from `devices_perms` where user_id=" . Auth::id() . ")";
+    $device_filter .= ' and ';
+}
+$app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE ' . $device_filter . ' D.device_id = A.device_id AND A.app_type = ? order by D.hostname', array($vars['app']));
 
 foreach ($app_devices as $app_device) {
     echo '<div class="panel panel-default">
