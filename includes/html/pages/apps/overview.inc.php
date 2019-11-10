@@ -14,7 +14,7 @@ foreach ($apps as $app) {
     echo '<h2>'.generate_link($app->displayName(), array('page' => 'apps', 'app' => $app->app_type)).'</h2>';
 
     $device_filter = '';
-    if ( ! Auth::user()->hasGlobalRead()) {
+    if (! Auth::user()->hasGlobalRead()) {
         $device_filter = "D.device_id in (SELECT device_id from `devices_perms` where user_id=" . Auth::id() . ")";
         $device_filter .= ' and ';
     }

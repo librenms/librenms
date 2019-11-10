@@ -11,7 +11,7 @@ $graph_array['legend']      = 'no';
 
 
 $device_filter = '';
-if ( ! Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_filter = "D.device_id in (SELECT device_id from `devices_perms` where user_id=" . Auth::id() . ")";
     $device_filter .= ' and ';
 }
