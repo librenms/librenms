@@ -132,8 +132,7 @@ class UserPreferencesController extends Controller
 
     private function getValidStyles()
     {
-        $config_data = json_decode(file_get_contents(Config::get('install_dir') . '/misc/config_definitions.json'), true)['config'];
-        $site_styles = $config_data['site_style']['options'];
+        $site_styles = Config::getDefinitions()['site_style']['options'];
 
         asort($site_styles);
 
