@@ -14,11 +14,11 @@ foreach ($apps as $app) {
     echo '<h2>'.generate_link($app->displayName(), array('page' => 'apps', 'app' => $app->app_type)).'</h2>';
 
     $device_filter = '';
-    if (! Auth::user()->hasGlobalRead()) {
-        $device_filter = "D.device_id in (SELECT device_id from `devices_perms` where user_id=" . Auth::id() . ")";
-        $device_filter .= ' and ';
+    if ( ! Auth::user()->hasGlobalRead()) {
+        $device_ids = Permissions::devicesForUser()->implode(',');
+        $device_filter = "`D`.`device_id` IN ($device_ids) AND ";
     }
-    $app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE ' . $device_filter . ' D.device_id = A.device_id AND A.app_type = ? order by D.hostname', array($app->app_type));
+    $app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE ' . $device_filter . 'D.device_id = A.device_id AND A.app_type = ? order by D.hostname', array($app->app_type));
 
     foreach ($app_devices as $app_device) {
         $graph_type = $graphs[$app->app_type][0];

@@ -11,11 +11,11 @@ $graph_array['legend']      = 'no';
 
 
 $device_filter = '';
-if (! Auth::user()->hasGlobalRead()) {
-    $device_filter = "D.device_id in (SELECT device_id from `devices_perms` where user_id=" . Auth::id() . ")";
-    $device_filter .= ' and ';
+if ( ! Auth::user()->hasGlobalRead()) {
+    $device_ids = Permissions::devicesForUser()->implode(',');
+    $device_filter = "`D`.`device_id` IN ($device_ids) AND ";
 }
-$app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE ' . $device_filter . ' D.device_id = A.device_id AND A.app_type = ? order by D.hostname', array($vars['app']));
+$app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE ' . $device_filter . 'D.device_id = A.device_id AND A.app_type = ? order by D.hostname', array($vars['app']));
 
 foreach ($app_devices as $app_device) {
     echo '<div class="panel panel-default">
