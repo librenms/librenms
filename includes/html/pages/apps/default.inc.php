@@ -11,7 +11,7 @@ $graph_array['legend']      = 'no';
 
 
 $device_filter = '';
-if ( ! Auth::user()->hasGlobalRead()) {
+if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->implode(',');
     $device_filter = "`D`.`device_id` IN ($device_ids) AND ";
 }
