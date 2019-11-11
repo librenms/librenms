@@ -1117,6 +1117,7 @@ function port_fill_missing(&$port, $device)
         $port['ifAlias'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifAlias');
     }
+
     if ($port['ifName'] == '' || $port['ifName'] == null) {
         $port['ifName'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifName');
