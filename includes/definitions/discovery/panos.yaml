@@ -37,13 +37,20 @@ modules:
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.{{ $index }}'
                     group: Sessions
                     descr: Active Sessions
-                    high_limit: panSessionMax
-        count:
-            data:
+                    # high_limit: panSessionMax
+            
                 -
                    oid: panVsysEntry
                    value: panVsysActiveSessions
-                   num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.4.{{ $index }}'
+                   num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.{{ $index }}'
                    group: Sessions per seconds
                    descr: Active sessions per second
-                   high_limit: panSessionMax
+                   # high_limit: panVsysMaxActiveSessions
+
+                -
+                  oid: PanZoneTable
+                  value: panZoneName
+                  num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.10.{{ $index }}'
+                  group: Sessions per Zone
+                  descr: panZoneName
+
