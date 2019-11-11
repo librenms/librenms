@@ -2,9 +2,9 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-//$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0'], '-OQUs', 'PAN-COMMON-MIB');
+$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0'], '-OQUs', 'PAN-COMMON-MIB');
 
-$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0','panVsysActiveSessions.0', 'panVsysMaxSessions.0', 'panVsysActiveTcpCps.0', 'panVsysActiveUdpCps.0', 'panVsysOtherIpCps.0'], '-OQUs', 'PAN-COMMON-MIB');
+//$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0','panVsysActiveSessions.0', 'panVsysMaxSessions.0', 'panVsysActiveTcpCps.0', 'panVsysActiveUdpCps.0', 'panVsysOtherIpCps.0'], '-OQUs', 'PAN-COMMON-MIB');
 
 
 $hardware = $oids[0]['panChassisType'];
