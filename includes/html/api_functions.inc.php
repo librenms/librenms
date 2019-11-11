@@ -2019,9 +2019,11 @@ function list_arp(\Illuminate\Http\Request $request)
         } catch (InvalidIpException $e) {
             return api_error(400, "Invalid Network Address");
         }
+    } elseif (filter_var($ip, FILTER_VALIDATE_MAC)) {
+        $mac = \LibreNMS\Util\Rewrite::macToHex($ip);
+        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `mac_address`=?", [$mac]);
     } else {
-        $field = filter_var($ip, FILTER_VALIDATE_MAC) ? 'mac_address' : 'ipv4_address';
-        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `$field`=?", [$ip]);
+        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", [$ip]);
     }
     return api_success($arp, 'arp');
 }
