@@ -2,9 +2,9 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0'], '-OQUs', 'PAN-COMMON-MIB');
 
-//$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0','panVsysActiveSessions.0', 'panVsysMaxSessions.0', 'panVsysActiveTcpCps.0', 'panVsysActiveUdpCps.0', 'panVsysOtherIpCps.0'], '-OQUs', 'PAN-COMMON-MIB');
+// changed by joovoo
+$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0','panVsysActiveSessions.0' ], '-OQUs', 'PAN-COMMON-MIB');
 
 
 $hardware = $oids[0]['panChassisType'];
@@ -17,6 +17,9 @@ $sessions_icmp = $oids[0]['panSessionActiveICMP'];
 $sessions_ssl = $oids[0]['panSessionActiveSslProxy'];
 $sessions_sslutil = $oids[0]['panSessionSslProxyUtilization'];
 $activetunnels = $oids[0]['panGPGWUtilizationActiveTunnels'];
+// added by joovoo
+$vsysactivesessions = $oids [0]['panVsysActiveSessions'];
+
 
 if (is_numeric($sessions)) {
     $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
@@ -108,3 +111,19 @@ if (is_numeric($activetunnels)) {
 
     $graphs['panos_activetunnels'] = true;
 }
+
+
+// added by joovoo
+if (is_numeric($panVsysActiveSessions)) {
+    $rrd_def = RrdDefinition::make()->addDataset('panVsysActiveSessions', 'GAUGE', 0, 3000000);
+
+    $fields = array(
+        'panVsysActiveSessions' => $panVsysActiveSessions,
+    );
+
+    $tags = compact('rrd_def');
+    data_update($device, 'panos-panVsysActiveSessions', $tags, $fields);
+
+    $graphs['panos_panVsysActiveSessions'] = true;
+}
+
