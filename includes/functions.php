@@ -1113,11 +1113,9 @@ function port_fill_missing(&$port, $device)
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
         d_echo(' ifAlias overriden by user');
-    } elseif ($device['os'] != 'fabos') {
-        if ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
-            $port['ifAlias'] = $port['ifDescr'];
-            d_echo(' Using ifDescr as ifAlias');
-        }
+    } elseif ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
+        $port['ifAlias'] = $port['ifDescr'];
+        d_echo(' Using ifDescr as ifAlias');
     }
     if ($port['ifName'] == '' || $port['ifName'] == null) {
         $port['ifName'] = $port['ifDescr'];
