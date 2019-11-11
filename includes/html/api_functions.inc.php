@@ -2001,7 +2001,7 @@ function list_arp(\Illuminate\Http\Request $request)
     $hostname = $request->get('device');
 
     if (empty($ip)) {
-        return api_error(400, "No valid IP provided");
+        return api_error(400, "No valid IP/MAC provided");
     } elseif ($ip === "all" && empty($hostname)) {
         return api_error(400, "Device argument is required when requesting all entries");
     }
@@ -2020,7 +2020,8 @@ function list_arp(\Illuminate\Http\Request $request)
             return api_error(400, "Invalid Network Address");
         }
     } else {
-        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", [$ip]);
+        $field = filter_var($ip, FILTER_VALIDATE_MAC) ? 'mac_address' : 'ipv4_address';
+        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `$field`=?", [$ip]);
     }
     return api_success($arp, 'arp');
 }
