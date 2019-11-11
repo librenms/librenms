@@ -69,7 +69,7 @@ class QueryBuilderFilter implements \JsonSerializable
                 continue; // don't include the time based macros, they don't work like that
             }
 
-            if (ends_with($key, '_usage_perc')) {
+            if ((ends_with($key, '_usage_perc')) || (starts_with($key, 'packet_loss_'))) {
                 $this->filter[$field] = [
                     'id' => $field,
                     'type' => 'integer',
