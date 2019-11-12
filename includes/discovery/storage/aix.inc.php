@@ -28,6 +28,6 @@ if (is_array($aix_filesystem)) {
                 }
             }
         }
-        unset($aix_filesystem, $sql, $tmp_storage, $aix_fs);
+        unset($tmp_storage, $aix_fs);
     } // end foreach
 } // endif

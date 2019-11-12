@@ -43,7 +43,8 @@ if (is_array($hrstorage_array)) {
             continue;
         }
 
-        if ($device['os'] == 'aix') {
+        // Skip hrStorage if aixFsTable is available
+        if ($device['os'] == 'aix' && !empty($aix_filesystem)) {
             continue;
         }
 
