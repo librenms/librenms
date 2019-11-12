@@ -963,7 +963,7 @@ function list_alerts(\Illuminate\Http\Request $request)
             $sql .= ' AND `R`.severity=?';
         }
     }
-    
+
     $order = 'timestamp desc';
 
     if ($request->has('order')) {
@@ -2119,9 +2119,6 @@ function add_service_for_host(\Illuminate\Http\Request $request)
     // Print error if required fields are missing
     if (!empty($missing_fields)) {
         return api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
-    }
-    if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
-        return api_error(400, 'service_ip is not a valid IP address.');
     }
 
     // Check if service type exists
