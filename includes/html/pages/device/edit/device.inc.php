@@ -193,8 +193,11 @@ if ($_POST['editing']) {
     <div class="form-group">
         <label for="ignore" class="col-sm-2 control-label">Ignore alerts:</label>
         <div class="col-sm-6">
-           <input name="ignore" type="checkbox" id="ignore" disabled="<?php echo('$device_model->disable') ?>" value="1" data-size="small"
+           <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
                 <?php
+                if ($device_model->disabled) {
+                    echo("disabled=1");
+                }
                 if ($device_model->ignore) {
                     echo("checked=checked");
                 }
