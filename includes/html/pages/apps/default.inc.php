@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Application;
+use LibreNMS\Util\Url;
+
 $graph_array['height']      = '100';
 $graph_array['width']       = '220';
 $graph_array['to'] = \LibreNMS\Config::get('time.now');
@@ -9,35 +12,31 @@ $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width']  = '400';
 $graph_array['legend']      = 'no';
 
+$apps = Application::query()->hasAccess(Auth::user())->where('app_type', $vars['app'])->with('device')->get()->sortBy(function($app) {
+    return $app->device->hostname;
+});
 
-$device_filter = '';
-if (! Auth::user()->hasGlobalRead()) {
-    $device_ids = Permissions::devicesForUser()->implode(',');
-    $device_filter = "`D`.`device_id` IN ($device_ids) AND ";
-}
-$app_devices = dbFetchRows('SELECT * FROM `devices` AS D, `applications` AS A WHERE ' . $device_filter . 'D.device_id = A.device_id AND A.app_type = ? order by D.hostname', array($vars['app']));
-
-foreach ($app_devices as $app_device) {
+foreach ($apps as $app) {
     echo '<div class="panel panel-default">
         <div class="panel-heading">
         <h3 class="panel-title">
-        '.generate_device_link($app_device, shorthost($app_device['hostname']), array('tab' => 'apps', 'app' => $vars['app'])).'
-        <div class="pull-right"><small class="muted">'.$app_device['app_instance'].' '.$app_device['app_status'].'</small></div>
+        '. Url::deviceLink($app->device, null, ['tab' => 'apps', 'app' => $app->app_type]).'
+        <div class="pull-right"><small class="muted">'.$app->app_instance.' '.$app->app_status.'</small></div>
         </h3>
         </div>
         <div class="panel-body">
         <div class="row">';
 
-    foreach ($graphs[$vars['app']] as $graph_type) {
-        $graph_array['type']      = empty($graph_type) ? 'application_'.$vars['app'] : 'application_'.$vars['app'].'_'.$graph_type;
-        $graph_array['id']        = $app_device['app_id'];
-        $graph_array_zoom['type'] = 'application_'.$vars['app'].'_'.$graph_type;
-        $graph_array_zoom['id']   = $app_device['app_id'];
+    foreach ($graphs[$app->app_type] as $graph_type) {
+        $graph_array['type']      = empty($graph_type) ? 'application_'.$app->app_type : 'application_'.$app->app_type.'_'.$graph_type;
+        $graph_array['id']        = $app->app_id;
+        $graph_array_zoom['type'] = 'application_'.$app->app_type.'_'.$graph_type;
+        $graph_array_zoom['id']   = $app->app_id;
 
-        $link = generate_url(array('page' => 'device', 'device' => $app_device['device_id'], 'tab' => 'apps', 'app' => $vars['app']));
+        $link = Url::generate(['page' => 'device', 'device' => $app->device_id, 'tab' => 'apps', 'app' => $app->app_type]);
 
         echo '<div class="pull-left">';
-        echo overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
+        echo Url::overlibLink($link, Url::lazyGraphTag($graph_array), Url::graphTag($graph_array_zoom), null);
         echo '</div>';
     }
 
