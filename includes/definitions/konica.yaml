@@ -6,6 +6,7 @@ over:
     - { graph: device_toner, text: Toner }
 discovery:
     - sysDescr:
+        - 'KONICA MINOLTA'
         - 'konica minolta'
     - sysObjectID:
         - .1.3.6.1.4.1.18334.1.
