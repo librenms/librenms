@@ -1,3 +1,9 @@
+<div class="row">
+    <div class="alert alert-info text-center" role="alert">
+        Overview pages have changed to a new format, this page will not be converted to the new format and will be removed in the next release (1.59).
+        <br>For more info, see: <a href="https://t.libren.ms/overview">https://t.libren.ms/overview</a>
+    </div>
+</div>
 <table border=0 cellpadding=10 cellspacing=10 width=100%>
   <tr>
     <td colspan=2>

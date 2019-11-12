@@ -36,7 +36,7 @@ Output:
    "alerted": "1",
    "open": "1",
    "timestamp": "2014-12-11 14:40:02"
-  },
+  }]
 }
 ```
 
@@ -140,7 +140,7 @@ Output:
    "alerted": "1",
    "open": "1",
    "timestamp": "2014-12-11 14:40:02"
-  }
+  }]
 }
 ```
 
@@ -247,7 +247,7 @@ Output:
    "extra": "{\"mute\":false,\"count\":\"15\",\"delay\":\"300\",\"invert\":false}",
    "disabled": "0",
    "name": "A test rule"
-  },
+  }]
 }
 ```
 

@@ -9,7 +9,7 @@
                 prefix="{{ url('settings') }}"
                 initial-tab="{{ $active_tab }}"
                 initial-section="{{ $active_section }}"
-                :groups="{{ $groups }}"
+                :tabs="{{ $groups }}"
             ></librenms-settings>
         </div>
     </div>
@@ -21,6 +21,8 @@
 
 @push('scripts')
     @routes
+    <script src="{{ asset(mix('/js/lang/en.js')) }}"></script>
+    <script src="{{ asset(mix('/js/lang/' . app()->getLocale() . '.js')) }}"></script>
     <script src="{{ asset(mix('/js/manifest.js')) }}"></script>
     <script src="{{ asset(mix('/js/vendor.js')) }}"></script>
     <script src="{{ asset(mix('/js/app.js')) }}"></script>

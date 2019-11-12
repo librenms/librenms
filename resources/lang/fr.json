@@ -55,7 +55,7 @@
   "New Device Group": "Nouveau groupe de périphérique",
   "Pattern": "Modèle",
   "Type": "Type",
-  "Name": "Prénom", 
+  "Name": "Prénom",
   "User Preferences": "Préférences de l'utilisateur",
   "Global Administrative Access": "Accès administratif global",
   "Device Permissions": "Autorisations de périphérique",
@@ -117,6 +117,7 @@
   "My Settings": "Mes Paramètres",
   "Settings": "Paramètres",
   "Global Settings": "Paramètres globaux",
+  "Global Search": "Recherché globaux",
   "Validate Config": "Valider la configuration",
   "Auth History": "Historique d'authentification",
   "Peering": "Peering",
@@ -361,7 +362,6 @@
   "All Ports": "Tous les ports",
   "Total": "Total",
   "Ignored": "Ignoré",
-  "Disabled": "Désactiver",
   "Errored": "Erreurs",
   "Services": "Services",
   "No devices found within interval.": "Aucun appareil découvert dans l’intervalle.",
@@ -375,5 +375,6 @@
   "Pollers": "Sondeurs",
   "Groups": "Groupes",
   "Performance": "Performance",
-  "History": "Historique"
+  "History": "Historique",
+  "Filter Settings": "Paramètres de filtre"
 }
