@@ -15,7 +15,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->g
     echo '<div style="clear: both;">';
     echo '<h2>'.generate_link($groupedApps->first()->displayName(), array('page' => 'apps', 'app' => $type)).'</h2>';
     /** @var \Illuminate\Support\Collection $groupedApps */
-    $groupedApps = $groupedApps->sortBy(function($app) {
+    $groupedApps = $groupedApps->sortBy(function ($app) {
         return $app->device->hostname;
     });
     /** @var Application $app */
