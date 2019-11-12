@@ -180,9 +180,9 @@ if ($_POST['editing']) {
         </div>
     </div>
     <div class="form-group">
-        <label for="disabled" class="col-sm-2 control-label">Disable:</label>
+        <label for="disabled" class="col-sm-2 control-label">Disable polling:</label>
         <div class="col-sm-6">
-          <input name="disabled" type="checkbox" id="disabled" value="1"
+          <input onclick="edit.ignore.disabled=edit.disabled.checked" name="disabled" type="checkbox" id="disabled" value="1"
                 <?php
                 if ($device_model->disabled) {
                     echo("checked=checked");
@@ -191,7 +191,7 @@ if ($_POST['editing']) {
         </div>
     </div>
     <div class="form-group">
-        <label for="ignore" class="col-sm-2 control-label">Ignore</label>
+        <label for="ignore" class="col-sm-2 control-label">Ignore alerts:</label>
         <div class="col-sm-6">
            <input name="ignore" type="checkbox" id="ignore" value="1"
                 <?php
