@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7eacde667faf1dd423a5af1b8ae561a3",
+    "content-hash": "af1e9508013c6187a1ebaf4beaf59223",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -125,6 +125,58 @@
                 "rfc2869"
             ],
             "time": "2018-04-26T01:55:40+00:00"
+        },
+        {
+            "name": "darkghosthunter/larapoke",
+            "version": "v3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DarkGhostHunter/Larapoke.git",
+                "reference": "308b018001c7ad039a66fb2d4557b29ebe772ea9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DarkGhostHunter/Larapoke/zipball/308b018001c7ad039a66fb2d4557b29ebe772ea9",
+                "reference": "308b018001c7ad039a66fb2d4557b29ebe772ea9",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "5.8.*",
+                "illuminate/routing": "5.8.*",
+                "illuminate/support": "5.8.*",
+                "illuminate/view": "5.8.*",
+                "php": ">=7.1.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "1.2.*",
+                "orchestra/testbench": "3.8.*",
+                "orchestra/testbench-dusk": "3.8.x@dev"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "DarkGhostHunter\\Larapoke\\LarapokeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "DarkGhostHunter\\Larapoke\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Italo Baeza C.",
+                    "email": "DarkGhostHunter@Gmail.com"
+                }
+            ],
+            "description": "Keep your forms alive, avoid TokenMismatchException by gently poking your Laravel app",
+            "time": "2019-03-19T18:55:42+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
