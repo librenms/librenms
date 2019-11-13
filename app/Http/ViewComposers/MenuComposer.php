@@ -56,7 +56,8 @@ class MenuComposer
         $user = Auth::user();
 
         //Todo: should be handled via CSS Themes
-        $vars['navbar'] = in_array(UserPref::getPref($user, 'site_style'), ['mono', 'dark']) ? 'navbar-inverse' : '';
+        $site_style = UserPref::getPref($user, 'site_style')?: Config::get('site_style');
+        $vars['navbar'] = in_array($site_style, ['mono', 'dark']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $site_style = Config::get('site_style', 'light');

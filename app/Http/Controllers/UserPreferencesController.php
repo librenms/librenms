@@ -32,6 +32,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
+use LibreNMS\Util\DynamicConfig;
 use LibreNMS\Config;
 use Session;
 
@@ -57,9 +58,9 @@ class UserPreferencesController extends Controller
             'dashboards' => Dashboard::allAvailable($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
-            'locale' => UserPref::getPref($user, 'locale') ?: Config::get('locale'),
+            'locale' => UserPref::getPref($user, 'locale') ?: \config('app.locale'),
             'locales' => $this->getValidLocales(),
-            'site_style' => UserPref::getPref($user, 'site_style') ?: Config::get('site_style'),
+            'site_style' => UserPref::getPref($user, 'site_style') ?: \config('app.site_style'),
             'site_styles' => $this->getValidStyles(),
 
         ];
@@ -132,10 +133,7 @@ class UserPreferencesController extends Controller
 
     private function getValidStyles()
     {
-        $site_styles = Config::getDefinitions()['site_style']['options'];
-
-        asort($site_styles);
-
-        return $site_styles;
+        $definitions = new DynamicConfig();
+        return $definitions->get('site_style')->getOptions();
     }
 }
