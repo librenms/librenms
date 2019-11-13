@@ -306,6 +306,10 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
     }
 }
 
+if ($device['os'] == 'fabos') {
+    require_once 'ports/brocade.inc.php';
+}
+
 if ($device['os'] == 'procera') {
     require_once 'ports/procera.inc.php';
 }
