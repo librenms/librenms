@@ -5,15 +5,16 @@ path: blob/master/doc/
 
 Retrieve a specific ARP entry or all ARP enties for a device
 
-Route: `/api/v0/resources/ip/arp/:ip`
+Route: `/api/v0/resources/ip/arp/:query`
 
-- ip is the specific IP you would like to query, if this is all then
-  you need to pass ?device=_hostname_ (or device id)
-- This may also be a cidr network, for example 192.168.1.0/24
+Query can be:
+- An IP address
+- A CIDR network (192.168.1.0/24)
+- `all` and set ?device=_hostname_ (or device id)
 
 Input:
 
-- device if you specify all for the IP then you need to populate this
+- device if you specify all for the query then you need to populate this
   with the hostname or id of the device.
 
 Example:
