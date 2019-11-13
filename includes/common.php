@@ -431,8 +431,7 @@ function getifdescrbyid($id)
 
 function getidbyname($hostname)
 {
-    $device = DeviceCache::getByHostname($hostname);
-    return $device ? $device->device_id : null;
+    return DeviceCache::getByHostname($hostname)->device_id;
 }
 
 function safename($name)
