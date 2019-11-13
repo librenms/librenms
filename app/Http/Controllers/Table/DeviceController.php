@@ -240,7 +240,7 @@ class DeviceController extends TableController
     private function formatMetric($device, $count, $tab, $icon)
     {
         $html = '<a href="' . Url::deviceUrl($device, ['tab' => $tab]) . '">';
-        $html .= '<span><i class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
+        $html .= '<span><i title="' . $tab . '" class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
         $html .= '</span></a> ';
         return $html;
     }
