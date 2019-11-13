@@ -1996,22 +1996,22 @@ function list_ip_networks()
 
 function list_arp(\Illuminate\Http\Request $request)
 {
-    $ip       = $request->route('ip');
+    $query       = $request->route('query');
     $cidr     = $request->route('cidr');
     $hostname = $request->get('device');
 
-    if (empty($ip)) {
-        return api_error(400, "No valid IP provided");
-    } elseif ($ip === "all" && empty($hostname)) {
+    if (empty($query)) {
+        return api_error(400, "No valid IP/MAC provided");
+    } elseif ($query === "all" && empty($hostname)) {
         return api_error(400, "Device argument is required when requesting all entries");
     }
 
-    if ($ip === "all") {
+    if ($query === "all") {
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
         $arp = dbFetchRows("SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?", [$device_id]);
     } elseif ($cidr) {
         try {
-            $ip = new IPv4("$ip/$cidr");
+            $ip = new IPv4("$query/$cidr");
             $arp = dbFetchRows(
                 'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
                 [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())]
@@ -2019,8 +2019,11 @@ function list_arp(\Illuminate\Http\Request $request)
         } catch (InvalidIpException $e) {
             return api_error(400, "Invalid Network Address");
         }
+    } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
+        $mac = \LibreNMS\Util\Rewrite::macToHex($query);
+        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `mac_address`=?", [$mac]);
     } else {
-        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", [$ip]);
+        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", [$query]);
     }
     return api_success($arp, 'arp');
 }
