@@ -537,12 +537,7 @@ foreach ($port_stats as $ifIndex => $port) {
 echo "\n";
 
 // get last poll time to optimize poll_time, poll_prev and poll_period in table db
-$last_poll_time = 0;
-foreach ($ports as $port) {
-    if ($port['poll_time'] > $last_poll_time) {
-        $last_poll_time = $port['poll_time'];
-    }
-}
+$last_poll_time = max(array_column($ports, 'poll_time'));
 
 $device_global_ports = [];
 $device_global_ports['poll_time']  = $polled;
