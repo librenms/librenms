@@ -101,20 +101,20 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$query_device = 'select alert_device_map.rule_id as id from alert_device_map';
+$query_device = 'SELECT alert_device_map.rule_id AS id FROM alert_device_map';
 $where_device = '';
 
-$query_device_group = 'select alert_group_map.rule_id as id from device_group_device left join alert_group_map on device_group_device.device_group_id=alert_group_map.group_id';
+$query_device_group = 'SELECT alert_group_map.rule_id AS id FROM device_group_device LEFT JOIN alert_group_map ON device_group_device.device_group_id=alert_group_map.group_id';
 $where_device_group = '';
 
 if (isset($device['device_id']) && $device['device_id'] > 0) {
-    $where_device .= 'where alert_device_map.device_id=?';
-    $where_device_group .= 'where device_group_device.device_id=?';
+    $where_device .= 'WHERE alert_device_map.device_id=?';
+    $where_device_group .= 'WHERE device_group_device.device_id=?';
     $param[] = $device['device_id'];
     $param[] = $device['device_id'];
 }
 
-$full_query = "select alert_rules.* from alert_rules where id in ($query_device $where_device UNION DISTINCT $query_device_group $where_device_group) ORDER BY id ASC";
+$full_query = "SELECT alert_rules.* FROM alert_rules WHERE id IN ($query_device $where_device UNION DISTINCT $query_device_group $where_device_group) ORDER BY id ASC";
 $query_result = dbFetchRows($full_query, $param);
 
 $count = count($query_result);
