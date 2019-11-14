@@ -44,7 +44,7 @@
     @if(Auth::user())
     <link href="{{ asset('css/' . App\Models\UserPref::getPref(Auth::user(), 'site_style') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
     @else
-    <link href="{{ asset('css/' . LibreNMS\Config::get('site_style') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/' . \config('app.site_style') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
     @endif
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
