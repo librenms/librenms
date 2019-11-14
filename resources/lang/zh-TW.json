@@ -1,4 +1,8 @@
 {
+    "The device group could not be deleted": "無法刪除裝置群組",
+    "Operating System": "作業系統",
+    "Vendor": "廠商",
+    "Ungrouped Devices": "尚無群組裝置",
     "Enabled": "啟用",
     "Priority": "重要性",
     "Program": "程式",
