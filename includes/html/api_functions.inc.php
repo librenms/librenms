@@ -1040,9 +1040,11 @@ function add_edit_rule(\Illuminate\Http\Request $request)
     $count     = $data['count'];
     $mute      = $data['mute'];
     $delay     = $data['delay'];
+    $interval     = $data['interval'];
     $override_query = $data['override_query'];
     $adv_query = $data['adv_query'];
     $delay_sec = convert_delay($delay);
+    $interval_sec = convert_delay($interval);
     if ($mute == 1) {
         $mute = true;
     } else {
@@ -1053,6 +1055,7 @@ function add_edit_rule(\Illuminate\Http\Request $request)
         'mute'  => $mute,
         'count' => $count,
         'delay' => $delay_sec,
+        'interval' => $interval_sec,
         'options' =>
             [
                 'override_query' => $override_query
