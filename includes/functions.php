@@ -2470,8 +2470,8 @@ function get_db_schema()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if ($device['snmp_max_oid'] > 0) {
-        return $device['snmp_max_oid'];
+    if ($device['attribs']['snmp_max_oid'] > 0) {
+        return $device['attribs']['snmp_max_oid'];
     }
 
     // then os
