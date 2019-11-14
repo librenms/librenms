@@ -240,6 +240,7 @@ return [
 
         // LibreNMS
         'Permissions' => \App\Facades\Permissions::class,
+        'DeviceCache' => \App\Facades\DeviceCache::class,
     ],
 
 ];

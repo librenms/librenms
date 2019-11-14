@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use DeviceCache;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
@@ -132,6 +133,8 @@ class OSModulesTest extends DBTestCase
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
         }
+
+        DeviceCache::flush(); // clear cached devices
     }
 
     public function dumpedDataProvider()
