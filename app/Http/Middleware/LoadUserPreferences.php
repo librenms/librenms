@@ -8,8 +8,6 @@ use LibreNMS\Config;
 
 class LoadUserPreferences
 {
-    private $preferences;
-
     /**
      * Handle an incoming request.
      *
