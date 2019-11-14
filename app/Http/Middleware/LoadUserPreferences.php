@@ -38,23 +38,6 @@ class LoadUserPreferences
      * Fetch preferences from the database
      * Load all preferences at once if we need to query the database
      *
-     * @param string $preference
-     * @return mixed
-     */
-    private function getPref($preference)
-    {
-        if ($this->preferences === null) {
-            $preferences = ['locale', 'site_style'];
-            $this->preferences = Auth::user()->preferences()->whereIn('pref', $preferences)->pluck('value', 'pref');
-        }
-
-        return $this->preferences->get($preference);
-    }
-
-    /**
-     * Fetch preferences from the database
-     * Load all preferences at once if we need to query the database
-     *
      * @param \Illuminate\Http\Request $request
      * @param array $preferences
      */
