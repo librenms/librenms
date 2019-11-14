@@ -19,11 +19,15 @@ class LoadUserPreferences
      */
     public function handle($request, Closure $next)
     {
-        $this->loadPreference($request, 'locale', function ($locale) {
+        $preferences = ['locale', 'site_style'];
+        $this->loadPreferences($request, $preferences);
+
+        $this->setPreference($request, 'locale', function ($locale) {
             app()->setLocale($locale);
         });
 
-        $this->loadPreference($request, 'site_style', function ($style) {
+        $this->setPreference($request, 'site_style', function ($style) {
+            Config::set('site_style_default', Config::get('site_style'));
             Config::set('site_style', $style);
         });
 
@@ -31,7 +35,7 @@ class LoadUserPreferences
     }
 
     /**
-     * Fetch preferences from the databse and return one value
+     * Fetch preferences from the database
      * Load all preferences at once if we need to query the database
      *
      * @param string $preference
@@ -48,19 +52,29 @@ class LoadUserPreferences
     }
 
     /**
+     * Fetch preferences from the database
+     * Load all preferences at once if we need to query the database
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param array $preferences
+     */
+    private function loadPreferences($request, $preferences)
+    {
+        if (!$request->session()->has('preferences') && !is_null($request->user())) {
+            $loaded = $request->user()->preferences()->whereIn('pref', $preferences)->pluck('value', 'pref');
+            $request->session()->put('preferences', $loaded);
+        }
+    }
+
+    /**
      * @param \Illuminate\Http\Request $request
      * @param string $pref
      * @param callable $callable
      */
-    private function loadPreference($request, $pref, $callable)
+    private function setPreference($request, $pref, $callable)
     {
-        $session = $request->session();
-        if ($session->has($pref)) {
-            $value = $session->get($pref);
-            $callable($value);
-        } elseif (!is_null($request->user())) {
-            $value = $this->getPref($pref);
-            $session->put($pref, $value);
+        $value = $request->session()->get("preferences.$pref");
+        if ($value !== null) {
             $callable($value);
         }
     }

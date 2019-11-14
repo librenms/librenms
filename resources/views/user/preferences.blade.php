@@ -72,6 +72,7 @@
                     <label for="site_style" class="col-sm-4 control-label">@lang('CSS Style')</label>
                     <div class="col-sm-4">
                         <select class="form-control ajax-select" name="site_style" data-pref="site_style" data-previous="{{ $site_style }}">
+                            <option value="default">@lang('Default') ({{ $site_style_default }})</option>
                             @foreach($site_styles as $style => $descr)
                                 <option value="{{ $style }}" @if($style == $site_style) selected @endif>{{ $descr }}</option>
                             @endforeach
@@ -82,6 +83,7 @@
                     <label for="locale" class="col-sm-4 control-label">@lang('Language')</label>
                     <div class="col-sm-4">
                         <select class="form-control ajax-select" name="locale" data-pref="locale" data-previous="{{ $locale }}">
+                            <option value="default">@lang('Default') ({{ $locale_default }})</option>
                             @foreach($locales as $lang => $descr)
                                 <option value="{{ $lang }}" @if($lang == $locale) selected @endif>{{ $descr }}</option>
                             @endforeach
