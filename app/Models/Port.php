@@ -76,7 +76,7 @@ class Port extends DeviceRelatedModel
             return true;
         }
 
-        return Permissions::canAccessPort($this->port_id, $user);
+        return Permissions::canAccessDevice($this->device_id, $user) || Permissions::canAccessPort($this->port_id, $user);
     }
 
     // ---- Accessors/Mutators ----

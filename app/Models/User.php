@@ -164,6 +164,15 @@ class User extends Authenticatable
         $this->attributes['enabled'] = $enable ? 1 : 0;
     }
 
+    public function getDevicesAttribute()
+    {
+        // pseudo relation
+        if (!array_key_exists('devices', $this->relations)) {
+            $this->setRelation('devices', $this->devices()->get());
+        }
+        return $this->getRelation('devices');
+    }
+
     // ---- Define Relationships ----
 
     public function apiToken()
@@ -173,11 +182,10 @@ class User extends Authenticatable
 
     public function devices()
     {
-        if ($this->hasGlobalRead()) {
-            return Device::query();
-        } else {
-            return Device::HasAccess($this);
-        }
+        // pseudo relation
+        return Device::query()->when(!$this->hasGlobalRead(), function ($query) {
+            return $query->whereIn('device_id', Permissions::devicesForUser($this));
+        });
     }
 
     public function deviceGroups()

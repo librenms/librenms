@@ -90,6 +90,9 @@ abstract class BaseModel extends Model
             $table = $this->getTable();
         }
 
-        return $query->whereIn("$table.device_id", \Permissions::portsForUser($user));
+        return $query->where(function ($query) use ($table, $user) {
+            return $query->whereIn("$table.port_id", \Permissions::portsForUser($user))
+                ->orWhereIn("$table.device_id", \Permissions::devicesForUser($user));
+        });
     }
 }
