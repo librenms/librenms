@@ -60,7 +60,7 @@ class UserPreferencesController extends Controller
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
             'locale' => UserPref::getPref($user, 'locale') ?: \config('app.locale'),
             'locales' => $this->getValidLocales(),
-            'site_style' => UserPref::getPref($user, 'site_style') ?: \config('app.site_style'),
+            'site_style' => UserPref::getPref($user, 'site_style') ?: Config::get('site_style'),
             'site_styles' => $this->getValidStyles(),
 
         ];
@@ -108,12 +108,9 @@ class UserPreferencesController extends Controller
 
         UserPref::setPref($request->user(), $request->pref, $request->value);
 
-        if ($request->pref == 'locale') {
-            Session::put('locale', $request->value);
-        }
-
-        if ($request->pref == 'site_style') {
-            Session::put('site_style', $request->value);
+        $cachedSettings = ['locale', 'site_style'];
+        if (in_array($request->pref, $cachedSettings)) {
+            Session::put($request->pref, $request->value);
         }
 
         return response()->json(['status' => 'success']);

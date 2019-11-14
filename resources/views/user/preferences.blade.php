@@ -72,8 +72,8 @@
                     <label for="site_style" class="col-sm-4 control-label">@lang('CSS Style')</label>
                     <div class="col-sm-4">
                         <select class="form-control ajax-select" name="site_style" data-pref="site_style" data-previous="{{ $site_style }}">
-                            @foreach($site_styles as $site_style => $descr)
-                                <option value="{{ $site_style }}" @if($site_style == App\Models\UserPref::getPref(Auth::user(), 'site_style')) selected @endif>{{ $descr }}</option>
+                            @foreach($site_styles as $style => $descr)
+                                <option value="{{ $style }}" @if($style == $site_style) selected @endif>{{ $descr }}</option>
                             @endforeach
                         </select>
                     </div>

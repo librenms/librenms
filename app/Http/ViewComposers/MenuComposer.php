@@ -54,13 +54,12 @@ class MenuComposer
         $vars = [];
         /** @var User $user */
         $user = Auth::user();
+        $site_style = Config::get('site_style');
 
-        //Todo: should be handled via CSS Themes
-        $site_style = UserPref::getPref($user, 'site_style')?: Config::get('site_style');
+        //TODO: should be handled via CSS Themes
         $vars['navbar'] = in_array($site_style, ['mono', 'dark']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
-        $site_style = Config::get('site_style', 'light');
         $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
 
         // Device menu
