@@ -288,13 +288,14 @@ foreach ($list as $items) {
 
     // If mac is choosen to graph, ensure only one link exists between any two ports, or any two devices.
     // else ensure only one link exists between any two ports
-    if ((in_array('mac',$config['network_map_items']) &&
+    if ((in_array('mac', Config::get('network_map_items')) &&
         !array_key_exists($link_id1, $link_assoc_seen) &&
         !array_key_exists($link_id2, $link_assoc_seen) &&
         !array_key_exists($device_id1, $device_assoc_seen) &&
         !array_key_exists($device_id2, $device_assoc_seen)) ||
-        (!array_key_exists($link_id1, $link_assoc_seen)
-         & !array_key_exists($link_id2, $link_assoc_seen))) {
+        (!in_array('mac', Config::get('network_map_items')) &&
+        !array_key_exists($link_id1, $link_assoc_seen) &&
+        !array_key_exists($link_id2, $link_assoc_seen))) {
         $local_port = cleanPort($local_port);
         $remote_port = cleanPort($remote_port);
         $links[] = array_merge(
