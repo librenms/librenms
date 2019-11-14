@@ -8,6 +8,7 @@ return [
         'external' => '外部整合',
         'global' => '全域',
         'os' => '作業系統',
+        'discovery' => '探索',
         'poller' => '輪詢器',
         'system' => '系統',
         'webui' => 'Web UI',
@@ -22,9 +23,13 @@ return [
             'ad' => 'Active Directory 設定',
             'ldap' => 'LDAP 設定'
         ],
+        'discovery' => [
+            'general' => '一般探索設定'
+        ],
         'external' => [
             'binaries' => '執行檔位置',
             'location' => '位置資訊設定',
+            'graylog' => 'Graylog 整合',
             'oxidized' => 'Oxidized 整合',
             'peeringdb' => 'PeeringDB 整合',
             'nfsen' => 'NfSen 整合',
@@ -100,7 +105,7 @@ return [
             ],
             'syscontact' => [
                 'description' => '發送警報給 sysContact',
-                'help' => '發送警報郵件給 SNMP sysContact'
+                'help' => '發送警報郵件給 SNMP 中的 sysContact'
             ],
             'transports' => [
                 'mail' => [
@@ -109,7 +114,7 @@ return [
                 ]
             ],
             'tolerance_window' => [
-                'description' => 'Tolerance window for cron',
+                'description' => 'cron 容錯範圍',
                 'help' => 'Tolerance window in seconds'
             ],
             'users' => [
@@ -118,11 +123,15 @@ return [
             ]
         ],
         'alert_log_purge' => [
-            'description' => 'Alert log entries older than',
+            'description' => '警報記錄項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'allow_duplicate_sysName' => [
+            'description' => '允許重複 sysName',
+            'help' => 'By default duplicate sysNames are disabled from being added to prevent a device with multiple interfaces from being added multiple times'
+        ],
         'allow_unauth_graphs' => [
-            'description' => 'Allow unauthenticated graph access',
+            'description' => '允許未登入存取圖表',
             'help' => 'Allows any one to access graphs without login'
         ],
         'allow_unauth_graphs_cidr' => [
@@ -164,8 +173,8 @@ return [
             'help' => 'Active Directory LDAP filter for selecting groups'
         ],
         'auth_ad_groups' => [
-            'description' => 'Group access',
-            'help' => 'Define groups that have access and level'
+            'description' => '群組存取權限',
+            'help' => '定義群組具有的存取權限與等級'
         ],
         'auth_ad_user_filter' => [
             'description' => 'LDAP 使用者篩選',
@@ -213,11 +222,11 @@ return [
             'description' => '郵件屬性'
         ],
         'auth_ldap_group' => [
-            'description' => 'Access group DN',
+            'description' => '存取群組 DN',
             'help' => 'Distinguished name for a group to give normal level access. Example: cn=groupname,ou=groups,dc=example,dc=com'
         ],
         'auth_ldap_groupbase' => [
-            'description' => 'Group base DN',
+            'description' => '群組基礎 DN',
             'help' => 'Distinguished name to search for groups Example: ou=group,dc=example,dc=com'
         ],
         'auth_ldap_groupmemberattr' => [
@@ -265,11 +274,11 @@ return [
             'help' => 'If one or more servers are unresponsive, higher timeouts will cause slow access. To low may cause connection failures in some cases',
         ],
         'auth_ldap_uid_attribute' => [
-            'description' => 'Unique ID attribute',
+            'description' => '唯一 ID 屬性',
             'help' => 'LDAP attribute to use to identify users, must be numeric'
         ],
         'auth_ldap_userdn' => [
-            'description' => 'Use full user DN',
+            'description' => '使用全名 DN',
             'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it’s member: uid=username,ou=groups,dc=domain,dc=com)"
         ],
         'auth_ldap_version' => [
@@ -299,16 +308,24 @@ return [
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
-            'description' => 'Auth log entries older than (days)',
+            'description' => '驗證記錄項目大於 (天)',
             'help' => 'Cleanup done by daily.sh'
         ],
+        'base_url' => [
+            'description' => '指定 URL',
+            'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname'
+        ],
         'device_perf_purge' => [
-            'description' => 'Device performance entries older than (days)',
+            'description' => '裝置效能項目大於 (天)',
             'help' => 'Cleanup done by daily.sh'
         ],
         'distributed_poller' => [
             'description' => '啟用分散式輪詢 (需要額外設定)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/'
+        ],
+        'distributed_poller_group' => [
+            'description' => '預設輪詢器群組',
+            'help' => 'The default poller group all pollers should poll if none is set in config.php'
         ],
         'distributed_poller_memcached_host' => [
             'description' => 'Memcached 主機',
@@ -326,7 +343,7 @@ return [
             ]
         ],
         'email_backend' => [
-            'description' => '如何寄送郵件',
+            'description' => '寄送郵件方式',
             'help' => 'The backend to use for sending email, can be mail, sendmail or SMTP',
             'options' => [
                 'mail' => 'mail',
@@ -346,10 +363,10 @@ return [
             'description' => '若啟用此選項，sendmail 所在的位置'
         ],
         'email_smtp_auth' => [
-            'description' => '啟用 / 停用e smtp 驗證'
+            'description' => '啟用 / 停用 SMTP 驗證'
         ],
         'email_smtp_host' => [
-            'description' => 'SMTP Host for sending email if using this option'
+            'description' => '指定寄信用的 SMTP 主機'
         ],
         'email_smtp_password' => [
             'description' => 'SMTP 驗證密碼'
@@ -358,7 +375,7 @@ return [
             'description' => 'SMTP 連接埠設定'
         ],
         'email_smtp_secure' => [
-            'description' => '啟用 / 停用加密 (使用 tls 或 ssl)',
+            'description' => '啟用 / 停用加密 (使用 TLS 或 SSL)',
             'options' => [
                 '' => '停用',
                 'tls' => 'TLS',
@@ -391,7 +408,7 @@ return [
         ],
         'fping_options' => [
             'count' => [
-                'description' => 'fping count',
+                'description' => 'fping 次數',
                 'help' => 'The number of pings to send when checking if a host is up or down via icmp'
             ],
             'interval' => [
@@ -405,11 +422,11 @@ return [
         ],
         'geoloc' => [
             'api_key' => [
-                'description' => 'Geocoding API Key',
+                'description' => '地理編碼 API 金鑰',
                 'help' => 'Geocoding API Key (Required to function)'
             ],
             'engine' => [
-                'description' => 'Geocoding Engine',
+                'description' => '地理編碼引擎',
                 'options' => [
                     'google' => 'Google Maps',
                     'openstreetmap' => 'OpenStreetMap',
@@ -418,8 +435,48 @@ return [
                 ]
             ]
         ],
+        'graylog' => [
+            'base_uri' => [
+                'description' => 'Base URI',
+                'help' => 'Override the base uri in the case you have modified the Graylog default.'
+            ],
+            'device-page' => [
+                'loglevel' => [
+                    'description' => 'Device Overview Log Level',
+                    'help' => 'Sets the maximum log level shown on the device overview page.'
+                ],
+                'rowCount' => [
+                    'description' => 'Device Overview Row Count',
+                    'help' => 'Sets the number of rows show on the device overview page.'
+                ]
+            ],
+            'password' => [
+                'description' => '密碼',
+                'help' => 'Password for accessing Graylog API.'
+            ],
+            'port' => [
+                'description' => '連接埠',
+                'help' => 'The port used to access the Graylog API. If none give, it will be 80 for http and 443 for https.'
+            ],
+            'server' => [
+                'description' => '伺服器',
+                'help' => 'The ip or hostname of the Graylog server API endpoint.'
+            ],
+            'timezone' => [
+                'description' => '顯示時區',
+                'help' => 'Graylog times are stored in GMT, this setting will change the displayed timezone. The value must be a valid PHP timezone.'
+            ],
+            'username' => [
+                'description' => '使用者名稱',
+                'help' => 'Username for accessing the Graylog API.'
+            ],
+            'version' => [
+                'description' => '版本',
+                'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.'
+            ]
+        ],
         'http_proxy' => [
-            'description' => 'HTTP(S) Proxy',
+            'description' => 'HTTP(S) 代理',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.'
         ],
         'ipmitool' => [
@@ -435,6 +492,10 @@ return [
         'mtr' => [
             'description' => 'mtr 路徑'
         ],
+        'mydomain' => [
+            'description' => '主要網域',
+            'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.'
+        ],
         'nfsen_enable' => [
             'description' => '啟用 NfSen',
             'help' => '啟用 NfSen 整合',
@@ -444,7 +505,7 @@ return [
             'help' => 'This value specifies where your NFSen RRD files are located.'
         ],
         'nfsen_subdirlayout' => [
-            'description' => 'Set NfSen subdir layout',
+            'description' => '設定 NfSen 子目錄配置',
             'help' => 'This must match the subdir layout you have set in NfSen. 1 is the default.',
         ],
         'nfsen_last_max' => [
@@ -496,7 +557,7 @@ return [
             ],
             'features' => [
                 'versioning' => [
-                    'description' => 'Enable config versioning access',
+                    'description' => '啟用組態版本存取',
                     'help' => 'Enable Oxidized config versioning (requires git backend)'
                 ]
             ],
@@ -504,45 +565,53 @@ return [
                 'description' => 'Enable the return of groups to Oxidized'
             ],
             'reload_nodes' => [
-                'description' => 'Reload Oxidized nodes list, each time a device is added'
+                'description' => '在每次新增裝置後，重新載入 Oxidized 節點清單'
             ],
             'url' => [
-                'description' => 'URL to your Oxidized API',
+                'description' => '您的 Oxidized API URL',
                 'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)'
             ]
         ],
         'peeringdb' => [
             'enabled' => [
-                'description' => '啟用 PeeringDB lookup',
+                'description' => '啟用 PeeringDB 反查',
                 'help' => '起用 PeeringDB lookup (資料將於由 daily.sh 進行下載)'
             ]
         ],
         'perf_times_purge' => [
-            'description' => 'Poller performance log entries older than (days)',
+            'description' => '輪詢器效能記錄項目大於 (天)',
             'help' => 'Cleanup done by daily.sh'
         ],
         'ping' => [
             'description' => 'ping 路徑'
         ],
         'ports_fdb_purge' => [
-            'description' => 'Port FDB entries older than',
+            'description' => '連接埠 FDB 項目大於',
+            'help' => 'Cleanup done by daily.sh'
+        ],
+        'ports_purge' => [
+            'description' => '連接埠大於 (天)',
             'help' => 'Cleanup done by daily.sh'
         ],
         'public_status' => [
-            'description' => 'Show status publicly',
-            'help' => 'Shows the status of some devices on the logon page without authentication.'
+            'description' => '公開狀態顯示',
+            'help' => '允許不登入的情況下，顯示裝置的狀態資訊。'
         ],
         'rrd' => [
             'heartbeat' => [
-                'description' => 'Change the rrd heartbeat value (預設 600)'
+                'description' => '變更 rrd 活動訊號值 (預設 600)'
             ],
             'step' => [
-                'description' => 'Change the rrd step value (預設 300)'
+                'description' => '變更 rrd 間距值 (預設 300)'
             ]
         ],
         'rrd_dir' => [
             'description' => 'RRD 位置',
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.'
+        ],
+        'rrd_purge' => [
+            'description' => 'RRD 檔案項目大於 (天)',
+            'help' => 'Cleanup done by daily.sh'
         ],
         'rrd_rra' => [
             'description' => 'RRD 格式設定',
@@ -556,11 +625,15 @@ return [
             'description' => 'rrdtool 路徑'
         ],
         'rrdtool_tune' => [
-            'description' => 'Tune all rrd port files to use max values',
-            'help' => 'Auto tune maximum value for rrd port files'
+            'description' => '調整所有 rrd 連接埠檔案使用最大值',
+            'help' => '自動調整 rrd 連接埠檔案的最大值'
         ],
         'sfdp' => [
             'description' => 'sfdp 路徑'
+        ],
+        'shorthost_target_length' => [
+            'description' => 'shortend hostname maximum length',
+            'help' => 'shrinks hostname to maximum length, but always complete subdomain parts'
         ],
         'site_style' => [
             'description' => '設定站台 css 樣式',
@@ -573,19 +646,19 @@ return [
         ],
         'snmp' => [
             'transports' => [
-                'description' => '傳輸 (priority)',
+                'description' => '傳輸 (優先順序)',
                 'help' => 'Select enabled transports and order them as you want them to be tried.'
             ],
             'version' => [
-                'description' => '版本 (priority)',
+                'description' => '版本 (優先順序)',
                 'help' => 'Select enabled versions and order them as you want them to be tried.'
             ],
             'community' => [
-                'description' => '社群 (priority)',
+                'description' => '社群 (優先順序)',
                 'help' => 'Enter community strings for v1 and v2c and order them as you want them to be tried'
             ],
             'max_repeaters' => [
-                'description' => 'Max Repeaters',
+                'description' => '重複擷取最多次數',
                 'help' => 'Set repeaters to use for SNMP bulk requests'
             ],
             'port' => [
@@ -593,7 +666,7 @@ return [
                 'help' => 'Set the tcp/udp port to be used for SNMP'
             ],
             'v3' => [
-                'description' => 'SNMP v3 驗證 (priority)',
+                'description' => 'SNMP v3 驗證 (優先順序)',
                 'help' => 'Set up v3 authentication variables and order them as you want them to be tried',
                 'auth' => '驗證',
                 'crypto' => '加密',
@@ -631,8 +704,12 @@ return [
             'description' => 'Filter syslog messages containing'
         ],
         'syslog_purge' => [
-            'description' => 'Syslog entries older than (days)',
+            'description' => 'Syslog 項目大於 (天)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'title_image' => [
+            'description' => '標題圖片',
+            'help' => 'Overrides the default Title Image.'
         ],
         'traceroute' => [
             'description' => 'traceroute 路徑'
@@ -714,6 +791,10 @@ return [
         'whois' => [
             'description' => 'whois 路徑'
         ]
+    ],
+    'twofactor' => [
+        'description' => '啟用雙因素驗證',
+        'help' => "Enables the built in Two-Factor authentication. You must set up each account to make it active."
     ],
     'units' => [
         'days' => '日',
