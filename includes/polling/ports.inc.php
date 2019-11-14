@@ -501,7 +501,6 @@ foreach ($port_stats as $ifIndex => $port) {
             dbInsert(array('port_id' => $port_id), 'ports_statistics');
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($port_id));
             echo 'Adding: '.$ifName.'('.$ifIndex.')('.$port_id.')';
-            // print_r($ports);
         } // Port re-discovered after previous deletion?
         elseif ($ports[$port_id]['deleted'] == 1) {
             dbUpdate(array('deleted' => '0'), 'ports', '`port_id` = ?', array($port_id));
