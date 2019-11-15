@@ -543,6 +543,8 @@ $device_global_ports['poll_time']  = $polled;
 $device_global_ports['poll_prev']  = $last_poll_time;
 $device_global_ports['poll_period']  = ($polled - $port['poll_time']);
 
+$port_ids = array();
+
 // Loop ports in the DB and update where necessary
 foreach ($ports as $port) {
     $port_id = $port['port_id'];
@@ -952,13 +954,20 @@ foreach ($ports as $port) {
         // Update Database
         if (count($port['update'])) {
             if (!empty($port['update'])) {
+                $port['update']['poll_time'] = $polled;
+                $port['update']['poll_prev'] = $port['poll_time'];
+                $port['update']['poll_period'] = $polled_period;
                 $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port_id));
+            } else {
+                $port_ids[] =  $port_id;
             }
             // do we want to do something else with this?
             if (!empty($port['update_extended'])) {
                 $updated += dbUpdate($port['update_extended'], 'ports_statistics', '`port_id` = ?', array($port_id));
             }
             d_echo("$updated updated");
+        } else {
+            $port_ids[] =  $port_id;
         }
         // End Update Database
     }
@@ -970,7 +979,7 @@ foreach ($ports as $port) {
 } //end port update
 
 // Update the poll_time, poll_prev and poll_period of all ports in an unique request
-$updated = dbUpdate($device_global_ports, 'ports', '`device_id` = ? AND poll_time = ? AND disabled = 0 AND deleted = 0', array($device['device_id'], $device_global_ports['poll_prev']));
+$updated = dbUpdate($device_global_ports, 'ports', '`port_id` IN ('.implode(',', $port_ids).')', array($device['device_id'], $device_global_ports['poll_prev']));
 d_echo("$updated updated");
 
 // Clear Variables Here
