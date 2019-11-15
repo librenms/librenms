@@ -54,7 +54,7 @@ class MenuComposer
         $vars = [];
         /** @var User $user */
         $user = Auth::user();
-        $site_style = Config::get('site_style');
+        $site_style = Config::get('applied_site_style');
 
         //TODO: should be handled via CSS Themes
         $vars['navbar'] = in_array($site_style, ['mono', 'dark']) ? 'navbar-inverse' : '';
