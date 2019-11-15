@@ -382,7 +382,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
         }
 
         if ($device_config_file) {
-            if (!get_dev_attrib($device, 'override_Oxidized_disable') === 'true') {
+            if (!get_dev_attrib($device, 'override_Oxidized_disable') == 'true') {
                 echo '<li class="'.$select['showconfig'].'">
                     <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'">
                     <i class="fa fa-align-justify fa-lg icon-theme"  aria-hidden="true"></i> Config
