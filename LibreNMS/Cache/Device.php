@@ -37,7 +37,7 @@ class Device
      */
     public function getPrimary() : \App\Models\Device
     {
-        return self::get($this->primary);
+        return $this->get($this->primary);
     }
 
     /**
@@ -60,7 +60,7 @@ class Device
     public function get($device_id) : \App\Models\Device
     {
         if (!array_key_exists($device_id, $this->devices)) {
-            return self::load($device_id);
+            return $this->load($device_id);
         }
 
         return $this->devices[$device_id] ?: new \App\Models\Device;
@@ -92,7 +92,7 @@ class Device
     public function refresh($device_id) : \App\Models\Device
     {
         unset($this->devices[$device_id]);
-        return self::get($device_id);
+        return $this->get($device_id);
     }
 
     /**
