@@ -28,7 +28,7 @@ foreach ($applications as $app) {
     if (isset($enabled_apps[$app])) {
         $modifiers = ' checked';
         if ($enabled_apps[$app]
-            && is_dev_attrib_enabled($device, "poll_applications", Config::getOsSetting($device['os'], "poller_modules.applications"))
+            && (get_dev_attrib($device, 'poll_applications') || Config::getOsSetting($device['os'], "poller_modules.applications"))
         ) {
             $app_text .= '<span class="text-success"> (Discovered)</span>';
             $modifiers .= ' disabled';

@@ -130,6 +130,7 @@ class OSDiscoveryTest extends TestCase
             'community' => $community,
             'os' => 'generic',
             'os_group' => '',
+            'attribs' => [],
         ];
     }
 
