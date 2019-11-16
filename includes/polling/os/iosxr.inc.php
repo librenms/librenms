@@ -8,6 +8,18 @@ if (preg_match('/^Cisco IOS XR Software \(Cisco ([^\)]+)\),\s+Version ([^\[]+)\[
     // It is not an IOS-XR ... What should we do ?
 }
 
+$data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
+
+if (isset($data[1]['entPhysicalSoftwareRev']) && !empty($data[1]['entPhysicalSoftwareRev'])) {
+    $version = $data[1]['entPhysicalSoftwareRev'];
+}
+
+if (isset($data[8384518]['entPhysicalModelName']) && !empty($data[8384513]['entPhysicalModelName'])) {
+    $hardware = $data[8384513]['entPhysicalModelName'];
+} elseif (isset($data[8384518]['entPhysicalModelName']) && !empty($data[8384518]['entPhysicalModelName'])) {
+    $hardware = $data[8384518]['entPhysicalModelName'];
+}
+
 $serial = get_main_serial($device);
 
 echo "\n".$device['sysDescr']."\n";
