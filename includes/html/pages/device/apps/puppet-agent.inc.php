@@ -1,11 +1,11 @@
 <?php
 
 $graphs = array(
+    'puppet-agent_last_run' => 'Last run',
     'puppet-agent_changes' => 'Changes',
     'puppet-agent_events' => 'Events',
     'puppet-agent_resources' => 'Resources',
     'puppet-agent_time' => 'Runtime',
-    'puppet-agent_last_run' => 'Last run',
 );
 
 foreach ($graphs as $key => $text) {
