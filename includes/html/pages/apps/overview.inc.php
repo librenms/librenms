@@ -11,7 +11,7 @@ $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width']  = '400';
 $graph_array['legend']      = 'no';
 
-foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->sortBy('app_type')->groupBy('app_type') as $type => $groupedApps) {
+foreach (Application::query()->hasAccess(Auth::user())->with('device')->orderBy('app_type')->get()->groupBy('app_type') as $type => $groupedApps) {
     echo '<div style="clear: both;">';
     echo '<h2>'.generate_link($groupedApps->first()->displayName(), array('page' => 'apps', 'app' => $type)).'</h2>';
     /** @var \Illuminate\Support\Collection $groupedApps */
