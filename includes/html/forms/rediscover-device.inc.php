@@ -36,9 +36,7 @@ if (isset($_POST['device_id'])) {
              $message = 'Error rediscovering device';
         }
     }
-}
-
-elseif (isset($_POST['device_group_id'])) {
+} elseif (isset($_POST['device_group_id'])) {
     if (!is_numeric($_POST['device_group_id'])) {
         $status  = 'error';
         $message = 'Invalid device group id';
@@ -57,9 +55,7 @@ elseif (isset($_POST['device_group_id'])) {
             $message = 'Error rediscovering devices of Group';
         }
     }
-}
-
-else {
+} else {
     $status  = 'Error';
     $message = 'unddefined post Keys received';
 }
