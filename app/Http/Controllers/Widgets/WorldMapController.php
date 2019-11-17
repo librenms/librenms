@@ -80,16 +80,14 @@ class WorldMapController extends WidgetController
                     }
                     $device->markerIcon = 'greenMarker';
                     $device->zOffset = 0;
-                }
-                else { // Down device
+                } elseif ($device->status == 0) { // Down device
                     if ($device->isUnderMaintenance()) { // Hide/Show devices under maintenance
                         if ($maintenance == '0') { // Hide devices under maintenance
                             return false;
                         }
                         $device->markerIcon = 'blueMarker';
                         $device->zOffset = 5000;
-                    }
-                    else {
+                    } else {
                         if ($maintenance == '2') { // Display only devices under maintenance
                             return false;
                         }
