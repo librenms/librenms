@@ -49,3 +49,6 @@ $config['enable_billing'] = 1;
 
 # Enable the in-built services support (Nagios plugins)
 $config['show_services'] = 1;
+
+# Uncomment the following line to use OpenStreetMap instead of Google for the "Map" button in the device overview screen
+#$config['map_provider'] = "osm";
