@@ -22,18 +22,46 @@ if (!Auth::user()->hasGlobalAdmin()) {
 }
 
 // FIXME: Make this part of the API instead of a standalone function
-if (!is_numeric($_POST['device_id'])) {
-    $status  = 'error';
-    $message = 'Invalid device id';
-} else {
-    $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($_POST['device_id']));
-    if (!empty($update) || $update == '0') {
-        $status  = 'ok';
-        $message = 'Device will be rediscovered';
+if (isset($_POST['device_id'])) {
+    if (!is_numeric($_POST['device_id'])) {
+        $status  = 'error';
+        $message = 'Invalid device id';
     } else {
-         $status  = 'error';
-         $message = 'Error rediscovering device';
+        $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($_POST['device_id']));
+        if (!empty($update) || $update == '0') {
+            $status  = 'ok';
+            $message = 'Device will be rediscovered';
+        } else {
+             $status  = 'error';
+             $message = 'Error rediscovering device';
+        }
     }
+}
+
+elseif (isset($_POST['device_group_id'])) {
+    if (!is_numeric($_POST['device_group_id'])) {
+        $status  = 'error';
+        $message = 'Invalid device group id';
+    } else {
+        $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=" . $_POST['device_group_id']);
+        $update = 0;
+        foreach ($device_ids as $device_id) {
+            $update += dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($device_id));
+        }
+
+        if (!empty($update) || $update == '0') {
+            $status  = 'ok';
+            $message = 'Devices of Group will be rediscovered';
+        } else {
+            $status  = 'error';
+            $message = 'Error rediscovering devices of Group';
+        }
+    }
+}
+
+else {
+    $status  = 'Error';
+    $message = 'unddefined post Keys received';
 }
 
 $output = array(
