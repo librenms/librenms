@@ -1,0 +1,203 @@
+-- *****************************************************************
+-- UBQS-AUTO-RESET-MIB:  Ubiquoss Auto Reset MIB file
+--
+-- June 2011, Hyung Eun Park
+--
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+-- All rights reserved.                        
+--                                               
+-- *****************************************************************
+--
+
+UBQS-CPU-MAC-FILTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+	PhysAddress
+		FROM SNMPv2-TC
+	InetAddress
+    	FROM INET-ADDRESS-MIB
+	ubiMgmtv2
+		FROM UBQS-SMI;
+          
+ubiCpuMacFilterMIB MODULE-IDENTITY
+    LAST-UPDATED    "201311191545Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        ""             
+    ::= { ubiMgmtv2 30 }
+                          
+
+-- ***********************************************************
+-- Textual Conventions
+-- *********************************************************** 
+
+-- ***************************************************************
+-- ubiCpuMacFilterMIB
+-- ***************************************************************
+
+ubiCpuMacFilterMIBNotificationPrefix 	OBJECT IDENTIFIER 	::= { ubiCpuMacFilterMIB 0 }
+ubiCpuMacFilterMIBObjects  				OBJECT IDENTIFIER	::= { ubiCpuMacFilterMIB 1 }    
+ubiCpuMacFilterMIBConformance  	  		OBJECT IDENTIFIER 	::= { ubiCpuMacFilterMIB 2 }                 
+
+-- *****************************************************************   
+-- ubiCpuMacFilterMIBNotificationPrefix
+-- *****************************************************************
+
+	ubiCpuMacFilterNotification NOTIFICATION-TYPE
+    	OBJECTS         {
+    		ubiCpuMacFilterStatsVlanIfIndex,
+			ubiCpuMacFilterStatsMacAddr,
+			ubiCpuMacFilterStatsBlocked,
+			ubiCpuMacFilterStatsPortIndex,
+			ubiCpuMacFilterStatsIpAddr,
+			ubiCpuMacFilterStatsType
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"Notification of that CPU-mac-filter event is occured"
+   	::= { ubiCpuMacFilterMIBNotificationPrefix 1 }            
+             
+-- *****************************************************************   
+-- ubiCpuMacFilterMIBObjects
+-- *****************************************************************
+
+	ubiCpuMacFilterStatsTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiCpuMacFilterStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"This table contains objects which privide
+			the information about the occured cpu-mac-filter event"
+		::=  {  ubiCpuMacFilterMIBObjects 1  }
+                                   
+	ubiCpuMacFilterStatsEntry OBJECT-TYPE
+		SYNTAX     UbiCpuMacFilterStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"An entry containing information about the occured cpu-mac-filter event"
+		INDEX   { ubiCpuMacFilterStatsVlanIfIndex, ubiCpuMacFilterStatsMacAddr }
+		::= { ubiCpuMacFilterStatsTable 1 }
+
+    UbiCpuMacFilterStatsEntry ::= SEQUENCE
+    {
+		ubiCpuMacFilterStatsVlanIfIndex		INTEGER,
+		ubiCpuMacFilterStatsMacAddr			PhysAddress,
+		ubiCpuMacFilterStatsBlocked			INTEGER,
+		ubiCpuMacFilterStatsPortIndex		INTEGER,
+		ubiCpuMacFilterStatsIpAddr			InetAddress,
+		ubiCpuMacFilterStatsType				INTEGER
+	}
+    
+    ubiCpuMacFilterStatsVlanIfIndex OBJECT-TYPE
+		SYNTAX     INTEGER
+		MAX-ACCESS accessible-for-notify
+		STATUS     current
+		DESCRIPTION
+			"Ifindex for vlan that cpu-mac-filter event is occured at."
+		::= { ubiCpuMacFilterStatsEntry 1 }
+
+    ubiCpuMacFilterStatsMacAddr OBJECT-TYPE
+		SYNTAX     PhysAddress
+		MAX-ACCESS accessible-for-notify
+		STATUS     current
+		DESCRIPTION
+			"MAC address blocked by cpu-mac-filter event."
+		::= { ubiCpuMacFilterStatsEntry 2 }
+                
+    ubiCpuMacFilterStatsBlocked OBJECT-TYPE
+		SYNTAX     INTEGER{
+			block(1),
+			unblock(2)
+		}
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"this object presents that this event is for block(1) or unblock(2)"
+		::= { ubiCpuMacFilterStatsEntry 3 }    
+		
+	ubiCpuMacFilterStatsPortIndex OBJECT-TYPE
+		SYNTAX      INTEGER
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"Ifindex for physical port that cpu-mac-filter event is occured at."
+		::= { ubiCpuMacFilterStatsEntry 4 }    
+		
+	ubiCpuMacFilterStatsIpAddr OBJECT-TYPE
+		SYNTAX      InetAddress
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"IP address which associated the blocked mac-address"
+		::= { ubiCpuMacFilterStatsEntry 5 }  
+    ubiCpuMacFilterStatsType OBJECT-TYPE
+		SYNTAX     INTEGER{
+			unicast(0),
+			broadcast(1),
+			multicast(2)
+		}
+		MAX-ACCESS  accessible-for-notify
+		STATUS      current
+		DESCRIPTION
+			"Type of ubiCpuMacFilterStatsMacAddr object"
+		::= { ubiCpuMacFilterStatsEntry 6 }
+
+	                                           
+-- *****************************************************************   
+-- ubiCpuMacFilterMIBConformance
+-- *****************************************************************
+	
+-- 
+-- conformance information         
+--
+ubiCpuMacFilterMIBCompliances 	OBJECT IDENTIFIER ::= { ubiCpuMacFilterMIBConformance 1 }
+ubiCpuMacFilterMIBGroups      	OBJECT IDENTIFIER ::= { ubiCpuMacFilterMIBConformance 2 }      
+
+
+
+-- compliance statements
+
+	ubiCpuMacFilterMIBCompliance MODULE-COMPLIANCE
+        STATUS  current     
+        DESCRIPTION
+                "The compliance statement for entities which
+        	    implement the UBQS-CPU-MAC-FILTER-MIB"
+        MODULE  
+                MANDATORY-GROUPS {  ubiCpuMacFilterGroup }
+
+       GROUP    ubiCpuMacFilterGroup
+       DESCRIPTION  
+       	         "The ubiCpuMacFilterGroup is applicable for implementations which
+ 			     need to get the Cpu-mac-filter information."     
+      	::= { ubiCpuMacFilterMIBCompliances 1 }
+
+
+ 
+-- units of conformance
+
+	ubiCpuMacFilterGroup OBJECT-GROUP
+        OBJECTS {       
+        	         
+        	    }
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about the Cpu-mac-filter of system."
+    	::= { ubiCpuMacFilterMIBGroups 1 }
+
+
+END

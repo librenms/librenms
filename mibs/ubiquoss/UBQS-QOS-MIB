@@ -1,0 +1,1704 @@
+-- *****************************************************************
+-- UBQS-QOS-MIB  : Ubiquoss QOS MIB
+--
+-- Nov 2010, boo kn kim
+--
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+-- All rights reserved.    
+--
+-- *****************************************************************
+--
+
+UBQS-QOS-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		ubiMgmtv2
+		FROM UBQS-SMI
+				
+		MODULE-IDENTITY, OBJECT-TYPE, IpAddress, 
+		Integer32,Counter32
+		FROM SNMPv2-SMI     
+		
+		DisplayString, PhysAddress 			
+		FROM RFC1213-MIB   
+		         
+    	InetAddress, InetAddressType,
+    	InetAddressPrefixLength,
+    	InetVersion        
+    	FROM INET-ADDRESS-MIB   
+
+   		VlanIndex
+    	FROM Q-BRIDGE-MIB
+    	    			         
+		RowStatus, TruthValue
+		FROM SNMPv2-TC;
+			    
+    ubiQosMIB MODULE-IDENTITY
+        LAST-UPDATED    "201011052000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        "This UBQS-QOS-MIB mib contains the information 
+        about Quality of Service(QoS)."
+     ::= { ubiMgmtv2 12 }
+     
+
+-- ***********************************************************   
+-- TEXTUAL-CONVENTION
+-- ***********************************************************
+
+-- ***********************************************************
+-- ubiQoSMIB
+-- *********************************************************** 
+ubiQosMIBNotificationsPrefix        OBJECT IDENTIFIER ::= { ubiQosMIB  0 }
+ubiClassMapMIBObjects   			OBJECT IDENTIFIER ::= { ubiQosMIB  1 }   
+ubiPolicyMapMIBObjects   			OBJECT IDENTIFIER ::= { ubiQosMIB  2 }     
+ubiServicePolicyMIBObjects   		OBJECT IDENTIFIER ::= { ubiQosMIB  3 }
+ubiQosMIBObjects   					OBJECT IDENTIFIER ::= { ubiQosMIB  4 }
+ubiQosMIBConformance				OBJECT IDENTIFIER ::= { ubiQosMIB  5 }
+
+ubiPolicyGlobal 					OBJECT IDENTIFIER ::= { ubiPolicyMapMIBObjects  5 }                               
+
+ubiQosMap 							OBJECT IDENTIFIER ::= { ubiQosMIBObjects  1 } 
+ubiQosGlobal						OBJECT IDENTIFIER ::= { ubiQosMIBObjects  10 }		
+ubiTxSchedule 						OBJECT IDENTIFIER ::= { ubiQosMap  3 }
+--
+-- Class Map Objects
+--
+                               
+-- ***********************************************************
+-- ubiClassMapTable
+-- ***********************************************************  
+	ubiClassMapTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE  OF  UbiClassMapEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION	
+		"The table of class map about QOS"
+		::=  { ubiClassMapMIBObjects 1 }
+
+	ubiClassMapEntry	OBJECT-TYPE
+		SYNTAX			UbiClassMapEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION	
+		"An entry in ubiClassMapTable,
+		 representing class map list created.
+		 can create or remove class map entry."
+		INDEX		{ ubiClassMapName }
+		::=  { ubiClassMapTable 1 }
+
+    UbiClassMapEntry	::=	SEQUENCE {
+		ubiClassMapName				DisplayString,
+		ubiClassMapRowStatus		RowStatus
+	}
+	
+	ubiClassMapName	OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-only
+   		STATUS		current
+   		DESCRIPTION
+   		"Class map name"
+   		::= { ubiClassMapEntry 1 }
+   		
+   	ubiClassMapRowStatus	OBJECT-TYPE
+   		SYNTAX		RowStatus
+   		MAX-ACCESS	read-create
+   		STATUS		current
+   		DESCRIPTION
+   		"Create or remove class map"
+   		::= { ubiClassMapEntry 2 }
+                                      
+                                      
+-- ***********************************************************
+-- ubiClassMapMatchTable
+-- ***********************************************************   
+ 
+	ubiClassMapMatchTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiClassMapMatchEntry                   
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of matching entrys of class map"
+		::= { ubiClassMapMIBObjects 2 }
+		
+	ubiClassMapMatchEntry	OBJECT-TYPE
+		SYNTAX		UbiClassMapMatchEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry in ubiClassMapMatchTable,
+		 representing each matching entry of class map."
+		INDEX	{ ubiClassMapName }
+		::= { ubiClassMapMatchTable 1 }
+		
+	UbiClassMapMatchEntry ::= SEQUENCE { 
+		ubiCmMatchType				INTEGER,
+ 		ubiCmMatchAcl				DisplayString,
+ 		ubiCmMatchCos				Integer32,
+ 		ubiCmMatchEtherType			DisplayString,       	-- << Integer32
+ 		ubiCmMatchIpDscp			Integer32,
+ 		ubiCmMatchIpPrecedence		Integer32,
+ 		ubiCmMatchSourcePort		Integer32,
+ 		ubiCmMatchDestPort			Integer32,
+ 		ubiCmMatchMplsExp			Integer32,
+ 		ubiCmMatchProtocol			Integer32,
+ 		ubiCmMatchTagType			INTEGER,
+ 		ubiCmMatchTcpControl		DisplayString,
+ 		ubiCmMatchArp				DisplayString,
+ 		ubiCmMatchVlan				Integer32,
+ 		ubiCmMatchVlanInner			Integer32
+  	}                                    
+      			 			
+   	ubiCmMatchType	OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{
+   			match-all(0),
+   			match-any(1)
+   		}(0..1)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Matching entry type"       
+   		DEFVAL 		{ match_all }
+   		::= { ubiClassMapMatchEntry 1 }
+   		
+   	ubiCmMatchAcl				OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Access-list name. 
+   		 If need to unset access-list, set NULL string."
+   		::= { ubiClassMapMatchEntry 2 }
+   		
+   	ubiCmMatchCos				OBJECT-TYPE
+   		SYNTAX		Integer32
+   		{
+   			none(-1)
+   		}(-1..7)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Cos matching value" 
+   		::= { ubiClassMapMatchEntry 3 }
+   		
+   	ubiCmMatchEtherType			OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-write 
+   		STATUS		current
+   		DESCRIPTION
+   		"Ethernet type matching value. 
+   		 For example, '80dd'"
+   		::= { ubiClassMapMatchEntry 4 }   		                               
+   		
+   	ubiCmMatchIpDscp			OBJECT-TYPE
+   		SYNTAX		Integer32
+   		{
+   			none(-1)
+   		}(-1..63)       
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"DSCP matching value" 
+   		::= { ubiClassMapMatchEntry 5 }                                    
+   		
+   		
+   	ubiCmMatchIpPrecedence			OBJECT-TYPE
+   		SYNTAX		Integer32
+   		{
+   			none(-1)
+   		}(-1..7)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"IP Precedence matching value" 
+   		::= { ubiClassMapMatchEntry 6 } 
+   		                  
+   		
+   	ubiCmMatchSourcePort		OBJECT-TYPE
+   		SYNTAX		Integer32   		
+   		{
+   			none(0)
+   		}(0..65535)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Source port matching value" 
+   		::= { ubiClassMapMatchEntry 7 }
+   		
+   	ubiCmMatchDestPort		OBJECT-TYPE
+   		SYNTAX		Integer32
+   		{
+   			none(0)
+   		}(0..65535)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Destination matching value" 
+   		::= { ubiClassMapMatchEntry 8 }
+   		
+   	ubiCmMatchMplsExp			OBJECT-TYPE
+   		SYNTAX		Integer32
+   		{
+   			none(-1)
+   		}(-1..7)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"MPLS experimental bit matching value" 
+   		::= { ubiClassMapMatchEntry 9 }
+   		
+   	ubiCmMatchProtocol		OBJECT-TYPE
+		SYNTAX		Integer32
+		{
+   			none(-1)
+   		}(-1..255)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"Protocol number matching value.
+		 well-known value for protocol below:
+		 
+		 	1		icmp        Internet Control Management Protocol
+ 		 	2		igmp        Internet Group Management Protocol
+ 		 	0		ip          Any Internat Protocol
+ 		 	103		ospf        OSPF routing protocol
+ 		 	89		pim         Protocol Independent Protocol
+ 		 	6 		tcp         Transmission Control Protocol
+ 		 	17 		udp        	User Datagram Protocol
+ 			and so on.	 	
+ 		 "
+ 		::= { ubiClassMapMatchEntry 10 }  
+ 		
+ 	ubiCmMatchTagType			OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{   
+   			none(-1),
+     		untagged(0),
+   			tagged(1),
+   			double-tagged (3)
+   		}
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Tagging type matching value" 
+   		::= { ubiClassMapMatchEntry 11 }
+   		
+   	ubiCmMatchTcpControl		OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"TCP Control bit matching value.
+   		 available value for TCP Control below:
+   		 
+   		 	URG		32	100000
+   		 	ACK		16	010000
+   		 	PSH		8	001000
+   		 	RST		4	000100
+   		 	SYN		2	000010
+   		 	FIN		1	000001
+   		 
+   		 '' : no tcp control" 
+   		::= { ubiClassMapMatchEntry 12 }
+   	     
+   	ubiCmMatchArp	OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"The types of arp configuration are:
+   		 
+   		 	1) SET arp
+   		 		(0.0.0.0/0 0.0.0.0/0)                 
+   		 	
+   			2) SET arp with a particular source/destination address 
+   				('%d.%d.%d.%d/%d %d.%d.%d.%d/%d')
+
+    		3) Unset arp 
+    			(empty string(''))				
+   		"       
+   		::= { ubiClassMapMatchEntry 13 }  	  
+  
+   		   
+   	ubiCmMatchVlan	OBJECT-TYPE
+   		SYNTAX		Integer32 
+		{
+   			none(0)
+   		}(0..4094)
+   		MAX-ACCESS	read-write
+   		STATUS		deprecated
+   		DESCRIPTION
+   		"Vlan matching value"       
+   		::= { ubiClassMapMatchEntry 14 }  	     
+   		                                       
+	ubiCmMatchVlanInner	OBJECT-TYPE
+   		SYNTAX		Integer32 
+		{
+   			none(0)
+   		}(0..4094)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Inner Vlan matching value"       
+   		::= { ubiClassMapMatchEntry 15 }
+
+   	     
+-- ***********************************************************
+-- ubiClassMapMatchVlanTable
+-- *********************************************************** 
+ 	ubiClassMapMatchVlanTable	OBJECT-TYPE
+ 		SYNTAX		SEQUENCE OF	UbiClassMapMatchVlanEntry
+ 		MAX-ACCESS	not-accessible
+ 		STATUS		current
+ 		DESCRIPTION
+ 		"The table of vlan matching value of class map"
+ 		::= { ubiClassMapMIBObjects 3 }
+ 		
+ 	ubiClassMapMatchVlanEntry	OBJECT-TYPE
+ 		SYNTAX		UbiClassMapMatchVlanEntry
+ 		MAX-ACCESS	not-accessible
+ 		STATUS		current
+ 		DESCRIPTION
+ 	  	"An entry in ubiClassMapVlanTable,
+ 	  	 representing vlan matching list entry."
+ 	  	INDEX	{ ubiClassMapName, ubiCmVlanIndex }
+ 	  	::= { ubiClassMapMatchVlanTable 1 }
+ 	  	
+	UbiClassMapMatchVlanEntry ::= SEQUENCE {
+		ubiCmMatchVlanIndex			Integer32,
+--		ubiCmMatchVlanID				Integer32,
+		ubiCmMatchVlanRowStatus   	RowStatus
+	}
+	
+   	ubiCmMatchVlanIndex		OBJECT-TYPE
+   		SYNTAX	    Integer32
+   		MAX-ACCESS	not-accessible
+   		STATUS		current
+   		DESCRIPTION
+   		"The index of vlan matching on class map"
+   		::= { ubiClassMapMatchVlanEntry 1 }
+   		
+--  	ubiCmMatchVlanID			OBJECT-TYPE
+--  		SYNTAX		Integer32
+--  		MAX-ACCESS	read-create
+-- 		STATUS		current
+--  		DESCRIPTION
+--  		"The ID of vlan matching on class map"
+--  		::= { ubiClassMapMatchVlanEntry 2 }
+   		
+   	ubiCmMatchVlanRowStatus	OBJECT-TYPE
+   		SYNTAX		RowStatus
+   		MAX-ACCESS	read-create
+   		STATUS		current
+   		DESCRIPTION
+   		"create or remove vlan matching entry"
+   		::= { ubiClassMapMatchVlanEntry 2 }
+
+
+--
+-- Policy Map Objects
+--
+-- ***********************************************************
+-- ubiPolicyMapTable
+-- ***********************************************************  
+
+	ubiPolicyMapTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE  OF  UbiPolicyMapEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION	
+		"The table of policy map about QOS"
+		::=  { ubiPolicyMapMIBObjects 1 }
+
+	ubiPolicyMapEntry	OBJECT-TYPE
+		SYNTAX			UbiPolicyMapEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION	
+		"An entry in ubiPolicyMapTable,
+		 representing policy map list created."
+		INDEX		{ ubiPolicyMapName }
+		::=  { ubiPolicyMapTable 1 }
+
+    UbiPolicyMapEntry	::=	SEQUENCE {
+		ubiPolicyMapName		DisplayString,
+		ubiPolicyMapRowStatus	RowStatus
+	}
+	
+	ubiPolicyMapName	OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-only
+   		STATUS		current
+   		DESCRIPTION
+   		"Policy map name created"
+   		::= { ubiPolicyMapEntry 1 }
+   		
+   	ubiPolicyMapRowStatus	OBJECT-TYPE
+  		SYNTAX		RowStatus
+  		MAX-ACCESS	read-create
+  		STATUS		current
+  		DESCRIPTION
+  		"Create or remove a policy map entry."
+  		::= { ubiPolicyMapEntry 2 }
+   		         
+
+-- ***********************************************************
+-- ubiPolicyMapClassTable
+-- ***********************************************************    		         
+   		         
+	ubiPolicyMapClassTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiPolicyMapClassEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of class map of policy map"
+		::= { ubiPolicyMapMIBObjects 2 }
+		
+	ubiPolicyMapClassEntry	OBJECT-TYPE
+		SYNTAX		UbiPolicyMapClassEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry in ubiPolicyMapClassTable,
+		 representing class map entry of policy map."
+		INDEX	{ ubiPolicyMapName, ubiPolicyMapClassIndex }
+		::= { ubiPolicyMapClassTable 1 }
+		
+	UbiPolicyMapClassEntry ::= SEQUENCE {
+		ubiPolicyMapClassIndex			Integer32,
+		ubiPolicyMapClassName			DisplayString,
+		ubiPolicyMapClassRowStatus		RowStatus
+	}
+	  	
+  	ubiPolicyMapClassIndex		OBJECT-TYPE
+  		SYNTAX		Integer32
+  		MAX-ACCESS	not-accessible
+  		STATUS		current
+  		DESCRIPTION
+  		"Class map index in policy map structure.
+  		 If a class index is zero, it means that the smallest 
+  		 index that can be used is assigned when the new 
+  		 instance is created."
+  		::= { ubiPolicyMapClassEntry 1 }
+  			                        
+   	ubiPolicyMapClassName	OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-create
+   		STATUS		current
+   		DESCRIPTION
+   		"Class map name of policy map"
+   		::= { ubiPolicyMapClassEntry 2 }
+   		
+   	ubiPolicyMapClassRowStatus	OBJECT-TYPE
+ 		SYNTAX		RowStatus
+ 		MAX-ACCESS	read-create         
+ 		STATUS		current
+ 		DESCRIPTION
+ 		"Create or remove a class map entry."
+ 		::= { ubiPolicyMapClassEntry 3 }
+
+
+-- ***********************************************************
+-- ubiPolicyMapActionTable
+-- ***********************************************************       
+	ubiPolicyMapActionTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiPolicyMapActionEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of action set of policy map"
+		::= { ubiPolicyMapMIBObjects 3 }
+		
+	ubiPolicyMapActionEntry	OBJECT-TYPE
+		SYNTAX		UbiPolicyMapActionEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry in ubiPolicyMapActionTable,
+		 representing action set entry of policy map."
+		INDEX	{ ubiPolicyMapName, ubiPolicyMapClassIndex }
+		::= { ubiPolicyMapActionTable 1 }
+		
+ 	UbiPolicyMapActionEntry ::= SEQUENCE {        
+        ubiPmActionDrop      			INTEGER,
+        ubiPmActionMirror    			INTEGER,
+        ubiPmActionNetFlow   			INTEGER,
+        ubiPmActionRedirectifIndex  	Integer32,
+        ubiPmActionTrapCpu  			INTEGER,
+  		ubiPmActionTrustDscp			INTEGER,
+        ubiPmActionPoliceRate			DisplayString,
+        ubiPmActionPoliceAggName		DisplayString,
+  		ubiPmActionCos					Integer32,
+  		ubiPmActionDropPrecedence		INTEGER,
+  		ubiPmActionIpDscp				Integer32,
+  		ubiPmActionIpPrecedence			Integer32,
+  		ubiPmActionQueueing				Integer32,
+  		ubiPmActionVlanPriority			DisplayString,     
+  		ubiPmActionPoliceCirPir			DisplayString,
+  		ubiPmActionTagVlan   			DisplayString
+  	}
+		   			                        
+   	ubiPmActionDrop		OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{
+   			off(0),
+   			on(1)
+   		}
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Drop the packet"
+   		::= { ubiPolicyMapActionEntry 1 }
+   		
+   	ubiPmActionMirror		OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{
+   			off(0),
+   			on(1)
+   		}
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Mirror the packet to another interface" 
+   		::= { ubiPolicyMapActionEntry 2 }
+ 		
+   	ubiPmActionNetFlow		OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{
+   			off(0),
+   			on(1)
+   		}
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Send packets to netflow device" 
+   		::= { ubiPolicyMapActionEntry 3 }                                    
+  		
+   	ubiPmActionRedirectifIndex		OBJECT-TYPE
+   		SYNTAX		Integer32
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Redirect the packet to another interface.
+   		 if need to unset, set a value 0" 
+   		::= { ubiPolicyMapActionEntry 4 }
+   		
+   	ubiPmActionTrapCpu		OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{
+   			off(0),
+   			normal(1),
+   			high(2)
+   		}
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Trap the packet to CPU" 
+   		::= { ubiPolicyMapActionEntry 5 }
+   		
+   	ubiPmActionTrustDscp	OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{          
+   			off(0),
+   			on(1)
+   		}
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Specify trust state for policy-map" 
+   		::= { ubiPolicyMapActionEntry 6 } 
+   		
+   	ubiPmActionPoliceRate	OBJECT-TYPE
+   		SYNTAX		DisplayString 
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"Policy rate set value.
+   		 input avg-rate and ' '(space) and bur-rate.
+   		
+   		 example :
+   		 111111 222222
+   		 
+   		 if need to unset, set a value ''(empty string)"
+   		::= { ubiPolicyMapActionEntry 7 }
+   	  		
+   	ubiPmActionPoliceAggName		OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"You could set aggregate policer instead of policy rate.
+   		 if need to unset, set a value ''(empty string)"
+   		::= { ubiPolicyMapActionEntry 8 }
+   		
+   	ubiPmActionCos			OBJECT-TYPE
+   		SYNTAX		Integer32
+   		{       
+   			none(-1),
+   			cos_inner(100)
+   		}(-1..8)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   		"COS set value of VLAN tag.
+   		 if need to unset, set a value -1."
+   		::= { ubiPolicyMapActionEntry 9 }
+  
+  	ubiPmActionDropPrecedence	OBJECT-TYPE
+  		SYNTAX		INTEGER
+  		{         
+  			 none(-1),
+  			 green(0),
+  			 yellow(1),
+  			 red(2)
+  		}
+  		MAX-ACCESS	read-write
+  		STATUS		current
+  		DESCRIPTION
+  		"Drop precedence set value of Diffserv.
+  		 if need to unset, set a value 0."
+  		::= { ubiPolicyMapActionEntry 10 }
+  		
+  	ubiPmActionIpDscp		OBJECT-TYPE
+  		SYNTAX		Integer32
+  		{
+  			none(-1)
+  		}(-1..63)
+  		MAX-ACCESS	read-write
+  		STATUS		current
+  		DESCRIPTION 
+  		"DSCP set value.
+  		 if need to unset, set a value -1."
+  		::= { ubiPolicyMapActionEntry 11 }
+  		
+  	ubiPmActionIpPrecedence		OBJECT-TYPE
+  		SYNTAX		Integer32
+  		{
+  			none(-1)
+  		}(-1..7)
+  		MAX-ACCESS	read-write
+  		STATUS		current
+  		DESCRIPTION
+  		"IP precedence set value.
+  		 if need to unset, set a value -1."
+  		::= { ubiPolicyMapActionEntry 12 }
+  
+  	ubiPmActionQueueing	OBJECT-TYPE
+  		SYNTAX		Integer32
+  		{
+  			none(-1)
+  		}(-1..7)
+  		MAX-ACCESS	read-write
+  		STATUS		current
+  		DESCRIPTION
+  		"Queue set value.
+  		 if need to unset, set a value -1."
+  		::= { ubiPolicyMapActionEntry 13 }		
+  	
+ 	ubiPmActionVlanPriority	OBJECT-TYPE      
+ 		SYNTAX		DisplayString    		
+ 		MAX-ACCESS	read-write
+ 		STATUS		current
+ 		DESCRIPTION
+ 		"Represents the vlan priority for each queue:
+        '%d %d %d %d %d %d %d %d'  
+        
+            # Queue 	vlan prirory        
+            --------    -------------       
+                0     		<0-7>    
+                1     		<0-7> 
+                2     		<0-7>  
+                3     		<0-7> 
+                4     		<0-7> 
+                5     		<0-7> 
+                6     		<0-7> 
+                7     		<0-7>    
+ 		 
+ 		 if need to unset, set a value ''(empty string).
+ 		 "      
+ 		::= { ubiPolicyMapActionEntry 14 }   
+
+ 	ubiPmActionPoliceCirPir	OBJECT-TYPE      
+ 		SYNTAX		DisplayString    		
+ 		MAX-ACCESS	read-write
+ 		STATUS		current
+ 		DESCRIPTION
+ 		"Represents the CIR and PIR configuration:
+        '%d %d %d %d'  
+        
+			  #   	Description
+			 ----------------------------------------
+			  1 	Committed information rate (kbps)
+			  2 	Conform burst (kbps)
+			  3 	PIR (kbps)
+			  4 	Excess burst (kbps)    
+			  
+   		 if need to unset, set a value ''(empty string)
+		"      
+ 		::= { ubiPolicyMapActionEntry 15 } 
+                         
+                         
+	ubiPmActionTagVlan  OBJECT-TYPE      
+ 		SYNTAX		DisplayString 
+ 		MAX-ACCESS	read-write
+ 		STATUS		current
+ 		DESCRIPTION
+ 		"Represents the tag vlan:      
+ 		'%d %d'
+ 		
+		 #   	Description
+		 ----------------------------------------
+         1      Inner tag vlan ID
+         2      Outer tag vlan ID
+         
+         The second value could be zero (0) when get/set 
+"      
+ 		::= { ubiPolicyMapActionEntry 16 } 
+
+                         
+                         
+-- ***********************************************************
+-- ubiPolicyMapActionNexthopTable
+-- *********************************************************** 
+
+	ubiPolicyMapActionNexthopTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiPolicyMapActionNexthopEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of nexthop IP address of policy map"
+		::= { ubiPolicyMapMIBObjects 4 }
+		
+	ubiPolicyMapActionNexthopEntry	OBJECT-TYPE
+		SYNTAX		UbiPolicyMapActionNexthopEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry in ubiPolicyMapActionNexthopTable,
+		 representing nexthop IP address entry of policy map."
+		INDEX	{ ubiPolicyMapName, ubiPolicyMapClassIndex, 
+					ubiPmActionNexthopIndex }
+		::= { ubiPolicyMapActionNexthopTable 1 }
+		
+	UbiPolicyMapActionNexthopEntry ::= SEQUENCE {
+		ubiPmActionNexthopIndex			Integer32,   
+		ubiPmActionNextHopAddrType		InetAddressType,
+		ubiPmActionNexthopAddress		InetAddress,
+		ubiPmActionNexthopPriority		Integer32,
+		ubiPmActionNexthopRowStatus		RowStatus
+	}			
+    
+    ubiPmActionNexthopIndex		OBJECT-TYPE
+    	SYNTAX		Integer32
+    	MAX-ACCESS	not-accessible
+    	STATUS		current
+    	DESCRIPTION
+    	"Nexthop entry index in Policy map structure."
+    	::= { ubiPolicyMapActionNexthopEntry 1 }
+
+	ubiPmActionNextHopAddrType	OBJECT-TYPE
+		SYNTAX		InetAddressType
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Nexthop address type"
+		::= { ubiPolicyMapActionNexthopEntry 2 }
+    	
+	ubiPmActionNexthopAddress	OBJECT-TYPE
+		SYNTAX		InetAddress
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Nexthop IP address"
+		::= { ubiPolicyMapActionNexthopEntry 3 }
+		
+	ubiPmActionNexthopPriority		OBJECT-TYPE
+		SYNTAX		Integer32(1..8)
+		MAX-ACCESS	read-create
+		STATUS		current 
+		DESCRIPTION
+		"Priority of nexthop IP address. 
+		 low value is to mean high priority."
+		::= { ubiPolicyMapActionNexthopEntry 4 }
+		
+	ubiPmActionNexthopRowStatus	OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Create or remove a nexthop IP address."
+		::= { ubiPolicyMapActionNexthopEntry 5 }		
+ 
+ 
+
+-- ***********************************************************
+-- ubiPolicyGlobal
+-- ***********************************************************         
+
+	ubiPolicyMapClassDelete	OBJECT-TYPE
+		SYNTAX		INTEGER 
+		{          
+			none(0),
+			all(1)
+		}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"This object is function that delete the mapping information 
+		of class map(s) for a particular policy map."
+		::= { ubiPolicyGlobal 1 }
+		
+
+
+-- ***********************************************************
+-- ubiServicePolicyTable
+-- ***********************************************************  
+	ubiServicePolicyTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE  OF  UbiServicePolicyEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION	
+		"The table of service policy information"
+		::=  { ubiServicePolicyMIBObjects 1 }
+
+	ubiServicePolicyEntry	OBJECT-TYPE
+		SYNTAX			UbiServicePolicyEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION	
+		"An entry in ubiServicePolicyTable,
+		 representing an entry of service policy."
+		INDEX		{ ifIndex, ubiServicePolicyDirection, 
+						ubiServicePolicyName }
+		::=  { ubiServicePolicyTable 1 }
+
+    UbiServicePolicyEntry	::=	SEQUENCE {
+		ubiServicePolicyName			DisplayString,      
+		ubiServicePolicyDirection   	INTEGER,
+		ubiServicePolicyRowStatus		RowStatus
+	}
+	
+	ubiServicePolicyName	OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-only
+   		STATUS		current
+   		DESCRIPTION
+   		"A textual string containing information 
+   		 about the service policy."
+   		::= { ubiServicePolicyEntry 1 }
+ 
+	ubiServicePolicyDirection	OBJECT-TYPE
+   		SYNTAX		INTEGER 
+   		{
+   			input(1),
+   			output(2)
+   		}
+   		MAX-ACCESS	read-only
+   		STATUS		current
+   		DESCRIPTION
+   		"Indicates the interface direction 
+   		 which set service policy."
+   		::= { ubiServicePolicyEntry 2 }
+   		
+   	ubiServicePolicyRowStatus	OBJECT-TYPE
+   		SYNTAX		RowStatus
+   		MAX-ACCESS	read-create
+   		STATUS		current
+   		DESCRIPTION
+   		"Create or remove the service policy."
+   		::= { ubiServicePolicyEntry 3 }
+ 
+
+--
+-- Qos Map Objects
+--
+-- ***********************************************************
+-- ubiCosMapTable
+-- *********************************************************** 
+	ubiCosMapTable	OBJECT-TYPE
+		SYNTAX			SEQUENCE  OF  UbiCosMapEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION	
+		"The table of COS map of QOS"
+		::=  { ubiQosMap 1 }
+
+	ubiCosMapEntry	OBJECT-TYPE
+		SYNTAX			UbiCosMapEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION	
+		"An entry in ubiCosMapTable,
+		 representing COS map entry of QOS."
+		INDEX		{ ubiCosMapIndex }
+		::=  { ubiCosMapTable 1 }
+
+    UbiCosMapEntry	::=	SEQUENCE {
+		ubiCosMapIndex				Integer32,        
+        ubiCosToDscpMapValue		Integer32,
+        ubiCosToMutationMapValue	Integer32,
+        ubiCosToQueueMapValue		Integer32
+    }                                    
+                                         
+	ubiCosMapIndex		OBJECT-TYPE	
+		SYNTAX			Integer32(0..7)     
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		
+		"COS map index"
+		::=  {  ubiCosMapEntry  1  }   
+		
+   ubiCosToDscpMapValue OBJECT-TYPE
+        SYNTAX       Integer32(0..63)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+        "COS to DSCP map value"
+        ::= { ubiCosMapEntry 2 }   
+        
+   ubiCosToMutationMapValue OBJECT-TYPE
+    	SYNTAX		Integer32(0..7)
+    	MAX-ACCESS	read-write
+    	STATUS		current
+    	DESCRIPTION
+    	"COS to other COS mapping value"
+    	::=  {  ubiCosMapEntry 3 }
+	
+	 ubiCosToQueueMapValue	OBJECT-TYPE
+    	SYNTAX		Integer32(0..7)  
+    	MAX-ACCESS	read-write
+    	STATUS		current
+    	DESCRIPTION
+    	"COS to Queue mapping value"
+    	::= { ubiCosMapEntry 4 }
+
+                       
+-- ***********************************************************
+-- ubiDscpMapTable
+-- ***********************************************************     
+	ubiDscpMapTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  UbiDscpMapEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of DSCP map of QOS"
+		::= { ubiQosMap 2 }
+		
+	ubiDscpMapEntry 	OBJECT-TYPE
+		SYNTAX		UbiDscpMapEntry   
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry in ubiDscpMapTable,
+		 representing DSCP map entry of QOS."
+		INDEX	{ ubiDscpMapIndex }
+		::= { ubiDscpMapTable 1 }
+		
+	UbiDscpMapEntry ::= SEQUENCE {
+		ubiDscpMapIndex				Integer32,
+		ubiDscpToCosMapValue		Integer32,
+		ubiDscpToMutationMapValue  	Integer32,
+		ubiDscpToQueueMapValue		Integer32
+	}
+	
+	ubiDscpMapIndex		OBJECT-TYPE
+		SYNTAX		Integer32(0..63)
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"DSCP map index"
+		::= { ubiDscpMapEntry 1 }
+		
+	ubiDscpToCosMapValue	OBJECT-TYPE
+		SYNTAX		Integer32(0..7)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"DSCP to COS mapping value"
+		::= { ubiDscpMapEntry 2 }
+		
+	ubiDscpToMutationMapValue	OBJECT-TYPE
+		SYNTAX		Integer32(0..63)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"DSCP to other DSCP mapping value"
+		::= { ubiDscpMapEntry 3 }
+		
+	ubiDscpToQueueMapValue	OBJECT-TYPE
+		SYNTAX		Integer32(0..7)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"DSCP to Queue mapping value"
+		::= { ubiDscpMapEntry 4 } 
+		                                                       
+
+		                                                       
+-- ***********************************************************
+-- ubiTxScheduleTable
+-- *********************************************************** 
+	ubiTxScheduleTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  UbiTxScheduleEntry		
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of tx-scheduling map of QOS"
+		::= { ubiTxSchedule 1 }
+		
+	ubiTxScheduleEntry	OBJECT-TYPE
+		SYNTAX		UbiTxScheduleEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry in ubiTxScheduleTable,
+		 representing tx-scheduling map entry."
+		INDEX	{ ubiTxScheduleName }
+		::= { ubiTxScheduleTable 1 }
+		
+	UbiTxScheduleEntry ::= SEQUENCE {
+		ubiTxScheduleName				DisplayString,
+		ubiTxScheduleIfIndex				Integer32,
+		ubiTxScheduleRowStatus			RowStatus
+	}
+
+	ubiTxScheduleName			OBJECT-TYPE
+		SYNTAX		DisplayString (SIZE (1..255))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"tx-scheduling entry name"
+		::= { ubiTxScheduleEntry 1 }
+		
+	ubiTxScheduleIfIndex			OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-write
+		STATUS		deprecated
+		DESCRIPTION
+		""
+		::= { ubiTxScheduleEntry 2 }
+
+	ubiTxScheduleRowStatus	OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"create or remove tx-scheduling entry"
+		::= { ubiTxScheduleEntry 3 }
+		    
+		    
+-- ***********************************************************
+-- ubiTxSchedulQueueTable
+-- *********************************************************** 
+  
+	ubiTxScheduleQueueTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiTxScheduleQueueEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"The table of tx-scheduling queue value"
+		::= { ubiTxSchedule 2 }
+		
+	ubiTxScheduleQueueEntry	OBJECT-TYPE
+		SYNTAX		UbiTxScheduleQueueEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry in ubiTxScheduleQueueTable,
+		 representing queue value of tx-scheduling."
+		INDEX	{ ubiTxSchedulName, ubiTxScheduleQueueIndex }
+		::= { ubiTxScheduleQueueTable 1 }
+		
+	UbiTxScheduleQueueEntry ::= SEQUENCE {        
+		ubiTxScheduleQueueIndex		Integer32,
+		ubiTxScheduleQueueMethod	INTEGER,
+		ubiTxScheduleQueueWeight	Integer32
+	}                             
+		  
+	ubiTxScheduleQueueIndex	OBJECT-TYPE
+		SYNTAX		Integer32    (0..7)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The unique identifier of Tx scheduling queue."
+		::= { ubiTxScheduleQueueEntry 1 }
+    
+    ubiTxScheduleQueueMethod	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			none(0),
+			strict(1),
+			wrr1(2),                                                   
+			wrr2(3)
+		}    
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION  
+		"queue method value"       
+		DEFVAL		{ strict }
+		::= { ubiTxScheduleQueueEntry 2 }
+
+	ubiTxScheduleQueueWeight	OBJECT-TYPE
+		SYNTAX		Integer32  (1..100)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION        
+		"queue weight value.
+		 in strict mode, weight value is 1."
+		DEFVAL 		{ 1 }
+		::= { ubiTxScheduleQueueEntry 3 }
+         
+         
+-- ***********************************************************
+-- ubiAggPoliceTable
+-- *********************************************************** 
+	ubiAggPoliceTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiAggPoliceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiQosMIBObjects 2 }
+		
+	ubiAggPoliceEntry	OBJECT-TYPE
+		SYNTAX		UbiAggPoliceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		""
+		INDEX	{ ubiAggPoliceAggName }
+		::= { ubiAggPoliceTable 1 }
+		
+	UbiAggPoliceEntry ::= SEQUENCE {        
+		ubiAggPoliceAggName			DisplayString,
+		ubiAggPoliceAvgTrafficRate	Integer32,
+		ubiAggPoliceAvgBurstRate	Integer32,
+		ubiAggPoliceRowStatus		RowStatus
+	}                             
+		  
+	ubiAggPoliceAggName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"A textual string containing information about the
+ 		the aggregate-police."
+		::= { ubiAggPoliceEntry 1 }
+    
+    ubiAggPoliceAvgTrafficRate	OBJECT-TYPE
+		SYNTAX		Integer32(1..10000000)    
+		UNITS		"kbps"
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION  
+		"Specify an average traffic rate."       
+		::= { ubiAggPoliceEntry 2 }
+
+    ubiAggPoliceAvgBurstRate	OBJECT-TYPE
+		SYNTAX		Integer32(1..10000000)    
+		UNITS		"kbps"
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION  
+		"Specify an average burst rate."       
+		::= { ubiAggPoliceEntry 3 }
+
+    ubiAggPoliceRowStatus	OBJECT-TYPE
+		SYNTAX		RowStatus    
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION  
+		"Create or remove an aggregate-police entry."       
+		::= { ubiAggPoliceEntry 4 }
+                  
+-- ***********************************************************
+-- ubiVlanPriorityOverride
+-- ***********************************************************  
+
+	ubiVlanPriorityOverrideTable	OBJECT-TYPE	
+		SYNTAX		SEQUENCE OF VlanPriorityOverrideEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		"vlan-priority-override table"
+		::= { ubiQosMIBObjects 3 }
+		
+	ubiVlanPriorityOverrideEntry	OBJECT-TYPE	
+		SYNTAX		VlanPriorityOverrideEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		"vlan-priority-override entry"
+		INDEX { ubiBridgeId, ubiVlanIndex }
+		::= { ubiVlanPriorityOverrideTable 1 }
+		
+	VlanPriorityOverrideEntry ::= SEQUENCE {
+		ubiVlanPriority		INTEGER
+	}	
+	                                 
+	ubiVlanPriority		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			unset(8)
+		}(0..7)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"vlan-priority-override priority"
+		::= { ubiVlanPriorityOverrideEntry 1 }	                                 
+
+-- ***********************************************************
+-- ubiMinReserve
+-- *********************************************************** 
+
+	ubiMinReserveTable	OBJECT-TYPE	
+		SYNTAX		SEQUENCE OF MinReserveEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		"min-reserve table"
+		::= { ubiQosMIBObjects 4 }
+	
+	ubiMinReserveEntry	OBJECT-TYPE	
+		SYNTAX		MinReserveEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		"min-reserve entry"
+		INDEX { ubiMinReserveLevelID } 
+		::= { ubiMinReserveTable 1 }  
+		
+	MinReserveEntry	::= SEQUENCE {
+		ubiMinReserveLevelID		Integer32,
+		ubiMinReserveHoldingPacket  INTEGER
+	}
+				
+	ubiMinReserveLevelID		OBJECT-TYPE
+		SYNTAX		Integer32(1..8)
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		"min-reserve level-id"
+		::= { ubiMinReserveEntry 1 }
+		
+	ubiMinReserveHoldingPacket	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			unset(0)
+		}(10..170)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"min-reserve holding-packet"
+		::= { ubiMinReserveEntry 2 }
+
+-- ***********************************************************
+-- ubiInterfaceQos
+-- *********************************************************** 
+    ubiInterfaceQosTable	OBJECT-TYPE	
+		SYNTAX		SEQUENCE OF UbiInterfaceQosEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiQosMIBObjects 5 }
+	
+	ubiInterfaceQosEntry	OBJECT-TYPE	
+		SYNTAX		UbiInterfaceQosEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		""
+		INDEX { ifIndex } 
+		::= { ubiInterfaceQosTable 1 }  
+		
+	UbiInterfaceQosEntry	::= SEQUENCE {
+		ubiInterfaceQosCos				INTEGER,
+		ubiInterfaceCosDscp				TruthValue,
+		ubiInterfaceCosMutation			TruthValue,
+		ubiInterfaceDaPrioOveride   	INTEGER,
+		ubiInterfaceDscpCos				TruthValue,
+		ubiInterfaceDscpMutation		TruthValue,
+		ubiInterfaceForceTrustCos		TruthValue,
+		ubiInterfaceTrust				INTEGER,
+		ubiInterfaceTxScheduling		DisplayString,
+		ubiInterfaceVlanPrioOverride	INTEGER
+	}      
+	
+	ubiInterfaceQosCos	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			unset(8)
+		}(0..7)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"mls qos cos"
+		::= { ubiInterfaceQosEntry 1 }   
+		
+    ubiInterfaceCosDscp	OBJECT-TYPE
+		SYNTAX		TruthValue
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"mls qos cos-dscp"
+		::= { ubiInterfaceQosEntry 2 }    
+	
+	ubiInterfaceCosMutation	OBJECT-TYPE
+		SYNTAX		TruthValue
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"mls qos cos-mutation"
+		::= { ubiInterfaceQosEntry 3 }
+	
+	ubiInterfaceDaPrioOveride	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{     
+			none(0),
+			cos(1),
+			queue(2),
+			both(3)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"mls qos da-priority-override"
+		::= { ubiInterfaceQosEntry 4 }
+	
+	ubiInterfaceDscpCos	OBJECT-TYPE
+		SYNTAX		TruthValue
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"mls qos dscp-cos"
+		::= { ubiInterfaceQosEntry 5 } 
+		
+	ubiInterfaceDscpMutation	OBJECT-TYPE
+		SYNTAX		TruthValue
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"mls qos dscp-mutation"
+		::= { ubiInterfaceQosEntry 6 }
+		
+	ubiInterfaceForceTrustCos	OBJECT-TYPE
+		SYNTAX		TruthValue
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"mls qos force-trust cos"
+		::= { ubiInterfaceQosEntry 7 }
+	
+	ubiInterfaceTrust	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			none(0),
+			cos(1),
+			dscp(2),
+			both(3)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"mls qos trust (cos[1]|dscp[2]|both[3])"
+		::= { ubiInterfaceQosEntry 8 }
+	
+	ubiInterfaceTxScheduling	OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiInterfaceQosEntry 9 }
+	
+	ubiInterfaceVlanPrioOverride	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			none(0),
+			cos(1),
+			queue(2),
+			both(3)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"mls qos vlan-priority-override (cos[1]|queue[2]|both[3])"
+		::= { ubiInterfaceQosEntry 10 }
+	
+ 
+ -- ***********************************************************
+-- queue buffer
+-- *********************************************************** 
+    ubiQueueBufferTable	OBJECT-TYPE	
+		SYNTAX		SEQUENCE OF UbiQueueBufferEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Queue Buffer Table"
+		::= { ubiQosMIBObjects 6 }
+	
+	ubiQueueBufferEntry	OBJECT-TYPE	
+		SYNTAX		UbiQueueBufferEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Queue Buffer Entry"
+		INDEX { ubiQueueBufferID } 
+		::= { ubiQueueBufferTable 1 }  
+		
+	UbiQueueBufferEntry	::= SEQUENCE {
+		ubiQueueBufferID				INTEGER,
+		ubiQueueBufferSize				INTEGER,
+		ubiQueueBufferDesc 				INTEGER,
+		ubiQueueBufferSet               INTEGER
+	}      
+	
+	ubiQueueBufferID	OBJECT-TYPE
+		SYNTAX		INTEGER (1..8)
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Queue Buffer identity."
+		::= { ubiQueueBufferEntry 1 }   
+		
+	ubiQueueBufferSize	OBJECT-TYPE
+		SYNTAX		INTEGER (0..4096)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"Queue Buffer size."
+		::= { ubiQueueBufferEntry 2 }
+		
+	ubiQueueBufferDesc	OBJECT-TYPE
+		SYNTAX		INTEGER (0..7680)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"Queue Buffer description."
+		::= { ubiQueueBufferEntry 3 }
+
+	ubiQueueBufferSet	OBJECT-TYPE
+		SYNTAX		INTEGER {
+			unset(0),
+			set(1)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"Queue Buffer status. 
+		 Apply values of ubiQueueBufferDesc and ubiQueueBufferSize."
+		::= { ubiQueueBufferEntry 4 }
+                        
+-- ubiQosEnable  
+
+	ubiQosEnable	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			disable(0),
+			enable(1)
+		}            
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"qos enable"
+		::= { ubiQosGlobal 1 }       
+		
+        
+-- ***********************************************************
+-- ubiFrameTypePriorityOverride
+-- *********************************************************** 
+
+	ubiFrameTypePriorityOverride	OBJECT IDENTIFIER ::= { ubiQosGlobal 2 }
+	
+	ubiBpduToCpu		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{     
+			disable(4)
+		}(0..3)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"frame-type-priority-override bpdu-to-cpu"
+		::= { ubiFrameTypePriorityOverride 1 }
+
+	ubiUcastMgmtToCpu	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{     
+			disable(4)
+		}(0..3)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"fream-type-priority-override ucast-mgmt-to-cpu"
+		::= { ubiFrameTypePriorityOverride 2 }
+		
+	ubiFromCpu			OBJECT-TYPE
+		SYNTAX		INTEGER
+		{     
+			disable(4)
+		}(0..3)
+		ACCESS		read-write  
+		STATUS		current
+		DESCRIPTION
+		"frame-type-priority-override from-cpu"
+		::= { ubiFrameTypePriorityOverride 3 }
+		
+	ubiPortEtypeMatch	OBJECT-TYPE   
+		SYNTAX		INTEGER
+		{     
+			disable(4)
+		}(0..3)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+		"fream-type-priority-override port-etype-match"
+		::= { ubiFrameTypePriorityOverride 4 }
+
+	                              
+-- ***********************************************************
+-- ubiQoSMIBConformance
+-- ***********************************************************  
+
+-- conformance information
+
+ubiQosMIBCompliances  	OBJECT IDENTIFIER		::= { ubiQosMIBConformance 1 }
+ubiQosMIBGroups  		OBJECT IDENTIFIER		::= { ubiQosMIBConformance 2 }
+
+
+--
+-- compliance statements
+--
+	ubiQosMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"An Entity-MIB implementation can implement this group to
+        	provide FRU status and control."
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {
+    					ubiQosMIBClassGroup,
+    					ubiQosMIBPolicyGroup,
+                        ubiQosMIBQosMapGroup
+        }
+
+    	GROUP           ubiQosMIBClassGroup
+    	DESCRIPTION
+        	""
+
+    	GROUP           ubiQosMIBPolicyGroup
+    	DESCRIPTION
+        	""
+        	   
+    	GROUP           ubiQosMIBQosMapGroup
+    	DESCRIPTION
+        	""           	
+        
+    	::= { ubiQosMIBCompliances 1 }
+
+-- units of conformance
+
+	ubiQosMIBClassGroup OBJECT-GROUP
+    	OBJECTS         {
+                    	}
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiQosMIBGroups 1 }
+
+	ubiQosMIBPolicyGroup NOTIFICATION-GROUP
+   		NOTIFICATIONS    { 
+   		 }
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiQosMIBGroups 2 }    
+ 
+	ubiQosMIBQosMapGroup OBJECT-GROUP
+    	OBJECTS         { 
+    					}
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiQosMIBGroups 3 }
+	
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

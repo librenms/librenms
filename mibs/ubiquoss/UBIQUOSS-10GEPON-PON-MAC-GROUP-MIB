@@ -1,0 +1,2736 @@
+-- *****************************************************************
+-- UBIQUOSS-10GEPON-PON-MAC-GROUP-MIB.my
+--
+-- Jul. 2013, Hangil Won   
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+	UBIQUOSS-10GEPON-PON-MAC-GROUP-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			InterfaceIndex			
+				FROM IF-MIB	
+			onuPortFilterRuleIngressPort, onuClassRuleId			
+				FROM UBIQUOSS-EPON-PON-PROFILE-GROUP-MIB			
+			OnuType			
+				FROM UBIQUOSS-EPON-TC-MIB			
+			IpAddress, Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			MacAddress, RowStatus, DisplayString			
+				FROM SNMPv2-TC
+	        ubi10GEponGroupMIB		                 
+	        	FROM UBQS-SMI 			
+			ubiPortIndex
+				FROM UBQS-INTERFACE-MIB;	
+	                                            
+		ubi10gPonMacMIB MODULE-IDENTITY 
+			LAST-UPDATED "201601072200Z"		
+			ORGANIZATION 
+				"Ubiquoss Inc."
+			CONTACT-INFO 
+				"Chair		: Hangil Won
+							  Ubiquoss Inc.
+				 Postal:	: 8F Ubiquoss B/D, 68, Pangyo-ro
+				 			  255beon-gil, Bundang-gu, Seongnam-si,
+				 			  Gyeonggi-do, 463-400, Republic of Korea							  
+				 EMail: 	: hg88pro@ubiquoss.com"
+			DESCRIPTION 
+				"This MIB module defines 10g epon mac information"
+   			::= { ubi10GEponGroupMIB 1 }
+	                    	
+-- ***********************************************************
+-- Node definitions
+-- ***********************************************************
+	    ubi10gPonMacMIBObjects	OBJECT IDENTIFIER ::= { ubi10gPonMacMIB 1 } 
+
+-- ***********************************************************
+-- olt10gPonMacTable
+-- ***********************************************************
+		olt10gPonMacTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Olt10gPonMacEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 1 }
+		
+		olt10gPonMacEntry OBJECT-TYPE
+			SYNTAX Olt10gPonMacEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex }
+			::= { olt10gPonMacTable 1 }
+		
+		Olt10gPonMacEntry ::=
+			SEQUENCE {     
+				olt10gPonMacAddress
+					MacAddress,
+				olt10gPonMacAdminStatus
+					INTEGER,
+				olt10gPonMacOperStatus
+					INTEGER,
+				olt10gPonMacMode
+					INTEGER,
+				registeredOntCount
+					Integer32
+			 }
+
+		olt10gPonMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { olt10gPonMacEntry 1 }
+		
+		olt10gPonMacAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				locked(0),
+				unlocked(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { olt10gPonMacEntry 2 }
+		
+		olt10gPonMacOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2),
+				cableDown(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { olt10gPonMacEntry 3 }
+		
+		olt10gPonMacMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				mixed(1),
+				real(2),
+				hybrid(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { olt10gPonMacEntry 4 }
+		
+        registeredOntCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { olt10gPonMacEntry 5 }                
+                       
+-- ***********************************************************
+--  onu10gPonMacTable
+-- ***********************************************************
+		onu10gPonMacTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Onu10gPonMacEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 2 }
+		
+		onu10gPonMacEntry OBJECT-TYPE
+			SYNTAX Onu10gPonMacEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId }
+			::= { onu10gPonMacTable 1 }
+		
+		Onu10gPonMacEntry ::=
+			SEQUENCE {
+				onu10gId
+					Integer32, 
+				onu10gPonMacAddress
+					MacAddress,
+				onu10gPonMacOnuType
+					DisplayString,
+				onu10gPonMacAdminStatus
+					INTEGER,
+				onu10gPonMacOperStatus
+					INTEGER,
+				onu10gPonMacLoc
+					DisplayString,
+				onu10gPonMacRowStatus
+					RowStatus,
+				onu10gPonMacDistance
+					Integer32,
+				onu10gPonLoopStatus
+					INTEGER,
+				onu10gPonAutoRemoveStatus
+					INTEGER,
+				onu10gPonSpeedSelect
+					INTEGER,
+				onu10gPonReportMode
+					INTEGER,
+				ubi10gPortIndex
+					Integer32
+			 }
+                              
+        onu10gId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gPonMacEntry 1 }
+
+		onu10gPonMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gPonMacEntry 2 }
+		
+		onu10gPonMacOnuType OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gPonMacEntry 3 }
+		
+	
+		onu10gPonMacAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				locked(0),
+				unlocked(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gPonMacEntry 4 }
+		
+		onu10gPonMacOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2),
+				cableDown(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gPonMacEntry 5 }
+		
+		onu10gPonMacLoc OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gPonMacEntry 6 }
+		
+		onu10gPonMacRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gPonMacEntry 7 }
+		
+		onu10gPonMacDistance OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Unit : meter"
+			::= { onu10gPonMacEntry 8 }         
+			
+		onu10gPonLoopStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				enable(1)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Display ONU Loop Status"
+			::= { onu10gPonMacEntry 9 }         
+			
+		onu10gPonAutoRemoveStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				enable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"disable: onu-auto-remove, enable: no onu-auto-remove"
+			::= { onu10gPonMacEntry 10 }  
+	
+			onu10gPonSpeedSelect OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				speed_10_10(0),
+				speed_10_1(1),
+				speed_1_1(2),
+				speed_turbo(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Display ONU's Supported Bandwidth
+				 Downstream Speed/Upstream Speed"
+			::= { onu10gPonMacEntry 11 } 
+
+			onu10gPonReportMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unknown(0),
+				siepon-a(1),
+				siepon-b(2),
+				siepon-c(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Display ONU Link-up SIEPON Package
+				 SIEPON-A : DPoE
+				 SIEPON-B : Broadcom
+				 SIEPON-C : CTC"
+			::= { onu10gPonMacEntry 12 } 	 
+						
+-- ***********************************************************
+-- pon10gRemoteLoopBack
+-- ***********************************************************
+		
+		pon10gRemoteLoopBack OBJECT IDENTIFIER ::= { ubi10gPonMacMIBObjects 3 }
+			
+-- ***********************************************************
+-- pon10gLpbkTestTable
+-- ***********************************************************
+		pon10gLpbkTestTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pon10gLpbkTestEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"10G Loopback Test Command.
+				Each object setting is impossible.
+				Multiple setting is only available."
+			::= { pon10gRemoteLoopBack 1 }
+		
+		pon10gLpbkTestEntry OBJECT-TYPE
+			SYNTAX Pon10gLpbkTestEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description"
+			INDEX { ubiPortIndex, onu10gId, linkId }
+			::= { pon10gLpbkTestTable 1 }
+		
+		Pon10gLpbkTestEntry ::=
+			SEQUENCE {
+				linkId
+					Integer32, 
+				pon10gLpbkTestFramesNum
+					Integer32,
+				pon10gLpbkTestPayloadLength
+					Integer32,
+				pon10gLpbkTestPayloadType
+					INTEGER,
+				pon10gLpbkTestVlanTag
+					Integer32,
+				pon10gLpbkTestRowStatus
+				    RowStatus
+			 }
+                                                    
+        linkId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestEntry 1 }
+
+		pon10gLpbkTestFramesNum OBJECT-TYPE
+			SYNTAX Integer32 (1..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Nember of frames.
+				Units : Frames"
+			::= { pon10gLpbkTestEntry 2 }
+		
+		pon10gLpbkTestPayloadLength OBJECT-TYPE
+			SYNTAX Integer32 (46..1500)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Payload length.
+				Units : Bytes"
+			::= { pon10gLpbkTestEntry 3 }
+
+		pon10gLpbkTestPayloadType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				incrementing(0),
+				random(1),
+				allOnes(2),
+				allZeros(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Payload Type."
+			::= { pon10gLpbkTestEntry 4 }
+		
+		pon10gLpbkTestVlanTag OBJECT-TYPE
+			SYNTAX Integer32 (0..4094)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"VLAN Tag.
+				Untagged frames : 0
+				Valid tags : 1~4094"
+			::= { pon10gLpbkTestEntry 5 }
+		
+   		pon10gLpbkTestRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"RowStatus"
+			::= { pon10gLpbkTestEntry 6 }
+   		
+-- ***********************************************************
+-- pon10gLpbkTestResultForNotify		: NOT USE
+-- ***********************************************************
+--
+--		ponLpbkTestResultForNotify OBJECT IDENTIFIER ::= { ponRemoteLoopBack 2 }
+--		
+--		ponLpbkTestResultFramesSent OBJECT-TYPE
+--			SYNTAX Integer32
+--			MAX-ACCESS accessible-for-notify
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ponLpbkTestResultForNotify 1 }
+--		
+--		ponLpbkTestResultFramesRecievedOK OBJECT-TYPE
+--			SYNTAX Integer32
+--			MAX-ACCESS accessible-for-notify
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ponLpbkTestResultForNotify 2 }
+--		
+--		ponLpbkTestResultCorruptedFramesReceived OBJECT-TYPE
+--			SYNTAX Integer32
+--			MAX-ACCESS accessible-for-notify
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ponLpbkTestResultForNotify 3 }
+--		
+--		ponLpbkTestResultMinDelay OBJECT-TYPE
+--			SYNTAX Integer32
+--			MAX-ACCESS accessible-for-notify
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ponLpbkTestResultForNotify 4 }
+--		
+--		ponLpbkTestResultMaxDelay OBJECT-TYPE
+--			SYNTAX Integer32
+--			MAX-ACCESS accessible-for-notify
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ponLpbkTestResultForNotify 5 }
+--		
+--		ponLpbkTestResultAverageDelay OBJECT-TYPE
+--			SYNTAX Integer32
+--			MAX-ACCESS accessible-for-notify
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ponLpbkTestResultForNotify 6 }
+--		
+--		ponLpbkTestResult OBJECT-TYPE
+--			SYNTAX INTEGER
+--				{
+--				loopbackFail(0),
+--				loopbackSuccess(1)
+--				}
+--			MAX-ACCESS accessible-for-notify
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ponLpbkTestResultForNotify 7 }
+--
+
+-- ***********************************************************
+-- pon10gLpbkTestResultTable
+-- ***********************************************************
+
+		pon10gLpbkTestResultTable OBJECT IDENTIFIER ::= { pon10gRemoteLoopBack 3 }
+		
+		pon10gLpbkResultOltPortIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 1 }
+		
+		pon10gLpbkResultOnuId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 2 }
+		
+		pon10gLpbkResultLinkId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 3 }
+		
+		pon10gLpbkResultFrameSent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 4 }
+		
+		pon10gLpbkResultPayloadType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				incrementing(0),
+				random(1),
+				allOnes(2),
+				allZeros(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 5 }
+		
+		pon10gLpbkResultFramesRecievedOK OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 6 }
+		
+		pon10gLpbkResultFramesRecievedBad OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 7 }			
+				
+		pon10gLpbkResultMinDelay OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 8 }
+			
+		pon10gLpbkResultMaxDelay OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 9 }			
+			
+		pon10gLpbkResultAverageDelay OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gLpbkTestResultTable 10 }		
+			
+					
+-- ***********************************************************
+-- dot3MpcpStatTable
+-- ***********************************************************
+		pon10gMpcp OBJECT IDENTIFIER ::= { ubi10gPonMacMIBObjects 4 }
+
+		dot3MpcpStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Dot3MpcpStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pon10gMpcp 1 }
+		
+		dot3MpcpStatEntry OBJECT-TYPE
+			SYNTAX Dot3MpcpStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, mpcpLmhzd }
+			::= { dot3MpcpStatTable 1 }
+		
+		Dot3MpcpStatEntry ::=
+			SEQUENCE {
+				mpcpLmhzd
+					Integer32, 
+--				dot3MpcpMACCtrlFramesTransmitted
+--					Counter32,
+--				dot3MpcpMACCtrlFramesReceived
+--					Counter32,
+				dot3MpcpDiscoveryWindowsSent
+					Counter32,
+				dot3MpcpDiscoveryTimeout
+					Counter32,
+--				dot3MpcpTxRegRequest
+--					Counter32,
+				dot3MpcpRxRegRequest
+					Counter32,   
+--				dot3MpcpTxRegAck
+--					Counter32,
+				dot3MpcpRxRegAck
+					Counter32,  
+--				dot3MpcpTxReport
+--					Counter32,
+				dot3MpcpRxReport
+					Counter32,
+				dot3MpcpTxGate
+					Counter32,
+--				dot3MpcpRxGate
+--					Counter32,
+--				dot3MpcpTxRegister
+--					Counter32,
+--				dot3MpcpRxRegister
+--					Counter32
+			 }
+                    
+        
+		mpcpLmhzd OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { dot3MpcpStatEntry 1 }
+
+--		dot3MpcpMACCtrlFramesTransmitted OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { dot3MpcpStatEntry 2 }
+		
+--		dot3MpcpMACCtrlFramesReceived OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { dot3MpcpStatEntry 3 }
+		
+		dot3MpcpDiscoveryWindowsSent OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { dot3MpcpStatEntry 4 }
+		
+		dot3MpcpDiscoveryTimeout OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { dot3MpcpStatEntry 5 }
+		
+--		dot3MpcpTxRegRequest OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { dot3MpcpStatEntry 6 }
+		
+		dot3MpcpRxRegRequest OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { dot3MpcpStatEntry 7 }
+		
+--		dot3MpcpTxRegAck OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { dot3MpcpStatEntry 8 }
+
+		dot3MpcpRxRegAck OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { dot3MpcpStatEntry 9 }
+		
+--		dot3MpcpTxReport OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { dot3MpcpStatEntry 10 }
+		
+		dot3MpcpRxReport OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { dot3MpcpStatEntry 11 }
+		
+		dot3MpcpTxGate OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { dot3MpcpStatEntry 12 }
+
+--		dot3MpcpRxGate OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { dot3MpcpStatEntry 13 }
+		
+--		dot3MpcpTxRegister OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { dot3MpcpStatEntry 14 }
+		
+--		dot3MpcpRxRegister OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { dot3MpcpStatEntry 15 }
+		
+-- ***********************************************************
+-- onuVlanTagTable
+-- ***********************************************************
+--		onuVlanTagTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF OnuVlanTagEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ubiPonMacMIBObjects 5 }
+--		
+--		-- 1.3.6.1.4.1.7800.500.5.1
+--		onuVlanTagEntry OBJECT-TYPE
+--			SYNTAX OnuVlanTagEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }   				-- TODO  
+--			::= { onuVlanTagTable 1 }
+--		
+--		OnuVlanTagEntry ::=
+--			SEQUENCE { 
+--				onuVlanTagId
+--					Integer32,
+--				onuNetworkVlanTag
+--					Integer32,
+--				onuTranslatedVlanId
+--					Integer32,
+--				onuVlanTagRowStatus
+--					Integer32
+--			 }
+--
+--		onuVlanTagId OBJECT-TYPE
+--			SYNTAX Integer32 (1..32)
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuVlanTagEntry 1 }
+--		
+--		onuNetworkVlanTag OBJECT-TYPE
+--			SYNTAX Integer32 (1..4094)
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuVlanTagEntry 2 }
+--		
+--		onuTranslatedVlanId OBJECT-TYPE
+--			SYNTAX Integer32 (0)
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuVlanTagEntry 3 }
+--		
+--		onuVlanTagRowStatus OBJECT-TYPE
+--			SYNTAX Integer32
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuVlanTagEntry 4 }
+		
+-- ***********************************************************
+-- onuPriorityVlanTable
+-- ***********************************************************
+--		onuPriorityVlanTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF OnuPriorityVlanEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ubiPonMacMIBObjects 6 }
+--		
+--		onuPriorityVlanEntry OBJECT-TYPE
+--			SYNTAX OnuPriorityVlanEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"delete : onuNetworkVlanId value == 0
+--				add : onuNetworkVlanId > 0
+--				"
+--			INDEX { ubiPortIndex }          -- TODO
+--			::= { onuPriorityVlanTable 1 }
+--		
+--		OnuPriorityVlanEntry ::=
+--			SEQUENCE { 
+--				onuNetworkVlanId
+--					Integer32,
+--				onuUpStreamCos
+--					Integer32,
+--				onuDownstreamPriorityUse
+--					INTEGER,
+--				onuMinPriorityValue
+--					Integer32,
+--				onuMaxPriorityValue
+--					Integer32,
+--				onuTxNonTosFrame
+--					INTEGER
+--			 }
+--
+--		onuNetworkVlanId OBJECT-TYPE
+--			SYNTAX Integer32 (0..4094)
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuPriorityVlanEntry 1 }
+--
+--		onuUpStreamCos OBJECT-TYPE
+--			SYNTAX Integer32 (0..7)
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuPriorityVlanEntry 2 }
+--		
+--		onuDownstreamPriorityUse OBJECT-TYPE
+--			SYNTAX INTEGER
+--				{
+--				cos(0),
+--				tos(1)
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuPriorityVlanEntry 3 }
+--		
+--		onuMinPriorityValue OBJECT-TYPE
+--			SYNTAX Integer32 (0..7)
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuPriorityVlanEntry 4 }
+--		
+--		onuMaxPriorityValue OBJECT-TYPE
+--			SYNTAX Integer32 (0..7)
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuPriorityVlanEntry 5 }
+--		
+--		onuTxNonTosFrame OBJECT-TYPE
+--			SYNTAX INTEGER
+--				{
+--				off(0),
+--				on(1)
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuPriorityVlanEntry 6 }
+		
+-- ***********************************************************
+-- igmpVlanTable
+-- ***********************************************************
+--		igmpVlanTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF IgmpVlanEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ubiPonMacMIBObjects 7 }
+--		
+--		igmpVlanEntry OBJECT-TYPE
+--			SYNTAX IgmpVlanEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }            -- TODO 
+--			::= { igmpVlanTable 1 }
+--		
+--		IgmpVlanEntry ::=
+--			SEQUENCE { 
+--				fcfsPoolSize
+--					Integer32
+--			 }
+--
+--		fcfsPoolSize OBJECT-TYPE
+--			SYNTAX Integer32 (0..1000000)
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { igmpVlanEntry 1 }       
+			
+-- ***********************************************************
+-- igmpVlanProvTable
+-- ***********************************************************
+--		igmpVlanProvTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF IgmpVlanProvEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ubiPonMacMIBObjects 8 }
+--		
+--		igmpVlanProvEntry OBJECT-TYPE
+--			SYNTAX IgmpVlanProvEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }         -- TODO
+--			::= { igmpVlanProvTable 1 }
+--		
+--		IgmpVlanProvEntry ::=
+--			SEQUENCE { 
+--				networkVid
+--					Integer32,
+--				eponVid
+--					Integer32,
+--				vlanMgb
+--					Integer32,
+--				vlanMab
+--					Integer32,
+--				defaultPerChanBw
+--					Integer32,
+--				igmpVlanProvRowStatus
+--					RowStatus
+--			 }
+--
+--		networkVid OBJECT-TYPE
+--			SYNTAX Integer32 (0..65535)
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"range : 0 ~ 4093
+--				in igmpChanTable only use:: all network vlan Id delete (65535)"
+--			::= { igmpVlanProvEntry 1 }
+--		
+--		eponVid OBJECT-TYPE
+--			SYNTAX Integer32 (0..4093)
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { igmpVlanProvEntry 2 }
+--		
+--		vlanMgb OBJECT-TYPE
+--			SYNTAX Integer32 (0..1000000)
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { igmpVlanProvEntry 3 }
+--		
+--		vlanMab OBJECT-TYPE
+--			SYNTAX Integer32 (0..1000000)
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { igmpVlanProvEntry 4 }
+--		
+--		defaultPerChanBw OBJECT-TYPE
+--			SYNTAX Integer32 (0..1000000)
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { igmpVlanProvEntry 5 }
+--		
+--		igmpVlanProvRowStatus OBJECT-TYPE
+--			SYNTAX RowStatus
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { igmpVlanProvEntry 6 }
+		
+-- ***********************************************************
+-- igmpChanTable
+-- ***********************************************************
+--		igmpChanTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF IgmpChanEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ubiPonMacMIBObjects 9 }
+--		
+--		igmpChanEntry OBJECT-TYPE
+--			SYNTAX IgmpChanEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }  				-- TODO
+--			::= { igmpChanTable 1 }
+--		
+--		IgmpChanEntry ::=
+--			SEQUENCE { 
+--				igmpChanId
+--					Integer32,
+--				igmpChanFromGroupIP
+--					IpAddress,
+--				igmpChanToGroupIP
+--					IpAddress,
+--				igmpChanGroupBw
+--					Integer32,
+--				igmpChanRowStatus
+--					RowStatus
+--			 }
+--
+--		igmpChanId OBJECT-TYPE
+--			SYNTAX Integer32 (1..65535)
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"range : 1 ~ 3780
+--				All channel Id delete : 65535"
+--			::= { igmpChanEntry 1 }
+--		
+--		igmpChanFromGroupIP OBJECT-TYPE
+--			SYNTAX IpAddress
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"range : 224.0.1.0 - 239.255.255.255"
+--			::= { igmpChanEntry 2 }
+--		
+--		igmpChanToGroupIP OBJECT-TYPE
+--			SYNTAX IpAddress
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"range : 224.0.1.0 - 239.255.255.255"
+--			::= { igmpChanEntry 3 }
+--		
+--		igmpChanGroupBw OBJECT-TYPE
+--			SYNTAX Integer32 (0..1000)
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { igmpChanEntry 4 }
+--		
+--		igmpChanRowStatus OBJECT-TYPE
+--			SYNTAX RowStatus
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { igmpChanEntry 5 }
+		
+-- ***********************************************************
+-- onu10gAdvancedRuleTable
+-- ***********************************************************
+		onu10gAdvancedRuleTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Onu10gAdvancedRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 10 }
+		
+		onu10gAdvancedRuleEntry OBJECT-TYPE
+			SYNTAX Onu10gAdvancedRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, onuPortFilterRuleIngressPort, onuClassRuleId }
+			::= { onu10gAdvancedRuleTable 1 }
+		
+		Onu10gAdvancedRuleEntry ::=
+			SEQUENCE { 
+				onu10gAdvancedRuleClassMapName
+					DisplayString,
+				onu10gAdvancedRulePrecedence
+					Integer32,
+				onu10gAdvancedRuleAction
+					INTEGER,
+				onu10gAdvancedRuleSetVidActionParam
+					Integer32,
+				onu10gAdvancedRuleSetCosActionParam
+					Integer32,
+				onu10gAdvancedRuleSetDstActionParamPort
+					Integer32,
+				onu10gAdvancedRuleSetDstActionParamQueue
+					Integer32,
+				onu10gAdvancedRuleRowStatus
+					RowStatus
+			 }
+
+		onu10gAdvancedRuleClassMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gAdvancedRuleEntry 1 }
+		
+		onu10gAdvancedRulePrecedence OBJECT-TYPE
+			SYNTAX Integer32 (0..15)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"value must be even number"
+			::= { onu10gAdvancedRuleEntry 2 }
+		
+		onu10gAdvancedRuleAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				addTag(3),
+				deleteTag(4),
+				setVidAndAddTag(5),
+				setCos(6),
+				replaceTag(7),
+				replaceTagAndSetVid(8),
+				clrAddTag(9),
+				clrDelTag(10),
+				clrReplaceTag(11),
+				discard(14),
+				setDstAndFwd(18)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gAdvancedRuleEntry 3 }
+		
+		onu10gAdvancedRuleSetVidActionParam OBJECT-TYPE
+			SYNTAX Integer32 (1..4094)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"if ruleAction is
+					setVidAndAddTag(5),
+					replaceTagAndSetVid(8),
+					vidActionParam has value between 1 and 4094
+				 else
+				 	vidActionParam has 65535"
+			::= { onu10gAdvancedRuleEntry 4 }
+		
+		onu10gAdvancedRuleSetCosActionParam OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"if ruleAction is
+					setCos(6),
+					cosActionParam has value between 0 and 7
+				 else
+				 	cosActionParam has 65535"
+			::= { onu10gAdvancedRuleEntry 5 }
+		
+		onu10gAdvancedRuleSetDstActionParamPort OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"if ruleAction is
+					setDstAndFwd(18),
+					dstActionParam has value between 1 and 4
+				 else
+				 	dstActionParam has 65535"
+			::= { onu10gAdvancedRuleEntry 6 }
+		
+		onu10gAdvancedRuleSetDstActionParamQueue OBJECT-TYPE
+			SYNTAX Integer32 (0..10)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"if ruleAction is
+					setDstAndFwd(18),
+					dstActionParam has value between 0 and 10
+				 else
+				 	dstActionParam has 65535"
+			::= { onu10gAdvancedRuleEntry 7 }
+		
+		onu10gAdvancedRuleRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gAdvancedRuleEntry 8 }
+		
+-- ***********************************************************
+--  unAdmin10gOnuTable
+-- ***********************************************************
+		unAdmin10gOnuTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UnAdmin10gOnuEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 11 }
+
+		unAdmin10gOnuEntry OBJECT-TYPE
+			SYNTAX UnAdmin10gOnuEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, unAdminOnuId }
+			::= { unAdmin10gOnuTable 1 }
+		
+		UnAdmin10gOnuEntry ::=
+			SEQUENCE { 
+				unAdmin10gOnuId
+					INTEGER,
+				unAdmin10gOnuPonMacAddress
+					MacAddress,
+				unAdmin10gOnuVendorSpecificInfo
+					DisplayString
+			 }
+
+		unAdmin10gOnuId OBJECT-TYPE
+			SYNTAX INTEGER (1..64)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description. "
+			::= { unAdmin10gOnuEntry 1 }
+
+		unAdmin10gOnuPonMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { unAdmin10gOnuEntry 2 }
+		
+		unAdmin10gOnuVendorSpecificInfo OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { unAdmin10gOnuEntry 3 }  
+			
+-- ***********************************************************
+--  clearUnAdminOnu
+-- ***********************************************************
+		clearUnAdmin10gOnu OBJECT IDENTIFIER ::= { ubi10gPonMacMIBObjects 12 }
+		
+		clearUnAdmin10gOnuOltPort OBJECT-TYPE
+			SYNTAX InterfaceIndex
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { clearUnAdmin10gOnu 1 }
+		
+		clearUnAdmin10gOnuMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION			" "
+			::= { clearUnAdmin10gOnu 2 }        
+			
+-- ***********************************************************
+--  onu10gSubscriberMacTable
+-- ***********************************************************
+		onu10gSubscriberMacTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Onu10gSubscriberMacEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 13 }
+		
+		onu10gSubscriberMacEntry OBJECT-TYPE
+			SYNTAX Onu10gSubscriberMacEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, onuSubscriberMacId }
+			::= { onu10gSubscriberMacTable 1 }
+		
+		Onu10gSubscriberMacEntry ::=
+			SEQUENCE { 
+				onu10gSubscriberMacId
+					Integer32,
+				onu10gSubscriberMacAddress
+					MacAddress
+			 }
+
+		onu10gSubscriberMacId OBJECT-TYPE
+			SYNTAX Integer32 (1..256)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gSubscriberMacEntry 1 }
+		
+		onu10gSubscriberMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gSubscriberMacEntry 2 }
+		
+-- ***********************************************************
+--  onu10gRegMode
+-- ***********************************************************
+		onu10gRegMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				modeManual(1),
+				modeAuto(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 14 }
+		
+-- ***********************************************************
+--  onuIpToSnmpIndexTable
+-- ***********************************************************		
+--		onuIpToSnmpIndexTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF OnuIpToSnmpIndexEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ubiPonMacMIBObjects 15 }
+--		
+--		onuIpToSnmpIndexEntry OBJECT-TYPE
+--			SYNTAX OnuIpToSnmpIndexEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }   		-- TODO
+--			::= { onuIpToSnmpIndexTable 1 }
+--		
+--		OnuIpToSnmpIndexEntry ::=
+--			SEQUENCE { 
+--				onuIpToSnmpIndexIpAddress
+--					IpAddress,
+--				onuIpToSnmpIndexOnuModelType
+--					OnuType
+--			 }
+--
+--		onuIpToSnmpIndexIpAddress OBJECT-TYPE
+--			SYNTAX IpAddress
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuIpToSnmpIndexEntry 1 }
+--		
+--		onuIpToSnmpIndexOnuModelType OBJECT-TYPE
+--			SYNTAX OnuType
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onuIpToSnmpIndexEntry 2 }
+		
+-- ***********************************************************
+--  onuBandWidthTable
+-- ***********************************************************
+		onu10gBandWidthTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Onu10gBandWidthEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 16 }
+		
+		onu10gBandWidthEntry OBJECT-TYPE
+			SYNTAX Onu10gBandWidthEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId }
+			::= { onu10gBandWidthTable 1 }
+		
+		Onu10gBandWidthEntry ::=
+			SEQUENCE { 
+				onu10gDownStreamMin
+					Integer32,
+				onu10gDownStreamMax
+					Integer32,
+				onu10gUpStreamMin
+					Integer32,
+				onu10gUpStreamMax
+					Integer32
+			 }
+
+		onu10gDownStreamMin OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gBandWidthEntry 1 }
+		
+		onu10gDownStreamMax OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gBandWidthEntry 2 }
+		
+		onu10gUpStreamMin OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gBandWidthEntry 3 }
+		
+		onu10gUpStreamMax OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gBandWidthEntry 4 }   
+			
+-- ***********************************************************
+--  onu10gAutoRemoveTimer
+-- ***********************************************************
+		onu10gAutoRemoveTimer OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"ONU auto remove timer. (unit : day)
+                 0 : clear
+				 1-100 : auto remove timer range"
+			::= { ubi10gPonMacMIBObjects 17 }
+		
+-- ***********************************************************
+--  onu10gStaticMacTable
+-- ***********************************************************
+--		onu10gStaticMacTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF Onu10gStaticMacEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ubi10gPonMacMIBObjects 18 }
+--		
+--		onu10gStaticMacEntry OBJECT-TYPE
+--			SYNTAX Onu10gStaticMacEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex, onu10gStaticMacId }
+--			::= { onu10gStaticMacTable 1 }
+--		
+--		Onu10gStaticMacEntry ::=
+--			SEQUENCE { 
+--				onu10gStaticMacId
+--					Integer32,
+--				onu10gStaticMacAddress
+--					MacAddress
+--			 }
+--
+--		onu10gStaticMacId OBJECT-TYPE
+--			SYNTAX Integer32 (1..256)
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onu10gStaticMacEntry 1 }
+--		
+--		onu10gStaticMacAddress OBJECT-TYPE
+--			SYNTAX MacAddress
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { onu10gStaticMacEntry 2 }
+		
+-- ***********************************************************
+--  dayRegisteredOnuTable
+-- ***********************************************************
+-- 		dayRegisteredOnuTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF DayRegisteredOnuEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ubiPonMacMIBObjects 19 }
+--		
+--		dayRegisteredOnuEntry OBJECT-TYPE
+--			SYNTAX DayRegisteredOnuEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }
+--			::= { dayRegisteredOnuTable 1 }
+--		
+--		DayRegisteredOnuEntry ::=
+--			SEQUENCE { 
+---				dayRegisteredOnuId
+----					Integer32,
+--				dayRegisteredMacAddr
+--					DisplayString
+--			 }
+
+----		dayRegisteredOnuId OBJECT-TYPE
+----			SYNTAX Integer32 (1..32)
+----			MAX-ACCESS not-accessible
+----			STATUS current
+----			DESCRIPTION
+----				"Description."
+----			::= { dayRegisteredOnuEntry 1 }     
+--			
+--		dayRegisteredMacAddr OBJECT-TYPE
+--			SYNTAX DisplayString
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { dayRegisteredOnuEntry 1 }
+
+-- ***********************************************************
+--  olt10gPrevBridgeTable
+-- ***********************************************************
+ 		olt10gPrevBridgeTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Olt10gPrevBridgeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 20 }      
+			
+		olt10gPrevBridgeEntry OBJECT-TYPE
+			SYNTAX Olt10gPrevBridgeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId }
+			::= { olt10gPrevBridgeTable 1 }
+		
+		Olt10gPrevBridgeEntry ::=
+			SEQUENCE { 
+				prevMacAddress
+					OCTET STRING,
+				prevMacAddressSize
+					Integer32
+			 }
+			              
+		prevMacAddress OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..48))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { olt10gPrevBridgeEntry 1 }
+
+		prevMacAddressSize OBJECT-TYPE
+			SYNTAX Integer32 (1..32)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { olt10gPrevBridgeEntry 2 }     
+
+-- ***********************************************************
+--  get10gOntIndexFromMacAddr
+-- ***********************************************************
+		get10gOntIndexFromMacAddr OBJECT IDENTIFIER ::= { ubi10gPonMacMIBObjects 21 } 
+		
+		req10gOntMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION			
+			    "Description."
+			::= { get10gOntIndexFromMacAddr 1 }
+					
+		resp10gOltIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { get10gOntIndexFromMacAddr 2 }
+		
+		resp10gOnuId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			
+				"Description."
+			::= { get10gOntIndexFromMacAddr 3 }
+
+		resp10gOnuIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..48))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { get10gOntIndexFromMacAddr 4 }  
+
+-- 091012 dsshin			            
+		resp10gOnuType OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { get10gOntIndexFromMacAddr 5 }
+		
+		resp10gOnuAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				locked(0),
+				unlocked(1)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { get10gOntIndexFromMacAddr 6 }
+		
+		resp10gOnuOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2),
+				cableDown(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { get10gOntIndexFromMacAddr 7 }			
+						
+-- ***********************************************************
+--  lgpAuthenticationObjects
+-- ***********************************************************
+--		lgpAuthenticationObjects OBJECT IDENTIFIER ::= { ubiPonMacMIBObjects 22 }			
+--			
+--		lgpAuthMode OBJECT-TYPE
+--			SYNTAX INTEGER
+--			{
+--				disable(0),
+--				enable(1)
+--			}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Set ONT authentication mode"
+--			::= { lgpAuthenticationObjects 1 }			
+--			
+--		lgpAuthServerIpAddress OBJECT-TYPE
+--			SYNTAX IpAddress
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Set auth-server IP address"
+--			::= { lgpAuthenticationObjects 2 }			
+--			
+--		lgpAuthOntInfoTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF LgpAuthOntInfoEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"ONT auth Info table"
+--			::= { lgpAuthenticationObjects 3 }			
+--
+--	lgpAuthOntInfoEntry OBJECT-TYPE
+--			SYNTAX LgpAuthOntInfoEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"ONT auth Info Entry"
+--			INDEX { ubiPortIndex, onuId }
+--			::= { lgpAuthOntInfoTable 1 }
+--			
+--		LgpAuthOntInfoEntry ::=
+--			SEQUENCE { 
+--				lgpAuthOntStatus
+--					INTEGER	
+--			 }
+--
+--		lgpAuthOntStatus OBJECT-TYPE
+--			SYNTAX INTEGER
+--			{
+--				disable(0),
+--				enable(1)
+--			}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"ONT authentication action"
+--			::= { lgpAuthOntInfoEntry 1 }	
+			
+-- ***********************************************************
+--  pon10gBranchStatus
+-- ***********************************************************
+		pon10gBranchStatus OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				branch_32(32),
+				branch_64(64)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION            
+				"Description."
+			::= { ubi10gPonMacMIBObjects 22 } 
+				                                        
+-- ***********************************************************
+--  onu10gDdmi
+-- ***********************************************************
+	                                        
+	    onu10gDdmi OBJECT IDENTIFIER ::= { ubi10gPonMacMIBObjects 23 }
+	    		                                        
+-- ***********************************************************
+--  onu10gDdmiTable                        
+-- ***********************************************************
+ 		onu10gDdmiTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Onu10gDdmiEntry			
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"10g ONU DDM Information Table"
+			::= { onu10gDdmi 1 }      
+		
+		onu10gDdmiEntry OBJECT-TYPE
+			SYNTAX Onu10gDdmiEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"10g ONU DDM Information Table Entry"
+			INDEX { ubiPortIndex, onu10gId }
+			::= { onu10gDdmiTable 1 }
+		
+		Onu10gDdmiEntry ::=
+			SEQUENCE { 
+				rx10gLaserPower
+					DisplayString,
+				tx10gLaserPower
+					DisplayString,
+				tx10gLaserVcc
+					DisplayString,
+				tx10gLaserBias
+					DisplayString,
+				tx10gTemperature
+					DisplayString,
+			 }
+			              
+		rx10gLaserPower OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"RX Laser Power"
+			::= { onu10gDdmiEntry 1 }
+
+		tx10gLaserPower OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"TX Laser Power"
+			::= { onu10gDdmiEntry 2 }			
+			
+		tx10gLaserVcc OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"TX Laser Vcc"
+			::= { onu10gDdmiEntry 3 }
+
+		tx10gLaserBias OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"TX Laser Bias(not supported)"
+			::= { onu10gDdmiEntry 4 }
+
+		tx10gTemperature OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"TX Temperature"
+			::= { onu10gDdmiEntry 5 }		     
+                                     
+-- ***********************************************************
+--  onu10gDdmThreshold
+-- ***********************************************************		                          
+					 			
+		rx10gLaserPowerLowThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"RX Laser Power Low Limit(-32~-20)"
+			::= { onu10gDdmi 2 }
+
+		rx10gLaserPowerHighThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"RX Laser Power High Limit(-10~1)"
+			::= { onu10gDdmi 3 }
+			
+		tx10gLaserPowerLowThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX Laser Power Low Limit(-7~0)"
+			::= { onu10gDdmi 4 } 
+			
+		tx10gLaserPowerHighThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX Laser Power High Limit(1~9)"
+			::= { onu10gDdmi 5 }
+			
+		tx10gLaserVccLowThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX Laser Vcc Low Limit(2.7~3.2)"
+			::= { onu10gDdmi 6 }
+			                      
+		tx10gLaserVccHighThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX Laser Vcc High Limit(3.3~3.8)"
+			::= { onu10gDdmi 7 }
+			
+		tx10gLaserBiasLowThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX Laser Bias Low Limit(Not Supported)"
+			::= { onu10gDdmi 8 }
+			
+		tx10gLaserBiasHighThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX Laser Bias High Limit(Not Supported)"
+			::= { onu10gDdmi 9 }
+			
+		tx10gTemperatureLowThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX Temperature Low Limit(0~40)"
+			::= { onu10gDdmi 10 }
+			
+		tx10gTemperatureHighThreshold OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX Temperature High Limit (50~90)"
+			::= { onu10gDdmi 11}
+		
+
+-- ***********************************************************
+--  onu10gInfoFromSubscriberMacTable
+-- ***********************************************************
+		onu10gInfoFromSubscriberTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Onu10gInfoFromSubscriberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 24 }
+		
+		onu10gInfoFromSubscriberEntry OBJECT-TYPE
+			SYNTAX Onu10gInfoFromSubscriberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, subscriberMacAddress }
+			::= { onu10gInfoFromSubscriberTable 1 }
+		
+		Onu10gInfoFromSubscriberEntry ::=
+			SEQUENCE {		
+				onu10gInfoFromSubscriberOltIfIndex
+					Integer32,				  
+				onu10gInfoFromSubscriberOnuId
+					Integer32, 
+				onu10gInfoFromSubscriberOnuIfName
+					OCTET STRING,
+				onu10gInfoFromSubscriberOnuMacAddress
+					MacAddress, 
+				onu10gInfoFromSubscriberOnuType
+					DisplayString,
+				onu10gInfoFromSubscriberAdminStatus
+					INTEGER,
+				onu10gInfoFromSubscriberOperStatus
+					INTEGER
+			 }	
+								
+		onu10gInfoFromSubscriberOltIfIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gInfoFromSubscriberEntry 2 }
+		
+		onu10gInfoFromSubscriberOnuId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			
+				"Get ONU ID From Subscriber MAC Address
+				(OLT Dynamic Bridging-entries)"
+			::= { onu10gInfoFromSubscriberEntry 3 }
+
+		onu10gInfoFromSubscriberOnuIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..48))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"GET ONU Interface Name From Subscriber MAC Address
+				(OLT Dynamic Bridging-entries)"
+			::= { onu10gInfoFromSubscriberEntry 4 }  
+       
+        onu10gInfoFromSubscriberOnuMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			
+			    "Get ONU MAC Address From Subscriber MAC Address
+				(OLT Dynamic Bridging-entries)"
+			::= { onu10gInfoFromSubscriberEntry 5 }
+			            
+		onu10gInfoFromSubscriberOnuType OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Get ONU Type From Subscriber MAC Address
+				(OLT Dynamic Bridging-entries)"
+			::= { onu10gInfoFromSubscriberEntry 6 }
+		
+		onu10gInfoFromSubscriberAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				locked(0),
+				unlocked(1)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Get ONU Admin Status From Subscriber MAC Address
+				(OLT Dynamic Bridging-entries)"
+			::= { onu10gInfoFromSubscriberEntry 7 }
+		
+		onu10gInfoFromSubscriberOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2),
+				cableDown(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Get ONU Oper Status From Subscriber MAC Address
+				(OLT Dynamic Bridging-entries)"
+			::= { onu10gInfoFromSubscriberEntry 8 }			                       
+
+-- ***********************************************************
+--  onu10gPonMacFromSubMacTable
+-- ***********************************************************
+		onu10gSubportIdFromSubscriberTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Onu10gSubportIdFromSubscriberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 25 }
+		
+		onu10gSubportIdFromSubscriberEntry OBJECT-TYPE
+			SYNTAX Onu10gSubportIdFromSubscriberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, subscriberMacAddress  }
+			::= { onu10gSubportIdFromSubscriberTable 1 }
+		
+		Onu10gSubportIdFromSubscriberEntry ::=
+			SEQUENCE {
+				onu10gSubportId
+					Integer32
+					 }
+        								
+		onu10gSubportId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Get ONU User Port ID From Subscriber MAC Address
+				(ONU Dynamic Bridging-entries)"
+			::= { onu10gSubportIdFromSubscriberEntry 1 }  
+			
+			
+-- ***********************************************************
+--  olt10gDynamicBridgeEntryTable
+-- ***********************************************************
+		olt10gDynamicBridgeEntryTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Olt10gDynamicBridgeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 26 }
+		
+		olt10gDynamicBridgeEntry OBJECT-TYPE
+			SYNTAX Olt10gDynamicBridgeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId, olt10gDynamicMacId }
+			::= { olt10gDynamicBridgeEntryTable 1 }
+		
+		Olt10gDynamicBridgeEntry ::=
+			SEQUENCE { 
+				olt10gDynamicMacId
+					Integer32,
+				olt10gDynamicMacAddress
+					MacAddress
+			 }
+
+		olt10gDynamicMacId OBJECT-TYPE
+			SYNTAX Integer32 (1..256)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { olt10gDynamicBridgeEntry 1 }
+		
+		olt10gDynamicMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { olt10gDynamicBridgeEntry 2 }
+
+						
+-- ***********************************************************
+-- onu10gPmapFilteringRuleTable
+-- ***********************************************************
+		onu10gPmapFilteringRuleTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Onu10gPmapFilteringRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonMacMIBObjects 27 }
+		
+		onu10gPmapFilteringRuleEntry OBJECT-TYPE
+			SYNTAX Onu10gPmapFilteringRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, onu10gPolicyMapId }
+			::= { onu10gPmapFilteringRuleTable 1 }
+		
+		Onu10gPmapFilteringRuleEntry ::=
+			SEQUENCE { 
+				onu10gFilteringRulePolicyMapName
+					DisplayString,
+				onu10gFilteringRuleVid
+					Integer32,
+				onu10gFilteringRuleVidForClause
+					Integer32,
+				onu10gFilteringRuleRowStatus
+					RowStatus,          
+				onu10gFilteringRuleUserPortId
+					Integer32,
+				onu10gFilteringRuleLinkId
+					Integer32      
+			 }
+
+		onu10gFilteringRulePolicyMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Filter type policy-map name"
+			::= { onu10gPmapFilteringRuleEntry 1 }
+		
+		onu10gFilteringRuleVid OBJECT-TYPE
+			SYNTAX Integer32 (1..4094)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Rule subparam (VLAN ID)"
+			::= { onu10gPmapFilteringRuleEntry 2 }    
+
+        onu10gFilteringRuleVidForClause OBJECT-TYPE
+			SYNTAX Integer32 (1..4094)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Rule subparam (VLAN ID for Double-tag)"
+			::= { onu10gPmapFilteringRuleEntry 3 }
+			
+		onu10gFilteringRuleRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Map Create operator (Create & Go)"
+			::= { onu10gPmapFilteringRuleEntry 4 }
+						
+        onu10gFilteringRuleUserPortId OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Rule subparam (ONU User Port ID)"
+			::= { onu10gPmapFilteringRuleEntry 5 }
+
+        onu10gFilteringRuleLinkId OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Rule subparam (ONU Link ID)"
+			::= { onu10gPmapFilteringRuleEntry 6 }
+			
+-- ***********************************************************
+--  olt10gDdmi
+-- ***********************************************************
+	                                        
+	    olt10gDdmi OBJECT IDENTIFIER ::= { ubi10gPonMacMIBObjects 28 }
+	    		                                        
+                                  
+-- ***********************************************************
+--  olt10gDdmiGlobal
+-- ***********************************************************		                          
+					 			
+		olt10gDdmiControlPort OBJECT-TYPE
+			SYNTAX Integer32 (1..256)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"RSSI Control PortIndex"
+			::= { olt10gDdmi 1 }
+
+		olt10gDdmiControlOnuId OBJECT-TYPE
+			SYNTAX Integer32 (1..256)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"RSSI Control onuId (1~64, 255:idle)"
+			::= { olt10gDdmi 2 }
+			
+		olt10gRxLaserPower OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..48))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"OLT RX Laser Power"
+			::= { olt10gDdmi 3 } 
+			
+-- ***********************************************************
+--  olt10gPonRedundancyInfoTable
+-- ***********************************************************
+		olt10gPonRedundancyInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Olt10gPonRedundancyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"10g Olt Pon Redundancy Info"
+			::= { ubi10gPonMacMIBObjects 29 }
+		
+		olt10gPonRedundancyEntry OBJECT-TYPE
+			SYNTAX Olt10gPonRedundancyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"10g Olt Pon Redundancy Info Entry"
+			INDEX {ubiPortIndex}
+			::= { olt10gPonRedundancyInfoTable 1 }
+		
+		Olt10gPonRedundancyEntry ::=
+			SEQUENCE {
+				olt10gRedPortIndex
+					Integer32,
+				olt10gRedPeerPortIndex
+					Integer32,
+				olt10gRedActiveStatus
+					INTEGER,
+				olt10gRedLinkStatus
+					INTEGER
+			 }
+        
+        olt10gRedPortIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10g Olt Pon Redundancy PortIndex"
+			::= { olt10gPonRedundancyEntry 1 }
+		
+		olt10gRedPeerPortIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			
+				"10g Olt Pon Redundancy Peer PortIndex"
+			::= { olt10gPonRedundancyEntry 2 }
+
+			
+		olt10gRedActiveStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				no(0),
+				yes(1)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10g Olt Pon Redundancy Active Status"
+			::= { olt10gPonRedundancyEntry 3 }
+		
+		olt10gRedLinkStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{  
+				down(0),
+				up(1)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10g Olt Pon Redundancy Link Status"
+			::= { olt10gPonRedundancyEntry 4 }	
+		
+
+-- ***********************************************************
+--  onu10gTxPowerOff
+-- ***********************************************************
+	                                        
+	    onu10gTxPowerOff OBJECT IDENTIFIER ::= { ubi10gPonMacMIBObjects 30 }
+			
+-- ***********************************************************
+--  onuTxPowerOffTable                        
+-- ***********************************************************
+ 				              
+		TxPowerOltPortId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX-Power PortIndex"
+			::= { onu10gTxPowerOff 1 }
+               
+        TxPowerOnuId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX-Power OnuId"
+			::= { onu10gTxPowerOff 2 }
+			
+		TxPowerTimeOut OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"TX-Power Timeout
+				 0 : Clear (Tx-Power ON)
+				 1~254 : Timeout
+				 65535 : Endless Off"
+			::= { onu10gTxPowerOff 3 }	
+   		
+-- ***********************************************************
+--  olt10gPortReset
+-- ***********************************************************
+	                                        
+	    olt10gPortReset OBJECT IDENTIFIER ::= { ubi10gPonMacMIBObjects 31 }
+      
+-- ***********************************************************
+--  oltPortResetTable                        
+-- ***********************************************************     
+
+ 		olt10gPortId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Reset PortIndex"
+			::= { olt10gPortReset 1 } 
+	    
+		olt10gPortResetOp OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				normal(0),
+				reset(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT Port Reset Operation"
+			::= { olt10gPortReset 2 }	
+
+		
+-- ***********************************************************
+-- OnuVideoUniTable
+-- ***********************************************************    
+--		rfogPortTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF RfogPortEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"RFoG Info Table."
+--			::= { ubiPonMacMIBObjects 32 }  			
+--
+--		rfogPortEntry OBJECT-TYPE
+--			SYNTAX RfogPortEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"RFoG Info Entry."
+--			INDEX { ubiPortIndex , onuId }
+--			::= { rfogPortTable 1 }		
+--
+--		RfogPortEntry ::=
+--			SEQUENCE { 
+--				onuVideoUniAdminStatus
+--					INTEGER,
+--				onuRfogRxPower
+--					DisplayString,
+--				onuRfogRxOut
+--					DisplayString		  
+--			 }   
+--			 
+--		onuVideoUniAdminStatus OBJECT-TYPE
+--			SYNTAX INTEGER {
+--			 	disable(0),
+--			 	enable(1)
+--			}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"RFoG Port Admin Status."
+--			::= { rfogPortEntry 1 }
+--		
+--	
+--		onuRfogRxPower OBJECT-TYPE
+--			SYNTAX DisplayString (SIZE (0..48))
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"RFoG Rx Power."
+--			::= { rfogPortEntry 2 }      
+--			
+--		onuRfogRxOut OBJECT-TYPE
+--			SYNTAX DisplayString (SIZE (0..48))
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"RFoG Rx Out Laser"
+--			::= { rfogPortEntry 3 }  
+	   
+-- ***********************************************************
+-- ktAlarmCntTable
+-- ***********************************************************    
+--		ktAlarmCntTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF KtAlarmCntEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ubiPonMacMIBObjects 33 }  
+--			
+--
+--		ktAlarmCntEntry OBJECT-TYPE
+--			SYNTAX KtAlarmCntEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex , onuId }
+--			::= { ktAlarmCntTable 1 }
+--		
+--
+--		KtAlarmCntEntry ::=
+--			SEQUENCE { 
+--				loopDetectCnt
+--					Counter32,
+--				rxPowerAlarmCnt
+--					Counter32,
+--				inputVoltageAlarmCnt
+--					Counter32		  
+--			 }
+--
+--
+--		loopDetectCnt OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ktAlarmCntEntry 1 }
+--		
+--	
+--		rxPowerAlarmCnt OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ktAlarmCntEntry 2 }  
+--			                                
+--			                                
+--		inputVoltageAlarmCnt OBJECT-TYPE
+--			SYNTAX Counter32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { ktAlarmCntEntry 3 }  
+
+-- ***********************************************************
+-- olt10gAdvancedRuleTable
+-- ***********************************************************
+		olt10gAdvancedRuleTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Olt10gAdvancedRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"10g OLT Filtering Rule Table"
+			::= { ubi10gPonMacMIBObjects 34 }
+		
+		olt10gAdvancedRuleEntry OBJECT-TYPE
+			SYNTAX Olt10gAdvancedRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"10g OLT Filtering Rule Entry"
+			INDEX { ubiPortIndex, onu10gId, linkId, olt10gClassRuleId }
+			::= { olt10gAdvancedRuleTable 1 }
+		
+		Olt10gAdvancedRuleEntry ::=
+			SEQUENCE { 
+				olt10gAdvancedRuleClassMapName
+					DisplayString,
+				olt10gAdvancedRulePrecedence
+					Integer32,
+				olt10gAdvancedRuleAction
+					INTEGER,
+				olt10gAdvancedRuleSetVidActionParam
+					Integer32,
+				olt10gAdvancedRuleSetCosActionParam
+					Integer32,
+				olt10gAdvancedRuleSetDstActionParamLink
+					Integer32,
+				olt10gAdvancedRuleSetDstActionParamQueue
+					Integer32,
+				olt10gAdvancedRuleRowStatus
+					RowStatus
+			 }
+
+		olt10gAdvancedRuleClassMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"10g OLT Filtering Rule Class Map"
+			::= { olt10gAdvancedRuleEntry 1 }
+		
+		olt10gAdvancedRulePrecedence OBJECT-TYPE
+			SYNTAX Integer32 (0..15)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"value must be even number"
+			::= { olt10gAdvancedRuleEntry 2 }
+		
+		olt10gAdvancedRuleAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				add-cvlan-tag(4),
+				del-tag(4),
+				add-svlan-tag(6)				
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"2 : add-cvlan-tag,
+				 4 : del-tag,
+				 6 : add-svlan-tag"
+			::= { olt10gAdvancedRuleEntry 3 }
+		
+		olt10gAdvancedRuleSetVidActionParam OBJECT-TYPE
+			SYNTAX Integer32 (1..4094)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"if ruleAction is
+					add-cvlan-tag,
+					add-svlan-tag,
+					del-tag,
+					vidActionParam has value between 1 and 4094
+				 else
+				 	vidActionParam has 65535"
+			::= { olt10gAdvancedRuleEntry 4 } 
+			
+		olt10gAdvancedRuleSetCosActionParam OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"no supported"
+			::= { olt10gAdvancedRuleEntry 5 }
+		
+		olt10gAdvancedRuleSetDstActionParamLink OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"no supported"
+			::= { olt10gAdvancedRuleEntry 6 }
+		
+		olt10gAdvancedRuleSetDstActionParamQueue OBJECT-TYPE
+			SYNTAX Integer32 (0..10)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"no supported"				 	
+			::= { olt10gAdvancedRuleEntry 7 }
+
+		
+ 		olt10gAdvancedRuleRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Row Status
+				4 : CreateAndGo,
+				6 : Destroy"
+			::= { olt10gAdvancedRuleEntry 8 }       
+			
+-- ***********************************************************
+-- olt10gPmapFilteringRuleTable
+-- ***********************************************************
+		olt10gPmapFilteringRuleTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Olt10gPmapFilteringRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"OLT Policy-map Filtering Rule Table"
+			::= { ubi10gPonMacMIBObjects 35 }
+		
+		olt10gPmapFilteringRuleEntry OBJECT-TYPE
+			SYNTAX Olt10gPmapFilteringRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"OLT Policy-map Filtering Rule Entry"
+			INDEX { ubiPortIndex, onu10gId, oltPolicyMapId }
+			::= { olt10gPmapFilteringRuleTable 1 }
+		
+		Olt10gPmapFilteringRuleEntry ::=
+			SEQUENCE { 
+				olt10gFilteringRulePolicyMapName
+					DisplayString,
+--				oltFilteringRuleLinkId
+--					Integer32,           
+				olt10gFilteringRuleRowStatus
+					RowStatus
+			 }
+
+		olt10gFilteringRulePolicyMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"10g OLT Filtering Rule Policy-map Name"
+			::= { olt10gPmapFilteringRuleEntry 1 }
+		
+--		oltFilteringRuleLinkId OBJECT-TYPE
+--			SYNTAX Integer32 (1..4)
+--			MAX-ACCESS read-create
+--			STATUS current
+--			DESCRIPTION
+--				"OLT Filtering Rule Link Id"
+--			::= { oltPmapFilteringRuleEntry 2 }    
+			
+		olt10gFilteringRuleRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Row Status
+				4 : CreateAndGo,
+				6 : Destroy"
+			::= { olt10gPmapFilteringRuleEntry 2 }   
+			
+-- ***********************************************************
+-- onuRxPwrStatusTable
+-- ***********************************************************
+--		onuRxPwrStatusTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF OnuRxPwrStatusEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"ONU Optic RX-Power Status Table"
+--			::= { ubiPonMacMIBObjects 36 }
+--		
+--		onuRxPwrStatusEntry OBJECT-TYPE
+--			SYNTAX OnuRxPwrStatusEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"ONU Optic RX-Power Status Entry"
+--			INDEX { ubiPortIndex, onuId }
+--			::= { onuRxPwrStatusTable 1 }
+--		
+--		OnuRxPwrStatusEntry ::=
+--			SEQUENCE { 
+--				onuRxPwrStatus
+--					DisplayString
+--			 }
+--			 
+--		onuRxPwrStatus OBJECT-TYPE
+--			SYNTAX DisplayString 
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				" ONU Optic RX-Power Status "
+--			::= { onuRxPwrStatusEntry 1 }  			
+					
+	
+-- ***********************************************************
+--  onu10gUpCount
+-- ***********************************************************
+		onu10gUpCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of up ONU(10G)"
+			::= { ubi10gPonMacMIBObjects 37 }		
+	
+	END
+
+-- ***********************************************************
+-- UBIQUOSS-10GEPON-PON-MAC-MIB.my
+-- ***********************************************************
+
+
