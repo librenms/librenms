@@ -126,9 +126,15 @@ if ($device['location_id']) {
         <div class="col-sm-8"><span id="coordinates-text">' . $location_coords . '</span><div class="pull-right">';
 
     echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
-    if ($location_valid) {
-        echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . ',' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
+
+   # Display Map button which will take you to Google or OSM depending on the setting map_provider in config.php
+    echo ' <a id="map-it-button" href="';
+    if ($location_valid && (Config::get('map_provider') != 'osm')) {
+        echo 'https://maps.google.com/?q=' . $location->lat . ',' . $location->lng;
+    } elseif ($location_valid && (Config::get('map_provider') == 'osm')) {
+        echo 'https://www.openstreetmap.org/#map=19/' . $location->lat . '/' . $location->lng;
     }
+    echo '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     echo '</div>
         </div>
     </div>
