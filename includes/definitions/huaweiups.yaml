@@ -8,7 +8,6 @@ over:
     - { graph: device_current, text: Current }
 discovery:
     -
-      sysDescr: Linux GSE200M
       snmpget:
         oid: UPS-MIB::upsIdentManufacturer.0
         value: HUAWEI
