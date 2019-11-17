@@ -13,6 +13,7 @@ echo('
     <div class="col-md-6">
 ');
 require 'includes/html/dev-overview-data.inc.php';
+require 'overview/puppet_agent.inc.php';
 require 'overview/tracepath.inc.php';
 
 echo LibreNMS\Plugins::call('device_overview_container', [$device]);
