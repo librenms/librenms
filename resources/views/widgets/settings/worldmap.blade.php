@@ -37,6 +37,14 @@
     </div>
 
     <div class="form-group">
+        <select class="form-control" name="maintenance" id="maintenance-{{ $id }}">
+            <option value="0" @if($maintenance == '0') selected @endif>@lang('Hide devices under maintenance')</opt
+            <option value="1" @if($maintenance == '1') selected @endif>@lang('Show devices under maintenance')</opt
+            <option value="2" @if($maintenance == '2') selected @endif>@lang('Show only devices under maintenance')
+        </select>
+    </div>
+
+    <div class="form-group">
         <label for="device_group-{{ $id }}" class="control-label">@lang('Device group')</label>
         <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="@lang('All Devices')">
             @if($device_group)

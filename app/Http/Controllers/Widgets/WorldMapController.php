@@ -44,7 +44,8 @@ class WorldMapController extends WidgetController
             'init_lng' => Config::get('leaflet.default_lng', 0),
             'init_zoom' => Config::get('leaflet.default_zoom', 2),
             'group_radius' => Config::get('leaflet.group_radius', 80),
-            'status' => '0,1',
+            'status' => '0,1', // Show all devices
+            'maintenance' => '0', // Hide devices under maintenance
             'device_group' => null,
         ];
     }
@@ -54,6 +55,7 @@ class WorldMapController extends WidgetController
     {
         $settings = $this->getSettings();
         $status = explode(',', $settings['status']);
+        $maintenance = $settings['maintenance'];
 
         $settings['dimensions'] = $request->get('dimensions');
 
@@ -65,28 +67,35 @@ class WorldMapController extends WidgetController
                 $query->inDeviceGroup($settings['device_group']);
             })
             ->get()
-            ->filter(function ($device) use ($status) {
+            ->filter(function ($device) use ($status, $maintenance) {
                 /** @var Device $device */
                 if (!($device->location_id && $device->location && $device->location->coordinatesValid())) {
                     return false;
                 }
 
                 // add extra data
-                $device->markerIcon = 'greenMarker';
-                $device->zOffset = 0;
-
-                if ($device->status == 0) {
-                    $device->markerIcon = 'redMarker';
-                    $device->zOffset = 10000;
-
-                    if ($device->isUnderMaintenance()) {
-                        if (in_array(0, $status)) {
+                if ($device->status == 1) { // Up device
+                    if ($maintenance == '2') { // Display only devices under maintenance
+                        return false;
+                    }
+                    $device->markerIcon = 'greenMarker';
+                    $device->zOffset = 0;
+                }
+                else { // Down device
+                    if ($device->isUnderMaintenance()) { // Hide/Show devices under maintenance
+                        if ($maintenance == '0') { // Hide devices under maintenance
                             return false;
                         }
                         $device->markerIcon = 'blueMarker';
                         $device->zOffset = 5000;
                     }
-                }
+                    else {
+                        if ($maintenance == '2') { // Display only devices under maintenance
+                            return false;
+                        }
+                        $device->markerIcon = 'redMarker';
+                        $device->zOffset = 10000;
+                    }
 
                 return true;
             });

@@ -43,7 +43,7 @@ We have two current mapping engines available:
   zoom levels](https://wiki.openstreetmap.org/wiki/Zoom_levels).
 - *Grouping radius*: Markers are grouped by area. This value define
   the maximum size of grouping areas.
-- *Show devices*: Show devices based on there status.
+- *Show devices*: Show devices based on their status.
 
 Example Settings:
 
