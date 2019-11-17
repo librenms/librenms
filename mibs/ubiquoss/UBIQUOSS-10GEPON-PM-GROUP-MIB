@@ -765,15 +765,15 @@
 				    Counter64,
 				pm10gOltLinkRxRx64ByteFrames  
 				    Counter64,
-				pm10gOltLinkRxRx65_127ByteFrames  
+				pm10gOltLinkRxRx65127ByteFrames  
 				    Counter64,
-				pm10gOltLinkRxRx128_255ByteFrames  
+				pm10gOltLinkRxRx128255ByteFrames  
 				    Counter64,
-				pm10gOltLinkRxRx256_511ByteFrames  
+				pm10gOltLinkRxRx256511ByteFrames  
 				    Counter64,
-				pm10gOltLinkRxRx511_1023ByteFrames 
+				pm10gOltLinkRxRx5111023ByteFrames 
 				    Counter64,
-				pm10gOltLinkRxRx1024_1518ByteFrames 
+				pm10gOltLinkRxRx10241518ByteFrames 
 				    Counter64,
 				pm10gOltLinkRxGreater1518ByteFrames 
 				    Counter64,
@@ -795,15 +795,15 @@
 				    Counter64,
 				pm10gOltLinkTxTx64ByteFrames        
 				    Counter64,
-				pm10gOltLinkTxTx65_127ByteFrames    
+				pm10gOltLinkTxTx65127ByteFrames    
 				    Counter64,
-				pm10gOltLinkTxTx128_255ByteFrames  
+				pm10gOltLinkTxTx128255ByteFrames  
 				    Counter64,
-				pm10gOltLinkTxTx256_511ByteFrames   
+				pm10gOltLinkTxTx256511ByteFrames   
 				    Counter64,
-				pm10gOltLinkTxTx511_1023ByteFrames  
+				pm10gOltLinkTxTx5111023ByteFrames  
 				    Counter64,
-				pm10gOltLinkTxTx1024_1518ByteFrames  
+				pm10gOltLinkTxTx10241518ByteFrames  
 				    Counter64,
 				pm10gOltLinkTxGreater1518ByteFrames  
 				    Counter64,
@@ -859,7 +859,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 6 }
 		
-		pm10gOltLinkRxRx65_127ByteFrames OBJECT-TYPE
+		pm10gOltLinkRxRx65127ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -867,7 +867,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 7 }
 		
-		pm10gOltLinkRxRx128_255ByteFrames OBJECT-TYPE
+		pm10gOltLinkRxRx128255ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -875,7 +875,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 8 }
 		
-		pm10gOltLinkRxRx256_511ByteFrames OBJECT-TYPE
+		pm10gOltLinkRxRx256511ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -883,7 +883,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 9 }
 		
-		pm10gOltLinkRxRx511_1023ByteFrames OBJECT-TYPE
+		pm10gOltLinkRxRx5111023ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -891,7 +891,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 10 }                                                      
                                                       
-		pm10gOltLinkRxRx1024_1518ByteFrames OBJECT-TYPE
+		pm10gOltLinkRxRx10241518ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -979,7 +979,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 21 }
 		
-		pm10gOltLinkTxTx65_127ByteFrames OBJECT-TYPE
+		pm10gOltLinkTxTx65127ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -987,7 +987,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 22 }
 		
-		pm10gOltLinkTxTx128_255ByteFrames OBJECT-TYPE
+		pm10gOltLinkTxTx128255ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -995,7 +995,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 23 }
 		
-		pm10gOltLinkTxTx256_511ByteFrames OBJECT-TYPE
+		pm10gOltLinkTxTx256511ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1003,7 +1003,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 24 }
 		
-		pm10gOltLinkTxTx511_1023ByteFrames OBJECT-TYPE
+		pm10gOltLinkTxTx5111023ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1011,7 +1011,7 @@
 				"Description"
 			::= { pm10gOltLinkStatsEntry 25 }
 
-		pm10gOltLinkTxTx1024_1518ByteFrames OBJECT-TYPE
+		pm10gOltLinkTxTx10241518ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1069,15 +1069,15 @@
 				    Counter64, 
 				pm10gOnuEponRxRx64ByteFrames
 				    Counter64, 
-				pm10gOnuEponRxRx65_127ByteFrames
+				pm10gOnuEponRxRx65127ByteFrames
 				    Counter64, 
-				pm10gOnuEponRxRx128_255ByteFrames
+				pm10gOnuEponRxRx128255ByteFrames
 				    Counter64, 
-				pm10gOnuEponRxRx256_511ByteFrames 
+				pm10gOnuEponRxRx256511ByteFrames 
 				    Counter64,
-				pm10gOnuEponRxRx511_1023ByteFrames 
+				pm10gOnuEponRxRx5111023ByteFrames 
 				    Counter64,
-				pm10gOnuEponRxRx1024_1518ByteFrames     
+				pm10gOnuEponRxRx10241518ByteFrames     
 				    Counter64,
 				pm10gOnuEponRxGreater1518ByteFrames    
 				    Counter64,
@@ -1103,15 +1103,15 @@
 				    Counter64,
 				pm10gOnuEponTxTx64ByteFrames   
 				    Counter64,
-				pm10gOnuEponTxTx65_127ByteFrames 
+				pm10gOnuEponTxTx65127ByteFrames 
 				    Counter64,
-				pm10gOnuEponTxTx128_255ByteFrames  
+				pm10gOnuEponTxTx128255ByteFrames  
 				    Counter64,
-				pm10gOnuEponTxTx256_511ByteFrames 
+				pm10gOnuEponTxTx256511ByteFrames 
 				    Counter64,
-				pm10gOnuEponTxTx511_1023ByteFrames 
+				pm10gOnuEponTxTx5111023ByteFrames 
 				    Counter64,
-				pm10gOnuEponTxTx1024_1518ByteFrames  
+				pm10gOnuEponTxTx10241518ByteFrames  
 				    Counter64,
 				pm10gOnuEponTxGreater1518ByteFrames  
 				    Counter64,
@@ -1169,7 +1169,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 6 }
 		
-		pm10gOnuEponRxRx65_127ByteFrames OBJECT-TYPE
+		pm10gOnuEponRxRx65127ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1177,7 +1177,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 7 }
 		
-		pm10gOnuEponRxRx128_255ByteFrames OBJECT-TYPE
+		pm10gOnuEponRxRx128255ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1185,7 +1185,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 8 }
 		
-		pm10gOnuEponRxRx256_511ByteFrames OBJECT-TYPE
+		pm10gOnuEponRxRx256511ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1193,7 +1193,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 9 }
 		
-		pm10gOnuEponRxRx511_1023ByteFrames OBJECT-TYPE
+		pm10gOnuEponRxRx5111023ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1201,7 +1201,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 10 }
                            
-		pm10gOnuEponRxRx1024_1518ByteFrames OBJECT-TYPE
+		pm10gOnuEponRxRx10241518ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1305,7 +1305,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 23 }
 		
-		pm10gOnuEponTxTx65_127ByteFrames OBJECT-TYPE
+		pm10gOnuEponTxTx65127ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1313,7 +1313,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 24 }
 		
-		pm10gOnuEponTxTx128_255ByteFrames OBJECT-TYPE
+		pm10gOnuEponTxTx128255ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1321,7 +1321,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 25 }
                            
-		pm10gOnuEponTxTx256_511ByteFrames OBJECT-TYPE
+		pm10gOnuEponTxTx256511ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1329,7 +1329,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 26 }
 		
-		pm10gOnuEponTxTx511_1023ByteFrames OBJECT-TYPE
+		pm10gOnuEponTxTx5111023ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1337,7 +1337,7 @@
 				"Description"
 			::= { pm10gOnuPortStatsEntry 27 }
 		
-		pm10gOnuEponTxTx1024_1518ByteFrames OBJECT-TYPE
+		pm10gOnuEponTxTx10241518ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1597,15 +1597,15 @@
 				    Counter64,
 				pm10gOnuLinkRxRx64ByteFrames               
 				    Counter64,
-				pm10gOnuLinkRxRx65_127ByteFrames        
+				pm10gOnuLinkRxRx65127ByteFrames        
 				    Counter64,
-				pm10gOnuLinkRxRx128_255ByteFrames     
+				pm10gOnuLinkRxRx128255ByteFrames     
 				    Counter64,
-				pm10gOnuLinkRxRx256_511ByteFrames    
+				pm10gOnuLinkRxRx256511ByteFrames    
 				    Counter64,
-				pm10gOnuLinkRxRx511_1023ByteFrames   
+				pm10gOnuLinkRxRx5111023ByteFrames   
 				    Counter64,
-				pm10gOnuLinkRxRx1024_1518ByteFrames 
+				pm10gOnuLinkRxRx10241518ByteFrames 
 				    Counter64,
 				pm10gOnuLinkRxGreater1518ByteFrames   
 				    Counter64,
@@ -1629,15 +1629,15 @@
 				    Counter64,
 				pm10gOnuLinkTxTx64ByteFrames   
 				    Counter64,
-				pm10gOnuLinkTxTx65_127ByteFrames   
+				pm10gOnuLinkTxTx65127ByteFrames   
 				    Counter64,
-				pm10gOnuLinkTxTx128_255ByteFrames  
+				pm10gOnuLinkTxTx128255ByteFrames  
 				    Counter64,
-				pm10gOnuLinkTxTx256_511ByteFrames  
+				pm10gOnuLinkTxTx256511ByteFrames  
 				    Counter64,
-				pm10gOnuLinkTxTx511_1023ByteFrames 
+				pm10gOnuLinkTxTx5111023ByteFrames 
 				    Counter64,
-				pm10gOnuLinkTxTx1024_1518ByteFrames  
+				pm10gOnuLinkTxTx10241518ByteFrames  
 				    Counter64,
 			    pm10gOnuLinkTxGreater1518ByteFrames  
 			        Counter64,
@@ -1695,7 +1695,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 6 }
 		
-		pm10gOnuLinkRxRx65_127ByteFrames OBJECT-TYPE
+		pm10gOnuLinkRxRx65127ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1703,7 +1703,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 7 }
 		
-		 pm10gOnuLinkRxRx128_255ByteFrames OBJECT-TYPE
+		 pm10gOnuLinkRxRx128255ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1711,7 +1711,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 8 }
 		
-		pm10gOnuLinkRxRx256_511ByteFrames OBJECT-TYPE
+		pm10gOnuLinkRxRx256511ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1719,7 +1719,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 9 }
 		
-		pm10gOnuLinkRxRx511_1023ByteFrames OBJECT-TYPE
+		pm10gOnuLinkRxRx5111023ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1727,7 +1727,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 10 }
 			
-		pm10gOnuLinkRxRx1024_1518ByteFrames OBJECT-TYPE
+		pm10gOnuLinkRxRx10241518ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1823,7 +1823,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 22 }
 		
-		 pm10gOnuLinkTxTx65_127ByteFrames OBJECT-TYPE
+		 pm10gOnuLinkTxTx65127ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1831,7 +1831,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 23 }
 		
-		 pm10gOnuLinkTxTx128_255ByteFrames OBJECT-TYPE
+		 pm10gOnuLinkTxTx128255ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1839,7 +1839,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 24 }
 		
-		pm10gOnuLinkTxTx256_511ByteFrames OBJECT-TYPE
+		pm10gOnuLinkTxTx256511ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1847,7 +1847,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 25 }
 			
-		pm10gOnuLinkTxTx511_1023ByteFrames OBJECT-TYPE
+		pm10gOnuLinkTxTx5111023ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -1855,7 +1855,7 @@
 				"Description"
 			::= { pm10gOnuLinkStatsEntry 26 }
 		
-		pm10gOnuLinkTxTx1024_1518ByteFrames OBJECT-TYPE
+		pm10gOnuLinkTxTx10241518ByteFrames OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
@@ -2475,6 +2475,3 @@
                     
 	END
 
---
--- UBIQUOSS-10GEPON-PM_GROUP-MIB.mib
---
