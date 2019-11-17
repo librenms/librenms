@@ -133,7 +133,7 @@ if ($_POST['editing']) {
     <div class="form-group">
         <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
         <div class="col-sm-6">
-          <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked; edit.sysLocation.select()" type="checkbox" name="override_sysLocation"
+          <input onChange="edit.sysLocation.disabled=!edit.override_sysLocation.checked; edit.sysLocation.select()" type="checkbox" name="override_sysLocation" data-size="small"
                 <?php
                 if ($device_model->override_sysLocation) {
                     echo(' checked="1"');
@@ -180,9 +180,9 @@ if ($_POST['editing']) {
         </div>
     </div>
     <div class="form-group">
-        <label for="disabled" class="col-sm-2 control-label">Disable:</label>
+        <label for="disabled" class="col-sm-2 control-label">Disable polling:</label>
         <div class="col-sm-6">
-          <input name="disabled" type="checkbox" id="disabled" value="1"
+          <input name="disabled" type="checkbox" id="disabled" value="1" data-size="small"
                 <?php
                 if ($device_model->disabled) {
                     echo("checked=checked");
@@ -191,9 +191,9 @@ if ($_POST['editing']) {
         </div>
     </div>
     <div class="form-group">
-        <label for="ignore" class="col-sm-2 control-label">Ignore</label>
+        <label for="ignore" class="col-sm-2 control-label">Ignore alerts:</label>
         <div class="col-sm-6">
-           <input name="ignore" type="checkbox" id="ignore" value="1"
+           <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
                 <?php
                 if ($device_model->ignore) {
                     echo("checked=checked");
@@ -209,6 +209,8 @@ if ($_POST['editing']) {
 </form>
 <br />
 <script>
+    $('[type="checkbox"]').bootstrapSwitch();
+
     $("#rediscover").click(function() {
         var device_id = $(this).data("device_id");
         $.ajax({

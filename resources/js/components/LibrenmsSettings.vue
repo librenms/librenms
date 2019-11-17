@@ -27,7 +27,7 @@
         <template v-slot:header>
             <form class="form-inline" @submit.prevent>
                 <div class="input-group">
-                    <input id="settings-search" type="search" class="form-control" placeholder="Filter Settings" v-model.trim="search_phrase">
+                    <input id="settings-search" type="search" class="form-control" :placeholder="$t('Filter Settings')" v-model.trim="search_phrase">
                 </div>
             </form>
         </template>
@@ -61,7 +61,7 @@
             prefix: String,
             initialTab: {type: String, default: 'alerting'},
             initialSection: String,
-            groups: {type: Object}
+            tabs: {type: Object}
         },
         data() {
             return {
@@ -100,9 +100,6 @@
             handleBack(event) {
                 [this.tab, this.section] = event.state.split('/');
             },
-            loadData(response) {
-                this.settings = response.data;
-            },
             updateSetting(name, value) {
                 this.$set(this.settings[name], 'value', value)
             },
@@ -113,11 +110,20 @@
                     return true;
                 }
 
-                switch (setting.when.operator) {
+                if (setting.when.hasOwnProperty('and')) {
+                    return setting.when.and.reduce((result, logic) => this.checkLogic(logic) && result, true)
+                } else if (setting.when.hasOwnProperty('or')) {
+                    return setting.when.or.reduce((result, logic) => this.checkLogic(logic) || result, false)
+                }
+
+                return this.checkLogic(setting.when);
+            },
+            checkLogic(logic) {
+                switch (logic.operator) {
                     case 'equals':
-                        return this.settings[setting.when.setting].value === setting.when.value;
+                        return this.settings[logic.setting].value === logic.value;
                     case 'in':
-                        return setting.when.value.includes(this.settings[setting.when.setting].value);
+                        return logic.value.includes(this.settings[logic.setting].value);
                     default:
                         return true;
                 }
@@ -126,6 +132,46 @@
         mounted() {
             window.onpopstate = this.handleBack; // handle back button
             axios.get(route('settings.list')).then((response) => this.settings = response.data)
+        },
+        computed: {
+            groups() {
+                if (_.isEmpty(this.settings)) {
+                    return this.tabs;
+                }
+
+                // group data
+                let groups = {};
+                for (const key of Object.keys(this.settings)) {
+                    let setting = this.settings[key];
+                    // filter
+                    if (!setting.name.includes(this.search_phrase)) {
+                        continue
+                    }
+                    if (setting.group) {
+                        if (!(setting.group in groups)) {
+                            groups[setting.group] = {};
+                        }
+                        if (setting.section) {
+                            if (!(setting.section in groups[setting.group])) {
+                                groups[setting.group][setting.section] = [];
+                            }
+
+                            groups[setting.group][setting.section].push(setting);
+                        }
+                    }
+                }
+
+                // sort groups
+                let sorted = {};
+                Object.keys(groups).sort().forEach(group_key => {
+                    sorted[group_key] = {};
+                    Object.keys(groups[group_key]).sort().forEach(section_key => {
+                        sorted[group_key][section_key] = _.sortBy(groups[group_key][section_key], 'order').map(a => a.name);
+                    });
+                });
+
+                return sorted;
+            }
         }
     }
 </script>

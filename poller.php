@@ -164,6 +164,7 @@ if (!isset($query)) {
 }
 
 foreach (dbFetch($query) as $device) {
+    DeviceCache::setPrimary($device['device_id']);
     if ($device['os_group'] == 'cisco') {
         $device['vrf_lite_cisco'] = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = " . $device['device_id']);
     } else {

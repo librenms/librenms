@@ -40,7 +40,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::get('links/{id}', 'LegacyApiController@get_link')->name('get_link');
             Route::get('locations', 'LegacyApiController@list_locations')->name('list_locations');
             Route::get('ip/addresses', 'LegacyApiController@list_ip_addresses')->name('list_ip_addresses');
-            Route::get('ip/arp/{ip}', 'LegacyApiController@list_arp')->name('list_arp');
+            Route::get('ip/arp/{query}/{cidr?}', 'LegacyApiController@list_arp')->name('list_arp');
             Route::get('ip/networks', 'LegacyApiController@list_ip_networks')->name('list_ip_networks');
             Route::get('ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
         });
@@ -74,6 +74,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::delete('rules/{id}', 'LegacyApiController@delete_rule')->name('delete_rule');
         Route::post('services/{hostname}', 'LegacyApiController@add_service_for_host')->name('add_service_for_host');
         Route::get('oxidized/config/search/{searchstring}', 'LegacyApiController@search_oxidized')->name('search_oxidized');
+        Route::post('devicegroups', 'LegacyApiController@add_device_group')->name('add_device_group');
     });
 
     // restricted by access

@@ -1009,11 +1009,7 @@
             "group": "alerting",
             "section": "email",
             "order": 10,
-            "type": "select",
-            "options": {
-                "true": "Yes",
-                "false": "No"
-            },
+            "type": "boolean",
             "when": {
                 "setting": "email_backend",
                 "operator": "equals",
@@ -1092,9 +1088,18 @@
             "order": 13,
             "type": "password",
             "when": {
-                "setting": "email_backend",
-                "operator": "equals",
-                "value": "smtp"
+                "and" : [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_auth",
+                        "operator": "equals",
+                        "value": true
+                    }
+                ]
             }
         },
         "email_smtp_port": {
@@ -1110,7 +1115,7 @@
             }
         },
         "email_smtp_secure": {
-            "default": false,
+            "default": "",
             "group": "alerting",
             "section": "email",
             "order": 9,
@@ -1145,9 +1150,18 @@
             "order": 12,
             "type": "text",
             "when": {
-                "setting": "email_backend",
-                "operator": "equals",
-                "value": "smtp"
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_auth",
+                        "operator": "equals",
+                        "value": true
+                    }
+                ]
             }
         },
         "email_user": {
@@ -3507,13 +3521,12 @@
             "type": "boolean"
         },
         "oxidized.url": {
-            "default": false,
             "group": "external",
             "section": "oxidized",
             "order": 1,
             "type": "text",
             "validate": {
-                "value": "regex:/^[a-zA-Z0-9]{1,5}://.*$/"
+                "value": "url"
             }
         },
         "page_refresh": {
@@ -3864,6 +3877,20 @@
                 "/^cpu interface/": "Mgmt"
             },
             "type": "array"
+        },
+        "routes_max_number": {
+            "default": 1000,
+            "group": "discovery",
+            "section": "route",
+            "order": 3,
+            "type": "integer"
+        },
+        "route_purge": {
+            "default": 10,
+            "group": "system",
+            "section": "cleanup",
+            "order": 2,
+            "type": "integer"
         },
         "rrd.heartbeat": {
             "default": 600,

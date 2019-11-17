@@ -465,12 +465,12 @@
                 @csrf
                 <div class="form-group">
                     <input class="form-control typeahead" type="search" id="gsearch" name="gsearch"
-                           placeholder="Global Search" autocomplete="off">
+                           placeholder="@lang('Global Search')" autocomplete="off">
                 </div>
             </form>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i><span class="hidden-sm"><small>{{ Auth::user()->username }}</small></span>
                         <span class="visible-xs-inline-block">@lang('User')</span><span
                             class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count }}</span></a>
                     <ul class="dropdown-menu">

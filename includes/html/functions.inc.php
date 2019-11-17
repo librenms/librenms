@@ -1323,6 +1323,20 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
 }
 
 /**
+ * Get all certificate names from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @return array list of certificate names
+ */
+function get_domains_with_certificates($device, $app_id)
+{
+    $app_name = 'certificate';
+    return get_arrays_with_application($device, $app_id, $app_name);
+}
+
+/**
  * Get all seafile data from the collected
  * rrd files.
  *

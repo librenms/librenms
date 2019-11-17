@@ -24,7 +24,8 @@ return [
             'ldap' => 'LDAP Settings'
         ],
         'discovery' => [
-            'general' => 'General Discovery Settings'
+            'general' => 'General Discovery Settings',
+            'route' => 'Routes Discovery Module',
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -336,11 +337,8 @@ return [
             'help' => 'The port for the memcached server. Default is 11211'
         ],
         'email_auto_tls' => [
-            'description' => 'Enable / disable Auto TLS support',
-            'options' => [
-                'true' => 'Yes',
-                'false' => 'No'
-            ]
+            'description' => 'Auto TLS support',
+            'help' => 'Tries to use TLS before falling back to un-encrypted'
         ],
         'email_backend' => [
             'description' => 'How to deliver mail',
@@ -360,13 +358,15 @@ return [
             'help' => 'Send HTML emails'
         ],
         'email_sendmail_path' => [
-            'description' => 'Location of sendmail if using this option'
+            'description' => 'Path to sendmail binary'
         ],
         'email_smtp_auth' => [
-            'description' => 'Enable / disable smtp authentication'
+            'description' => 'SMTP authentication',
+            'help' => 'Enable this if your SMTP server requires authentication'
         ],
         'email_smtp_host' => [
-            'description' => 'SMTP Host for sending email if using this option'
+            'description' => 'SMTP Server',
+            'help' => 'IP or dns name for the SMTP server to deliver mail to'
         ],
         'email_smtp_password' => [
             'description' => 'SMTP Auth password'
@@ -375,7 +375,7 @@ return [
             'description' => 'SMTP port setting'
         ],
         'email_smtp_secure' => [
-            'description' => 'Enable / disable encryption (use tls or ssl)',
+            'description' => 'Encryption',
             'options' => [
                 '' => 'Disabled',
                 'tls' => 'TLS',
@@ -596,6 +596,14 @@ return [
         'public_status' => [
             'description' => 'Show status publicly',
             'help' => 'Shows the status of some devices on the logon page without authentication.'
+        ],
+        'routes_max_number' => [
+            'description' => 'Max number of routes allowed for discovery',
+            'help' => 'No route will be discovered if the size of the routing table is bigger than this number'
+        ],
+        'route_purge' => [
+            'description' => 'Route entries older than (days)',
+            'help' => 'Cleanup done by daily.sh'
         ],
         'rrd' => [
             'heartbeat' => [

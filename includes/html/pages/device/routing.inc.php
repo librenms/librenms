@@ -20,6 +20,7 @@ $type_text['bgp']  = 'BGP';
 $type_text['cef']  = 'CEF';
 $type_text['ospf'] = 'OSPF';
 $type_text['vrf']  = 'VRFs';
+$type_text['routes']  = 'Routing Table';
 $type_text['cisco-otv']  = 'OTV';
 $type_text['mpls']  = 'MPLS';
 

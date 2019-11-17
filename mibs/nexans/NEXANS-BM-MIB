@@ -1,0 +1,2155 @@
+-- ***********************************************************************************
+-- * NEXANS-BM-MIB   (January 29, 2014, HUBERT THEISSEN)
+-- * Copyright (c) 2003-2014  Nexans Advanced Networking Solutions
+-- *
+-- * MIB for Nexans Switches
+-- * Release version = 4.01
+-- *
+-- * Changes in version 4.01
+-- * - bmSwitchAdmin:     object adminLedGlobalMode added
+-- * - bmTraps:		  trap portErrorDisabled added
+-- * - bmSwitchPortTable: portAdminState: enum bpduDisable(6), udldDisable(7), linkFlapDisable(8), 
+-- *			  errorCountDisable(9), sfpErrorDisable(10) and redundanyLoopDisable(11) added
+-- * - bmSwitchPortTable: portSecurityForwardingState: enum portBpduDisabled(13), portUdldDisabled(14),
+-- *			  portLinkFlapDisabled(15), portErrorCountDisabled(16), portSfpErrorDisabled(17)
+-- *			  and portRedundanyLoopDisable(18) added.
+-- * Changes in version 4.00
+-- * - No changes. Renamed to 4.00 only
+-- * Changes in version 3.98
+-- * - bmSwitchAdmin:     object adminAlarmNameM1, adminAlarmNameM2 and adminFunctionInputNameF1 added
+-- * Changes in version 3.97
+-- * - bmSwitchAdmin:     object adminMemoryCardMode added
+-- * - bmSwitchPortTable: object portPrioDot1p and portPrioIp added
+-- * - bmSwitchInfo:      object infoAlarmStateM1: enum (15)...(16) added
+-- * - bmSwitchInfo:      object infoAlarmStateM2: enum (15)...(16) added
+-- * - bmSwitchAdmin:     object adminAlarmM1:  enum (13)...(15) added
+-- * - bmSwitchAdmin:     object adminAlarmM2:  enum (13)...(15) added
+-- * Changes in version 3.96
+-- * - bmSwitchInfo:      object infoFunctionInputStateF1 and infoTotalConfigChanges added
+-- * - bmTraps:		  trap switchFunctionInputAlarm and switchConfigurationChanged added
+-- * Changes in version 3.95
+-- * - Spelling was wrong: "lenght" changed to "length"
+-- * - bmSwitchPortTable: object portSpeedDuplexSetup: fix1000fdxNoAutoneg(12) added
+-- * Changes in version 3.94
+-- * - bmSwitchInfo:      object infoAlarmStateM1/infoAlarmStateM2: enum alarmOnRemoteFunctionInput(12), 
+-- *                      alarmOnRemoteAlarmDestTable(13) and alarmOnLocalAlarmDestTable(14) added
+-- * - bmSwitchInfo:      object infoLastInternalMgmtWarning added
+-- * - bmSwitchAdmin:     object adminSwitchVlanTableMode: enum staticModeVlans64(3) added
+-- * - bmSwitchAdmin:     object adminSwitchVlanTableMode: enum staticModePortBased(4) added
+-- * - bmSwitchAdmin:     object adminAlarmM1 and adminAlarmM2 added
+-- * - bmSwitchPortTable: object portSpeedDuplexSetup: enum eco(9), ecoOverTemp(10) and ecoPowerSave(11) added
+-- * - bmSwitchPortTable: object portPoeAdminState: enum afHighPower(7) and atHighPower(8) added
+-- * - bmSwitchPortTable: object portLEDGreen: enum showLinkSpeedDuplex added
+-- * - bmSwitchPortTable: object portLimiterPacketType: enum limitAllPacketsBurstsAllowed added
+-- * - bmTraps:		  trap clientRemoved and internalMgmtWarning added
+-- * Changes in version 3.92
+-- * - bmSwitchPortTable: portLEDYellow: enum showSpeed added
+-- * Changes in version 3.91
+-- * - bmSwitchInfo: object infoAlarmStateM1: enum (4)...(11) added
+-- * - bmSwitchInfo: object infoAlarmStateM2: enum (4)...(11) added
+-- * Changes in version 3.9
+-- * - Some textual corrections
+-- * - bmSwitchInfo: object infoLastSfpAlarmMessage renamed to infoLastSfpEventMessage
+-- * - bmSwitchSfp: objects sfpAlarmTxBiasCurrentUpperLimit, sfpAlarmTxOutputPowerLowerLimit and 
+-- *                sfpAlarmRxInputPowerLowerLimit changed to MAX-ACCESS = read-write
+-- * Changes in version 3.8
+-- * - bmSwitchSfp: bmSwitchSfpTable added
+-- * - bmSwitchInfo: object infoLastSfpAlarmMessage added
+-- * - trap sfpEvent added
+-- * Changes in version 3.7
+-- * - bmSwitchInfo: object infoLastTftpMessage added
+-- * - bmSwitchPortTable:portSecurityForwardingState: enum (3) renamed from 'noLink' to 'waitingForLink'
+-- * - bmSwitchPortTable:portSecurityForwardingState: enum (5) renamed from 'forwarding' to 'authenticated'
+-- * - bmSwitchPortTable:portSecurityForwardingState: enum (10)...(11) added
+-- * - trap switchInternalVoltageFailure added
+-- * - trap tftpMessage added
+-- * Changes in version 3.6
+-- * - trap switchOverTemperature renamed to switchTemperatureFailure
+-- * Changes in version 3.5
+-- * - bmSwitchAdmin: object adminSnmpMacTableMode added
+-- * - bmSwitchPortTable: object portVoiceVlanId added
+-- * Changes in version 3.4
+-- * - bmSwitchAdmin: object adminDot1xAuthFailureVlanId added
+-- * - bmSwitchAdmin: object adminTftpAccess added
+-- * - adminMgmtAccessList: enum enableForSnmpAccess(4) added
+-- * Changes in version 3.3
+-- * - Textual changes for compatibility with OmniView
+-- * Changes in version 3.2
+-- * - bmSwitchPortTable:portTrunkingMode: enum enableWithoutTagging(3) added
+-- * Changes in version 3.1
+-- * - bmSwitchAdmin: SYNTAX of object infoSecurityFailMacAddr chanded to DisplayString
+-- * - bmSwitchAdmin: SYNTAX of object infoNewMacAddr  chanded to DisplayString
+-- * - bmSwitchInfo: object infoAlarmStateM1 and infoAlarmStateM2 added
+-- * - trap switchIndustrialAlarmM1 and switchIndustrialAlarmM2 added
+-- * Changes in version 3.0
+-- * - bmSwitchAdmin: object adminUnsecureVlanId added
+-- * - bmSwitchPortTable: object portLinkType added
+-- * - bmSwitchPortTable: object portAcApSetup added
+-- * - bmSwitchPortTable:portSecurityForwardingState: enum (6)...(9) added
+-- * - bmSwitchPortTable:portAdminState: enum securityDisable/loopDisable added
+-- * - bmSwitchPortTable:portLinkSetup: renamed to portSpeedDuplexSetup
+-- * - bmSwitchPortTable:portSpeedDuplexSetup: enum fix1000Hdx and fix1000Fdx added
+-- * - bmSwitchPortTable:portSpeedDuplexSetup: enum autonegAcAp no longer supported 
+-- * - bmSwitchPortTable:portLinkState: enum up1000Hdx and up1000Fdx added
+-- * - bmSwitchPortTable:portBandwidthLimitRxd: enum's limit16M...limit256M added
+-- * - bmSwitchPortTable:portBandwidthLimitTxd: enum's limit16M...limit256M added
+-- * - bmSwitchPortTable:portSecurityAdminState: enum (12)...(17) added
+-- * - bmSwitchPortTable:portNativeVlanId: renamed to portDefaultVlanId
+-- * - bmSwitchPortTable:portDefaultVlanId: range changed from 1...4095 to 0...4095
+-- * - bmSwitchPortTable:portDot1qPrioValue: renamed to portDot1qDefaultPrioValue
+-- * - bmSwitchPortTable:portPrioLevel: renamed to portDefaultPrioQueue and access
+-- *                                    changed to read-only
+-- * - bmSwitchPortTable:portTrunkingMode: enum enableWithoutTagging(3) removed
+-- * - bmSwitchPortTable:portLEDGreen: enum blink(3) no longer supported
+-- * - bmSwitchPortTable:portLEDYellow: enum blink(3) no longer supported
+-- * - trap portActiveLoopDetectionFailure added
+-- * - bmSwitchInfo: object infoMgmtSoftwareVersion renamed to infoMgmtFirmwareVersion
+-- * Changes in version 2.9
+-- * - bmSwitchInfo: object infoPoeInputPower added
+-- * - bmSwitchAdmin: object adminSwitchPoEPowerLimit added
+-- * - bmSwitchAdmin: object adminSwitchVlanTableMode added
+-- * - bmSwitchPortTable: object portTagging renamed to portTrunkingMode
+-- * - bmSwitchPortTable: object portPoePowerLimit added
+-- * - bmSwitchPortTable: object portLimiterPacketType added
+-- * - trap portLoopBcastFailure added
+-- * - trap switchPoeVoltageFailure added
+-- * - trap portPoeOverloadFailure added
+-- * - trap switchPoeOverloadFailure added
+-- * Changes in version 2.8
+-- * - bmSwitchPortTable: enum ieee802AllowOneMacAddr added to portSecurityAdminState
+-- * Changes in version 2.7
+-- * - bmSwitchPortTable: object portPoeVoltage has the unit volt
+-- * - bmSwitchInfo: objects renamed from bmSwitchInfo... to info... 
+-- * - bmSwitchAdmin: objects renamed from bmSwitchAdmin... to admin...
+-- * - trap switchMgmtAuthenticationFailure renamed to switchMgmtAuthFailure
+-- * - trap radiusMgmtAuthenticationReject renamed to radiusMgmtAuthReject
+-- * Changes in version 2.6
+-- * - bmSwitchInfo: object bmSwitchInfoPoeInputVoltage added
+-- * Changes in version 2.5
+-- * - bmSwitchInfo: bmSwitchInfoType: type 16 and 17 added
+-- * Changes in version 2.4
+-- * - switchMgmtAuthenticationFailure trap added
+-- * - radiusMgmtAuthenticationFailure trap added
+-- * - radiusPortSecurityFailure trap added
+-- * Changes in version 2.3
+-- * - bmSwitchPortTable: enum renew added to portSecurityAdminState
+-- * - bmSwitchPortTable: enum radiusAllowXxxMacAddr added to portSecurityAdminState
+-- * - bmSwitchPortTable: object portSecurityForwardingState added
+-- * Changes in version 2.2
+-- * - object bmSwitchInfoNoOfUserPorts changed to bmSwitchInfoNoOfPorts
+-- * - object bmSwitchInfoNoOfUplinkPorts changed to bmSwitchInfoNoOfReboots
+-- * - description of portSecurityMacAddr1..3 modified
+-- * Changes in version 2.1
+-- * - switchOverTemperature trap: object bmSwitchInfoTemperature added
+-- * - all traps: message formats for Castlerock's SNMPc added
+-- * - bmSwitchPortTable: objects portPoeVoltage, portPoeCurrent and portPoePower added
+-- ************************************************************************************
+
+NEXANS-BM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	NOTIFICATION-TYPE,
+	OBJECT-TYPE,
+	Integer32,
+	IpAddress,
+	Counter32
+		FROM SNMPv2-SMI
+	MacAddress,
+	DisplayString
+		FROM SNMPv2-TC
+	nexansANS
+		FROM NEXANS-MIB;
+
+bmSwitchMIB MODULE-IDENTITY
+	LAST-UPDATED "201401290000Z"
+	ORGANIZATION "Nexans Advanced Networking Solutions"
+	CONTACT-INFO "h.theissen@nexans.com"
+	DESCRIPTION  "MIB for Nexans switches"
+	REVISION     "201401290000Z"
+	DESCRIPTION  "Revision 4.01"
+	::= { nexansANS 20 }
+
+bmTraps			OBJECT IDENTIFIER ::= { bmSwitchMIB 0 }
+bmSwitchInfo		OBJECT IDENTIFIER ::= { bmSwitchMIB 1 }
+bmSwitchAdmin		OBJECT IDENTIFIER ::= { bmSwitchMIB 2 }
+bmSwitchPort		OBJECT IDENTIFIER ::= { bmSwitchMIB 3 }
+bmSwitchVlan		OBJECT IDENTIFIER ::= { bmSwitchMIB 4 }
+bmSwitchSfp		OBJECT IDENTIFIER ::= { bmSwitchMIB 5 }
+
+-- ****************************************************************************
+-- * bmSwitchInfo
+-- ****************************************************************************
+-- * Contains global information regarding to the whole BM Switch
+-- ****************************************************************************
+
+infoDescr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..40))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The ordering description of the switch"
+	::= { bmSwitchInfo 1 }
+
+infoType OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The infoType indentifies the product familie of this switch.
+		 Refer to NEXANS-MIB for the currently defined families"
+	::= { bmSwitchInfo 2 }
+
+infoProductNo OBJECT-TYPE
+	SYNTAX	    DisplayString (SIZE	(0..8))
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The product number of the switch (8830xxxx)"
+	::= { bmSwitchInfo 3 }
+
+infoSerie OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..6))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The production series of the switch"
+	::= { bmSwitchInfo 4 }
+
+infoSeriesNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..6))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The production number of the switch"
+	::= { bmSwitchInfo 5 }
+
+
+infoManufactureDate OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (10))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The manufacturing date of the switch.
+		 The display format is dd.mm.jjjj"
+	::= { bmSwitchInfo 6 }
+
+infoSwitchHardwareVersion OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..6))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The hardware version of the base switch."
+	::= { bmSwitchInfo 7 }
+
+infoMgmtHardwareVersion OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..6))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The hardware version of the plug-in management module."
+	::= { bmSwitchInfo 8 }
+
+infoMgmtFirmwareVersion OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..20))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The firmware version of the management module."
+	::= { bmSwitchInfo 9 }
+
+infoNoOfPorts OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of switching ports within the system. This includes all
+		 user and uplink ports."
+	::= { bmSwitchInfo 10 }
+
+infoNoOfReboots OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of reboots since the manufacturing date. This counter 
+		can't be cleared by any admin command."
+	::= { bmSwitchInfo 11 }
+
+
+infoTemperature OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The case temperature in degree Celsius of the switch."
+	::= { bmSwitchInfo 12 }
+
+infoTemperatureMaxAllowed OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The upper limit of the allowed temperature range in degree
+		Celsius.
+		If the current temperature indicated by infoTemperature
+		exceeds infoTemperatureMaxAllowed, the switch sends an 
+		switchOverTemperature alarm trap."
+	::= { bmSwitchInfo 13 }
+
+infoPowerVoltage2500 OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The 2.5 volt supply voltage in millivolts.
+		The allowed range is 2300...2700 millivolts."
+	::= { bmSwitchInfo 14 }
+
+infoPowerVoltage3300 OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The 3.3 volt supply voltage in millivolts.
+		The allowed range is 3100...3500 millivolts."
+	::= { bmSwitchInfo 15 }
+
+infoUnauthIpAddr OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The source IP address of the station which generated the last
+		authentication failure. The infoUnauthAddr is also reported 
+		in the switchMgmtAuthFailure alarm trap."
+	::= { bmSwitchInfo 16 }
+
+infoSecurityFailMacAddr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..12))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The source MAC address of the station which has generated a
+		the last port security failure. The infoSecurityFailMacAddr is
+		also reported in the portSecurityFailure alarm trap."
+	::= { bmSwitchInfo 17 }
+
+infoNewMacAddr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..12))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The last new source MAC address seen on a port witch has 
+		portsecurity enabled. The infoNewMacAddr is also reported in the
+		newMacAddress trap."
+	::= { bmSwitchInfo 18 }
+
+infoPoeInputVoltage OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current PoE input voltage delivered from the power supply."
+	::= { bmSwitchInfo 19 }
+
+infoPoeInputPower OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current PoE input power delivered from the power supply."
+	::= { bmSwitchInfo 20 }
+
+infoAlarmStateM1 OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported                (1),
+			alarmOff                    (2),
+			alarmOn                     (3),
+			alarmOnLinkDown             (4),
+			alarmOnForced               (5),
+			alarmOffForced	            (6),
+			alarmOnPowerSupplyS1        (7),
+			alarmOnPowerSupplyS2        (8),
+			alarmOnPowerSupplyS1orS2    (9),
+			alarmOnFunctionInputShorted (10),
+			alarmOnFunctionInputOpen    (11),
+			alarmOnRemoteFunctionInput  (12),
+			alarmOnRemoteAlarmDestTable (13),
+			alarmOnLocalAlarmDestTable  (14),
+			alarmContactForcedShorted   (15),
+			alarmContactForcedOpen      (16)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current state of the industrial alarm output M1."
+	::= { bmSwitchInfo 21 }
+
+infoAlarmStateM2 OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported                (1),
+			alarmOff                    (2),
+			alarmOn                     (3),
+			alarmOnLinkDown             (4),
+			alarmOnForced               (5),
+			alarmOffForced	            (6),
+			alarmOnPowerSupplyS1        (7),
+			alarmOnPowerSupplyS2        (8),
+			alarmOnPowerSupplyS1orS2    (9),
+			alarmOnFunctionInputShorted (10),
+			alarmOnFunctionInputOpen    (11),
+			alarmOnRemoteFunctionInput  (12),
+			alarmOnRemoteAlarmDestTable (13),
+			alarmOnLocalAlarmDestTable  (14),
+			alarmContactForcedShorted   (15),
+			alarmContactForcedOpen      (16)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current state of the industrial alarm output M2."
+	::= { bmSwitchInfo 22 }
+
+infoLastTftpMessage OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..80))
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The message of the last successful or failed TFTP transfer.
+		 This does not include TFTP transfers executed from Device Manager."
+	::= { bmSwitchInfo 23 }
+
+infoLastSfpEventMessage OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..80))
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The last event message from one of the available SFP modules."
+	::= { bmSwitchInfo 24 }
+
+infoLastInternalMgmtWarning OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..80))
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The last internal management warning message."
+	::= { bmSwitchInfo 25 }
+
+infoFunctionInputStateF1 OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported                (1),
+			functionInputShorted        (2),
+			functionInputOpen           (3)
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current state of the function input F1."
+	::= { bmSwitchInfo 26 }
+
+infoTotalConfigChanges OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of total configurations changes."
+	::= { bmSwitchInfo 27 }
+
+-- ****************************************************************************
+-- * bmSwitchAdmin
+-- ****************************************************************************
+-- * Contains global administration functions regarding to the whole BM Switch
+-- ****************************************************************************
+adminReset	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			resetIdle		       (1),
+			resetCounters		       (2),
+			rebootSwitch		       (3),
+			rebootToFactoryDefaults	       (4),
+			renewIpAndVlanParameter	       (5)
+	}
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+		"Writing this object causes the switch to perform a reset operation.
+		The following reset types are supported.
+			Set Values:
+			resetCounters(2)
+				This action resets all error and statistic counters to zero.
+				This actions will NOT reboot the switch.
+			rebootSwitch(3)
+				This action resets switch and management. All counters, timers and other
+				volatile data are reset to there power-up values stored in flash.
+				This actions will reboot the switch.
+			rebootToFactoryDefaults(4)
+				This action resets switch and management. All volatile and nonvolatile data
+				are reset to there power-up or factory default values.
+				This actions will reboot the switch.
+			renewIpAndVlanParameter(5)
+				This action reinitializes the IP and VLAN module of the switch so that the 
+				actually set IP and VLAN parameters will take affect.
+				This actions will NOT reboot the switch.
+			Get values:
+			resetIdle(1)
+				Reading this object will allways return resetIdle(1)."
+	::= { bmSwitchAdmin 1 }
+
+adminAgentDhcp OBJECT-TYPE
+	SYNTAX      INTEGER {
+			enable		(1),
+			disable		(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If set to enable(1), the switch tries to get his IP parameter
+		via DHCP. If set to disable(2), the switch uses the IP parameters
+		defined with adminIpAddress, adminDefRouterIpAddress and 
+		adminNetmask.
+		Changes of this value will take affect after the next switch reboot or
+		after setting adminReset to renewIpAndVlanParameter(5)."
+	DEFVAL  { enable }
+	::= { bmSwitchAdmin 2 }
+
+adminAgentIpAddress OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The IP address of the switch agent's ethernet interface.
+		If the value of adminDHCP is enable(1) this value is read-only.
+		Changes of this value will take affect after the next switch reboot or
+		after setting adminReset to renewIpAndVlanParameter(5)."
+	::= { bmSwitchAdmin 3 }
+
+adminAgentPhysAddress OBJECT-TYPE
+	SYNTAX      MacAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The Ethernet MAC address of the switch agent."
+	::= { bmSwitchAdmin 4 }
+
+adminAgentDefRouterIpAddress OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The IP address of the default Router.
+		If the value of adminDHCP is enable(1) this value is read-only.
+		Changes of this value will take affect after the next switch reboot or
+		after setting adminReset to renewIpAndVlanParameter(5)."
+	::= { bmSwitchAdmin 5 }
+
+adminAgentNetmask OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The IP Netmask of the connected network.
+		If the value of adminDHCP is enable(1) this value is read-only.
+		Changes of this value will take affect after the next switch reboot or
+		after setting adminReset to renewIpAndVlanParameter(5)."
+	::= { bmSwitchAdmin 6 }
+
+adminAgentDhcpServerIpAddress OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The IP address of the last used DHCP server."
+	::= { bmSwitchAdmin 7 }
+
+adminAgentVlanId  OBJECT-TYPE
+	SYNTAX      Integer32 (1..4095)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The VLAN-ID assigned to the agent. 
+		Changes of this value will take affect after the next switch reboot or
+		after setting adminReset to renewIpAndVlanParameter(5)."
+	::= { bmSwitchAdmin 8 }
+
+adminAgentPrioValue  OBJECT-TYPE
+	SYNTAX      Integer32 (0..7)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The IEEE802.1Q priority value and queue assigned to all frames transmitted
+		by the agent.
+		The definition between value, service class and queue are as follows:
+		0=Best Effort (queue=0),
+		1=Background (queue=0),
+		2=Reserved (queue=1),
+		3=Excellent Effort (queue=1),
+		4=Controlled Load (queue=2),
+		5=Video (queue=2),
+		6=Voice (queue=3),
+		7=Network Control (queue=3)"
+	::= { bmSwitchAdmin 9 }
+
+adminAddrAgingTimeMinutes OBJECT-TYPE
+        SYNTAX       Integer32 (1..68)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The timeout period in minutes for aging out dynamically
+		learned MAC addresses . The allowed range is 1 minute
+		to 68 minutes."
+	DEFVAL  { 5 }
+	::= { bmSwitchAdmin 10 }
+
+adminSwitchPortMirror OBJECT-TYPE
+	SYNTAX     INTEGER {
+			enable		(1),
+			disable		(2)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If set to enable(1), the switch doesn't use address learning.
+		This affects that any received packet will be forwarded to all ports
+		of the particular VLAN. The switch acts like a hub within each VLAN."
+	DEFVAL  { disable }
+	::= { bmSwitchAdmin 11 }
+
+adminMgmtAccessList OBJECT-TYPE
+	SYNTAX     INTEGER {
+			disable				(1),
+			enableForNexManAccess		(2),
+			enableForAllAccess		(3),
+			enableForSnmpAccess		(4)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If set to enableForNexManAccess(2) or enableForAllAccess(3), the
+		switch only accepts read or write requests from IP addresses which
+		are listed in the management accesslist."
+	DEFVAL  { disable }
+	::= { bmSwitchAdmin 12 }
+
+adminSwitchPoEPowerLimit OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The limit for the POE input power from the power supply in VA.
+		If the current power exceeds this value a overload conditions occurs and 
+		the inline power for the highest port number will be switched off."
+	::= { bmSwitchAdmin 13 }
+
+adminSwitchVlanTableMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+			staticMode		(1),
+			dynamicMode		(2),
+			staticModeVlans64	(3),
+			staticModePortBased	(4)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If set to staticMode(1) or staticModeVlans64(3) any existing VLAN table entry
+		must be removed manually by management. With staticMode(1) total 16 VLAN-ID's 
+		and with staticModeVlans64(3) total 64 VLAN-ID's are supported. 
+		If set to dynamicMode(2) all unused VLAN-ID's are removed automatically by the 
+		switch. This means, that all VLAN-ID's not assigned to a port Default-VLAND or 
+		to the Unsecure-VLAN will be removed."
+	DEFVAL  { staticMode }
+	::= { bmSwitchAdmin 14 }
+
+adminUnsecureVlanId  OBJECT-TYPE
+	SYNTAX      Integer32 (1..4095)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The VLAN-ID of the unsecure VLAN"
+	::= { bmSwitchAdmin 15 }
+
+adminDot1xAuthFailureVlanId  OBJECT-TYPE
+	SYNTAX      Integer32 (0..4095)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The VLAN-ID in the case of an IEEE802.1X authentication failure.
+		 Setting the VLAN-ID to 0 disables the authentication failure VLAN."
+	::= { bmSwitchAdmin 16 }
+
+adminTftpAccess OBJECT-TYPE
+	SYNTAX     INTEGER {
+			tftpAccessDisable	(1),
+			tftpAccessReadOnly	(2),
+			tftpAccessReadWrite	(3)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If 'TFTP authentication via SNMP' is disabled, this value is allways
+		 tftpAccessDisable(1).
+                 If 'TFTP authentication via SNMP' is read/only or read/write, an this
+		 object is read, the value is tftpAccessReadOnly(2) and the agent allowes
+		 a single TFTP read access of the switch configuration.
+                 If 'TFTP authentication via SNMP' is read/write, this value can be set
+		 to tftpAccessReadWrite(3) and the agent allowes a single TFTP read or
+		 write access to the configuration or a single firmware upgrade.
+		 After finishing the TFTP transfer, this value will return to
+		 ftpAccessDisable(1) automatically.
+		 Note: If the 'NexMan authentication mode' is set to 'none',
+		 TFTP read and write access is allways allowed."
+	::= { bmSwitchAdmin 17 }
+
+
+adminSnmpMacTableMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+			listAllPorts		(1),
+			listUserPortsOnly	(2)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If set to listAllPorts(1) the BRIDGE-MIBs dot1dTpFdbTable lits MAC address
+		 of all ports.
+		 If set to listUserPortsOnly(2) the BRIDGE-MIBs dot1dTpFdbTable lits only 
+		 MAC addresses of user ports. MAC addresses of uplink/downlink ports
+		 are ignored."
+	::= { bmSwitchAdmin 18 }
+
+adminAlarmM1 OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported                   (1),
+			alarmLinkDown                  (2),
+			alarmOnForced                  (3),
+			alarmOffForced	               (4),
+			alarmPowerSupply1Failure       (5),
+			alarmPowerSupply2Failure       (6),
+			alarmPowerSupply1or2Failure    (7),
+			alarmLocalFunctionInputShorted (8),
+			alarmLocalFunctionInputOpen    (9),
+			alarmRemoteFunctionInput       (10),
+			alarmRemoteAlarmDestination    (11),
+			alarmLocalAlarmDestination     (12),
+			alarmForceContactShorted       (13),
+			alarmForceContactOpen          (14),
+			alarmForceContactOpenShorted   (15)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The current setup of the industrial alarm output M1."
+	::= { bmSwitchAdmin 19 }
+
+adminAlarmM2 OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported                   (1),
+			alarmLinkDown                  (2),
+			alarmOnForced                  (3),
+			alarmOffForced	               (4),
+			alarmPowerSupply1Failure       (5),
+			alarmPowerSupply2Failure       (6),
+			alarmPowerSupply1or2Failure    (7),
+			alarmLocalFunctionInputShorted (8),
+			alarmLocalFunctionInputOpen    (9),
+			alarmRemoteFunctionInput       (10),
+			alarmRemoteAlarmDestination    (11),
+			alarmLocalAlarmDestination     (12),
+			alarmForceContactShorted       (13),
+			alarmForceContactOpen          (14),
+			alarmForceContactOpenShorted   (15)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The current setup of the industrial alarm output M2."
+	::= { bmSwitchAdmin 20 }
+
+adminMemoryCardMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+			notSupported            (1),
+			mcEnabled		(2),
+			mcDisabled		(3),
+			mcPermanentDisabled	(4)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If set to mcDisabled(2), the memory card is disabled but may
+		 be re-enabled later by writing mcEnabled(1).
+		 If set to mcPermanentDisabled(3), the memory card is disabled 
+		 permanently and can't be re-enabled by management or any
+		 kind of hardware reset."
+	::= { bmSwitchAdmin 21 }
+
+adminAlarmNameM1 OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"An administratively assigned name for alarm output M1.
+		 The configured name will be send as part of alarm message
+		 switchIndustrialAlarmM1."
+	DEFVAL  { "not defined" }
+	::= { bmSwitchAdmin 22 }
+
+adminAlarmNameM2 OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"An administratively assigned name for alarm output M1.
+		 The configured name will be send as part of alarm message
+		 switchIndustrialAlarmM2."
+	DEFVAL  { "not defined" }
+	::= { bmSwitchAdmin 23 }
+
+adminFunctionInputNameF1 OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"An administratively assigned name for function input F1.
+		 The configured name will be send as part of alarm message
+		 switchFunctionInputAlarm."
+	DEFVAL  { "not defined" }
+	::= { bmSwitchAdmin 24 }
+
+adminLedGlobalMode OBJECT-TYPE
+	SYNTAX     INTEGER {
+			ledGlobalModeNotSupported  (1),
+			ledGlobalModeStandard	   (2),
+			ledGlobalModeAllOff        (3),
+			ledGlobalModeAllOn         (4),
+			ledGlobalModeMgmtOnly      (5)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Set the global mode for all front side LEDs."
+	::= { bmSwitchAdmin 25 }
+
+-- ****************************************************************************
+-- * bmSwitchPort
+-- ****************************************************************************
+-- * The bmSwitchPort object group gives status and control information to every
+-- * physical port on a switch.
+-- ****************************************************************************
+
+bmSwitchPortTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF PortEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of port entries for the switch.	The number of
+		entries is defined by ifNumber."
+	::= { bmSwitchPort 1 }
+
+
+bmSwitchPortEntry OBJECT-TYPE
+	SYNTAX      PortEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A port entry in the table containing information about a
+		port in the switch."
+	INDEX   { portIndex }
+	::= { bmSwitchPortTable 1 }
+
+
+PortEntry ::= SEQUENCE {
+		portIndex
+			Integer32,
+		portDescr
+			DisplayString,
+		portName
+			DisplayString,
+		portAdminState
+			INTEGER,
+		portSpeedDuplexSetup
+			INTEGER,
+		portLinkState
+			INTEGER,
+		portErrorCounter
+			Counter32,
+		portRemoteFault
+			INTEGER,
+		portDefaultVlanId
+			Integer32,
+		portTrunkingMode
+			INTEGER,
+		portDot1qDefaultPrioValue
+			Integer32,
+		portDefaultPrioQueue
+			Integer32,
+		portLEDGreen
+			INTEGER,
+		portLEDYellow
+			INTEGER,
+		portBandwidthLimitRxd
+			INTEGER,
+		portBandwidthLimitTxd
+			INTEGER,
+		portSecurityAdminState
+			INTEGER,
+		portSecurityMacAddr1
+			MacAddress,
+		portSecurityMacAddr2
+			MacAddress,
+		portSecurityMacAddr3
+			MacAddress,
+		portPoeAdminState
+			INTEGER,
+		portPoeVoltage
+			Integer32,
+		portPoeCurrent
+			Integer32,
+		portPoePower
+			Integer32,
+		portSecurityForwardingState
+			INTEGER,
+		portPoePowerLimit
+			Integer32,
+		portLimiterPacketType
+			INTEGER,
+		portAcApSetup
+			INTEGER,
+		portLinkType
+			INTEGER,
+		portVoiceVlanId
+			Integer32,
+		portPrioDot1p
+			INTEGER,
+		portPrioIp
+			INTEGER
+		}
+
+
+portIndex OBJECT-TYPE
+	SYNTAX      Integer32 (1..64)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A unique value for each port.  Its value ranges between 1
+		and the value of ifNumber.
+		The port identified by a particular value of this index is
+		the same port as identified by the same value of ifIndex."
+	::= { bmSwitchPortEntry 1 }
+
+portDescr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing information about the
+		interface. Same as ifDescr."
+	::= { bmSwitchPortEntry 2 }
+
+portName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..15))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"An administratively assigned name for this port."
+	DEFVAL  { "" }
+	::= { bmSwitchPortEntry 3 }
+
+portAdminState OBJECT-TYPE
+	SYNTAX      INTEGER {
+			allwaysEnable		(1),
+			enable			(2),
+			adminDisable		(3),
+			securityDisable		(4),
+			loopDisable		(5),
+			bpduDisable		(6),
+			udldDisable		(7),
+			linkFlapDisable		(8),
+			errorCountDisable	(9),
+			sfpErrorDisable		(10),
+			redundanyLoopDisable	(11)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"A value indicating the current state of the port.
+		A SET to this object enables (2) or disables (3) the port.
+			The possible values returned by GET are:
+			allwaysEnable(1)
+				The port is always enabled (usually the uplink port).
+			enable(2)
+				The port is active to transmit or receive data.
+			disable(3)
+				The port is inactive and unable to transmit or receive data.
+			securityDisable(4)
+				The port has been automatically disabled because of security 
+				violation.
+			loopDisable(5)
+				The port has been automatically disabled because of the
+				active loop protection.
+			bpduDisable(6)
+				The port has been automatically disabled because a BPDU has been 
+				received on a Spanning Tree disabled port.
+			udldDisable(7)
+				The port has been automatically disabled because of the
+				UDLD function.
+			linkFlapDisable(8)
+				The port has been automatically disabled because of the
+				link flap protection.
+			errorCountDisable(9)
+				The port has been automatically disabled because of the
+				error counter incrementation detection.
+			sfpErrorDisable(10)
+				The port has been automatically disabled because of wromg
+				SFP inserted or SFP malfunction.
+			redundanyLoopDisable(11)
+				The port has been automatically disabled because of loop
+				detection while spannung tree was enabled"
+	::= { bmSwitchPortEntry 4 }
+
+portSpeedDuplexSetup OBJECT-TYPE
+	SYNTAX      INTEGER {
+			autoneg			(1),
+			fix10Hdx		(2),
+			fix10Fdx		(3),
+			fix100Hdx		(4),
+			fix100Fdx		(5),
+--			autonegAcAp		(6),  no longer supported for V3.x switchsoftware
+--						      please use portAcApSetup for Autoneg.-Autopol.
+			fix1000Hdx		(7),  
+			fix1000Fdx		(8),
+			eco			(9),
+			ecoOverTemp		(10),
+			ecoPowerSave		(11),
+			fix1000fdxNoAutoneg	(12)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"A value indicating the current speed and duplex link setup.
+		Independent of portSpeedDuplexSetup the port may be disabled
+		by portAdminState."
+	::= { bmSwitchPortEntry 5 }
+
+portLinkState OBJECT-TYPE
+	SYNTAX      INTEGER {
+			down		(1),
+			up10Hdx		(2),
+			up10Fdx		(3),
+			up100Hdx	(4),
+			up100Fdx	(5),
+			up1000Hdx	(6),
+			up1000Fdx	(7)
+			}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A value indicating the current link state."
+	::= { bmSwitchPortEntry 6 }
+
+portErrorCounter OBJECT-TYPE
+	SYNTAX      Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Errors are usually caused by a FDX/HDX mismatch between the switch port
+		and the connected port. If the switch detects a incrementation of this
+		counter, he will send a portErrorCountFailure trap.
+		The counted errors are depending on the switch type.
+		For BM-A, BM+ and Access Switches:
+	        - Received packets with bad CRC,
+	        - Received packets with bad alignment,
+	        - Late collisions (only valid if Link State is 10HDX or 100HDX).
+	      For old BM Switches:
+	        - Received packets with bad CRC"
+	::= { bmSwitchPortEntry 7 }
+
+portRemoteFault OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported    (1),
+			enable          (2),
+			disable         (3)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If portRemoteFault is enabled for this port, the port transmitter will
+		be only enabled if the port receiver has a valid link (portLinkState must
+		not be down)."
+	::= { bmSwitchPortEntry 8 }
+
+
+portDefaultVlanId  OBJECT-TYPE
+	SYNTAX      Integer32 (0..4095)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The Default-VLAN-ID assigned to this port.
+		This Default-VLAN-ID has differnt affects depending on received
+		or transmited frames:
+		a) All received frames, which have no VLAN-tag, will
+			be assigned to the Default-VLAN-ID.
+		b) All transmited frames, which belong to the Default-VLAN,
+			are send without a VLAN-tag.
+		If portTrunkingMode is set to dot1qTagging, all frames are transmited
+		with a VLAN-tag, except frames which belong to the Default-VLAN-ID.
+		Changes of this value will take affect after the next switch reboot or
+		after setting adminReset to renewIpAndVlanParameter(5).
+		Setting this value to 0 for a port with dot1qTagging will disable the
+		Default-VLAN. This means, that all frames are send tagged."
+	::= { bmSwitchPortEntry 9 }
+
+portTrunkingMode  OBJECT-TYPE
+	SYNTAX      INTEGER {
+			dot1qTagging		(1),
+			disable			(2),
+			enableWithoutTagging	(3)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If portTrunkingMode is set to dot1qTagging, all frames are transmited
+		with a VLAN-tag, except frames which belong to portNativeVlanId. 
+		If portTrunkingMode is set to enableWithoutTagging, all frames are transmited
+		without a VLAN-tag. 
+		Changes of this value will take affect after the next switch reboot or
+		after setting adminReset to renewIpAndVlanParameter(5)."
+	::= { bmSwitchPortEntry 10 }
+
+portDot1qDefaultPrioValue  OBJECT-TYPE
+	SYNTAX      Integer32 (0..7)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The default IEEE802.1Q priority and queue assigned all frames received
+		on this port, for which no other priorisation applies (IEEE801.1q Tag or 
+		IPv4/IPv6). 
+		The definition between value, service class and queue are as follows:
+		0=Best Effort (queue=0),
+		1=Background (queue=0),
+		2=Reserved (queue=1),
+		3=Excellent Effort (queue=1),
+		4=Controlled Load (queue=2),
+		5=Video (queue=2),
+		6=Voice (queue=3),
+		7=Network Control (queue=3)"
+	::= { bmSwitchPortEntry 11 }
+
+portDefaultPrioQueue   OBJECT-TYPE
+	SYNTAX      Integer32 (0..3)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The default priority queue assigned all frames received on this port,
+		for which no other priorisation applies (IEEE801.1q Tag or IPv4/IPv6). 
+		A value of 0 means the lowest priority level.
+		A value of 3 means the highest priority level.
+		To change this default queue use object portDot1qDefaultPrioValue."
+	::= { bmSwitchPortEntry 12 }
+
+portLEDGreen   OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported		(1),
+			showLinkState		(2),
+			blink			(3),
+			allwaysOff		(4),
+			allwaysOn		(5),
+			showLinkSpeedDuplex	(6)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The function of the green port LED. Only supported for user ports"
+	::= { bmSwitchPortEntry 13 }
+
+portLEDYellow   OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported	(1),
+			showDuplexState	(2),
+			blink		(3), 
+			allwaysOff	(4),
+			allwaysOn	(5),
+			showPoeEnabled	(6),
+			showSpeed	(7)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The function of the yellow port LED. Only supported for user ports"
+	::= { bmSwitchPortEntry 14 }
+
+portBandwidthLimitRxd   OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported	(1),
+			disable		(2),
+			limit128k	(3),
+			limit256k	(4),
+			limit512k	(5),
+			limit1M		(6),
+			limit2M		(7),
+			limit4M		(8),
+			limit8M		(9),
+			limit16M	(10),
+			limit32M	(11),
+			limit64M	(12),
+			limit128M	(13),
+			limit256M	(14)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The bandwidth limiter for received packets. If set to disable(2) the
+		limiter will be disabled."
+	::= { bmSwitchPortEntry 15 }
+
+portBandwidthLimitTxd   OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported	(1),
+			disable		(2),
+			limit128k	(3),
+			limit256k	(4),
+			limit512k	(5),
+			limit1M		(6),
+			limit2M		(7),
+			limit4M		(8),
+			limit8M		(9),
+			limit16M	(10),
+			limit32M	(11),
+			limit64M	(12),
+			limit128M	(13),
+			limit256M	(14)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The bandwidth limiter for transmitted packets. If set to disable(2) the
+		limiter will be disabled."
+	::= { bmSwitchPortEntry 16 }
+
+portSecurityAdminState  OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported			(1),
+			disable				(2),
+			manualSettingMacAddr		(3),
+			autoAllowOneMacAddr		(4),
+			autoAllowTwoMacAddr		(5),
+			autoAllowThreeMacAddr		(6),
+			radiusAllowOneMacAddr		(7),
+			radiusAllowTwoMacAddr		(8),
+			radiusAllowThreeMacAddr		(9),
+			renew				(10),
+			ieee802AllowOneMacAddr		(11),
+			vendorSettingMacAddr		(12),
+			ieee802AllowMultiMacAddr	(13),
+			ieee802OrRadiusOneMac		(14),
+			ieee802AndRadiusTwoMac		(15),
+			learnOneMacAddr			(16),
+			learnTwoMacAddr			(17)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Enables the port security feature for that port. 
+		 A value of notSupported(1) means, that port security ist not supported or 
+		 disabled for that port (i.e. uplink port). The command renew(10) clears
+		 all learned MAC addresses and enables the port if it is disabled.
+		 See documentation for more details."
+	::= { bmSwitchPortEntry 17 }
+
+portSecurityMacAddr1 OBJECT-TYPE
+	SYNTAX      MacAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The first MAC address used for port security.
+		If portSecurityAdminState has the value disable(2), portSecurityManualSettingMacAddr(3)
+		or vendorSettingMacAddr(12) then this object will be read-write.
+		In any other mode this object will be read-only and shows the first automatically
+		learned MAC addresses for that port."
+	::= { bmSwitchPortEntry 18 }
+
+portSecurityMacAddr2 OBJECT-TYPE
+	SYNTAX      MacAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The second MAC address used for port security.
+		If portSecurityAdminState has the value disable(2), portSecurityManualSettingMacAddr(3)
+		or vendorSettingMacAddr(12) then this object will be read-write.
+		In any other mode this object will be read-only and shows the second automatically
+		learned MAC addresses for that port."
+	::= { bmSwitchPortEntry 19 }
+
+portSecurityMacAddr3 OBJECT-TYPE
+	SYNTAX      MacAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The third MAC address used for port security.
+		If portSecurityAdminState has the value disable(2), portSecurityManualSettingMacAddr(3)
+		or vendorSettingMacAddr(12) then this object will be read-write.
+		In any other mode this object will be read-only and shows the third automatically
+		learned MAC addresses for that port."
+	::= { bmSwitchPortEntry 20 }
+
+portPoeAdminState OBJECT-TYPE
+	SYNTAX	INTEGER {
+			notSupported	(1),
+			off		(2),
+			forcedOn	(3),
+			autoOn		(4),
+			overloadFail	(5),
+			reset		(6),
+			afHighPower	(7),
+			atHighPower	(8)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"If no POE adapter is installed this object is read-only and will always
+		report notSupported(1). The possible values are:
+			notSupported(1):
+				No adapter installed or not supported for that port (i.e. uplink port).
+			off(2):
+				Adapter installed but inline power for that port is switched off.
+			forcedOn(3):
+				Adapter installed and inline power is asserted permanently. In the case
+				of an IEEE802.3af adapter this setting will disable the IEEE802.3af automatic
+				detection.
+			autoOn(4):
+				This setting is only supported if a IEEE802.3af adapter is installed.
+				The adapter automatically detects if the connected device
+				is IEEE802.3af compliant and will assert the power if possible.
+			overloadFail(5):
+				Adapter installed but inline power for that port is automatically
+				switched off because of a overload condition at that port."
+	::= { bmSwitchPortEntry 21 }
+
+portPoeVoltage OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current PoE output voltage at this port in volts."
+	::= { bmSwitchPortEntry 22 }
+
+portPoeCurrent OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current PoE output current at this port in milliampere."
+	::= { bmSwitchPortEntry 23 }
+
+portPoePower OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current PoE output power at this port in milliwatt. The output
+		power is the product of portPoeVoltage and portPoeCurrent."
+	::= { bmSwitchPortEntry 24 }
+
+portSecurityForwardingState OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported		(1),
+			portAdminDisabled	(2),
+			waitingForLink		(3),
+			unsecureVLAN		(4),
+			portAuthenticated	(5),
+			portSecurityDisabled	(6),
+			portLoopDisabled	(7),
+			authFailureVLAN		(8),
+			securityWarning		(9),
+			authenticatingClients	(10),
+			waitingForMacAddress	(11),
+			allRadiusServersDown	(12),
+			portBpduDisabled	(13),
+			portUdldDisabled	(14),
+			portLinkFlapDisabled	(15),
+			portErrorCountDisabled	(16),
+			portSfpErrorDisabled	(17),
+			portRedundanyLoopDisable(18)
+			}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The port security forwarding state of that port.
+		 See documentation for details."
+	::= { bmSwitchPortEntry 25 }
+
+portPoePowerLimit OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The limit for the POE output power at this port in VA. If the
+		current power exceeds this value a overload conditions occurs and 
+		the inline power for that port will be switched off."
+	::= { bmSwitchPortEntry 26 }
+
+portLimiterPacketType   OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported			(1),
+			limitAllPackets			(2),
+			limitLoopBcastPackets	  	(3),
+			limitAllPacketsBurstsAllowed	(4)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The packet type for bandwidth limiter. If set to limitAllPacktes(2)
+		then all packets are limited. If set to limitLoppBcastPackets(3) only
+		flooted loop- and broadcast-pakets are limited."
+	::= { bmSwitchPortEntry 27 }
+
+portAcApSetup OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported	(1),
+			allwaysEnable   (2),
+			enable          (3),
+			disable         (4)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"If portAcApSetup is enabled, the switch will perform Autocrossover
+		and Autopolarity for this port. This function should only be enabled
+		if portSpeedDuplexSetup ist set to autoneg."
+	::= { bmSwitchPortEntry 28 }
+
+portLinkType OBJECT-TYPE
+	SYNTAX      INTEGER {
+			user			(1),
+			userWithLoopProtection	(2),
+			upDownlink		(3)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The link type of that port. If set to upDownlink(3) the portAdminState 
+		 will be forced to enable." 
+	::= { bmSwitchPortEntry 29 }
+
+portVoiceVlanId  OBJECT-TYPE
+	SYNTAX      Integer32 (0..4095)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The Voide-VLAN-ID assigned to this port.
+		Packets of this Voice-VLAN are allway send with a VLAN-Tag, because
+		IP-Phones normaly need a tagged VLAN.
+		If portTrunkingMode is set to dot1qTagging, ALL frames are transmited
+		with a VLAN-tag, except frames which belong to the Default-VLAN-ID. In
+		this case the Voice-VLAN-ID has no effect.
+		Changes of this value will take affect after the next switch reboot or
+		after setting adminReset to renewIpAndVlanParameter(5).
+		Setting this value to 0 will disable the Voice-VLAN."
+	::= { bmSwitchPortEntry 30 }
+
+portPrioDot1p  OBJECT-TYPE
+	SYNTAX      INTEGER {
+			prioDot1pDisabled	(1),
+			prioDot1pEnabled	(2)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Defines whether port prioritisation for IEEE802.1p packets is enabled."
+	::= { bmSwitchPortEntry 31 }
+
+portPrioIp  OBJECT-TYPE
+	SYNTAX      INTEGER {
+			prioIpDisabled	(1),
+			prioIpEnabled	(2)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Defines whether port prioritisation for IPv4/IPv6 packets is enabled."
+	::= { bmSwitchPortEntry 32 }
+
+-- ****************************************************************************
+-- * bmSwitchPort subtables
+-- ****************************************************************************
+-- * Because the bmSwitchPortTable has too many entries for a usefull display
+-- * we define some meaningful subtables with related objects
+-- ****************************************************************************
+
+PortStatus ::= SEQUENCE {
+		portIndex
+			Integer32,
+		portDescr
+			DisplayString,
+		portName
+			DisplayString,
+		portLinkType
+			INTEGER,
+		portAdminState
+			INTEGER,
+		portSpeedDuplexSetup
+			INTEGER,
+		portAcApSetup
+			INTEGER,
+		portLinkState
+			INTEGER,
+		portErrorCounter
+			Counter32,
+		portRemoteFault
+			INTEGER
+		}
+
+PortVlan ::= SEQUENCE {
+		portIndex
+			Integer32,
+		portDescr
+			DisplayString,
+		portName
+			DisplayString,
+		portDefaultVlanId
+			Integer32,
+		portVoiceVlanId
+			Integer32,
+		portTrunkingMode
+			INTEGER
+		}
+
+PortPrio ::= SEQUENCE {
+		portIndex
+			Integer32,
+		portDescr
+			DisplayString,
+		portName
+			DisplayString,
+		portDot1qDefaultPrioValue
+			Integer32,
+		portDefaultPrioQueue
+			Integer32,
+		portPrioDot1p
+			INTEGER,
+		portPrioIp
+			INTEGER
+		}
+
+PortLEDs ::= SEQUENCE {
+		portIndex
+			Integer32,
+		portDescr
+			DisplayString,
+		portName
+			DisplayString,
+		portLEDGreen
+			INTEGER,
+		portLEDYellow
+			INTEGER
+		}
+
+PortSecurity ::= SEQUENCE {
+		portIndex
+			Integer32,
+		portDescr
+			DisplayString,
+		portName
+			DisplayString,
+		portAdminState
+			INTEGER,
+		portSecurityAdminState
+			INTEGER,
+		portSecurityForwardingState
+			INTEGER,
+		portSecurityMacAddr1
+			MacAddress,
+		portSecurityMacAddr2
+			MacAddress,
+		portSecurityMacAddr3
+			MacAddress
+		}
+
+PortBandwidthLimiter ::= SEQUENCE {
+		portIndex
+			Integer32,
+		portDescr
+			DisplayString,
+		portName
+			DisplayString,
+		portBandwidthLimitRxd
+			INTEGER,
+		portBandwidthLimitTxd
+			INTEGER,
+		portLimiterPacketType
+			INTEGER
+		}
+
+PortPoe ::= SEQUENCE {
+		portIndex
+			Integer32,
+		portDescr
+			DisplayString,
+		portName
+			DisplayString,
+		portLEDYellow
+			INTEGER,
+		portPoeAdminState
+			INTEGER,
+		portPoeVoltage
+			Integer32,
+		portPoeCurrent
+			Integer32,
+		portPoePower
+			Integer32,
+		portPoePowerLimit
+			Integer32
+		}
+
+
+-- ****************************************************************************
+-- * bmSwitchVlan
+-- ****************************************************************************
+-- * The bmSwitchVlan object group gives status and control information to all
+-- * VLAN ID's known by the switch.
+-- ****************************************************************************
+
+bmSwitchVlanTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF VlanEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of Virtual LAN instances."
+	::= { bmSwitchVlan 1 }
+
+bmSwitchVlanEntry OBJECT-TYPE
+	SYNTAX      VlanEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"VLAN entry."
+	INDEX   { vlanIndex }
+	::= { bmSwitchVlanTable 1 }
+
+VlanEntry ::= SEQUENCE {
+		vlanIndex
+			Integer32,
+		vlanId
+			Integer32,
+		vlanDescr
+			DisplayString
+		}
+
+vlanIndex OBJECT-TYPE
+	SYNTAX      Integer32 (1..16)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A unique value for each VLAN entry. Its value ranges between 1 and 16."
+	::= { bmSwitchVlanEntry 1 }
+
+vlanId OBJECT-TYPE
+	SYNTAX      Integer32 (0..4095)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The VLAN-ID assigned to this entry. Only entries with a VLAN-ID greater
+		then 0 are valid entries.
+		Setting a valid VLAN-ID to 0 will disable that entry and also delete the
+		vlanDescr
+		To add a new VLAN-ID first set an valid or non valid entry to the
+		desired	VLAN-ID. In a second step you may set the vlanDescr.
+		Only VLAN-ID's listed in the vlanTable are forwarded by the switch."
+	::= { bmSwitchVlanEntry 2 }
+
+vlanDescr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..50))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing information about the VLAN."
+	::= { bmSwitchVlanEntry 3 }
+
+
+-- ****************************************************************************
+-- * bmSwitchSfp
+-- ****************************************************************************
+-- * The bmSwitchSfp object group gives status and control information to every
+-- * installed SFP module.
+-- ****************************************************************************
+
+bmSwitchSfpTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF SfpEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of SFP entries for the switch. The number of
+		 entries is defined by ifNumber."
+	::= { bmSwitchSfp 1 }
+
+
+bmSwitchSfpEntry OBJECT-TYPE
+	SYNTAX      SfpEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A SFP entry in the table containing information about a
+		SFP in the switch."
+	INDEX   { sfpPortIndex }
+	::= { bmSwitchSfpTable 1 }
+
+
+SfpEntry ::= SEQUENCE {
+		sfpPortIndex
+			Integer32,
+		sfpState
+			INTEGER,
+		sfpInfoVendorName 
+			DisplayString,
+		sfpInfoPartNumber 
+			DisplayString,
+		sfpInfoRevisionNumber 
+			DisplayString,
+		sfpInfoSerialNumber 
+			DisplayString,
+		sfpInfoDateCode 
+			DisplayString,
+		sfpInfoBitRate  
+			DisplayString,
+		sfpInfoWavelength 
+			DisplayString,
+		sfpInfoLength9um 
+			DisplayString,
+		sfpInfoLength50um 
+			DisplayString,
+		sfpInfoLength62um 
+			DisplayString,
+		sfpInfoConnectorDescr 
+			DisplayString,
+		sfpDiagTemperature 
+			Integer32,
+		sfpDiagSupplyVoltage 
+			Integer32,
+		sfpDiagTxBiasCurrent 
+			Integer32,
+		sfpDiagTxOutputPower
+			Integer32,
+		sfpDiagTxOutputPowerDbm 
+			Integer32,
+		sfpDiagRxIntputPower
+			Integer32,
+		sfpDiagRxInputPowerDbm 
+			Integer32,
+		sfpAlarmTxBiasCurrentUpperLimit
+			Integer32,
+		sfpAlarmTxOutputPowerLowerLimit
+			Integer32,
+		sfpAlarmRxInputPowerLowerLimit
+			Integer32
+		}
+
+sfpPortIndex OBJECT-TYPE
+	SYNTAX      Integer32 (1..64)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A unique value for each port. Its value ranges between 1
+		and the value of ifNumber.
+		The port identified by a particular value of this index is
+		the same port as identified by the same value of ifIndex."
+	::= { bmSwitchSfpEntry 1 }
+
+sfpState OBJECT-TYPE
+	SYNTAX      INTEGER {
+			notSupported          (1),
+			noSfpInserted         (2),
+			validSfpNoDiagnostic  (3),
+			validSfpWithDiagnostic(4)
+			}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A value indicating the current state of the SFP module.
+		The possible values returned are:
+		notSupported(1)
+			The port has no SFP slot.
+		noSfpInserted(2)
+			The port has a SFP slot but there is no valid SFP module inserted.
+		validSfpNoDiagnostic(3)
+			A valid SFP module is inserted but the module doesn't supports 
+			diagnostic values.
+		validSfpWithDiagnostic(4)
+			A valid SFP module which supports diagnostic is inserted."
+	::= { bmSwitchSfpEntry 2 }
+
+sfpInfoVendorName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the vendor name of the SFP module."
+	::= { bmSwitchSfpEntry 3 }
+
+sfpInfoPartNumber OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the part number of the SFP module."
+	::= { bmSwitchSfpEntry 4 }
+
+sfpInfoRevisionNumber OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the revision number of the SFP module."
+	::= { bmSwitchSfpEntry 5 }
+
+sfpInfoSerialNumber OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the serial number 	of the SFP module."
+	::= { bmSwitchSfpEntry 6 }
+
+sfpInfoDateCode OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the date code of the SFP module."
+	::= { bmSwitchSfpEntry 7 }
+
+sfpInfoBitRate  OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the bit rate of the SFP module.
+		The unit is Mbit/s"
+	::= { bmSwitchSfpEntry 8 }
+
+sfpInfoWavelength OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the wavelength of the SFP module.
+		The unit is nm."
+	::= { bmSwitchSfpEntry 9 }
+
+sfpInfoLength9um OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the typically supported
+		fiber length for 9um fiber cable. The unit is meters."
+	::= { bmSwitchSfpEntry 10 }
+
+sfpInfoLength50um OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the typically supported
+		fiber length for 50um fiber cable. The unit is meters."
+	::= { bmSwitchSfpEntry 11 }
+
+sfpInfoLength62um OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the typically supported
+		fiber length for 62.5um fiber cable. The unit is meters."
+	::= { bmSwitchSfpEntry 12 }
+
+sfpInfoConnectorDescr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..17))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A textual string containing the connector description
+		of the SFP module."
+	::= { bmSwitchSfpEntry 13 }
+
+sfpDiagTemperature OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current temperature of the SFP module in degree celsius."
+	::= { bmSwitchSfpEntry 14 }
+
+sfpDiagSupplyVoltage OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current supply voltage of the SFP module in millivolt."
+	::= { bmSwitchSfpEntry 15 }
+
+sfpDiagTxBiasCurrent OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current transmitter bias current of the SFP module in milliampere."
+	::= { bmSwitchSfpEntry 16 }
+
+sfpDiagTxOutputPower OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current transmitter output power of the SFP module in microwatt."
+	::= { bmSwitchSfpEntry 17 }
+
+sfpDiagTxOutputPowerDbm OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current transmitter output power of the SFP module in dbm."
+	::= { bmSwitchSfpEntry 18 }
+
+sfpDiagRxIntputPower OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current receiver input power of the SFP module in microwatt."
+	::= { bmSwitchSfpEntry 19 }
+
+sfpDiagRxInputPowerDbm OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current receiver input power of the SFP module in dbm."
+	::= { bmSwitchSfpEntry 20 }
+
+sfpAlarmTxBiasCurrentUpperLimit OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The maximum allowed transmitter bias current in milliampere.
+		If the current value indicated by sfpDiagTxBiasCurrent
+		exceeds sfpAlarmTxBiasCurrentUpperLimit, the switch sends an 
+		sfpEvent alarm trap.
+		If the value of this limit is 0 no alarm will be send."
+	::= { bmSwitchSfpEntry 21 }
+
+sfpAlarmTxOutputPowerLowerLimit OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The minimum required transmitter output power in microwatt.
+		If the power value indicated by sfpDiagTxOutputPower
+		falls below sfpAlarmTxOutputPowerLowerLimit, the switch sends an 
+		sfpEvent alarm trap.
+		If the value of this limit is 0 no alarm will be send."
+	::= { bmSwitchSfpEntry 22 }
+
+sfpAlarmRxInputPowerLowerLimit OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The minimum required received input power in microwatt.
+		If the power value indicated by sfpDiagRxInputPower
+		falls below sfpAlarmRxInputPowerLowerLimit, the switch sends an 
+		sfpEvent alarm trap.
+		If the value of this limit is 0 no alarm will be send."
+	::= { bmSwitchSfpEntry 23 }
+
+-- ****************************************************************************
+-- * bmTraps
+-- ****************************************************************************
+-- * The enterprise specific traps
+-- ****************************************************************************
+switchTemperatureFailure NOTIFICATION-TYPE
+	OBJECTS		{ infoTemperature }
+	STATUS		current
+	--&MESG "Temperature failure: Temperature(degree celsius)=$1"
+        DESCRIPTION	"A TemperatureFailure signifies that the switch hardware
+			has detected under- or overtemperature condition."
+	::= { bmTraps 1 }
+
+portLinkChange NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr,	portName, portLinkState	}
+	STATUS		current
+	--&MESG "Port link change: portLinkState=$'4, portIndex=$1, portDescr=$'2, portName=$'3"
+	DESCRIPTION	"The trap is sent whenever the link state of a port changes
+			from link-up to link-down or from link-down to link-up"
+	::= { bmTraps 2 }
+
+portNewMacAddress NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr,	portName, infoNewMacAddr }
+	STATUS		current
+	--&MESG "Port new MAC address: MacAddr=$4, portIndex=$1, portDescr=$'2, portName=$'3"
+	DESCRIPTION	"A new source MAC address has been detected on a switch port. This trap is only
+			send for ports which have port-security enabled with the setting 
+			autoAllowOneMacAddr, autoAllowTwoMacAddr or autoAllowThreeMacAddr."
+	::= { bmTraps 3 }
+
+portSecurityFailure NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName, infoSecurityFailMacAddr }
+	STATUS		current
+	--&MESG "Port security failure: MacAddr=$4, portIndex=$1, portDescr=$'2, portName=$'3"
+	DESCRIPTION	"An unauthorized source MAC address has accessed a port which has port-security
+			enabled."
+	::= { bmTraps 4 }
+
+portErrorCountFailure NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName, portErrorCounter }
+	STATUS		current
+	--&MESG "Port error counter failure: Counter=$4, portIndex=$1, portDescr=$'2, portName=$'3"
+	DESCRIPTION	"The port error counter has incremented by 2 or more within a timewindow of
+			two seconds. An counter increment by 1 ist not reported because single increments
+			often may result because of link-changes."
+	::= { bmTraps 5 }
+
+switchMgmtAuthFailure NOTIFICATION-TYPE
+	OBJECTS		{ infoUnauthIpAddr }
+	STATUS		current
+	--&MESG "Mgmt authentication failure: IP-Addr=$1"
+        DESCRIPTION
+			"A station has tried to access the switch management with a wrong 
+			authentication. This includes wrong user/password for telnet, wrong
+			community for SNMP read/write and wrong accessrights in the accesslist."
+	::= { bmTraps 6 }
+
+radiusMgmtAuthReject NOTIFICATION-TYPE
+	OBJECTS		{ infoUnauthIpAddr }
+	STATUS		current
+	--&MESG "Radius mgmt authentication reject: IP-Addr=$1"
+        DESCRIPTION
+			"A station has tried to access the switch management with radius  
+			authentication enabled and the radius server has rejected the request."
+	::= { bmTraps 7 }
+
+radiusPortSecurityReject NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName, infoSecurityFailMacAddr }
+	STATUS		current
+	--&MESG "Radius port security reject: MacAddr=$4, portIndex=$1, portDescr=$'2, portName=$'3"
+        DESCRIPTION
+			"A station has tried to access the switch with radius port security   
+			authentication enabled and the radius server has rejected the request."
+	::= { bmTraps 8 }
+
+portLoopBcastFailure NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName}
+	STATUS		current
+	--&MESG "Port broadcast/multicast failure: portIndex=$1, portDescr=$'2, portName=$'3"
+	DESCRIPTION	"The port broadcast/multicast counter has incremented by 25 packets/second for 
+			more then 10 successive seconds. Excessive multicast or broadcast packets may
+			result in case of a loop between two port of the switch."
+	::= { bmTraps 9 }
+
+switchPoeVoltageFailure NOTIFICATION-TYPE
+	OBJECTS		{ infoPoeInputVoltage}
+	STATUS		current
+	--&MESG "Switch PoE voltage failure: InputVoltage(V)=$1"
+	DESCRIPTION	"The switch has detected a PoE over- or undervoltage conditions."
+	::= { bmTraps 10 }
+
+switchPoeOverloadFailure NOTIFICATION-TYPE
+	OBJECTS		{ infoPoeInputPower}
+	STATUS		current
+	--&MESG "Switch PoE overload failure: InputPower(mW)=$1"
+	DESCRIPTION	"The switch has detected a overload for the PoE power supply."
+	::= { bmTraps 11 }
+
+portPoeOverloadFailure NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName, portPoePower}
+	STATUS		current
+	--&MESG "Port PoE overload failure: PortPower(mW)=$4, portIndex=$1, portDescr=$'2, portName=$'3"
+	DESCRIPTION	"The switch has detected a PoE overload condition at the port."
+	::= { bmTraps 12 }
+
+portActiveLoopDetectionFailure NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName}
+	STATUS		current
+	--&MESG "Port active loop detection failure: portIndex=$1, portDescr=$'2, portName=$'3"
+	DESCRIPTION	"The active loop protection has disabled the port."
+	::= { bmTraps 13 }
+
+switchIndustrialAlarmM1 NOTIFICATION-TYPE
+	OBJECTS		{ infoAlarmStateM1, adminAlarmNameM1 }
+	STATUS		current
+	--&MESG "Industrial Alarm M1: State=$'1, Name=$'2"
+        DESCRIPTION	"The alarm state of the industrial alarm output M1 has changed."
+	::= { bmTraps 14 }
+
+switchIndustrialAlarmM2 NOTIFICATION-TYPE
+	OBJECTS		{ infoAlarmStateM2, adminAlarmNameM2 }
+	STATUS		current
+	--&MESG "Industrial Alarm M2: State=$'1, Name=$'2"
+        DESCRIPTION	"The alarm state of the industrial alarm output M2 has changed."
+	::= { bmTraps 15 }
+
+switchInternalVoltageFailure NOTIFICATION-TYPE
+	OBJECTS		{ infoPowerVoltage2500, infoPowerVoltage3300 }
+	STATUS		current
+	--&MESG "Internal Voltage Failure: Voltage-1(mV)=$1, Voltage-2(mV)=$2"
+        DESCRIPTION	"The switch has detected a internal over- or undervoltage conditions."
+	::= { bmTraps 16 }
+
+tftpMessage NOTIFICATION-TYPE
+	OBJECTS		{ infoLastTftpMessage }
+	STATUS		current
+	--&MESG "TFTP Message: $'1"
+        DESCRIPTION	"An successful or failed TFTP transfer has been occured.
+			 This does not include TFTP transfers executed from Nexan Manager."
+	::= { bmTraps 17 }
+
+sfpEvent NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName, infoLastSfpEventMessage }
+	STATUS		current
+	--&MESG "SFP Event: $'4, portIndex=$1, portDescr=$'2, portName=$'3"
+        DESCRIPTION	"The switch has detected one of the following SFP events:
+			- a SFP module has been inserted
+			- a SFP module has been removed
+			- the optical receive power has fallen below the configured threshold
+			- the optical transmit power has fallen below the configured threshold
+			- the laser bias current has exceeded the configured threshold
+			In the case of a threshold event, the trap will only send out every
+			five minutes."
+	::= { bmTraps 18 }
+
+clientRemoved NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName }
+	STATUS		current
+	--&MESG "Client Remove Alarm: portIndex=$1, portDescr=$'2, portName=$'3"
+        DESCRIPTION	"The client on this port has been removed because the link down time
+			 has exceeded the configured 'Link Down Timeout'."
+	::= { bmTraps 19 }
+
+internalMgmtWarning NOTIFICATION-TYPE
+	OBJECTS		{ infoLastInternalMgmtWarning }
+	STATUS		current
+	--&MESG "$'1"
+        DESCRIPTION	"An internal management warning has been detected. Please consult 
+			 Nexans for further informations regarding the reported warning code."
+	::= { bmTraps  20 }
+
+switchFunctionInputAlarm NOTIFICATION-TYPE
+	OBJECTS		{ infoFunctionInputStateF1, adminFunctionInputNameF1 }
+	STATUS		current
+	--&MESG "Function Input Alarm: F1-State=$'1, Name=$'2"
+        DESCRIPTION	"The state of the function input has changed."
+	::= { bmTraps 21 }
+
+switchConfigurationChanged NOTIFICATION-TYPE
+	OBJECTS		{ infoTotalConfigChanges }
+	STATUS		current
+	--&MESG "Configuration has been changed: Total-Configuration-Changes=$'1"
+        DESCRIPTION	"The configuration of the switch has been changed."
+	::= { bmTraps 22 }
+
+portErrorDisabled NOTIFICATION-TYPE
+	OBJECTS		{ portIndex, portDescr, portName, portAdminState }
+	STATUS		current
+	--&MESG "Port Error disabled: portAdminState=$'4, portIndex=$1, portDescr=$'2, portName=$'3"
+        DESCRIPTION	"The port has been error disabled."
+	::= { bmTraps 23 }
+
+END

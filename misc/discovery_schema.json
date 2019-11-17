@@ -257,6 +257,12 @@
                                                 "items": {
                                                     "type": "string"
                                                 }
+                                            },
+                                            "snmp_flags": {
+                                                "type": [
+                                                    "string",
+                                                    "array"
+                                                ]
                                             }
                                         },
                                         "additionalProperties": false,
