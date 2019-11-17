@@ -25,21 +25,21 @@ if (!Auth::user()->hasGlobalAdmin()) {
 if (isset($_POST['device_id'])) {
     if (!is_numeric($_POST['device_id'])) {
         $status  = 'error';
-        $message = 'Invalid device id';
+        $message = 'Invalid device id ' . $_POST['device_id'];
     } else {
         $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($_POST['device_id']));
         if (!empty($update) || $update == '0') {
             $status  = 'ok';
-            $message = 'Device will be rediscovered';
+            $message = 'Device ' . $_POST['device_id'] . ' will be rediscovered';
         } else {
              $status  = 'error';
-             $message = 'Error rediscovering device';
+             $message = 'Error rediscovering device ' . $_POST['device_id'];
         }
     }
 } elseif (isset($_POST['device_group_id'])) {
     if (!is_numeric($_POST['device_group_id'])) {
         $status  = 'error';
-        $message = 'Invalid device group id';
+        $message = 'Invalid device group id ' . $_POST['device_group_id'];
     } else {
         $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=" . $_POST['device_group_id']);
         $update = 0;
@@ -49,15 +49,15 @@ if (isset($_POST['device_id'])) {
 
         if (!empty($update) || $update == '0') {
             $status  = 'ok';
-            $message = 'Devices of Group will be rediscovered';
+            $message = 'Devices of group ' . $_POST['device_group_id'] . ' will be rediscovered';
         } else {
             $status  = 'error';
-            $message = 'Error rediscovering devices of Group';
+            $message = 'Error rediscovering devices of group ' . $_POST['device_group_id'];
         }
     }
 } else {
     $status  = 'Error';
-    $message = 'unddefined post Keys received';
+    $message = 'Undefined POST keys received';
 }
 
 $output = array(
