@@ -96,6 +96,7 @@ class WorldMapController extends WidgetController
                         $device->markerIcon = 'redMarker';
                         $device->zOffset = 10000;
                     }
+                }
 
                 return true;
             });
