@@ -25,8 +25,7 @@ class LoadUserPreferences
         });
 
         $this->setPreference($request, 'site_style', function ($style) {
-            Config::set('site_style_default', Config::get('site_style'));
-            Config::set('site_style', $style);
+            Config::set('applied_site_style', $style);
         });
 
         return $next($request);
