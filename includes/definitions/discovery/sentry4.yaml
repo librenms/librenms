@@ -489,3 +489,34 @@ modules:
                         - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
+
+                -
+                    oid: st4WaterSensorStatus
+                    value: st4WaterSensorStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.11.3.1.1.{{ $index }}'
+                    descr: Water Sensor Status
+                    index: 'st4WaterSensorStatus.{{ $index }}'
+                    state_name: st4WaterSensorStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
