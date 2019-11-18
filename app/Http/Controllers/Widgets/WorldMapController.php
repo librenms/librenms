@@ -45,7 +45,7 @@ class WorldMapController extends WidgetController
             'init_zoom' => Config::get('leaflet.default_zoom', 2),
             'group_radius' => Config::get('leaflet.group_radius', 80),
             'status' => '0,1', // Show all devices
-            'maintenance' => '0', // Hide devices under maintenance
+            'maintenance' => 0, // Hide devices under maintenance
             'device_group' => null,
         ];
     }
@@ -67,7 +67,7 @@ class WorldMapController extends WidgetController
                 $query->inDeviceGroup($settings['device_group']);
             })
             ->get()
-            ->filter(function ($device) use ($status, $maintenance) {
+            ->filter(function ($device) use ($maintenance) {
                 /** @var Device $device */
                 if (!($device->location_id && $device->location && $device->location->coordinatesValid())) {
                     return false;
@@ -79,20 +79,20 @@ class WorldMapController extends WidgetController
                 if ($device->status == 1) {
                     $device->markerIcon = 'greenMarker';
                     $device->zOffset = 0;
-                    return ($maintenance != '2'); // Filter out when showing only devices under maintenance
+                    return ($maintenance != 2); // Filter out when showing only devices under maintenance
                 }
                 
                 // Down device under maintenance
                 if ($device->isUnderMaintenance()) {
                     $device->markerIcon = 'blueMarker';
                     $device->zOffset = 5000;
-                    return ($maintenance != '0'); // Filter out when hiding devices under maintenance
+                    return ($maintenance != 0); // Filter out when hiding devices under maintenance
                 }
                 
                 // Down device not under maintenance
                 $device->markerIcon = 'redMarker';
                 $device->zOffset = 10000;
-                return ($maintenance != '2'); // Filter out when showing only devices under maintenance
+                return ($maintenance != 2); // Filter out when showing only devices under maintenance
             });
 
         $settings['devices'] = $devices;
