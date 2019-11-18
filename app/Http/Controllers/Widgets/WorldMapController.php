@@ -74,29 +74,25 @@ class WorldMapController extends WidgetController
                 }
 
                 // add extra data
-                if ($device->status == 1) { // Up device
-                    if ($maintenance == '2') { // Display only devices under maintenance
-                        return false;
-                    }
+                
+                // Up device
+                if ($device->status == 1) {
                     $device->markerIcon = 'greenMarker';
                     $device->zOffset = 0;
-                } elseif ($device->status == 0) { // Down device
-                    if ($device->isUnderMaintenance()) { // Hide/Show devices under maintenance
-                        if ($maintenance == '0') { // Hide devices under maintenance
-                            return false;
-                        }
-                        $device->markerIcon = 'blueMarker';
-                        $device->zOffset = 5000;
-                    } else {
-                        if ($maintenance == '2') { // Display only devices under maintenance
-                            return false;
-                        }
-                        $device->markerIcon = 'redMarker';
-                        $device->zOffset = 10000;
-                    }
+                    return ($maintenance != '2'); // Filter out when showing only devices under maintenance
                 }
-
-                return true;
+                
+                // Down device under maintenance
+                if ($device->isUnderMaintenance()) {
+                    $device->markerIcon = 'blueMarker';
+                    $device->zOffset = 5000;
+                    return ($maintenance != '0'); // Filter out when hiding devices under maintenance
+                }
+                
+                // Down device not under maintenance
+                $device->markerIcon = 'redMarker';
+                $device->zOffset = 10000;
+                return ($maintenance != '2'); // Filter out when showing only devices under maintenance
             });
 
         $settings['devices'] = $devices;
