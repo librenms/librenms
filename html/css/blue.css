@@ -50,12 +50,6 @@
   color: #0052cccc;
 }
 
-.panel-default .panel-heading .icon-theme,
-.panel-default .panel-heading a:visited,
-.panel-default .panel-heading a:link {
-  color: #ffffffbb;
-}
-
 .twitter-typeahead .tt-hint {
     border-color: #000 !important;
 }
@@ -138,7 +132,7 @@
 }
 
 .pagemenu-selected {
-  background-color: #0052cc;
+  background-color: white;
   border: 0;
   box-shadow: none;
   -moz-box-shadow: none;
