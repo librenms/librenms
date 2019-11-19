@@ -165,6 +165,8 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
     $aix_descr = explode("\n", $device['sysDescr']);
     # AIX standard snmp deamon
     if ($aix_descr[1]) {
+        # IBM Power Serial Number has 7 characters. We need last 7 characters from aixSeSerialNumber.0:
+        # aixSeSerialNumber.0 = "IBM,02061F57P"
         $serial = substr(snmp_get($device, 'aixSeSerialNumber.0', '-Oqv', 'IBM-AIX-MIB'), -7);
         $hardware = snmp_get($device, 'aixSeMachineType.0', '-Oqv', 'IBM-AIX-MIB');
 
