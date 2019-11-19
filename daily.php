@@ -71,15 +71,7 @@ if ($options['f'] === 'syslog') {
         if (is_numeric($syslog_purge)) {
             $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
             while (true) {
-                $limit = dbFetchRow('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
-
-                # If dbFetchRow() hands us an array, we convert it to a number so dbDelete() works.
-                if (is_array($limit)) {
-                    foreach($limit as $arr_value) {
-                        $limit = $arr_value;
-                    }
-                }
-                
+                $limit = dbFetchCell('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
                 if (empty($limit)) {
                     break;
                 }
