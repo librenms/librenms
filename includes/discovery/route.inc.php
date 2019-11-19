@@ -18,6 +18,7 @@
 
 use App\Models\Device;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Config;
 
 $ipForwardMibRoutesNumber = snmp_get($device, 'IP-FORWARD-MIB::inetCidrRouteNumber.0', '-Osqn');
 
