@@ -1,0 +1,3697 @@
+Unknown group (docsDevSoftwareGroupV2): At line 2072 in /usr/share/snmp/mibs/ietf/PKTC-IETF-MTA-MIB
+Did not find 'docsDevSoftwareGroupV2' in module DOCS-CABLE-DEVICE-MIB (/usr/share/snmp/mibs/ietf/PKTC-IETF-MTA-MIB)
+Bad operator (INTEGER): At line 73 in /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+Unknown group (snmpRptrGrpRptrAddrSearch): At line 1863 in /usr/share/snmp/mibs/ietf/DOT12-RPTR-MIB
+SQL[[1;33mselect `migration` from `migrations` order by `id` desc limit 1 [0;33m[][0m 0.24ms] 
+  
+SQL[[1;33mselect count(*) as aggregate from `migrations` limit 1 [0;33m[][0m 0.16ms] 
+  
+SQL[[1;33mSELECT version() [0;33m[][0m 0.09ms] 
+  
+Updating os_def.cache...  
+Done  
+SQL[[1;33mSELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 AND `hostname` LIKE 'lvt2100.park.rtvutrecht.nl' ORDER BY device_id DESC [0;33m[][0m 0.56ms] 
+  
+SQL[[1;33mSELECT * FROM devices_attribs WHERE `device_id` = ? [0;33m[2][0m 0.13ms] 
+  
+[FPING] '/usr/bin/fping' '-e' '-q' '-c' '3' '-p' '500' '-t' '500' 'lvt2100.park.rtvutrecht.nl'  
+array (
+  'xmt' => 3,
+  'rcv' => 3,
+  'loss' => 0,
+  'min' => 0.16,
+  'max' => 0.64,
+  'avg' => 0.32,
+  'dup' => 0,
+  'exitcode' => 0,
+)  
+SQL[[1;33mINSERT IGNORE INTO `device_perf` (`xmt`,`rcv`,`loss`,`min`,`max`,`avg`,`device_id`,`timestamp`,`debug`)  VALUES (:xmt,:rcv,:loss,:min,:max,:avg,:device_id,NOW(),:debug) [0;33m{"xmt":3,"rcv":3,"loss":0,"min":0.16,"max":0.64,"avg":0.32,"device_id":2,"debug":"[]"}[0m 2.18ms] 
+  
+SNMP Check response code: 0  
+SQL[[1;33mSELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?  [0;33m[2,"poll_mib"][0m 0.26ms] 
+  
+Attempting to initialize OS: panos  
+OS initialized as Generic  
+Modules status: Global+  
+OS  
+Device  
+.1.3.6.1.2.1.1.5.0 = LVT2100
+.1.3.6.1.2.1.1.2.0 = .1.3.6.1.4.1.25461.2.3.18
+.1.3.6.1.2.1.1.1.0 = Palo Alto Networks PA-3000 series firewall  
+  
+Modules status: Global+  
+OS+  
+Device  
+Palo Alto Networks PA-3000 series firewall  
+  
+.1.3.6.1.4.1.25461.2.3.18  
+  
+| Palo Alto Networks PA-3000 series firewall | .1.3.6.1.4.1.25461.2.3.18 |  
+No Such Object available on this agent at this OID  
+  
+No Such Object available on this agent at this OID  
+  
+No Such Object available on this agent at this OID  
+  
+No Such Object available on this agent at this OID  
+  
+No Such Object available on this agent at this OID  
+  
+Modules status: Global+  
+OS+  
+Device  
+ifDescr.1 = dedicated-ha1
+ifDescr.2 = dedicated-ha2
+ifDescr.3 = ha1
+ifDescr.4 = ha2
+ifDescr.5 = mgmt
+ifDescr.6 = ethernet1/1
+ifDescr.7 = ethernet1/2
+ifDescr.8 = ethernet1/3
+ifDescr.9 = ethernet1/4
+ifDescr.10 = ethernet1/5
+ifDescr.11 = ethernet1/6
+ifDescr.12 = ethernet1/7
+ifDescr.13 = ethernet1/8
+ifDescr.14 = ethernet1/9
+ifDescr.15 = ethernet1/10
+ifDescr.16 = ethernet1/11
+ifDescr.17 = ethernet1/12
+ifDescr.18 = ethernet1/13
+ifDescr.19 = ethernet1/14
+ifDescr.20 = ethernet1/15
+ifDescr.21 = ethernet1/16
+ifDescr.22 = ethernet1/17
+ifDescr.23 = ethernet1/18
+ifDescr.24 = ethernet1/19
+ifDescr.25 = ethernet1/20
+ifDescr.200000000 = vlan
+ifDescr.300000000 = loopback
+ifDescr.300000001 = loopback.1
+ifDescr.300000002 = loopback.2
+ifDescr.300000004 = loopback.4
+ifDescr.300000005 = loopback.5
+ifDescr.400000000 = tunnel
+ifDescr.400000001 = tunnel.1
+ifDescr.400000002 = tunnel.2
+ifDescr.400000101 = tunnel.101
+ifDescr.400000102 = tunnel.102
+ifDescr.400000103 = tunnel.103
+ifDescr.400000107 = tunnel.107
+ifDescr.400000108 = tunnel.108
+ifDescr.400000109 = tunnel.109
+ifDescr.400000201 = tunnel.201
+ifDescr.400000202 = tunnel.202
+ifDescr.400000301 = tunnel.301
+ifDescr.400000302 = tunnel.302
+ifDescr.400000303 = tunnel.303
+ifDescr.400000304 = tunnel.304
+ifDescr.400000306 = tunnel.306
+ifDescr.400000401 = tunnel.401
+ifDescr.400000501 = tunnel.501
+ifDescr.500050000 = ae5
+ifDescr.500050010 = ae5.10
+ifDescr.500050030 = ae5.30
+ifDescr.500050035 = ae5.35
+ifDescr.500050060 = ae5.60
+ifDescr.500050070 = ae5.70
+ifDescr.500050075 = ae5.75
+ifDescr.500050121 = ae5.121
+ifDescr.500050200 = ae5.200
+ifDescr.500050220 = ae5.220
+ifDescr.500050251 = ae5.251
+ifDescr.500050255 = ae5.255
+ifDescr.500050290 = ae5.290
+ifDescr.500050300 = ae5.300
+ifDescr.500050320 = ae5.320  
+  
+ifName.1 = dedicated-ha1
+ifName.2 = dedicated-ha2
+ifName.3 = ha1
+ifName.4 = ha2
+ifName.5 = mgmt
+ifName.6 = ethernet1/1
+ifName.7 = ethernet1/2
+ifName.8 = ethernet1/3
+ifName.9 = ethernet1/4
+ifName.10 = ethernet1/5
+ifName.11 = ethernet1/6
+ifName.12 = ethernet1/7
+ifName.13 = ethernet1/8
+ifName.14 = ethernet1/9
+ifName.15 = ethernet1/10
+ifName.16 = ethernet1/11
+ifName.17 = ethernet1/12
+ifName.18 = ethernet1/13
+ifName.19 = ethernet1/14
+ifName.20 = ethernet1/15
+ifName.21 = ethernet1/16
+ifName.22 = ethernet1/17
+ifName.23 = ethernet1/18
+ifName.24 = ethernet1/19
+ifName.25 = ethernet1/20
+ifName.200000000 = vlan
+ifName.300000000 = loopback
+ifName.300000001 = loopback.1
+ifName.300000002 = loopback.2
+ifName.300000004 = loopback.4
+ifName.300000005 = loopback.5
+ifName.400000000 = tunnel
+ifName.400000001 = tunnel.1
+ifName.400000002 = tunnel.2
+ifName.400000101 = tunnel.101
+ifName.400000102 = tunnel.102
+ifName.400000103 = tunnel.103
+ifName.400000107 = tunnel.107
+ifName.400000108 = tunnel.108
+ifName.400000109 = tunnel.109
+ifName.400000201 = tunnel.201
+ifName.400000202 = tunnel.202
+ifName.400000301 = tunnel.301
+ifName.400000302 = tunnel.302
+ifName.400000303 = tunnel.303
+ifName.400000304 = tunnel.304
+ifName.400000306 = tunnel.306
+ifName.400000401 = tunnel.401
+ifName.400000501 = tunnel.501
+ifName.500050000 = ae5
+ifName.500050010 = ae5.10
+ifName.500050030 = ae5.30
+ifName.500050035 = ae5.35
+ifName.500050060 = ae5.60
+ifName.500050070 = ae5.70
+ifName.500050075 = ae5.75
+ifName.500050121 = ae5.121
+ifName.500050200 = ae5.200
+ifName.500050220 = ae5.220
+ifName.500050251 = ae5.251
+ifName.500050255 = ae5.255
+ifName.500050290 = ae5.290
+ifName.500050300 = ae5.300
+ifName.500050320 = ae5.320  
+  
+ifAlias.1 = 
+ifAlias.2 = 
+ifAlias.3 = 
+ifAlias.4 = 
+ifAlias.5 = 
+ifAlias.6 = npo uplink
+ifAlias.7 = mexnet kpn voip
+ifAlias.8 = 
+ifAlias.9 = 
+ifAlias.10 = 
+ifAlias.11 = 
+ifAlias.12 = 
+ifAlias.13 = 
+ifAlias.14 = 
+ifAlias.15 = 
+ifAlias.16 = 
+ifAlias.17 = 
+ifAlias.18 = 
+ifAlias.19 = 
+ifAlias.20 = 
+ifAlias.21 = 
+ifAlias.22 = 
+ifAlias.23 = 
+ifAlias.24 = 
+ifAlias.25 = 
+ifAlias.200000000 = 
+ifAlias.300000000 = 
+ifAlias.300000001 = GLOBAL PROTECT
+ifAlias.300000002 = VPN ORN
+ifAlias.300000004 = Azure GW
+ifAlias.300000005 = N-H
+ifAlias.400000000 = 
+ifAlias.400000001 = 
+ifAlias.400000002 = 
+ifAlias.400000101 = 
+ifAlias.400000102 = 
+ifAlias.400000103 = 
+ifAlias.400000107 = 
+ifAlias.400000108 = 
+ifAlias.400000109 = 
+ifAlias.400000201 = 
+ifAlias.400000202 = ORN
+ifAlias.400000301 = 
+ifAlias.400000302 = 
+ifAlias.400000303 = 
+ifAlias.400000304 = 
+ifAlias.400000306 = 
+ifAlias.400000401 = Azure Gateway
+ifAlias.400000501 = N-H Commvault
+ifAlias.500050000 = 
+ifAlias.500050010 = 
+ifAlias.500050030 = int-dhd-30
+ifAlias.500050035 = dante-35
+ifAlias.500050060 = 
+ifAlias.500050070 = 
+ifAlias.500050075 = fallback-internet-75
+ifAlias.500050121 = IP 192 - 223
+ifAlias.500050200 = IP 0 - 127 & IP 128 - 159
+ifAlias.500050220 = IP 160 - 167 (T1807 222)
+ifAlias.500050251 = kpn-voip-251
+ifAlias.500050255 = cameras
+ifAlias.500050290 = int-printer-290
+ifAlias.500050300 = sandbox
+ifAlias.500050320 = teletekst  
+  
+ifType.1 = ethernetCsmacd
+ifType.2 = ethernetCsmacd
+ifType.3 = ethernetCsmacd
+ifType.4 = ethernetCsmacd
+ifType.5 = ethernetCsmacd
+ifType.6 = ethernetCsmacd
+ifType.7 = ethernetCsmacd
+ifType.8 = ethernetCsmacd
+ifType.9 = ethernetCsmacd
+ifType.10 = ethernetCsmacd
+ifType.11 = ethernetCsmacd
+ifType.12 = ethernetCsmacd
+ifType.13 = ethernetCsmacd
+ifType.14 = ethernetCsmacd
+ifType.15 = ethernetCsmacd
+ifType.16 = ethernetCsmacd
+ifType.17 = ethernetCsmacd
+ifType.18 = ethernetCsmacd
+ifType.19 = ethernetCsmacd
+ifType.20 = ethernetCsmacd
+ifType.21 = ethernetCsmacd
+ifType.22 = ethernetCsmacd
+ifType.23 = ethernetCsmacd
+ifType.24 = ethernetCsmacd
+ifType.25 = ethernetCsmacd
+ifType.200000000 = l2vlan
+ifType.300000000 = softwareLoopback
+ifType.300000001 = softwareLoopback
+ifType.300000002 = softwareLoopback
+ifType.300000004 = softwareLoopback
+ifType.300000005 = softwareLoopback
+ifType.400000000 = tunnel
+ifType.400000001 = tunnel
+ifType.400000002 = tunnel
+ifType.400000101 = tunnel
+ifType.400000102 = tunnel
+ifType.400000103 = tunnel
+ifType.400000107 = tunnel
+ifType.400000108 = tunnel
+ifType.400000109 = tunnel
+ifType.400000201 = tunnel
+ifType.400000202 = tunnel
+ifType.400000301 = tunnel
+ifType.400000302 = tunnel
+ifType.400000303 = tunnel
+ifType.400000304 = tunnel
+ifType.400000306 = tunnel
+ifType.400000401 = tunnel
+ifType.400000501 = tunnel
+ifType.500050000 = ieee8023adLag
+ifType.500050010 = ieee8023adLag
+ifType.500050030 = ieee8023adLag
+ifType.500050035 = ieee8023adLag
+ifType.500050060 = ieee8023adLag
+ifType.500050070 = ieee8023adLag
+ifType.500050075 = ieee8023adLag
+ifType.500050121 = ieee8023adLag
+ifType.500050200 = ieee8023adLag
+ifType.500050220 = ieee8023adLag
+ifType.500050251 = ieee8023adLag
+ifType.500050255 = ieee8023adLag
+ifType.500050290 = ieee8023adLag
+ifType.500050300 = ieee8023adLag
+ifType.500050320 = ieee8023adLag  
+  
+array (
+  1 => 
+  array (
+    'ifDescr' => 'dedicated-ha1',
+    'ifName' => 'dedicated-ha1',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  2 => 
+  array (
+    'ifDescr' => 'dedicated-ha2',
+    'ifName' => 'dedicated-ha2',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  3 => 
+  array (
+    'ifDescr' => 'ha1',
+    'ifName' => 'ha1',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  4 => 
+  array (
+    'ifDescr' => 'ha2',
+    'ifName' => 'ha2',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  5 => 
+  array (
+    'ifDescr' => 'mgmt',
+    'ifName' => 'mgmt',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  6 => 
+  array (
+    'ifDescr' => 'ethernet1/1',
+    'ifName' => 'ethernet1/1',
+    'ifAlias' => 'npo uplink',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  7 => 
+  array (
+    'ifDescr' => 'ethernet1/2',
+    'ifName' => 'ethernet1/2',
+    'ifAlias' => 'mexnet kpn voip',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  8 => 
+  array (
+    'ifDescr' => 'ethernet1/3',
+    'ifName' => 'ethernet1/3',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  9 => 
+  array (
+    'ifDescr' => 'ethernet1/4',
+    'ifName' => 'ethernet1/4',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  10 => 
+  array (
+    'ifDescr' => 'ethernet1/5',
+    'ifName' => 'ethernet1/5',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  11 => 
+  array (
+    'ifDescr' => 'ethernet1/6',
+    'ifName' => 'ethernet1/6',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  12 => 
+  array (
+    'ifDescr' => 'ethernet1/7',
+    'ifName' => 'ethernet1/7',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  13 => 
+  array (
+    'ifDescr' => 'ethernet1/8',
+    'ifName' => 'ethernet1/8',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  14 => 
+  array (
+    'ifDescr' => 'ethernet1/9',
+    'ifName' => 'ethernet1/9',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  15 => 
+  array (
+    'ifDescr' => 'ethernet1/10',
+    'ifName' => 'ethernet1/10',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  16 => 
+  array (
+    'ifDescr' => 'ethernet1/11',
+    'ifName' => 'ethernet1/11',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  17 => 
+  array (
+    'ifDescr' => 'ethernet1/12',
+    'ifName' => 'ethernet1/12',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  18 => 
+  array (
+    'ifDescr' => 'ethernet1/13',
+    'ifName' => 'ethernet1/13',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  19 => 
+  array (
+    'ifDescr' => 'ethernet1/14',
+    'ifName' => 'ethernet1/14',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  20 => 
+  array (
+    'ifDescr' => 'ethernet1/15',
+    'ifName' => 'ethernet1/15',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  21 => 
+  array (
+    'ifDescr' => 'ethernet1/16',
+    'ifName' => 'ethernet1/16',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  22 => 
+  array (
+    'ifDescr' => 'ethernet1/17',
+    'ifName' => 'ethernet1/17',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  23 => 
+  array (
+    'ifDescr' => 'ethernet1/18',
+    'ifName' => 'ethernet1/18',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  24 => 
+  array (
+    'ifDescr' => 'ethernet1/19',
+    'ifName' => 'ethernet1/19',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  25 => 
+  array (
+    'ifDescr' => 'ethernet1/20',
+    'ifName' => 'ethernet1/20',
+    'ifAlias' => '',
+    'ifType' => 'ethernetCsmacd',
+  ),
+  200000000 => 
+  array (
+    'ifDescr' => 'vlan',
+    'ifName' => 'vlan',
+    'ifAlias' => '',
+    'ifType' => 'l2vlan',
+  ),
+  300000000 => 
+  array (
+    'ifDescr' => 'loopback',
+    'ifName' => 'loopback',
+    'ifAlias' => '',
+    'ifType' => 'softwareLoopback',
+  ),
+  300000001 => 
+  array (
+    'ifDescr' => 'loopback.1',
+    'ifName' => 'loopback.1',
+    'ifAlias' => 'GLOBAL PROTECT',
+    'ifType' => 'softwareLoopback',
+  ),
+  300000002 => 
+  array (
+    'ifDescr' => 'loopback.2',
+    'ifName' => 'loopback.2',
+    'ifAlias' => 'VPN ORN',
+    'ifType' => 'softwareLoopback',
+  ),
+  300000004 => 
+  array (
+    'ifDescr' => 'loopback.4',
+    'ifName' => 'loopback.4',
+    'ifAlias' => 'Azure GW',
+    'ifType' => 'softwareLoopback',
+  ),
+  300000005 => 
+  array (
+    'ifDescr' => 'loopback.5',
+    'ifName' => 'loopback.5',
+    'ifAlias' => 'N-H',
+    'ifType' => 'softwareLoopback',
+  ),
+  400000000 => 
+  array (
+    'ifDescr' => 'tunnel',
+    'ifName' => 'tunnel',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000001 => 
+  array (
+    'ifDescr' => 'tunnel.1',
+    'ifName' => 'tunnel.1',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000002 => 
+  array (
+    'ifDescr' => 'tunnel.2',
+    'ifName' => 'tunnel.2',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000101 => 
+  array (
+    'ifDescr' => 'tunnel.101',
+    'ifName' => 'tunnel.101',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000102 => 
+  array (
+    'ifDescr' => 'tunnel.102',
+    'ifName' => 'tunnel.102',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000103 => 
+  array (
+    'ifDescr' => 'tunnel.103',
+    'ifName' => 'tunnel.103',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000107 => 
+  array (
+    'ifDescr' => 'tunnel.107',
+    'ifName' => 'tunnel.107',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000108 => 
+  array (
+    'ifDescr' => 'tunnel.108',
+    'ifName' => 'tunnel.108',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000109 => 
+  array (
+    'ifDescr' => 'tunnel.109',
+    'ifName' => 'tunnel.109',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000201 => 
+  array (
+    'ifDescr' => 'tunnel.201',
+    'ifName' => 'tunnel.201',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000202 => 
+  array (
+    'ifDescr' => 'tunnel.202',
+    'ifName' => 'tunnel.202',
+    'ifAlias' => 'ORN',
+    'ifType' => 'tunnel',
+  ),
+  400000301 => 
+  array (
+    'ifDescr' => 'tunnel.301',
+    'ifName' => 'tunnel.301',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000302 => 
+  array (
+    'ifDescr' => 'tunnel.302',
+    'ifName' => 'tunnel.302',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000303 => 
+  array (
+    'ifDescr' => 'tunnel.303',
+    'ifName' => 'tunnel.303',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000304 => 
+  array (
+    'ifDescr' => 'tunnel.304',
+    'ifName' => 'tunnel.304',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000306 => 
+  array (
+    'ifDescr' => 'tunnel.306',
+    'ifName' => 'tunnel.306',
+    'ifAlias' => '',
+    'ifType' => 'tunnel',
+  ),
+  400000401 => 
+  array (
+    'ifDescr' => 'tunnel.401',
+    'ifName' => 'tunnel.401',
+    'ifAlias' => 'Azure Gateway',
+    'ifType' => 'tunnel',
+  ),
+  400000501 => 
+  array (
+    'ifDescr' => 'tunnel.501',
+    'ifName' => 'tunnel.501',
+    'ifAlias' => 'N-H Commvault',
+    'ifType' => 'tunnel',
+  ),
+  500050000 => 
+  array (
+    'ifDescr' => 'ae5',
+    'ifName' => 'ae5',
+    'ifAlias' => '',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050010 => 
+  array (
+    'ifDescr' => 'ae5.10',
+    'ifName' => 'ae5.10',
+    'ifAlias' => '',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050030 => 
+  array (
+    'ifDescr' => 'ae5.30',
+    'ifName' => 'ae5.30',
+    'ifAlias' => 'int-dhd-30',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050035 => 
+  array (
+    'ifDescr' => 'ae5.35',
+    'ifName' => 'ae5.35',
+    'ifAlias' => 'dante-35',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050060 => 
+  array (
+    'ifDescr' => 'ae5.60',
+    'ifName' => 'ae5.60',
+    'ifAlias' => '',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050070 => 
+  array (
+    'ifDescr' => 'ae5.70',
+    'ifName' => 'ae5.70',
+    'ifAlias' => '',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050075 => 
+  array (
+    'ifDescr' => 'ae5.75',
+    'ifName' => 'ae5.75',
+    'ifAlias' => 'fallback-internet-75',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050121 => 
+  array (
+    'ifDescr' => 'ae5.121',
+    'ifName' => 'ae5.121',
+    'ifAlias' => 'IP 192 - 223',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050200 => 
+  array (
+    'ifDescr' => 'ae5.200',
+    'ifName' => 'ae5.200',
+    'ifAlias' => 'IP 0 - 127 & IP 128 - 159',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050220 => 
+  array (
+    'ifDescr' => 'ae5.220',
+    'ifName' => 'ae5.220',
+    'ifAlias' => 'IP 160 - 167 (T1807 222)',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050251 => 
+  array (
+    'ifDescr' => 'ae5.251',
+    'ifName' => 'ae5.251',
+    'ifAlias' => 'kpn-voip-251',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050255 => 
+  array (
+    'ifDescr' => 'ae5.255',
+    'ifName' => 'ae5.255',
+    'ifAlias' => 'cameras',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050290 => 
+  array (
+    'ifDescr' => 'ae5.290',
+    'ifName' => 'ae5.290',
+    'ifAlias' => 'int-printer-290',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050300 => 
+  array (
+    'ifDescr' => 'ae5.300',
+    'ifName' => 'ae5.300',
+    'ifAlias' => 'sandbox',
+    'ifType' => 'ieee8023adLag',
+  ),
+  500050320 => 
+  array (
+    'ifDescr' => 'ae5.320',
+    'ifName' => 'ae5.320',
+    'ifAlias' => 'teletekst',
+    'ifType' => 'ieee8023adLag',
+  ),
+)  
+SQL[[1;33mSELECT * FROM `ports` WHERE `device_id` = ? ORDER BY port_id [0;33m[2][0m 1.21ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["dedicated-ha1","dedicated-ha1","dedicated-ha1","ethernetCsmacd",1,1][0m 1.97ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["dedicated-ha2","dedicated-ha2","dedicated-ha2","ethernetCsmacd",2,2][0m 8.3ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ha1","ha1","ha1","ethernetCsmacd",3,3][0m 1.72ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ha2","ha2","ha2","ethernetCsmacd",4,4][0m 8.55ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["mgmt","mgmt","mgmt","ethernetCsmacd",5,5][0m 1.88ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/1","ethernet1\/1","npo uplink","ethernetCsmacd",6,6][0m 9.6ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/2","ethernet1\/2","mexnet kpn voip","ethernetCsmacd",7,7][0m 9.38ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/3","ethernet1\/3","ethernet1\/3","ethernetCsmacd",8,8][0m 9.28ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/4","ethernet1\/4","ethernet1\/4","ethernetCsmacd",9,9][0m 9.25ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/5","ethernet1\/5","ethernet1\/5","ethernetCsmacd",10,10][0m 9.26ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/6","ethernet1\/6","ethernet1\/6","ethernetCsmacd",11,11][0m 9.3ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/7","ethernet1\/7","ethernet1\/7","ethernetCsmacd",12,12][0m 9.32ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/8","ethernet1\/8","ethernet1\/8","ethernetCsmacd",13,13][0m 9.27ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/9","ethernet1\/9","ethernet1\/9","ethernetCsmacd",14,14][0m 9.37ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/10","ethernet1\/10","ethernet1\/10","ethernetCsmacd",15,15][0m 9.41ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/11","ethernet1\/11","ethernet1\/11","ethernetCsmacd",16,16][0m 9.29ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/12","ethernet1\/12","ethernet1\/12","ethernetCsmacd",17,17][0m 9.1ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/13","ethernet1\/13","ethernet1\/13","ethernetCsmacd",18,18][0m 9.46ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/14","ethernet1\/14","ethernet1\/14","ethernetCsmacd",19,19][0m 9.12ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/15","ethernet1\/15","ethernet1\/15","ethernetCsmacd",20,20][0m 9.37ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/16","ethernet1\/16","ethernet1\/16","ethernetCsmacd",21,21][0m 9.3ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/17","ethernet1\/17","ethernet1\/17","ethernetCsmacd",22,22][0m 9.31ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/18","ethernet1\/18","ethernet1\/18","ethernetCsmacd",23,23][0m 9.37ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/19","ethernet1\/19","ethernet1\/19","ethernetCsmacd",24,24][0m 9.61ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ethernet1\/20","ethernet1\/20","ethernet1\/20","ethernetCsmacd",25,25][0m 9.29ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["vlan","vlan","vlan","l2vlan",200000000,26][0m 9.28ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["loopback","loopback","loopback","softwareLoopback",300000000,27][0m 12.27ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["loopback.1","loopback.1","GLOBAL PROTECT","softwareLoopback",300000001,28][0m 9.45ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["loopback.2","loopback.2","VPN ORN","softwareLoopback",300000002,29][0m 9.16ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["loopback.4","loopback.4","Azure GW","softwareLoopback",300000004,30][0m 9.37ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["loopback.5","loopback.5","N-H","softwareLoopback",300000005,63][0m 9.29ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel","tunnel","tunnel","tunnel",400000000,31][0m 9.33ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.1","tunnel.1","tunnel.1","tunnel",400000001,32][0m 9.56ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.2","tunnel.2","tunnel.2","tunnel",400000002,33][0m 9.38ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.101","tunnel.101","tunnel.101","tunnel",400000101,34][0m 9.19ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.102","tunnel.102","tunnel.102","tunnel",400000102,35][0m 9.24ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.103","tunnel.103","tunnel.103","tunnel",400000103,36][0m 9.33ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.107","tunnel.107","tunnel.107","tunnel",400000107,37][0m 9.55ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.108","tunnel.108","tunnel.108","tunnel",400000108,38][0m 9.33ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.109","tunnel.109","tunnel.109","tunnel",400000109,39][0m 9.27ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.201","tunnel.201","tunnel.201","tunnel",400000201,40][0m 9.42ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.202","tunnel.202","ORN","tunnel",400000202,41][0m 9.33ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.301","tunnel.301","tunnel.301","tunnel",400000301,42][0m 9.09ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.302","tunnel.302","tunnel.302","tunnel",400000302,43][0m 9.37ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.303","tunnel.303","tunnel.303","tunnel",400000303,44][0m 9.26ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.304","tunnel.304","tunnel.304","tunnel",400000304,45][0m 9.32ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.306","tunnel.306","tunnel.306","tunnel",400000306,46][0m 9.08ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.401","tunnel.401","Azure Gateway","tunnel",400000401,47][0m 9.32ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["tunnel.501","tunnel.501","N-H Commvault","tunnel",400000501,64][0m 9.59ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5","ae5","ae5","ieee8023adLag",500050000,48][0m 9.36ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.10","ae5.10","ae5.10","ieee8023adLag",500050010,49][0m 9.23ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.30","ae5.30","int-dhd-30","ieee8023adLag",500050030,50][0m 9.51ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.35","ae5.35","dante-35","ieee8023adLag",500050035,51][0m 9.11ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.60","ae5.60","ae5.60","ieee8023adLag",500050060,52][0m 9.29ms] 
+  
+ Using ifDescr as ifAlias  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.70","ae5.70","ae5.70","ieee8023adLag",500050070,53][0m 9.54ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.75","ae5.75","fallback-internet-75","ieee8023adLag",500050075,54][0m 9.2ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.121","ae5.121","IP 192 - 223","ieee8023adLag",500050121,55][0m 9.33ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.200","ae5.200","IP 0 - 127 & IP 128 - 159","ieee8023adLag",500050200,56][0m 9.32ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.220","ae5.220","IP 160 - 167 (T1807 222)","ieee8023adLag",500050220,57][0m 9.48ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.251","ae5.251","kpn-voip-251","ieee8023adLag",500050251,58][0m 9.43ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.255","ae5.255","cameras","ieee8023adLag",500050255,59][0m 9.01ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.290","ae5.290","int-printer-290","ieee8023adLag",500050290,60][0m 9.37ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.300","ae5.300","sandbox","ieee8023adLag",500050300,61][0m 9.31ms] 
+  
+SQL[[1;33mUPDATE `ports` set `ifDescr`=?,`ifName`=?,`ifAlias`=?,`ifType`=?,`ifIndex`=? WHERE `port_id` = ? [0;33m["ae5.320","ae5.320","teletekst","ieee8023adLag",500050320,62][0m 13.83ms] 
+  
+Modules status: Global+  
+OS+  
+Device  
+SQL[[1;33mSELECT * FROM `ports_stack` WHERE `device_id` = '2' [0;33m[][0m 0.24ms] 
+  
+ifStackStatus.0.6 = active
+ifStackStatus.0.7 = active
+ifStackStatus.0.8 = active
+ifStackStatus.0.9 = active
+ifStackStatus.0.10 = active
+ifStackStatus.0.11 = active
+ifStackStatus.0.12 = active
+ifStackStatus.0.13 = active
+ifStackStatus.0.14 = active
+ifStackStatus.0.15 = active
+ifStackStatus.0.16 = active
+ifStackStatus.0.17 = active
+ifStackStatus.0.18 = active
+ifStackStatus.0.19 = active
+ifStackStatus.0.20 = active
+ifStackStatus.0.21 = active
+ifStackStatus.0.22 = active
+ifStackStatus.0.23 = active
+ifStackStatus.0.24 = active
+ifStackStatus.0.25 = active
+ifStackStatus.0.200000000 = active
+ifStackStatus.0.300000001 = active
+ifStackStatus.0.300000002 = active
+ifStackStatus.0.300000004 = active
+ifStackStatus.0.300000005 = active
+ifStackStatus.0.400000001 = active
+ifStackStatus.0.400000002 = active
+ifStackStatus.0.400000101 = active
+ifStackStatus.0.400000102 = active
+ifStackStatus.0.400000103 = active
+ifStackStatus.0.400000107 = active
+ifStackStatus.0.400000108 = active
+ifStackStatus.0.400000109 = active
+ifStackStatus.0.400000201 = active
+ifStackStatus.0.400000202 = active
+ifStackStatus.0.400000301 = active
+ifStackStatus.0.400000302 = active
+ifStackStatus.0.400000303 = active
+ifStackStatus.0.400000304 = active
+ifStackStatus.0.400000306 = active
+ifStackStatus.0.400000401 = active
+ifStackStatus.0.400000501 = active
+ifStackStatus.0.500050010 = active
+ifStackStatus.0.500050030 = active
+ifStackStatus.0.500050035 = active
+ifStackStatus.0.500050060 = active
+ifStackStatus.0.500050070 = active
+ifStackStatus.0.500050075 = active
+ifStackStatus.0.500050121 = active
+ifStackStatus.0.500050200 = active
+ifStackStatus.0.500050220 = active
+ifStackStatus.0.500050251 = active
+ifStackStatus.0.500050255 = active
+ifStackStatus.0.500050290 = active
+ifStackStatus.0.500050300 = active
+ifStackStatus.0.500050320 = active
+ifStackStatus.6.0 = active
+ifStackStatus.7.0 = active
+ifStackStatus.8.0 = active
+ifStackStatus.9.0 = active
+ifStackStatus.10.0 = active
+ifStackStatus.11.0 = active
+ifStackStatus.12.0 = active
+ifStackStatus.13.0 = active
+ifStackStatus.14.0 = active
+ifStackStatus.15.0 = active
+ifStackStatus.16.0 = active
+ifStackStatus.17.0 = active
+ifStackStatus.18.0 = active
+ifStackStatus.19.0 = active
+ifStackStatus.20.0 = active
+ifStackStatus.21.0 = active
+ifStackStatus.22.0 = active
+ifStackStatus.23.0 = active
+ifStackStatus.24.0 = active
+ifStackStatus.25.0 = active
+ifStackStatus.200000000.0 = active
+ifStackStatus.300000000.0 = active
+ifStackStatus.300000001.300000000 = active
+ifStackStatus.300000002.300000000 = active
+ifStackStatus.300000004.300000000 = active
+ifStackStatus.300000005.300000000 = active
+ifStackStatus.400000000.0 = active
+ifStackStatus.400000001.400000000 = active
+ifStackStatus.400000002.400000000 = active
+ifStackStatus.400000101.400000000 = active
+ifStackStatus.400000102.400000000 = active
+ifStackStatus.400000103.400000000 = active
+ifStackStatus.400000107.400000000 = active
+ifStackStatus.400000108.400000000 = active
+ifStackStatus.400000109.400000000 = active
+ifStackStatus.400000201.400000000 = active
+ifStackStatus.400000202.400000000 = active
+ifStackStatus.400000301.400000000 = active
+ifStackStatus.400000302.400000000 = active
+ifStackStatus.400000303.400000000 = active
+ifStackStatus.400000304.400000000 = active
+ifStackStatus.400000306.400000000 = active
+ifStackStatus.400000401.400000000 = active
+ifStackStatus.400000501.400000000 = active
+ifStackStatus.500050000.0 = active
+ifStackStatus.500050010.500050000 = active
+ifStackStatus.500050030.500050000 = active
+ifStackStatus.500050035.500050000 = active
+ifStackStatus.500050060.500050000 = active
+ifStackStatus.500050070.500050000 = active
+ifStackStatus.500050075.500050000 = active
+ifStackStatus.500050121.500050000 = active
+ifStackStatus.500050200.500050000 = active
+ifStackStatus.500050220.500050000 = active
+ifStackStatus.500050251.500050000 = active
+ifStackStatus.500050255.500050000 = active
+ifStackStatus.500050290.500050000 = active
+ifStackStatus.500050300.500050000 = active
+ifStackStatus.500050320.500050000 = active  
+  
+Modules status: Global+  
+OS+  
+Device  
+entPhysicalIndex.1 = 1
+entPhysicalIndex.2 = 2
+entPhysicalIndex.3 = 3
+entPhysicalIndex.4 = 4
+entPhysicalIndex.5 = 5
+entPhysicalIndex.6 = 6
+entPhysicalIndex.7 = 7
+entPhysicalIndex.8 = 8
+entPhysicalIndex.9 = 9
+entPhysicalIndex.10 = 10
+entPhysicalIndex.11 = 11
+entPhysicalDescr.1 = PA-3020
+entPhysicalDescr.2 = Fan #1 RPM
+entPhysicalDescr.3 = Fan #2 RPM
+entPhysicalDescr.4 = Fan #3 RPM
+entPhysicalDescr.5 = Fan #4 RPM
+entPhysicalDescr.6 = Temperature @ Ocelot
+entPhysicalDescr.7 = Temperature @ Switch
+entPhysicalDescr.8 = Temperature @ Cavium
+entPhysicalDescr.9 = Temperature @ Intel PHY
+entPhysicalDescr.10 = Temperature @ Switch Core
+entPhysicalDescr.11 = Temperature @ Cavium Core
+entPhysicalVendorType.1 = enterprises.25461.2.3.18
+entPhysicalVendorType.2 = zeroDotZero
+entPhysicalVendorType.3 = zeroDotZero
+entPhysicalVendorType.4 = zeroDotZero
+entPhysicalVendorType.5 = zeroDotZero
+entPhysicalVendorType.6 = zeroDotZero
+entPhysicalVendorType.7 = zeroDotZero
+entPhysicalVendorType.8 = zeroDotZero
+entPhysicalVendorType.9 = zeroDotZero
+entPhysicalVendorType.10 = zeroDotZero
+entPhysicalVendorType.11 = zeroDotZero
+entPhysicalContainedIn.1 = 0
+entPhysicalContainedIn.2 = 1
+entPhysicalContainedIn.3 = 1
+entPhysicalContainedIn.4 = 1
+entPhysicalContainedIn.5 = 1
+entPhysicalContainedIn.6 = 1
+entPhysicalContainedIn.7 = 1
+entPhysicalContainedIn.8 = 1
+entPhysicalContainedIn.9 = 1
+entPhysicalContainedIn.10 = 1
+entPhysicalContainedIn.11 = 1
+entPhysicalClass.1 = chassis
+entPhysicalClass.2 = sensor
+entPhysicalClass.3 = sensor
+entPhysicalClass.4 = sensor
+entPhysicalClass.5 = sensor
+entPhysicalClass.6 = sensor
+entPhysicalClass.7 = sensor
+entPhysicalClass.8 = sensor
+entPhysicalClass.9 = sensor
+entPhysicalClass.10 = sensor
+entPhysicalClass.11 = sensor
+entPhysicalParentRelPos.1 = -1
+entPhysicalParentRelPos.2 = 1
+entPhysicalParentRelPos.3 = 2
+entPhysicalParentRelPos.4 = 3
+entPhysicalParentRelPos.5 = 4
+entPhysicalParentRelPos.6 = 1
+entPhysicalParentRelPos.7 = 2
+entPhysicalParentRelPos.8 = 3
+entPhysicalParentRelPos.9 = 4
+entPhysicalParentRelPos.10 = 5
+entPhysicalParentRelPos.11 = 6
+entPhysicalName.1 = PA-3020
+entPhysicalName.2 = Fan #1 RPM
+entPhysicalName.3 = Fan #2 RPM
+entPhysicalName.4 = Fan #3 RPM
+entPhysicalName.5 = Fan #4 RPM
+entPhysicalName.6 = Temperature @ Ocelot
+entPhysicalName.7 = Temperature @ Switch
+entPhysicalName.8 = Temperature @ Cavium
+entPhysicalName.9 = Temperature @ Intel PHY
+entPhysicalName.10 = Temperature @ Switch Core
+entPhysicalName.11 = Temperature @ Cavium Core
+entPhysicalHardwareRev.1 = 1.1
+entPhysicalHardwareRev.2 = 
+entPhysicalHardwareRev.3 = 
+entPhysicalHardwareRev.4 = 
+entPhysicalHardwareRev.5 = 
+entPhysicalHardwareRev.6 = 
+entPhysicalHardwareRev.7 = 
+entPhysicalHardwareRev.8 = 
+entPhysicalHardwareRev.9 = 
+entPhysicalHardwareRev.10 = 
+entPhysicalHardwareRev.11 = 
+entPhysicalFirmwareRev.1 = 
+entPhysicalFirmwareRev.2 = 
+entPhysicalFirmwareRev.3 = 
+entPhysicalFirmwareRev.4 = 
+entPhysicalFirmwareRev.5 = 
+entPhysicalFirmwareRev.6 = 
+entPhysicalFirmwareRev.7 = 
+entPhysicalFirmwareRev.8 = 
+entPhysicalFirmwareRev.9 = 
+entPhysicalFirmwareRev.10 = 
+entPhysicalFirmwareRev.11 = 
+entPhysicalSoftwareRev.1 = 9.0.5
+entPhysicalSoftwareRev.2 = 
+entPhysicalSoftwareRev.3 = 
+entPhysicalSoftwareRev.4 = 
+entPhysicalSoftwareRev.5 = 
+entPhysicalSoftwareRev.6 = 
+entPhysicalSoftwareRev.7 = 
+entPhysicalSoftwareRev.8 = 
+entPhysicalSoftwareRev.9 = 
+entPhysicalSoftwareRev.10 = 
+entPhysicalSoftwareRev.11 = 
+entPhysicalSerialNum.1 = 001801049095
+entPhysicalSerialNum.2 = 
+entPhysicalSerialNum.3 = 
+entPhysicalSerialNum.4 = 
+entPhysicalSerialNum.5 = 
+entPhysicalSerialNum.6 = 
+entPhysicalSerialNum.7 = 
+entPhysicalSerialNum.8 = 
+entPhysicalSerialNum.9 = 
+entPhysicalSerialNum.10 = 
+entPhysicalSerialNum.11 = 
+entPhysicalMfgName.1 = Palo Alto Networks
+entPhysicalMfgName.2 = 
+entPhysicalMfgName.3 = 
+entPhysicalMfgName.4 = 
+entPhysicalMfgName.5 = 
+entPhysicalMfgName.6 = 
+entPhysicalMfgName.7 = 
+entPhysicalMfgName.8 = 
+entPhysicalMfgName.9 = 
+entPhysicalMfgName.10 = 
+entPhysicalMfgName.11 = 
+entPhysicalModelName.1 = PA-3020
+entPhysicalModelName.2 = 
+entPhysicalModelName.3 = 
+entPhysicalModelName.4 = 
+entPhysicalModelName.5 = 
+entPhysicalModelName.6 = 
+entPhysicalModelName.7 = 
+entPhysicalModelName.8 = 
+entPhysicalModelName.9 = 
+entPhysicalModelName.10 = 
+entPhysicalModelName.11 = 
+entPhysicalAlias.1 = 
+entPhysicalAlias.2 = 
+entPhysicalAlias.3 = 
+entPhysicalAlias.4 = 
+entPhysicalAlias.5 = 
+entPhysicalAlias.6 = 
+entPhysicalAlias.7 = 
+entPhysicalAlias.8 = 
+entPhysicalAlias.9 = 
+entPhysicalAlias.10 = 
+entPhysicalAlias.11 = 
+entPhysicalAssetID.1 = 
+entPhysicalAssetID.2 = 
+entPhysicalAssetID.3 = 
+entPhysicalAssetID.4 = 
+entPhysicalAssetID.5 = 
+entPhysicalAssetID.6 = 
+entPhysicalAssetID.7 = 
+entPhysicalAssetID.8 = 
+entPhysicalAssetID.9 = 
+entPhysicalAssetID.10 = 
+entPhysicalAssetID.11 = 
+entPhysicalIsFRU.1 = false
+entPhysicalIsFRU.2 = false
+entPhysicalIsFRU.3 = false
+entPhysicalIsFRU.4 = false
+entPhysicalIsFRU.5 = false
+entPhysicalIsFRU.6 = false
+entPhysicalIsFRU.7 = false
+entPhysicalIsFRU.8 = false
+entPhysicalIsFRU.9 = false
+entPhysicalIsFRU.10 = false
+entPhysicalIsFRU.11 = false
+entPhysicalMfgDate.1 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.2 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.3 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.4 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.5 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.6 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.7 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.8 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.9 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.10 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalMfgDate.11 = 12336-48-48,48:48:48.48,048:484848484848
+entPhysicalUris.1 = ""
+entPhysicalUris.2 = ""
+entPhysicalUris.3 = ""
+entPhysicalUris.4 = ""
+entPhysicalUris.5 = ""
+entPhysicalUris.6 = ""
+entPhysicalUris.7 = ""
+entPhysicalUris.8 = ""
+entPhysicalUris.9 = ""
+entPhysicalUris.10 = ""
+entPhysicalUris.11 = ""  
+  
+entAliasMappingIdentifier = No Such Object available on this agent at this OID  
+  
+Discover Inventory Item: 1, PA-3020, chassis, PA-3020, PA-3020, 001801049095, 0, Palo Alto Networks, -1, enterprises.25461.2.3.18, 1.1, , 9.0.5, false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,1][0m 0.32ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[1,"PA-3020","chassis","PA-3020","PA-3020","001801049095","0","Palo Alto Networks","-1","enterprises.25461.2.3.18","1.1","","9.0.5","false","","",null,2,1][0m 2.29ms] 
+  
+Discover Inventory Item: 2, Fan #1 RPM, sensor, Fan #1 RPM, , , 1, , 1, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,2][0m 0.13ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[2,"Fan #1 RPM","sensor","Fan #1 RPM","","","1","","1","zeroDotZero","","","","false","","",null,2,2][0m 9.12ms] 
+  
+Discover Inventory Item: 3, Fan #2 RPM, sensor, Fan #2 RPM, , , 1, , 2, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,3][0m 0.24ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[3,"Fan #2 RPM","sensor","Fan #2 RPM","","","1","","2","zeroDotZero","","","","false","","",null,2,3][0m 8.77ms] 
+  
+Discover Inventory Item: 4, Fan #3 RPM, sensor, Fan #3 RPM, , , 1, , 3, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,4][0m 0.11ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[4,"Fan #3 RPM","sensor","Fan #3 RPM","","","1","","3","zeroDotZero","","","","false","","",null,2,4][0m 9.12ms] 
+  
+Discover Inventory Item: 5, Fan #4 RPM, sensor, Fan #4 RPM, , , 1, , 4, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,5][0m 0.12ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[5,"Fan #4 RPM","sensor","Fan #4 RPM","","","1","","4","zeroDotZero","","","","false","","",null,2,5][0m 9.02ms] 
+  
+Discover Inventory Item: 6, Temperature @ Ocelot, sensor, Temperature @ Ocelot, , , 1, , 1, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,6][0m 0.14ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[6,"Temperature @ Ocelot","sensor","Temperature @ Ocelot","","","1","","1","zeroDotZero","","","","false","","",null,2,6][0m 8.93ms] 
+  
+Discover Inventory Item: 7, Temperature @ Switch, sensor, Temperature @ Switch, , , 1, , 2, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,7][0m 0.26ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[7,"Temperature @ Switch","sensor","Temperature @ Switch","","","1","","2","zeroDotZero","","","","false","","",null,2,7][0m 8.73ms] 
+  
+Discover Inventory Item: 8, Temperature @ Cavium, sensor, Temperature @ Cavium, , , 1, , 3, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,8][0m 0.14ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[8,"Temperature @ Cavium","sensor","Temperature @ Cavium","","","1","","3","zeroDotZero","","","","false","","",null,2,8][0m 9.26ms] 
+  
+Discover Inventory Item: 9, Temperature @ Intel PHY, sensor, Temperature @ Intel PHY, , , 1, , 4, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,9][0m 0.18ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[9,"Temperature @ Intel PHY","sensor","Temperature @ Intel PHY","","","1","","4","zeroDotZero","","","","false","","",null,2,9][0m 10.15ms] 
+  
+Discover Inventory Item: 10, Temperature @ Switch Core, sensor, Temperature @ Switch Core, , , 1, , 5, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,10][0m 0.29ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[10,"Temperature @ Switch Core","sensor","Temperature @ Switch Core","","","1","","5","zeroDotZero","","","","false","","",null,2,10][0m 8.92ms] 
+  
+Discover Inventory Item: 11, Temperature @ Cavium Core, sensor, Temperature @ Cavium Core, , , 1, , 6, zeroDotZero, , , , false, , ,  
+SQL[[1;33mSELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ? [0;33m[2,11][0m 0.12ms] 
+  
+SQL[[1;33mUPDATE `entPhysical` set `entPhysicalIndex`=?,`entPhysicalDescr`=?,`entPhysicalClass`=?,`entPhysicalName`=?,`entPhysicalModelName`=?,`entPhysicalSerialNum`=?,`entPhysicalContainedIn`=?,`entPhysicalMfgName`=?,`entPhysicalParentRelPos`=?,`entPhysicalVendorType`=?,`entPhysicalHardwareRev`=?,`entPhysicalFirmwareRev`=?,`entPhysicalSoftwareRev`=?,`entPhysicalIsFRU`=?,`entPhysicalAlias`=?,`entPhysicalAssetID`=?,`ifIndex`=? WHERE `device_id`=? AND `entPhysicalIndex`=? [0;33m[11,"Temperature @ Cavium Core","sensor","Temperature @ Cavium Core","","","1","","6","zeroDotZero","","","","false","","",null,2,11][0m 11.56ms] 
+  
+SQL[[1;33mSELECT * FROM `entPhysical` WHERE `device_id` = ? [0;33m[2][0m 0.17ms] 
+  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global+  
+OS+  
+Device  
+No YAML Discovery data.  
+hrProcessorLoad.1 = 21
+hrProcessorLoad.2 = 24  
+  
+hrDeviceDescr.1 = Management Processor
+hrDeviceDescr.2 = Slot-1 Data Processor  
+  
+Discovered LibreNMS\Device\Processor Array
+(
+    [processor_id] => 
+    [entPhysicalIndex] => 0
+    [hrDeviceIndex] => 1
+    [device_id] => 2
+    [processor_oid] => .1.3.6.1.2.1.25.3.3.1.2.1
+    [processor_index] => 1
+    [processor_type] => hr
+    [processor_usage] => 21
+    [processor_descr] => Management Processor
+    [processor_precision] => 1
+    [processor_perc_warn] => 75
+)  
+Discovered LibreNMS\Device\Processor Array
+(
+    [processor_id] => 
+    [entPhysicalIndex] => 0
+    [hrDeviceIndex] => 2
+    [device_id] => 2
+    [processor_oid] => .1.3.6.1.2.1.25.3.3.1.2.2
+    [processor_index] => 2
+    [processor_type] => hr
+    [processor_usage] => 24
+    [processor_descr] => Slot-1 Data Processor
+    [processor_precision] => 1
+    [processor_perc_warn] => 75
+)  
+SQL[[1;33mSELECT * FROM `processors` WHERE  device_id=? AND processor_index=? AND processor_type=? [0;33m[2,"1","hr"][0m 0.38ms] 
+  
+SQL[[1;33mSELECT * FROM `processors` WHERE  device_id=? AND processor_index=? AND processor_type=? [0;33m[2,"2","hr"][0m 0.22ms] 
+  
+SQL[[1;33mSELECT * FROM `processors` WHERE  device_id=? AND processor_index=? AND processor_type=? [0;33m[2,"1","hr"][0m 0.12ms] 
+  
+SQL[[1;33mSELECT * FROM `processors` WHERE  device_id=? AND processor_index=? AND processor_type=? [0;33m[2,"2","hr"][0m 0.11ms] 
+  
+SQL[[1;33mSELECT * FROM `processors` WHERE `device_id`=? AND `processor_id` NOT IN (?,?,?,?) [0;33m[2,1,2,1,2][0m 0.25ms] 
+  
+SQL[[1;33mDELETE T FROM `processors` T LEFT JOIN `devices` ON `devices`.`device_id` = T.`device_id` WHERE `devices`.`device_id` IS NULL [0;33m[][0m 0.17ms] 
+  
+Modules status: Global+  
+OS+  
+Device  
+SQL[[1;33mSELECT COUNT(*) FROM `mempools` WHERE `device_id` = ? AND `mempool_type` = 'cemp' [0;33m[2][0m 0.23ms] 
+  
+dellNetCpuUtilTable = No Such Object available on this agent at this OID  
+  
+dellNetProcessorEntry = No Such Object available on this agent at this OID  
+  
+hpLocalMem = No Such Object available on this agent at this OID  
+  
+hpGlobalMem = No Such Object available on this agent at this OID  
+  
+hrStorageIndex.20 = 20
+hrStorageIndex.30 = 30
+hrStorageIndex.40 = 40
+hrStorageIndex.41 = 41
+hrStorageIndex.42 = 42
+hrStorageIndex.1010 = 1010
+hrStorageIndex.1011 = 1011
+hrStorageIndex.1012 = 1012
+hrStorageType.20 = hrStorageRam
+hrStorageType.30 = hrStorageVirtualMemory
+hrStorageType.40 = hrStorageFixedDisk
+hrStorageType.41 = hrStorageFixedDisk
+hrStorageType.42 = hrStorageFixedDisk
+hrStorageType.1010 = hrStorageOther
+hrStorageType.1011 = hrStorageOther
+hrStorageType.1012 = hrStorageOther
+hrStorageDescr.20 = Slot-0 Management Memory
+hrStorageDescr.30 = Slot-0 Management Swap
+hrStorageDescr.40 = Slot-0 Management Config Partition
+hrStorageDescr.41 = Slot-0 Management Log Partition
+hrStorageDescr.42 = Slot-0 Management Root Partition
+hrStorageDescr.1010 = Slot-1 Data Processor-0 Packet Descriptors
+hrStorageDescr.1011 = Slot-1 Data Processor-0 Hardware Packet Buffers
+hrStorageDescr.1012 = Slot-1 Data Processor-0 Software Packet Buffers
+hrStorageAllocationUnits.20 = 1024
+hrStorageAllocationUnits.30 = 1024
+hrStorageAllocationUnits.40 = 1024
+hrStorageAllocationUnits.41 = 1024
+hrStorageAllocationUnits.42 = 1024
+hrStorageAllocationUnits.1010 = 128
+hrStorageAllocationUnits.1011 = 2048
+hrStorageAllocationUnits.1012 = 5470
+hrStorageSize.20 = 3849884
+hrStorageSize.30 = 3056660
+hrStorageSize.40 = 11764568
+hrStorageSize.41 = 93286500
+hrStorageSize.42 = 13651232
+hrStorageSize.1010 = 229376
+hrStorageSize.1011 = 57344
+hrStorageSize.1012 = 168240
+hrStorageUsed.20 = 2630484
+hrStorageUsed.30 = 418716
+hrStorageUsed.40 = 4186800
+hrStorageUsed.41 = 67190208
+hrStorageUsed.42 = 3386300
+hrStorageUsed.1010 = 109
+hrStorageUsed.1011 = 167
+hrStorageUsed.1012 = 2  
+  
+Discover Mempool: 20, hrstorage, Slot-0 Management Memory, 1024, , , 90  
+SQL[[1;33mSELECT COUNT(mempool_id) FROM `mempools` WHERE `mempool_index` = ? AND `device_id` = ? AND `mempool_type` = ? [0;33m[20,2,"hrstorage"][0m 0.4ms] 
+  
+SQL[[1;33mUPDATE `mempools` set `mempool_descr`=? WHERE device_id=? AND mempool_index=? AND mempool_type=? [0;33m["Slot-0 Management Memory",2,20,"hrstorage"][0m 2.19ms] 
+  
+Discover Mempool: 30, hrstorage, Slot-0 Management Swap, 1024, , , 90  
+SQL[[1;33mSELECT COUNT(mempool_id) FROM `mempools` WHERE `mempool_index` = ? AND `device_id` = ? AND `mempool_type` = ? [0;33m[30,2,"hrstorage"][0m 0.28ms] 
+  
+SQL[[1;33mUPDATE `mempools` set `mempool_descr`=? WHERE device_id=? AND mempool_index=? AND mempool_type=? [0;33m["Slot-0 Management Swap",2,30,"hrstorage"][0m 8.12ms] 
+  
+array (
+  'hrstorage' => 
+  array (
+    20 => 1,
+    30 => 1,
+  ),
+)  
+SQL[[1;33mSELECT * FROM `mempools` WHERE `device_id`  = '2' [0;33m[][0m 0.34ms] 
+  
+20 -> hrstorage  
+30 -> hrstorage  
+Modules status: Global+  
+OS+  
+Device  
+SQL[[1;33mSELECT * FROM vrf_lite_cisco WHERE device_id = ?  [0;33m[2][0m 0.17ms] 
+  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global+  
+OS+  
+Device  
+ipAdEntIfIndex No Such Object available on this agent at this OID  
+  
+No Such Object available on this agent at this OID  
+  
+SQL[[1;33mSELECT `ipv4_addresses`.*, `ports`.`device_id`, `ports`.`ifIndex` FROM `ipv4_addresses` LEFT JOIN `ports` ON `ipv4_addresses`.`port_id` = `ports`.`port_id` WHERE `ports`.device_id = ? OR `ports`.`device_id` IS NULL [0;33m[2][0m 0.51ms] 
+  
+Modules status: Global+  
+OS+  
+Device  
+ipAddressIfIndex.ipv6 No Such Object available on this agent at this OID  
+  
+.1.3.6.1.2.1.55.1.8.1.2 No Such Object available on this agent at this OID  
+  
+SQL[[1;33mSELECT `ipv6_addresses`.*, `ports`.`device_id`, `ports`.`ifIndex` FROM `ipv6_addresses` LEFT JOIN `ports` ON `ipv6_addresses`.`port_id` = `ports`.`port_id` WHERE `ports`.device_id = ? OR `ports`.`device_id` IS NULL [0;33m[2][0m 0.47ms] 
+  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global+  
+OS+  
+Device  
+panSysHAMode.0 = "active-passive"  
+  
+panSysHAState.0 = "active"  
+  
+panSysHAPeerState.0 = "passive"  
+  
+panSessionUtilization.0 = 1
+panSessionMax.0 = 262142
+panSessionActive.0 = 3405
+panSessionActiveTcp.0 = 2418
+panSessionActiveUdp.0 = 974
+panSessionActiveICMP.0 = 9
+panSessionActiveSslProxy.0 = 29
+panSessionSslProxyUtilization.0 = 0
+panVsysId.1 = 1
+panVsysName.1 = "vsys1"
+panVsysSessionUtilizationPct.1 = 0
+panVsysActiveSessions.1 = 3403
+panVsysMaxSessions.1 = 0
+panVsysActiveTcpCps.1 = 7
+panVsysActiveUdpCps.1 = 4
+panVsysActiveOtherIpCps.1 = 0
+panZoneName.10.105.110.116.45.100.104.100.45.51.48 = "int-dhd-30"
+panZoneName.11.101.120.116.45.101.49.95.49.45.55.53 = "ext-e1_1-75"
+panZoneName.11.105.110.116.45.119.105.102.105.45.55.48 = "int-wifi-70"
+panZoneName.13.101.120.116.45.105.112.115.101.99.45.110.45.104 = "ext-ipsec-n-h"
+panZoneName.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48 = "ext-dmz-nat-60"
+panZoneName.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101 = "ext-ipsec-azure"
+panZoneName.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49 = "ext-kpn-een-251"
+panZoneName.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50 = "ext-mexnet-e1_2"
+panZoneName.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50 = "ext-orn-tun-202"
+panZoneName.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53 = "int-cameras-255"
+panZoneName.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48 = "int-printer-290"
+panZoneName.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48 = "int-sandb0x-300"
+panZoneName.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48 = "ext-dmz-nonat-200"
+panZoneName.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48 = "int-teletekst-320"
+panZoneName.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53 = "int-ka-10-dante-35"
+panZoneName.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49 = "ext-audio-codecs-121"
+panZoneName.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49 = "ext-media-pro-tun-201"
+panZoneName.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48 = "ext-video-streams-220"
+panZoneName.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120 = "ext-global-protect-tunx"
+panZoneName.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120 = "ext-regio-camera-tun10x"
+panZoneName.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120 = "ext-vpn-medew-ict-tun30x"
+panZoneActiveTcpCps.10.105.110.116.45.100.104.100.45.51.48 = 0
+panZoneActiveTcpCps.11.101.120.116.45.101.49.95.49.45.55.53 = 0
+panZoneActiveTcpCps.11.105.110.116.45.119.105.102.105.45.55.48 = 3
+panZoneActiveTcpCps.13.101.120.116.45.105.112.115.101.99.45.110.45.104 = 0
+panZoneActiveTcpCps.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48 = 0
+panZoneActiveTcpCps.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101 = 0
+panZoneActiveTcpCps.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49 = 0
+panZoneActiveTcpCps.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50 = 0
+panZoneActiveTcpCps.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50 = 0
+panZoneActiveTcpCps.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53 = 4
+panZoneActiveTcpCps.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48 = 0
+panZoneActiveTcpCps.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48 = 0
+panZoneActiveTcpCps.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48 = 0
+panZoneActiveTcpCps.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48 = 0
+panZoneActiveTcpCps.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53 = 0
+panZoneActiveTcpCps.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49 = 0
+panZoneActiveTcpCps.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49 = 0
+panZoneActiveTcpCps.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48 = 0
+panZoneActiveTcpCps.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120 = 0
+panZoneActiveTcpCps.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120 = 0
+panZoneActiveTcpCps.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120 = 0
+panZoneActiveUdpCps.10.105.110.116.45.100.104.100.45.51.48 = 0
+panZoneActiveUdpCps.11.101.120.116.45.101.49.95.49.45.55.53 = 0
+panZoneActiveUdpCps.11.105.110.116.45.119.105.102.105.45.55.48 = 0
+panZoneActiveUdpCps.13.101.120.116.45.105.112.115.101.99.45.110.45.104 = 0
+panZoneActiveUdpCps.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48 = 0
+panZoneActiveUdpCps.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101 = 0
+panZoneActiveUdpCps.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49 = 0
+panZoneActiveUdpCps.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50 = 0
+panZoneActiveUdpCps.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50 = 0
+panZoneActiveUdpCps.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53 = 0
+panZoneActiveUdpCps.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48 = 0
+panZoneActiveUdpCps.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48 = 0
+panZoneActiveUdpCps.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48 = 0
+panZoneActiveUdpCps.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48 = 0
+panZoneActiveUdpCps.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53 = 0
+panZoneActiveUdpCps.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49 = 0
+panZoneActiveUdpCps.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49 = 0
+panZoneActiveUdpCps.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48 = 4
+panZoneActiveUdpCps.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120 = 0
+panZoneActiveUdpCps.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120 = 0
+panZoneActiveUdpCps.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120 = 0
+panZoneActiveOtherIpCps.10.105.110.116.45.100.104.100.45.51.48 = 0
+panZoneActiveOtherIpCps.11.101.120.116.45.101.49.95.49.45.55.53 = 0
+panZoneActiveOtherIpCps.11.105.110.116.45.119.105.102.105.45.55.48 = 0
+panZoneActiveOtherIpCps.13.101.120.116.45.105.112.115.101.99.45.110.45.104 = 0
+panZoneActiveOtherIpCps.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48 = 0
+panZoneActiveOtherIpCps.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101 = 0
+panZoneActiveOtherIpCps.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49 = 0
+panZoneActiveOtherIpCps.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50 = 0
+panZoneActiveOtherIpCps.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50 = 0
+panZoneActiveOtherIpCps.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53 = 0
+panZoneActiveOtherIpCps.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48 = 0
+panZoneActiveOtherIpCps.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48 = 0
+panZoneActiveOtherIpCps.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48 = 0
+panZoneActiveOtherIpCps.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48 = 0
+panZoneActiveOtherIpCps.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53 = 0
+panZoneActiveOtherIpCps.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49 = 0
+panZoneActiveOtherIpCps.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49 = 0
+panZoneActiveOtherIpCps.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48 = 0
+panZoneActiveOtherIpCps.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120 = 0
+panZoneActiveOtherIpCps.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120 = 0
+panZoneActiveOtherIpCps.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120 = 0
+ifIndex.1 = 1
+ifIndex.3 = 3
+ifIndex.4 = 4
+ifIndex.5 = 5
+ifIndex.6 = 6
+ifIndex.16 = 16
+ifIndex.17 = 17
+ifIndex.52 = 52
+ifIndex.256 = 256
+ifIndex.257 = 257
+ifIndex.258 = 258
+ifIndex.261 = 261
+ifIndex.262 = 262
+ifIndex.263 = 263
+ifIndex.264 = 264
+ifIndex.265 = 265
+ifIndex.266 = 266
+ifIndex.267 = 267
+ifIndex.268 = 268
+ifIndex.269 = 269
+ifIndex.270 = 270
+ifIndex.271 = 271
+ifIndex.272 = 272
+ifIndex.273 = 273
+ifIndex.274 = 274
+ifIndex.275 = 275
+ifIndex.276 = 276
+ifIndex.277 = 277
+ifIndex.278 = 278
+ifIndex.279 = 279
+ifIndex.280 = 280
+ifIndex.281 = 281
+ifIndex.282 = 282
+ifIndex.284 = 284
+ifIndex.285 = 285
+ifIndex.286 = 286
+ifIndex.287 = 287
+ifIndex.288 = 288
+ifIndex.289 = 289
+ifIndex.290 = 290
+ifIndex.291 = 291
+ifIndex.292 = 292
+ifIndex.293 = 293
+ifDescr.1 = "vlan"
+ifDescr.3 = "loopback"
+ifDescr.4 = "tunnel"
+ifDescr.5 = "ha1"
+ifDescr.6 = "ha2"
+ifDescr.16 = "ethernet1/1"
+ifDescr.17 = "ethernet1/2"
+ifDescr.52 = "ae5"
+ifDescr.256 = "ae5.10"
+ifDescr.257 = "ae5.60"
+ifDescr.258 = "ae5.200"
+ifDescr.261 = "ae5.121"
+ifDescr.262 = "ae5.220"
+ifDescr.263 = "ae5.70"
+ifDescr.264 = "tunnel.1"
+ifDescr.265 = "loopback.1"
+ifDescr.266 = "tunnel.103"
+ifDescr.267 = "tunnel.102"
+ifDescr.268 = "tunnel.107"
+ifDescr.269 = "tunnel.101"
+ifDescr.270 = "tunnel.201"
+ifDescr.271 = "tunnel.301"
+ifDescr.272 = "tunnel.302"
+ifDescr.273 = "tunnel.303"
+ifDescr.274 = "tunnel.304"
+ifDescr.275 = "tunnel.306"
+ifDescr.276 = "ae5.75"
+ifDescr.277 = "tunnel.108"
+ifDescr.278 = "tunnel.109"
+ifDescr.279 = "ae5.35"
+ifDescr.280 = "tunnel.2"
+ifDescr.281 = "loopback.2"
+ifDescr.282 = "ae5.251"
+ifDescr.284 = "ae5.300"
+ifDescr.285 = "ae5.30"
+ifDescr.286 = "tunnel.202"
+ifDescr.287 = "ae5.290"
+ifDescr.288 = "ae5.320"
+ifDescr.289 = "ae5.255"
+ifDescr.290 = "tunnel.401"
+ifDescr.291 = "loopback.4"
+ifDescr.292 = "tunnel.501"
+ifDescr.293 = "loopback.5"
+panIfActiveTcpCps.1 = 0
+panIfActiveTcpCps.3 = 0
+panIfActiveTcpCps.4 = 0
+panIfActiveTcpCps.5 = 0
+panIfActiveTcpCps.6 = 0
+panIfActiveTcpCps.16 = 0
+panIfActiveTcpCps.17 = 0
+panIfActiveTcpCps.52 = 0
+panIfActiveTcpCps.256 = 0
+panIfActiveTcpCps.257 = 0
+panIfActiveTcpCps.258 = 0
+panIfActiveTcpCps.261 = 0
+panIfActiveTcpCps.262 = 0
+panIfActiveTcpCps.263 = 3
+panIfActiveTcpCps.264 = 0
+panIfActiveTcpCps.265 = 0
+panIfActiveTcpCps.266 = 0
+panIfActiveTcpCps.267 = 0
+panIfActiveTcpCps.268 = 0
+panIfActiveTcpCps.269 = 0
+panIfActiveTcpCps.270 = 0
+panIfActiveTcpCps.271 = 0
+panIfActiveTcpCps.272 = 0
+panIfActiveTcpCps.273 = 0
+panIfActiveTcpCps.274 = 0
+panIfActiveTcpCps.275 = 0
+panIfActiveTcpCps.276 = 0
+panIfActiveTcpCps.277 = 0
+panIfActiveTcpCps.278 = 0
+panIfActiveTcpCps.279 = 0
+panIfActiveTcpCps.280 = 0
+panIfActiveTcpCps.281 = 0
+panIfActiveTcpCps.282 = 0
+panIfActiveTcpCps.284 = 0
+panIfActiveTcpCps.285 = 0
+panIfActiveTcpCps.286 = 0
+panIfActiveTcpCps.287 = 0
+panIfActiveTcpCps.288 = 0
+panIfActiveTcpCps.289 = 4
+panIfActiveTcpCps.290 = 0
+panIfActiveTcpCps.291 = 0
+panIfActiveTcpCps.292 = 0
+panIfActiveTcpCps.293 = 0
+panIfActiveUdpCps.1 = 0
+panIfActiveUdpCps.3 = 0
+panIfActiveUdpCps.4 = 0
+panIfActiveUdpCps.5 = 0
+panIfActiveUdpCps.6 = 0
+panIfActiveUdpCps.16 = 0
+panIfActiveUdpCps.17 = 0
+panIfActiveUdpCps.52 = 0
+panIfActiveUdpCps.256 = 0
+panIfActiveUdpCps.257 = 0
+panIfActiveUdpCps.258 = 0
+panIfActiveUdpCps.261 = 0
+panIfActiveUdpCps.262 = 4
+panIfActiveUdpCps.263 = 0
+panIfActiveUdpCps.264 = 0
+panIfActiveUdpCps.265 = 0
+panIfActiveUdpCps.266 = 0
+panIfActiveUdpCps.267 = 0
+panIfActiveUdpCps.268 = 0
+panIfActiveUdpCps.269 = 0
+panIfActiveUdpCps.270 = 0
+panIfActiveUdpCps.271 = 0
+panIfActiveUdpCps.272 = 0
+panIfActiveUdpCps.273 = 0
+panIfActiveUdpCps.274 = 0
+panIfActiveUdpCps.275 = 0
+panIfActiveUdpCps.276 = 0
+panIfActiveUdpCps.277 = 0
+panIfActiveUdpCps.278 = 0
+panIfActiveUdpCps.279 = 0
+panIfActiveUdpCps.280 = 0
+panIfActiveUdpCps.281 = 0
+panIfActiveUdpCps.282 = 0
+panIfActiveUdpCps.284 = 0
+panIfActiveUdpCps.285 = 0
+panIfActiveUdpCps.286 = 0
+panIfActiveUdpCps.287 = 0
+panIfActiveUdpCps.288 = 0
+panIfActiveUdpCps.289 = 0
+panIfActiveUdpCps.290 = 0
+panIfActiveUdpCps.291 = 0
+panIfActiveUdpCps.292 = 0
+panIfActiveUdpCps.293 = 0
+panIfActiveOtherIpCps.1 = 0
+panIfActiveOtherIpCps.3 = 0
+panIfActiveOtherIpCps.4 = 0
+panIfActiveOtherIpCps.5 = 0
+panIfActiveOtherIpCps.6 = 0
+panIfActiveOtherIpCps.16 = 0
+panIfActiveOtherIpCps.17 = 0
+panIfActiveOtherIpCps.52 = 0
+panIfActiveOtherIpCps.256 = 0
+panIfActiveOtherIpCps.257 = 0
+panIfActiveOtherIpCps.258 = 0
+panIfActiveOtherIpCps.261 = 0
+panIfActiveOtherIpCps.262 = 0
+panIfActiveOtherIpCps.263 = 0
+panIfActiveOtherIpCps.264 = 0
+panIfActiveOtherIpCps.265 = 0
+panIfActiveOtherIpCps.266 = 0
+panIfActiveOtherIpCps.267 = 0
+panIfActiveOtherIpCps.268 = 0
+panIfActiveOtherIpCps.269 = 0
+panIfActiveOtherIpCps.270 = 0
+panIfActiveOtherIpCps.271 = 0
+panIfActiveOtherIpCps.272 = 0
+panIfActiveOtherIpCps.273 = 0
+panIfActiveOtherIpCps.274 = 0
+panIfActiveOtherIpCps.275 = 0
+panIfActiveOtherIpCps.276 = 0
+panIfActiveOtherIpCps.277 = 0
+panIfActiveOtherIpCps.278 = 0
+panIfActiveOtherIpCps.279 = 0
+panIfActiveOtherIpCps.280 = 0
+panIfActiveOtherIpCps.281 = 0
+panIfActiveOtherIpCps.282 = 0
+panIfActiveOtherIpCps.284 = 0
+panIfActiveOtherIpCps.285 = 0
+panIfActiveOtherIpCps.286 = 0
+panIfActiveOtherIpCps.287 = 0
+panIfActiveOtherIpCps.288 = 0
+panIfActiveOtherIpCps.289 = 0
+panIfActiveOtherIpCps.290 = 0
+panIfActiveOtherIpCps.291 = 0
+panIfActiveOtherIpCps.292 = 0
+panIfActiveOtherIpCps.293 = 0  
+  
+panVsysId.1 = 1
+panVsysName.1 = "vsys1"
+panVsysSessionUtilizationPct.1 = 0
+panVsysActiveSessions.1 = 3403
+panVsysMaxSessions.1 = 0
+panVsysActiveTcpCps.1 = 7
+panVsysActiveUdpCps.1 = 4
+panVsysActiveOtherIpCps.1 = 0  
+  
+panZoneName.10.105.110.116.45.100.104.100.45.51.48 = "int-dhd-30"
+panZoneName.11.101.120.116.45.101.49.95.49.45.55.53 = "ext-e1_1-75"
+panZoneName.11.105.110.116.45.119.105.102.105.45.55.48 = "int-wifi-70"
+panZoneName.13.101.120.116.45.105.112.115.101.99.45.110.45.104 = "ext-ipsec-n-h"
+panZoneName.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48 = "ext-dmz-nat-60"
+panZoneName.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101 = "ext-ipsec-azure"
+panZoneName.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49 = "ext-kpn-een-251"
+panZoneName.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50 = "ext-mexnet-e1_2"
+panZoneName.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50 = "ext-orn-tun-202"
+panZoneName.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53 = "int-cameras-255"
+panZoneName.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48 = "int-printer-290"
+panZoneName.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48 = "int-sandb0x-300"
+panZoneName.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48 = "ext-dmz-nonat-200"
+panZoneName.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48 = "int-teletekst-320"
+panZoneName.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53 = "int-ka-10-dante-35"
+panZoneName.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49 = "ext-audio-codecs-121"
+panZoneName.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49 = "ext-media-pro-tun-201"
+panZoneName.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48 = "ext-video-streams-220"
+panZoneName.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120 = "ext-global-protect-tunx"
+panZoneName.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120 = "ext-regio-camera-tun10x"
+panZoneName.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120 = "ext-vpn-medew-ict-tun30x"
+panZoneActiveTcpCps.10.105.110.116.45.100.104.100.45.51.48 = 0
+panZoneActiveTcpCps.11.101.120.116.45.101.49.95.49.45.55.53 = 0
+panZoneActiveTcpCps.11.105.110.116.45.119.105.102.105.45.55.48 = 3
+panZoneActiveTcpCps.13.101.120.116.45.105.112.115.101.99.45.110.45.104 = 0
+panZoneActiveTcpCps.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48 = 0
+panZoneActiveTcpCps.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101 = 0
+panZoneActiveTcpCps.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49 = 0
+panZoneActiveTcpCps.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50 = 0
+panZoneActiveTcpCps.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50 = 0
+panZoneActiveTcpCps.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53 = 4
+panZoneActiveTcpCps.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48 = 0
+panZoneActiveTcpCps.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48 = 0
+panZoneActiveTcpCps.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48 = 0
+panZoneActiveTcpCps.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48 = 0
+panZoneActiveTcpCps.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53 = 0
+panZoneActiveTcpCps.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49 = 0
+panZoneActiveTcpCps.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49 = 0
+panZoneActiveTcpCps.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48 = 0
+panZoneActiveTcpCps.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120 = 0
+panZoneActiveTcpCps.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120 = 0
+panZoneActiveTcpCps.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120 = 0
+panZoneActiveUdpCps.10.105.110.116.45.100.104.100.45.51.48 = 0
+panZoneActiveUdpCps.11.101.120.116.45.101.49.95.49.45.55.53 = 0
+panZoneActiveUdpCps.11.105.110.116.45.119.105.102.105.45.55.48 = 0
+panZoneActiveUdpCps.13.101.120.116.45.105.112.115.101.99.45.110.45.104 = 0
+panZoneActiveUdpCps.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48 = 0
+panZoneActiveUdpCps.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101 = 0
+panZoneActiveUdpCps.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49 = 0
+panZoneActiveUdpCps.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50 = 0
+panZoneActiveUdpCps.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50 = 0
+panZoneActiveUdpCps.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53 = 0
+panZoneActiveUdpCps.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48 = 0
+panZoneActiveUdpCps.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48 = 0
+panZoneActiveUdpCps.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48 = 0
+panZoneActiveUdpCps.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48 = 0
+panZoneActiveUdpCps.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53 = 0
+panZoneActiveUdpCps.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49 = 0
+panZoneActiveUdpCps.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49 = 0
+panZoneActiveUdpCps.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48 = 4
+panZoneActiveUdpCps.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120 = 0
+panZoneActiveUdpCps.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120 = 0
+panZoneActiveUdpCps.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120 = 0
+panZoneActiveOtherIpCps.10.105.110.116.45.100.104.100.45.51.48 = 0
+panZoneActiveOtherIpCps.11.101.120.116.45.101.49.95.49.45.55.53 = 0
+panZoneActiveOtherIpCps.11.105.110.116.45.119.105.102.105.45.55.48 = 0
+panZoneActiveOtherIpCps.13.101.120.116.45.105.112.115.101.99.45.110.45.104 = 0
+panZoneActiveOtherIpCps.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48 = 0
+panZoneActiveOtherIpCps.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101 = 0
+panZoneActiveOtherIpCps.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49 = 0
+panZoneActiveOtherIpCps.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50 = 0
+panZoneActiveOtherIpCps.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50 = 0
+panZoneActiveOtherIpCps.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53 = 0
+panZoneActiveOtherIpCps.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48 = 0
+panZoneActiveOtherIpCps.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48 = 0
+panZoneActiveOtherIpCps.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48 = 0
+panZoneActiveOtherIpCps.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48 = 0
+panZoneActiveOtherIpCps.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53 = 0
+panZoneActiveOtherIpCps.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49 = 0
+panZoneActiveOtherIpCps.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49 = 0
+panZoneActiveOtherIpCps.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48 = 0
+panZoneActiveOtherIpCps.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120 = 0
+panZoneActiveOtherIpCps.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120 = 0
+panZoneActiveOtherIpCps.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120 = 0  
+  
+entPhysicalDescr.1 = PA-3020
+entPhysicalDescr.2 = Fan #1 RPM
+entPhysicalDescr.3 = Fan #2 RPM
+entPhysicalDescr.4 = Fan #3 RPM
+entPhysicalDescr.5 = Fan #4 RPM
+entPhysicalDescr.6 = Temperature @ Ocelot
+entPhysicalDescr.7 = Temperature @ Switch
+entPhysicalDescr.8 = Temperature @ Cavium
+entPhysicalDescr.9 = Temperature @ Intel PHY
+entPhysicalDescr.10 = Temperature @ Switch Core
+entPhysicalDescr.11 = Temperature @ Cavium Core  
+  
+entPhysicalName.1 = PA-3020
+entPhysicalName.2 = Fan #1 RPM
+entPhysicalName.3 = Fan #2 RPM
+entPhysicalName.4 = Fan #3 RPM
+entPhysicalName.5 = Fan #4 RPM
+entPhysicalName.6 = Temperature @ Ocelot
+entPhysicalName.7 = Temperature @ Switch
+entPhysicalName.8 = Temperature @ Cavium
+entPhysicalName.9 = Temperature @ Intel PHY
+entPhysicalName.10 = Temperature @ Switch Core
+entPhysicalName.11 = Temperature @ Cavium Core  
+  
+entPhySensorType.2 = rpm
+entPhySensorType.3 = rpm
+entPhySensorType.4 = rpm
+entPhySensorType.5 = rpm
+entPhySensorType.6 = celsius
+entPhySensorType.7 = celsius
+entPhySensorType.8 = celsius
+entPhySensorType.9 = celsius
+entPhySensorType.10 = celsius
+entPhySensorType.11 = celsius  
+  
+entPhySensorScale.2 = units
+entPhySensorScale.3 = units
+entPhySensorScale.4 = units
+entPhySensorScale.5 = units
+entPhySensorScale.6 = units
+entPhySensorScale.7 = units
+entPhySensorScale.8 = units
+entPhySensorScale.9 = units
+entPhySensorScale.10 = units
+entPhySensorScale.11 = units  
+  
+entPhySensorPrecision.2 = 0
+entPhySensorPrecision.3 = 0
+entPhySensorPrecision.4 = 0
+entPhySensorPrecision.5 = 0
+entPhySensorPrecision.6 = 0
+entPhySensorPrecision.7 = 0
+entPhySensorPrecision.8 = 0
+entPhySensorPrecision.9 = 0
+entPhySensorPrecision.10 = 0
+entPhySensorPrecision.11 = 0  
+  
+entPhySensorValue.2 = 9597
+entPhySensorValue.3 = 9310
+entPhySensorValue.4 = 9397
+entPhySensorValue.5 = 9311
+entPhySensorValue.6 = 33
+entPhySensorValue.7 = 38
+entPhySensorValue.8 = 41
+entPhySensorValue.9 = 32
+entPhySensorValue.10 = 56
+entPhySensorValue.11 = 46  
+  
+entPhySensorOperStatus.2 = ok
+entPhySensorOperStatus.3 = ok
+entPhySensorOperStatus.4 = ok
+entPhySensorOperStatus.5 = ok
+entPhySensorOperStatus.6 = ok
+entPhySensorOperStatus.7 = ok
+entPhySensorOperStatus.8 = ok
+entPhySensorOperStatus.9 = ok
+entPhySensorOperStatus.10 = ok
+entPhySensorOperStatus.11 = ok  
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"fanspeed",2][0m 0.43ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.2, 2, entity-sensor, Fan #1 RPM, snmp, 1, 1, 2, 9597, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","fanspeed",2,"entity-sensor","2"][0m 0.35ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["fanspeed",2,"entity-sensor","2"][0m 0.3ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"fanspeed",3][0m 0.21ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.3, 3, entity-sensor, Fan #2 RPM, snmp, 1, 1, 3, 9310, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","fanspeed",2,"entity-sensor","3"][0m 0.24ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["fanspeed",2,"entity-sensor","3"][0m 0.32ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"fanspeed",4][0m 0.34ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.4, 4, entity-sensor, Fan #3 RPM, snmp, 1, 1, 4, 9397, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","fanspeed",2,"entity-sensor","4"][0m 0.51ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["fanspeed",2,"entity-sensor","4"][0m 0.28ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"fanspeed",5][0m 0.25ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.5, 5, entity-sensor, Fan #4 RPM, snmp, 1, 1, 5, 9311, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","fanspeed",2,"entity-sensor","5"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["fanspeed",2,"entity-sensor","5"][0m 0.5ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"temperature",6][0m 0.2ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.6, 6, entity-sensor, Temperature @ Ocelot, snmp, 1, 1, 6, 33, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","temperature",2,"entity-sensor","6"][0m 0.24ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["temperature",2,"entity-sensor","6"][0m 0.33ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"temperature",7][0m 0.19ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.7, 7, entity-sensor, Temperature @ Switch, snmp, 1, 1, 7, 38, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","temperature",2,"entity-sensor","7"][0m 0.27ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["temperature",2,"entity-sensor","7"][0m 0.28ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"temperature",8][0m 0.19ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.8, 8, entity-sensor, Temperature @ Cavium, snmp, 1, 1, 8, 41, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","temperature",2,"entity-sensor","8"][0m 0.27ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["temperature",2,"entity-sensor","8"][0m 0.28ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"temperature",9][0m 0.19ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.9, 9, entity-sensor, Temperature @ Intel PHY, snmp, 1, 1, 9, 32, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","temperature",2,"entity-sensor","9"][0m 0.24ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["temperature",2,"entity-sensor","9"][0m 0.27ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"temperature",10][0m 0.24ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.10, 10, entity-sensor, Temperature @ Switch Core, snmp, 1, 1, 10, 56, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","temperature",2,"entity-sensor","10"][0m 0.26ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["temperature",2,"entity-sensor","10"][0m 0.28ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ? [0;33m[2,"temperature",11][0m 0.23ms] 
+  
+Discover sensor: .1.3.6.1.2.1.99.1.1.1.4.11, 11, entity-sensor, Temperature @ Cavium Core, snmp, 1, 1, 11, 46, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","temperature",2,"entity-sensor","11"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["temperature",2,"entity-sensor","11"][0m 0.27ms] 
+  
+SQL[[1;33mSELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?  [0;33m[2,"ipmi_hostname"][0m 0.12ms] 
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["voltage",2,"ipmi"][0m 0.37ms] 
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["temperature",2,"ipmi"][0m 0.41ms] 
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["fanspeed",2,"ipmi"][0m 0.34ms] 
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["power",2,"ipmi"][0m 0.38ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["airflow",2,"snmp"][0m 0.34ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["current",2,"snmp"][0m 0.34ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["charge",2,"snmp"][0m 0.34ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["dbm",2,"snmp"][0m 0.34ms] 
+  
+array (
+  'entity-sensor' => 
+  array (
+    2 => 1,
+    3 => 1,
+    4 => 1,
+    5 => 1,
+  ),
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["fanspeed",2,"snmp"][0m 0.4ms] 
+  
+2 -> entity-sensor  
+3 -> entity-sensor  
+4 -> entity-sensor  
+5 -> entity-sensor  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["frequency",2,"snmp"][0m 0.33ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["humidity",2,"snmp"][0m 0.33ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["load",2,"snmp"][0m 0.32ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["power",2,"snmp"][0m 0.32ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["power_consumed",2,"snmp"][0m 0.32ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["power_factor",2,"snmp"][0m 0.32ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["runtime",2,"snmp"][0m 0.33ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["signal",2,"snmp"][0m 0.32ms] 
+  
+Dynamic Discovery (state):  
+array (
+  'data' => 
+  array (
+    0 => 
+    array (
+      'oid' => 'panSysHAMode',
+      'num_oid' => '.1.3.6.1.4.1.25461.2.1.2.1.13.{{ $index }}',
+      'index' => 'panSysHAMode.{{ $index }}',
+      'descr' => 'High Availability Mode',
+      'states' => 
+      array (
+        0 => 
+        array (
+          'value' => 1,
+          'generic' => 0,
+          'graph' => 1,
+          'descr' => 'active-passive',
+        ),
+        1 => 
+        array (
+          'value' => 2,
+          'generic' => 0,
+          'graph' => 1,
+          'descr' => 'active-active',
+        ),
+      ),
+    ),
+    1 => 
+    array (
+      'oid' => 'panSysHAState',
+      'num_oid' => '.1.3.6.1.4.1.25461.2.1.2.1.11.{{ $index }}',
+      'index' => 'panSysHAState.{{ $index }}',
+      'descr' => 'High Availability Local Status',
+      'states' => 
+      array (
+        0 => 
+        array (
+          'value' => 1,
+          'generic' => 0,
+          'graph' => 1,
+          'descr' => 'active',
+        ),
+        1 => 
+        array (
+          'value' => 2,
+          'generic' => 3,
+          'graph' => 1,
+          'descr' => 'passive',
+        ),
+        2 => 
+        array (
+          'value' => 3,
+          'generic' => 2,
+          'graph' => 1,
+          'descr' => 'suspended',
+        ),
+      ),
+    ),
+    2 => 
+    array (
+      'oid' => 'panSysHAPeerState',
+      'num_oid' => '.1.3.6.1.4.1.25461.2.1.2.1.12.{{ $index }}',
+      'index' => 'panSysHAPeerState.{{ $index }}',
+      'descr' => 'High Availability Peer Status',
+      'states' => 
+      array (
+        0 => 
+        array (
+          'value' => 1,
+          'generic' => 0,
+          'graph' => 1,
+          'descr' => 'active',
+        ),
+        1 => 
+        array (
+          'value' => 2,
+          'generic' => 3,
+          'graph' => 1,
+          'descr' => 'passive',
+        ),
+        2 => 
+        array (
+          'value' => 3,
+          'generic' => 2,
+          'graph' => 1,
+          'descr' => 'suspended',
+        ),
+      ),
+    ),
+  ),
+)  
+Data panSysHAMode:  
+array (
+  0 => 
+  array (
+    'panSysHAMode' => 'active-passive',
+  ),
+)  
+Final sensor value: 1  
+SQL[[1;33mSELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1 [0;33m["panSysHAMode"][0m 0.12ms] 
+  
+SQL[[1;33mSELECT `state_index_id`,`state_descr`,`state_draw_graph`,`state_value`,`state_generic_value` FROM `state_translations` WHERE `state_index_id`=? [0;33m[1][0m 0.1ms] 
+  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.1.13.0, panSysHAMode.0, panSysHAMode, High Availability Mode, snmp, 1, 1, , 1, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","state",2,"panSysHAMode","panSysHAMode.0"][0m 0.2ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["state",2,"panSysHAMode","panSysHAMode.0"][0m 0.24ms] 
+  
+SQL[[1;33mSELECT sensor_id FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["state",2,"panSysHAMode","panSysHAMode.0"][0m 0.2ms] 
+  
+SQL[[1;33mSELECT state_index_id FROM `state_indexes` WHERE `state_name` = ? [0;33m["panSysHAMode"][0m 0.15ms] 
+  
+SQL[[1;33mINSERT IGNORE INTO `sensors_to_state_indexes` (`sensor_id`,`state_index_id`)  VALUES (:sensor_id,:state_index_id) [0;33m{"sensor_id":11,"state_index_id":1}[0m 2.02ms] 
+  
+Data panSysHAState:  
+array (
+  0 => 
+  array (
+    'panSysHAState' => 'active',
+  ),
+)  
+Final sensor value: 1  
+SQL[[1;33mSELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1 [0;33m["panSysHAState"][0m 0.11ms] 
+  
+SQL[[1;33mSELECT `state_index_id`,`state_descr`,`state_draw_graph`,`state_value`,`state_generic_value` FROM `state_translations` WHERE `state_index_id`=? [0;33m[2][0m 0.1ms] 
+  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.1.11.0, panSysHAState.0, panSysHAState, High Availability Local Status, snmp, 1, 1, , 1, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","state",2,"panSysHAState","panSysHAState.0"][0m 0.21ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["state",2,"panSysHAState","panSysHAState.0"][0m 0.24ms] 
+  
+SQL[[1;33mSELECT sensor_id FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["state",2,"panSysHAState","panSysHAState.0"][0m 0.19ms] 
+  
+SQL[[1;33mSELECT state_index_id FROM `state_indexes` WHERE `state_name` = ? [0;33m["panSysHAState"][0m 0.09ms] 
+  
+SQL[[1;33mINSERT IGNORE INTO `sensors_to_state_indexes` (`sensor_id`,`state_index_id`)  VALUES (:sensor_id,:state_index_id) [0;33m{"sensor_id":12,"state_index_id":2}[0m 6.87ms] 
+  
+Data panSysHAPeerState:  
+array (
+  0 => 
+  array (
+    'panSysHAPeerState' => 'passive',
+  ),
+)  
+Final sensor value: 2  
+SQL[[1;33mSELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1 [0;33m["panSysHAPeerState"][0m 0.11ms] 
+  
+SQL[[1;33mSELECT `state_index_id`,`state_descr`,`state_draw_graph`,`state_value`,`state_generic_value` FROM `state_translations` WHERE `state_index_id`=? [0;33m[3][0m 0.1ms] 
+  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.1.12.0, panSysHAPeerState.0, panSysHAPeerState, High Availability Peer Status, snmp, 1, 1, , 2, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","state",2,"panSysHAPeerState","panSysHAPeerState.0"][0m 0.2ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["state",2,"panSysHAPeerState","panSysHAPeerState.0"][0m 0.24ms] 
+  
+SQL[[1;33mSELECT sensor_id FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["state",2,"panSysHAPeerState","panSysHAPeerState.0"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT state_index_id FROM `state_indexes` WHERE `state_name` = ? [0;33m["panSysHAPeerState"][0m 0.09ms] 
+  
+SQL[[1;33mINSERT IGNORE INTO `sensors_to_state_indexes` (`sensor_id`,`state_index_id`)  VALUES (:sensor_id,:state_index_id) [0;33m{"sensor_id":13,"state_index_id":3}[0m 1.71ms] 
+  
+array (
+  'panSysHAMode' => 
+  array (
+    'panSysHAMode.0' => 1,
+  ),
+  'panSysHAState' => 
+  array (
+    'panSysHAState.0' => 1,
+  ),
+  'panSysHAPeerState' => 
+  array (
+    'panSysHAPeerState.0' => 1,
+  ),
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["state",2,"snmp"][0m 0.39ms] 
+  
+panSysHAMode.0 -> panSysHAMode  
+panSysHAState.0 -> panSysHAState  
+panSysHAPeerState.0 -> panSysHAPeerState  
+Dynamic Discovery (count):  
+array (
+  'data' => 
+  array (
+    0 => 
+    array (
+      'oid' => 'panSession',
+      'value' => 'panSessionActive',
+      'num_oid' => '.1.3.6.1.4.1.25461.2.1.2.3.{{ $index }}',
+      'group' => 'Sessions',
+      'descr' => 'Active Sessions',
+      'high_limit' => 'panSessionMax',
+    ),
+    1 => 
+    array (
+      'oid' => 'panVsysEntry',
+      'value' => 'panVsysActiveTcpCps',
+      'num_oid' => '.1.3.6.1.4.1.25461.2.1.2.3.9.1.6.1',
+      'group' => 'Sessions per second',
+      'descr' => 'TCP connections per second',
+    ),
+    2 => 
+    array (
+      'oid' => 'panVsysEntry',
+      'value' => 'panVsysActiveUdpCps',
+      'num_oid' => '.1.3.6.1.4.1.25461.2.1.2.3.9.1.7.1',
+      'group' => 'Sessions per second',
+    ),
+    3 => 
+    array (
+      'oid' => 'panVsysEntry',
+      'value' => 'panVsysActiveOtherIpCps',
+      'num_oid' => '.1.3.6.1.4.1.25461.2.1.2.3.9.1.8.1',
+      'group' => 'Session per second',
+    ),
+    4 => 
+    array (
+      'oid' => 'PanZoneTable',
+      'value' => 'panZoneActiveTcpCps',
+      'num_oid' => '.1.3.6.1.4.1.25461.2.1.2.3.10.{{ $index }}',
+      'group' => 'Connections per Zone per Second',
+      'descr' => 'panZoneName',
+    ),
+  ),
+)  
+Data panSession:  
+array (
+  0 => 
+  array (
+    'panSessionUtilization' => '1',
+    'panSessionMax' => '262142',
+    'panSessionActive' => '3405',
+    'panSessionActiveTcp' => '2418',
+    'panSessionActiveUdp' => '974',
+    'panSessionActiveICMP' => '9',
+    'panSessionActiveSslProxy' => '29',
+    'panSessionSslProxyUtilization' => '0',
+  ),
+  1 => 
+  array (
+    'panVsysId' => '1',
+    'panVsysName' => 'vsys1',
+    'panVsysSessionUtilizationPct' => '0',
+    'panVsysActiveSessions' => '3403',
+    'panVsysMaxSessions' => '0',
+    'panVsysActiveTcpCps' => '7',
+    'panVsysActiveUdpCps' => '4',
+    'panVsysActiveOtherIpCps' => '0',
+    'ifIndex' => '1',
+    'ifDescr' => 'vlan',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  '10.105.110.116.45.100.104.100.45.51.48' => 
+  array (
+    'panZoneName' => 'int-dhd-30',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '11.101.120.116.45.101.49.95.49.45.55.53' => 
+  array (
+    'panZoneName' => 'ext-e1_1-75',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '11.105.110.116.45.119.105.102.105.45.55.48' => 
+  array (
+    'panZoneName' => 'int-wifi-70',
+    'panZoneActiveTcpCps' => '3',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '13.101.120.116.45.105.112.115.101.99.45.110.45.104' => 
+  array (
+    'panZoneName' => 'ext-ipsec-n-h',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '14.101.120.116.45.100.109.122.45.110.97.116.45.54.48' => 
+  array (
+    'panZoneName' => 'ext-dmz-nat-60',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101' => 
+  array (
+    'panZoneName' => 'ext-ipsec-azure',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49' => 
+  array (
+    'panZoneName' => 'ext-kpn-een-251',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50' => 
+  array (
+    'panZoneName' => 'ext-mexnet-e1_2',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50' => 
+  array (
+    'panZoneName' => 'ext-orn-tun-202',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53' => 
+  array (
+    'panZoneName' => 'int-cameras-255',
+    'panZoneActiveTcpCps' => '4',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48' => 
+  array (
+    'panZoneName' => 'int-printer-290',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48' => 
+  array (
+    'panZoneName' => 'int-sandb0x-300',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48' => 
+  array (
+    'panZoneName' => 'ext-dmz-nonat-200',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48' => 
+  array (
+    'panZoneName' => 'int-teletekst-320',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53' => 
+  array (
+    'panZoneName' => 'int-ka-10-dante-35',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49' => 
+  array (
+    'panZoneName' => 'ext-audio-codecs-121',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49' => 
+  array (
+    'panZoneName' => 'ext-media-pro-tun-201',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48' => 
+  array (
+    'panZoneName' => 'ext-video-streams-220',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '4',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120' => 
+  array (
+    'panZoneName' => 'ext-global-protect-tunx',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120' => 
+  array (
+    'panZoneName' => 'ext-regio-camera-tun10x',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120' => 
+  array (
+    'panZoneName' => 'ext-vpn-medew-ict-tun30x',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  3 => 
+  array (
+    'ifIndex' => '3',
+    'ifDescr' => 'loopback',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  4 => 
+  array (
+    'ifIndex' => '4',
+    'ifDescr' => 'tunnel',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  5 => 
+  array (
+    'ifIndex' => '5',
+    'ifDescr' => 'ha1',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  6 => 
+  array (
+    'ifIndex' => '6',
+    'ifDescr' => 'ha2',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  16 => 
+  array (
+    'ifIndex' => '16',
+    'ifDescr' => 'ethernet1/1',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  17 => 
+  array (
+    'ifIndex' => '17',
+    'ifDescr' => 'ethernet1/2',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  52 => 
+  array (
+    'ifIndex' => '52',
+    'ifDescr' => 'ae5',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  256 => 
+  array (
+    'ifIndex' => '256',
+    'ifDescr' => 'ae5.10',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  257 => 
+  array (
+    'ifIndex' => '257',
+    'ifDescr' => 'ae5.60',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  258 => 
+  array (
+    'ifIndex' => '258',
+    'ifDescr' => 'ae5.200',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  261 => 
+  array (
+    'ifIndex' => '261',
+    'ifDescr' => 'ae5.121',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  262 => 
+  array (
+    'ifIndex' => '262',
+    'ifDescr' => 'ae5.220',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '4',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  263 => 
+  array (
+    'ifIndex' => '263',
+    'ifDescr' => 'ae5.70',
+    'panIfActiveTcpCps' => '3',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  264 => 
+  array (
+    'ifIndex' => '264',
+    'ifDescr' => 'tunnel.1',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  265 => 
+  array (
+    'ifIndex' => '265',
+    'ifDescr' => 'loopback.1',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  266 => 
+  array (
+    'ifIndex' => '266',
+    'ifDescr' => 'tunnel.103',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  267 => 
+  array (
+    'ifIndex' => '267',
+    'ifDescr' => 'tunnel.102',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  268 => 
+  array (
+    'ifIndex' => '268',
+    'ifDescr' => 'tunnel.107',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  269 => 
+  array (
+    'ifIndex' => '269',
+    'ifDescr' => 'tunnel.101',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  270 => 
+  array (
+    'ifIndex' => '270',
+    'ifDescr' => 'tunnel.201',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  271 => 
+  array (
+    'ifIndex' => '271',
+    'ifDescr' => 'tunnel.301',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  272 => 
+  array (
+    'ifIndex' => '272',
+    'ifDescr' => 'tunnel.302',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  273 => 
+  array (
+    'ifIndex' => '273',
+    'ifDescr' => 'tunnel.303',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  274 => 
+  array (
+    'ifIndex' => '274',
+    'ifDescr' => 'tunnel.304',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  275 => 
+  array (
+    'ifIndex' => '275',
+    'ifDescr' => 'tunnel.306',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  276 => 
+  array (
+    'ifIndex' => '276',
+    'ifDescr' => 'ae5.75',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  277 => 
+  array (
+    'ifIndex' => '277',
+    'ifDescr' => 'tunnel.108',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  278 => 
+  array (
+    'ifIndex' => '278',
+    'ifDescr' => 'tunnel.109',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  279 => 
+  array (
+    'ifIndex' => '279',
+    'ifDescr' => 'ae5.35',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  280 => 
+  array (
+    'ifIndex' => '280',
+    'ifDescr' => 'tunnel.2',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  281 => 
+  array (
+    'ifIndex' => '281',
+    'ifDescr' => 'loopback.2',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  282 => 
+  array (
+    'ifIndex' => '282',
+    'ifDescr' => 'ae5.251',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  284 => 
+  array (
+    'ifIndex' => '284',
+    'ifDescr' => 'ae5.300',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  285 => 
+  array (
+    'ifIndex' => '285',
+    'ifDescr' => 'ae5.30',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  286 => 
+  array (
+    'ifIndex' => '286',
+    'ifDescr' => 'tunnel.202',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  287 => 
+  array (
+    'ifIndex' => '287',
+    'ifDescr' => 'ae5.290',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  288 => 
+  array (
+    'ifIndex' => '288',
+    'ifDescr' => 'ae5.320',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  289 => 
+  array (
+    'ifIndex' => '289',
+    'ifDescr' => 'ae5.255',
+    'panIfActiveTcpCps' => '4',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  290 => 
+  array (
+    'ifIndex' => '290',
+    'ifDescr' => 'tunnel.401',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  291 => 
+  array (
+    'ifIndex' => '291',
+    'ifDescr' => 'loopback.4',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  292 => 
+  array (
+    'ifIndex' => '292',
+    'ifDescr' => 'tunnel.501',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+  293 => 
+  array (
+    'ifIndex' => '293',
+    'ifDescr' => 'loopback.5',
+    'panIfActiveTcpCps' => '0',
+    'panIfActiveUdpCps' => '0',
+    'panIfActiveOtherIpCps' => '0',
+  ),
+)  
+Final sensor value: 3405  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.0, 0, panos, Active Sessions, snmp, 1, 1, , 3405, (limits: LL: , LW: , W: , H: 262142)  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","0"][0m 0.24ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","0"][0m 0.26ms] 
+  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Final sensor value:  
+Data panVsysEntry:  
+array (
+  1 => 
+  array (
+    'panVsysId' => '1',
+    'panVsysName' => 'vsys1',
+    'panVsysSessionUtilizationPct' => '0',
+    'panVsysActiveSessions' => '3403',
+    'panVsysMaxSessions' => '0',
+    'panVsysActiveTcpCps' => '7',
+    'panVsysActiveUdpCps' => '4',
+    'panVsysActiveOtherIpCps' => '0',
+  ),
+)  
+Final sensor value: 7  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.9.1.6.1, 1, panos, TCP connections per second, snmp, 1, 1, , 7, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","1"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","1"][0m 0.26ms] 
+  
+SQL[[1;33mUPDATE `sensors` set `sensor_oid`=?,`sensor_descr`=?,`sensor_multiplier`=?,`sensor_divisor`=?,`entPhysicalIndex`=?,`entPhysicalIndex_measured`=?,`user_func`=?,`group`=? WHERE `sensor_id` = ? [0;33m[".1.3.6.1.4.1.25461.2.1.2.3.9.1.6.1","TCP connections per second",1,1,null,null,null,"Sessions per second",15][0m 5.96ms] 
+  
+SQL[[1;33mINSERT IGNORE INTO `eventlog` (`device_id`,`reference`,`type`,`datetime`,`severity`,`message`,`username`)  VALUES (:device_id,:reference,:type,:datetime,:severity,:message,:username) [0;33m{"device_id":2,"reference":null,"type":"sensor","datetime":"2019-11-19 13:00:22","severity":3,"message":"Sensor Updated: count panos 1 TCP connections per second","username":""}[0m 7.22ms] 
+  
+( 1 updated )  
+Data panVsysEntry:  
+array (
+  1 => 
+  array (
+    'panVsysId' => '1',
+    'panVsysName' => 'vsys1',
+    'panVsysSessionUtilizationPct' => '0',
+    'panVsysActiveSessions' => '3403',
+    'panVsysMaxSessions' => '0',
+    'panVsysActiveTcpCps' => '7',
+    'panVsysActiveUdpCps' => '4',
+    'panVsysActiveOtherIpCps' => '0',
+  ),
+)  
+Final sensor value: 4  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.9.1.7.1, 1, panos, , snmp, 1, 1, , 4, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","1"][0m 0.25ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","1"][0m 0.27ms] 
+  
+SQL[[1;33mUPDATE `sensors` set `sensor_oid`=?,`sensor_descr`=?,`sensor_multiplier`=?,`sensor_divisor`=?,`entPhysicalIndex`=?,`entPhysicalIndex_measured`=?,`user_func`=?,`group`=? WHERE `sensor_id` = ? [0;33m[".1.3.6.1.4.1.25461.2.1.2.3.9.1.7.1","",1,1,null,null,null,"Sessions per second",15][0m 8.46ms] 
+  
+SQL[[1;33mINSERT IGNORE INTO `eventlog` (`device_id`,`reference`,`type`,`datetime`,`severity`,`message`,`username`)  VALUES (:device_id,:reference,:type,:datetime,:severity,:message,:username) [0;33m{"device_id":2,"reference":null,"type":"sensor","datetime":"2019-11-19 13:00:22","severity":3,"message":"Sensor Updated: count panos 1 ","username":""}[0m 9.37ms] 
+  
+( 1 updated )  
+Data panVsysEntry:  
+array (
+  1 => 
+  array (
+    'panVsysId' => '1',
+    'panVsysName' => 'vsys1',
+    'panVsysSessionUtilizationPct' => '0',
+    'panVsysActiveSessions' => '3403',
+    'panVsysMaxSessions' => '0',
+    'panVsysActiveTcpCps' => '7',
+    'panVsysActiveUdpCps' => '4',
+    'panVsysActiveOtherIpCps' => '0',
+  ),
+)  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.9.1.8.1, 1, panos, , snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","1"][0m 0.27ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","1"][0m 0.3ms] 
+  
+SQL[[1;33mUPDATE `sensors` set `sensor_oid`=?,`sensor_descr`=?,`sensor_multiplier`=?,`sensor_divisor`=?,`entPhysicalIndex`=?,`entPhysicalIndex_measured`=?,`user_func`=?,`group`=? WHERE `sensor_id` = ? [0;33m[".1.3.6.1.4.1.25461.2.1.2.3.9.1.8.1","",1,1,null,null,null,"Session per second",15][0m 8.5ms] 
+  
+SQL[[1;33mINSERT IGNORE INTO `eventlog` (`device_id`,`reference`,`type`,`datetime`,`severity`,`message`,`username`)  VALUES (:device_id,:reference,:type,:datetime,:severity,:message,:username) [0;33m{"device_id":2,"reference":null,"type":"sensor","datetime":"2019-11-19 13:00:22","severity":3,"message":"Sensor Updated: count panos 1 ","username":""}[0m 9.37ms] 
+  
+( 1 updated )  
+Data PanZoneTable:  
+array (
+  '10.105.110.116.45.100.104.100.45.51.48' => 
+  array (
+    'panZoneName' => 'int-dhd-30',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '11.101.120.116.45.101.49.95.49.45.55.53' => 
+  array (
+    'panZoneName' => 'ext-e1_1-75',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '11.105.110.116.45.119.105.102.105.45.55.48' => 
+  array (
+    'panZoneName' => 'int-wifi-70',
+    'panZoneActiveTcpCps' => '3',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '13.101.120.116.45.105.112.115.101.99.45.110.45.104' => 
+  array (
+    'panZoneName' => 'ext-ipsec-n-h',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '14.101.120.116.45.100.109.122.45.110.97.116.45.54.48' => 
+  array (
+    'panZoneName' => 'ext-dmz-nat-60',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101' => 
+  array (
+    'panZoneName' => 'ext-ipsec-azure',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49' => 
+  array (
+    'panZoneName' => 'ext-kpn-een-251',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50' => 
+  array (
+    'panZoneName' => 'ext-mexnet-e1_2',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50' => 
+  array (
+    'panZoneName' => 'ext-orn-tun-202',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53' => 
+  array (
+    'panZoneName' => 'int-cameras-255',
+    'panZoneActiveTcpCps' => '4',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48' => 
+  array (
+    'panZoneName' => 'int-printer-290',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48' => 
+  array (
+    'panZoneName' => 'int-sandb0x-300',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48' => 
+  array (
+    'panZoneName' => 'ext-dmz-nonat-200',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48' => 
+  array (
+    'panZoneName' => 'int-teletekst-320',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53' => 
+  array (
+    'panZoneName' => 'int-ka-10-dante-35',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49' => 
+  array (
+    'panZoneName' => 'ext-audio-codecs-121',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49' => 
+  array (
+    'panZoneName' => 'ext-media-pro-tun-201',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48' => 
+  array (
+    'panZoneName' => 'ext-video-streams-220',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '4',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120' => 
+  array (
+    'panZoneName' => 'ext-global-protect-tunx',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120' => 
+  array (
+    'panZoneName' => 'ext-regio-camera-tun10x',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+  '24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120' => 
+  array (
+    'panZoneName' => 'ext-vpn-medew-ict-tun30x',
+    'panZoneActiveTcpCps' => '0',
+    'panZoneActiveUdpCps' => '0',
+    'panZoneActiveOtherIpCps' => '0',
+  ),
+)  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.10.105.110.116.45.100.104.100.45.51.48, 10.105.110.116.45.100.104.100.45.51.48, panos, int-dhd-30, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","10.105.110.116.45.100.104.100.45.51.48"][0m 0.32ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","10.105.110.116.45.100.104.100.45.51.48"][0m 0.37ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.11.101.120.116.45.101.49.95.49.45.55.53, 11.101.120.116.45.101.49.95.49.45.55.53, panos, ext-e1_1-75, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","11.101.120.116.45.101.49.95.49.45.55.53"][0m 0.27ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","11.101.120.116.45.101.49.95.49.45.55.53"][0m 0.26ms] 
+  
+Final sensor value: 3  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.11.105.110.116.45.119.105.102.105.45.55.48, 11.105.110.116.45.119.105.102.105.45.55.48, panos, int-wifi-70, snmp, 1, 1, , 3, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","11.105.110.116.45.119.105.102.105.45.55.48"][0m 0.24ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","11.105.110.116.45.119.105.102.105.45.55.48"][0m 0.27ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.13.101.120.116.45.105.112.115.101.99.45.110.45.104, 13.101.120.116.45.105.112.115.101.99.45.110.45.104, panos, ext-ipsec-n-h, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","13.101.120.116.45.105.112.115.101.99.45.110.45.104"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","13.101.120.116.45.105.112.115.101.99.45.110.45.104"][0m 0.27ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48, 14.101.120.116.45.100.109.122.45.110.97.116.45.54.48, panos, ext-dmz-nat-60, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","14.101.120.116.45.100.109.122.45.110.97.116.45.54.48"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","14.101.120.116.45.100.109.122.45.110.97.116.45.54.48"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101, 15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101, panos, ext-ipsec-azure, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49, 15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49, panos, ext-kpn-een-251, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50, 15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50, panos, ext-mexnet-e1_2, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50, 15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50, panos, ext-orn-tun-202, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50"][0m 0.27ms] 
+  
+Final sensor value: 4  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53, 15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53, panos, int-cameras-255, snmp, 1, 1, , 4, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48, 15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48, panos, int-printer-290, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48"][0m 0.27ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48, 15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48, panos, int-sandb0x-300, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48"][0m 0.22ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48, 17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48, panos, ext-dmz-nonat-200, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48"][0m 0.22ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48, 17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48, panos, int-teletekst-320, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53, 18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53, panos, int-ka-10-dante-35, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53"][0m 0.22ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53"][0m 0.36ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49, 20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49, panos, ext-audio-codecs-121, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49, 21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49, panos, ext-media-pro-tun-201, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48, 21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48, panos, ext-video-streams-220, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120, 23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120, panos, ext-global-protect-tunx, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120, 23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120, panos, ext-regio-camera-tun10x, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120"][0m 0.23ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120"][0m 0.26ms] 
+  
+Final sensor value: 0  
+Discover sensor: .1.3.6.1.4.1.25461.2.1.2.3.10.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120, 24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120, panos, ext-vpn-medew-ict-tun30x, snmp, 1, 1, , 0, (limits: LL: , LW: , W: , H: )  
+SQL[[1;33mSELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? [0;33m["snmp","count",2,"panos","24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120"][0m 0.25ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? [0;33m["count",2,"panos","24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120"][0m 0.26ms] 
+  
+array (
+  'panos' => 
+  array (
+    0 => 1,
+    1 => 1,
+    '10.105.110.116.45.100.104.100.45.51.48' => 1,
+    '11.101.120.116.45.101.49.95.49.45.55.53' => 1,
+    '11.105.110.116.45.119.105.102.105.45.55.48' => 1,
+    '13.101.120.116.45.105.112.115.101.99.45.110.45.104' => 1,
+    '14.101.120.116.45.100.109.122.45.110.97.116.45.54.48' => 1,
+    '15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101' => 1,
+    '15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49' => 1,
+    '15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50' => 1,
+    '15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50' => 1,
+    '15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53' => 1,
+    '15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48' => 1,
+    '15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48' => 1,
+    '17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48' => 1,
+    '17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48' => 1,
+    '18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53' => 1,
+    '20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49' => 1,
+    '21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49' => 1,
+    '21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48' => 1,
+    '23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120' => 1,
+    '23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120' => 1,
+    '24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120' => 1,
+  ),
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["count",2,"snmp"][0m 0.65ms] 
+  
+0 -> panos  
+1 -> panos  
+10.105.110.116.45.100.104.100.45.51.48 -> panos  
+11.101.120.116.45.101.49.95.49.45.55.53 -> panos  
+11.105.110.116.45.119.105.102.105.45.55.48 -> panos  
+14.101.120.116.45.100.109.122.45.110.97.116.45.54.48 -> panos  
+15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49 -> panos  
+15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50 -> panos  
+15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50 -> panos  
+15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53 -> panos  
+15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48 -> panos  
+17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48 -> panos  
+17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48 -> panos  
+18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53 -> panos  
+20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49 -> panos  
+21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49 -> panos  
+21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48 -> panos  
+23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120 -> panos  
+24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120 -> panos  
+13.101.120.116.45.105.112.115.101.99.45.110.45.104 -> panos  
+15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101 -> panos  
+15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48 -> panos  
+23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120 -> panos  
+array (
+  'entity-sensor' => 
+  array (
+    6 => 1,
+    7 => 1,
+    8 => 1,
+    9 => 1,
+    10 => 1,
+    11 => 1,
+  ),
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["temperature",2,"snmp"][0m 0.43ms] 
+  
+6 -> entity-sensor  
+7 -> entity-sensor  
+8 -> entity-sensor  
+9 -> entity-sensor  
+10 -> entity-sensor  
+11 -> entity-sensor  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["voltage",2,"snmp"][0m 0.35ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["snr",2,"snmp"][0m 0.33ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["pressure",2,"snmp"][0m 0.34ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["cooling",2,"snmp"][0m 0.35ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["delay",2,"snmp"][0m 0.32ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["quality_factor",2,"snmp"][0m 0.33ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["chromatic_dispersion",2,"snmp"][0m 0.33ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["ber",2,"snmp"][0m 0.32ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["eer",2,"snmp"][0m 0.32ms] 
+  
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["waterflow",2,"snmp"][0m 0.32ms] 
+  
+Modules status: Global+  
+OS+  
+Device  
+fileSystemSpaceTable = No Such Object available on this agent at this OID  
+  
+hrStorageIndex.20 = 20
+hrStorageIndex.30 = 30
+hrStorageIndex.40 = 40
+hrStorageIndex.41 = 41
+hrStorageIndex.42 = 42
+hrStorageIndex.1010 = 1010
+hrStorageIndex.1011 = 1011
+hrStorageIndex.1012 = 1012
+hrStorageType.20 = hrStorageRam
+hrStorageType.30 = hrStorageVirtualMemory
+hrStorageType.40 = hrStorageFixedDisk
+hrStorageType.41 = hrStorageFixedDisk
+hrStorageType.42 = hrStorageFixedDisk
+hrStorageType.1010 = hrStorageOther
+hrStorageType.1011 = hrStorageOther
+hrStorageType.1012 = hrStorageOther
+hrStorageDescr.20 = Slot-0 Management Memory
+hrStorageDescr.30 = Slot-0 Management Swap
+hrStorageDescr.40 = Slot-0 Management Config Partition
+hrStorageDescr.41 = Slot-0 Management Log Partition
+hrStorageDescr.42 = Slot-0 Management Root Partition
+hrStorageDescr.1010 = Slot-1 Data Processor-0 Packet Descriptors
+hrStorageDescr.1011 = Slot-1 Data Processor-0 Hardware Packet Buffers
+hrStorageDescr.1012 = Slot-1 Data Processor-0 Software Packet Buffers
+hrStorageAllocationUnits.20 = 1024
+hrStorageAllocationUnits.30 = 1024
+hrStorageAllocationUnits.40 = 1024
+hrStorageAllocationUnits.41 = 1024
+hrStorageAllocationUnits.42 = 1024
+hrStorageAllocationUnits.1010 = 128
+hrStorageAllocationUnits.1011 = 2048
+hrStorageAllocationUnits.1012 = 5470
+hrStorageSize.20 = 3849884
+hrStorageSize.30 = 3056660
+hrStorageSize.40 = 11764568
+hrStorageSize.41 = 93286500
+hrStorageSize.42 = 13651232
+hrStorageSize.1010 = 229376
+hrStorageSize.1011 = 57344
+hrStorageSize.1012 = 168240
+hrStorageUsed.20 = 2630484
+hrStorageUsed.30 = 418716
+hrStorageUsed.40 = 4186800
+hrStorageUsed.41 = 67190208
+hrStorageUsed.42 = 3386300
+hrStorageUsed.1010 = 109
+hrStorageUsed.1011 = 167
+hrStorageUsed.1012 = 2  
+  
+Discover Storage: 40, hrStorageFixedDisk, hrstorage, Slot-0 Management Config Partition, 12046917632, 1024, 4287283200  
+SQL[[1;33mSELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ? [0;33m[40,2,"hrstorage"][0m 0.66ms] 
+  
+SQL[[1;33mUPDATE `storage` set `storage_descr`=?,`storage_type`=?,`storage_units`=?,`storage_size`=? WHERE `device_id` = ? AND `storage_index` = ? AND `storage_mib` = ? [0;33m["Slot-0 Management Config Partition","hrStorageFixedDisk","1024",12046917632,2,40,"hrstorage"][0m 2ms] 
+  
+Discover Storage: 41, hrStorageFixedDisk, hrstorage, Slot-0 Management Log Partition, 95525376000, 1024, 68802772992  
+SQL[[1;33mSELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ? [0;33m[41,2,"hrstorage"][0m 0.24ms] 
+  
+SQL[[1;33mUPDATE `storage` set `storage_descr`=?,`storage_type`=?,`storage_units`=?,`storage_size`=? WHERE `device_id` = ? AND `storage_index` = ? AND `storage_mib` = ? [0;33m["Slot-0 Management Log Partition","hrStorageFixedDisk","1024",95525376000,2,41,"hrstorage"][0m 8.12ms] 
+  
+Discover Storage: 42, hrStorageFixedDisk, hrstorage, Slot-0 Management Root Partition, 13978861568, 1024, 3467571200  
+SQL[[1;33mSELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ? [0;33m[42,2,"hrstorage"][0m 0.23ms] 
+  
+SQL[[1;33mUPDATE `storage` set `storage_descr`=?,`storage_type`=?,`storage_units`=?,`storage_size`=? WHERE `device_id` = ? AND `storage_index` = ? AND `storage_mib` = ? [0;33m["Slot-0 Management Root Partition","hrStorageFixedDisk","1024",13978861568,2,42,"hrstorage"][0m 1.75ms] 
+  
+dskTable = No Such Object available on this agent at this OID  
+  
+SQL[[1;33mSELECT `storage_descr` FROM `storage` WHERE `device_id`  = '2' AND `storage_type` != 'dsk' [0;33m[][0m 0.34ms] 
+  
+array (
+  'hrstorage' => 
+  array (
+    40 => 1,
+    41 => 1,
+    42 => 1,
+  ),
+)  
+SQL[[1;33mSELECT * FROM `storage` WHERE `device_id`  = '2' [0;33m[][0m 0.27ms] 
+  
+40 -> hrstorage  
+41 -> hrstorage  
+42 -> hrstorage  
+Modules status: Global+  
+OS+  
+Device  
+  
+hrDeviceIndex.1 = 1
+hrDeviceIndex.2 = 2
+hrDeviceType.1 = hrDeviceProcessor
+hrDeviceType.2 = hrDeviceProcessor
+hrDeviceDescr.1 = Management Processor
+hrDeviceDescr.2 = Slot-1 Data Processor
+hrDeviceID.1 = zeroDotZero
+hrDeviceID.2 = zeroDotZero
+hrDeviceStatus.1 = running
+hrDeviceStatus.2 = running  
+  
+hrProcessorFrwID.1 = zeroDotZero
+hrProcessorFrwID.2 = zeroDotZero
+hrProcessorLoad.1 = 21
+hrProcessorLoad.2 = 24  
+  
+array (
+  1 => 
+  array (
+    'hrDeviceIndex' => '1',
+    'hrDeviceType' => 'hrDeviceProcessor',
+    'hrDeviceDescr' => 'Management Processor',
+    'hrDeviceID' => 'zeroDotZero',
+    'hrDeviceStatus' => 'running',
+    'hrProcessorFrwID' => 'zeroDotZero',
+    'hrProcessorLoad' => '21',
+  ),
+  2 => 
+  array (
+    'hrDeviceIndex' => '2',
+    'hrDeviceType' => 'hrDeviceProcessor',
+    'hrDeviceDescr' => 'Slot-1 Data Processor',
+    'hrDeviceID' => 'zeroDotZero',
+    'hrDeviceStatus' => 'running',
+    'hrProcessorFrwID' => 'zeroDotZero',
+    'hrProcessorLoad' => '24',
+  ),
+)  
+SQL[[1;33mSELECT COUNT(*) FROM `hrDevice` WHERE device_id = ? AND hrDeviceIndex = ? [0;33m[2,"1"][0m 0.29ms] 
+  
+SQL[[1;33mUPDATE `hrDevice` set `hrDeviceType`=?,`hrDeviceDescr`=?,`hrDeviceStatus`=?,`hrDeviceErrors`=?,`hrProcessorLoad`=? WHERE device_id=? AND hrDeviceIndex=? [0;33m["hrDeviceProcessor","Management Processor","running",null,"21",2,"1"][0m 2.05ms] 
+  
+SQL[[1;33mSELECT COUNT(*) FROM `hrDevice` WHERE device_id = ? AND hrDeviceIndex = ? [0;33m[2,"2"][0m 0.21ms] 
+  
+SQL[[1;33mUPDATE `hrDevice` set `hrDeviceType`=?,`hrDeviceDescr`=?,`hrDeviceStatus`=?,`hrDeviceErrors`=?,`hrProcessorLoad`=? WHERE device_id=? AND hrDeviceIndex=? [0;33m["hrDeviceProcessor","Slot-1 Data Processor","running",null,"24",2,"2"][0m 9.06ms] 
+  
+SQL[[1;33mSELECT * FROM `hrDevice` WHERE `device_id`  = '2' [0;33m[][0m 0.2ms] 
+  
+Modules status: Global+  
+OS+  
+Device  
+cdpCache = No Such Object available on this agent at this OID  
+  
+lldpRemTable = No Such Object available on this agent at this OID  
+  
+SQL[[1;33mSELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs` WHERE `device_id`=? [0;33m[2][0m 0.26ms] 
+  
+  
+SQL[[1;33mSELECT * FROM `links` AS L, `ports` AS I WHERE L.local_port_id = I.port_id AND I.device_id = ? [0;33m[2][0m 0.49ms] 
+  
+SQL[[1;33mDELETE T FROM `links` T LEFT JOIN `devices` ON `devices`.`device_id` = T.`local_device_id` WHERE `devices`.`device_id` IS NULL [0;33m[][0m 0.17ms] 
+  
+ 0 orphaned links deleted  
+Modules status: Global+  
+OS+  
+Device  
+ipNetToPhysicalPhysAddress = No Such Object available on this agent at this OID  
+  
+ipNetToMediaPhysAddress = No Such Object available on this agent at this OID  
+  
+SQL[[1;33mSELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=? [0;33m[2,""][0m 0.35ms] 
+  
+SQL[[1;33mDELETE T FROM `ipv4_mac` T LEFT JOIN `ports` ON `ports`.`port_id` = T.`port_id` LEFT JOIN `devices` ON `devices`.`device_id` = T.`device_id` WHERE `ports`.`port_id` IS NULL AND `devices`.`device_id` IS NULL [0;33m[][0m 0.21ms] 
+  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global+  
+OS+  
+Device  
+4:3:03:43.59  
+  
+Peers :  
+SQL[[1;33mDELETE FROM `bgpPeers` WHERE device_id=? AND context_name=? [0;33m[2,""][0m 0.23ms] 
+  
+SQL[[1;33mDELETE FROM `bgpPeers_cbgp` WHERE device_id=? AND context_name=? [0;33m[2,""][0m 0.17ms] 
+  
+SQL[[1;33mSELECT DISTINCT context_name FROM bgpPeers WHERE device_id=? [0;33m[2][0m 0.12ms] 
+  
+Modules status: Global+  
+OS+  
+Device  
+SQL[[1;33mSELECT * FROM `vlans` WHERE `device_id` = ? [0;33m[2][0m 0.13ms] 
+  
+dot1dBasePortIfIndex = No Such Object available on this agent at this OID  
+  
+No Such Object available on this agent at this OID  
+  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global+  
+OS+  
+Device  
+diskIOEntry = No Such Object available on this agent at this OID  
+  
+array (
+)  
+SQL[[1;33mSELECT * FROM `ucd_diskio` where `device_id`  = '2' [0;33m[][0m 0.23ms] 
+  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global+  
+OS+  
+Device  
+Modules status: Global+  
+OS+  
+Device  
+SQL[[1;33mSELECT * FROM `stp` WHERE `device_id` = ? [0;33m[2][0m 0.17ms] 
+  
+No Such Object available on this agent at this OID  
+  
+Modules status: Global+  
+OS+  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global-  
+OS-  
+Device  
+Modules status: Global+  
+OS+  
+Device  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"ap-count"][0m 0.26ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"clients"][0m 0.15ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"quality"][0m 0.13ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"capacity"][0m 0.13ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"utilization"][0m 0.13ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"rate"][0m 0.14ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"ccq"][0m 0.16ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"snr"][0m 0.15ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"ssr"][0m 0.13ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"mse"][0m 0.13ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"xpi"][0m 0.13ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"rssi"][0m 0.15ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"power"][0m 0.15ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"noise-floor"][0m 0.17ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"errors"][0m 0.15ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"error-ratio"][0m 0.14ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"error-rate"][0m 0.15ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"frequency"][0m 0.16ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[2,"distance"][0m 0.14ms] 
+  
+Modules status: Global+  
+OS+  
+Device  
+SQL[[1;33mSELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ? [0;33m[2][0m 0.25ms] 
+  
+SQL[[1;33mSELECT * FROM `ports_fdb` WHERE `device_id` = ? [0;33m[2][0m 0.1ms] 
+  
+dot1qTpFdbPort = No Such Object available on this agent at this OID  
+  
+dot1dTpFdbPort = No Such Object available on this agent at this OID  
+  
+Modules status: Global+  
+OS+  
+Device  
+SQL[[1;33mSELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?  [0;33m[2,"poll_mib"][0m 0.22ms] 
+  
+SQL[[1;33mUPDATE `devices` set `last_discovered`=NOW(),`last_discovered_timetaken`=? WHERE `device_id` = ? [0;33m[4.568,2][0m 3.37ms] 
+  
+SQL[[1;33mINSERT IGNORE INTO `perf_times` (`type`,`doing`,`start`,`duration`,`devices`,`poller`)  VALUES (:type,:doing,:start,:duration,:devices,:poller) [0;33m{"type":"discover","doing":"lvt2100.park.rtvutrecht.nl","start":1574164818.055446,"duration":"4.690","devices":1,"poller":"librenms-dev"}[0m 9.16ms] 
+  
+/opt/librenms/discovery.php lvt2100.park.rtvutrecht.nl 2019-11-19 13:00:22 - 1 devices discovered in 4.690 secs  

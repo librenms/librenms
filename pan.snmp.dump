@@ -1,0 +1,592 @@
+LibreNMS Poller
+===================================
+Version info:
+Commit SHA: 39989a73a984ee88212cece9f81662a3fbfafce0
+Commit Date: 1573494070
+DB Schema: 2019_10_03_211702_serialize_config (145)
+PHP: 7.2.24-0ubuntu0.18.04.1
+MySQL: 10.1.41-MariaDB-0ubuntu0.18.04.1
+RRDTool: 1.7.0
+SNMP: NET-SNMP 5.7.3
+==================================DEBUG!
+Starting polling run:
+
+Hostname:    lvt2100.park.rtvutrecht.nl
+Device ID:   2
+OS:          panos
+Resolved IP: 172.17.8.210
+
+
+
+#### Load poller module core ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OQnUt' '-m' 'SNMPv2-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'sysUpTime.0' 'sysLocation.0' 'sysContact.0' 'sysName.0' 'sysObjectID.0' 'sysDescr.0'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OQnUst' '-m' 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'snmpEngineTime.0' 'hrSystemUptime.0'[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/uptime.rrd N:3995083[0m]
+Uptime:  46 days 5 hours 44 minutes 43 seconds
+
+>> Runtime for poller module 'core': 0.0207 seconds with 152480 bytes
+>> SNMP: [2/0.02s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module core ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-core.rrd N:0.020716905593872[0m]
+Module [ unix-agent ] disabled globally.
+
+
+#### Load poller module os ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'PAN-COMMON-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'panChassisType.0' 'panSysSwVersion.0' 'panSysSerialNumber.0' 'panSessionActive.0' 'panSessionActiveTcp.0' 'panSessionActiveUdp.0' 'panSessionActiveICMP.0' 'panSessionActiveSslProxy.0' 'panSessionSslProxyUtilization.0' 'panGPGWUtilizationActiveTunnels.0' 'panVsysActiveSessions.0'[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/panos-sessions.rrd N:3485[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/panos-sessions-tcp.rrd N:2678[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/panos-sessions-udp.rrd N:794[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/panos-sessions-icmp.rrd N:9[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/panos-sessions-ssl.rrd N:63[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/panos-sessions-sslutil.rrd N:0[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/panos-activetunnels.rrd N:1[0m]
+Hardware: PA-3020
+Version: 9.0.4
+Features: 
+Serial: 001801049095
+
+>> Runtime for poller module 'os': 0.0973 seconds with 57752 bytes
+>> SNMP: [1/0.10s] MySQL: [0/0.00s] RRD: [8/0.00s]
+#### Unload poller module os ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-os.rrd N:0.097323894500732[0m]
+
+#### Load poller module ipmi ####
+
+>> Runtime for poller module 'ipmi': 0.0010 seconds with 8240 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module ipmi ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-ipmi.rrd N:0.0009758472442627[0m]
+
+#### Load poller module sensors ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.25461.2.1.2.3.0' '.1.3.6.1.4.1.25461.2.1.2.3.9.1' '.1.3.6.1.4.1.25461.2.1.2.3.10.10.105.110.116.45.100.104.100.45.51.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.11.101.120.116.45.101.49.95.49.45.55.53' '.1.3.6.1.4.1.25461.2.1.2.3.10.11.105.110.116.45.119.105.102.105.45.55.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53' '.1.3.6.1.4.1.25461.2.1.2.3.10.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49' '.1.3.6.1.4.1.25461.2.1.2.3.10.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49' '.1.3.6.1.4.1.25461.2.1.2.3.10.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120' '.1.3.6.1.4.1.25461.2.1.2.3.10.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120'[0m]
+Checking (snmp) count Active Sessions... 
+Checking (snmp) count Active sessions per second... 
+Checking (snmp) count int-dhd-30... 
+Checking (snmp) count ext-e1_1-75... 
+Checking (snmp) count int-wifi-70... 
+Checking (snmp) count ext-dmz-nat-60... 
+Checking (snmp) count ext-kpn-een-251... 
+Checking (snmp) count ext-mexnet-e1_2... 
+Checking (snmp) count ext-orn-tun-202... 
+Checking (snmp) count int-cameras-255... 
+Checking (snmp) count int-printer-290... 
+Checking (snmp) count ext-dmz-nonat-200... 
+Checking (snmp) count int-teletekst-320... 
+Checking (snmp) count int-ka-10-dante-35... 
+Checking (snmp) count ext-audio-codecs-121... 
+Checking (snmp) count ext-media-pro-tun-201... 
+Checking (snmp) count ext-video-streams-220... 
+Checking (snmp) count ext-regio-camera-tun10x... 
+Checking (snmp) count ext-vpn-medew-ict-tun30x... 
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-0.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-1.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-10.105.110.116.45.100.104.100.45.51.48.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-11.101.120.116.45.101.49.95.49.45.55.53.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-11.105.110.116.45.119.105.102.105.45.55.48.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-14.101.120.116.45.100.109.122.45.110.97.116.45.54.48.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120.rrd N:0[0m]
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-count-panos-24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120.rrd N:0[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' '.1.3.6.1.2.1.99.1.1.1.4.2' '.1.3.6.1.2.1.99.1.1.1.4.3' '.1.3.6.1.2.1.99.1.1.1.4.4' '.1.3.6.1.2.1.99.1.1.1.4.5'[0m]
+Checking (snmp) fanspeed Fan #1 RPM... 
+Checking (snmp) fanspeed Fan #2 RPM... 
+Checking (snmp) fanspeed Fan #3 RPM... 
+Checking (snmp) fanspeed Fan #4 RPM... 
+9830 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-fanspeed-entity-sensor-2.rrd N:9830[0m]
+9666 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-fanspeed-entity-sensor-3.rrd N:9666[0m]
+9597 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-fanspeed-entity-sensor-4.rrd N:9597[0m]
+9598 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-fanspeed-entity-sensor-5.rrd N:9598[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.25461.2.1.2.1.13.0' '.1.3.6.1.4.1.25461.2.1.2.1.11.0' '.1.3.6.1.4.1.25461.2.1.2.1.12.0'[0m]
+Checking (snmp) state High Availability Mode... 
+Checking (snmp) state High Availability Local Status... 
+Checking (snmp) state High Availability Peer Status... 
+1 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-state-panSysHAMode-panSysHAMode.0.rrd N:1[0m]
+1 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-state-panSysHAState-panSysHAState.0.rrd N:1[0m]
+2 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-state-panSysHAPeerState-panSysHAPeerState.0.rrd N:2[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' '.1.3.6.1.2.1.99.1.1.1.4.6' '.1.3.6.1.2.1.99.1.1.1.4.7' '.1.3.6.1.2.1.99.1.1.1.4.8' '.1.3.6.1.2.1.99.1.1.1.4.9' '.1.3.6.1.2.1.99.1.1.1.4.10' '.1.3.6.1.2.1.99.1.1.1.4.11'[0m]
+Checking (snmp) temperature Temperature @ Ocelot... 
+Checking (snmp) temperature Temperature @ Switch... 
+Checking (snmp) temperature Temperature @ Cavium... 
+Checking (snmp) temperature Temperature @ Intel PHY... 
+Checking (snmp) temperature Temperature @ Switch Core... 
+Checking (snmp) temperature Temperature @ Cavium Core... 
+34 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-temperature-entity-sensor-6.rrd N:34[0m]
+40 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-temperature-entity-sensor-7.rrd N:40[0m]
+42 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-temperature-entity-sensor-8.rrd N:42[0m]
+32 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-temperature-entity-sensor-9.rrd N:32[0m]
+58 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-temperature-entity-sensor-10.rrd N:58[0m]
+47 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/sensor-temperature-entity-sensor-11.rrd N:47[0m]
+
+>> Runtime for poller module 'sensors': 0.0847 seconds with 2680 bytes
+>> SNMP: [5/0.04s] MySQL: [12/0.04s] RRD: [33/0.00s]
+#### Unload poller module sensors ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-sensors.rrd N:0.084650039672852[0m]
+
+#### Load poller module processors ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OUQn' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' '.1.3.6.1.2.1.25.3.3.1.2.1' '.1.3.6.1.2.1.25.3.3.1.2.2'[0m]
+3%
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/processor-hr-1.rrd N:3[0m]
+18%
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/processor-hr-2.rrd N:18[0m]
+
+>> Runtime for poller module 'processors': 0.0234 seconds with 126664 bytes
+>> SNMP: [1/0.01s] MySQL: [3/0.01s] RRD: [3/0.00s]
+#### Unload poller module processors ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-processors.rrd N:0.023396015167236[0m]
+
+#### Load poller module mempools ####
+Mempool Slot-0 Management Memory: SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'hrStorageEntry'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OUqv' '-m' 'HOST-RESOURCES-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'hrMemorySize.0'[0m]
+57.87% RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/mempool-hrstorage-20.rrd N:2281549824:1660731392[0m]
+
+Mempool Slot-0 Management Swap: 29.82% RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/mempool-hrstorage-30.rrd N:933302272:2196717568[0m]
+
+
+>> Runtime for poller module 'mempools': 0.0476 seconds with 15280 bytes
+>> SNMP: [2/0.04s] MySQL: [3/0.01s] RRD: [3/0.00s]
+#### Unload poller module mempools ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-mempools.rrd N:0.047638177871704[0m]
+
+#### Load poller module storage ####
+Storage Slot-0 Management Config Partition: hrstorage
+
+
+
+35% RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/storage-hrstorage-Slot-0_Management_Config_Partition.rrd N:4236361728:7810555904[0m]
+
+Storage Slot-0 Management Log Partition: hrstorage
+
+
+
+72% RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/storage-hrstorage-Slot-0_Management_Log_Partition.rrd N:68809617408:26715758592[0m]
+
+Storage Slot-0 Management Root Partition: hrstorage
+
+
+
+28% RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/storage-hrstorage-Slot-0_Management_Root_Partition.rrd N:3832057856:10036703232[0m]
+
+
+>> Runtime for poller module 'storage': 0.0220 seconds with 3072 bytes
+>> SNMP: [0/0.00s] MySQL: [4/0.02s] RRD: [4/0.00s]
+#### Unload poller module storage ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-storage.rrd N:0.021965980529785[0m]
+
+#### Load poller module netstats ####
+ ICMPSNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'icmp'[0m]
+ IPSNMP[[0;36m'/usr/bin/snmpgetnext' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ipForwDatagrams' 'ipInDelivers' 'ipInReceives' 'ipOutRequests' 'ipInDiscards' 'ipOutDiscards' 'ipOutNoRoutes' 'ipReasmReqds' 'ipReasmOKs' 'ipReasmFails' 'ipFragOKs' 'ipFragFails' 'ipFragCreates' 'ipInUnknownProtos' 'ipInHdrErrors' 'ipInAddrErrors'[0m]
+ IP-FORWARDSNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OQv' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'IP-FORWARD-MIB::ipCidrRouteNumber.0'[0m]
+ SNMPSNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'SNMPv2-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'snmp'[0m]
+ TCPSNMP[[0;36m'/usr/bin/snmpgetnext' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'TCP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'tcpActiveOpens' 'tcpPassiveOpens' 'tcpAttemptFails' 'tcpEstabResets' 'tcpCurrEstab' 'tcpInSegs' 'tcpOutSegs' 'tcpRetransSegs' 'tcpInErrs' 'tcpOutRsts'[0m]
+ TCPHCSNMP[[0;36m'/usr/bin/snmpgetnext' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'TCP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'tcpHCInSegs.0' 'tcpHCOutSegs.0'[0m]
+ UDPSNMP[[0;36m'/usr/bin/snmpgetnext' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'UDP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'udpInDatagrams' 'udpOutDatagrams' 'udpInErrors' 'udpNoPorts'[0m]
+
+
+>> Runtime for poller module 'netstats': 0.0839 seconds with 896 bytes
+>> SNMP: [7/0.08s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module netstats ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-netstats.rrd N:0.083914995193481[0m]
+
+#### Load poller module hr-mib ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OUQs' '-m' 'HOST-RESOURCES-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'hrSystemProcesses.0' 'hrSystemNumUsers.0'[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/hr_users.rrd N:2[0m]
+ Users
+
+>> Runtime for poller module 'hr-mib': 0.0083 seconds with 3496 bytes
+>> SNMP: [1/0.01s] MySQL: [0/0.00s] RRD: [2/0.00s]
+#### Unload poller module hr-mib ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-hr-mib.rrd N:0.0082859992980957[0m]
+
+#### Load poller module ucd-mib ####
+SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'systemStats'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'memTotalSwap.0' 'memAvailSwap.0' 'memTotalReal.0' 'memAvailReal.0' 'memTotalFree.0' 'memShared.0' 'memBuffer.0' 'memCached.0'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'laLoadInt.1' 'laLoadInt.2' 'laLoadInt.3'[0m]
+
+>> Runtime for poller module 'ucd-mib': 0.0243 seconds with 2336 bytes
+>> SNMP: [3/0.02s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module ucd-mib ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-ucd-mib.rrd N:0.024259805679321[0m]
+
+#### Load poller module ipSystemStats ####
+SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ipSystemStats'[0m]
+
+
+>> Runtime for poller module 'ipSystemStats': 0.0112 seconds with 1864 bytes
+>> SNMP: [1/0.01s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module ipSystemStats ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-ipSystemStats.rrd N:0.011190176010132[0m]
+
+#### Load poller module ports ####
+Caching Oids: Full ports polling SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifXEntry'[0m]
+ifDescr SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifDescr'[0m]
+ifAdminStatus SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifAdminStatus'[0m]
+ifOperStatus SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifOperStatus'[0m]
+ifLastChange SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifLastChange'[0m]
+ifType SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifType'[0m]
+ifPhysAddress SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifPhysAddress'[0m]
+ifMtu SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifMtu'[0m]
+ifInErrors SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifInErrors'[0m]
+ifOutErrors SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifOutErrors'[0m]
+ifInDiscards SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifInDiscards'[0m]
+ifOutDiscards SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'ifOutDiscards'[0m]
+dot3StatsDuplexStatusSNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'EtherLike-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'dot3StatsDuplexStatus'[0m]
+SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'Q-BRIDGE-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'dot1qPvid'[0m]
+
+Port dedicated-ha1: dedicated-ha1 (1 / #1) VLAN =  dedicated-ha1bps(6.11 kbps/5.66 kbps)bytes(99.23 kB/91.93 kB)pkts(4.39 pps/5.13 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id1.rrd N:4260652124:78778886638:0:0:23620462:70406088:U:U:0:0:U:0:0:0:0[0m]
+
+Port dedicated-ha2: dedicated-ha2 (2 / #2) VLAN =  dedicated-ha2bps(15 bps/5.56 Mbps)bytes(256 B/88.21 MB)pkts(15.04 mpps/1.71 kpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id2.rrd N:62298968:3412525457161:0:0:202718:8372453041:U:U:0:0:U:0:0:0:0[0m]
+
+Port ha1: ha1 (3 / #3) VLAN =  ha1bps(6.11 kbps/5.66 kbps)bytes(99.23 kB/91.93 kB)pkts(4.39 pps/5.13 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id3.rrd N:4260652124:78778886638:0:0:23620462:70406088:U:U:0:0:U:0:0:0:0[0m]
+
+Port ha2: ha2 (4 / #4) VLAN =  ha2bps(15 bps/5.56 Mbps)bytes(256 B/88.21 MB)pkts(15.04 mpps/1.71 kpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id4.rrd N:62298968:3412525457161:0:0:202718:8372453041:U:U:0:0:U:0:0:0:0[0m]
+
+Port mgmt: mgmt (5 / #5) VLAN =  mgmtbps(65.16 kbps/148.24 kbps)bytes(1.03 MB/2.35 MB)pkts(37.53 pps/39.56 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id5.rrd N:72950533150:45809092807:0:0:158562299:138451932:U:U:39829:0:U:0:0:14380:0[0m]
+
+Port ethernet1/1: ethernet1/1 (6 / #6) VLAN =  npo uplinkbps(125.33 Mbps/40.9 Mbps)bytes(1.94 GB/648.43 MB)pkts(12.67 kpps/7.63 kpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id6.rrd N:62207741119037:48048719244680:0:0:61940982694:50408634408:U:U:0:0:U:0:68807:0:0[0m]
+
+Port ethernet1/2: ethernet1/2 (7 / #7) VLAN =  mexnet kpn voipbps(51.2 kbps/47.32 kbps)bytes(831.17 kB/768.22 kB)pkts(28.17 pps/25.83 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id7.rrd N:14408750353:13761712650:0:0:62517364:62225160:U:U:0:0:U:15:73242:3790922:0[0m]
+
+Port ethernet1/3: ethernet1/3 (8 / #8) VLAN =  ethernet1/3bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id8.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/4: ethernet1/4 (9 / #9) VLAN =  ethernet1/4bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id9.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/5: ethernet1/5 (10 / #10) VLAN =  ethernet1/5bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id10.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/6: ethernet1/6 (11 / #11) VLAN =  ethernet1/6bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id11.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/7: ethernet1/7 (12 / #12) VLAN =  ethernet1/7bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id12.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/8: ethernet1/8 (13 / #13) VLAN =  ethernet1/8bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id13.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/9: ethernet1/9 (14 / #14) VLAN =  ethernet1/9bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id14.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/10: ethernet1/10 (15 / #15) VLAN =  ethernet1/10bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id15.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/11: ethernet1/11 (16 / #16) VLAN =  ethernet1/11bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id16.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/12: ethernet1/12 (17 / #17) VLAN =  ethernet1/12bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id17.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/13: ethernet1/13 (18 / #18) VLAN =  ethernet1/13bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id18.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/14: ethernet1/14 (19 / #19) VLAN =  ethernet1/14bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id19.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/15: ethernet1/15 (20 / #20) VLAN =  ethernet1/15bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id20.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/16: ethernet1/16 (21 / #21) VLAN =  ethernet1/16bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id21.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/17: ethernet1/17 (22 / #22) VLAN =  ethernet1/17bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id22.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/18: ethernet1/18 (23 / #23) VLAN =  ethernet1/18bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id23.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ethernet1/19: ethernet1/19 (24 / #24) VLAN =  ethernet1/19bps(25.15 Mbps/59.8 Mbps)bytes(398.69 MB/948.08 MB)pkts(4.95 kpps/5.96 kpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id24.rrd N:29381791410832:32738938936387:0:0:31706530638:34021667803:U:U:0:0:U:131927258:1807376:60016498:3994761[0m]
+
+Port ethernet1/20: ethernet1/20 (25 / #25) VLAN =  ethernet1/20bps(20.4 Mbps/69.8 Mbps)bytes(323.4 MB/1.08 GB)pkts(4.43 kpps/8.41 kpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id25.rrd N:27226849578591:34086515485993:0:0:28951103383:35425427554:U:U:0:0:U:83778559:0:47367656:3994761[0m]
+
+Port vlan: vlan (200000000 / #26) VLAN =  vlanbps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id26.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port loopback: loopback (300000000 / #27) VLAN =  loopbackbps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id27.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port loopback.1: loopback.1 (300000001 / #28) VLAN =  GLOBAL PROTECTbps(111 bps/0 bps)bytes(1.8 kB/0 B)pkts(0.17 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id28.rrd N:322172804:U:0:0:983580:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port loopback.2: loopback.2 (300000002 / #29) VLAN =  VPN ORNbps(253 bps/0 bps)bytes(4.11 kB/0 B)pkts(0.29 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id29.rrd N:121730799:U:0:0:1121465:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port loopback.4: loopback.4 (300000004 / #30) VLAN =  Azure GWbps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id30.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel: tunnel (400000000 / #31) VLAN =  tunnelbps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id31.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.1: tunnel.1 (400000001 / #32) VLAN =  tunnel.1bps(4.61 kbps/4.44 kbps)bytes(74.81 kB/72.11 kB)pkts(5.33 pps/3.07 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id32.rrd N:3305852340:14213785554:0:0:26489094:22386337:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.2: tunnel.2 (400000002 / #33) VLAN =  tunnel.2bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id33.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.101: tunnel.101 (400000101 / #34) VLAN =  tunnel.101bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id34.rrd N:6753512:6053866:0:0:41149:42885:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.102: tunnel.102 (400000102 / #35) VLAN =  tunnel.102bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id35.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.103: tunnel.103 (400000103 / #36) VLAN =  tunnel.103bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id36.rrd N:12818764783:480612184:0:0:8955995:3884644:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.107: tunnel.107 (400000107 / #37) VLAN =  tunnel.107bps(0 bps/63 bps)bytes(0 B/1.02 kB)pkts(0 pps/60.15 mpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id37.rrd N:479150:26185420:0:0:6475:201502:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.108: tunnel.108 (400000108 / #38) VLAN =  tunnel.108bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id38.rrd N:36594853623:1128864394:0:0:25491616:9158649:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.109: tunnel.109 (400000109 / #39) VLAN =  tunnel.109bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id39.rrd N:25786229387:908243466:0:0:17996648:7350557:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.201: tunnel.201 (400000201 / #40) VLAN =  tunnel.201bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id40.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.202: tunnel.202 (400000202 / #41) VLAN =  ORNbps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id41.rrd N:153089246:8036260:0:0:121221:35970:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.301: tunnel.301 (400000301 / #42) VLAN =  tunnel.301bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id42.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.302: tunnel.302 (400000302 / #43) VLAN =  tunnel.302bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id43.rrd N:488359934:2173621038:0:0:2588069:3084903:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.303: tunnel.303 (400000303 / #44) VLAN =  tunnel.303bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id44.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.304: tunnel.304 (400000304 / #45) VLAN =  tunnel.304bps(9.33 kbps/51.06 kbps)bytes(151.39 kB/828.9 kB)pkts(17.5 pps/17.56 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id45.rrd N:102064663286:47953253748:0:0:84687914:47342150:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.306: tunnel.306 (400000306 / #46) VLAN =  tunnel.306bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id46.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port tunnel.401: tunnel.401 (400000401 / #47) VLAN =  Azure Gatewaybps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id47.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5: ae5 (500050000 / #48) VLAN =  ae5bps(45.56 Mbps/129.61 Mbps)bytes(722.27 MB/2.01 GB)pkts(9.38 kpps/14.37 kpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id48.rrd N:56608641191101:66825454602796:0:0:60657634240:69447095540:U:U:0:0:U:215705817:1807376:107384154:7989522[0m]
+
+Port ae5.10: ae5.10 (500050010 / #49) VLAN =  ae5.10bps(26.86 Mbps/113.8 Mbps)bytes(425.83 MB/1.76 GB)pkts(6.57 kpps/11.43 kpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id49.rrd N:44031488939037:58450824251294:0:0:748104293:2388778620:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.30: ae5.30 (500050030 / #50) VLAN =  int-dhd-30bps(99.61 kbps/2.32 kbps)bytes(1.58 MB/37.65 kB)pkts(90.65 pps/4.44 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id50.rrd N:32057721768:498309098:0:0:201117856:7411821:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.35: ae5.35 (500050035 / #51) VLAN =  dante-35bps(15.22 kbps/140 bps)bytes(247.12 kB/2.27 kB)pkts(6.54 pps/82.71 mpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id51.rrd N:7004490465:220018001:0:0:23727886:516221:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.60: ae5.60 (500050060 / #52) VLAN =  ae5.60bps(48.28 kbps/34.75 kbps)bytes(783.84 kB/564.24 kB)pkts(21.8 pps/23.86 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id52.rrd N:1451995009501:1411138577573:0:0:1480402964:1263804063:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.70: ae5.70 (500050070 / #53) VLAN =  ae5.70bps(263.22 kbps/7.05 Mbps)bytes(4.17 MB/111.81 MB)pkts(249.45 pps/723.17 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id53.rrd N:239015532719:973903720049:0:0:552433891:886099689:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.75: ae5.75 (500050075 / #54) VLAN =  fallback-internet-75bps(282 bps/654 bps)bytes(4.57 kB/10.62 kB)pkts(0.32 pps/0.79 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id54.rrd N:19335445:13324036:0:0:191244:146626:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.121: ae5.121 (500050121 / #55) VLAN =  IP 192 - 223bps(420.15 kbps/5.74 Mbps)bytes(6.66 MB/91.07 MB)pkts(206.89 pps/565.32 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id55.rrd N:234610799421:2474806115756:0:0:888875518:2064052163:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.200: ae5.200 (500050200 / #56) VLAN =  IP 0 - 127 & IP 128 - 159bps(4.09 Mbps/1.15 Mbps)bytes(64.82 MB/18.22 MB)pkts(1.07 kpps/1.05 kpps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id56.rrd N:3565964178695:2894235166937:0:0:229508876:604609495:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.220: ae5.220 (500050220 / #57) VLAN =  IP 160 - 167 (T1807 222)bps(13.27 Mbps/265.91 kbps)bytes(210.47 MB/4.22 MB)pkts(1.11 kpps/413.8 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id57.rrd N:6687129851244:128796799860:0:0:190522734:1595315025:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.251: ae5.251 (500050251 / #58) VLAN =  kpn-voip-251bps(81.11 kbps/48.22 kbps)bytes(1.29 MB/782.83 kB)pkts(78.94 pps/29.14 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id58.rrd N:34743713794:15170352236:0:0:327363713:79032193:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.255: ae5.255 (500050255 / #59) VLAN =  camerasbps(2.72 kbps/1.57 kbps)bytes(44.14 kB/25.42 kB)pkts(4.38 pps/1.79 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id59.rrd N:1412975896:872031970:0:0:17618689:7240758:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.290: ae5.290 (500050290 / #60) VLAN =  int-printer-290bps(14.49 kbps/800.5 kbps)bytes(235.22 kB/12.69 MB)pkts(7.74 pps/67.23 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id60.rrd N:720357536:17081242986:0:0:2572108:12374482:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.300: ae5.300 (500050300 / #61) VLAN =  sandboxbps(4.67 kbps/1.39 kbps)bytes(75.84 kB/22.48 kB)pkts(5.29 pps/1.14 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id61.rrd N:5171252861:4430972767:0:0:33192305:16080366:U:U:0:0:U:0:0:0:0[0m]
+
+Port ae5.320: ae5.320 (500050320 / #62) VLAN =  teletekstbps(79.59 kbps/240.03 kbps)bytes(1.26 MB/3.81 MB)pkts(70.32 pps/66.79 pps)RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/port-id62.rrd N:69399890554:174441225085:0:0:408384910:393899301:U:U:0:0:U:0:0:0:0[0m]
+
+
+>> Runtime for poller module 'ports': 1.5874 seconds with 38512 bytes
+>> SNMP: [14/0.38s] MySQL: [125/1.13s] RRD: [63/0.00s]
+#### Unload poller module ports ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-ports.rrd N:1.5873749256134[0m]
+
+#### Load poller module bgp-peers ####
+
+>> Runtime for poller module 'bgp-peers': 0.0012 seconds with 11632 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module bgp-peers ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-bgp-peers.rrd N:0.0011870861053467[0m]
+Module [ junose-atm-vp ] disabled globally.
+
+Module [ toner ] disabled globally.
+
+
+#### Load poller module ucd-diskio ####
+
+>> Runtime for poller module 'ucd-diskio': 0.0003 seconds with 1824 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module ucd-diskio ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-ucd-diskio.rrd N:0.0003349781036377[0m]
+Module [ wifi ] disabled globally.
+
+
+#### Load poller module wireless ####
+
+>> Runtime for poller module 'wireless': 0.0012 seconds with 164200 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module wireless ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-wireless.rrd N:0.0012400150299072[0m]
+
+#### Load poller module ospf ####
+ Processes: SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' 'COMMUNITY' '-OQUs' '-m' 'OSPF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'OSPF-MIB::ospfGeneralGroup'[0m]
+0
+>> Runtime for poller module 'ospf': 0.0133 seconds with 176840 bytes
+>> SNMP: [1/0.01s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module ospf ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-ospf.rrd N:0.013279914855957[0m]
+Module [ cisco-ipsec-flow-monitor ] disabled globally.
+
+Module [ cisco-remote-access-monitor ] disabled globally.
+
+Module [ cisco-cef ] disabled globally.
+
+Module [ cisco-sla ] disabled globally.
+
+Module [ cisco-mac-accounting ] disabled globally.
+
+Module [ cipsec-tunnels ] disabled globally.
+
+Module [ cisco-ace-loadbalancer ] disabled globally.
+
+Module [ cisco-ace-serverfarms ] disabled globally.
+
+Module [ cisco-asa-firewall ] disabled globally.
+
+Module [ cisco-voice ] disabled globally.
+
+Module [ cisco-cbqos ] disabled globally.
+
+Module [ cisco-otv ] disabled globally.
+
+Module [ cisco-qfp ] disabled globally.
+
+Module [ cisco-vpdn ] disabled globally.
+
+Module [ nac ] disabled globally.
+
+Module [ netscaler-vsvr ] disabled globally.
+
+Module [ aruba-controller ] disabled globally.
+
+
+#### Load poller module entity-physical ####
+
+>> Runtime for poller module 'entity-physical': 0.0005 seconds with 1976 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module entity-physical ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-entity-physical.rrd N:0.00052404403686523[0m]
+Module [ entity-state ] disabled globally.
+
+
+#### Load poller module applications ####
+
+>> Runtime for poller module 'applications': 0.0003 seconds with 1472 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module applications ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-applications.rrd N:0.00029206275939941[0m]
+Module [ mib ] disabled globally.
+
+
+#### Load poller module stp ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' 'COMMUNITY' '-Oqv' '-m' 'RSTP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:HOSTNAME:161' 'dot1dStpProtocolSpecification.0'[0m]
+
+
+>> Runtime for poller module 'stp': 0.0093 seconds with 5608 bytes
+>> SNMP: [1/0.01s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module stp ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-stp.rrd N:0.0093131065368652[0m]
+
+#### Load poller module ntp ####
+
+>> Runtime for poller module 'ntp': 0.0001 seconds with 320 bytes
+>> SNMP: [0/0.00s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module ntp ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-ntp.rrd N:0.00010108947753906[0m]
+Module [ loadbalancers ] disabled globally.
+
+Module [ mef ] disabled globally.
+
+
+#### Load poller module mpls ####
+
+>> Runtime for poller module 'mpls': 0.0004 seconds with 22616 bytes
+>> SNMP: [0/0.00s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module mpls ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf-mpls.rrd N:0.0004429817199707[0m]
+### Start Device Groups ###
+### End Device Groups, runtime: 0.0035s ### 
+
+Enabling graphs: uptime panos_sessions panos_sessions_tcp panos_sessions_udp panos_sessions_icmp panos_sessions_ssl panos_sessions_sslutil panos_activetunnels hr_users 
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/ping-perf.rrd N:0.18[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/lvt2100.park.rtvutrecht.nl/poller-perf.rrd N:3.068[0m]
+
+Polled in 3.068 seconds
+#### Start Alerts ####
+#### End Alerts ####
+SNMP [40/0.73s]: Get[16/0.23s] Getnext[4/0.04s] Walk[20/0.47s]
+MySQL [161/1.23s]: Cell[5/0.00s] Row[-4/-0.00s] Rows[19/0.01s] Column[0/0.00s] Update[139/1.21s] Insert[2/0.01s] Delete[0/0.00s]
+RRD [133/0.01s]: Update[133/0.01s] Create [0/0.00s] Other[0/0.00s]

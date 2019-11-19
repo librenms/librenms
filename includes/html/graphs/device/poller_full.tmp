@@ -1,0 +1,753 @@
+LibreNMS Poller
+===================================
+Version info:
+Commit SHA: 39989a73a984ee88212cece9f81662a3fbfafce0
+Commit Date: 1573494070
+DB Schema: 2019_10_03_211702_serialize_config (145)
+PHP: 7.2.24-0ubuntu0.18.04.1
+MySQL: 10.1.41-MariaDB-0ubuntu0.18.04.1
+RRDTool: 1.7.0
+SNMP: NET-SNMP 5.7.3
+==================================DEBUG!
+Starting polling run:
+
+Hostname:    <host.fqdn.tld>
+Device ID:   2
+OS:          panos
+Resolved IP: <ip>
+
+
+
+#### Load poller module core ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OQnUt' '-m' 'SNMPv2-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'sysUpTime.0' 'sysLocation.0' 'sysContact.0' 'sysName.0' 'sysObjectID.0' 'sysDescr.0'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OQnUst' '-m' 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'snmpEngineTime.0' 'hrSystemUptime.0'[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/uptime.rrd N:355340[0m]
+RRDtool Output: Uptime:  4 days 2 hours 42 minutes 20 seconds
+
+>> Runtime for poller module 'core': 0.0213 seconds with 152480 bytes
+>> SNMP: [2/0.02s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module core ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-core.rrd N:0.021274089813232[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.24
+Module [ unix-agent ] disabled globally.
+
+
+#### Load poller module os ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OQUs' '-m' 'PAN-COMMON-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'panChassisType.0' 'panSysSwVersion.0' 'panSysSerialNumber.0' 'panSessionActive.0' 'panSessionActiveTcp.0' 'panSessionActiveUdp.0' 'panSessionActiveICMP.0' 'panSessionActiveSslProxy.0' 'panSessionSslProxyUtilization.0' 'panGPGWUtilizationActiveTunnels.0' 'panVsysActiveTcpCps.0' 'panVsysActiveUdpCps.0' 'panVsysActiveOtherIpCps.0'[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/panos-sessions.rrd N:2946[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.25
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/panos-sessions-tcp.rrd N:2229[0m]
+RRDtool Output: RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/panos-sessions-udp.rrd N:704[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.34
+OK u:0.00 s:0.00 r:1.34
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/panos-sessions-icmp.rrd N:9[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.34
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/panos-sessions-ssl.rrd N:47[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.34
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/panos-sessions-sslutil.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.34
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/panos-activetunnels.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.34
+Hardware: PA-3020
+Version: 9.0.5
+Features: 
+Serial: 001801049095
+
+>> Runtime for poller module 'os': 0.0941 seconds with 58208 bytes
+>> SNMP: [1/0.09s] MySQL: [0/0.00s] RRD: [8/0.00s]
+#### Unload poller module os ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-os.rrd N:0.094099044799805[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.34
+
+#### Load poller module ipmi ####
+
+>> Runtime for poller module 'ipmi': 0.0012 seconds with 8240 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module ipmi ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-ipmi.rrd N:0.0012309551239014[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.34
+
+#### Load poller module sensors ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' '.1.3.6.1.4.1.25461.2.1.2.3.0' '.1.3.6.1.4.1.25461.2.1.2.3.9.1.8.1' '.1.3.6.1.4.1.25461.2.1.2.3.10.10.105.110.116.45.100.104.100.45.51.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.11.101.120.116.45.101.49.95.49.45.55.53' '.1.3.6.1.4.1.25461.2.1.2.3.10.11.105.110.116.45.119.105.102.105.45.55.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.14.101.120.116.45.100.109.122.45.110.97.116.45.54.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53' '.1.3.6.1.4.1.25461.2.1.2.3.10.20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49' '.1.3.6.1.4.1.25461.2.1.2.3.10.21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49' '.1.3.6.1.4.1.25461.2.1.2.3.10.21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120' '.1.3.6.1.4.1.25461.2.1.2.3.10.24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120' '.1.3.6.1.4.1.25461.2.1.2.3.10.13.101.120.116.45.105.112.115.101.99.45.110.45.104'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101' '.1.3.6.1.4.1.25461.2.1.2.3.10.15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48' '.1.3.6.1.4.1.25461.2.1.2.3.10.23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120'[0m]
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+Checking (snmp) count <zone-name-vlan-id>...
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-0.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.34
+2 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-1.rrd N:2[0m]
+RRDtool Output: 
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-10.105.110.116.45.100.104.100.45.51.48.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.97
+OK u:0.00 s:0.00 r:1.97
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-11.101.120.116.45.101.49.95.49.45.55.53.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-11.105.110.116.45.119.105.102.105.45.55.48.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-14.101.120.116.45.100.109.122.45.110.97.116.45.54.48.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-15.101.120.116.45.107.112.110.45.101.101.110.45.50.53.49.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-15.101.120.116.45.109.101.120.110.101.116.45.101.49.95.50.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-15.101.120.116.45.111.114.110.45.116.117.110.45.50.48.50.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-15.105.110.116.45.99.97.109.101.114.97.115.45.50.53.53.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-15.105.110.116.45.112.114.105.110.116.101.114.45.50.57.48.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-17.101.120.116.45.100.109.122.45.110.111.110.97.116.45.50.48.48.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-17.105.110.116.45.116.101.108.101.116.101.107.115.116.45.51.50.48.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-18.105.110.116.45.107.97.45.49.48.45.100.97.110.116.101.45.51.53.rrd N:0[0m]
+RRDtool Output: 
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-20.101.120.116.45.97.117.100.105.111.45.99.111.100.101.99.115.45.49.50.49.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-21.101.120.116.45.109.101.100.105.97.45.112.114.111.45.116.117.110.45.50.48.49.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-21.101.120.116.45.118.105.100.101.111.45.115.116.114.101.97.109.115.45.50.50.48.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-23.101.120.116.45.114.101.103.105.111.45.99.97.109.101.114.97.45.116.117.110.49.48.120.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-24.101.120.116.45.118.112.110.45.109.101.100.101.119.45.105.99.116.45.116.117.110.51.48.120.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-13.101.120.116.45.105.112.115.101.99.45.110.45.104.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-15.101.120.116.45.105.112.115.101.99.45.97.122.117.114.101.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-15.105.110.116.45.115.97.110.100.98.48.120.45.51.48.48.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/polling/functions.inc.php on line 167
+0 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-count-panos-23.101.120.116.45.103.108.111.98.97.108.45.112.114.111.116.101.99.116.45.116.117.110.120.rrd N:0[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' '.1.3.6.1.2.1.99.1.1.1.4.2' '.1.3.6.1.2.1.99.1.1.1.4.3' '.1.3.6.1.2.1.99.1.1.1.4.4' '.1.3.6.1.2.1.99.1.1.1.4.5'[0m]
+Checking (snmp) fanspeed Fan #1 RPM... 
+Checking (snmp) fanspeed Fan #2 RPM... 
+Checking (snmp) fanspeed Fan #3 RPM... 
+Checking (snmp) fanspeed Fan #4 RPM... 
+9597 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-fanspeed-entity-sensor-2.rrd N:9597[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:1.98
+9246 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-fanspeed-entity-sensor-3.rrd N:9246[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:2.19
+9440 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-fanspeed-entity-sensor-4.rrd N:9440[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:2.19
+9311 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-fanspeed-entity-sensor-5.rrd N:9311[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:2.19
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' '.1.3.6.1.4.1.25461.2.1.2.1.13.0' '.1.3.6.1.4.1.25461.2.1.2.1.11.0' '.1.3.6.1.4.1.25461.2.1.2.1.12.0'[0m]
+Checking (snmp) state High Availability Mode... 
+Checking (snmp) state High Availability Local Status... 
+Checking (snmp) state High Availability Peer Status... 
+1 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-state-panSysHAMode-panSysHAMode.0.rrd N:1[0m]
+RRDtool Output: OK u:0.00 s:0.00 r:2.20
+1 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-state-panSysHAState-panSysHAState.0.rrd N:1[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.42
+2 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-state-panSysHAPeerState-panSysHAPeerState.0.rrd N:2[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.42
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OUQnte' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' '.1.3.6.1.2.1.99.1.1.1.4.6' '.1.3.6.1.2.1.99.1.1.1.4.7' '.1.3.6.1.2.1.99.1.1.1.4.8' '.1.3.6.1.2.1.99.1.1.1.4.9' '.1.3.6.1.2.1.99.1.1.1.4.10' '.1.3.6.1.2.1.99.1.1.1.4.11'[0m]
+Checking (snmp) temperature Temperature @ Ocelot... 
+Checking (snmp) temperature Temperature @ Switch... 
+Checking (snmp) temperature Temperature @ Cavium... 
+Checking (snmp) temperature Temperature @ Intel PHY... 
+Checking (snmp) temperature Temperature @ Switch Core... 
+Checking (snmp) temperature Temperature @ Cavium Core... 
+34 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-temperature-entity-sensor-6.rrd N:34[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.42
+40 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-temperature-entity-sensor-7.rrd N:40[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.64
+42 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-temperature-entity-sensor-8.rrd N:42[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.64
+32 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-temperature-entity-sensor-9.rrd N:32[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.64
+58 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-temperature-entity-sensor-10.rrd N:58[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.64
+47 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/sensor-temperature-entity-sensor-11.rrd N:47[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.64
+
+>> Runtime for poller module 'sensors': 1.2962 seconds with 2680 bytes
+>> SNMP: [6/1.27s] MySQL: [9/0.02s] RRD: [37/0.00s]
+#### Unload poller module sensors ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-sensors.rrd N:1.2961919307709[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.64
+
+#### Load poller module processors ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OUQn' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' '.1.3.6.1.2.1.25.3.3.1.2.1' '.1.3.6.1.2.1.25.3.3.1.2.2'[0m]
+3%
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/processor-hr-1.rrd N:3[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.64
+27%
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/processor-hr-2.rrd N:27[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.86
+
+>> Runtime for poller module 'processors': 0.2223 seconds with 126664 bytes
+>> SNMP: [1/0.22s] MySQL: [2/0.00s] RRD: [3/0.00s]
+#### Unload poller module processors ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-processors.rrd N:0.2223219871521[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.86
+
+#### Load poller module mempools ####
+Mempool Slot-0 Management Memory: SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUs' '-m' 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'hrStorageEntry'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OUqv' '-m' 'HOST-RESOURCES-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'hrMemorySize.0'[0m]
+63% RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/mempool-hrstorage-20.rrd N:2483597312:1458683904[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.86
+
+Mempool Slot-0 Management Swap: 13.65% RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/mempool-hrstorage-30.rrd N:427106304:2702913536[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.90
+
+
+>> Runtime for poller module 'mempools': 0.0504 seconds with 15280 bytes
+>> SNMP: [2/0.04s] MySQL: [3/0.01s] RRD: [3/0.00s]
+#### Unload poller module mempools ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-mempools.rrd N:0.050400972366333[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.90
+
+#### Load poller module storage ####
+Storage Slot-0 Management Config Partition: hrstorage
+
+
+
+36% RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/storage-hrstorage-Slot-0_Management_Config_Partition.rrd N:4287332352:7759585280[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.91
+
+Storage Slot-0 Management Log Partition: hrstorage
+
+
+
+72% RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/storage-hrstorage-Slot-0_Management_Log_Partition.rrd N:68783423488:26741952512[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.91
+
+Storage Slot-0 Management Root Partition: hrstorage
+
+
+
+25% RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/storage-hrstorage-Slot-0_Management_Root_Partition.rrd N:3465654272:10513207296[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.92
+
+
+>> Runtime for poller module 'storage': 0.0281 seconds with 3072 bytes
+>> SNMP: [0/0.00s] MySQL: [4/0.03s] RRD: [4/0.00s]
+#### Unload poller module storage ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-storage.rrd N:0.028136968612671[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.93
+
+#### Load poller module netstats ####
+ ICMPSNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUs' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'icmp'[0m]
+ IPSNMP[[0;36m'/usr/bin/snmpgetnext' '-v2c' '-c' '<community>' '-OQUs' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ipForwDatagrams' 'ipInDelivers' 'ipInReceives' 'ipOutRequests' 'ipInDiscards' 'ipOutDiscards' 'ipOutNoRoutes' 'ipReasmReqds' 'ipReasmOKs' 'ipReasmFails' 'ipFragOKs' 'ipFragFails' 'ipFragCreates' 'ipInUnknownProtos' 'ipInHdrErrors' 'ipInAddrErrors'[0m]
+ IP-FORWARDSNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OQv' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'IP-FORWARD-MIB::ipCidrRouteNumber.0'[0m]
+ SNMPSNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUs' '-m' 'SNMPv2-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'snmp'[0m]
+ TCPSNMP[[0;36m'/usr/bin/snmpgetnext' '-v2c' '-c' '<community>' '-OQUs' '-m' 'TCP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'tcpActiveOpens' 'tcpPassiveOpens' 'tcpAttemptFails' 'tcpEstabResets' 'tcpCurrEstab' 'tcpInSegs' 'tcpOutSegs' 'tcpRetransSegs' 'tcpInErrs' 'tcpOutRsts'[0m]
+ TCPHCSNMP[[0;36m'/usr/bin/snmpgetnext' '-v2c' '-c' '<community>' '-OQUs' '-m' 'TCP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'tcpHCInSegs.0' 'tcpHCOutSegs.0'[0m]
+ UDPSNMP[[0;36m'/usr/bin/snmpgetnext' '-v2c' '-c' '<community>' '-OQUs' '-m' 'UDP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'udpInDatagrams' 'udpOutDatagrams' 'udpInErrors' 'udpNoPorts'[0m]
+
+
+>> Runtime for poller module 'netstats': 0.2994 seconds with 896 bytes
+>> SNMP: [7/0.30s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module netstats ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-netstats.rrd N:0.29935312271118[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:2.94
+
+#### Load poller module hr-mib ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OUQs' '-m' 'HOST-RESOURCES-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'hrSystemProcesses.0' 'hrSystemNumUsers.0'[0m]
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/hr_users.rrd N:2[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.24
+ Users
+
+>> Runtime for poller module 'hr-mib': 0.0089 seconds with 3496 bytes
+>> SNMP: [1/0.01s] MySQL: [0/0.00s] RRD: [2/0.00s]
+#### Unload poller module hr-mib ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-hr-mib.rrd N:0.0089430809020996[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.25
+
+#### Load poller module ucd-mib ####
+SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'systemStats'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'memTotalSwap.0' 'memAvailSwap.0' 'memTotalReal.0' 'memAvailReal.0' 'memTotalFree.0' 'memShared.0' 'memBuffer.0' 'memCached.0'[0m]
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'laLoadInt.1' 'laLoadInt.2' 'laLoadInt.3'[0m]
+
+>> Runtime for poller module 'ucd-mib': 0.0266 seconds with 2336 bytes
+>> SNMP: [3/0.03s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module ucd-mib ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-ucd-mib.rrd N:0.02655291557312[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.25
+
+#### Load poller module ipSystemStats ####
+SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUs' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ipSystemStats'[0m]
+
+
+>> Runtime for poller module 'ipSystemStats': 0.0116 seconds with 1864 bytes
+>> SNMP: [1/0.01s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module ipSystemStats ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-ipSystemStats.rrd N:0.011635065078735[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.28
+
+#### Load poller module ports ####
+Caching Oids: Full ports polling SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUs' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifXEntry'[0m]
+ifDescr SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifDescr'[0m]
+ifAdminStatus SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifAdminStatus'[0m]
+ifOperStatus SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifOperStatus'[0m]
+ifLastChange SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifLastChange'[0m]
+ifType SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifType'[0m]
+ifPhysAddress SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifPhysAddress'[0m]
+ifMtu SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifMtu'[0m]
+ifInErrors SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifInErrors'[0m]
+ifOutErrors SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifOutErrors'[0m]
+ifInDiscards SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifInDiscards'[0m]
+ifOutDiscards SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'ifOutDiscards'[0m]
+dot3StatsDuplexStatusSNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUs' '-m' 'EtherLike-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'dot3StatsDuplexStatus'[0m]
+SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUs' '-m' 'Q-BRIDGE-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'dot1qPvid'[0m]
+
+Port dedicated-ha1: dedicated-ha1 (1 / #1) VLAN = <vlan-name or if-name>(5.94 kbps/5.13 kbps)bytes(169.06 kB/145.99 kB)pkts(4.45 pps/4.94 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id1.rrd N:350828458:7591737982:0:0:2106101:6616788:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.29
+
+Port dedicated-ha2: dedicated-ha2 (2 / #2) VLAN = <vlan-name or if-name>(18 bps/10.87 Mbps)bytes(512 B/302.02 MB)pkts(17.17 mpps/3.34 kpps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id2.rrd N:375193660:159650949860:0:0:925439:392031014:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.74
+
+Port ha1: ha1 (3 / #3) VLAN = <vlan-name or if-name>(5.94 kbps/5.13 kbps)bytes(169.06 kB/145.99 kB)pkts(4.45 pps/4.94 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id3.rrd N:350828458:7591737982:0:0:2106101:6616788:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.75
+
+Port ha2: ha2 (4 / #4) VLAN = <vlan-name or if-name>(18 bps/10.87 Mbps)bytes(512 B/302.02 MB)pkts(17.17 mpps/3.34 kpps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id4.rrd N:375193660:159650949860:0:0:925439:392031014:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.77
+
+Port mgmt: mgmt (5 / #5) VLAN = <vlan-name or if-name>(68.87 kbps/133.79 kbps)bytes(1.91 MB/3.72 MB)pkts(40.5 pps/39.85 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id5.rrd N:6832483418:3673320518:0:0:14597154:12336819:U:U:2522:0:U:0:0:1381:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.79
+
+Port ethernet1/1: ethernet1/1 (6 / #6) VLAN = <vlan-name or if-name>(240.98 Mbps/134.26 Mbps)bytes(6.54 GB/3.64 GB)pkts(25.12 kpps/21.99 kpps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id6.rrd N:2223459086348:2432988133369:0:0:2380889582:2303207558:U:U:0:0:U:0:6115:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.81
+
+Port ethernet1/2: ethernet1/2 (7 / #7) VLAN = <vlan-name or if-name>(90.91 kbps/90.76 kbps)bytes(2.52 MB/2.52 MB)pkts(51.73 pps/51.75 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id7.rrd N:993482575:975798536:0:0:4013672:3984493:U:U:0:0:U:0:6509:336439:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.83
+
+Port ethernet1/3: ethernet1/3 (8 / #8) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id8.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.84
+
+Port ethernet1/4: ethernet1/4 (9 / #9) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id9.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.86
+
+Port ethernet1/5: ethernet1/5 (10 / #10) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id10.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.88
+
+Port ethernet1/6: ethernet1/6 (11 / #11) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id11.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.90
+
+Port ethernet1/7: ethernet1/7 (12 / #12) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id12.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.92
+
+Port ethernet1/8: ethernet1/8 (13 / #13) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id13.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.94
+
+Port ethernet1/9: ethernet1/9 (14 / #14) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id14.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.96
+
+Port ethernet1/10: ethernet1/10 (15 / #15) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id15.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:3.98
+
+Port ethernet1/11: ethernet1/11 (16 / #16) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id16.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.00
+
+Port ethernet1/12: ethernet1/12 (17 / #17) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id17.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.02
+
+Port ethernet1/13: ethernet1/13 (18 / #18) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id18.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.03
+
+Port ethernet1/14: ethernet1/14 (19 / #19) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id19.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.05
+
+Port ethernet1/15: ethernet1/15 (20 / #20) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id20.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.07
+
+Port ethernet1/16: ethernet1/16 (21 / #21) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id21.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.09
+
+Port ethernet1/17: ethernet1/17 (22 / #22) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id22.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.11
+
+Port ethernet1/18: ethernet1/18 (23 / #23) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id23.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.13
+
+Port ethernet1/19: ethernet1/19 (24 / #24) VLAN = <vlan-name or if-name>(24.77 Mbps/148.8 Mbps)bytes(687.89 MB/4.04 GB)pkts(9.65 kpps/16.15 kpps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id24.rrd N:1480955621335:1329188993458:0:0:1548097942:1733459630:U:U:0:0:U:11523018:157663:5355017:355071[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.15
+
+Port ethernet1/20: ethernet1/20 (25 / #25) VLAN = <vlan-name or if-name>(113.96 Mbps/89.83 Mbps)bytes(3.09 GB/2.44 GB)pkts(13.87 kpps/9.86 kpps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id25.rrd N:1414570609413:1273932243328:0:0:1519039853:1358670665:U:U:0:0:U:7870666:0:4649749:355072[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.17
+
+Port vlan: vlan (200000000 / #26) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id26.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.19
+
+Port loopback: loopback (300000000 / #27) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id27.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.20
+
+Port loopback.1: loopback.1 (300000001 / #28) VLAN = <vlan-name or if-name>(171 bps/0 bps)bytes(4.86 kB/0 B)pkts(0.18 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id28.rrd N:8892437:U:0:0:73405:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.22
+
+Port loopback.2: loopback.2 (300000002 / #29) VLAN = <vlan-name or if-name>(252 bps/0 bps)bytes(7.18 kB/0 B)pkts(0.29 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id29.rrd N:10824840:U:0:0:99779:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.24
+
+Port loopback.4: loopback.4 (300000004 / #30) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id30.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.26
+
+Port tunnel: tunnel (400000000 / #31) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id31.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.28
+
+Port tunnel.1: tunnel.1 (400000001 / #32) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id32.rrd N:32387455:137921004:0:0:215197:228934:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.30
+
+Port tunnel.2: tunnel.2 (400000002 / #33) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id33.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.32
+
+Port tunnel.101: tunnel.101 (400000101 / #34) VLAN = <vlan-name or if-name>(375 bps/292 bps)bytes(10.66 kB/8.31 kB)pkts(0.23 pps/0.25 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id34.rrd N:581414:518614:0:0:3504:3663:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.34
+
+Port tunnel.102: tunnel.102 (400000102 / #35) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id35.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.36
+
+Port tunnel.103: tunnel.103 (400000103 / #36) VLAN = <vlan-name or if-name>(550.18 kbps/20.76 kbps)bytes(15.28 MB/590.52 kB)pkts(48.04 pps/21.01 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id36.rrd N:1565363002:61374564:0:0:1093513:496418:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.38
+
+Port tunnel.107: tunnel.107 (400000107 / #37) VLAN = <vlan-name or if-name>(3 bps/71 bps)bytes(74 B/2.01 kB)pkts(4.29 mpps/68.67 mpps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id37.rrd N:43660:2386514:0:0:590:18365:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.39
+
+Port tunnel.108: tunnel.108 (400000108 / #38) VLAN = <vlan-name or if-name>(1.23 Mbps/41.86 kbps)bytes(34.05 MB/1.16 MB)pkts(106.64 pps/42.42 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id38.rrd N:3270814763:109043462:0:0:2278353:884907:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.41
+
+Port tunnel.109: tunnel.109 (400000109 / #39) VLAN = <vlan-name or if-name>(828.43 kbps/27.91 kbps)bytes(23.01 MB/793.93 kB)pkts(72.19 pps/28.28 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id39.rrd N:2356466928:84812528:0:0:1644471:686972:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.43
+
+Port tunnel.201: tunnel.201 (400000201 / #40) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id40.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.45
+
+Port tunnel.202: tunnel.202 (400000202 / #41) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id41.rrd N:10403421:520584:0:0:8288:2108:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.47
+
+Port tunnel.301: tunnel.301 (400000301 / #42) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id42.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.49
+
+Port tunnel.302: tunnel.302 (400000302 / #43) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id43.rrd N:18394039:359795384:0:0:137697:301276:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.51
+
+Port tunnel.303: tunnel.303 (400000303 / #44) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id44.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.53
+
+Port tunnel.304: tunnel.304 (400000304 / #45) VLAN = <vlan-name or if-name>(264 bps/367 bps)bytes(7.51 kB/10.44 kB)pkts(81.55 mpps/0.14 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id45.rrd N:2608525:17938132:0:0:21412:26142:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.55
+
+Port tunnel.306: tunnel.306 (400000306 / #46) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id46.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.57
+
+Port tunnel.401: tunnel.401 (400000401 / #47) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id47.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.58
+
+Port ae5: ae5 (500050000 / #48) VLAN = <vlan-name or if-name>(138.73 Mbps/238.63 Mbps)bytes(3.76 GB/6.47 GB)pkts(23.52 kpps/26.02 kpps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id48.rrd N:2895526394127:2603121491223:0:0:3067138046:3092130581:U:U:0:0:U:19393686:157663:10004766:710143[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.60
+
+Port ae5.10: ae5.10 (500050010 / #49) VLAN = <vlan-name or if-name>(118.61 Mbps/231.19 Mbps)bytes(3.22 GB/6.27 GB)pkts(20.83 kpps/23.98 kpps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id49.rrd N:1924730035184:2061884800933:0:0:2032313276:2240794733:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.62
+
+Port ae5.30: ae5.30 (500050030 / #50) VLAN = <vlan-name or if-name>(94.41 kbps/1.09 kbps)bytes(2.62 MB/31.03 kB)pkts(85.96 pps/2.03 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id50.rrd N:2938696792:42161568:0:0:18778914:625473:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.64
+
+Port ae5.35: ae5.35 (500050035 / #51) VLAN = <vlan-name or if-name>(23.51 kbps/86 bps)bytes(668.78 kB/2.45 kB)pkts(10.65 pps/64.38 mpps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id51.rrd N:606401648:2156350:0:0:2042655:17563:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.66
+
+Port ae5.60: ae5.60 (500050060 / #52) VLAN = <vlan-name or if-name>(45.99 kbps/35.26 kbps)bytes(1.28 MB/1002.91 kB)pkts(21.92 pps/24.2 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id52.rrd N:100778543333:120696695452:0:0:110689591:97434364:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.68
+
+Port ae5.70: ae5.70 (500050070 / #53) VLAN = <vlan-name or if-name>(618.84 kbps/948.37 kbps)bytes(17.19 MB/26.34 MB)pkts(148.5 pps/149.89 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id53.rrd N:12367317672:60276684985:0:0:33406461:55605970:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.70
+
+Port ae5.75: ae5.75 (500050075 / #54) VLAN = <vlan-name or if-name>(223 bps/190 bps)bytes(6.34 kB/5.4 kB)pkts(0.22 pps/0.24 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id54.rrd N:1668781:1085485:0:0:16982:11852:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.72
+
+Port ae5.121: ae5.121 (500050121 / #55) VLAN = <vlan-name or if-name>(423.68 kbps/3.72 Mbps)bytes(11.77 MB/103.36 MB)pkts(204.16 pps/411.67 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id55.rrd N:18591983255:162619500553:0:0:68967948:144365159:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.74
+
+Port ae5.200: ae5.200 (500050200 / #56) VLAN = <vlan-name or if-name>(4.24 Mbps/1.3 Mbps)bytes(117.78 MB/35.99 MB)pkts(977.94 pps/908.12 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id56.rrd N:219975208016:156536112047:0:0:364445285:376980694:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.76
+
+Port ae5.220: ae5.220 (500050220 / #57) VLAN = <vlan-name or if-name>(13.68 Mbps/267.17 kbps)bytes(380.11 MB/7.42 MB)pkts(1.15 kpps/414.92 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id57.rrd N:594482088549:10938882208:0:0:399172305:134764865:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.77
+
+Port ae5.251: ae5.251 (500050251 / #58) VLAN = <vlan-name or if-name>(139.9 kbps/92.58 kbps)bytes(3.89 MB/2.57 MB)pkts(129.98 pps/56.13 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id58.rrd N:2511749796:1044490212:0:0:23332054:5217875:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.79
+
+Port ae5.255: ae5.255 (500050255 / #59) VLAN = <vlan-name or if-name>(2.87 kbps/1.61 kbps)bytes(81.64 kB/45.64 kB)pkts(4.48 pps/1.84 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id59.rrd N:124852585:69776369:0:0:1567142:640300:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.81
+
+Port ae5.290: ae5.290 (500050290 / #60) VLAN = <vlan-name or if-name>(171 bps/154 bps)bytes(4.85 kB/4.37 kB)pkts(0.16 pps/0.18 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id60.rrd N:44445867:1130441859:0:0:178466:831741:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.83
+
+Port ae5.300: ae5.300 (500050300 / #61) VLAN = <vlan-name or if-name>(4.53 kbps/2.16 kbps)bytes(128.79 kB/61.28 kB)pkts(5.52 pps/1.31 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id61.rrd N:451683421:389703389:0:0:2882160:1490191:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.85
+
+Port ae5.320: ae5.320 (500050320 / #62) VLAN = <vlan-name or if-name>(82.15 kbps/244.83 kbps)bytes(2.28 MB/6.8 MB)pkts(72.06 pps/68.43 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id62.rrd N:5163020529:15016213243:0:0:34609483:33507507:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.87
+
+Port loopback.5: loopback.5 (300000005 / #63) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id63.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.89
+
+Port tunnel.501: tunnel.501 (400000501 / #64) VLAN = <vlan-name or if-name>(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/port-id64.rrd N:U:U:0:0:U:U:U:U:0:0:U:0:0:0:0[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.91
+
+
+>> Runtime for poller module 'ports': 1.6554 seconds with 38360 bytes
+>> SNMP: [14/0.42s] MySQL: [129/1.05s] RRD: [65/0.00s]
+#### Unload poller module ports ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-ports.rrd N:1.6553809642792[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.93
+
+#### Load poller module bgp-peers ####
+
+>> Runtime for poller module 'bgp-peers': 0.0012 seconds with 11632 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module bgp-peers ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-bgp-peers.rrd N:0.0012030601501465[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.94
+Module [ junose-atm-vp ] disabled globally.
+
+Module [ toner ] disabled globally.
+
+
+#### Load poller module ucd-diskio ####
+
+>> Runtime for poller module 'ucd-diskio': 0.0005 seconds with 1824 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module ucd-diskio ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-ucd-diskio.rrd N:0.00050711631774902[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.95
+Module [ wifi ] disabled globally.
+
+
+#### Load poller module wireless ####
+
+>> Runtime for poller module 'wireless': 0.0014 seconds with 164200 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module wireless ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-wireless.rrd N:0.0014281272888184[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.95
+
+#### Load poller module ospf ####
+ Processes: SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-v2c' '-c' '<community>' '-OQUs' '-m' 'OSPF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'OSPF-MIB::ospfGeneralGroup'[0m]
+0
+>> Runtime for poller module 'ospf': 0.0149 seconds with 176840 bytes
+>> SNMP: [1/0.01s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module ospf ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-ospf.rrd N:0.014898061752319[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.95
+Module [ cisco-ipsec-flow-monitor ] disabled globally.
+
+Module [ cisco-remote-access-monitor ] disabled globally.
+
+Module [ cisco-cef ] disabled globally.
+
+Module [ cisco-sla ] disabled globally.
+
+Module [ cisco-mac-accounting ] disabled globally.
+
+Module [ cipsec-tunnels ] disabled globally.
+
+Module [ cisco-ace-loadbalancer ] disabled globally.
+
+Module [ cisco-ace-serverfarms ] disabled globally.
+
+Module [ cisco-asa-firewall ] disabled globally.
+
+Module [ cisco-voice ] disabled globally.
+
+Module [ cisco-cbqos ] disabled globally.
+
+Module [ cisco-otv ] disabled globally.
+
+Module [ cisco-qfp ] disabled globally.
+
+Module [ cisco-vpdn ] disabled globally.
+
+Module [ nac ] disabled globally.
+
+Module [ netscaler-vsvr ] disabled globally.
+
+Module [ aruba-controller ] disabled globally.
+
+
+#### Load poller module entity-physical ####
+
+>> Runtime for poller module 'entity-physical': 0.0006 seconds with 1976 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module entity-physical ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-entity-physical.rrd N:0.00059604644775391[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.96
+Module [ entity-state ] disabled globally.
+
+
+#### Load poller module applications ####
+
+>> Runtime for poller module 'applications': 0.0004 seconds with 1472 bytes
+>> SNMP: [0/0.00s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module applications ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-applications.rrd N:0.0004270076751709[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.97
+Module [ mib ] disabled globally.
+
+
+#### Load poller module stp ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v2c' '-c' '<community>' '-Oqv' '-m' 'RSTP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/paloaltonetworks' 'udp:<host.fqdn.tld>:161' 'dot1dStpProtocolSpecification.0'[0m]
+
+
+>> Runtime for poller module 'stp': 0.0100 seconds with 5608 bytes
+>> SNMP: [1/0.01s] MySQL: [1/0.00s] RRD: [1/0.00s]
+#### Unload poller module stp ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-stp.rrd N:0.010028123855591[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.97
+
+#### Load poller module ntp ####
+
+>> Runtime for poller module 'ntp': 0.0001 seconds with 320 bytes
+>> SNMP: [0/0.00s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module ntp ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-ntp.rrd N:0.00010895729064941[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.98
+Module [ loadbalancers ] disabled globally.
+
+Module [ mef ] disabled globally.
+
+
+#### Load poller module mpls ####
+
+>> Runtime for poller module 'mpls': 0.0006 seconds with 22616 bytes
+>> SNMP: [0/0.00s] MySQL: [0/0.00s] RRD: [1/0.00s]
+#### Unload poller module mpls ####
+
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf-mpls.rrd N:0.00055694580078125[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.98
+### Start Device Groups ###
+### End Device Groups, runtime: 0.0038s ### 
+
+Enabling graphs: uptime panos_sessions panos_sessions_tcp panos_sessions_udp panos_sessions_icmp panos_sessions_ssl panos_sessions_sslutil panos_activetunnels hr_users 
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/ping-perf.rrd N:0.16[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.98
+RRD[[0;32mupdate /opt/librenms/rrd/<host.fqdn.tld>/poller-perf.rrd N:4.994[0m]
+RRDtool Output: OK u:0.00 s:0.01 r:4.99
+
+Polled in 4.994 seconds
+#### Start Alerts ####
+#### End Alerts ####
+SNMP [41/2.64s]: Get[17/2.08s] Getnext[4/0.04s] Walk[20/0.52s]
+MySQL [161/1.13s]: Cell[5/0.00s] Row[-4/-0.00s] Rows[19/0.01s] Column[0/0.00s] Update[139/1.12s] Insert[2/0.00s] Delete[0/0.00s]
+RRD [139/0.01s]: Update[139/0.01s] Create [0/0.00s] Other[0/0.00s]

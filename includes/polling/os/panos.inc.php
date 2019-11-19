@@ -4,7 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 
 // changed by joovoo
-$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0','panVsysActiveSessions.0' ], '-OQUs', 'PAN-COMMON-MIB');
+$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0','panVsysActiveTcpCps.0','panVsysActiveUdpCps.0','panVsysActiveOtherIpCps.0' ], '-OQUs', 'PAN-COMMON-MIB');
 
 
 $hardware = $oids[0]['panChassisType'];
@@ -17,8 +17,11 @@ $sessions_icmp = $oids[0]['panSessionActiveICMP'];
 $sessions_ssl = $oids[0]['panSessionActiveSslProxy'];
 $sessions_sslutil = $oids[0]['panSessionSslProxyUtilization'];
 $activetunnels = $oids[0]['panGPGWUtilizationActiveTunnels'];
-// added by joovoo
-$vsysactivesessions = $oids [0]['panVsysActiveSessions'];
+$vsys_active_tcp_cps = $oids[0] ['panVsysActiveTcpCps'];
+$vsys_activeudp_cps = $oids[0] ['panVsysActiveUdpCps'];
+$vsys_active_other_ip_cps = $oids[0] ['panVsysActiveOtherIpCps'];
+
+
 
 
 if (is_numeric($sessions)) {
@@ -112,18 +115,42 @@ if (is_numeric($activetunnels)) {
     $graphs['panos_activetunnels'] = true;
 }
 
-
-// added by joovoo
-if (is_numeric($panVsysActiveSessions)) {
-    $rrd_def = RrdDefinition::make()->addDataset('panVsysActiveSessions', 'GAUGE', 0, 3000000);
+if (is_numeric($vsys_active_tcp_cps)) {
+    $rrd_def = RrdDefinition::make()->addDataset('vsys_active_tcp_cps', 'GAUGE', 0, 3000000);
 
     $fields = array(
-        'panVsysActiveSessions' => $panVsysActiveSessions,
+        'vsys_active_tcp_cps' => $vsys_active_tcp_cps,
     );
 
     $tags = compact('rrd_def');
-    data_update($device, 'panos-panVsysActiveSessions', $tags, $fields);
+    data_update($device, 'vsys-active-tcp-cps', $tags, $fields);
 
-    $graphs['panos_panVsysActiveSessions'] = true;
+    $graphs['panos_vsys_active_tcp_cps'] = true;
+}
+
+if (is_numeric($panVsysActiveUdpCps)) {
+    $rrd_def = RrdDefinition::make()->addDataset('vsys_active_udp_cps', 'GAUGE', 0, 3000000);
+
+    $fields = array(
+        'vsys_active_udp_cps' => $vsys_active_udp_cps,
+    );
+
+    $tags = compact('rrd_def');
+    data_update($device, 'vsys-active-udp-cps', $tags, $fields);
+
+    $graphs['panos_vsys_active_udp_cps'] = true;
+}
+
+if (is_numeric($vsys_active_other_ip_cps)) {
+    $rrd_def = RrdDefinition::make()->addDataset('vsys_active_other_ip_cps', 'GAUGE', 0, 3000000);
+
+    $fields = array(
+        'vsys_active_other_ip_cps' => $vsys_active_other_ip_cps,
+    );
+
+    $tags = compact('rrd_def');
+    data_update($device, 'vsys-active-other-ip-cps', $tags, $fields);
+
+    $graphs['panos_vsys_active_other_ip_cps'] = true;
 }
 
