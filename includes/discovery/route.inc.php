@@ -1,6 +1,8 @@
 <?php
-
-/* Copyright (C) 2014 Nicolas Armando <nicearma@yahoo.com> and Mathieu Millet <htam-net@github.net>
+/* Copyright (C) 2014 Nicolas Armando <nicearma@yahoo.com>
+ * Copyright (C) 2014 Mathieu Millet <htam-net@github.net>
+ * Copyright (C) 2019 PipoCanaja <pipocanaja@github.net>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,7 +14,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 //We can use RFC1213 or IP-FORWARD-MIB or MPLS-L3VPN-STD-MIB
 
