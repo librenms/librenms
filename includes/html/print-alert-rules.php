@@ -101,36 +101,39 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$query_device = 'SELECT alert_device_map.rule_id AS id FROM alert_device_map';
-$where_device = '';
-
-$query_device_group = 'SELECT alert_group_map.rule_id AS id FROM device_group_device LEFT JOIN alert_group_map ON device_group_device.device_group_id=alert_group_map.group_id';
-$where_device_group = '';
-
+$param = [];
 if (isset($device['device_id']) && $device['device_id'] > 0) {
-    $where_device .= 'WHERE alert_device_map.device_id=?';
-    $where_device_group .= 'WHERE device_group_device.device_id=?';
+    //device selected
+
+    $global_rules = "SELECT ar1.* FROM alert_rules AS ar1 WHERE ar1.id NOT IN (SELECT agm1.rule_id FROM alert_group_map AS agm1 UNION DISTINCT SELECT adm1.rule_id FROM alert_device_map AS adm1)";
+
+    $device_rules = "SELECT ar2.* FROM alert_rules AS ar2 WHERE ar2.id IN (SELECT adm2.rule_id FROM alert_device_map AS adm2 WHERE adm2.device_id=?)";
     $param[] = $device['device_id'];
+
+    $device_group_rules = "SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)";
     $param[] = $device['device_id'];
+
+    $full_query = '('. $global_rules .') UNION DISTINCT ('. $device_rules .') UNION DISTINCT ('. $device_group_rules .')';
+} else {
+    // no device selected
+    $full_query = 'SELECT alert_rules.* FROM alert_rules';
 }
 
-$full_query = "SELECT alert_rules.* FROM alert_rules WHERE id IN ($query_device $where_device UNION DISTINCT $query_device_group $where_device_group) ORDER BY id ASC";
-$query_result = dbFetchRows($full_query, $param);
+$full_query .= ' ORDER BY id ASC';
 
-$count = count($query_result);
+$rule_list = dbFetchRows($full_query, $param);
+$count = count($rule_list);
+
 if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_number'] <= $count) {
     $page_number = $_POST['page_number'];
 } else {
     $page_number = 1;
 }
 
-# start printing rules starting at result number $start
 $start = (($page_number - 1) * $results);
-# print only $result counts, beginning from $start
-$end = $start + $results;
 
 $index = 0;
-foreach ($query_result as $rule) {
+foreach ($rule_list as $rule) {
     $index++;
 
     if ($index < $start) {
