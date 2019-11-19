@@ -170,7 +170,7 @@ class RoutesTablesController extends TableController
         }
         $item['inetCidrRouteIfIndex'] = 'ifIndex ' . $item['inetCidrRouteIfIndex'];
         if ($port = $route_entry->port()->first()) {
-            $item['inetCidrRouteIfIndex'] = Url::portLink($port, $port->getShortLabel());
+            $item['inetCidrRouteIfIndex'] = Url::portLink($port, htmlspecialchars($port->getShortLabel()));
         }
         $device = Device::findByIp($route_entry->inetCidrRouteNextHop);
         if ($device) {
@@ -188,7 +188,7 @@ class RoutesTablesController extends TableController
         }
         $item['context_name'] = '[global]';
         if ($route_entry->context_name != '') {
-            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . $route_entry->context_name . '</a>' ;
+            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . htmlspecialchars($route_entry->context_name) . '</a>' ;
         }
         return $item;
     }
