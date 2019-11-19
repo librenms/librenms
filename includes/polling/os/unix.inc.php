@@ -19,8 +19,6 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
         $hardware = "Generic ARMv6";
     } elseif (strstr($device['sysDescr'], "armv7")) {
         $hardware = "Generic ARMv7";
-    } elseif (strstr($device['sysDescr'], "aarch64")) {
-        $hardware = "Generic ARMv8 64-bit";
     } elseif (strstr($device['sysDescr'], "armv")) {
         $hardware = "Generic ARM";
     }
@@ -165,9 +163,12 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
     $aix_descr = explode("\n", $device['sysDescr']);
     # AIX standard snmp deamon
     if ($aix_descr[1]) {
-        $serial = explode("Processor id: ", $aix_descr[1])[1];
+        $serial = substr(snmp_get($device, 'aixSeSerialNumber.0', '-Oqv', 'IBM-AIX-MIB'), -7);
+        $hardware = snmp_get($device, 'aixSeMachineType.0', '-Oqv', 'IBM-AIX-MIB');
+
         $aix_long_version = explode(" version: ", $aix_descr[2])[1];
-        list($version,$aix_version_min) = array_map('intval', explode(".", $aix_long_version));
+        list($version,$aix_version_min,$aix_tl) = array_map('intval', explode(".", $aix_long_version));
+        $aix_version_min = $aix_version_min . " TL " . $aix_tl;
     # AIX net-snmp
     } else {
         list(,,$aix_version_min,$version,$serial) = explode(" ", $aix_descr[0]);
