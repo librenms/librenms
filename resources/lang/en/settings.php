@@ -30,6 +30,8 @@ return [
         'discovery' => [
             'general' => 'General Discovery Settings',
             'route' => 'Routes Discovery Module',
+            'discovery_modules' => 'Discovery Modules',
+            'poller_modules' => 'Poller Modules'
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -328,6 +330,135 @@ return [
             'description' => 'Device performance entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
         ],
+        'discovery_modules' => [
+            'arp-table' => [
+                'description' => 'arp-table'
+            ],
+            'applications' => [
+                'description' => 'applications'
+            ],
+            'bgp-peers' => [
+                'description' => 'bgp-peers'
+            ],
+            'cisco-cbqos' => [
+                'description' => 'cisco-cbqos'
+            ],
+            'cisco-cef' => [
+                'description' => 'cisco-cef'
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'cisco-mac-accounting'
+            ],
+            'cisco-otv' => [
+                'description' => 'cisco-otv'
+            ],
+            'cisco-qfp' => [
+                'description' => 'cisco-qfp'
+            ],
+            'cisco-sla' => [
+                'description' => 'cisco-sla'
+            ],
+            'cisco-pw' => [
+                'description' => 'cisco-pw'
+            ],
+            'cisco-vrf-lite' => [
+                'description' => 'cisco-vrf-list'
+            ],
+            'discovery-arp' => [
+                'description' => 'discovery-arp'
+            ],
+            'discovery-protocols' => [
+                'description' => 'discovery-protocols'
+            ],
+            'entity-physical' => [
+                'description' => 'entity-physical'
+            ],
+            'entity-state' => [
+                'description' => 'entity-state'
+            ],
+            'fdb-table' => [
+                'description' => 'fdb-table'
+            ],
+            'hr-device' => [
+                'description' => 'hr-device'
+            ],
+            'ipv4-addresses' => [
+                'description' => 'ipv4-addresses'
+            ],
+            'ipv6-addresses' => [
+                'description' => 'ipv6-addresses'
+            ],
+            'junose-atm-vp' => [
+                'description' => 'junose-atm-vp'
+            ],
+            'libvirt-vminfo' => [
+                'description' => 'libvirt-vminfo'
+            ],
+            'loadbalancers' => [
+                'description' => 'loadbalancers'
+            ],
+            'mef' => [
+                'description' => 'mef'
+            ],
+            'mempools' => [
+                'description' => 'mempools'
+            ],
+            'mpls' => [
+                'description' => 'mpls'
+            ],
+            'ntp' => [
+                'description' => 'ntp'
+            ],
+            'os' => [
+                'description' => 'os'
+            ],
+            'ports' => [
+                'description' => 'ports'
+            ],
+            'ports-stack' => [
+                'description' => 'ports-stack'
+            ],
+            'processors' => [
+                'description' => 'processors'
+            ],
+
+            'route' => [
+                'description' => 'route'
+            ],
+
+            'sensors' => [
+                'description' => 'sensors'
+            ],
+
+            'services' => [
+                'description' => 'services'
+            ],
+            'storage' => [
+                'description' => 'storage'
+            ],
+
+            'stp' => [
+                'description' => 'stp'
+            ],
+            'toner' => [
+                'description' => 'toner'
+            ],
+            'ucd-diskio' => [
+                'description' => 'ucd-diskio'
+            ],
+            'vlans' => [
+                'description' => 'vlans'
+            ],
+            'vmware-vminfo' => [
+                'description' => 'vmware-vminfo'
+            ],
+            'vrf' => [
+                'description' => 'vrf'
+            ],
+            'wireless' => [
+                'description' => 'wireless'
+            ],
+        ],
         'distributed_poller' => [
             'description' => 'Enable Distributed Polling (requires additional setup)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/'
@@ -605,6 +736,143 @@ return [
         ],
         'ping' => [
             'description' => 'Path to ping'
+        ],
+        'poller_modules' => [
+            'unix-agent' => [
+                'description' => 'unix-agent'
+            ],
+            'os' => [
+                'description' => 'os'
+            ],
+            'ipmi' => [
+                'description' => 'ipmi'
+            ],
+            'sensors' => [
+                'description' => 'sensors'
+            ],
+            'processors' => [
+                'description' => 'processors'
+            ],
+            'mempools' => [
+                'description' => 'mempools'
+            ],
+            'storage' => [
+                'description' => 'storage'
+            ],
+            'netstats' => [
+                'description' => 'netstats'
+            ],
+            'hr-mib' => [
+                'description' => 'hr-mib'
+            ],
+            'ucd-mib' => [
+                'description' => 'ucd-mib'
+            ],
+            'ipSystemStats' => [
+                'description' => 'ipSystemStats'
+            ],
+            'ports' => [
+                'description' => 'ports'
+            ],
+            'bgp-peers' => [
+                'description' => 'bgp-peers'
+            ],
+            'junose-atm-vp' => [
+                'description' => 'junos-atm-vp'
+            ],
+            'toner' => [
+                'description' => 'toner'
+            ],
+            'ucd-diskio' => [
+                'description' => 'ucd-diskio'
+            ],
+            'wifi' => [
+                'description' => 'wifi'
+            ],
+            'wireless' => [
+                'description' => 'wireless'
+            ],
+            'ospf' => [
+                'description' => 'ospf'
+            ],
+            'cisco-ipsec-flow-monitor' => [
+                'description' => 'cisco-ipsec-flow-monitor'
+            ],
+            'cisco-remote-access-monitor' => [
+                'description' => 'cisco-remote-access-monitor'
+            ],
+            'cisco-cef' => [
+                'description' => 'cisco-cef'
+            ],
+            'cisco-sla' => [
+                'description' => 'cisco-sla'
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'cisco-mac-accounting'
+            ],
+            'cipsec-tunnels' => [
+                'description' => 'cipsec-tunnels'
+            ],
+            'cisco-ace-loadbalancer' => [
+                'description' => 'cisco-ace-loadbalancer'
+            ],
+            'cisco-ace-serverfarms' => [
+                'description' => 'cisco-ace-serverfarms'
+            ],
+            'cisco-asa-firewall' => [
+                'description' => 'cisco-asa-firewall'
+            ],
+            'cisco-voice' => [
+                'description' => 'cisco-voice'
+            ],
+            'cisco-cbqos' => [
+                'description' => 'cisco-cbqos'
+            ],
+            'cisco-otv' => [
+                'description' => 'cisco-otv'
+            ],
+            'cisco-qfp' => [
+                'description' => 'cisco-qfp'
+            ],
+            'cisco-vpdn' => [
+                'description' => 'cisco-vpdn'
+            ],
+            'nac' => [
+                'description' => 'nac'
+            ],
+            'netscaler-vsvr' => [
+                'description' => 'netscaler-vsvr'
+            ],
+            'aruba-controller' => [
+                'description' => 'aruba-controller'
+            ],
+            'entity-physical' => [
+                'description' => 'entity-physical'
+            ],
+            'entity-state' => [
+                'description' => 'entity-state'
+            ],
+            'applications' => [
+                'description' => 'applications'
+            ],
+            'mib' => [
+                'description' => 'mib'
+            ],
+            'stp' => [
+                'description' => 'stp'
+            ],
+            'ntp' => [
+                'description' => 'ntp'
+            ],
+            'loadbalancers' => [
+                'description' => 'loadbalancers'
+            ],
+            'mef' => [
+                'description' => 'mef'
+            ],
+            'mpls' => [
+                'description' => 'mpls'
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
