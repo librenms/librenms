@@ -71,7 +71,7 @@ if ($options['f'] === 'syslog') {
         if (is_numeric($syslog_purge)) {
             $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
             while (true) {
-                $limit = dbFetchRow('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
+                $limit = dbFetchCell('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
                 if (empty($limit)) {
                     break;
                 }
