@@ -60,6 +60,7 @@ $('#hostdep-removal').click('', function(event) {
                 $("#confirm-delete").modal('hide');
                 // Clear the host association from html
                 $('[data-row-id=' + row_id + ']').find('.parenthost').text('None');
+                $('#hostdeps').bootgrid('reload');
             } else {
                 toastr.error(output.message);
             }
