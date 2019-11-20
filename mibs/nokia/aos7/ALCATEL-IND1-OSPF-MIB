@@ -897,7 +897,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                         disable(2)
                     }
         MAX-ACCESS  read-write
-        STATUS  current
+        STATUS deprecated 
         DESCRIPTION
             "The router's support for acting as an OSPF hitless restart helper."
         DEFVAL      { enable }
@@ -910,10 +910,11 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                         disable(2)
                     }
         MAX-ACCESS  read-write
-        STATUS  current
+        STATUS deprecated 
         DESCRIPTION
             "Indicates whether or not a changed LSA will result in termination
-            of graceful restart by a helping router."
+            of graceful restart by a helping router.
+            Deprecated with IETF object ospfRestartStrictLsaChecking"
         DEFVAL      { enable }
         ::= { alaProtocolOspf 20 }
 
@@ -937,7 +938,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
    alaOspfRFC1583Compatibility  OBJECT-TYPE
         SYNTAX       TruthValue
         MAX-ACCESS   read-only            -- read-write in IETF_OSPF.mib
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Indicates metrics used to choose among multiple AS-
            external-LSAs. When RFC1583Compatibility is set to
@@ -945,7 +946,8 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
            multiple AS-external-LSAs advertising the same
            destination. When RFC1583Compatibility is set to
            disabled, preference will be driven first by type of
-           path using cost only to break ties."
+           path using cost only to break ties.
+           Deprecated by IETF standard object ospfRFC1583Compatibility"
        REFERENCE
             "OSPF Version 2, Section 16.4.1 External path preferences"
          ::= { alaProtocolOspf 22 }
@@ -971,11 +973,12 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
    alaOspfReferenceBandwidth OBJECT-TYPE
         SYNTAX       Unsigned32
         MAX-ACCESS   read-only            -- read-write in IETF_OSPF.mib
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Reference bandwidth in kilobits/second for
            calculating default interface metrics. The
-           default value is 100,000 KBPS (100 MBPS)"
+           default value is 100,000 KBPS (100 MBPS)
+           deprecated by IETF mib object ospfReferenceBandwidth"
         ::= { alaProtocolOspf 25 }
 
    alaOspfRestartSupport OBJECT-TYPE
@@ -984,20 +987,22 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                                plannedAndUnplanned (3)
                              }
         MAX-ACCESS   read-write
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "The router's support for OSPF hitless restart.
            Options include: no restart support, only planned
-           restarts or both planned and unplanned restarts."
+           restarts or both planned and unplanned restarts.
+           Deprecated by IETF object ospfRestartSupport"
         ::= { alaProtocolOspf 26 }
 
    alaOspfRestartInterval OBJECT-TYPE
         SYNTAX       Integer32 (1..1800)
         UNITS        "seconds"
         MAX-ACCESS   read-write
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
-           "Configured OSPF hitless restart timeout interval."
+           "Configured OSPF hitless restart timeout interval.
+            Deprecated by IETF mib ospfRestartInterval"
         ::= { alaProtocolOspf 27 }
 
    alaOspfRestartStatus OBJECT-TYPE
@@ -1006,7 +1011,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                                unplannedRestart (3)
                              }
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Current status of OSPF hitless restart. The status of hitless restart is
            unplannedRestart after a CMM takeover.  Before CMM takeover, the status is
@@ -1017,10 +1022,11 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
         SYNTAX       Unsigned32
         UNITS        "seconds"
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Remaining time in current OSPF hitless restart
-           interval."
+           interval.
+           Deprecated by alaOspfRestartAge"
         ::= { alaProtocolOspf 29 }
 
    alaOspfRestartExitReason OBJECT-TYPE
@@ -1034,12 +1040,13 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                                                    -- topology change.
                              }
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Describes the outcome of the last attempt at a
            hitless restart. If the value is 'none', no restart
            has yet been attempted. If the value is 'inProgress',
-           a restart attempt is currently underway."
+           a restart attempt is currently underway.
+           Deprecated by IETF object ospfRestartExitReason"
         ::= { alaProtocolOspf 30 }
 
 -- END
@@ -1091,7 +1098,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                                helping (2)
                              }
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Indicates whether the router is acting
            as a hitless restart helper for the neighbor."
@@ -1101,7 +1108,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
         SYNTAX       Unsigned32
         UNITS        "seconds"
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Remaining time in current OSPF hitless restart
            interval, if the router is acting as a restart
@@ -1121,7 +1128,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                                                    -- change.
                              }
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Describes the outcome of the last attempt at acting
             as a hitless restart helper for the neighbor."
@@ -1258,7 +1265,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                                helping (2)
                              }
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Indicates whether the router is acting
            as a hitless restart helper for the neighbor."
@@ -1268,7 +1275,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
         SYNTAX       Unsigned32
         UNITS        "seconds"
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Remaining time in current OSPF hitless restart
            interval, if the router is acting as a restart
@@ -1287,7 +1294,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                                                    -- change.
                              }
         MAX-ACCESS   read-only
-        STATUS       current
+        STATUS       deprecated 
         DESCRIPTION
            "Describes the outcome of the last attempt at acting
             as a hitless restart helper for the neighbor."
@@ -1584,12 +1591,12 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 
     alaOspfAreaNssaTranslatorRole OBJECT-TYPE
         SYNTAX   INTEGER {
-                            candidate(1),
-                            always(2),
+                            always(1),
+                            candidate(2),
                             none(3)
                          }
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS  deprecated 
         DESCRIPTION
            "Specifies whether or not an NSSA border router will unconditionally translate
             Type-7 LSAs into Type-5 LSAs. When set to always, an NSSA border router always
@@ -1602,7 +1609,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
     alaOspfAreaNssaTranslatorStabilityInterval OBJECT-TYPE
         SYNTAX   Integer32 (0..120)
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS  deprecated 
         DESCRIPTION
            "Defines the length of time (in seconds) an elected Type-7 translator will continue
             to perform its translator duties once it has determined that its translator status
@@ -1628,13 +1635,13 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 
     alaOspfAreaNssaTranslatorState OBJECT-TYPE
         SYNTAX   INTEGER {
-                            disabled(1),
-                            enabled(2),
-                            elected(3),
+                            enabled(1),
+                            elected(2),
+                            disabled(3),
                             none(4)
                          }
         MAX-ACCESS   read-only
-        STATUS   current
+        STATUS  deprecated 
         DESCRIPTION
            "The state of the NSSA Translator, for NSSA border routers. For non-NSSA border
             routers, the state is none."
@@ -1854,7 +1861,18 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                 DEFVAL      { disable }
                 ::= { alaProtocolOspf 43}
 
-
+    alaOspfOpaqueTransitCapability  OBJECT-TYPE
+                SYNTAX      INTEGER
+                {
+                        enable(1),
+                        disable(2)
+                }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Enables or disables opaque LSA accept and retransmit capability for OSPF"
+                DEFVAL      { enable }
+                ::= { alaProtocolOspf 44}
 
 
 
@@ -1915,7 +1933,8 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 			alaOspfDefaultOriginate,
 			alaOspfDefaultOriginateMetricType,
 			alaOspfDefaultOriginateMetric,
-                        alaOspfRestartInitiate
+         alaOspfRestartInitiate,
+         alaOspfOpaqueTransitCapability
         }
         STATUS  current
         DESCRIPTION

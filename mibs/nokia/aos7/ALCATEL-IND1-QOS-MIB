@@ -1,9 +1,8 @@
-
 ALCATEL-IND1-QOS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
   OBJECT-TYPE, OBJECT-IDENTITY, MODULE-IDENTITY,
-  Counter32, Counter64, Integer32, IpAddress
+  Counter32, Counter64, Integer32, IpAddress, Unsigned32
     FROM SNMPv2-SMI
   OBJECT-GROUP, MODULE-COMPLIANCE
     FROM SNMPv2-CONF
@@ -14,17 +13,42 @@ IMPORTS
   softentIND1QoS
     FROM ALCATEL-IND1-BASE
   Ipv6Address, Ipv6IfIndexOrZero
-    FROM IPV6-TC;
+    FROM IPV6-TC
+  InterfaceIndex
+    FROM IF-MIB
+  InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB;
 
 
 alaQoSMIB MODULE-IDENTITY
-  LAST-UPDATED "201301240000Z"
+  LAST-UPDATED "201408210000Z"
   ORGANIZATION "Alcatel IND"
   CONTACT-INFO
-    "Steve Clawson
-    E-Mail: Steve.Clawson@alcatel-lucent.com"
+    "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
+
+                 Alcatel-Lucent, Enterprise Solutions Division
+                (Formerly Alcatel Internetworking, Incorporated)
+                        26801 West Agoura Road 
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
+
+     Telephone:               North America  +1 800 995 2696
+                              Latin America  +1 877 919 9526
+                              Europe         +31 23 556 0100
+                              Asia           +65 394 7933
+                              All Other      +1 818 878 4507
+
+     Electronic Mail:         support@ind.alcatel.com
+     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
   DESCRIPTION
     "QoS and Filtering MIB"
+
+   REVISION "201407140000Z"
+   DESCRIPTION
+       "Added alaQoSV6NetworkGroupTable and alaQoSAppliedV6NetworkGroupTable"
+
   ::= { softentIND1QoS 1 }
 
 -- FILE: ALCATEL-IND1-QOS-MIB.mib
@@ -813,9 +837,32 @@ QoSConditionEntry ::=
     alaQoSConditionAppFpGroupStatus                         INTEGER,
     alaQoSConditionSIP                                      INTEGER,
     alaQoSConditionSIPStatus                                INTEGER,
-    alaQoSConditionDPIAppName				    SnmpAdminString,
-    alaQoSConditionDPIGrpName			    	    SnmpAdminString,
-    alaQoSConditionDPIStatus				    INTEGER
+    alaQoSConditionDPIAppName                               SnmpAdminString,
+    alaQoSConditionDPIGrpName                               SnmpAdminString,
+    alaQoSConditionDPIAppNameStatus                         INTEGER,
+    alaQoSConditionDPIAppGroupStatus                        INTEGER,
+    alaQoSConditionVxlanVni                                 Integer32,
+    alaQoSConditionVxlanVniStatus                           INTEGER,
+    alaQoSConditionVxlanPort                                Integer32,
+    alaQoSConditionVxlanPortStatus			    INTEGER,
+    alaQoSConditionVmSourceMacAddr                          MacAddress,
+    alaQoSConditionVmSourceMacAddrStatus                    INTEGER,
+    alaQoSConditionVmSourceMacMask			    MacAddress,
+    alaQoSConditionVmSourceIpAddr                           IpAddress,
+    alaQoSConditionVmSourceIpAddrStatus                     INTEGER,
+    alaQoSConditionVmSourceIpMask                           IpAddress,
+    alaQoSConditionVmSourceIpv6IpAddr                             Ipv6Address,
+    alaQoSConditionVmSourceIpv6IpAddrStatus                       INTEGER,
+    alaQoSConditionVmSourceIpv6IpMask                             Ipv6Address,
+    alaQoSConditionVmIpProtocol                             Integer32,
+    alaQoSConditionVmIpProtocolStatus                       INTEGER,
+    alaQosConditionVmL4SourcePort			    Integer32,
+    alaQosConditionVmL4SourcePortStatus		    	    INTEGER,	
+    alaQosConditionVmL4DestPort			            Integer32,
+    alaQosConditionVmL4DestPortStatus		            INTEGER,
+    alaQosConditionVxlanStatus				    INTEGER,
+    alaQoSConditionSourcePortSplitGroup                           SnmpAdminString,
+    alaQoSConditionSourcePortSplitGroupStatus                     INTEGER
  }
 
 alaQoSConditionName OBJECT-TYPE
@@ -861,7 +908,7 @@ alaQoSConditionSourceSlotStatus OBJECT-TYPE
   ::= { alaQoSConditionEntry 4 }
 
 alaQoSConditionSourcePort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (0..255)
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Source physical port range start to use for
@@ -910,7 +957,7 @@ alaQoSConditionDestinationSlotStatus OBJECT-TYPE
   ::= { alaQoSConditionEntry 9 }
 
 alaQoSConditionDestinationPort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (0..255)
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Destination physical port range start to use for traffic
@@ -1436,7 +1483,7 @@ alaQoSConditionRowStatus OBJECT-TYPE
   ::= { alaQoSConditionEntry 64 }
 
 alaQoSConditionSourcePortEnd OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (0..255)
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Source physical port range end to use for traffic
@@ -1446,7 +1493,7 @@ alaQoSConditionSourcePortEnd OBJECT-TYPE
   ::= { alaQoSConditionEntry 65 }
 
 alaQoSConditionDestinationPortEnd OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (0..255)
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Destination physical port range end to use for traffic
@@ -1911,7 +1958,7 @@ alaQoSConditionAppFpGroup OBJECT-TYPE
   SYNTAX      SnmpAdminString (SIZE(1..24))
   MAX-ACCESS  read-create
   STATUS      current
-  DESCRIPTION "Application Fingerprinting group." 
+  DESCRIPTION "Application Fingerprinting group."
   ::= { alaQoSConditionEntry 114 }
 
 alaQoSConditionAppFpGroupStatus OBJECT-TYPE
@@ -1953,27 +2000,251 @@ alaQoSConditionDPIAppName OBJECT-TYPE
   SYNTAX      SnmpAdminString (SIZE(0..32))
   MAX-ACCESS  read-create
   STATUS      current
-  DESCRIPTION "DPI Application Member."
+  DESCRIPTION "DPI Application Name associated with a policy condition."
   ::= { alaQoSConditionEntry 118 }
 
 alaQoSConditionDPIGrpName OBJECT-TYPE
   SYNTAX      SnmpAdminString (SIZE(0..32))
   MAX-ACCESS  read-create
   STATUS      current
-  DESCRIPTION "DPI Application Member Type."
+  DESCRIPTION "DPI Group Name associated with a policy condition."
   ::= { alaQoSConditionEntry 119 }
 
-alaQoSConditionDPIStatus OBJECT-TYPE
+alaQoSConditionDPIAppNameStatus OBJECT-TYPE
    SYNTAX      INTEGER {
                enabled (1),
                disabled (2)
                }
    MAX-ACCESS    read-create
    STATUS        current
-   DESCRIPTION   "DPI Status field indicates whether DPI is enabled or disabled
+   DESCRIPTION   "DPI Status field indicates whether DPI Application Name is enabled or disabled
                  for traffic classification"
-   DEFVAL        { enabled }
+   DEFVAL        { disabled }
    ::= { alaQoSConditionEntry 120 }
+
+alaQoSConditionDPIAppGroupStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+               enabled (1),
+               disabled (2)
+               }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "DPI Status field indicates whether DPI Application Group is enabled or disabled
+                 for traffic classification"
+   DEFVAL        { disabled }
+   ::= { alaQoSConditionEntry 121 }
+
+alaQoSConditionVxlanVni OBJECT-TYPE
+  SYNTAX      Integer32(0..16777215)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION ""
+  ::= { alaQoSConditionEntry 122 }
+
+alaQoSConditionVxlanVniStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the VNI needs
+  to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 123 }
+
+alaQoSConditionVxlanPort OBJECT-TYPE
+  SYNTAX      Integer32(0..65535)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION ""
+  ::= { alaQoSConditionEntry 124 }
+
+alaQoSConditionVxlanPortStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the VXLAN Port needs
+  to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 125 }
+
+alaQoSConditionVmSourceMacAddr OBJECT-TYPE
+  SYNTAX      MacAddress
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source MAC address to use for traffic classification"
+  DEFVAL      { '000000000000'h }
+  ::= { alaQoSConditionEntry 126 }
+
+alaQoSConditionVmSourceMacAddrStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source MAC address & mask
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 127 }
+
+alaQoSConditionVmSourceMacMask OBJECT-TYPE
+  SYNTAX      MacAddress
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source MAC mask to use for traffic classification"
+  DEFVAL      { 'ffffffffffff'h }
+  ::= { alaQoSConditionEntry 128 }
+
+alaQoSConditionVmSourceIpAddr OBJECT-TYPE
+  SYNTAX      IpAddress
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source IP address to use for traffic classification"
+  DEFVAL      { '00000000'h }
+  ::= { alaQoSConditionEntry 129 }
+
+alaQoSConditionVmSourceIpAddrStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source IP address & mask
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 130 }
+
+alaQoSConditionVmSourceIpMask OBJECT-TYPE
+  SYNTAX      IpAddress
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source IP mask to use for traffic classification"
+  DEFVAL      { 'ffffffff'h }
+  ::= { alaQoSConditionEntry 131 }
+
+alaQoSConditionVmSourceIpv6IpAddr OBJECT-TYPE
+  SYNTAX      Ipv6Address
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Destination IP address to use for traffic classification"
+  DEFVAL      { '00000000000000000000000000000000'h }
+  ::= { alaQoSConditionEntry 132 }
+
+alaQoSConditionVmSourceIpv6IpAddrStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source IP address & mask
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 133 }
+
+alaQoSConditionVmSourceIpv6IpMask OBJECT-TYPE
+  SYNTAX      Ipv6Address
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source IP mask to use for traffic classification"
+  DEFVAL      { 'ffffffffffffffffffffffffffffffff'h }
+  ::= { alaQoSConditionEntry 134 }
+
+alaQoSConditionVmIpProtocol OBJECT-TYPE
+  SYNTAX      Integer32 (0..255)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "IP protocol to use for traffic classification."
+  DEFVAL      { 0 }
+  ::= { alaQoSConditionEntry 135 }
+
+alaQoSConditionVmIpProtocolStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the IP protocol
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 136 }
+
+alaQosConditionVmL4SourcePort OBJECT-TYPE
+  SYNTAX      Integer32 (0..65535)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source IP port to use for traffic classification."
+  ::= { alaQoSConditionEntry 137 }
+
+alaQosConditionVmL4SourcePortStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source IP port 
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 138 }
+
+alaQosConditionVmL4DestPort OBJECT-TYPE
+  SYNTAX      Integer32 (0..65535)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Destination IP port to use for traffic
+               classification."
+  ::= { alaQoSConditionEntry 139 }
+
+alaQosConditionVmL4DestPortStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the destination port range
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 140 }
+
+alaQosConditionVxlanStatus OBJECT-TYPE
+ SYNTAX INTEGER {
+	enabled(1),
+	disabled(2)
+        }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating vxlan configuration."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 141 }
+
+alaQoSConditionSourcePortSplitGroup OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(0..31))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source physical port split-group to be used for traffic classification. Meter action should be applied on per-port basis."
+  ::= { alaQoSConditionEntry 142 }
+
+alaQoSConditionSourcePortSplitGroupStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+        enabled (1),
+        disabled (2)
+  }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source physical port splitGroup
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSConditionEntry 143 }
+
 --
 -- Definition of condition table
 --
@@ -2113,11 +2384,34 @@ QoSAppliedConditionEntry ::=
     alaQoSAppliedConditionDestinationChassis                Integer32,
     alaQoSAppliedConditionAppFpGroup                        SnmpAdminString,
     alaQoSAppliedConditionAppFpGroupStatus                  INTEGER,
-    alaQoSAppliedConditionSIP	                        	INTEGER,
-    alaQoSAppliedConditionSIPStatus	                	INTEGER,
-    alaQoSAppliedConditionDPIAppName			    SnmpAdminString,
-    alaQoSAppliedConditionDPIAppGrp			    SnmpAdminString,
-    alaQoSAppliedConditionDPIStatus			    INTEGER
+    alaQoSAppliedConditionSIP                               INTEGER,
+    alaQoSAppliedConditionSIPStatus                         INTEGER,
+    alaQoSAppliedConditionDPIAppName                        SnmpAdminString,
+    alaQoSAppliedConditionDPIAppGrp                         SnmpAdminString,
+    alaQoSAppliedConditionDPIAppNameStatus                  INTEGER,
+    alaQoSAppliedConditionDPIAppGroupStatus                 INTEGER,
+    alaQoSAppliedConditionVxlanVni                          Integer32,
+    alaQoSAppliedConditionVxlanVniStatus                    INTEGER,
+    alaQoSAppliedConditionVxlanPort                         Integer32,
+    alaQoSAppliedConditionVxlanPortStatus                   INTEGER,
+    alaQoSAppliedConditionVmSourceMacAddr                   MacAddress,
+    alaQoSAppliedConditionVmSourceMacAddrStatus             INTEGER,
+    alaQoSAppliedConditionVmSourceMacMask		    MacAddress,
+    alaQoSAppliedConditionVmSourceIpAddr                    IpAddress,
+    alaQoSAppliedConditionVmSourceIpAddrStatus              INTEGER,
+    alaQoSAppliedConditionVmSourceIpMask                    IpAddress,
+    alaQoSAppliedConditionVmSourceIpv6IpAddr                Ipv6Address,
+    alaQoSAppliedConditionVmSourceIpv6IpAddrStatus          INTEGER,
+    alaQoSAppliedConditionVmSourceIpv6IpMask                Ipv6Address,
+    alaQoSAppliedConditionVmIpProtocol                      Integer32,
+    alaQoSAppliedConditionVmIpProtocolStatus                INTEGER,
+    alaQosAppliedConditionVmL4SourcePort                    Integer32,
+    alaQosAppliedConditionVmL4SourcePortStatus              INTEGER,
+    alaQosAppliedConditionVmL4DestPort                      Integer32,
+    alaQosAppliedConditionVmL4DestPortStatus                INTEGER,
+    alaQosAppliedConditionVxlanStatus			    INTEGER,
+    alaQoSAppliedConditionSourcePortSplitGroup              SnmpAdminString,
+    alaQoSAppliedConditionSourcePortSplitGroupStatus        INTEGER
   }
 
 alaQoSAppliedConditionName OBJECT-TYPE
@@ -3140,7 +3434,7 @@ alaQoSAppliedConditionAppFpGroup OBJECT-TYPE
   SYNTAX      SnmpAdminString (SIZE(1..24))
   MAX-ACCESS  read-create
   STATUS      current
-  DESCRIPTION "Application Fingerprinting group." 
+  DESCRIPTION "Application Fingerprinting group."
   ::= { alaQoSAppliedConditionEntry 114 }
 
 alaQoSAppliedConditionAppFpGroupStatus OBJECT-TYPE
@@ -3192,17 +3486,238 @@ alaQoSAppliedConditionDPIAppGrp OBJECT-TYPE
   DESCRIPTION "DPI Application Member Type."
   ::= { alaQoSAppliedConditionEntry 119 }
 
-alaQoSAppliedConditionDPIStatus OBJECT-TYPE
+alaQoSAppliedConditionDPIAppNameStatus OBJECT-TYPE
    SYNTAX      INTEGER {
                enabled (1),
                disabled (2)
                }
    MAX-ACCESS    read-create
    STATUS        current
-   DESCRIPTION   "DPI Status field indicates whether DPI is enabled or disabled
+   DESCRIPTION   "DPI Status field indicates whether DPI Application name is enabled or disabled
                  for traffic classification"
-   DEFVAL        { enabled }
+   DEFVAL        { disabled }
    ::= { alaQoSAppliedConditionEntry 120 }
+
+alaQoSAppliedConditionDPIAppGroupStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+               enabled (1),
+               disabled (2)
+               }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "DPI Status field indicates whether DPI Application group is enabled or disabled
+                 for traffic classification"
+   DEFVAL        { disabled }
+   ::= { alaQoSAppliedConditionEntry 121 }
+
+alaQoSAppliedConditionVxlanVni OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Vni value associated with this vxlan"
+  ::= { alaQoSAppliedConditionEntry 122 }
+
+alaQoSAppliedConditionVxlanVniStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1), 
+                disabled (2)
+              }    
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the VNI needs
+  to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSAppliedConditionEntry 123 }
+
+alaQoSAppliedConditionVxlanPort OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION ""
+  ::= { alaQoSAppliedConditionEntry 124 }
+
+alaQoSAppliedConditionVxlanPortStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1), 
+                disabled (2)
+              }    
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the VNI needs
+  to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSAppliedConditionEntry 125 }
+
+alaQoSAppliedConditionVmSourceMacAddr OBJECT-TYPE
+  SYNTAX      MacAddress
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source MAC address to use for traffic classification"
+  DEFVAL      { '000000000000'h }
+  ::= { alaQoSAppliedConditionEntry 126 }
+
+alaQoSAppliedConditionVmSourceMacAddrStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source MAC address & mask
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSAppliedConditionEntry 127 }
+
+alaQoSAppliedConditionVmSourceMacMask OBJECT-TYPE
+  SYNTAX      MacAddress
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source MAC address to use for traffic classification"
+  DEFVAL      { '000000000000'h }
+  ::= { alaQoSAppliedConditionEntry 128 }
+
+alaQoSAppliedConditionVmSourceIpAddr OBJECT-TYPE
+  SYNTAX      IpAddress
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source IP address to use for traffic classification"
+  DEFVAL      { '00000000'h }
+  ::= { alaQoSAppliedConditionEntry 129 }
+
+alaQoSAppliedConditionVmSourceIpAddrStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source IP address & mask
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSAppliedConditionEntry 130 }
+
+alaQoSAppliedConditionVmSourceIpMask OBJECT-TYPE
+  SYNTAX      IpAddress
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source IP mask to use for traffic classification"
+  DEFVAL      { 'ffffffff'h }
+  ::= { alaQoSAppliedConditionEntry 131 }
+
+alaQoSAppliedConditionVmSourceIpv6IpAddr OBJECT-TYPE
+  SYNTAX      Ipv6Address
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source IPV6 address to use for traffic classification"
+  DEFVAL      { '00000000000000000000000000000000'h }
+  ::= { alaQoSAppliedConditionEntry 132 }
+
+alaQoSAppliedConditionVmSourceIpv6IpAddrStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source IP address & mask
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSAppliedConditionEntry 133 }
+
+alaQoSAppliedConditionVmSourceIpv6IpMask OBJECT-TYPE
+  SYNTAX      Ipv6Address
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source IPV6 mask to use for traffic classification"
+  DEFVAL      { 'ffffffffffffffffffffffffffffffff'h }
+  ::= { alaQoSAppliedConditionEntry 134 }
+
+alaQoSAppliedConditionVmIpProtocol OBJECT-TYPE
+  SYNTAX      Integer32 (0..255)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "IP protocol to use for traffic classification."
+  DEFVAL      { 0 }
+  ::= { alaQoSAppliedConditionEntry 135 }
+
+alaQoSAppliedConditionVmIpProtocolStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the IP protocol
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSAppliedConditionEntry 136 }
+
+alaQosAppliedConditionVmL4SourcePort OBJECT-TYPE
+  SYNTAX      Integer32 (0..65535)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Source IP port to use for traffic classification."
+  ::= { alaQoSAppliedConditionEntry 137 }
+
+alaQosAppliedConditionVmL4SourcePortStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source port 
+               needs to be matched(enabled) or not(disabled)."
+  ::= { alaQoSAppliedConditionEntry 138 }
+
+alaQosAppliedConditionVmL4DestPort OBJECT-TYPE
+  SYNTAX      Integer32 (0..65535)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Destination port to use for traffic
+               classification."
+  ::= { alaQoSAppliedConditionEntry 139 }
+
+alaQosAppliedConditionVmL4DestPortStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the destination port
+               needs to be matched(enabled) or not(disabled)."
+  DEFVAL      { disabled }
+  ::= { alaQoSAppliedConditionEntry 140 }
+
+alaQosAppliedConditionVxlanStatus OBJECT-TYPE
+ SYNTAX INTEGER {
+	enabled(1),
+	disabled(2)
+        }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Status field indicating vxlan configuration."
+  DEFVAL      { disabled }
+  ::= { alaQoSAppliedConditionEntry 141 }
+
+alaQoSAppliedConditionSourcePortSplitGroup OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(0..31))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Source physical port split-group to be used for traffic classification. Meter action should be applied on per-port basis."
+  ::= { alaQoSAppliedConditionEntry 142}
+
+alaQoSAppliedConditionSourcePortSplitGroupStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+        enabled (1),
+        disabled (2)
+  }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Status field indicating whether the source physical port splitGroup
+               needs to be matched(enabled) or not(disabled)."
+  ::= { alaQoSAppliedConditionEntry 143 }
 
 --
 -- Definition of service table
@@ -4487,7 +5002,6 @@ alaQoSAppliedPortGroupsStatus OBJECT-TYPE
                RowStatus convention"
   ::= { alaQoSAppliedPortGroupsEntry 3 }
 
-
 --
 -- Definition of port group entry table
 --
@@ -4522,7 +5036,7 @@ QoSPortGroupEntry ::=
   }
 
 alaQoSPortGroupSlot OBJECT-TYPE
-  SYNTAX      Integer32 (1..6016)
+  SYNTAX      Integer32 (0..6016)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Physical slot for port group entry.
@@ -4531,7 +5045,7 @@ alaQoSPortGroupSlot OBJECT-TYPE
   ::= { alaQoSPortGroupEntry 1 }
 
 alaQoSPortGroupPort OBJECT-TYPE
-  SYNTAX      Integer32 (1..52)
+  SYNTAX      Integer32 (0..255)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Physical port range start for port group entry"
@@ -4546,13 +5060,14 @@ alaQoSPortGroupStatus OBJECT-TYPE
   ::= { alaQoSPortGroupEntry 3 }
 
 alaQoSPortGroupPortEnd OBJECT-TYPE
-  SYNTAX      Integer32 (0..52)
+  SYNTAX      Integer32 (0..255)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Physical port range end for port group entry
                Must be greater than port range start to indicate a range.
                When '1', use port as a single port."
   ::= { alaQoSPortGroupEntry 4 }
+
 
 --
 -- Definition of port group entry table
@@ -4942,18 +5457,19 @@ QoSActionEntry ::=
     alaQoSActionPBSStatus                                   INTEGER,
     alaQoSActionCPUPriority                                 Integer32,
     alaQoSActionCPUPriorityStatus                           INTEGER,
-    alaQoSActionColorOnly		                            INTEGER,
+    alaQoSActionColorOnly                                           INTEGER,
     alaQoSActionRedirectChassis                             Integer32,
     alaQoSActionMirrorChassis                               Integer32,
     alaQoSActionPermanentGatewayIpV6Addr                    Ipv6Address,
     alaQoSActionPermanentGatewayIpV6AddrStatus              INTEGER,
     alaQoSActionPermanentGatewayIpV6IfIndex                 Ipv6IfIndexOrZero,
-    alaQoSActionRTCPMonitor		           	    INTEGER,
-    alaQoSActionRTCPMonitorStatus			    INTEGER,
-    alaQoSActionRTCPDSCP			            Integer32,
-    alaQoSActionRTCPDSCPStatus	      			    INTEGER,
-    alaQoSActionTrustDSCP				    INTEGER,
-    alaQoSActionTrustDSCPStatus	      			    INTEGER
+    alaQoSActionRTCPMonitor                                 INTEGER,
+    alaQoSActionRTCPMonitorStatus                           INTEGER,
+    alaQoSActionRTCPDSCP                                    Integer32,
+    alaQoSActionRTCPDSCPStatus                              INTEGER,
+    alaQoSActionTrustDSCP                                   INTEGER,
+    alaQoSActionTrustDSCPStatus                             INTEGER,
+    alaQoSActionRedirectModule                              INTEGER
   }
 
 alaQoSActionName OBJECT-TYPE
@@ -5502,65 +6018,81 @@ alaQoSActionPermanentGatewayIpV6IfIndex OBJECT-TYPE
 
 alaQoSActionRTCPMonitor OBJECT-TYPE
   SYNTAX      INTEGER {
-				enable (1),
-		   		disable (2)
-				}	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"RTCP Monitor status for the traffic."
-  DEFVAL      	{ enable }
+                                enable (1),
+                                disable (2)
+                                }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "RTCP Monitor status for the traffic."
+  DEFVAL        { enable }
   ::= { alaQoSActionEntry 55 }
 
 alaQoSActionRTCPMonitorStatus OBJECT-TYPE
   SYNTAX      INTEGER {
-				enabled (1),
-		   		disabled (2)
-				}	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"Status of the RTCP Monitor field for the traffic."
-  DEFVAL      	{ enabled }
+                                enabled (1),
+                                disabled (2)
+                                }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "Status of the RTCP Monitor field for the traffic."
+  DEFVAL        { enabled }
   ::= { alaQoSActionEntry 56 }
 
 alaQoSActionRTCPDSCP OBJECT-TYPE
-  SYNTAX		Integer32
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"RTCP DSCP number for the traffic."
+  SYNTAX                Integer32
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "RTCP DSCP number for the traffic."
   ::= { alaQoSActionEntry 57 }
 
 alaQoSActionRTCPDSCPStatus OBJECT-TYPE
   SYNTAX      INTEGER {
-				enabled (1),
-		   		disabled (2)
-				}	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"Status of the RTCP DSCP field for the traffic."
-  DEFVAL      	{ enabled }
+                                enabled (1),
+                                disabled (2)
+                                }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "Status of the RTCP DSCP field for the traffic."
+  DEFVAL        { enabled }
   ::= { alaQoSActionEntry 58 }
 
 alaQoSActionTrustDSCP OBJECT-TYPE
   SYNTAX      INTEGER {
-				yes (1),
-		   		no (2)
-				}	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"Trust DSCP status for the traffic."
-  DEFVAL      	{ no }
+                                yes (1),
+                                no (2)
+                                }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "Trust DSCP status for the traffic."
+  DEFVAL        { no }
   ::= { alaQoSActionEntry 59 }
 
 alaQoSActionTrustDSCPStatus OBJECT-TYPE
   SYNTAX      INTEGER {
-				enabled (1),
-		   		disabled (2)
-				}	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"Status of the Trust DSCP field for the traffic."
-  DEFVAL      	{ enabled }
+                                enabled (1),
+                                disabled (2)
+                                }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "Status of the Trust DSCP field for the traffic."
+  DEFVAL        { enabled }
   ::= { alaQoSActionEntry 60 }
+
+alaQoSActionRedirectModule OBJECT-TYPE
+  SYNTAX      INTEGER {
+                none (0),
+                qmr (1),
+                captivePortal (2),
+                unauthorized (3),
+                byod (4)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Object to configure action on HTTP port for Access-Guardian
+               Restricted Role configuration."
+
+  DEFVAL      { none }
+  ::= { alaQoSActionEntry 61 }
 
 
 --
@@ -5641,12 +6173,12 @@ QoSAppliedActionEntry ::=
     alaQoSAppliedActionPermanentGatewayIpV6Addr             Ipv6Address,
     alaQoSAppliedActionPermanentGatewayIpV6AddrStatus       INTEGER,
     alaQoSAppliedActionPermanentGatewayIpV6IfIndex          Ipv6IfIndexOrZero,
-    alaQoSAppliedActionRTCPMonitor			    INTEGER,
-    alaQoSAppliedActionRTCPMonitorStatus		    INTEGER,
-    alaQoSAppliedActionRTCPDSCP				    Integer32,
-    alaQoSAppliedActionRTCPDSCPStatus			    INTEGER,
-    alaQoSAppliedActionTrustDSCP			    INTEGER,
-    alaQoSAppliedActionTrustDSCPStatus			    INTEGER
+    alaQoSAppliedActionRTCPMonitor                          INTEGER,
+    alaQoSAppliedActionRTCPMonitorStatus                    INTEGER,
+    alaQoSAppliedActionRTCPDSCP                             Integer32,
+    alaQoSAppliedActionRTCPDSCPStatus                       INTEGER,
+    alaQoSAppliedActionTrustDSCP                            INTEGER,
+    alaQoSAppliedActionTrustDSCPStatus                      INTEGER
   }
 
 alaQoSAppliedActionName OBJECT-TYPE
@@ -6160,63 +6692,63 @@ alaQoSAppliedActionPermanentGatewayIpV6IfIndex OBJECT-TYPE
 
 alaQoSAppliedActionRTCPMonitor OBJECT-TYPE
   SYNTAX      INTEGER {
-				enable (1),
-		   		disable (2)
-		      }	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"RTCP Monitor status for the traffic."
-  DEFVAL      	{ enable }
+                                enable (1),
+                                disable (2)
+                      }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "RTCP Monitor status for the traffic."
+  DEFVAL        { enable }
   ::= { alaQoSAppliedActionEntry 55 }
 
 alaQoSAppliedActionRTCPMonitorStatus OBJECT-TYPE
   SYNTAX      INTEGER {
-				enable (1),
-		   		disable (2)
-		      }	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"Status of the RTCP Monitor field for the traffic."
-  DEFVAL      	{ enable }
+                                enable (1),
+                                disable (2)
+                      }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "Status of the RTCP Monitor field for the traffic."
+  DEFVAL        { enable }
   ::= { alaQoSAppliedActionEntry 56 }
 
 alaQoSAppliedActionRTCPDSCP OBJECT-TYPE
-  SYNTAX		Integer32
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"RTCP DSCP number for the traffic."
+  SYNTAX                Integer32
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "RTCP DSCP number for the traffic."
   ::= { alaQoSAppliedActionEntry 57 }
 
 alaQoSAppliedActionRTCPDSCPStatus OBJECT-TYPE
   SYNTAX      INTEGER {
-				enable (1),
-		   		disable (2)
-		      }	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"Status of the RTCP DSCP field for the traffic."
+                                enable (1),
+                                disable (2)
+                      }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "Status of the RTCP DSCP field for the traffic."
   ::= { alaQoSAppliedActionEntry 58 }
 
 alaQoSAppliedActionTrustDSCP OBJECT-TYPE
   SYNTAX      INTEGER {
-				yes (1),
-		   		no (2)
-		      }	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"Trust DSCP status for the traffic."
-  DEFVAL      	{ no }
+                                yes (1),
+                                no (2)
+                      }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "Trust DSCP status for the traffic."
+  DEFVAL        { no }
   ::= { alaQoSAppliedActionEntry 59 }
 
 alaQoSAppliedActionTrustDSCPStatus OBJECT-TYPE
   SYNTAX      INTEGER {
-				enable (1),
-		   		disable (2)
-				}	
-  MAX-ACCESS  	read-create
-  STATUS      	current
-  DESCRIPTION 	"Status of the Trust DSCP field for the traffic."
-  DEFVAL      	{ enable }
+                                enable (1),
+                                disable (2)
+                                }
+  MAX-ACCESS    read-create
+  STATUS        current
+  DESCRIPTION   "Status of the Trust DSCP field for the traffic."
+  DEFVAL        { enable }
   ::= { alaQoSAppliedActionEntry 60 }
 
 
@@ -6262,6 +6794,8 @@ QoSPortEntry ::=
     alaQoSPortMaximumBandwidthStatus                        INTEGER,
     alaQoSPortMaximumIngBandwidth                           Integer32,
     alaQoSPortMaximumIngBandwidthStatus                     INTEGER,
+    alaQoSPortMaximumIngressDepth                           Integer32,
+    alaQoSPortMaximumIngressDepthStatus                     INTEGER,
     alaQoSPortDEIMarking                                    INTEGER,
     alaQoSPortDEIMapping                                    INTEGER
   }
@@ -6335,9 +6869,8 @@ alaQoSPortMaximumDefaultDepth OBJECT-TYPE
   SYNTAX      Integer32
   MAX-ACCESS  read-create
   STATUS      current
-  DESCRIPTION "Pending maximum depth of egress queues (Kbytes).
-               Maximum depth of queues on this port
-               Does not take effect until an 'Apply' command is issued"
+  DESCRIPTION "Maximum depth of egress queues (Kbytes).
+               Maximum depth of queues on this port"
   DEFVAL      { 0 }
   ::= { alaQoSPortEntry 7 }
 
@@ -6348,8 +6881,8 @@ alaQoSPortMaximumDefaultDepthStatus OBJECT-TYPE
               }
   MAX-ACCESS  read-create
   STATUS      current
-  DESCRIPTION "Pending status field indicating whether to enforce
-               maximum depth on next 'Apply'"
+  DESCRIPTION "Status field indicating whether to enforce
+               maximum depth on this port"
   DEFVAL      { disabled }
   ::= { alaQoSPortEntry 8 }
 
@@ -6437,6 +6970,29 @@ alaQoSPortMaximumIngBandwidthStatus OBJECT-TYPE
   DEFVAL      { disabled }
   ::= { alaQoSPortEntry 16 }
 
+alaQoSPortMaximumIngressDepth OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maximum depth of ingress queues (Kbytes).
+        Maximum depth of queues on this port"
+    DEFVAL      { 0 }
+    ::= { alaQoSPortEntry  17 }
+
+alaQoSPortMaximumIngressDepthStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled (1),
+                    disabled (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Status field indicating whether to enforce
+        maximum depth on  this port"
+    DEFVAL      { disabled }
+    ::= { alaQoSPortEntry  18 }
+
 alaQoSPortDEIMarking OBJECT-TYPE
   SYNTAX      INTEGER {
                 enabled (1),
@@ -6444,8 +7000,8 @@ alaQoSPortDEIMarking OBJECT-TYPE
               }
   MAX-ACCESS  read-create
   STATUS      current
-  DESCRIPTION "This object specifies if, in egress traffic, the DEI/CFI bit 
-               will be set or not for the traffic which is not conformant to 
+  DESCRIPTION "This object specifies if, in egress traffic, the DEI/CFI bit
+               will be set or not for the traffic which is not conformant to
                SLA (Yellow color packets).
 
           enabled(1)  -- the DEI/CFI bit will be set in egress traffic.
@@ -6705,14 +7261,15 @@ alaQoSConfigAutoPhones OBJECT-TYPE
   ::= { alaQoSConfig 19 }
 
 alaQoSConfigQMPage OBJECT-TYPE
-  SYNTAX      INTEGER {
-                yes (1),
-                no (2)
-              }
-  MAX-ACCESS  read-write
-  STATUS      current
-  DESCRIPTION "Flag to indicate whether to send back a quarantined page when a client is quarantined but a remediation URL is not specified."
-  ::= { alaQoSConfig 20 }
+SYNTAX      INTEGER {
+yes (1),
+no (2)
+}
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION "Flag to indicate whether to send back a quarantined page when a client is quarantined but a remediation URL is not specified."
+::= { alaQoSConfig 20 }
+
 
 alaQoSConfigQMMACGroup OBJECT-TYPE
   SYNTAX        SnmpAdminString (SIZE(0..31))
@@ -6722,11 +7279,12 @@ alaQoSConfigQMMACGroup OBJECT-TYPE
   ::= { alaQoSConfig 21 }
 
 alaQoSConfigQMPath OBJECT-TYPE
-  SYNTAX        SnmpAdminString (SIZE(0..255))
-  MAX-ACCESS    read-write
-  STATUS        current
-  DESCRIPTION "Default path for remediation server redirect."
-  ::= { alaQoSConfig 22 }
+SYNTAX        SnmpAdminString (SIZE(0..255))
+MAX-ACCESS    read-write
+STATUS        current
+DESCRIPTION "Default path for remediation server redirect."
+::= { alaQoSConfig 22 }
+
 alaQoSConfigDEIMapping OBJECT-TYPE
   SYNTAX      INTEGER {
                 enabled (1),
@@ -6760,6 +7318,32 @@ alaQoSConfigDEIMarking OBJECT-TYPE
                          color."
   DEFVAL      { disabled }
   ::= { alaQoSConfig 24 }
+
+alaQoSConfigSwitchGroup OBJECT-TYPE
+  SYNTAX      INTEGER {
+                expanded (1),
+                compact (2)
+              }
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "How to match the network group `Switch'.
+      expanded -- Match each interface address as a unique identifier.
+      compact  -- Match Switch interfaces using an aggregated identifier."
+
+  DEFVAL      { expanded }
+  ::= { alaQoSConfig 25 }
+
+
+alaQoSVmSnooping OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enable (1),
+                disabled (2)
+              }
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "Is VM Snooping enabled on the switch"
+  DEFVAL      { disabled }
+  ::= { alaQoSConfig 26 }
 
 --
 -- Definition of statistics table
@@ -7170,7 +7754,8 @@ alaQoSRuleGroupsType OBJECT-TYPE
                 default (1),
                 egress (2),
                 unp (3),
-                appfp (4)
+                appfp (4),
+                empacl (5)
               }
   MAX-ACCESS  read-create
   STATUS      current
@@ -7440,12 +8025,13 @@ alaQoSAppliedRuleGroupStatus OBJECT-TYPE
                RowStatus convention"
   ::= { alaQoSAppliedRuleGroupEntry 6 }
 
+
 --
 -- Definition of DSCP table
 --
 
 alaQoSDSCPTable OBJECT-TYPE
-  SYNTAX      SEQUENCE OF AlaQoSDSCPEntry 
+  SYNTAX      SEQUENCE OF AlaQoSDSCPEntry
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Table of QoS Condition definitions"
@@ -7464,50 +8050,449 @@ alaQoSDSCPEntry OBJECT-TYPE
 AlaQoSDSCPEntry ::=
   SEQUENCE
   {
-	alaQoSDSCPEntryNumber		Integer32,
-	alaQoSDSCPPriority			Integer32,
-	alaQoSDSCPDropPrecedence	INTEGER,
-        alaQoSDSCPRowStatus             RowStatus 
+        alaQoSDSCPEntryNumber           Integer32,
+        alaQoSDSCPPriority              Integer32,
+        alaQoSDSCPDropPrecedence        INTEGER,
+        alaQoSDSCPRowStatus             RowStatus
    }
 
 alaQoSDSCPEntryNumber OBJECT-TYPE
-  SYNTAX      		Integer32(1..5000)
-  MAX-ACCESS  		not-accessible
-  STATUS      		current
-  DESCRIPTION 		"DSCP Entry number for the traffic."
+  SYNTAX                Integer32(1..5000)
+  MAX-ACCESS            not-accessible
+  STATUS                current
+  DESCRIPTION           "DSCP Entry number for the traffic."
   ::= { alaQoSDSCPEntry 1}
 
 alaQoSDSCPPriority OBJECT-TYPE
-  SYNTAX      		Integer32
-  MAX-ACCESS 		read-create
-  STATUS      		current
-  DESCRIPTION 		"DSCP priority for the traffic."
+  SYNTAX                Integer32
+  MAX-ACCESS            read-create
+  STATUS                current
+  DESCRIPTION           "DSCP priority for the traffic."
   ::= { alaQoSDSCPEntry 2}
 
 alaQoSDSCPDropPrecedence OBJECT-TYPE
-  SYNTAX	INTEGER {
-				low (1),
-				medium (2),
-				high (3)
-			}		
-  MAX-ACCESS 		read-create
-  STATUS      		current
-  DESCRIPTION 		"DSCP drop precedence for the traffic."
-  DEFVAL      	{low}
+  SYNTAX        INTEGER {
+                                low (1),
+                                medium (2),
+                                high (3)
+                        }
+  MAX-ACCESS            read-create
+  STATUS                current
+  DESCRIPTION           "DSCP drop precedence for the traffic."
+  DEFVAL        {low}
   ::= { alaQoSDSCPEntry 3}
 
 alaQoSDSCPRowStatus OBJECT-TYPE
-  SYNTAX      		RowStatus 
-  MAX-ACCESS 		read-create
-  STATUS      		current
-  DESCRIPTION 		"RowStatus entry for QoS DSCP."
+  SYNTAX                RowStatus
+  MAX-ACCESS            read-create
+  STATUS                current
+  DESCRIPTION           "RowStatus entry for QoS DSCP."
   ::= { alaQoSDSCPEntry 4}
 
+--
+-- Definition of Mac-Range table
+--
+
+alaQoSAutoMacRangeTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF AlaQoSAutoMacRangeEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS Auto Mac ranges"
+  ::= { alaQoSMIBObjects 56 }
+
+alaQoSAutoMacRangeEntry OBJECT-TYPE
+  SYNTAX      AlaQoSAutoMacRangeEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS Auto Mac Range"
+  INDEX {
+          alaQoSAutoMacRangeIndex
+        }
+  ::= { alaQoSAutoMacRangeTable 1 }
+
+AlaQoSAutoMacRangeEntry ::=
+  SEQUENCE
+  {
+        alaQoSAutoMacRangeIndex     Unsigned32,
+        alaQoSAutoMacRangeStart     MacAddress,
+        alaQoSAutoMacRangeEnd       MacAddress
+   }
+
+alaQoSAutoMacRangeIndex OBJECT-TYPE
+  SYNTAX                Unsigned32
+  MAX-ACCESS            not-accessible
+  STATUS                current
+  DESCRIPTION           "Index to the Mac range table."
+  ::= { alaQoSAutoMacRangeEntry 1 }
+
+alaQoSAutoMacRangeStart  OBJECT-TYPE
+  SYNTAX                MacAddress
+  MAX-ACCESS            read-only
+  STATUS                current
+  DESCRIPTION "specifies the starting mac-address of the default mac-range
+               which is supported by qos auto phones."
+  ::= { alaQoSAutoMacRangeEntry 2 }
+
+alaQoSAutoMacRangeEnd  OBJECT-TYPE
+  SYNTAX                MacAddress
+  MAX-ACCESS            read-only
+  STATUS                current
+  DESCRIPTION "specifies the end mac-address of the default mac-range
+               which is supported by qos auto phones."
+  ::= { alaQoSAutoMacRangeEntry 3 }
 
 
+--
+-- Definition of extended rule table
+--
+alaQoSExtendedRuleTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSExtendedRuleEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS Rule definitions for extending port group behavior on individual port basis or group basis"
+  ::= { alaQoSMIBObjects 57 }
+
+alaQoSExtendedRuleEntry OBJECT-TYPE
+  SYNTAX      QoSExtendedRuleEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS Rule" 
+  INDEX {
+          alaQoSRuleName,
+          alaQoSExtendedRuleSplitRuleID
+        }
+  ::= { alaQoSExtendedRuleTable 1 }
+
+QoSExtendedRuleEntry ::=
+  SEQUENCE
+  {
+    alaQoSExtendedRuleSplitRuleID           Unsigned32,
+    alaQoSExtendedRuleChassis               Integer32,
+    alaQoSExtendedRuleSlot                  Integer32,
+    alaQoSExtendedRulePort                  Integer32,
+    alaQoSExtendedRulePacketCount           Counter64,
+    alaQoSExtendedRuleByteCount             Counter64,
+    alaQoSExtendedRuleGreenPacketCount      Counter64,
+    alaQoSExtendedRuleYellowPacketCount     Counter64,
+    alaQoSExtendedRuleRedPacketCount        Counter64,
+    alaQoSExtendedRuleGreenByteCount        Counter64,
+    alaQoSExtendedRuleYellowByteCount       Counter64,
+    alaQoSExtendedRuleRedByteCount          Counter64
+  }
+
+alaQoSExtendedRuleSplitRuleID OBJECT-TYPE
+  SYNTAX      Unsigned32 (1..8192)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Split Rule ID defined from the number of members in the group."
+  ::= { alaQoSExtendedRuleEntry 1 }
+
+alaQoSExtendedRuleChassis OBJECT-TYPE
+  SYNTAX      Integer32 (0..16)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Chassis on which rate-limit is enabled."
+  ::= { alaQoSExtendedRuleEntry 2 }
+
+alaQoSExtendedRuleSlot OBJECT-TYPE
+  SYNTAX      Integer32 (0..16)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Slot on which rate-limit is enabled."
+  ::= { alaQoSExtendedRuleEntry 3 }
+
+alaQoSExtendedRulePort OBJECT-TYPE
+  SYNTAX      Integer32 (1..52)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Port on which rate-limit is enabled."
+  ::= { alaQoSExtendedRuleEntry 4 }
+
+alaQoSExtendedRulePacketCount OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for packets matching this rule"
+  ::= { alaQoSExtendedRuleEntry 5 }
+
+alaQoSExtendedRuleByteCount OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for bytes matching this rule"
+  ::= { alaQoSExtendedRuleEntry 6 }
+
+alaQoSExtendedRuleGreenPacketCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are green compliant."
+  ::= { alaQoSExtendedRuleEntry 7 }
+
+alaQoSExtendedRuleYellowPacketCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are yellow compliant."
+  ::= { alaQoSExtendedRuleEntry 8 }
+
+alaQoSExtendedRuleRedPacketCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are red compliant."
+  ::= { alaQoSExtendedRuleEntry 9 }
+
+alaQoSExtendedRuleGreenByteCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of Bytes which are green compliant."
+  ::= { alaQoSExtendedRuleEntry 10 }
+
+alaQoSExtendedRuleYellowByteCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of Bytes which are yellow compliant."
+  ::= { alaQoSExtendedRuleEntry 11 }
+
+alaQoSExtendedRuleRedByteCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of Bytes which are red compliant."
+  ::= { alaQoSExtendedRuleEntry 12 }
 
 
+--
+-- Definition of network group entry table
+--
 
+alaQoSV6NetworkGroupTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSV6NetworkGroupEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS V6NetworkGroup definitions"
+  ::= { alaQoSMIBObjects 40 }
+
+alaQoSV6NetworkGroupEntry OBJECT-TYPE
+  SYNTAX      QoSV6NetworkGroupEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS NetworkGroup"
+  INDEX {
+          alaQoSNetworkGroupsName,
+          alaQoSV6NetworkGroupIpAddr,
+          alaQoSV6NetworkGroupIpMask
+        }
+  ::= { alaQoSV6NetworkGroupTable 1 }
+
+QoSV6NetworkGroupEntry ::=
+  SEQUENCE
+  {
+    alaQoSV6NetworkGroupIpAddr                                Ipv6Address,
+    alaQoSV6NetworkGroupIpMask                                Ipv6Address,
+    alaQoSV6NetworkGroupStatus                                RowStatus
+  }
+
+alaQoSV6NetworkGroupIpAddr OBJECT-TYPE
+  SYNTAX      Ipv6Address
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "IP address for network group entry."
+  ::= { alaQoSV6NetworkGroupEntry 1 }
+
+alaQoSV6NetworkGroupIpMask OBJECT-TYPE
+  SYNTAX      Ipv6Address
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "IP mask for network group entry."
+  ::= { alaQoSV6NetworkGroupEntry 2 }
+
+alaQoSV6NetworkGroupStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Used to create/delete network group entries according to the
+               RowStatus convention"
+  ::= { alaQoSV6NetworkGroupEntry 3 }
+
+
+--
+-- Definition of network group entry table
+--
+
+alaQoSAppliedV6NetworkGroupTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSAppliedV6NetworkGroupEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS AppliedNetworkGroup definitions"
+  ::= { alaQoSMIBObjects 41 }
+
+alaQoSAppliedV6NetworkGroupEntry OBJECT-TYPE
+  SYNTAX      QoSAppliedV6NetworkGroupEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS AppliedNetworkGroup"
+  INDEX {
+          alaQoSAppliedNetworkGroupsName,
+          alaQoSAppliedV6NetworkGroupIpAddr,
+          alaQoSAppliedV6NetworkGroupIpMask
+        }
+  ::= { alaQoSAppliedV6NetworkGroupTable 1 }
+
+QoSAppliedV6NetworkGroupEntry ::=
+  SEQUENCE
+  {
+    alaQoSAppliedV6NetworkGroupIpAddr                         Ipv6Address,
+    alaQoSAppliedV6NetworkGroupIpMask                         Ipv6Address,
+    alaQoSAppliedV6NetworkGroupStatus                         RowStatus
+  }
+
+alaQoSAppliedV6NetworkGroupIpAddr OBJECT-TYPE
+  SYNTAX      Ipv6Address
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "IP address for network group entry."
+  ::= { alaQoSAppliedV6NetworkGroupEntry 1 }
+
+alaQoSAppliedV6NetworkGroupIpMask OBJECT-TYPE
+  SYNTAX      Ipv6Address
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "IP mask for network group entry."
+  ::= { alaQoSAppliedV6NetworkGroupEntry 2 }
+
+alaQoSAppliedV6NetworkGroupStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Used to create/delete network group entries according to the
+               RowStatus convention"
+  ::= { alaQoSAppliedV6NetworkGroupEntry 3 }
+
+--
+--  Definition of IP Network Summary Table
+--
+
+alaQoSIpNetworkSummaryTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF AlaQoSIpNetworkSummaryEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS IpNetworkSummary definitions."
+  ::= { alaQoSMIBObjects 58 }
+
+alaQoSIpNetworkSummaryEntry OBJECT-TYPE
+  SYNTAX      AlaQoSIpNetworkSummaryEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS IpNetworkSummary."
+  INDEX {
+          alaQoSRuleName
+        }
+  ::= { alaQoSIpNetworkSummaryTable 1 }
+
+AlaQoSIpNetworkSummaryEntry ::=
+  SEQUENCE
+  {
+    alaQoSIpNetworkSummaryProtocol                          SnmpAdminString,
+    alaQoSIpNetworkSummarySourceIpAddressType               InetAddressType,
+    alaQoSIpNetworkSummarySourceIpAddress                   InetAddress,
+    alaQoSIpNetworkSummaryDestinationIpAddressType          InetAddressType,
+    alaQoSIpNetworkSummaryDestinationIpAddress              InetAddress,
+    alaQoSIpNetworkSummarySourceGroup                       SnmpAdminString,
+    alaQoSIpNetworkSummaryDestinationGroup                  SnmpAdminString,
+    alaQoSIpNetworkSummaryVrfName                           SnmpAdminString,
+    alaQoSIpNetworkSummaryAction                            INTEGER,
+    alaQoSIpNetworkSummaryHitCount                          Counter64
+  }
+
+alaQoSIpNetworkSummaryProtocol OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(0..31))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Network Protocols as specified in condition classifier for given rule."
+  ::= { alaQoSIpNetworkSummaryEntry 1 }
+
+alaQoSIpNetworkSummarySourceIpAddressType OBJECT-TYPE
+  SYNTAX      InetAddressType
+    {
+        ipv4 (1),
+        ipv6 (2)
+    }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Source Ip Address Type as specified in condition classifier for given rule."
+  ::= { alaQoSIpNetworkSummaryEntry 2 }
+
+alaQoSIpNetworkSummarySourceIpAddress OBJECT-TYPE
+  SYNTAX       InetAddress (SIZE(4|16))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Source  IP address as specified in condition classifier for given rule."
+  ::= { alaQoSIpNetworkSummaryEntry 3 }
+
+alaQoSIpNetworkSummaryDestinationIpAddressType OBJECT-TYPE
+  SYNTAX      InetAddressType
+    {
+        ipv4 (1),
+        ipv6 (2)
+    }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Destination Ip Address Type as specified in condition classifier for given rule."
+  ::= { alaQoSIpNetworkSummaryEntry 4 }
+
+alaQoSIpNetworkSummaryDestinationIpAddress OBJECT-TYPE
+  SYNTAX       InetAddress (SIZE(4|16))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Destination Ip Address as specified in condition classifier for given rule."
+  ::= { alaQoSIpNetworkSummaryEntry 5 }
+
+alaQoSIpNetworkSummarySourceGroup OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(0..31))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Source Group as specified in condition classifier for given rule."
+  ::= { alaQoSIpNetworkSummaryEntry 6 }
+
+alaQoSIpNetworkSummaryDestinationGroup OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(0..31))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Destination Group as specified in condition classifier for given rule."
+  ::= { alaQoSIpNetworkSummaryEntry 7 }
+
+alaQoSIpNetworkSummaryVrfName OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(0..31))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "VRF Name as specified in condition classifier for given rule."
+  ::= { alaQoSIpNetworkSummaryEntry 8 }
+
+alaQoSIpNetworkSummaryAction OBJECT-TYPE
+  SYNTAX      INTEGER
+    {
+        accept (1),
+        deny (2)
+    }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "The action performed when the packet hit the rule."
+  ::= { alaQoSIpNetworkSummaryEntry 9 }
+
+alaQoSIpNetworkSummaryHitCount OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Number of packets hit the rule."
+  ::= { alaQoSIpNetworkSummaryEntry 10 }
+
+--
+--  Conformance Information
+--
 
 alaQoSMIBConformance OBJECT-IDENTITY
   STATUS      current
@@ -7711,7 +8696,30 @@ alaQoSMIBConditionObjects OBJECT-GROUP
     alaQoSConditionSIPStatus,
     alaQoSConditionDPIAppName,
     alaQoSConditionDPIGrpName,
-    alaQoSConditionDPIStatus
+    alaQoSConditionDPIAppNameStatus,
+    alaQoSConditionDPIAppGroupStatus,
+    alaQoSConditionVxlanVni,
+    alaQoSConditionVxlanVniStatus,
+    alaQoSConditionVxlanPort,
+    alaQoSConditionVxlanPortStatus,
+    alaQoSConditionVmSourceMacAddr,
+    alaQoSConditionVmSourceMacAddrStatus,
+    alaQoSConditionVmSourceMacMask,
+    alaQoSConditionVmSourceIpAddr,
+    alaQoSConditionVmSourceIpAddrStatus,
+    alaQoSConditionVmSourceIpMask,
+    alaQoSConditionVmSourceIpv6IpAddr,
+    alaQoSConditionVmSourceIpv6IpAddrStatus,
+    alaQoSConditionVmSourceIpv6IpMask,
+    alaQoSConditionVmIpProtocol,
+    alaQoSConditionVmIpProtocolStatus,
+    alaQosConditionVmL4SourcePort,
+    alaQosConditionVmL4SourcePortStatus,
+    alaQosConditionVmL4DestPort,
+    alaQosConditionVmL4DestPortStatus,
+    alaQosConditionVxlanStatus,
+    alaQoSConditionSourcePortSplitGroup,
+    alaQoSConditionSourcePortSplitGroupStatus
   }
 
   STATUS      current
@@ -7838,7 +8846,30 @@ alaQoSMIBAppliedConditionObjects OBJECT-GROUP
     alaQoSAppliedConditionSIPStatus,
     alaQoSAppliedConditionDPIAppName,
     alaQoSAppliedConditionDPIAppGrp,
-    alaQoSAppliedConditionDPIStatus
+    alaQoSAppliedConditionDPIAppNameStatus,
+    alaQoSAppliedConditionDPIAppGroupStatus,
+    alaQoSAppliedConditionVxlanVni,
+    alaQoSAppliedConditionVxlanVniStatus,
+    alaQoSAppliedConditionVxlanPort,
+    alaQoSAppliedConditionVxlanPortStatus,
+    alaQoSAppliedConditionVmSourceMacAddr,
+    alaQoSAppliedConditionVmSourceMacAddrStatus,
+    alaQoSAppliedConditionVmSourceMacMask,
+    alaQoSAppliedConditionVmSourceIpAddr,
+    alaQoSAppliedConditionVmSourceIpAddrStatus,
+    alaQoSAppliedConditionVmSourceIpMask,
+    alaQoSAppliedConditionVmSourceIpv6IpAddr,
+    alaQoSAppliedConditionVmSourceIpv6IpAddrStatus,
+    alaQoSAppliedConditionVmSourceIpv6IpMask,
+    alaQoSAppliedConditionVmIpProtocol,
+    alaQoSAppliedConditionVmIpProtocolStatus,
+    alaQosAppliedConditionVmL4SourcePort,
+    alaQosAppliedConditionVmL4SourcePortStatus,
+    alaQosAppliedConditionVmL4DestPort,
+    alaQosAppliedConditionVmL4DestPortStatus,
+    alaQosAppliedConditionVxlanStatus,
+    alaQoSAppliedConditionSourcePortSplitGroup,
+    alaQoSAppliedConditionSourcePortSplitGroupStatus
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
@@ -7908,7 +8939,7 @@ alaQoSMIBServiceGroupsObjects OBJECT-GROUP
     alaQoSServiceGroupsStatus
   }
   STATUS      current
-  DESCRIPTION "Collections of objects providing information for ServiceGroupss"
+  DESCRIPTION "Collections of objects providing information for ServiceGroups"
   ::= { alaQoSMIBGroups 7 }
 
 alaQoSMIBAppliedServiceGroupsObjects OBJECT-GROUP
@@ -7918,7 +8949,7 @@ alaQoSMIBAppliedServiceGroupsObjects OBJECT-GROUP
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
-               for applied ServiceGroupss"
+               for applied ServiceGroups"
   ::= { alaQoSMIBGroups 8 }
 
 alaQoSMIBServiceGroupObjects OBJECT-GROUP
@@ -7944,7 +8975,7 @@ alaQoSMIBNetworkGroupsObjects OBJECT-GROUP
     alaQoSNetworkGroupsStatus
   }
   STATUS      current
-  DESCRIPTION "Collections of objects providing information for NetworkGroupss"
+  DESCRIPTION "Collections of objects providing information for NetworkGroups"
   ::= { alaQoSMIBGroups 11 }
 
 alaQoSMIBAppliedNetworkGroupsObjects OBJECT-GROUP
@@ -7954,7 +8985,7 @@ alaQoSMIBAppliedNetworkGroupsObjects OBJECT-GROUP
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
-               for applied NetworkGroupss"
+               for applied NetworkGroups"
   ::= { alaQoSMIBGroups 12 }
 
 alaQoSMIBNetworkGroupObjects OBJECT-GROUP
@@ -7980,7 +9011,7 @@ alaQoSMIBMACGroupsObjects OBJECT-GROUP
     alaQoSMACGroupsStatus
   }
   STATUS      current
-  DESCRIPTION "Collections of objects providing information for MACGroupss"
+  DESCRIPTION "Collections of objects providing information for MACGroups"
   ::= { alaQoSMIBGroups 15 }
 
 alaQoSMIBAppliedMACGroupsObjects OBJECT-GROUP
@@ -7990,7 +9021,7 @@ alaQoSMIBAppliedMACGroupsObjects OBJECT-GROUP
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
-               for applied MACGroupss"
+               for applied MACGroups"
   ::= { alaQoSMIBGroups 16 }
 
 alaQoSMIBMACGroupObjects OBJECT-GROUP
@@ -8016,7 +9047,7 @@ alaQoSMIBPortGroupsObjects OBJECT-GROUP
     alaQoSPortGroupsStatus
   }
   STATUS      current
-  DESCRIPTION "Collections of objects providing information for PortGroupss"
+  DESCRIPTION "Collections of objects providing information for PortGroups"
   ::= { alaQoSMIBGroups 19 }
 
 alaQoSMIBAppliedPortGroupsObjects OBJECT-GROUP
@@ -8026,7 +9057,7 @@ alaQoSMIBAppliedPortGroupsObjects OBJECT-GROUP
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
-               for applied PortGroupss"
+               for applied PortGroups"
   ::= { alaQoSMIBGroups 20 }
 
 alaQoSMIBPortGroupObjects OBJECT-GROUP
@@ -8052,7 +9083,7 @@ alaQoSMIBMapGroupsObjects OBJECT-GROUP
     alaQoSMapGroupsStatus
   }
   STATUS      current
-  DESCRIPTION "Collections of objects providing information for MapGroupss"
+  DESCRIPTION "Collections of objects providing information for MapGroups"
   ::= { alaQoSMIBGroups 23 }
 
 alaQoSMIBAppliedMapGroupsObjects OBJECT-GROUP
@@ -8062,7 +9093,7 @@ alaQoSMIBAppliedMapGroupsObjects OBJECT-GROUP
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
-               for applied MapGroupss"
+               for applied MapGroups"
   ::= { alaQoSMIBGroups 24 }
 
 alaQoSMIBMapGroupObjects OBJECT-GROUP
@@ -8142,7 +9173,8 @@ alaQoSMIBActionObjects OBJECT-GROUP
     alaQoSActionRTCPDSCP,
     alaQoSActionRTCPDSCPStatus,
     alaQoSActionTrustDSCP,
-    alaQoSActionTrustDSCPStatus
+    alaQoSActionTrustDSCPStatus,
+    alaQoSActionRedirectModule
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information for Actions"
@@ -8231,6 +9263,8 @@ alaQoSMIBPortObjects OBJECT-GROUP
     alaQoSPortMaximumBandwidthStatus,
     alaQoSPortMaximumIngBandwidth,
     alaQoSPortMaximumIngBandwidthStatus,
+    alaQoSPortMaximumIngressDepth,
+    alaQoSPortMaximumIngressDepthStatus,
     alaQoSPortDEIMarking,
     alaQoSPortDEIMapping
   }
@@ -8263,7 +9297,10 @@ alaQoSMIBConfigObjects OBJECT-GROUP
     alaQoSConfigQMMACGroup,
     alaQoSConfigQMPath,
     alaQoSConfigDEIMapping,
-    alaQoSConfigDEIMarking
+    alaQoSConfigDEIMarking,
+    alaQoSConfigSwitchGroup,
+    alaQoSVmSnooping
+
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information for Configs"
@@ -8287,7 +9324,7 @@ alaQoSMIBRuleGroupsObjects OBJECT-GROUP
     alaQoSRuleGroupsStatus
   }
   STATUS      current
-  DESCRIPTION "Collections of objects providing information for RuleGroupss"
+  DESCRIPTION "Collections of objects providing information for RuleGroups"
   ::= { alaQoSMIBGroups 32 }
 
 alaQoSMIBAppliedRuleGroupsObjects OBJECT-GROUP
@@ -8299,7 +9336,7 @@ alaQoSMIBAppliedRuleGroupsObjects OBJECT-GROUP
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
-               for applied RuleGroupss"
+               for applied RuleGroups"
   ::= { alaQoSMIBGroups 33 }
 
 alaQoSMIBRuleGroupObjects OBJECT-GROUP
@@ -8379,6 +9416,70 @@ alaQoSMIBDSCPGroupObjects OBJECT-GROUP
                for DSCP Table"
   ::= { alaQoSMIBGroups 38 }
 
+alaQoSMIBAutoMacRangeGroupObjects OBJECT-GROUP
+  OBJECTS {
+        alaQoSAutoMacRangeStart,
+        alaQoSAutoMacRangeEnd
+  }
+  STATUS      current
+  DESCRIPTION "Collections of objects providing information
+               for Auto Qos Mac Range Table"
+  ::= { alaQoSMIBGroups 39 }
+
+
+alaQoSMIBV6NetworkGroupObjects OBJECT-GROUP
+  OBJECTS {
+    alaQoSV6NetworkGroupStatus
+  }
+  STATUS      current
+  DESCRIPTION "Collections of objects providing information for V6NetworkGroups"
+  ::= { alaQoSMIBGroups 40 }
+
+alaQoSMIBAppliedV6NetworkGroupObjects OBJECT-GROUP
+  OBJECTS {
+    alaQoSAppliedV6NetworkGroupStatus
+  }
+  STATUS      current
+  DESCRIPTION "Collections of objects providing information
+               for applied V6NetworkGroups"
+  ::= { alaQoSMIBGroups 41 }
+
+alaQoSRuleExtendedObjects OBJECT-GROUP
+  OBJECTS {
+    alaQoSExtendedRuleChassis,
+    alaQoSExtendedRuleSlot,
+    alaQoSExtendedRulePort,
+    alaQoSExtendedRulePacketCount,
+    alaQoSExtendedRuleByteCount,
+    alaQoSExtendedRuleGreenPacketCount,
+    alaQoSExtendedRuleYellowPacketCount,
+    alaQoSExtendedRuleRedPacketCount,
+    alaQoSExtendedRuleGreenByteCount,
+    alaQoSExtendedRuleYellowByteCount,
+    alaQoSExtendedRuleRedByteCount
+  }
+  STATUS      current
+  DESCRIPTION "Collections of objects providing information
+               for rule extended"
+  ::= { alaQoSMIBGroups 42 }
+
+alaQoSIpNetworkSummaryGroupObjects OBJECT-GROUP
+  OBJECTS {
+    alaQoSIpNetworkSummaryProtocol,
+    alaQoSIpNetworkSummarySourceIpAddressType,
+    alaQoSIpNetworkSummarySourceIpAddress,
+    alaQoSIpNetworkSummaryDestinationIpAddressType,
+    alaQoSIpNetworkSummaryDestinationIpAddress,
+    alaQoSIpNetworkSummarySourceGroup,
+    alaQoSIpNetworkSummaryDestinationGroup,
+    alaQoSIpNetworkSummaryVrfName,
+    alaQoSIpNetworkSummaryAction,
+    alaQoSIpNetworkSummaryHitCount
+  }
+  STATUS      current
+  DESCRIPTION "Collections of objects providing information for Ip Network Summary."
+  ::= { alaQoSMIBGroups 43 }
+
 alaQoSMIBCompliance MODULE-COMPLIANCE
   STATUS      current
   DESCRIPTION "Compliance statement for QoS."
@@ -8420,7 +9521,13 @@ alaQoSMIBCompliance MODULE-COMPLIANCE
     alaQoSMIBRuleGroupObjects,
     alaQoSMIBAppliedRuleGroupObjects,
     alaQoSMIBValidityPeriodObjects,
-    alaQoSMIBAppliedValidityPeriodObjects
+    alaQoSMIBAppliedValidityPeriodObjects,
+    alaQoSMIBDSCPGroupObjects,
+    alaQoSMIBAutoMacRangeGroupObjects,
+    alaQoSMIBV6NetworkGroupObjects,
+    alaQoSMIBAppliedV6NetworkGroupObjects,
+    alaQoSRuleExtendedObjects,
+    alaQoSIpNetworkSummaryGroupObjects
   }
   ::= { alaQoSMIBCompliances 1 }
 

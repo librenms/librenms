@@ -2428,7 +2428,11 @@ vl4095(4095)
                 vStpPortConfigPVST
                     INTEGER,
                 vStpPortConfigStatePVST
-                    INTEGER
+                    INTEGER,
+                vStpPortConfigLoopGuard
+                    INTEGER,
+                vStpPortConfigLoopGuardNote
+                    SnmpAdminString
             }
 
 
@@ -2484,6 +2488,27 @@ vl4095(4095)
                  this port."
             DEFVAL { off }
             ::= { vStpPortConfigEntry 4 }
+
+        vStpPortConfigLoopGuard OBJECT-TYPE
+            SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Configure STP loop guard on the port."
+            DEFVAL { disable }
+            ::= { vStpPortConfigEntry 5 }
+
+        vStpPortConfigLoopGuardNote OBJECT-TYPE
+            SYNTAX SnmpAdminString (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "STP loop guard status to signify if the port is in loop inconsistency state(Err) or not."
+            ::= { vStpPortConfigEntry  6 }
+
 
 -- -------------------------------------------------------------
         -- The Ring Rapid spanning tree global state
@@ -2632,6 +2657,28 @@ vl4095(4095)
             bridge."
     ::= { alcatelIND1VLANSTPMIBNotifications 2 }
 
+    alaSTPLoopGuardError NOTIFICATION-TYPE
+    OBJECTS    {
+                  vStpPortConfigIfIndex,
+                  vStpInsNumber
+               }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent by a bridge when a port
+            enters the Loop inconsistent state (ERR state)."
+    ::= { alcatelIND1VLANSTPMIBNotifications 3 }
+
+    alaSTPLoopGuardRecovery NOTIFICATION-TYPE
+    OBJECTS    {
+                 vStpPortConfigIfIndex,
+                 vStpInsNumber
+               }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent by a bridge when a port
+            leaves the Loop inconsistent state (ERR state)."
+    ::= { alcatelIND1VLANSTPMIBNotifications 4 }
+
 
 
 -- Conformance Information
@@ -2757,7 +2804,9 @@ vl4095(4095)
             vStpPortConfigIfIndex,
             vStpPortConfigTenGigOs8800Opt,
             vStpPortConfigPVST,
-            vStpPortConfigStatePVST
+            vStpPortConfigStatePVST,
+            vStpPortConfigLoopGuard,
+            vStpPortConfigLoopGuardNote
         }
          STATUS  current
          DESCRIPTION
@@ -2769,7 +2818,9 @@ vl4095(4095)
     vStpNotificationGroup NOTIFICATION-GROUP
     NOTIFICATIONS {
           stpNewRoot,
-          stpRootPortChange
+          stpRootPortChange,
+          alaSTPLoopGuardError,
+          alaSTPLoopGuardRecovery
         }
     STATUS current
     DESCRIPTION

@@ -154,6 +154,14 @@ IMPORTS
             healthModuleCpu1DayAvg
                         Integer32,
             healthModuleChassisId
+                        Integer32,
+            healthModuleCpuLatest
+                        Integer32,
+            healthModuleMemoryLatest
+                        Integer32,
+            healthModuleRxLatest
+                        Integer32,
+            healthModuleRxTxLatest
                         Integer32
             }
 
@@ -276,15 +284,46 @@ IMPORTS
             ::= { healthModuleEntry 13 }
 
         healthModuleChassisId  OBJECT-TYPE
-            SYNTAX  Integer32 (0..2)
+            SYNTAX  Integer32 (0..8)
             MAX-ACCESS  read-only
             STATUS  current
 	    DESCRIPTION
 	        "This is a configuraion for chassis id.
 	         (0) if no chassis id been applied
-	         (1..2) configure VC valid chassis id"
+	         (1..8) configure VC valid chassis id"
 	    ::= { healthModuleEntry 14 }
 
+        healthModuleCpuLatest  OBJECT-TYPE
+            SYNTAX  Integer32  (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Current CPU utilization (percent)."
+            ::= { healthModuleEntry 15 }
+
+        healthModuleMemoryLatest  OBJECT-TYPE
+            SYNTAX  Integer32  (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Current memory utilization (percent)."
+            ::= { healthModuleEntry 16 }
+
+        healthModuleRxLatest  OBJECT-TYPE
+            SYNTAX  Integer32  (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Current input utilization (percent)."
+            ::= { healthModuleEntry 17 }
+
+        healthModuleRxTxLatest  OBJECT-TYPE
+            SYNTAX  Integer32  (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Current i/o utilization (percent)."
+            ::= { healthModuleEntry 18 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -454,6 +493,15 @@ IMPORTS
                 "Device Cpu threshold value.  Units are percent."
             DEFVAL  { 80 }
             ::= { healthThreshInfo 4 }
+	
+	 healthThreshFlashLimit  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Device Flash threshold value.  Units are percent."
+            DEFVAL  { 75 }
+            ::= { healthThreshInfo 5 }
 
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -512,6 +560,18 @@ IMPORTS
             DESCRIPTION
                 "CPU threshold status."
             ::= { healthTrapInfo 4 }
+       
+	healthMonFlashStatus  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                     crossedBelowThreshold (1),
+                     noChange              (2),
+                     crossedAboveThreshold (3)
+                             }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Flash threshold status."
+            ::= { healthTrapInfo 5 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 --  NOTIFICATIONS
@@ -519,12 +579,13 @@ IMPORTS
 
         healthMonModuleTrap NOTIFICATION-TYPE
            OBJECTS {
-               healthModuleChassisId,
 	       healthModuleSlot,
 	       healthMonRxStatus,
 	       healthMonRxTxStatus,
 	       healthMonMemoryStatus,
-	       healthMonCpuStatus
+	       healthMonCpuStatus,
+               healthModuleChassisId,
+	       healthModuleCpuLatest
            }
            STATUS   current
            DESCRIPTION
@@ -534,11 +595,11 @@ IMPORTS
 
         healthMonPortTrap NOTIFICATION-TYPE
            OBJECTS {
-               healthModuleChassisId,
-               healthModuleSlot,
 	       healthPortIfIndex,
 	       healthMonRxStatus,
-	       healthMonRxTxStatus
+	       healthMonRxTxStatus,
+               healthModuleChassisId,
+               healthModuleSlot
            }
            STATUS   current
            DESCRIPTION
@@ -548,7 +609,8 @@ IMPORTS
         healthMonCmmTrap NOTIFICATION-TYPE
            OBJECTS {
 	       healthMonMemoryStatus,
-	       healthMonCpuStatus
+	       healthMonCpuStatus,
+	       healthMonFlashStatus
            }
            STATUS   current
            DESCRIPTION
@@ -597,7 +659,12 @@ IMPORTS
                         healthModuleMemory1DayAvg,
                         healthModuleCpu1MinAvg,
                         healthModuleCpu1HrAvg,
-                        healthModuleCpu1DayAvg
+                        healthModuleCpu1DayAvg,
+			healthModuleChassisId,
+                        healthModuleCpuLatest,        
+                        healthModuleMemoryLatest,        
+                        healthModuleRxLatest,        
+                        healthModuleRxTxLatest        
         }
         STATUS  current
         DESCRIPTION
@@ -638,7 +705,9 @@ IMPORTS
                         healthThreshRxLimit,
                         healthThreshRxTxLimit,
                         healthThreshMemoryLimit,
-                        healthThreshCpuLimit
+                        healthThreshCpuLimit,
+			healthThreshFlashLimit
+
         }
         STATUS  current
         DESCRIPTION
@@ -652,7 +721,9 @@ IMPORTS
                         healthMonRxStatus,
                         healthMonRxTxStatus,
                         healthMonMemoryStatus,
-                        healthMonCpuStatus
+                        healthMonCpuStatus,
+			healthMonFlashStatus
+
         }
         STATUS  current
         DESCRIPTION

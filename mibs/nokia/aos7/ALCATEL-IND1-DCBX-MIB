@@ -675,7 +675,7 @@ alaDcbxPIRowStatus OBJECT-TYPE
 
 alaDcbxPIDCBXVersion OBJECT-TYPE
     SYNTAX DcbxVersion
-    MAX-ACCESS  read-write
+    MAX-ACCESS  read-create
     STATUS current
     DESCRIPTION
         "DCBX Version selected on this port."
