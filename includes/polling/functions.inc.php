@@ -776,8 +776,8 @@ function data_flatten($array, $prefix = '', $joiner = '_')
 }
 
 //TODO: fx documentation
-function set_device_location( $sysLocation, &$device, &$update_array ) {
-
+function set_device_location($sysLocation, &$device, &$update_array)
+{
     $sysLocation = str_replace('"', '', $sysLocation);
 
     // Rewrite sysLocation if there is a mapping array (database too?)

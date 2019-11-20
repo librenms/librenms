@@ -31,7 +31,7 @@ if ($serial != $device['serial']) {
 }
 
 update_device_logo($device);
-set_device_location($location, $device, $update_array );
+set_device_location($location, $device, $update_array);
 
 echo 'Location: ' . $location . PHP_EOL;
 echo 'Hardware: ' . $hardware . PHP_EOL;
