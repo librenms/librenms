@@ -38,9 +38,9 @@
 
     <div class="form-group">
         <select class="form-control" name="maintenance" id="maintenance-{{ $id }}" type="number">
-            <option value="0" @if($maintenance == '0') selected @endif>@lang('Hide devices under maintenance')</opt
-            <option value="1" @if($maintenance == '1') selected @endif>@lang('Show devices under maintenance')</opt
-            <option value="2" @if($maintenance == '2') selected @endif>@lang('Show only devices under maintenance')
+            <option value="0" @if($maintenance == '0') selected @endif>@lang('Hide devices under maintenance')</option>
+            <option value="1" @if($maintenance == '1') selected @endif>@lang('Show devices under maintenance')</option>
+            <option value="2" @if($maintenance == '2') selected @endif>@lang('Show only devices under maintenance')</option>
         </select>
     </div>
 
