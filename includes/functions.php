@@ -1323,6 +1323,14 @@ function convert_delay($delay)
     return($delay_sec);
 }
 
+function normalize_snmp_ip_address($data)
+{
+    // $data is received from snmpwalk, can be ipv4 xxx.xxx.xxx.xxx or ipv6 xx:xx:...:xx (16 chunks)
+    // ipv4 is returned unchanged, ipv6 is returned with one ':' removed out of two, like
+    //  xxxx:xxxx:...:xxxx (8 chuncks)
+    return (preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', $data, 2)[0]));
+}
+
 function guidv4($data)
 {
     // http://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid#15875555
@@ -2470,8 +2478,8 @@ function get_db_schema()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if ($device['snmp_max_oid'] > 0) {
-        return $device['snmp_max_oid'];
+    if ($device['attribs']['snmp_max_oid'] > 0) {
+        return $device['attribs']['snmp_max_oid'];
     }
 
     // then os

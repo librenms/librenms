@@ -70,21 +70,24 @@ if ($options['f'] === 'syslog') {
 
         if (is_numeric($syslog_purge)) {
             $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
+            $initial_rows = $rows;
             while (true) {
-                $limit = dbFetchRow('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
+                $limit = dbFetchCell('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
                 if (empty($limit)) {
                     break;
                 }
 
+                # Deletes are done in blocks of 1000 to avoid a single very large operation.
                 if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $limit, $syslog_purge)) > 0) {
                     $rows = $limit;
-                    echo "Syslog cleared for entries over $syslog_purge days 1000 limit\n";
                 } else {
                     break;
                 }
             }
 
             dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $syslog_purge));
+            $final_rows = $rows - $initial_rows;
+            echo "Syslog cleared for entries over $syslog_purge days (about $final_rows rows)\n";
         }
     } catch (LockException $e) {
         echo $e->getMessage() . PHP_EOL;
@@ -96,7 +99,10 @@ if ($options['f'] === 'ports_fdb') {
     $ret = lock_and_purge('ports_fdb', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
 }
-
+if ($options['f'] === 'route') {
+    $ret = lock_and_purge('route', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
+    exit($ret);
+}
 if ($options['f'] === 'eventlog') {
     $ret = lock_and_purge('eventlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);

@@ -11,15 +11,16 @@
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-32x32.png') }}" sizes="32x32">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-16x16.png') }}" sizes="16x16">
-        <link rel="manifest" href="{{ asset('images/manifest.json') }}">
         <link rel="mask-icon" href="{{ asset('images/safari-pinned-tab.svg') }}" color="#5bbad5">
         <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
-        <meta name="theme-color" content="#ffffff">
     @else
         <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}" />
     @endif
+    
+    <link rel="manifest" href="{{ asset('images/manifest.json') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
+    <meta name="theme-color" content="#ffffff">
 
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" type="text/css" />
@@ -41,7 +42,7 @@
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190912" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('css/' . LibreNMS\Config::get('site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
     @endforeach

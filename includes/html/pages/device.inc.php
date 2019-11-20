@@ -17,6 +17,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     }
     $select = array($tab => 'class="active"');
 
+    DeviceCache::setPrimary($vars['device']);
     $device = device_by_id_cache($vars['device']);
     $attribs = get_dev_attribs($device['device_id']);
     $device['attribs'] = $attribs;
@@ -268,6 +269,11 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             $routing_tabs[] = 'cisco-otv';
         }
 
+        $device_routing_count['routes'] = dbFetchCell('SELECT COUNT(*) FROM `route` WHERE `device_id` = ?', array($device['device_id']));
+        if ($device_routing_count['routes']) {
+            $routing_tabs[] = 'routes';
+        }
+
         if (is_array($routing_tabs)) {
             echo '<li role="presentation" '.$select['routing'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
@@ -381,7 +387,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
         }
 
         if ($device_config_file) {
-            if (!get_dev_attrib($device, 'override_Oxidized_disable', 'true')) {
+            if (!get_dev_attrib($device, 'override_Oxidized_disable') == 'true') {
                 echo '<li class="'.$select['showconfig'].'">
                     <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'">
                     <i class="fa fa-align-justify fa-lg icon-theme"  aria-hidden="true"></i> Config

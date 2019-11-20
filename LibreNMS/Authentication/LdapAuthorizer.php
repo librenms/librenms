@@ -9,6 +9,7 @@ use LibreNMS\Exceptions\LdapMissingException;
 class LdapAuthorizer extends AuthorizerBase
 {
     protected $ldap_connection;
+    private $userloginname = "";
 
     public function authenticate($credentials)
     {
@@ -16,6 +17,7 @@ class LdapAuthorizer extends AuthorizerBase
 
         if (!empty($credentials['username'])) {
             $username = $credentials['username'];
+            $this->userloginname = $username;
             if (!empty($credentials['password']) && ldap_bind($connection, $this->getFullDn($username), $credentials['password'])) {
                 $ldap_groups = $this->getGroupList();
                 if (empty($ldap_groups)) {
@@ -198,10 +200,22 @@ class LdapAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        foreach ($this->getUserlist() as $user) {
-            if ((int)$user['user_id'] === (int)$user_id) {
-                return $user;
+        $connection = $this->getLdapConnection();
+
+        $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
+        if (Config::get('auth_ldap_userlist_filter') != null) {
+            $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
+        }
+        
+        $search = ldap_search($connection, $this->getFullDn($this->userloginname), $filter);
+        $entries = ldap_get_entries($connection, $search);
+        foreach ($entries as $entry) {
+            $user = $this->ldapToUser($entry);
+            if ((int)$user['user_id'] !== (int)$user_id) {
+                continue;
             }
+            
+            return $user;
         }
         return 0;
     }

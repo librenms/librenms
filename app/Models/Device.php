@@ -7,6 +7,7 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -334,6 +335,45 @@ class Device extends BaseModel
         $this->save();
     }
 
+    public function getAttrib($name)
+    {
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name);
+    }
+
+    public function setAttrib($name, $value)
+    {
+        $attrib = $this->attribs->first(function ($item) use ($name) {
+            return $item->attrib_type === $name;
+        });
+
+        if (!$attrib) {
+            $attrib = new DeviceAttrib(['attrib_type' => $name]);
+            $this->attribs->push($attrib);
+        }
+
+        $attrib->attrib_value = $value;
+        return (bool)$this->attribs()->save($attrib);
+    }
+
+    public function forgetAttrib($name)
+    {
+        $attrib_index = $this->attribs->search(function ($attrib) use ($name) {
+            return $attrib->attrib_type === $name;
+        });
+
+        if ($attrib_index !== false) {
+            $this->attribs->forget($attrib_index);
+            return (bool)$this->attribs->get($attrib_index)->delete();
+        }
+
+        return false;
+    }
+
+    public function getAttribs()
+    {
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
+    }
+
     // ---- Accessors/Mutators ----
 
     public function getIconAttribute($icon)
@@ -443,6 +483,11 @@ class Device extends BaseModel
     public function alerts()
     {
         return $this->hasMany('App\Models\Alert', 'device_id');
+    }
+
+    public function attribs()
+    {
+        return $this->hasMany('App\Models\DeviceAttrib', 'device_id');
     }
 
     public function alertSchedules()
@@ -604,6 +649,11 @@ class Device extends BaseModel
     {
         // FIXME does not include global read
         return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');
+    }
+
+    public function vrfLites()
+    {
+        return $this->hasMany('App\Models\VrfLite', 'device_id');
     }
 
     public function vrfs()

@@ -1040,9 +1040,11 @@ function add_edit_rule(\Illuminate\Http\Request $request)
     $count     = $data['count'];
     $mute      = $data['mute'];
     $delay     = $data['delay'];
+    $interval     = $data['interval'];
     $override_query = $data['override_query'];
     $adv_query = $data['adv_query'];
     $delay_sec = convert_delay($delay);
+    $interval_sec = convert_delay($interval);
     if ($mute == 1) {
         $mute = true;
     } else {
@@ -1053,6 +1055,7 @@ function add_edit_rule(\Illuminate\Http\Request $request)
         'mute'  => $mute,
         'count' => $count,
         'delay' => $delay_sec,
+        'interval' => $interval_sec,
         'options' =>
             [
                 'override_query' => $override_query
@@ -1996,22 +1999,22 @@ function list_ip_networks()
 
 function list_arp(\Illuminate\Http\Request $request)
 {
-    $ip       = $request->route('ip');
+    $query       = $request->route('query');
     $cidr     = $request->route('cidr');
     $hostname = $request->get('device');
 
-    if (empty($ip)) {
-        return api_error(400, "No valid IP provided");
-    } elseif ($ip === "all" && empty($hostname)) {
+    if (empty($query)) {
+        return api_error(400, "No valid IP/MAC provided");
+    } elseif ($query === "all" && empty($hostname)) {
         return api_error(400, "Device argument is required when requesting all entries");
     }
 
-    if ($ip === "all") {
+    if ($query === "all") {
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
         $arp = dbFetchRows("SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?", [$device_id]);
     } elseif ($cidr) {
         try {
-            $ip = new IPv4("$ip/$cidr");
+            $ip = new IPv4("$query/$cidr");
             $arp = dbFetchRows(
                 'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
                 [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())]
@@ -2019,8 +2022,11 @@ function list_arp(\Illuminate\Http\Request $request)
         } catch (InvalidIpException $e) {
             return api_error(400, "Invalid Network Address");
         }
+    } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
+        $mac = \LibreNMS\Util\Rewrite::macToHex($query);
+        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `mac_address`=?", [$mac]);
     } else {
-        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", [$ip]);
+        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", [$query]);
     }
     return api_success($arp, 'arp');
 }
@@ -2173,9 +2179,6 @@ function add_service_for_host(\Illuminate\Http\Request $request)
     // Print error if required fields are missing
     if (!empty($missing_fields)) {
         return api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
-    }
-    if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
-        return api_error(400, 'service_ip is not a valid IP address.');
     }
 
     // Check if service type exists

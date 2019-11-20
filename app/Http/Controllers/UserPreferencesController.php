@@ -28,15 +28,19 @@ namespace App\Http\Controllers;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Config;
+use LibreNMS\Util\DynamicConfig;
 use Session;
 
 class UserPreferencesController extends Controller
 {
+    private $cachedPreferences = ['locale', 'site_style'];
+
     public function __construct()
     {
         $this->middleware('deny-demo');
@@ -51,14 +55,25 @@ class UserPreferencesController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+
+        $locales = $this->getValidLocales();
+        $styles = $this->getValidStyles();
+        $default_locale = \config('app.locale');
+        $default_style = Config::get('site_style');
+
         $data = [
             'user' => $user,
             'can_change_password' => LegacyAuth::get()->canUpdatePasswords($user->username),
             'dashboards' => Dashboard::allAvailable($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
-            'locale' => UserPref::getPref($user, 'locale') ?: 'en',
-            'locales' => $this->getValidLocales(),
+            'locale' => UserPref::getPref($user, 'locale'),
+            'locale_default' => $locales[$default_locale] ?? $default_locale,
+            'locales' => $locales,
+            'site_style' => UserPref::getPref($user, 'site_style'),
+            'site_style_default' => $styles[$default_style] ?? $default_style,
+            'site_styles' => $styles,
+
         ];
 
         if (Config::get('twofactor')) {
@@ -89,7 +104,11 @@ class UserPreferencesController extends Controller
             'add_schedule_note_to_device' => 'required|integer',
             'locale' => [
                 'required',
-                Rule::in(array_keys($this->getValidLocales())),
+                Rule::in(array_merge(['default'], array_keys($this->getValidLocales()))),
+            ],
+            'site_style' => [
+                'required',
+                Rule::in(array_merge(['default'], array_keys($this->getValidStyles()))),
             ],
         ];
 
@@ -98,11 +117,7 @@ class UserPreferencesController extends Controller
             'value' => $valid_prefs[$request->pref] ?? 'required|integer',
         ]);
 
-        UserPref::setPref($request->user(), $request->pref, $request->value);
-
-        if ($request->pref == 'locale') {
-            Session::put('locale', $request->value);
-        }
+        $this->updatePreference($request->pref, $request->value);
 
         return response()->json(['status' => 'success']);
     }
@@ -117,5 +132,26 @@ class UserPreferencesController extends Controller
                 return $locales;
             }
         }, []);
+    }
+
+    private function getValidStyles()
+    {
+        $definitions = new DynamicConfig();
+        return $definitions->get('site_style')->getOptions();
+    }
+
+    private function updatePreference($preference, $value)
+    {
+        if ($value == 'default') {
+            UserPref::forgetPref(Auth::user(), $preference);
+            if (in_array($preference, $this->cachedPreferences)) {
+                Session::forget('preferences.' . $preference);
+            }
+        } else {
+            UserPref::setPref(Auth::user(), $preference, $value);
+            if (in_array($preference, $this->cachedPreferences)) {
+                Session::put('preferences.' . $preference, $value);
+            }
+        }
     }
 }
