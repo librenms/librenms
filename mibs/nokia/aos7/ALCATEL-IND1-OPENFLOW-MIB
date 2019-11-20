@@ -2,7 +2,7 @@
 
       IMPORTS
           MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
-          Integer32,NOTIFICATION-TYPE
+          Integer32, Unsigned32, NOTIFICATION-TYPE
               FROM SNMPv2-SMI
 
           RowStatus
@@ -22,7 +22,7 @@
 
 
       alcatelIND1OpenflowMIB MODULE-IDENTITY
-          LAST-UPDATED  "201311080000Z"
+          LAST-UPDATED  "201403260000Z"
           ORGANIZATION  "Alcatel-Lucent"
           CONTACT-INFO
               "Please consult with Customer Service to ensure the most appropriate
@@ -64,9 +64,13 @@
                            Copyright (C) 2013 Alcatel-Lucent
                                ALL RIGHTS RESERVED WORLDWIDE"
 
-          REVISION      "201311080000Z"
+          REVISION      "201403260000Z"
           DESCRIPTION
               "The latest version of this MIB Module."
+
+          REVISION      "201410080000Z"
+          DESCRIPTION
+              "alaOpenflowLogicalSwitchLearnedMacUpdate is not limited to OS6900 devices"
           ::= { softentIND1OpenflowMIB 1 }
 
   -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -137,7 +141,15 @@
              alaOpenflowLogicalSwitchControllerCount  Integer32,
              alaOpenflowLogicalSwitchInterfaceCount   Integer32,
              alaOpenflowLogicalSwitchFlowCount        Integer32,
-             alaOpenflowLogicalSwitchRowStatus        RowStatus
+             alaOpenflowLogicalSwitchRowStatus        RowStatus,
+             alaOpenflowLogicalSwitchLearnedMacUpdate INTEGER,
+             alaOpenflowLogicalSwitchProbeTime 	      Integer32,
+             alaOpenflowLogicalSwitchFailureDetectTime Integer32,
+             alaOpenflowLogicalSwitchDPID 	      OCTET STRING,
+
+             alaOpenflowLogicalSwitchTableMissAction  INTEGER,
+             alaOpenflowLogicalSwitchTCPBufferSizeTx  Unsigned32,
+             alaOpenflowLogicalSwitchTCPBufferSizeRx  Unsigned32
          }
 
   alaOpenflowLogicalSwitch OBJECT-TYPE
@@ -166,16 +178,20 @@
   alaOpenflowLogicalSwitchMode OBJECT-TYPE
         SYNTAX INTEGER {
              normal(1),
-             api(2)
+             api(2),
+             pfcChannel(3)
         }
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
          "Openflow Logical Switch Mode. Normal is regular Openflow,
          API is for ACL-like flow operation. Only one Logical Switch
-         can be in api mode at a time. This object cannot be modified
-         after the Logical Switch has been created."
-        DEFVAL { normal }
+         can be in api mode at a time. 
+	 PFC-Channel mode is to indicate the Logical Switch 
+	 is operating in NEC mode.
+
+	 This object cannot be modified after the Logical Switch has been created."
+         DEFVAL { normal }
         ::= { alaOpenflowLogicalSwitchEntry 3 }
 
   alaOpenflowLogicalSwitchVersions OBJECT-TYPE
@@ -227,7 +243,6 @@
           "Count of the flows pushed to the Logical Switch by its controllers."
        ::= { alaOpenflowLogicalSwitchEntry 8 }
 
-
   alaOpenflowLogicalSwitchRowStatus OBJECT-TYPE
         SYNTAX RowStatus
         MAX-ACCESS read-create
@@ -236,6 +251,86 @@
          "Deleting a row from this table will also remove associated entries from other tables in this mib
          that have a logical switch as part of their index."
         ::= { alaOpenflowLogicalSwitchEntry 9 }
+
+  alaOpenflowLogicalSwitchLearnedMacUpdate OBJECT-TYPE
+        SYNTAX INTEGER {
+             enabled(1),
+             disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "This object is only applicable to Logical Switches in api(2) mode.
+          When enabled(1), learned MACs will be forwarded to controllers
+          via a Packet-In message."
+        DEFVAL { disabled }
+        ::= { alaOpenflowLogicalSwitchEntry 10 }
+
+  alaOpenflowLogicalSwitchProbeTime OBJECT-TYPE
+       SYNTAX  	  	Integer32 (1..60)
+       MAX-ACCESS	read-create
+       STATUS 	  	current
+       DESCRIPTION
+          "Probe-time for a logical switch in the pfc-channel mode in seconds,
+	  which will override the existing global idle-probe-time for sending 
+	  echo-request to the OpenFlow Controller."
+       DEFVAL { 5 }
+       ::= { alaOpenflowLogicalSwitchEntry 11 }
+
+  alaOpenflowLogicalSwitchFailureDetectTime OBJECT-TYPE
+       SYNTAX  		Integer32 (1..60)
+       MAX-ACCESS 	read-create
+       STATUS 		current
+       DESCRIPTION
+          "Failure detect time, in seconds, is configured for a logical switch 
+	  in the pfc-channel mode for detecting disconnection to the 
+	  OpenFlow Controller if there was no echo reply or message from the controller."
+       DEFVAL { 4 }
+       ::= { alaOpenflowLogicalSwitchEntry 12 }
+
+  alaOpenflowLogicalSwitchDPID OBJECT-TYPE
+       SYNTAX           OCTET STRING (SIZE (8))
+       MAX-ACCESS 	read-create
+       STATUS 		current
+       DESCRIPTION
+          "An unique 8 bytes DPID for a logical switch."
+       ::= { alaOpenflowLogicalSwitchEntry 13 }
+
+  alaOpenflowLogicalSwitchTableMissAction OBJECT-TYPE
+        SYNTAX INTEGER {
+             drop(1),
+             controller(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "The action to be taken when an Openflow Table Miss occurs. When set to drop 
+	  if any packet has a table miss, it will be dropped. If set to controller
+	  it will be forwarded to the controller."        
+        DEFVAL { drop }
+        ::= { alaOpenflowLogicalSwitchEntry 14 }
+
+  alaOpenflowLogicalSwitchTCPBufferSizeTx OBJECT-TYPE
+       SYNTAX  Unsigned32 (2..32)
+       UNITS   "Kilo Bytes"
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+          "TCP send buffer size, in Kilo Bytes, for socket connection to OpenFlow controllers 
+       in the logical switch."
+       DEFVAL { 2 }
+       ::= { alaOpenflowLogicalSwitchEntry 15 }
+
+  alaOpenflowLogicalSwitchTCPBufferSizeRx OBJECT-TYPE
+       SYNTAX  Unsigned32 (2..32)
+       UNITS   "Kilo Bytes"
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+          "TCP receive buffer size, in Kilo Bytes, for socket connection to OpenFlow controllers 
+       in the logical switch."
+       DEFVAL { 2 }
+       ::= { alaOpenflowLogicalSwitchEntry 16 }
 
   -- Openflow Controller Table
 
@@ -266,7 +361,8 @@
              alaOpenflowControllerRole            INTEGER,
              alaOpenflowControllerAdminState      INTEGER,
              alaOpenflowControllerOperState       INTEGER,
-             alaOpenflowControllerRowStatus       RowStatus
+             alaOpenflowControllerRowStatus       RowStatus,
+             alaOpenflowControllerPriority        Integer32
          }
 
   alaOpenflowControllerLogicalSwitch OBJECT-TYPE
@@ -359,6 +455,15 @@
           an entry will be created in that table. Delete does not effect alaOpenflowLogicalSwitchTable."
         ::= { alaOpenflowControllerEntry 8 }
 
+  alaOpenflowControllerPriority OBJECT-TYPE
+        SYNTAX		Integer32(0..2)
+        MAX-ACCESS 	read-create 
+        STATUS      	current
+        DESCRIPTION
+         "Openflow Controller Priority. Priority value of 0 implies highest pririoty and 2 implies lowest."
+        DEFVAL { 2 }
+        ::= { alaOpenflowControllerEntry 9 }
+
   -- Openflow Interface Table
 
   alaOpenflowInterfaceTable OBJECT-TYPE
@@ -389,7 +494,9 @@
              alaOpenflowInterfaceLogicalSwitch   SnmpAdminString,
              alaOpenflowInterface                Integer32,
              alaOpenflowInterfaceMode            INTEGER,
-             alaOpenflowInterfaceRowStatus       RowStatus
+             alaOpenflowInterfaceRowStatus       RowStatus,
+             alaOpenflowInterfaceType 		 INTEGER,
+             alaOpenflowInterfaceNativeVlan      Unsigned32
          }
 
   alaOpenflowInterfaceLogicalSwitch OBJECT-TYPE
@@ -412,13 +519,14 @@
   alaOpenflowInterfaceMode OBJECT-TYPE
         SYNTAX INTEGER {
              normal(1),
-             api(2)
+             api(2),
+             pfcChannel(3)
         }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
          "Openflow Interface Mode. Normal is regular Openflow,
-         API is for ACL like flow operation."
+         API is for ACL like flow operation and PFC-Channel is for NEC OFC."
         ::= { alaOpenflowInterfaceEntry 3 }
 
   alaOpenflowInterfaceRowStatus OBJECT-TYPE
@@ -429,6 +537,71 @@
          "On create, if the specified logical switch does not exist in alaOpenflowLogicalSwitchTable,
           an entry will be created in that table. Delete does not effect alaOpenflowLogicalSwitchTable."
         ::= { alaOpenflowInterfaceEntry 4 }
+
+  alaOpenflowInterfaceType OBJECT-TYPE
+        SYNTAX INTEGER {
+             trunk (1),
+             access (2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Openflow Interface Type."
+        ::= { alaOpenflowInterfaceEntry 5 }
+
+  alaOpenflowInterfaceNativeVlan OBJECT-TYPE
+        SYNTAX 	    Unsigned32 (2..4093)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Native VLAN for Openflow Interface."
+        ::= { alaOpenflowInterfaceEntry 6 }
+
+  -- Openflow Interface VLAN Table
+
+  alaOpenflowInterfaceVlanTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AlaOpenflowInterfaceVlanEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This table contains a list of Tag VLANs for an OpenFlow Interface (port or link-aggregation) Entry.
+           logical switch belongs to."
+    ::= { alcatelIND1OpenflowMIBObjects 5 }
+
+  alaOpenflowInterfaceVlanEntry OBJECT-TYPE
+            SYNTAX AlaOpenflowInterfaceVlanEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+              "Information about the Tag VLANs associated with an OpenFlow Interface."
+            INDEX { alaOpenflowInterfaceLogicalSwitch, alaOpenflowInterface, alaOpenflowInterfaceVlanVlanID }
+    ::= { alaOpenflowInterfaceVlanTable 1 }
+
+  AlaOpenflowInterfaceVlanEntry ::= SEQUENCE
+         {
+             alaOpenflowInterfaceVlanVlanID	Unsigned32,
+             alaOpenflowInterfaceVlanRowStatus	RowStatus
+         }
+
+  alaOpenflowInterfaceVlanVlanID OBJECT-TYPE
+        SYNTAX		    Unsigned32 (0|2..4093)
+        MAX-ACCESS  	not-accessible 
+        STATUS      	current
+        DESCRIPTION
+         "Tag VLAN for an Openflow Interface."
+        DEFVAL { 0 }
+        ::= { alaOpenflowInterfaceVlanEntry 1 }
+
+  alaOpenflowInterfaceVlanRowStatus OBJECT-TYPE
+        SYNTAX 		RowStatus
+        MAX-ACCESS 	read-create
+        STATUS     	current
+        DESCRIPTION
+         "On create, the specified logical switch interface must exist in alaOpenflowInterfaceTable,
+          otherwise an entry creation in this table would not be allowed. Deletion of an interface entry in 
+          alaOpenflowInterfaceTable would result in deletion of all entries for that interface in the
+          alaOpenflowInterfaceVlanEntry"
+        ::= { alaOpenflowInterfaceVlanEntry 2 }
 
    -- Openflow MIB Conformance and Compliances
 
@@ -455,7 +628,8 @@
                alaOpenflowModuleConfigGroup,
                alaOpenflowModuleLogicalSwitchGroup,
                alaOpenflowModuleControllerGroup,
-               alaOpenflowModuleInterfaceGroup
+               alaOpenflowModuleInterfaceGroup,
+               alaOpenflowModuleInterfaceVlanGroup
            }
        ::= { alcatelIND1OpenflowMIBCompliances 1 }
 
@@ -481,7 +655,14 @@
            alaOpenflowLogicalSwitchControllerCount,
            alaOpenflowLogicalSwitchInterfaceCount,
            alaOpenflowLogicalSwitchFlowCount,
-           alaOpenflowLogicalSwitchRowStatus
+           alaOpenflowLogicalSwitchRowStatus,
+           alaOpenflowLogicalSwitchLearnedMacUpdate,
+           alaOpenflowLogicalSwitchProbeTime,
+           alaOpenflowLogicalSwitchFailureDetectTime,
+           alaOpenflowLogicalSwitchDPID,
+           alaOpenflowLogicalSwitchTableMissAction,
+           alaOpenflowLogicalSwitchTCPBufferSizeTx,
+           alaOpenflowLogicalSwitchTCPBufferSizeRx
        }
        STATUS  current
        DESCRIPTION
@@ -494,7 +675,8 @@
            alaOpenflowControllerRole,
            alaOpenflowControllerAdminState,
            alaOpenflowControllerOperState,
-           alaOpenflowControllerRowStatus
+           alaOpenflowControllerRowStatus,
+           alaOpenflowControllerPriority
        }
        STATUS  current
        DESCRIPTION
@@ -505,11 +687,23 @@
        OBJECTS
        {
            alaOpenflowInterfaceMode,
-           alaOpenflowInterfaceRowStatus
+           alaOpenflowInterfaceRowStatus,
+           alaOpenflowInterfaceType,
+           alaOpenflowInterfaceNativeVlan
        }
        STATUS  current
        DESCRIPTION
           "Openflow Interface Configuration Modules Group."
        ::= { alcatelIND1OpenflowMIBGroups 4 }
+
+  alaOpenflowModuleInterfaceVlanGroup OBJECT-GROUP
+       OBJECTS
+       {
+           alaOpenflowInterfaceVlanRowStatus
+       }
+       STATUS  current
+       DESCRIPTION
+          "Openflow Interface with VLAN Configuration Modules Group."
+       ::= { alcatelIND1OpenflowMIBGroups 5 }
 
   END

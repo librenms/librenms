@@ -7,7 +7,9 @@ IMPORTS
         OBJECT-IDENTITY,
         IpAddress,
         Integer32, Unsigned32,
+        Counter32,
         NOTIFICATION-TYPE       FROM SNMPv2-SMI
+        DateAndTime,
         RowStatus               FROM SNMPv2-TC
         SnmpAdminString         FROM SNMP-FRAMEWORK-MIB
         MODULE-COMPLIANCE,
@@ -67,6 +69,9 @@ alcatelIND1TrapMgrMIB  MODULE-IDENTITY
         REVISION      "200708070000Z"
         DESCRIPTION
             "The latest version of this MIB Module."
+        REVISION      "201409180000Z"
+        DESCRIPTION
+            "Added additional table event action scripting. "
         ::= { softentIND1TrapMgr 1 }
 
     alcatelIND1TrapMgrMIBNotifications OBJECT-IDENTITY
@@ -491,6 +496,112 @@ alaTrapInetFilterStatus  OBJECT-TYPE
         ::= { alaTrapInetFilterEntry 1 }
 
 
+alaDgTrapStationTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AlaDgTrapStationEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A list of Dying Gasp management stations."
+        ::= { trapMgt 8 }
+
+alaDgTrapStationEntry  OBJECT-TYPE
+        SYNTAX  AlaDgTrapStationEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A management station entry for Dying Gasp Trap."
+        INDEX {
+                alaDgTrapStationIPType, 
+                alaDgTrapStationIP
+              }
+        ::= { alaDgTrapStationTable 1 }
+
+AlaDgTrapStationEntry ::= SEQUENCE {
+	alaDgTrapStationIPType 	  InetAddressType,
+        alaDgTrapStationIP           InetAddress,
+        alaDgTrapStationPort         Unsigned32,
+        alaDgTrapStationProtocol     INTEGER,
+        alaDgTrapStationUser         SnmpAdminString,
+        alaDgTrapStationReplay       Unsigned32,
+        alaDgTrapStationNextSeq      Unsigned32 
+	}
+
+alaDgTrapStationIPType  OBJECT-TYPE
+            SYNTAX  InetAddressType
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "The IP network address type."
+            ::= { alaDgTrapStationEntry 1 }
+
+alaDgTrapStationIP  OBJECT-TYPE
+        SYNTAX InetAddress (SIZE (4 | 16))
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "The IP address of Dying Gasp management entity."
+        ::= { alaDgTrapStationEntry 2 }
+
+alaDgTrapStationPort  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The UDP port used by this management entity.
+                 This defaults to the SNMP-TRAP port 162."
+        DEFVAL { 162 }
+        ::= { alaDgTrapStationEntry 3 }
+
+alaDgTrapStationProtocol  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                v1 (1),
+                v2 (2),
+                v3 (3) 
+		}
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The type of protocol used to send the traps
+                 to the station.
+                 The different values are :
+                 v1 : the traps are sent using SNMPv1.
+                 v2 : the traps are sent using SNMPv2.
+                 v3 : the traps are sent using SNMPv3."
+        DEFVAL { v3 }
+        ::= { alaDgTrapStationEntry 4 }
+
+alaDgTrapStationUser  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (1..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "User name used to send the trap to the station.
+                 This name must correspond to an existing user
+                 account name."
+        ::= { alaDgTrapStationEntry 5 }
+
+alaDgTrapStationReplay  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The replay value. The switch is required
+                 to send the last known traps for this station
+                 from the replay value."
+        DEFVAL { 0 }
+        ::= { alaDgTrapStationEntry 6 }
+
+
+alaDgTrapStationNextSeq  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The sequence number of the next trap generated
+                 for this station."
+        DEFVAL { 0 }
+        ::= { alaDgTrapStationEntry 7 }
+
 --
 -- Trap description
 --
@@ -595,7 +706,12 @@ trapAbsorTime  OBJECT-TYPE
             alaTrapInetStationUser,
             alaTrapInetStationReplay,
             alaTrapInetStationNextSeq,
-            alaTrapInetFilterStatus
+            alaTrapInetFilterStatus,
+            alaDgTrapStationPort,      
+            alaDgTrapStationProtocol,   
+            alaDgTrapStationUser,    
+            alaDgTrapStationReplay,  
+            alaDgTrapStationNextSeq
         }
         STATUS  current
         DESCRIPTION

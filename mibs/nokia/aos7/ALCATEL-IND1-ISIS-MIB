@@ -282,7 +282,9 @@ VRtrIsisEntry ::=
             vRtrIsisSpfMaxWait              Unsigned32,
             vRtrIsisActivateIPv4            TruthValue,
             vRtrIsisActivateIPv6            TruthValue,
-            vRtrIsisMTEnabled               TruthValue
+            vRtrIsisMTEnabled               TruthValue,
+            vRtrIsisBfdStatus               TruthValue,
+            vRtrIsisBfdAllVlanStatus        TruthValue
          }
 
 vRtrIsisLastEnabledTime    OBJECT-TYPE
@@ -681,6 +683,25 @@ vRtrIsisMTEnabled     OBJECT-TYPE
          enabled (or not) on this ISIS system."
     DEFVAL { false }
     ::= { vRtrIsisEntry 34}
+
+vRtrIsisBfdStatus     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether BFD is enabled (or not) on this ISIS system."
+    DEFVAL { false }
+    ::= { vRtrIsisEntry 35}
+
+vRtrIsisBfdAllVlanStatus     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether BFD is enabled (or not) for all
+         VLANs on this ISIS system."
+    DEFVAL { false }
+    ::= { vRtrIsisEntry 36}
 
 --
 --  vRtrIsisLevelTable
@@ -1669,7 +1690,8 @@ VRtrIsisIfEntry ::=
             vRtrIsisIfCircIndex             Integer32,
             vRtrIsisIfRetransmitInterval    Unsigned32,
             vRtrIsisIfTypeDefault           TruthValue,
-            vRtrIsisIfAddressFamily         INTEGER
+            vRtrIsisIfAddressFamily         INTEGER,
+            vRtrIsisIfBfdStatus             TruthValue
         }
 
 
@@ -1852,6 +1874,15 @@ vRtrIsisIfAddressFamily       OBJECT-TYPE
              on a particular ISIS circuit" 
         DEFVAL { nov4v6 }
         ::= { vRtrIsisIfEntry 13 }
+
+vRtrIsisIfBfdStatus     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether BFD is enabled (or not) on this ISIS interface."
+    DEFVAL { false }
+    ::= { vRtrIsisIfEntry 14}
 
 --
 --  vRtrIsisIfLevelTable  IS-IS Interfaces Level Table
@@ -3792,7 +3823,9 @@ vRtrIsisV4v0Group OBJECT-GROUP
                 vRtrIsisCSPFPathsFound,
                 vRtrIsisCSPFPathsNotFound,
                 vRtrIsisActivateIPv4,
-                vRtrIsisActivateIPv6
+                vRtrIsisActivateIPv6,
+                vRtrIsisBfdStatus,
+                vRtrIsisBfdAllVlanStatus
             }
     STATUS    current
     DESCRIPTION
@@ -3879,7 +3912,8 @@ vRtrIsisIfV4v0Group OBJECT-GROUP
                 vRtrIsisIfLevelHelloTimer,
                 vRtrIsisIfLevelAdminMetric,
                 vRtrIsisIfLevelOperMetric,
-                vRtrIsisIfAddressFamily
+                vRtrIsisIfAddressFamily,
+                vRtrIsisIfBfdStatus
             }
     STATUS    current
     DESCRIPTION
